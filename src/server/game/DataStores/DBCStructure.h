@@ -648,7 +648,7 @@ struct BarberShopStyleEntry
     uint32  hair_id;                                        // 7        m_data (real ID to hair/facial hair)
 };
 
-struct BattlemasterListEntry
+struct BattleMasterListEntry
 {
     uint32  id;                                             // 0
     int32   mapid[10];                                       // 1-10 mapid
@@ -1388,7 +1388,7 @@ struct ItemSetEntry
     uint32    required_skill_value;                         // 36       m_requiredSkillRank
 };
 
-struct LFGDungeonEntry
+struct LfgDungeonEntry
 {
     uint32  ID;                                             // 0
     char*   name;                                           // 1

@@ -156,7 +156,7 @@ void LoadDisables()
                 break;
             }
             case DISABLE_TYPE_BATTLEGROUND:
-                if (!sBattlemasterListStore.LookupEntry(entry))
+                if (!sBattleMasterListStore.LookupEntry(entry))
                 {
                     sLog->outError(LOG_FILTER_SQL, "Battleground entry %u from `disables` doesn't exist in dbc, skipped.", entry);
                     continue;
