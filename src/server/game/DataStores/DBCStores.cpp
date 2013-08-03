@@ -72,7 +72,7 @@ DBCStorage <ChrRacesEntry> sChrRacesStore(ChrRacesEntryfmt);
 DBCStorage <ChrPowerTypesEntry> sChrPowerTypesStore(ChrClassesXPowerTypesfmt);
 DBCStorage <ChrSpecializationEntry> sChrSpecializationStore(ChrSpecializationfmt);
 DBCStorage <ChrSpecializationSpellsEntry> sChrSpecializationSpellsStore(ChrSpecializationSpellsfmt);
-std::map<uint32, std::list<uint32>> SpecializationSpellsBySpec;
+std::map<uint32, std::list<uint32> > SpecializationSpellsBySpec;
 
 DBCStorage <CinematicSequencesEntry> sCinematicSequencesStore(CinematicSequencesEntryfmt);
 DBCStorage <CreatureDisplayInfoEntry> sCreatureDisplayInfoStore(CreatureDisplayInfofmt);
@@ -1054,7 +1054,7 @@ uint32 GetPowerIndexByClass(uint32 powerType, uint32 classId)
 
 std::list<uint32> const* GetSpecializationSpellsBySpec(uint32 specId)
 {
-    std::map<uint32, std::list<uint32>>::const_iterator itr = SpecializationSpellsBySpec.find(specId);
+    std::map<uint32, std::list<uint32> >::const_iterator itr = SpecializationSpellsBySpec.find(specId);
     if (itr == SpecializationSpellsBySpec.end())
         return NULL;
 
