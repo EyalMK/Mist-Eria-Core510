@@ -1,0 +1,27 @@
+#ifndef DEF_TEMPLE_OF_THE_JADE_SERPENT_H_
+#define DEF_TEMPLE_OF_THE_JADE_SERPENT_H_
+
+#define MAX_ENCOUNTERS 4
+
+enum Creatures
+{
+	BOSS_LIU_FLAMEHEART   = 56732,
+    BOSS_SHA_OF_DOUBT  = 56439,
+    BOSS_LOREWALKER_STONESTEP  = 56843,
+	BOSS_WISE_MARI = 56448,   
+};
+
+enum Objects
+{
+    
+};
+
+enum Data
+{
+	DATA_WISE_MARI = 1,
+	DATA_LOREWALKER_STONESTEP  = 2,
+    DATA_LIU_FLAMEHEART   = 3,
+    DATA_SHA_OF_DOUBT  = 4,	
+};
+
+#endif

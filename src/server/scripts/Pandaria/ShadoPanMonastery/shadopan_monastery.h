@@ -1,0 +1,27 @@
+#ifndef DEF_SHADOPAN_MONASTERY_H_
+#define DEF_SHADOPAN_MONASTERY_H_
+
+#define MAX_ENCOUNTERS 4
+
+enum Creatures
+{
+	BOSS_GU_CLOUDSTRIKE   = 56747,
+    BOSS_MASTER_SNOWDRIFT  = 56541,
+    BOSS_SHA_OF_VIOLENCE  = 56719,
+	BOSS_TARAN_ZHU = 56884,   
+};
+
+enum Objects
+{
+    
+};
+
+enum Data
+{
+    DATA_GU_CLOUDSTRIKE   = 1,
+    DATA_MASTER_SNOWDRIFT  = 2,
+    DATA_SHA_OF_VIOLENCE  = 3,
+	DATA_TARAN_ZHU = 4,
+};
+
+#endif
