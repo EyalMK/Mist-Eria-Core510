@@ -83,11 +83,11 @@ void WorldSession::HandleArenaTeamCreateOpcode(WorldPacket & recvData)
     std::string name;
 
     recvData >> slot;
-    recvData >> iconcolor;
-    recvData >> bordercolor;
     recvData >> icon;
-    recvData >> background;
+    recvData >> bordercolor;
     recvData >> border;
+    recvData >> background;
+    recvData >> iconcolor;
     name = recvData.ReadString(recvData.ReadBits(8));
 
     uint8 type = ArenaTeam::GetTypeBySlot(slot);
