@@ -66,6 +66,7 @@ include(cmake/genrev.cmake)
 
 # print out the results before continuing
 include(cmake/showoptions.cmake)
+include("${CMAKE_SOURCE_DIR}/cmake/macros.cmake")
 
 # add dependencies
 add_subdirectory(dep)
