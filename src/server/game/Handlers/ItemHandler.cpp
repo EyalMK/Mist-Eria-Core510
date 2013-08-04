@@ -714,14 +714,15 @@ void WorldSession::HandleListInventoryOpcode(WorldPacket& recvData)
     SendListInventory(guid);
 }
 
-void WorldSession::SendListInventory(uint64 vendorGuid)
+void WorldSession::SendListInventory(uint64 p_VendorGuid)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_LIST_INVENTORY");
 
-    Creature* vendor = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_VENDOR);
-    if (!vendor)
+    Creature* l_Vendor = GetPlayer()->GetNPCIfCanInteractWith(p_VendorGuid, UNIT_NPC_FLAG_VENDOR);
+
+    if (!l_Vendor)
     {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendListInventory - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(vendorGuid)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendListInventory - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(p_VendorGuid)));
         _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, NULL, 0);
         return;
     }
@@ -731,150 +732,174 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
     // Stop the npc if moving
-    if (vendor->HasUnitState(UNIT_STATE_MOVING))
-        vendor->StopMoving();
+    if (l_Vendor->HasUnitState(UNIT_STATE_MOVING))
+        l_Vendor->StopMoving();
 
-    VendorItemData const* vendorItems = vendor->GetVendorItems();
-    uint8 rawItemCount = vendorItems ? vendorItems->GetItemCount() : 0;
+    VendorItemData const*       l_VendorItems   = l_Vendor->GetVendorItems();
+    uint8                                       l_RawItemCount  = l_VendorItems ? l_VendorItems->GetItemCount() : 0;
+    ByteBuffer                          l_ItemListData(32 * l_RawItemCount);
+    std::vector<bool>           l_ItemFlags;
 
-    //if (rawItemCount > 300),
-    //    rawItemCount = 300; // client cap but uint8 max value is 255
+        /// 3 flags per item (!unk, !HaveExtendedCost, UnkFlagEnabled)
+    l_ItemFlags.reserve(3 * l_RawItemCount);
 
-    ByteBuffer itemsData(32 * rawItemCount);
-    std::vector<bool> enablers;
-    enablers.reserve(2 * rawItemCount);
+    const float l_DiscountMod           = _player->GetReputationPriceDiscount(l_Vendor);
+    uint8               l_PushedItemCount       = 0;
 
-    const float discountMod = _player->GetReputationPriceDiscount(vendor);
-    uint8 count = 0;
-    for (uint8 slot = 0; slot < rawItemCount; ++slot)
+    for (uint8 l_Slot = 0 ; l_Slot < l_RawItemCount ; ++l_Slot)
     {
-        VendorItem const* vendorItem = vendorItems->GetItem(slot);
-        if (!vendorItem) continue;
+        VendorItem const* l_VendorItem = l_VendorItems->GetItem(l_Slot);
 
-        if (vendorItem->Type == ITEM_VENDOR_TYPE_ITEM)
+        if (!l_VendorItem) 
+                        continue;
+
+        if (l_VendorItem->Type == ITEM_VENDOR_TYPE_ITEM)
         {
-            ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(vendorItem->item);
-            if (!itemTemplate)
+            ItemTemplate const* l_ItemTemplate = sObjectMgr->GetItemTemplate(l_VendorItem->item);
+
+            if (!l_ItemTemplate)
                 continue;
 
-            uint32 leftInStock = !vendorItem->maxcount ? 0xFFFFFFFF : vendor->GetVendorItemCurrentCount(vendorItem);
+            uint32 l_AvailableInStock = !l_VendorItem->maxcount ? 0xFFFFFFFF : l_Vendor->GetVendorItemCurrentCount(l_VendorItem);
+
             if (!_player->isGameMaster()) // ignore conditions if GM on
             {
                 // Respect allowed class
-                if (!(itemTemplate->AllowableClass & _player->getClassMask()) && itemTemplate->Bonding == BIND_WHEN_PICKED_UP)
+                if (!(l_ItemTemplate->AllowableClass & _player->getClassMask()) && l_ItemTemplate->Bonding == BIND_WHEN_PICKED_UP)
                     continue;
 
                 // Only display items in vendor lists for the team the player is on
-                if ((itemTemplate->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && _player->GetTeam() == ALLIANCE) ||
-                    (itemTemplate->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && _player->GetTeam() == HORDE))
+                if ((l_ItemTemplate->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && _player->GetTeam() == ALLIANCE) ||
+                    (l_ItemTemplate->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && _player->GetTeam() == HORDE))
                     continue;
 
                 // Items sold out are not displayed in list
-                if (leftInStock == 0)
+                if (l_AvailableInStock == 0)
                     continue;
             }
 
-            ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(vendor->GetEntry(), vendorItem->item);
-            if (!sConditionMgr->IsObjectMeetToConditions(_player, vendor, conditions))
+            ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(l_Vendor->GetEntry(), l_VendorItem->item);
+            if (!sConditionMgr->IsObjectMeetToConditions(_player, l_Vendor, conditions))
             {
-                sLog->outDebug(LOG_FILTER_CONDITIONSYS, "SendListInventory: conditions not met for creature entry %u item %u", vendor->GetEntry(), vendorItem->item);
+                sLog->outDebug(LOG_FILTER_CONDITIONSYS, "SendListInventory: conditions not met for creature entry %u item %u", l_Vendor->GetEntry(), l_VendorItem->item);
                 continue;
             }
 
-            int32 price = vendorItem->IsGoldRequired(itemTemplate) ? uint32(floor(itemTemplate->BuyPrice * discountMod)) : 0;
+            int32 l_FinalPrice  = l_VendorItem->IsGoldRequired(l_ItemTemplate) ? uint32(floor(l_ItemTemplate->BuyPrice * l_DiscountMod)) : 0;
+            int32 l_PriceMod        = _player->GetTotalAuraModifier(SPELL_AURA_MOD_VENDOR_ITEMS_PRICES);
+            
+            if (l_PriceMod)
+				l_FinalPrice -= CalculatePct(l_FinalPrice, l_PriceMod);
 
-            if (int32 priceMod = _player->GetTotalAuraModifier(SPELL_AURA_MOD_VENDOR_ITEMS_PRICES))
-                price -= CalculatePct(price, priceMod);
+            bool l_UnkFlag = false;
 
-            ++count;
-            itemsData << uint32(slot + 1);        // client expects counting to start at 1
-            itemsData << uint32(itemTemplate->MaxDurability);
+			++l_PushedItemCount;
 
-            if (vendorItem->ExtendedCost != 0)
-            {
-                enablers.push_back(0);
-                itemsData << uint32(vendorItem->ExtendedCost);
-            }
-            else
-                enablers.push_back(1);
-            enablers.push_back(1);                 // unk bit
+			l_ItemListData << uint32(3);
+			l_ItemListData << uint32(l_VendorItem->item);                                      
+            l_ItemListData << uint32(l_ItemTemplate->BuyCount);                            
+            l_ItemListData << uint32(4);    
 
-            itemsData << uint32(vendorItem->item);
-            itemsData << uint32(vendorItem->Type);     // 1 is items, 2 is currency
-            itemsData << uint32(price);
-            itemsData << uint32(itemTemplate->DisplayInfoID);
-            // if (!unk "enabler") data << uint32(something);
-            itemsData << int32(leftInStock);
-            itemsData << uint32(itemTemplate->BuyCount);
+			if (l_VendorItem->ExtendedCost != 0)
+                    l_ItemListData << uint32(l_VendorItem->ExtendedCost);
+
+			l_ItemListData << int32(l_AvailableInStock);                                  
+            l_ItemListData << uint32(l_ItemTemplate->DisplayInfoID);         
+            l_ItemListData << uint32(l_FinalPrice);                                    
+			l_ItemListData << uint32(l_VendorItem->Type);                            
+
+			if (l_UnkFlag)
+                    l_ItemListData << uint32(0);
+
+            // itemTemplate->MaxDurability
+
+            /// !UnkFlag
+            l_ItemFlags.push_back(!l_UnkFlag);      // + 40
+            /// !HaveExtendedCost
+            l_ItemFlags.push_back(!l_VendorItem->ExtendedCost);
+
+            /// UnkFlagEnabled
+            l_ItemFlags.push_back(1);                    // unk bit + 44
+
+
+            l_ItemListData << uint32(0);
         }
-        else if (vendorItem->Type == ITEM_VENDOR_TYPE_CURRENCY)
+        else if (l_VendorItem->Type == ITEM_VENDOR_TYPE_CURRENCY)
         {
-            CurrencyTypesEntry const* currencyTemplate = sCurrencyTypesStore.LookupEntry(vendorItem->item);
-            if (!currencyTemplate)
+            CurrencyTypesEntry const* l_CurrencyTemplate = sCurrencyTypesStore.LookupEntry(l_VendorItem->item);
+
+            if (!l_CurrencyTemplate)
                 continue;
 
-            if (vendorItem->ExtendedCost == 0)
-                continue; // there's no price defined for currencies, only extendedcost is used
+                        /// There's no price defined for currencies, only extendedcost is used
+            if (l_VendorItem->ExtendedCost == 0)
+                continue; 
 
-            ++count;
-            itemsData << uint32(slot + 1);             // client expects counting to start at 1
-            itemsData << uint32(0);                  // max durability
+            uint32 l_Precision = (l_CurrencyTemplate->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
+            bool l_UnkFlag = false;
 
-            if (vendorItem->ExtendedCost != 0)
-            {
-                enablers.push_back(0);
-                itemsData << uint32(vendorItem->ExtendedCost);
-            }
-            else
-                enablers.push_back(1);
+            ++l_PushedItemCount;
 
-            enablers.push_back(1);                    // unk bit
+            l_ItemListData << uint32(l_Slot + 1);             // client expects counting to start at 1
+            l_ItemListData << uint32(0);                  // max durability
+            l_ItemListData << uint32(l_VendorItem->item);
+            l_ItemListData << uint32(0);    // 1 is items, 2 is currency
 
-            itemsData << uint32(vendorItem->item);
-            itemsData << uint32(vendorItem->Type);    // 1 is items, 2 is currency
-            itemsData << uint32(0);                   // price, only seen currency types that have Extended cost
-            itemsData << uint32(0);                   // displayId
-            // if (!unk "enabler") data << uint32(something);
-            itemsData << int32(-1);
-            itemsData << uint32(vendorItem->maxcount);
+			if (l_VendorItem->ExtendedCost != 0)
+                    l_ItemListData << uint32(l_VendorItem->ExtendedCost);
+
+            l_ItemListData << uint32(0);                   // price, only seen currency types that have Extended cost
+            l_ItemListData << uint32(0);                   // displayId
+            l_ItemListData << uint32(0);                                            /// unk
+			l_ItemListData << uint32(l_VendorItem->Type);                         
+
+            /// !UnkFlag
+            l_ItemFlags.push_back(!l_UnkFlag);      // + 40
+            /// !HaveExtendedCost
+            l_ItemFlags.push_back(!l_VendorItem->ExtendedCost);
+
+            /// UnkFlagEnabled
+            l_ItemFlags.push_back(1);                    // unk bit + 44
+
+            if (l_UnkFlag)
+                    l_ItemListData << uint32(0);
+        
+            l_ItemListData << uint32(l_VendorItem->maxcount * l_Precision);
         }
-        // else error
     }
 
-    ObjectGuid guid = vendorGuid;
 
-    WorldPacket data(SMSG_LIST_INVENTORY, 12 + itemsData.size());
+    ObjectGuid guid = p_VendorGuid;
 
-    data.WriteBit(guid[1]);
-    data.WriteBit(guid[0]);
+    WorldPacket data(SMSG_LIST_INVENTORY, 12 + l_ItemListData.size());
 
-    data.WriteBits(count, 21); // item count
-
-    data.WriteBit(guid[3]);
-    data.WriteBit(guid[6]);
-    data.WriteBit(guid[5]);
     data.WriteBit(guid[2]);
     data.WriteBit(guid[7]);
-
-    for (std::vector<bool>::const_iterator itr = enablers.begin(); itr != enablers.end(); ++itr)
-        data.WriteBit(*itr);
-
+    data.WriteBit(guid[3]);
+    data.WriteBit(guid[5]);
+    data.WriteBit(guid[0]);
+    data.WriteBit(guid[6]);
     data.WriteBit(guid[4]);
+    data.WriteBit(guid[1]);
+
+    data.WriteBits(l_PushedItemCount, 20); // item count
+
+	for (std::vector<bool>::const_iterator l_Itr = l_ItemFlags.begin(); l_Itr != l_ItemFlags.end(); ++l_Itr)
+        data.WriteBit(*l_Itr);
 
     data.FlushBits();
-    data.append(itemsData);
+    data.append(l_ItemListData);
 
-    data.WriteByteSeq(guid[5]);
     data.WriteByteSeq(guid[4]);
-    data.WriteByteSeq(guid[1]);
     data.WriteByteSeq(guid[0]);
-    data.WriteByteSeq(guid[6]);
-
-    data << uint8(count == 0); // unk byte, item count 0: 1, item count != 0: 0 or some "random" value below 300
-
     data.WriteByteSeq(guid[2]);
-    data.WriteByteSeq(guid[3]);
     data.WriteByteSeq(guid[7]);
+    data.WriteByteSeq(guid[6]);
+    data.WriteByteSeq(guid[5]);
+    data.WriteByteSeq(guid[1]);
+    data.WriteByteSeq(guid[3]);
+
+	data << uint8(l_PushedItemCount == 0); // unk byte, item count 0: 1, item count != 0: 0 or some "random" value below 300
 
     SendPacket(&data);
 }
