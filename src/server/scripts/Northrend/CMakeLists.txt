@@ -8,8 +8,8 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-set(scripts_STAT_SRCS
-  ${scripts_STAT_SRCS}
+set(sources
+  ${sources}
   Northrend/zone_wintergrasp.cpp
   Northrend/isle_of_conquest.cpp
   Northrend/zone_storm_peaks.cpp

@@ -22,8 +22,8 @@ include(Commands/CMakeLists.txt)
 
 include(Examples/CMakeLists.txt)
 
-set(scripts_STAT_SRCS
-  ${scripts_STAT_SRCS}
+set(sources
+  ${sources}
   ../game/AI/ScriptedAI/ScriptedEscortAI.cpp
   ../game/AI/ScriptedAI/ScriptedCreature.cpp
   ../game/AI/ScriptedAI/ScriptedFollowerAI.cpp
@@ -39,6 +39,8 @@ if(SCRIPTS)
   include(Northrend/CMakeLists.txt)
   include(Events/CMakeLists.txt)
 endif()
+
+GenerateProject("${CMAKE_CURRENT_SOURCE_DIR}" "${sources}")
 
 message(STATUS "SCRIPT PREPARATION COMPLETE")
 message("")
@@ -145,6 +147,7 @@ include_directories(
 add_library(scripts STATIC
   ${scripts_STAT_SRCS}
   ${scripts_STAT_PCH_SRC}
+  ${sources}
 )
 
 add_dependencies(scripts revision.h)

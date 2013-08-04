@@ -48,6 +48,8 @@ set(shared_STAT_SRCS
   Debugging/Errors.h
 )
 
+GenerateProject("${CMAKE_CURRENT_SOURCE_DIR}" "${shared_STAT_SRCS}")
+
 include_directories(
   ${CMAKE_BINARY_DIR}
   ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour

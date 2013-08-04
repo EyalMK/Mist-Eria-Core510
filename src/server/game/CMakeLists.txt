@@ -8,46 +8,8 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-file(GLOB_RECURSE sources_Accounts Accounts/*.cpp Accounts/*.h)
-file(GLOB_RECURSE sources_Achievements Achievements/*.cpp Achievements/*.h)
-file(GLOB_RECURSE sources_Addons Addons/*.cpp Addons/*.h)
-file(GLOB_RECURSE sources_AI AI/*.cpp AI/*.h)
-file(GLOB_RECURSE sources_AuctionHouse AuctionHouse/*.cpp AuctionHouse/*.h)
-file(GLOB_RECURSE sources_Battlefield Battlefield/*.cpp Battlefield/*.h)
-file(GLOB_RECURSE sources_Battlegrounds Battlegrounds/*.cpp Battlegrounds/*.h)
-file(GLOB_RECURSE sources_Calendar Calendar/*.cpp Calendar/*.h)
-file(GLOB_RECURSE sources_Chat Chat/*.cpp Chat/*.h)
-file(GLOB_RECURSE sources_Combat Combat/*.cpp Combat/*.h)
-file(GLOB_RECURSE sources_Conditions Conditions/*.cpp Conditions/*.h)
-file(GLOB_RECURSE sources_DataStores DataStores/*.cpp DataStores/*.h)
-file(GLOB_RECURSE sources_DungeonFinding DungeonFinding/*.cpp DungeonFinding/*.h)
-file(GLOB_RECURSE sources_Entities Entities/*.cpp Entities/*.h)
-file(GLOB_RECURSE sources_Events Events/*.cpp Events/*.h)
-file(GLOB_RECURSE sources_Globals Globals/*.cpp Globals/*.h)
-file(GLOB_RECURSE sources_Grids Grids/*.cpp Grids/*.h)
-file(GLOB_RECURSE sources_Groups Groups/*.cpp Groups/*.h)
-file(GLOB_RECURSE sources_Guilds Guilds/*.cpp Guilds/*.h)
-file(GLOB_RECURSE sources_Handlers Handlers/*.cpp Handlers/*.h)
-file(GLOB_RECURSE sources_Instances Instances/*.cpp Instances/*.h)
-file(GLOB_RECURSE sources_Loot Loot/*.cpp Loot/*.h)
-file(GLOB_RECURSE sources_Mails Mails/*.cpp Mails/*.h)
-file(GLOB_RECURSE sources_Maps Maps/*.cpp Maps/*.h)
-file(GLOB_RECURSE sources_Miscellaneous Miscellaneous/*.cpp Miscellaneous/*.h)
-file(GLOB_RECURSE sources_Movement Movement/*.cpp Movement/*.h)
-file(GLOB_RECURSE sources_OutdoorPvP OutdoorPvP/*.cpp OutdoorPvP/*.h)
-file(GLOB_RECURSE sources_Pools Pools/*.cpp Pools/*.h)
-file(GLOB_RECURSE sources_Quests Quests/*.cpp Quests/*.h)
-file(GLOB_RECURSE sources_Reputation Reputation/*.cpp Reputation/*.h)
-file(GLOB_RECURSE sources_Scripting Scripting/*.cpp Scripting/*.h)
-file(GLOB_RECURSE sources_Server Server/*.cpp Server/*.h)
-file(GLOB_RECURSE sources_Skills Skills/*.cpp Skills/*.h)
-file(GLOB_RECURSE sources_Spells Spells/*.cpp Spells/*.h)
-file(GLOB_RECURSE sources_Texts Texts/*.cpp Texts/*.h)
-file(GLOB_RECURSE sources_Tools Tools/*.cpp Tools/*.h)
-file(GLOB_RECURSE sources_Tickets Tickets/*.cpp Tickets/*.h)
-file(GLOB_RECURSE sources_Warden Warden/*.cpp Warden/*.h)
-file(GLOB_RECURSE sources_Weather Weather/*.cpp Weather/*.h)
-file(GLOB_RECURSE sources_World World/*.cpp World/*.h)
+
+file(GLOB_RECURSE sources *.cpp *.h *.inl)
 
 # Create game-libary
 
@@ -56,49 +18,7 @@ if (USE_COREPCH)
   set(game_STAT_PCH_SRC PrecompiledHeaders/gamePCH.cpp)
 endif ()
 
-set(game_STAT_SRCS
-  ${game_STAT_SRCS}
-  ${sources_Accounts}
-  ${sources_Achievements}
-  ${sources_Addons}
-  ${sources_AI}
-  ${sources_AuctionHouse}
-  ${sources_Battlefield}
-  ${sources_Battlegrounds}
-  ${sources_Calendar}
-  ${sources_Chat}
-  ${sources_Combat}
-  ${sources_Conditions}
-  ${sources_DataStores}
-  ${sources_DungeonFinding}
-  ${sources_Entities}
-  ${sources_Events}
-  ${sources_Globals}
-  ${sources_Grids}
-  ${sources_Groups}
-  ${sources_Guilds}
-  ${sources_Handlers}
-  ${sources_Instances}
-  ${sources_Loot}
-  ${sources_Mails}
-  ${sources_Maps}
-  ${sources_Miscellaneous}
-  ${sources_Movement}
-  ${sources_OutdoorPvP}
-  ${sources_Pools}
-  ${sources_Quests}
-  ${sources_Reputation}
-  ${sources_Scripting}
-  ${sources_Server}
-  ${sources_Skills}
-  ${sources_Spells}
-  ${sources_Texts}
-  ${sources_Tools}
-  ${sources_Tickets}
-  ${sources_Warden}
-  ${sources_Weather}
-  ${sources_World}
-)
+GenerateProject("${CMAKE_CURRENT_SOURCE_DIR}" "${sources}")
 
 include_directories(
   ${CMAKE_BINARY_DIR}
@@ -203,6 +123,7 @@ include_directories(
 add_library(game STATIC
   ${game_STAT_SRCS}
   ${game_STAT_PCH_SRC}
+  ${sources}
 )
 
 add_dependencies(game revision.h)

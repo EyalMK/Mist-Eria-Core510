@@ -8,8 +8,8 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-set(scripts_STAT_SRCS
-  ${scripts_STAT_SRCS}
+set(sources
+  ${sources}
   EasternKingdoms/zone_ghostlands.cpp
   EasternKingdoms/zone_eversong_woods.cpp
   EasternKingdoms/AlteracValley/boss_galvangar.cpp
