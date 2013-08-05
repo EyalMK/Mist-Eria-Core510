@@ -277,10 +277,14 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
     MovementInfo movementInfo;
     GetPlayer()->ReadMovementInfo(recvPacket, &movementInfo);
 
+    sLog->outError(LOG_FILTER_NETWORKIO, "opcode : %u", opcode);
+
+
     // prevent tampered movement data
     if (movementInfo.guid != mover->GetGUID())
     {
         sLog->outError(LOG_FILTER_NETWORKIO, "HandleMovementOpcodes: guid error");
+        sLog->outError(LOG_FILTER_NETWORKIO, "moveguid : %lu, mover : %lu, opcode : %u", movementInfo.guid, mover->GetGUID(), opcode);
         return;
     }
     if (!movementInfo.pos.IsPositionValid())
