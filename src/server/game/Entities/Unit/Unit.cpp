@@ -16813,10 +16813,10 @@ void Unit::WriteMovementInfo(WorldPacket& data)
                 data << mover->m_movementInfo.splineElevation;
             break;
         case MSEHasCounter:
-            data.WriteBits(0, 24);
+            data.WriteBits(counter, 24);
             break;
         case MSECounter:
-            for (uint32 b = 0; b < counter; ++i)
+            for (uint32 b = 0; b < counter; ++b)
                 data << uint32(0);
             break;
         case MSEIsAlive:
