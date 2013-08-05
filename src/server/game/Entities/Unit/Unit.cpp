@@ -16817,7 +16817,7 @@ void Unit::WriteMovementInfo(WorldPacket& data)
             break;
         case MSECounter:
             for (uint32 b = 0; b < counter; ++i)
-                data.WriteBit(4);
+                data << uint32(0);
             break;
         case MSEIsAlive:
             data.WriteBit(isAlive);

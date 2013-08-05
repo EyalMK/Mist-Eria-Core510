@@ -1946,7 +1946,6 @@ MovementStatusElements MoveChngTransport[]=
     MSEEnd,
 };
 
-// 4.3.4
 MovementStatusElements MoveSplineDone[] =
 {
     MSEPositionY,
@@ -2186,7 +2185,6 @@ MovementStatusElements DismissControlledVehicle[] =
     MSEEnd,
 };
 
-// 4.3.4
 MovementStatusElements MoveUpdateTeleport[] =
 {
     MSEPositionZ,
