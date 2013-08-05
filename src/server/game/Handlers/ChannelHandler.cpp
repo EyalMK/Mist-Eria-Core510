@@ -20,38 +20,53 @@
 #include "ChannelMgr.h"
 #include "Player.h"
 #include "WorldSession.h"
+#include <iostream>
 
 void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 {
     uint32 channelId;
-    uint32 channelLength, passLength;
+    uint8 channelLength, passLength;
     std::string channelName, password;
 
+	uint8 unknown1,unknown2;
+
     recvPacket >> channelId;
-    uint8 unknown1 = recvPacket.ReadBit();   // unknowns
-    uint8 unknown2 = recvPacket.ReadBit();
-    channelLength = recvPacket.ReadBits(8);
-    passLength = recvPacket.ReadBits(8);
-    channelName = recvPacket.ReadString(channelLength);
-    password = recvPacket.ReadString(passLength);
+	passLength = recvPacket.ReadBits(8);
+	unknown1 = recvPacket.ReadBit();
+	channelLength = recvPacket.ReadBits(8);
+	unknown2 = recvPacket.ReadBit();
+	password = recvPacket.ReadString(passLength);
+	channelName = recvPacket.ReadString(channelLength);
+
+	/*
+	Testing purpose :
+
+	std::cout << "channelId:" << channelId << std::endl;
+	std::cout << "channelLength:" << channelLength << std::endl;
+	std::cout << "unknown1:" << unknown1 << std::endl;
+	std::cout << "passLength:" << passLength << std::endl;
+	std::cout << "unknown2:" << unknown2 << std::endl;
+	std::cout << "channelName:" << channelName << std::endl;
+	std::cout << "password:" << password << std::endl;
+	*/
 
     sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_JOIN_CHANNEL %s Channel: %u, unk1: %u, unk2: %u, channel: %s, password: %s",
         GetPlayerInfo().c_str(), channelId, unknown1, unknown2, channelName.c_str(), password.c_str());
-
+ 
     if (channelId)
     {
         ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(channelId);
         if (!channel)
             return;
-
+ 
         AreaTableEntry const* zone = GetAreaEntryByAreaID(GetPlayer()->GetZoneId());
         if (!zone || !GetPlayer()->CanJoinConstantChannelInZone(channel, zone))
             return;
     }
-
+ 
     if (channelName.empty())
         return;
-
+ 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
     {
         cMgr->setTeam(GetPlayer()->GetTeam());
