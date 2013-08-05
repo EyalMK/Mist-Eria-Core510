@@ -97,6 +97,7 @@ enum MovementStatusElements
     MSECounter, //reads uint32 based on counter num.
     MSEIsAlive, //unk
     MSEAlive,   //unk
+    MSEFlushBits, //flushes the bit to start at a correct byte offset
     MSEEnd,     // marks end of parsing
     MSE_COUNT
 };
@@ -138,6 +139,7 @@ MovementStatusElements PlayerMoveSequence[] =
     MSEHasGuidByte3,
     MSEHasPitch,
     MSEHasFallDirection,
+    MSEFlushBits,
     MSEFallTime,
     MSEFallHorizontalSpeed,
     MSEFallCosAngle,
