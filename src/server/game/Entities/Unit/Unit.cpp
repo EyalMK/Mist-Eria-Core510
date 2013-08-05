@@ -16820,7 +16820,7 @@ void Unit::WriteMovementInfo(WorldPacket& data)
                 data << uint32(0);
             break;
         case MSEIsAlive:
-            data.WriteBit(isAlive);
+            data.WriteBit(!isAlive);
             break;
         case MSEAlive:
             if (isAlive)
