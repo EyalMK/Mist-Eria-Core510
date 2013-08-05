@@ -16832,9 +16832,6 @@ void Unit::WriteMovementInfo(WorldPacket& data)
         case MSEOneBit:
             data.WriteBit(1);
             break;
-        case MSEFlushBits:
-            data.FlushBits();
-            break;
         default:
             ASSERT(false && "Incorrect sequence element detected at ReadMovementInfo");
             break;
