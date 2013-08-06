@@ -2197,6 +2197,7 @@ MovementStatusElements DismissControlledVehicle[] =
     MSEEnd,
 };
 
+//5.1.0 16357 OK
 MovementStatusElements MoveUpdateTeleport[] =
 {
     MSEHasSpline,
@@ -2332,7 +2333,7 @@ MovementStatusElements* GetMovementStatusElementsSequence(Opcodes opcode)
         return MoveNotActiveMover;
     case CMSG_DISMISS_CONTROLLED_VEHICLE:
         return DismissControlledVehicle;
-    case MSG_MOVE_UPDATE_TELEPORT:
+    case SMSG_MOVE_UPDATE_TELEPORT:
         return MoveUpdateTeleport;
     default:
         break;
