@@ -511,6 +511,8 @@ struct AchievementCriteriaEntry
         } raw;
     };
 
+    //uint32 unkalways0;
+
     struct
     {
         uint32  additionalRequirement_type;

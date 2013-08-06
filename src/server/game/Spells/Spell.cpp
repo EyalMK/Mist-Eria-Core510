@@ -4014,7 +4014,7 @@ void Spell::SendSpellGo()
     {
         data << uint32(1);
         data << uint32(m_spellInfo->PowerType);
-        data << uint32(m_powerCost);
+        data << uint32(300); //NOBODIE HARDCODE
     }
 
     if (castFlags & CAST_FLAG_RUNE_LIST)                   // rune cooldowns list
