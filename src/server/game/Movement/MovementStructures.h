@@ -413,10 +413,7 @@ MovementStatusElements MovementJumpSequence[] =
     MSEEnd,
 };
 
-//4.3.4
-
-// TO DO : structure for 5.1.0.16357 , gather from IDA
-
+//5.1.0 16357
 MovementStatusElements MovementSetFacingSequence[] =
 {
 	MSEPositionZ,
@@ -456,7 +453,6 @@ MovementStatusElements MovementSetFacingSequence[] =
 	MSEHasFallDirection,
 	MSEMovementFlags,
     MSEMovementFlags2,
-    
     MSEGuidByte6,
 	MSEGuidByte1,
 	MSECounter,
