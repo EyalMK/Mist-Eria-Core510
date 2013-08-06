@@ -459,7 +459,7 @@ enum Opcodes
     CMSG_REALM_SPLIT                                  = 0x261, //16357
     CMSG_RECLAIM_CORPSE                               = 0x0324,//16357
     CMSG_REDIRECTION_AUTH_PROOF                       = 0x0EC7,//16357
-    CMSG_REFORGE_ITEM                                 = 0x1409,
+    CMSG_REFORGE_ITEM                                 = 0x68A,//16357
     CMSG_REORDER_CHARACTERS                           = 0x1410,
     CMSG_REPAIR_ITEM                                  = 0x0CA4,
     CMSG_REPLACE_ACCOUNT_DATA                         = 0x1412,
@@ -651,6 +651,7 @@ enum Opcodes
     MSG_MOVE_UPDATE_FLIGHT_SPEED                      = 0x1588,
     MSG_MOVE_UPDATE_MOUSE                             = 0x1589,
     MSG_MOVE_UPDATE_RUN_SPEED                         = 0x1590,
+    MSG_MOVE_UPDATE_TELEPORT                          = 0x0E1D,//16357
     MSG_MOVE_WATER_WALK                               = 0x1592,
     MSG_MOVE_WORLDPORT_ACK                            = 0x1593,
     MSG_NOTIFY_PARTY_SQUELCH                          = 0x1594,
@@ -1125,7 +1126,7 @@ enum Opcodes
     SMSG_MOVE_UPDATE_RUN_SPEED                        = 0x049D,//16357 NEW OF MOP
     SMSG_MOVE_UPDATE_SWIM_BACK_SPEED                  = 0x7BC, //16357
     SMSG_MOVE_UPDATE_SWIM_SPEED                       = 0x6B8, //16357
-    SMSG_MOVE_UPDATE_TELEPORT                         = 0x0E1D,//16357
+    SMSG_MOVE_UPDATE_TELEPORT                         = 0x1970,
     SMSG_MOVE_UPDATE_TURN_RATE                        = 0xBB5, //16357
     SMSG_MOVE_UPDATE_WALK_SPEED                       = 0x3B8, //16357
     SMSG_MOVE_WATER_WALK                              = 0x21C, //16357
