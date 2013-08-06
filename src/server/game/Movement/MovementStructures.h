@@ -962,7 +962,7 @@ MovementStatusElements MovementStartTurnLeftSequence[] =
     MSEEnd,
 };
 
-//5.1.0 16357
+//5.1.0 16357 OK
 MovementStatusElements MovementStartTurnRightSequence[] =
 {
     MSEPositionY,
@@ -976,8 +976,8 @@ MovementStatusElements MovementStartTurnRightSequence[] =
     MSEHasGuidByte0,
     MSEHasSpline,
     MSEHasFallData,
-    MSEHasSplineElevation,
     MSEZeroBit,
+    MSEHasSplineElevation,
     MSEHasCounter,
     MSEHasGuidByte4,
     MSEHasTransportData,
