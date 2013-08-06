@@ -651,7 +651,6 @@ enum Opcodes
     MSG_MOVE_UPDATE_FLIGHT_SPEED                      = 0x1588,
     MSG_MOVE_UPDATE_MOUSE                             = 0x1589,
     MSG_MOVE_UPDATE_RUN_SPEED                         = 0x1590,
-    MSG_MOVE_UPDATE_TELEPORT                          = 0x0E1D,//16357
     MSG_MOVE_WATER_WALK                               = 0x1592,
     MSG_MOVE_WORLDPORT_ACK                            = 0x1593,
     MSG_NOTIFY_PARTY_SQUELCH                          = 0x1594,
@@ -1126,7 +1125,7 @@ enum Opcodes
     SMSG_MOVE_UPDATE_RUN_SPEED                        = 0x049D,//16357 NEW OF MOP
     SMSG_MOVE_UPDATE_SWIM_BACK_SPEED                  = 0x7BC, //16357
     SMSG_MOVE_UPDATE_SWIM_SPEED                       = 0x6B8, //16357
-    SMSG_MOVE_UPDATE_TELEPORT                         = 0x1970,
+    SMSG_MOVE_UPDATE_TELEPORT                         = 0x0E1D,//16357
     SMSG_MOVE_UPDATE_TURN_RATE                        = 0xBB5, //16357
     SMSG_MOVE_UPDATE_WALK_SPEED                       = 0x3B8, //16357
     SMSG_MOVE_WATER_WALK                              = 0x21C, //16357
