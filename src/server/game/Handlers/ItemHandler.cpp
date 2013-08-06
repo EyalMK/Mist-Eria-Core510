@@ -28,6 +28,7 @@
 #include "ObjectAccessor.h"
 #include "SpellInfo.h"
 #include <vector>
+#include <iostream>
 
 void WorldSession::HandleSplitItemOpcode(WorldPacket& recvData)
 {
@@ -1676,7 +1677,9 @@ void WorldSession::SendReforgeResult(bool success)
 {
     WorldPacket data(SMSG_REFORGE_RESULT, 1);
     data.WriteBit(success);
-    data.FlushBits();
+
+	//std::cout << "success:" << success << std::endl;
+
     SendPacket(&data);
 }
 
@@ -1687,25 +1690,35 @@ void WorldSession::HandleReforgeItemOpcode(WorldPacket& recvData)
     uint32 bag;
     Player* player = GetPlayer();
 
-    recvData >> reforgeEntry >> slot >> bag;
+    recvData >> slot >> reforgeEntry >> bag;
 
-    guid[2] = recvData.ReadBit();
-    guid[6] = recvData.ReadBit();
+	
+	//Testing purpose only:
+	/*
+	std::cout << "reforgeEntry:" << reforgeEntry << std::endl;
+	std::cout << "bag:" << bag << std::endl;
+	std::cout << "slot:" << slot << std::endl;
+	*/
+	
     guid[3] = recvData.ReadBit();
     guid[4] = recvData.ReadBit();
-    guid[1] = recvData.ReadBit();
-    guid[0] = recvData.ReadBit();
-    guid[7] = recvData.ReadBit();
     guid[5] = recvData.ReadBit();
+    guid[6] = recvData.ReadBit();
+    guid[7] = recvData.ReadBit();
+    guid[0] = recvData.ReadBit();
+    guid[2] = recvData.ReadBit();
+    guid[1] = recvData.ReadBit();
 
-    recvData.ReadByteSeq(guid[2]);
-    recvData.ReadByteSeq(guid[3]);
-    recvData.ReadByteSeq(guid[6]);
-    recvData.ReadByteSeq(guid[4]);
-    recvData.ReadByteSeq(guid[1]);
-    recvData.ReadByteSeq(guid[0]);
-    recvData.ReadByteSeq(guid[7]);
     recvData.ReadByteSeq(guid[5]);
+    recvData.ReadByteSeq(guid[4]);
+    recvData.ReadByteSeq(guid[7]);
+    recvData.ReadByteSeq(guid[6]);
+    recvData.ReadByteSeq(guid[0]);
+    recvData.ReadByteSeq(guid[2]);
+    recvData.ReadByteSeq(guid[1]);
+    recvData.ReadByteSeq(guid[3]);
+
+	//std::cout << "guid:" << guid << std::endl;
 
     if (!player->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_REFORGER))
     {
