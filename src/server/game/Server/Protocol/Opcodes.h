@@ -133,7 +133,7 @@ enum Opcodes
     CMSG_CHANNEL_DISPLAY_LIST                         = 0x1095,
     CMSG_CHANNEL_INVITE                               = 0x1096,
     CMSG_CHANNEL_KICK                                 = 0x0C7A,//16357
-    CMSG_CHANNEL_LIST                                 = 0x1098,
+    CMSG_CHANNEL_LIST                                 = 0xDDA,//16357
     CMSG_CHANNEL_MODERATE                             = 0x1099,
     CMSG_CHANNEL_MODERATOR                            = 0x0DAA,//16357
     CMSG_CHANNEL_MUTE                                 = 0x02C6,//16357
