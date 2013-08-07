@@ -68,7 +68,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
     recvData.read_skip<uint32>(); // Always 0
     recvData.read_skip<uint8>(); //Unk
 
-    crossRealmGuid[7] = data.ReadBit();
+    crossRealmGuid[7] = recvData.ReadBit();
     uint16 nameLen = recvData.ReadBits(10);
     uint16 realmLen = recvData.ReadBits(9);
     crossRealmGuid[6] = recvData.ReadBit();
