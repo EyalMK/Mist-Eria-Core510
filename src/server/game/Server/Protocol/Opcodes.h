@@ -627,8 +627,8 @@ enum Opcodes
     MSG_MOVE_START_BACKWARD                           = 0x37A, //16357
     MSG_MOVE_START_DESCEND                            = 0x0B1B,//16357
     MSG_MOVE_START_FORWARD                            = 0x0FE, //16357
-    MSG_MOVE_START_PITCH_DOWN                         = 0x1571,
-    MSG_MOVE_START_PITCH_UP                           = 0x1572,
+    MSG_MOVE_START_PITCH_DOWN                         = 0x03FE,//16357
+    MSG_MOVE_START_PITCH_UP                           = 0x068F,//16357
     MSG_MOVE_START_STRAFE_LEFT                        = 0x25E, //16357
     MSG_MOVE_START_STRAFE_RIGHT                       = 0x1FB, //16357
     MSG_MOVE_START_SWIM                               = 0x03B7,//16357
@@ -636,7 +636,7 @@ enum Opcodes
     MSG_MOVE_START_TURN_RIGHT                         = 0x9F7, //16357
     MSG_MOVE_STOP                                     = 0x9DF, //16357
     MSG_MOVE_STOP_ASCEND                              = 0x0B9B,//16357
-    MSG_MOVE_STOP_PITCH                               = 0x1577,
+    MSG_MOVE_STOP_PITCH                               = 0x0BB6,//16357
     MSG_MOVE_STOP_STRAFE                              = 0x0ADE,//16357
     MSG_MOVE_STOP_SWIM                                = 0x0133,//16357
     MSG_MOVE_STOP_TURN                                = 0x04CB, //16357
