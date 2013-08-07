@@ -24686,19 +24686,6 @@ void Player::_LoadSkills(PreparedQueryResult result)
         while (result->NextRow());
     }
 
-    for (; count < PLAYER_MAX_SKILLS; ++count)
-    {
-        uint16 field = count / 2;
-        uint8 offset = count & 1;
-
-        SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, 0);
-        SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, 0);
-        SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, 0);
-        SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, 0);
-        SetUInt16Value(PLAYER_SKILL_MODIFIER_0 + field, offset, 0);
-        SetUInt16Value(PLAYER_SKILL_TALENT_0 + field, offset, 0);
-    }
-
     // special settings
     if (getClass() == CLASS_DEATH_KNIGHT)
     {
