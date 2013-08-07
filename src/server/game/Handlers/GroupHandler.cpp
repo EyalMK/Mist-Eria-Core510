@@ -331,12 +331,12 @@ void WorldSession::HandleGroupInviteResponseOpcode(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GROUP_INVITE_RESPONSE");
 
-    recvData.ReadBit(); // unk always 0
+    recvData.read_skip<uint8>(); // unk always 0
     bool accept = recvData.ReadBit();
+    recvData.ReadBit();
 
-    // Never actually received?
-    /*if (accept)
-        recvData.read_skip<uint32>(); // unk*/
+    if (accept)
+        recvData.read_skip<uint32>(); // unk
 
     Group* group = GetPlayer()->GetGroupInvite();
 
