@@ -336,7 +336,7 @@ void WorldSession::HandleGroupInviteResponseOpcode(WorldPacket& recvData)
     accept = recvData.ReadBit();
     recvData.ReadBit();
 
-    if (accept)
+    if (false)
         recvData.read_skip<uint32>(); // unk
 
     Group* group = GetPlayer()->GetGroupInvite();
