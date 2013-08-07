@@ -331,7 +331,8 @@ void WorldSession::HandleGroupInviteResponseOpcode(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GROUP_INVITE_RESPONSE");
 
-    bool accept = recvData.read_skip<uint8>(); // unk always 0
+    bool accept;
+    recvData >> accept; // unk always 0
     recvData.ReadBit();
     recvData.ReadBit();
 
