@@ -562,7 +562,7 @@ enum Opcodes
     CMSG_TOTEM_DESTROYED                              = 0x1507,
     CMSG_TRAINER_BUY_SPELL                            = 0x03EC,//16357
     CMSG_TRAINER_LIST                                 = 0x0CA0,//16357
-    CMSG_TRANSMOGRIFY_ITEMS                           = 0x1510,
+    CMSG_TRANSMOGRIFY_ITEMS                           = 0x446,//16357
     CMSG_TRIGGER_CINEMATIC_CHEAT                      = 0x1511,
     CMSG_TURN_IN_PETITION                             = 0x1512,
     CMSG_TUTORIAL_CLEAR                               = 0x0885,//16357
