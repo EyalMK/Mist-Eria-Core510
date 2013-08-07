@@ -796,21 +796,20 @@ void WorldSession::SendListInventory(uint64 p_VendorGuid)
 
 			++l_PushedItemCount;
 
-			l_ItemListData << uint32(3);
-			l_ItemListData << uint32(l_VendorItem->item);                                      
-            l_ItemListData << uint32(l_ItemTemplate->BuyCount);                            
-            l_ItemListData << uint32(4);    
+            l_ItemListData << uint32(l_VendorItem->Type);
+            l_ItemListData << uint32(l_ItemTemplate->DisplayInfoID);
+            l_ItemListData << uint32(l_ItemTemplate->ItemId);
+            l_ItemListData << uint32(l_AvailableInStock);
 
-			if (l_VendorItem->ExtendedCost != 0)
+            //l_unk
+
+            l_ItemListData << int32(4); //unk2
+            l_ItemListData << uint32(1); //canBuy
+            l_ItemListData << uint32(l_ItemTemplate->BuyCount);
+            l_ItemListData << uint32(l_FinalPrice);
+
+            if (l_VendorItem->ExtendedCost)
                     l_ItemListData << uint32(l_VendorItem->ExtendedCost);
-
-			l_ItemListData << int32(l_AvailableInStock);                                  
-            l_ItemListData << uint32(l_ItemTemplate->DisplayInfoID);         
-            l_ItemListData << uint32(l_FinalPrice);                                    
-			l_ItemListData << uint32(l_VendorItem->Type);                            
-
-			if (l_UnkFlag)
-                    l_ItemListData << uint32(0);
 
             // itemTemplate->MaxDurability
 
@@ -823,7 +822,7 @@ void WorldSession::SendListInventory(uint64 p_VendorGuid)
             l_ItemFlags.push_back(1);                    // unk bit + 44
 
 
-            l_ItemListData << uint32(0);
+            l_ItemListData << uint32(l_Slot+1);
         }
         else if (l_VendorItem->Type == ITEM_VENDOR_TYPE_CURRENCY)
         {
