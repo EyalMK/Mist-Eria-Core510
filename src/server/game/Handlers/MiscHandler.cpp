@@ -2044,8 +2044,13 @@ void WorldSession::HandleObjectUpdateFailedOpcode(WorldPacket& recvPacket)
     recvPacket.ReadByteSeq(guid[0]);
     recvPacket.ReadByteSeq(guid[6]);
 
-    WorldObject* obj = ObjectAccessor::GetWorldObject(*GetPlayer(), guid);
+    WorldObject* obj = ObjectAccessor::GetWorldObject(*GetPlayer(), guid);    
     sLog->outError(LOG_FILTER_NETWORKIO, "Object update failed for object " UI64FMTD " (%s) for player %s (%u)", uint64(guid), obj ? obj->GetName().c_str() : "object-not-found", GetPlayerName().c_str(), GetGuidLow());
+
+    WorldPacket delObj(SMSG_DESTROY_OBJECT);
+    delObj << uint64(guid);
+    delObj << uint8(0);
+    SendPacket(&delObj);
 }
 
 void WorldSession::HandleSaveCUFProfiles(WorldPacket& recvPacket)
