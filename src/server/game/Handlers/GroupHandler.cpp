@@ -158,55 +158,36 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
             // tell the player that they were invited but it failed as they were already in a group
             WorldPacket data(SMSG_GROUP_INVITE, 45);
 
-            data.WriteBit(0);
-
-            data.WriteBit(invitedGuid[0]);
-            data.WriteBit(invitedGuid[3]);
-            data.WriteBit(invitedGuid[2]);
-
-            data.WriteBit(0); // Inverse already in group
-
-            data.WriteBit(invitedGuid[6]);
-            data.WriteBit(invitedGuid[5]);
-
-            data.WriteBits(0, 9); // Realm name
-
-            data.WriteBit(invitedGuid[4]);
-
-            data.WriteBits(GetPlayer()->GetName().size(), 7); // Inviter name length
-
-            data.WriteBits(0, 24); // Count 2
-
-            data.WriteBit(0);
-
             data.WriteBit(invitedGuid[1]);
-            data.WriteBit(invitedGuid[7]);
-
+            data.WriteBits(0, 9); //realm name len
+            data.WriteBit(invitedGuid[3]);
+            data.WriteBit(0); //unk
+            data.WriteBit(1); //Already in group ?
+            data.WriteBit(invitedGuid[5]);
+            data.WriteBit(invitedGuid[2]);
+            data.WriteBit(invitedGuid[4]);
+            data.WriteBit(invitedGuid[0]);
+            data.WriteBit(invitedGuid[6]);
+            data.WriteBits(0, 24); //counter2
+            data.WriteBit(0); //unk
+            data.WriteBits(_player->GetName().size(), 7);
             data.FlushBits();
 
-            data.WriteByteSeq(invitedGuid[1]);
-            data.WriteByteSeq(invitedGuid[4]);
-
-            data << int32(getMSTime());
-            data << int32(0);
-            data << int32(0);
-
             data.WriteByteSeq(invitedGuid[6]);
-            data.WriteByteSeq(invitedGuid[0]);
-            data.WriteByteSeq(invitedGuid[2]);
-            data.WriteByteSeq(invitedGuid[3]);
-
-            // for count2 { int32(0) }
-
+            //foreach counter2 data >> uint32
+            //data.WriteString(realmName);
+            data.WriteString(_player->GetName());
+            data << uint32(0); //unk
             data.WriteByteSeq(invitedGuid[5]);
-
-            // data.append(realm name);
-
+            data << uint32(0);
+            data.WriteByteSeq(invitedGuid[2]);
+            data.WriteByteSeq(invitedGuid[4]);
+            data.WriteByteSeq(invitedGuid[0]);
+            data << uint32(getMSTime());
+            data.WriteByteSeq(invitedGuid[1]);
+            data << uint32(0);
+            data.WriteByteSeq(invitedGuid[3]);
             data.WriteByteSeq(invitedGuid[7]);
-
-            data.WriteString(GetPlayer()->GetName()); // inviter name
-
-            data << int32(0);
 
             player->GetSession()->SendPacket(&data);
         }
@@ -322,7 +303,8 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
     data.WriteBit(invitedGuid[6]);
     data.WriteBits(0, 24); //counter2
     data.WriteBit(0); //unk
-    data.WriteBits(GetPlayerName().length(), 7);
+    data.WriteBits(_player->GetName().size(), 7);
+    data.FlushBits();
 
     data.WriteByteSeq(invitedGuid[6]);
     //foreach counter2 data >> uint32
