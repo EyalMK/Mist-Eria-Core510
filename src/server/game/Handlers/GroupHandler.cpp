@@ -162,7 +162,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
             data.WriteBits(0, 9); //realm name len
             data.WriteBit(invitedGuid[3]);
             data.WriteBit(0); //unk
-            data.WriteBit(1); //Already in group ?
+            data.WriteBit(0); //Already in group ?
             data.WriteBit(invitedGuid[5]);
             data.WriteBit(invitedGuid[2]);
             data.WriteBit(invitedGuid[4]);
@@ -295,7 +295,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
     data.WriteBits(0, 9); //realm name len
     data.WriteBit(invitedGuid[3]);
     data.WriteBit(0); //unk
-    data.WriteBit(0); //Already in group ?
+    data.WriteBit(1); //Already in group ?
     data.WriteBit(invitedGuid[5]);
     data.WriteBit(invitedGuid[2]);
     data.WriteBit(invitedGuid[4]);
