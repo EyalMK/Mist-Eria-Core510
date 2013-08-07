@@ -2043,7 +2043,8 @@ MovementStatusElements MoveSplineDone[] =
     MSETimestamp,
     MSEOrientation,
     MSESplineElevation,
-    MSEAlive
+    MSEAlive,
+    MSEEnd
 };
 
 // 4.3.4
