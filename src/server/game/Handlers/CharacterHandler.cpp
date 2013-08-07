@@ -869,22 +869,22 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     bool l_EnableVoiceChat                          = false;
     bool l_PlayTimeAlert                            = false;
     bool l_ItemRestauration                         = false;
-    bool l_CanCrossRealmGroup                       = true;
+    bool l_CanCrossRealmGroup                       = false;
 
     data.Initialize(SMSG_FEATURE_SYSTEM_STATUS, 4 + 4 + 4 + 4 + 1 + 1 + (l_PlayTimeAlert ? (4 + 4 + 4) : 0) + (l_QuickTicketThrottleSystem ? (4 + 4 + 4 + 4) : 0));    
 
 	data << uint32(0);     
     data << uint32(0);       
-    data << uint32(0);      
-    data << uint32(0);      
-    data << uint8(0);   // Calendar related
+    data << uint32(1);      
+    data << uint32(1);      
+    data << uint8(2);   // Calendar related
 
-	data.WriteBit(l_EnableVoiceChat);  // not sure   
-    data.WriteBit(l_CanCrossRealmGroup);  // not sure                         
-    data.WriteBit(l_ItemRestauration);  // not sure           
+	data.WriteBit(false);  // not sure   
+    data.WriteBit(false);  // not sure                         
+    data.WriteBit(false);  // not sure           
 	data.WriteBit(l_PlayTimeAlert); //ok
 	data.WriteBit(l_QuickTicketThrottleSystem);  //ok
-    data.WriteBit(l_CanSendScroolOfResurection); // not sure                                                      
+    data.WriteBit(false); // not sure                                                      
     data.FlushBits();
 
 	if (l_PlayTimeAlert)
