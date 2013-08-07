@@ -864,34 +864,46 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     LoadAccountData(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_ACCOUNT_DATA), PER_CHARACTER_CACHE_MASK);
     SendAccountDataTimes(PER_CHARACTER_CACHE_MASK);
 
-    bool featureBit4 = true;
-    data.Initialize(SMSG_FEATURE_SYSTEM_STATUS, 7);         // checked in 4.2.2
-    data << uint8(2);                                       // unknown value
-    data << uint32(1);
-    data << uint32(1);
-    data << uint32(2);
-    data << uint32(0);
-    data.WriteBit(1);
-    data.WriteBit(1);
-    data.WriteBit(0);
-    data.WriteBit(featureBit4);
-    data.WriteBit(0);
-    data.WriteBit(0);
+    bool l_QuickTicketThrottleSystem        = true;
+    bool l_CanSendScroolOfResurection       = false;
+    bool l_EnableVoiceChat                          = false;
+    bool l_PlayTimeAlert                            = false;
+    bool l_ItemRestauration                         = false;
+    bool l_CanCrossRealmGroup                       = false;
+
+    data.Initialize(SMSG_FEATURE_SYSTEM_STATUS, 4 + 4 + 4 + 4 + 1 + 1 + (l_PlayTimeAlert ? (4 + 4 + 4) : 0) + (l_QuickTicketThrottleSystem ? (4 + 4 + 4 + 4) : 0));    
+
+	data << uint32(0);     
+    data << uint32(0);       
+    data << uint32(1);      
+    data << uint32(1);      
+    data << uint8(2);   // Calendar related
+
+	data.WriteBit(false);  // not sure   
+    data.WriteBit(false);  // not sure                         
+    data.WriteBit(false);  // not sure           
+	data.WriteBit(l_PlayTimeAlert); //ok
+	data.WriteBit(l_QuickTicketThrottleSystem);  //ok
+    data.WriteBit(false); // not sure                                                      
     data.FlushBits();
-    if (featureBit4)
+
+	if (l_PlayTimeAlert)
     {
-        data << uint32(1);
         data << uint32(0);
-        data << uint32(10);
-        data << uint32(60);
+        data << uint32(0);
+        data << uint32(0);
     }
 
-    //if (featureBit5)
-    //{
-    //    data << uint32(0);
-    //    data << uint32(0);
-    //    data << uint32(0);
-    //}
+    if (l_QuickTicketThrottleSystem)
+    {
+        data << uint32(60);
+        data << uint32(0);
+        data << uint32(10);
+        data << uint32(1);
+    }
+
+    
+
     SendPacket(&data);
 
     // Send MOTD
