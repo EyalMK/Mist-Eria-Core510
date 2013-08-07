@@ -382,7 +382,7 @@ enum Opcodes
     CMSG_MOVE_SET_COLLISION_HEIGHT_ACK                = 0x1332,
     CMSG_MOVE_SET_RELATIVE_POSITION                   = 0x1333,
     CMSG_MOVE_SET_VEHICLE_REC_ID_ACK                  = 0x1334,
-    CMSG_MOVE_SPLINE_DONE                             = 0x1335,
+    CMSG_MOVE_SPLINE_DONE                             = 0x0487,
     CMSG_MOVE_TIME_SKIPPED                            = 0x1336,
     CMSG_MOVE_TOGGLE_COLLISION_ACK                    = 0x1337,
     CMSG_MOVE_WATER_WALK_ACK                          = 0x1338,

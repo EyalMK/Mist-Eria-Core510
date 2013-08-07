@@ -16537,6 +16537,9 @@ void Unit::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
             case MSEOneBit:
                 data.ReadBit();
                 break;
+            case MSESplineUnk:
+                data.read_skip<uint32>();
+                break;
             default:
                 ASSERT(false && "Incorrect sequence element detected at ReadMovementInfo");
                 break;
@@ -16831,6 +16834,9 @@ void Unit::WriteMovementInfo(WorldPacket& data)
             break;
         case MSEOneBit:
             data.WriteBit(1);
+            break;
+        case MSESplineUnk:
+            data << uint32(0);
             break;
         default:
             ASSERT(false && "Incorrect sequence element detected at ReadMovementInfo");
