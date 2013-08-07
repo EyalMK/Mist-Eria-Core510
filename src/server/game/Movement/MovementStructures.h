@@ -1661,7 +1661,7 @@ MovementStatusElements MovementStopAscendSequence[] =
     MSEEnd,
 };
 
-//4.3.4
+//5.1
 MovementStatusElements MovementStopPitchSequence[] =
 {
 	MSEPositionZ,
@@ -1675,13 +1675,13 @@ MovementStatusElements MovementStopPitchSequence[] =
 	MSEHasGuidByte6,
 	MSEHasPitch,
 	MSEHasGuidByte7,
-	MSEHasGuidByte2,
+	MSEHasCounter,
 	MSEHasSplineElevation,
+	MSEHasGuidByte2,
     MSEHasGuidByte5,
 	MSEHasTimestamp,
-	MSEHasFallData,
 	MSEZeroBit,
-	MSEHasCounter,
+	MSEHasFallData,
 	MSEHasMovementFlags2,
 	MSEHasMovementFlags,
 	MSEIsAlive,

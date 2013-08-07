@@ -804,7 +804,7 @@ void WorldSession::SendListInventory(uint64 p_VendorGuid)
             //l_unk
 
             l_ItemListData << int32(4); //unk2
-            l_ItemListData << uint32(1); //canBuy
+            l_ItemListData << uint32(l_Slot+1); //canBuy
             l_ItemListData << uint32(l_ItemTemplate->BuyCount);
             l_ItemListData << uint32(l_FinalPrice);
 
@@ -822,7 +822,7 @@ void WorldSession::SendListInventory(uint64 p_VendorGuid)
             l_ItemFlags.push_back(1);                    // unk bit + 44
 
 
-            l_ItemListData << uint32(l_Slot+1);
+            l_ItemListData << uint32(1);
         }
         else if (l_VendorItem->Type == ITEM_VENDOR_TYPE_CURRENCY)
         {
