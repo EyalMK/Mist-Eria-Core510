@@ -1629,7 +1629,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         if(citr->guid == player->GetGUID())
             continue;
 
-        data.WriteString(citr->guid);
+        data.WriteString(citr->name);
 
         ObjectGuid memberGuid = citr->guid;
         uint8 byte39 = 0, byte3A = 0, byte38 = 0, byte3B = 0;
