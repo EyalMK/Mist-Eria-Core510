@@ -16638,11 +16638,11 @@ void Unit::WriteMovementInfo(WorldPacket& data)
     bool hasTransportTime2 = mover->HasExtraUnitMovementFlag(MOVEMENTFLAG2_INTERPOLATED_MOVEMENT);
     bool hasTransportTime3 = false;
     bool hasPitch = mover->HasUnitMovementFlag(MovementFlags(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || mover->HasExtraUnitMovementFlag(MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING);
-    bool hasFallData = mover->HasExtraUnitMovementFlag(MOVEMENTFLAG2_INTERPOLATED_TURNING);
-    bool hasFallDirection = mover->HasUnitMovementFlag(MOVEMENTFLAG_FALLING);
+    bool hasFallData = mover->HasExtraUnitMovementFlag(MOVEMENTFLAG2_INTERPOLATED_TURNING) || !mover->HasExtraUnitMovementFlag(MOVEMENTFLAG2_NO_JUMPING);
+    bool hasFallDirection = mover->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) || !mover->HasExtraUnitMovementFlag(MOVEMENTFLAG2_NO_JUMPING);
     bool hasSplineElevation = mover->HasUnitMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
     bool hasSpline = false;
-    bool isAlive = false;
+    bool isAlive = mover->isAlive();
     uint32 counter = 0;
 
     MovementStatusElements* sequence = GetMovementStatusElementsSequence(data.GetOpcode());
