@@ -1515,7 +1515,7 @@ void WorldSession::HandleTransmogrifyItems(WorldPacket& recvData)
     npcGuid[0] = recvData.ReadBit();
 
     // Read data
-    uint32 count = recvData.ReadBits(22);
+    uint32 count = recvData.ReadBits(18);
 
     if (count >= EQUIPMENT_SLOT_END)
     {
