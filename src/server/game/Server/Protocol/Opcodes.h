@@ -1272,7 +1272,7 @@ enum Opcodes
     SMSG_ROLE_POLL_BEGIN                              = 0xF15, //16357
     SMSG_RWHOIS                                       = 0x0F04,//16357
     SMSG_SELL_ITEM                                    = 0x03C8,//16357
-    SMSG_SEND_MAIL_RESULT                             = 0x2072,
+    SMSG_SEND_MAIL_RESULT                             = 0x0039,
     SMSG_SEND_UNLEARN_SPELLS                          = 0x0DF5,//16357
     SMSG_SERVERTIME                                   = 0x2074,
     SMSG_SERVER_FIRST_ACHIEVEMENT                     = 0xD78, //16357

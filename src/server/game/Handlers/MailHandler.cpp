@@ -368,14 +368,12 @@ void WorldSession::HandleMailMarkAsRead(WorldPacket& recvData)
 //called when client deletes mail
 void WorldSession::HandleMailDelete(WorldPacket& recvData)
 {
-    uint64 mailbox;
     uint32 mailId;
-    recvData >> mailbox;
     recvData >> mailId;
     recvData.read_skip<uint32>();                          // mailTemplateId
 
-    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
-        return;
+    //if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
+    //    return;
 
     Mail* m = _player->GetMail(mailId);
     Player* player = _player;
