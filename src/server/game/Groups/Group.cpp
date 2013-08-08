@@ -1523,7 +1523,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
     }
 
     WorldPacket data(SMSG_GROUP_LIST, (1+1+1+1+1+4+8+4+4+(GetMembersCount()-1)*(13+8+1+1+1+1)+8+1+8+1+1+1+1));
-    data << uint8(m_groupType);                         // group type (flags in 3.3)
+    /*data << uint8(m_groupType);                         // group type (flags in 3.3)
     data << uint8(slot->group);
     data << uint8(slot->flags);
     data << uint8(slot->roles);
@@ -1564,7 +1564,113 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         data << uint8(m_lootThreshold);                 // loot threshold
         data << uint8(m_dungeonDifficulty);             // Dungeon Difficulty
         data << uint8(m_raidDifficulty);                // Raid Difficulty
+    }*/
+
+    ObjectGuid leaderGuid = m_leaderGuid, groupGuid = m_guid;
+    uint8 byte10 = 0;
+    uint8 hasLootRule = 0; //For testing purpose
+    uint8 isLFG = 0;
+    uint8 byte74 = 0;
+    uint8 byte1C = 0;
+    uint8 byte40 = 0;
+    uint32 dword38 = 0, dword3C = 0;
+
+    data.WriteBit(leaderGuid[2]);
+    data.WriteBit(byte10);
+    data.WriteBit(hasLootRule);
+    data.WriteBits(GetMembersCount()-1, 22);
+    data.WriteBit(groupGuid[6]);
+    data.WriteBit(groupGuid[4]);
+
+    for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
+    {
+        if(citr->guid == player->GetGUID())
+            continue;
+
+        ObjectGuid memberGuid = citr->guid;
+        data.WriteBit(memberGuid[7]);
+        data.WriteBit(memberGuid[5]);
+        data.WriteBit(memberGuid[3]);
+        data.WriteBit(memberGuid[4]);
+        data.WriteBit(memberGuid[1]);
+        data.WriteBit(memberGuid[0]);
+        data.WriteBits(citr->name.size(), 7);
+        data.WriteBit(memberGuid[6]);
+        data.WriteBit(memberGuid[2]);
     }
+
+    //if (hasLootRule) { ... }
+
+    data.WriteBit(leaderGuid[4]);
+    data.WriteBit(groupGuid[5]);
+    data.WriteBit(groupGuid[0]);
+    data.WriteBit(leaderGuid[6]);
+    data.WriteBit(leaderGuid[7]);
+    data.WriteBit(leaderGuid[3]);
+    data.WriteBit(groupGuid[3]);
+    data.WriteBit(leaderGuid[1]);
+    data.WriteBit(leaderGuid[5]);
+    data.WriteBit(groupGuid[7]);
+    data.WriteBit(leaderGuid[0]);
+    data.WriteBit(groupGuid[1]);
+    data.WriteBit(groupGuid[2]);
+    data.WriteBit(isLFG);
+
+    //if(isLFG) { ... }
+
+    //if(isLFG) { ... }
+
+    data.WriteByteSeq(groupGuid[1]);
+
+    //if(hasLootRule) { ... }
+
+    for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
+    {
+        if(citr->guid == player->GetGUID())
+            continue;
+
+        data.WriteString(citr->guid);
+
+        ObjectGuid memberGuid = citr->guid;
+        uint8 byte39 = 0, byte3A = 0, byte38 = 0, byte3B = 0;
+
+        data.WriteByteSeq(memberGuid[0]);
+        data.WriteByteSeq(memberGuid[7]);
+        data.WriteByteSeq(memberGuid[5]);
+        data << uint8(byte39);
+        data << uint8(byte3A);
+        data << uint8(byte38);
+        data.WriteByteSeq(memberGuid[6]);
+        data.WriteByteSeq(memberGuid[2]);
+        data << uint8(byte3B);
+        data.WriteByteSeq(memberGuid[1]);
+        data.WriteByteSeq(memberGuid[3]);
+        data.WriteByteSeq(memberGuid[4]);
+    }
+
+    data.WriteByteSeq(leaderGuid[6]);
+    data.WriteByteSeq(leaderGuid[0]);
+    data.WriteByteSeq(leaderGuid[3]);
+    data << uint32(dword38);
+    data << uint32(dword3C);
+    data.WriteByteSeq(groupGuid[0]);
+    data.WriteByteSeq(leaderGuid[7]);
+
+    //if(byte10) { ... }
+
+    data << uint8(byte74);
+    data.WriteByteSeq(groupGuid[7]);
+    data.WriteByteSeq(groupGuid[2]);
+    data.WriteByteSeq(leaderGuid[5]);
+    data.WriteByteSeq(leaderGuid[1]);
+    data << uint8(byte1C);
+    data.WriteByteSeq(groupGuid[4]);
+    data.WriteByteSeq(leaderGuid[2]);
+    data.WriteByteSeq(groupGuid[3]);
+    data.WriteByteSeq(groupGuid[5]);
+    data.WriteByteSeq(leaderGuid[4]);
+    data.WriteByteSeq(groupGuid[6]);
+    data << uint8(byte40);
 
     player->GetSession()->SendPacket(&data);
 }

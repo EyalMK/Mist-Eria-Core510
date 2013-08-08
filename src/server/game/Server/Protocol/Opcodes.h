@@ -922,7 +922,7 @@ enum Opcodes
     SMSG_GROUP_DECLINE                                = 0x09C1,//16357
     SMSG_GROUP_DESTROYED                              = 0x1797,
     SMSG_GROUP_INVITE                                 = 0x0574,//16357
-    SMSG_GROUP_LIST                                   = 0x0620,//16357
+    SMSG_GROUP_LIST                                   = 0x087C,//16357
     SMSG_GROUP_SET_LEADER                             = 0x0D71,//16357
     SMSG_GROUP_SET_ROLE                               = 0x1801,
     SMSG_GROUP_UNINVITE                               = 0x1802,
