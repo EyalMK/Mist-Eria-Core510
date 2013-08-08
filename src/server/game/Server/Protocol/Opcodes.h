@@ -705,10 +705,10 @@ enum Opcodes
     SMSG_ATTACKSWING_CANT_ATTACK                      = 0x0B45,//16357
     SMSG_ATTACKSWING_DEADTARGET                       = 0x038D,//16357
     SMSG_ATTACKSWING_NOTINRANGE                       = 0x0328,//16357
-    SMSG_AUCTION_BIDDER_LIST_RESULT                   = 0x0F24,//16357
+    SMSG_AUCTION_BIDDER_LIST_RESULT                   = 0x0200,//16357
     SMSG_AUCTION_BIDDER_NOTIFICATION                  = 0x01E5,//16357
     SMSG_AUCTION_COMMAND_RESULT                       = 0x1638,
-    SMSG_AUCTION_LIST_PENDING_SALES                   = 0x0200,//16357
+    SMSG_AUCTION_LIST_PENDING_SALES                   = 0x0F24,//16357
     SMSG_AUCTION_LIST_RESULT                          = 0x0D09,//16357
     SMSG_AUCTION_OWNER_LIST_RESULT                    = 0x04CC,//16357
     SMSG_AUCTION_OWNER_NOTIFICATION                   = 0x03C9,//16357
