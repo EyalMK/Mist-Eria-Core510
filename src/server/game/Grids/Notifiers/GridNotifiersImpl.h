@@ -35,6 +35,13 @@ inline void Trinity::VisibleNotifier::Visit(GridRefManager<T> &m)
     {
         vis_guids.erase(iter->getSource()->GetGUID());
         i_player.UpdateVisibilityOf(iter->getSource(), i_data, i_visibleNow);
+
+        if (i_data.IsFull()){
+            WorldPacket packet;
+            i_data.BuildPacket(&packet);
+            i_player.GetSession()->SendPacket(&packet);
+            i_data = UpdateData(i_player.GetMapId());
+        }
     }
 }
 

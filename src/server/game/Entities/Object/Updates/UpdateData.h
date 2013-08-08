@@ -51,23 +51,29 @@ enum OBJECT_UPDATE_FLAGS
 
 class UpdateData
 {
-    public:
-        UpdateData(uint16 map);
+public:
+    UpdateData(uint16 map);
 
-        void AddOutOfRangeGUID(std::set<uint64>& guids);
-        void AddOutOfRangeGUID(uint64 guid);
-        void AddUpdateBlock(const ByteBuffer &block);
-        bool BuildPacket(WorldPacket* packet);
-        bool HasData() const { return m_blockCount > 0 || !m_outOfRangeGUIDs.empty(); }
-        void Clear();
+    void AddOutOfRangeGUID(std::set<uint64>& guids);
+    void AddOutOfRangeGUID(uint64 guid);
+    void AddUpdateBlock(const ByteBuffer &block);
+    bool BuildPacket(WorldPacket* packet);
+    bool HasData() const { return m_blockCount > 0 || !m_outOfRangeGUIDs.empty(); }
+    void Clear();
 
-        std::set<uint64> const& GetOutOfRangeGUIDs() const { return m_outOfRangeGUIDs; }
+    bool IsFull();
+    uint8 GetMaxBlockLimit();
+    uint8 GetBlockCount();
 
-    protected:
-        uint16 m_map;
-        uint32 m_blockCount;
-        std::set<uint64> m_outOfRangeGUIDs;
-        ByteBuffer m_data;
+
+
+    std::set<uint64> const& GetOutOfRangeGUIDs() const { return m_outOfRangeGUIDs; }
+
+protected:
+    uint16 m_map;
+    uint32 m_blockCount;
+    std::set<uint64> m_outOfRangeGUIDs;
+    ByteBuffer m_data;
 };
 #endif
 

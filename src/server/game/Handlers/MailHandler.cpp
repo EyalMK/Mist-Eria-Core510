@@ -368,14 +368,12 @@ void WorldSession::HandleMailMarkAsRead(WorldPacket& recvData)
 //called when client deletes mail
 void WorldSession::HandleMailDelete(WorldPacket& recvData)
 {
-    uint64 mailbox;
     uint32 mailId;
-    recvData >> mailbox;
     recvData >> mailId;
     recvData.read_skip<uint32>();                          // mailTemplateId
 
-    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
-        return;
+    //if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
+    //    return;
 
     Mail* m = _player->GetMail(mailId);
     Player* player = _player;
@@ -675,12 +673,14 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
             data << uint32((item ? item->GetGUIDLow() : 0));
             // entry
             data << uint32((item ? item->GetEntry() : 0));
-            for (uint8 j = 0; j < MAX_INSPECTED_ENCHANTMENT_SLOT; ++j)
+            for (uint8 j = 0; j < 8; ++j)
             {
                 data << uint32((item ? item->GetEnchantmentId((EnchantmentSlot)j) : 0));
                 data << uint32((item ? item->GetEnchantmentDuration((EnchantmentSlot)j) : 0));
                 data << uint32((item ? item->GetEnchantmentCharges((EnchantmentSlot)j) : 0));
             }
+
+            data << uint32(0); //string size 0
 
             // can be negative
             data << int32((item ? item->GetItemRandomPropertyId() : 0));

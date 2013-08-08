@@ -46,6 +46,14 @@ void VisibleNotifier::SendToSelf()
                 if (!(*itr)->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
                     (*itr)->UpdateVisibilityOf(&i_player);
             }
+
+            if (i_data.IsFull())
+            {
+                WorldPacket packet;
+                i_data.BuildPacket(&packet);
+                i_player.GetSession()->SendPacket(&packet);
+                i_data = UpdateData(i_player.GetMapId());
+            }
         }
 
     for (Player::ClientGUIDs::const_iterator it = vis_guids.begin();it != vis_guids.end(); ++it)
@@ -58,6 +66,14 @@ void VisibleNotifier::SendToSelf()
             Player* player = ObjectAccessor::FindPlayer(*it);
             if (player && player->IsInWorld() && !player->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
                 player->UpdateVisibilityOf(&i_player);
+        }
+
+        if (i_data.IsFull())
+        {
+            WorldPacket packet;
+            i_data.BuildPacket(&packet);
+            i_player.GetSession()->SendPacket(&packet);
+            i_data = UpdateData(i_player.GetMapId());
         }
     }
 
@@ -132,6 +148,14 @@ void PlayerRelocationNotifier::Visit(PlayerMapType &m)
 
         i_player.UpdateVisibilityOf(player, i_data, i_visibleNow);
 
+        if (i_data.IsFull())
+        {
+            WorldPacket packet;
+            i_data.BuildPacket(&packet);
+            i_player.GetSession()->SendPacket(&packet);
+            i_data = UpdateData(i_player.GetMapId());
+        }
+
         if (player->m_seer->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
             continue;
 
@@ -150,6 +174,14 @@ void PlayerRelocationNotifier::Visit(CreatureMapType &m)
         vis_guids.erase(c->GetGUID());
 
         i_player.UpdateVisibilityOf(c, i_data, i_visibleNow);
+
+        if (i_data.IsFull())
+        {
+            WorldPacket packet;
+            i_data.BuildPacket(&packet);
+            i_player.GetSession()->SendPacket(&packet);
+            i_data = UpdateData(i_player.GetMapId());
+        }
 
         if (relocated_for_ai && !c->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
             CreatureUnitRelocationWorker(c, &i_player);

@@ -705,11 +705,11 @@ enum Opcodes
     SMSG_ATTACKSWING_CANT_ATTACK                      = 0x0B45,//16357
     SMSG_ATTACKSWING_DEADTARGET                       = 0x038D,//16357
     SMSG_ATTACKSWING_NOTINRANGE                       = 0x0328,//16357
-    SMSG_AUCTION_BIDDER_LIST_RESULT                   = 0x0F24,//16357
+    SMSG_AUCTION_BIDDER_LIST_RESULT                   = 0x0D09,//16357
     SMSG_AUCTION_BIDDER_NOTIFICATION                  = 0x01E5,//16357
-    SMSG_AUCTION_COMMAND_RESULT                       = 0x1638,
+    SMSG_AUCTION_COMMAND_RESULT                       = 0x0620,
     SMSG_AUCTION_LIST_PENDING_SALES                   = 0x0200,//16357
-    SMSG_AUCTION_LIST_RESULT                          = 0x0D09,//16357
+    SMSG_AUCTION_LIST_RESULT                          = 0x0F24,//16357
     SMSG_AUCTION_OWNER_LIST_RESULT                    = 0x04CC,//16357
     SMSG_AUCTION_OWNER_NOTIFICATION                   = 0x03C9,//16357
     SMSG_AUCTION_REMOVED_NOTIFICATION                 = 0x0A29,//16357
@@ -1272,7 +1272,7 @@ enum Opcodes
     SMSG_ROLE_POLL_BEGIN                              = 0xF15, //16357
     SMSG_RWHOIS                                       = 0x0F04,//16357
     SMSG_SELL_ITEM                                    = 0x03C8,//16357
-    SMSG_SEND_MAIL_RESULT                             = 0x2072,
+    SMSG_SEND_MAIL_RESULT                             = 0x0039,
     SMSG_SEND_UNLEARN_SPELLS                          = 0x0DF5,//16357
     SMSG_SERVERTIME                                   = 0x2074,
     SMSG_SERVER_FIRST_ACHIEVEMENT                     = 0xD78, //16357
