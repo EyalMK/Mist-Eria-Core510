@@ -25,6 +25,8 @@
 #include "World.h"
 #include "zlib.h"
 
+#define UPDATE_DATA_MAX_BLOCK 1
+
 UpdateData::UpdateData(uint16 map) : m_map(map), m_blockCount(0)
 {
 }
@@ -73,4 +75,19 @@ void UpdateData::Clear()
     m_blockCount = 0;
     m_map = 0;
 }
+
+bool UpdateData::IsFull()
+{
+    return !(m_blockCount < UPDATE_DATA_MAX_BLOCK);
+}
+uint8 UpdateData::GetMaxBlockLimit()
+{
+    return UPDATE_DATA_MAX_BLOCK;
+}
+uint8 UpdateData::GetBlockCount()
+{
+    return m_blockCount;
+}
+
+
 
