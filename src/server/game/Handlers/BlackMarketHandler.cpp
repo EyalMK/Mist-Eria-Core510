@@ -145,15 +145,37 @@ void WorldSession::HandleBlackMarketRequestItems(WorldPacket& recvData)
         return;
     }
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleBlackMarketRequestItems - unk = %u", unk);
 
-	//SendBlackMarketRequestItemsResult(npcGuid);
+	SendBlackMarketRequestItemsResult();
 
 }
 
-void WorldSession::SendBlackMarketRequestItemsResult(uint64 npcGuid)
+void WorldSession::SendBlackMarketRequestItemsResult()
 {
+	WorldPacket data(SMSG_BLACK_MARKET_REQUEST_ITEMS_RESULT, 9);
 
+	uint32 count = 1;
 
+	data << uint32(1);
+	data.WriteBits(count, 20);
+
+	for(uint32 i=0; i<count; ++i)
+		data.WriteBit(1);
+
+	for(uint32 i=0; i<count; ++i)
+	{
+		data << uint32(1);
+		data << uint32(2);
+		data << uint64(3);
+		data << uint64(4);
+		data << uint64(5);
+		data << uint32(6);
+		data << uint32(7);
+		data << uint32(8);
+		data << uint32(9);
+		data << uint32(10);
+	}
+
+	SendPacket(&data);
 
 }

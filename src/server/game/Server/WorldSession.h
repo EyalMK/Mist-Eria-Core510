@@ -921,7 +921,7 @@ class WorldSession
 		void HandleBlackMarketHello(WorldPacket& recvData);
 		void SendBlackMarketHello(uint64 guid);
 		void HandleBlackMarketRequestItems(WorldPacket& recvData);
-		void SendBlackMarketRequestItemsResult(uint64 guid);
+		void SendBlackMarketRequestItemsResult();
 
         // Miscellaneous
         void HandleSpellClick(WorldPacket& recvData);
