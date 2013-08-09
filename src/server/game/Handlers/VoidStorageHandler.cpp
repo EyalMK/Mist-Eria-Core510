@@ -133,50 +133,51 @@ void WorldSession::HandleVoidStorageQuery(WorldPacket& recvData)
         ObjectGuid itemId = item->ItemId;
         ObjectGuid creatorGuid = item->CreatorGuid;
 
-        data.WriteBit(creatorGuid[3]);
-        data.WriteBit(itemId[5]);
-        data.WriteBit(creatorGuid[6]);
-        data.WriteBit(creatorGuid[1]);
-        data.WriteBit(itemId[1]);
-        data.WriteBit(itemId[3]);
-        data.WriteBit(itemId[6]);
-        data.WriteBit(creatorGuid[5]);
-        data.WriteBit(creatorGuid[2]);
-        data.WriteBit(itemId[2]);
-        data.WriteBit(creatorGuid[4]);
-        data.WriteBit(itemId[0]);
-        data.WriteBit(itemId[4]);
-        data.WriteBit(itemId[7]);
         data.WriteBit(creatorGuid[0]);
+        data.WriteBit(creatorGuid[3]);
+        data.WriteBit(creatorGuid[5]);
+        data.WriteBit(creatorGuid[6]);
+        data.WriteBit(creatorGuid[2]);
+        data.WriteBit(creatorGuid[1]);
+        data.WriteBit(itemId[4]);
+        data.WriteBit(itemId[5]);
+        data.WriteBit(itemId[3]);
+        data.WriteBit(itemId[2]);
+        data.WriteBit(itemId[6]);
+        data.WriteBit(itemId[7]);
+        data.WriteBit(creatorGuid[4]);
+        data.WriteBit(itemId[1]);
+        data.WriteBit(itemId[0]);
         data.WriteBit(creatorGuid[7]);
-
-        itemData.WriteByteSeq(creatorGuid[3]);
-
-        itemData << uint32(item->ItemSuffixFactor);
-
-        itemData.WriteByteSeq(creatorGuid[4]);
 
         itemData << uint32(i);
 
-        itemData.WriteByteSeq(itemId[0]);
-        itemData.WriteByteSeq(itemId[6]);
-        itemData.WriteByteSeq(creatorGuid[0]);
+        itemData.WriteByteSeq(creatorGuid[6]);
+        itemData.WriteByteSeq(itemId[7]);
+        itemData.WriteByteSeq(creatorGuid[5]);
+
+        itemData << uint32(item->ItemSuffixFactor);
+
+        itemData.WriteByteSeq(itemId[5]);
+        itemData.WriteByteSeq(creatorGuid[2]);
+        itemData.WriteByteSeq(creatorGuid[1]);
+        itemData.WriteByteSeq(itemId[3]);
+        itemData.WriteByteSeq(creatorGuid[4]);
+        itemData.WriteByteSeq(creatorGuid[3]);
+        itemData.WriteByteSeq(itemId[4]);
 
         itemData << uint32(item->ItemRandomPropertyId);
-
-        itemData.WriteByteSeq(itemId[4]);
-        itemData.WriteByteSeq(itemId[5]);
-        itemData.WriteByteSeq(itemId[2]);
-        itemData.WriteByteSeq(creatorGuid[2]);
-        itemData.WriteByteSeq(creatorGuid[6]);
         itemData.WriteByteSeq(itemId[1]);
-        itemData.WriteByteSeq(itemId[3]);
-        itemData.WriteByteSeq(creatorGuid[5]);
-        itemData.WriteByteSeq(creatorGuid[7]);
 
         itemData << uint32(item->ItemEntry);
+        itemData.WriteByteSeq(itemId[2]);
+        itemData.WriteByteSeq(itemId[0]);
+        itemData.WriteByteSeq(creatorGuid[7]);
 
-        itemData.WriteByteSeq(itemId[7]);
+
+
+        itemData.WriteByteSeq(itemId[6]);
+        itemData.WriteByteSeq(creatorGuid[0]);
     }
 
     data.FlushBits();
