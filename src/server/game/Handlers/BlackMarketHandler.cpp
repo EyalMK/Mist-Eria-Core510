@@ -22,7 +22,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-
+#include "BlackMarket/BlackMarketMgr.h"
 #include "Log.h"
 #include "Language.h"
 #include "Opcodes.h"
@@ -153,34 +153,8 @@ void WorldSession::HandleBlackMarketRequestItems(WorldPacket& recvData)
 void WorldSession::SendBlackMarketRequestItemsResult()
 {
 	WorldPacket data(SMSG_BLACK_MARKET_REQUEST_ITEMS_RESULT, 9);
-
-	uint32 count = 1;
-
-
-	data << uint32(1); // "A saisir" ?
-	data.WriteBits(count, 20);
-	
-	for(uint32 i=0; i<count; ++i)
-		data.WriteBit(0); // Your are the highest bidder
-
-	data.FlushBits();
-
-	for(uint32 i=0; i<count; ++i)
-	{
-		data << uint32(39582); //seller
-		data << uint32(36000); //time left
-		data << uint64(0); //unk
-		data << uint64(0); //unk
-		data << uint64(100000); //price
-		data << uint32(0); //unk
-		data << uint32(0); //unk
-		data << uint32(1); //stack
-		data << uint32(60); //item id
-		data << uint32(70); //unk
-	}
-
+	sBlackMarketMgr->BuildBlackMarketAuctionsPacket(data, GetPlayer()->GetGUIDLow());
 	SendPacket(&data);
-
 }
 
 void WorldSession::HandleBlackMarketBid(WorldPacket& recvData)
