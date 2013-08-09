@@ -990,7 +990,7 @@ enum Opcodes
     SMSG_INITIAL_SPELLS                               = 0x155, //16357
     SMSG_INIT_CURRENCY                                = 0x04D0,//16357
     SMSG_INIT_WORLD_STATES                            = 0x010C,//16357
-    SMSG_INSPECT                                      = 0x1901,
+    SMSG_INSPECT                                      = 0x4DD,//16357
     SMSG_INSPECT_HONOR_STATS                          = 0x5D0, //16357
     SMSG_INSPECT_RATED_BG_STATS                       = 0x2B5, //16357
     SMSG_INSPECT_RESULTS_UPDATE                       = 0x4DD, //16357
