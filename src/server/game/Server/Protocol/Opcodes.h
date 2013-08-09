@@ -92,6 +92,7 @@ enum Opcodes
     CMSG_BATTLEMASTER_JOIN_RATED                      = 0x015E,//16357
     CMSG_BATTLE_PET_NAME_QUERY                        = 0x0E60,//16357 NEW OF MOP
     CMSG_BEGIN_TRADE                                  = 0x04EB,//16357
+	CMSG_BLACK_MARKET_BID							  = 0x0932,//16357 NEW OF MOP
 	CMSG_BLACK_MARKET_HELLO							  = 0x06E6,//16357 NEW OF MOP
 	CMSG_BLACK_MARKET_REQUEST_ITEMS					  = 0x040F,//16357 NEW OF MOP
     CMSG_BINDER_ACTIVATE                              = 0x030C,//16357

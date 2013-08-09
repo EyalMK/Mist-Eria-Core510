@@ -168,17 +168,63 @@ void WorldSession::SendBlackMarketRequestItemsResult()
 	for(uint32 i=0; i<count; ++i)
 	{
 		data << uint32(39582); //seller
-		data << uint32(36000); //unk
+		data << uint32(36000); //time left
 		data << uint64(0); //unk
 		data << uint64(0); //unk
 		data << uint64(100000000); //price
-		data << uint32(3600);
+		data << uint32(0); //unk
 		data << uint32(0); //unk
 		data << uint32(1); //stack
 		data << uint32(60); //item id
-		data << uint32(0); //unk
+		data << uint32(70); //unk
 	}
 
 	SendPacket(&data);
 
+}
+
+void WorldSession::HandleBlackMarketBid(WorldPacket& recvData)
+{
+	ObjectGuid guid;
+	uint32 unk, id;
+	uint64 bid;
+
+	recvData >> id;
+	recvData >> bid;
+	recvData >> unk;
+
+	guid[7] = recvData.ReadBit();
+	guid[4] = recvData.ReadBit();
+	guid[0] = recvData.ReadBit();
+	guid[2] = recvData.ReadBit();
+	guid[5] = recvData.ReadBit();
+	guid[3] = recvData.ReadBit();
+	guid[1] = recvData.ReadBit();
+	guid[6] = recvData.ReadBit();
+
+	recvData.ReadByteSeq(guid[3]);
+	recvData.ReadByteSeq(guid[7]);
+	recvData.ReadByteSeq(guid[0]);
+	recvData.ReadByteSeq(guid[1]);
+	recvData.ReadByteSeq(guid[6]);
+	recvData.ReadByteSeq(guid[5]);
+	recvData.ReadByteSeq(guid[2]);
+	recvData.ReadByteSeq(guid[4]);
+
+	uint64 npcGuid = uint64(guid);
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleBlackMarketBid - GUID : %u, id : %u, bid : %lu, unk : %u", uint32(GUID_LOPART(npcGuid)), id, bid, unk);
+
+	SendBlackMarketBidResult();
+}
+
+void WorldSession::SendBlackMarketBidResult()
+{
+	WorldPacket data(SMSG_BLACK_MARKET_BID_RESULT, 12);
+
+	data << uint32(0);
+	data << uint32(0);
+	data << uint32(0);
+
+	SendPacket(&data);
 }
