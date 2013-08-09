@@ -230,6 +230,7 @@ void OpcodeTable::Initialize()
     DEFINE_OPCODE_HANDLER(CMSG_GM_REPORT_LAG,                           STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleReportLag                 );
     DEFINE_OPCODE_HANDLER(CMSG_GOSSIP_HELLO,                            STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleGossipHelloOpcode         );
     DEFINE_OPCODE_HANDLER(CMSG_GOSSIP_SELECT_OPTION,                    STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleGossipSelectOptionOpcode  );
+    DEFINE_OPCODE_HANDLER(CMSG_DB_QUERY,							    STATUS_LOGGEDIN,  PROCESS_THREADSAFE,   &WorldSession::HandleDbQueryOpcode             );
     DEFINE_OPCODE_HANDLER(CMSG_GRANT_LEVEL,                             STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleGrantLevel                );
     DEFINE_OPCODE_HANDLER(CMSG_GROUP_ASSISTANT_LEADER,                  STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleGroupAssistantLeaderOpcode);
     DEFINE_OPCODE_HANDLER(CMSG_GROUP_CHANGE_SUB_GROUP,                  STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleGroupChangeSubGroupOpcode );

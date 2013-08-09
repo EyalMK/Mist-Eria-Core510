@@ -584,6 +584,7 @@ class WorldSession
         void HandlePetitionShowListOpcode(WorldPacket& recvPacket);
         void HandleGossipHelloOpcode(WorldPacket& recvPacket);
         void HandleGossipSelectOptionOpcode(WorldPacket& recvPacket);
+        void HandleDbQueryOpcode(WorldPacket& recvPacket);
         void HandleSpiritHealerActivateOpcode(WorldPacket& recvPacket);
         void HandleNpcTextQueryOpcode(WorldPacket& recvPacket);
         void HandleBinderActivateOpcode(WorldPacket& recvPacket);

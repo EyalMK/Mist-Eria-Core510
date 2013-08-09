@@ -31,6 +31,49 @@
 #include "Pet.h"
 #include "MapManager.h"
 
+
+
+enum DBQueryType
+{
+    /*BattlePetAbility           = 0xCBA43BD7,
+    BattlePetAbilityEffect     = 0xDD8B690E,
+    BattlePetAbilityState      = 0x3C556E43,
+    BattlePetAbilityTurn       = 0xECD8ECDC,
+    BattlePetBreedQuality      = 0x1B5A4EA6,
+    BattlePetBreedState        = 0x6AFB3206,
+    BattlePetEffectProperties  = 0x63B4C4BA,
+    BattlePetNPCTeamMember     = 0xF2059DFA,
+    BattlePetSpecies           = 0x6C93F9B1,
+    BattlePetSpeciesState      = 0x15D87DD0,
+    BattlePetSpeciesXAbility   = 0x44237314,
+    BattlePetState             = 0x8F447330,
+    BattlePetVisual            = 0xC3ADEB43,*/
+    DB_QUERY_NPC_TEXT                   = 0x021826BB
+    /*Creature                   = 0xC9D6B6B3,
+    GameObjects                = 0x13C403A5,
+    ItemSparse                 = 0x919BE54E,
+    Item                       = 0x50238EC2,
+    ItemCurrencyCost           = 0x6FE05AE9,
+    ItemExtendedCost           = 0xBB858355,
+    ItemUpgrade                = 0x7006463B,
+    KeyChain                   = 0x6D8A2694,
+    Locale                     = 0x3F85ABB7,
+    Location                   = 0x394C3727,
+    MapChallengeMode           = 0x383B4C27,
+    MarketingPromotionsXLocale = 0xA1D3F1AD,
+    Path                       = 0x94F46395,
+    PathNode                   = 0x3B9E4CA2,
+    PathNodeProperty           = 0xFE21C024,
+    PathProperty               = 0x08E54F60,
+    QuestPackageItem           = 0xCC2F84F0,
+    RulesetItemUpgrade         = 0x6DB7086C,
+    RulesetRaidLootUpgrade     = 0xED1FBB4D,
+    SceneScript                = 0xD4B163CC,
+    SceneScriptPackage         = 0xE8CB5E09,
+    SceneScriptPackageMember   = 0xE44DB71C,
+    SpellReagents              = 0xAB66C99F*/
+};
+
 void WorldSession::SendNameQueryOpcode(uint64 guid)
 {
     Player* player = ObjectAccessor::FindPlayer(guid);
@@ -377,6 +420,138 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recvData)
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_NPC_TEXT_UPDATE");
 }
+
+
+void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, std::vector<ObjectGuid> & p_Guids, std::vector<uint32> & p_LocalTextIDs)
+{
+    uint32 l_LocalTextID = p_LocalTextIDs[0];
+
+    GossipText const* p_Gossip = sObjectMgr->GetGossipText(l_LocalTextID);
+    std::string l_Text1 = "Greetings $N";
+    std::string l_Text2 = "Greetings $N";
+
+    if (p_Gossip && p_Gossip->Options[0].Text_0.size())
+        l_Text1 = p_Gossip->Options[0].Text_0;
+    if (p_Gossip && p_Gossip->Options[0].Text_1.size())
+        l_Text2 = p_Gossip->Options[0].Text_1;
+
+    int l_SessionLocalIndex = p_Session->GetSessionDbLocaleIndex();
+    if (l_SessionLocalIndex >= 0)
+    {
+        if (NpcTextLocale const* l_LocalData = sObjectMgr->GetNpcTextLocale(l_LocalTextID))
+        {
+            ObjectMgr::GetLocaleString(l_LocalData->Text_0[0], l_SessionLocalIndex, l_Text1);
+            ObjectMgr::GetLocaleString(l_LocalData->Text_1[0], l_SessionLocalIndex, l_Text2);
+        }
+    }
+
+    p_Data << uint32(0);				/// Data size
+    p_Data << uint32(l_LocalTextID);
+    p_Data << uint32(p_Gossip->Options[0].Language);
+    p_Data << uint16(l_Text1.size());
+    p_Data << l_Text1;
+    p_Data << uint16(l_Text2.size());
+    p_Data << l_Text2;
+
+    if (p_Gossip)
+    {
+        for (int j = 0; j < MAX_GOSSIP_TEXT_EMOTES; ++j)
+        {
+            p_Data << p_Gossip->Options[0].Emotes[j]._Delay;
+            p_Data << p_Gossip->Options[0].Emotes[j]._Emote;
+        }
+    }
+    else
+    {
+        for (int j = 0; j < MAX_GOSSIP_TEXT_EMOTES; ++j)
+        {
+            p_Data << uint32(0);
+            p_Data << uint32(0);
+        }
+    }
+
+    p_Data << uint32(0);	/// unk
+    p_Data << uint32(0);	/// unk
+
+    p_Data << uint32(0x01);	/// unk
+
+    p_Data << uint32(time(0));
+    p_Data << uint32(DB_QUERY_NPC_TEXT);
+    p_Data << uint32(l_LocalTextID);
+
+    p_Data.wpos(0);
+    p_Data << uint32(p_Data.size() - 16);
+}
+
+void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
+{
+    uint32 l_QueryType;
+    uint32 l_Count;
+
+    p_ReceivedPacket >> l_QueryType;
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "DBQuery lQueryType %u", l_QueryType);
+
+    l_Count = p_ReceivedPacket.ReadBits(17);
+
+    std::vector<ObjectGuid> l_Guids;
+    std::vector<uint32>		l_LocalTextIDs;
+
+    for (uint32 l_I = 0 ; l_I < l_Count ; l_I++)
+    {
+        ObjectGuid l_Guid;
+
+        l_Guid[7] = p_ReceivedPacket.ReadBit();
+        l_Guid[5] = p_ReceivedPacket.ReadBit();
+        l_Guid[6] = p_ReceivedPacket.ReadBit();
+        l_Guid[2] = p_ReceivedPacket.ReadBit();
+        l_Guid[1] = p_ReceivedPacket.ReadBit();
+        l_Guid[3] = p_ReceivedPacket.ReadBit();
+        l_Guid[0] = p_ReceivedPacket.ReadBit();
+        l_Guid[4] = p_ReceivedPacket.ReadBit();
+
+        l_Guids.push_back(l_Guid);
+    }
+
+    for (uint32 l_I = 0 ; l_I < l_Count ; l_I++)
+    {
+        uint32	l_LocalTextID;
+
+        p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][7]);
+        p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][6]);
+        p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][1]);
+        p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][2]);
+        p_ReceivedPacket >> l_LocalTextID;
+        p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][5]);
+        p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][3]);
+        p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][0]);
+        p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][4]);
+
+        l_LocalTextIDs.push_back(l_LocalTextID);
+    }
+
+    if (!l_Count)
+        return;
+
+    /*WorldPacket l_Data(SMSG_DB_QUERY_RESPONSE, 100);
+
+    switch (l_QueryType)
+    {
+        case DB_QUERY_NPC_TEXT:
+            SendNpcTextDBQueryResponse(this, l_Data, l_Guids, l_LocalTextIDs);
+            break;
+
+        default:
+            sLog->outDebug(LOG_FILTER_SERVER_LOADING, "Receive non handled db query type 0x%08.8X", l_QueryType);
+            break;
+
+    }
+
+    if (l_Data.size())
+        SendPacket(&l_Data);*/
+}
+
+
 
 /// Only _static_ data is sent in this packet !!!
 void WorldSession::HandlePageTextQueryOpcode(WorldPacket& recvData)

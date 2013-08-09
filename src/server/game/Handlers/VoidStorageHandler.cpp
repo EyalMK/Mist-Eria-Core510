@@ -383,29 +383,30 @@ void WorldSession::HandleVoidStorageTransfer(WorldPacket& recvData)
         7 * withdrawCount) / 8) + 7 * withdrawCount + (7 + 7 + 4 * 4) * depositCount);
 
     data.WriteBits(depositCount, 5);
-    data.WriteBits(withdrawCount, 5);
 
     for (uint8 i = 0; i < depositCount; ++i)
     {
         ObjectGuid itemId = depositItems[i].first.ItemId;
         ObjectGuid creatorGuid = depositItems[i].first.CreatorGuid;
-        data.WriteBit(creatorGuid[7]);
-        data.WriteBit(itemId[7]);
-        data.WriteBit(itemId[4]);
-        data.WriteBit(creatorGuid[6]);
+        data.WriteBit(creatorGuid[1]);
         data.WriteBit(creatorGuid[5]);
-        data.WriteBit(itemId[3]);
+        data.WriteBit(creatorGuid[6]);
+        data.WriteBit(itemId[4]);
+        data.WriteBit(itemId[6]);
         data.WriteBit(itemId[5]);
         data.WriteBit(creatorGuid[4]);
-        data.WriteBit(creatorGuid[2]);
         data.WriteBit(creatorGuid[0]);
-        data.WriteBit(creatorGuid[3]);
-        data.WriteBit(creatorGuid[1]);
-        data.WriteBit(itemId[2]);
-        data.WriteBit(itemId[0]);
+        data.WriteBit(itemId[3]);
         data.WriteBit(itemId[1]);
-        data.WriteBit(itemId[6]);
+        data.WriteBit(itemId[2]);
+        data.WriteBit(creatorGuid[2]);
+        data.WriteBit(creatorGuid[7]);
+        data.WriteBit(itemId[7]);
+        data.WriteBit(creatorGuid[3]);
+        data.WriteBit(itemId[0]);
     }
+
+    data.WriteBits(withdrawCount, 5);
 
     for (uint8 i = 0; i < withdrawCount; ++i)
     {
@@ -425,14 +426,14 @@ void WorldSession::HandleVoidStorageTransfer(WorldPacket& recvData)
     for (uint8 i = 0; i < withdrawCount; ++i)
     {
         ObjectGuid itemId = withdrawItems[i].ItemId;
-        data.WriteByteSeq(itemId[3]);
-        data.WriteByteSeq(itemId[1]);
+        data.WriteByteSeq(itemId[6]);
         data.WriteByteSeq(itemId[0]);
-        data.WriteByteSeq(itemId[2]);
         data.WriteByteSeq(itemId[7]);
         data.WriteByteSeq(itemId[5]);
-        data.WriteByteSeq(itemId[6]);
+        data.WriteByteSeq(itemId[3]);
         data.WriteByteSeq(itemId[4]);
+        data.WriteByteSeq(itemId[2]);
+        data.WriteByteSeq(itemId[1]);
     }
 
     for (uint8 i = 0; i < depositCount; ++i)
@@ -442,30 +443,28 @@ void WorldSession::HandleVoidStorageTransfer(WorldPacket& recvData)
 
         data << uint32(depositItems[i].first.ItemSuffixFactor);
 
-        data.WriteByteSeq(itemId[6]);
         data.WriteByteSeq(itemId[4]);
-        data.WriteByteSeq(creatorGuid[4]);
-        data.WriteByteSeq(itemId[2]);
-        data.WriteByteSeq(creatorGuid[1]);
         data.WriteByteSeq(creatorGuid[3]);
-        data.WriteByteSeq(itemId[3]);
-        data.WriteByteSeq(creatorGuid[0]);
-        data.WriteByteSeq(itemId[0]);
-        data.WriteByteSeq(creatorGuid[6]);
         data.WriteByteSeq(itemId[5]);
-        data.WriteByteSeq(creatorGuid[5]);
+        data.WriteByteSeq(creatorGuid[0]);
+        data.WriteByteSeq(itemId[7]);
+        data.WriteByteSeq(itemId[0]);
         data.WriteByteSeq(creatorGuid[7]);
+        data.WriteByteSeq(creatorGuid[1]);
+        data.WriteByteSeq(itemId[3]);
 
         data << uint32(depositItems[i].first.ItemEntry);
-
-        data.WriteByteSeq(itemId[1]);
-
         data << uint32(depositItems[i].second); // slot
 
         data.WriteByteSeq(creatorGuid[2]);
-        data.WriteByteSeq(itemId[7]);
+        data.WriteByteSeq(creatorGuid[6]);
+        data.WriteByteSeq(itemId[1]);
+        data.WriteByteSeq(creatorGuid[5]);
+        data.WriteByteSeq(itemId[6]);
+        data.WriteByteSeq(creatorGuid[4]);
 
         data << uint32(depositItems[i].first.ItemRandomPropertyId);
+        data.WriteByteSeq(itemId[2]);
     }
 
     SendPacket(&data);

@@ -179,7 +179,7 @@ enum Opcodes
     CMSG_CORPSE_MAP_POSITION_QUERY                    = 0xF78, //16357 ???
     CMSG_CREATURE_QUERY                               = 0x285, //16357
     CMSG_DANCE_QUERY                                  = 0x06EC,//16357
-    CMSG_DB_QUERY_BULK                                = 0x0537,//16357 NEW OF MOP
+    CMSG_DB_QUERY                                     = 0x0537,//16357 NEW OF MOP
     CMSG_DECLINE_CHANNEL_INVITE                       = 0x0AC1,//16357
     CMSG_DELETEEQUIPMENT_SET                          = 0x0C69,//16357
     CMSG_DEL_FRIEND                                   = 0x0C4D,//16357
