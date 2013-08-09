@@ -162,6 +162,8 @@ void WorldSession::SendBlackMarketRequestItemsResult()
 	for(uint32 i=0; i<count; ++i)
 		data.WriteBit(1);
 
+	data.FlushBits();
+
 	for(uint32 i=0; i<count; ++i)
 	{
 		data << uint32(1);
