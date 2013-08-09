@@ -35,6 +35,7 @@
 
 bool BMAuctionEntry::LoadFromDB(Field* fields)
 {
+	// TODO
     id = fields[0].GetUInt32();
     bidder = fields[8].GetUInt32();
     bid = fields[9].GetUInt32();
@@ -45,9 +46,9 @@ void BMAuctionEntry::SaveToDB(SQLTransaction& trans)
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_BLACKMARKET_AUCTION);
     stmt->setUInt32(0, id);
     stmt->setUInt32(1, templateId);
-    stmt->setUInt32(2, starttime);
+    stmt->setUInt32(2, startTime);
     stmt->setUInt32(3, bid);
-    stmt->setUInt32(6, bidder);
+    stmt->setUInt32(4, bidder);
     trans->Append(stmt);
 }
 
@@ -76,6 +77,8 @@ BlackMarketMgr::~BlackMarketMgr()
 
 void BlackMarketMgr::DeleteExpiredAuctionsAtStartup()
 {
+
+	/*
     // Deletes expired auctions. Should be called at server start before loading auctions.
 
     // DO NOT USE after auctions are already loaded since this deletes from the DB
@@ -132,6 +135,8 @@ void BlackMarketMgr::DeleteExpiredAuctionsAtStartup()
     } while (expAuctions->NextRow());
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Deleted %u expired auctions in %u ms", expirecount, GetMSTimeDiffToNow(oldMSTime));
+
+	*/
 
 
 }
