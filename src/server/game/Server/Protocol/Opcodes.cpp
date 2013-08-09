@@ -689,7 +689,7 @@ void OpcodeTable::Initialize()
     DEFINE_OPCODE_HANDLER(SMSG_BATTLEGROUND_PLAYER_JOINED,              STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     DEFINE_OPCODE_HANDLER(SMSG_BATTLEGROUND_PLAYER_LEFT,                STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
 	DEFINE_OPCODE_HANDLER(SMSG_BLACK_MARKET_HELLO,						STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
-	DEFINE_OPCODE_HANDLER(SMSG_BLACK_MARKET_REQUEST_ITEM_RESULT,        STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
+	DEFINE_OPCODE_HANDLER(SMSG_BLACK_MARKET_REQUEST_ITEMS_RESULT,       STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
 	DEFINE_OPCODE_HANDLER(SMSG_BLACK_MARKET_BID_RESULT,                 STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
 	DEFINE_OPCODE_HANDLER(SMSG_BLACK_MARKET_OUT_BID,					STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
 	DEFINE_OPCODE_HANDLER(SMSG_BLACK_MARKET_BID_WON,					STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
