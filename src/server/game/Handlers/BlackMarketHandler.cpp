@@ -166,14 +166,14 @@ void WorldSession::SendBlackMarketRequestItemsResult()
 
 	for(uint32 i=0; i<count; ++i)
 	{
-		data << uint32(1);
+		data << uint32(3); // Seller
 		data << uint32(2);
 		data << uint64(3);
 		data << uint64(4);
-		data << uint64(5);
+		data << uint64(10000); //price
 		data << uint32(6);
 		data << uint32(7);
-		data << uint32(8);
+		data << uint32(14); //stack
 		data << uint32(9);
 		data << uint32(10);
 	}
