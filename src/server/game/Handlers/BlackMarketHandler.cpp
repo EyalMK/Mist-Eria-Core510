@@ -171,7 +171,7 @@ void WorldSession::SendBlackMarketRequestItemsResult()
 		data << uint32(36000); //time left
 		data << uint64(0); //unk
 		data << uint64(0); //unk
-		data << uint64(100000000); //price
+		data << uint64(100000); //price
 		data << uint32(0); //unk
 		data << uint32(0); //unk
 		data << uint32(1); //stack
@@ -186,12 +186,12 @@ void WorldSession::SendBlackMarketRequestItemsResult()
 void WorldSession::HandleBlackMarketBid(WorldPacket& recvData)
 {
 	ObjectGuid guid;
-	uint32 unk, id;
-	uint64 bid;
+	uint32 itemid, id;
+	uint64 price;
 
 	recvData >> id;
-	recvData >> bid;
-	recvData >> unk;
+	recvData >> price;
+	recvData >> itemid;
 
 	guid[7] = recvData.ReadBit();
 	guid[4] = recvData.ReadBit();
@@ -213,7 +213,16 @@ void WorldSession::HandleBlackMarketBid(WorldPacket& recvData)
 
 	uint64 npcGuid = uint64(guid);
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleBlackMarketBid - GUID : %u, id : %u, bid : %lu, unk : %u", uint32(GUID_LOPART(npcGuid)), id, bid, unk);
+	if (!price)
+		return;
+
+	Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(npcGuid, UNIT_NPC_FLAG_BLACK_MARKET);
+    if (!creature)
+    {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleBlackMarketBid - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(npcGuid)));
+        return;
+    }
+
 
 	SendBlackMarketBidResult();
 }
@@ -223,8 +232,8 @@ void WorldSession::SendBlackMarketBidResult()
 	WorldPacket data(SMSG_BLACK_MARKET_BID_RESULT, 12);
 
 	data << uint32(0);
-	data << uint32(0);
-	data << uint32(0);
+	data << uint32(2);
+	data << uint32(3);
 
 	SendPacket(&data);
 }
