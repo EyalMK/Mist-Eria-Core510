@@ -155,9 +155,7 @@ void WorldSession::SendBlackMarketRequestItemsResult()
 	WorldPacket data(SMSG_BLACK_MARKET_REQUEST_ITEMS_RESULT, 9);
 
 	uint32 count = 1;
-	uint32 seller = 39582;
-	uint64 price = 100000000;
-	uint32 stack = 1;
+
 
 	data << uint32(1); // "A saisir" ?
 	data.WriteBits(count, 20);
@@ -169,15 +167,15 @@ void WorldSession::SendBlackMarketRequestItemsResult()
 
 	for(uint32 i=0; i<count; ++i)
 	{
-		data << uint32(seller);
-		data << uint32(100);
-		data << uint64(200000);
-		data << uint64(100000);
-		data << uint64(price);
-		data << uint32(40);
-		data << uint32(50);
-		data << uint32(stack);
-		data << uint32(60);
+		data << uint32(39582); //seller
+		data << uint32(72000);
+		data << uint64(0);
+		data << uint64(0);
+		data << uint64(100000000); //price
+		data << uint32(144000);
+		data << uint32(0);
+		data << uint32(1); //stack
+		data << uint32(60); //item id
 		data << uint32(70);
 	}
 
