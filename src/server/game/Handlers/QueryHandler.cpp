@@ -533,7 +533,7 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
     if (!l_Count)
         return;
 
-    /*WorldPacket l_Data(SMSG_DB_QUERY_RESPONSE, 100);
+    WorldPacket l_Data(SMSG_DB_REPLY, 100);
 
     switch (l_QueryType)
     {
@@ -548,7 +548,7 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
     }
 
     if (l_Data.size())
-        SendPacket(&l_Data);*/
+        SendPacket(&l_Data);
 }
 
 
