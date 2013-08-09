@@ -193,7 +193,14 @@ void WorldSession::HandleVoidStorageTransfer(WorldPacket& recvData)
     // Read everything
 
     ObjectGuid npcGuid;
+    npcGuid[5] = recvData.ReadBit();
+    npcGuid[0] = recvData.ReadBit();
+    npcGuid[3] = recvData.ReadBit();
+    npcGuid[4] = recvData.ReadBit();
     npcGuid[1] = recvData.ReadBit();
+    npcGuid[2] = recvData.ReadBit();
+    npcGuid[6] = recvData.ReadBit();
+    npcGuid[7] = recvData.ReadBit();
 
     uint32 countDeposit = recvData.ReadBits(26);
 
@@ -206,22 +213,15 @@ void WorldSession::HandleVoidStorageTransfer(WorldPacket& recvData)
     std::vector<ObjectGuid> itemGuids(countDeposit);
     for (uint32 i = 0; i < countDeposit; ++i)
     {
-        itemGuids[i][4] = recvData.ReadBit();
-        itemGuids[i][6] = recvData.ReadBit();
-        itemGuids[i][7] = recvData.ReadBit();
         itemGuids[i][0] = recvData.ReadBit();
+        itemGuids[i][7] = recvData.ReadBit();
+        itemGuids[i][6] = recvData.ReadBit();
         itemGuids[i][1] = recvData.ReadBit();
         itemGuids[i][5] = recvData.ReadBit();
-        itemGuids[i][3] = recvData.ReadBit();
+        itemGuids[i][4] = recvData.ReadBit();
         itemGuids[i][2] = recvData.ReadBit();
+        itemGuids[i][3] = recvData.ReadBit();
     }
-
-    npcGuid[2] = recvData.ReadBit();
-    npcGuid[0] = recvData.ReadBit();
-    npcGuid[3] = recvData.ReadBit();
-    npcGuid[5] = recvData.ReadBit();
-    npcGuid[6] = recvData.ReadBit();
-    npcGuid[4] = recvData.ReadBit();
 
     uint32 countWithdraw = recvData.ReadBits(26);
 
@@ -234,53 +234,51 @@ void WorldSession::HandleVoidStorageTransfer(WorldPacket& recvData)
     std::vector<ObjectGuid> itemIds(countWithdraw);
     for (uint32 i = 0; i < countWithdraw; ++i)
     {
-        itemIds[i][4] = recvData.ReadBit();
-        itemIds[i][7] = recvData.ReadBit();
-        itemIds[i][1] = recvData.ReadBit();
-        itemIds[i][0] = recvData.ReadBit();
-        itemIds[i][2] = recvData.ReadBit();
-        itemIds[i][3] = recvData.ReadBit();
         itemIds[i][5] = recvData.ReadBit();
         itemIds[i][6] = recvData.ReadBit();
+        itemIds[i][1] = recvData.ReadBit();
+        itemIds[i][7] = recvData.ReadBit();
+        itemIds[i][2] = recvData.ReadBit();
+        itemIds[i][4] = recvData.ReadBit();
+        itemIds[i][0] = recvData.ReadBit();
+        itemIds[i][3] = recvData.ReadBit();
     }
 
-    npcGuid[7] = recvData.ReadBit();
-
     recvData.FlushBits();
+
+    for (uint32 i = 0; i < countWithdraw; ++i)
+    {
+        recvData.ReadByteSeq(itemIds[i][4]);
+        recvData.ReadByteSeq(itemIds[i][7]);
+        recvData.ReadByteSeq(itemIds[i][0]);
+        recvData.ReadByteSeq(itemIds[i][6]);
+        recvData.ReadByteSeq(itemIds[i][1]);
+        recvData.ReadByteSeq(itemIds[i][2]);
+        recvData.ReadByteSeq(itemIds[i][3]);
+        recvData.ReadByteSeq(itemIds[i][5]);
+    }
+
+    recvData.ReadByteSeq(npcGuid[0]);
 
     for (uint32 i = 0; i < countDeposit; ++i)
     {
         recvData.ReadByteSeq(itemGuids[i][6]);
-        recvData.ReadByteSeq(itemGuids[i][1]);
-        recvData.ReadByteSeq(itemGuids[i][0]);
-        recvData.ReadByteSeq(itemGuids[i][2]);
-        recvData.ReadByteSeq(itemGuids[i][4]);
-        recvData.ReadByteSeq(itemGuids[i][5]);
         recvData.ReadByteSeq(itemGuids[i][3]);
         recvData.ReadByteSeq(itemGuids[i][7]);
+        recvData.ReadByteSeq(itemGuids[i][2]);
+        recvData.ReadByteSeq(itemGuids[i][1]);
+        recvData.ReadByteSeq(itemGuids[i][0]);
+        recvData.ReadByteSeq(itemGuids[i][4]);
+        recvData.ReadByteSeq(itemGuids[i][5]);
     }
 
-    recvData.ReadByteSeq(npcGuid[5]);
-    recvData.ReadByteSeq(npcGuid[6]);
-
-    for (uint32 i = 0; i < countWithdraw; ++i)
-    {
-        recvData.ReadByteSeq(itemIds[i][3]);
-        recvData.ReadByteSeq(itemIds[i][1]);
-        recvData.ReadByteSeq(itemIds[i][0]);
-        recvData.ReadByteSeq(itemIds[i][6]);
-        recvData.ReadByteSeq(itemIds[i][2]);
-        recvData.ReadByteSeq(itemIds[i][7]);
-        recvData.ReadByteSeq(itemIds[i][5]);
-        recvData.ReadByteSeq(itemIds[i][4]);
-    }
-
-    recvData.ReadByteSeq(npcGuid[1]);
     recvData.ReadByteSeq(npcGuid[4]);
-    recvData.ReadByteSeq(npcGuid[7]);
     recvData.ReadByteSeq(npcGuid[3]);
+    recvData.ReadByteSeq(npcGuid[1]);
+    recvData.ReadByteSeq(npcGuid[6]);
     recvData.ReadByteSeq(npcGuid[2]);
-    recvData.ReadByteSeq(npcGuid[0]);
+    recvData.ReadByteSeq(npcGuid[5]);
+    recvData.ReadByteSeq(npcGuid[7]);
 
     Creature* unit = player->GetNPCIfCanInteractWith(npcGuid, UNIT_NPC_FLAG_VAULTKEEPER);
     if (!unit)
