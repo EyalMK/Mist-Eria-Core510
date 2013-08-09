@@ -161,22 +161,22 @@ void WorldSession::SendBlackMarketRequestItemsResult()
 	data.WriteBits(count, 20);
 	
 	for(uint32 i=0; i<count; ++i)
-		data.WriteBit(1);
+		data.WriteBit(0); // Your are the highest bidder
 
 	data.FlushBits();
 
 	for(uint32 i=0; i<count; ++i)
 	{
 		data << uint32(39582); //seller
-		data << uint32(72000);
-		data << uint64(0);
-		data << uint64(0);
+		data << uint32(36000); //unk
+		data << uint64(0); //unk
+		data << uint64(0); //unk
 		data << uint64(100000000); //price
-		data << uint32(144000);
-		data << uint32(0);
+		data << uint32(3600);
+		data << uint32(0); //unk
 		data << uint32(1); //stack
 		data << uint32(60); //item id
-		data << uint32(70);
+		data << uint32(0); //unk
 	}
 
 	SendPacket(&data);
