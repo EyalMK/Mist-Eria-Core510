@@ -918,8 +918,10 @@ class WorldSession
         void SendReforgeResult(bool success);
 
 		// Black Market
-		void HandleBlackMarketHelloOpcode(WorldPacket& recvData);
-		void SendBlackMarketHello(uint64 guid, Creature* unit);
+		void HandleBlackMarketHello(WorldPacket& recvData);
+		void SendBlackMarketHello(uint64 guid);
+		void HandleBlackMarketRequestItems(WorldPacket& recvData);
+		void SendBlackMarketRequestItemsResult(uint64 guid);
 
         // Miscellaneous
         void HandleSpellClick(WorldPacket& recvData);

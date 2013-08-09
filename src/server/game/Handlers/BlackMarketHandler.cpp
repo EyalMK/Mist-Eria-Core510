@@ -34,7 +34,7 @@
 //post-incrementation is always slower than pre-incrementation !
 
 //void called when player click on black market npc
-void WorldSession::HandleBlackMarketHelloOpcode(WorldPacket& recvData)
+void WorldSession::HandleBlackMarketHello(WorldPacket& recvData)
 {
     ObjectGuid guid;
 
@@ -58,12 +58,10 @@ void WorldSession::HandleBlackMarketHelloOpcode(WorldPacket& recvData)
 
 	uint64 npcGuid = uint64(guid);
 
-
-
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(npcGuid, UNIT_NPC_FLAG_BLACK_MARKET);
     if (!unit)
     {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleBlackMarketHelloOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(npcGuid)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleBlackMarketHello - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(npcGuid)));
         return;
     }
 
@@ -71,11 +69,11 @@ void WorldSession::HandleBlackMarketHelloOpcode(WorldPacket& recvData)
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    SendBlackMarketHello(npcGuid, unit);
+    SendBlackMarketHello(npcGuid);
 }
 
 
-void WorldSession::SendBlackMarketHello(uint64 npcGuid, Creature* unit)
+void WorldSession::SendBlackMarketHello(uint64 npcGuid)
 {
 	/*
 	if (GetPlayer()->getLevel() < sWorld->getIntConfig(CONFIG_BLACK_MARKET_LEVEL_REQ))
@@ -83,12 +81,8 @@ void WorldSession::SendBlackMarketHello(uint64 npcGuid, Creature* unit)
         SendNotification(GetTrinityString(LANG_AUCTION_REQ), sWorld->getIntConfig(CONFIG_BLACK_MARKET_LEVEL_REQ));
         return;
     }
+	*/
 	
-
-    AuctionHouseEntry const* ahEntry = AuctionHouseMgr::GetAuctionHouseEntry(unit->getFaction());
-    if (!ahEntry)
-        return;*/
-
     WorldPacket data(SMSG_BLACK_MARKET_HELLO, 9);
     
 	ObjectGuid guid = npcGuid;
@@ -115,4 +109,51 @@ void WorldSession::SendBlackMarketHello(uint64 npcGuid, Creature* unit)
 	data.WriteByteSeq(guid[1]);
 
     SendPacket(&data);
+}
+
+void WorldSession::HandleBlackMarketRequestItems(WorldPacket& recvData)
+{
+	ObjectGuid guid;
+	uint32 unk;
+
+	recvData >> unk;
+
+	guid[2] = recvData.ReadBit();
+	guid[5] = recvData.ReadBit();
+	guid[4] = recvData.ReadBit();
+	guid[0] = recvData.ReadBit();
+	guid[7] = recvData.ReadBit();
+	guid[3] = recvData.ReadBit();
+	guid[6] = recvData.ReadBit();
+	guid[1] = recvData.ReadBit();
+
+	recvData.ReadByteSeq(guid[7]);
+	recvData.ReadByteSeq(guid[5]);
+	recvData.ReadByteSeq(guid[6]);
+	recvData.ReadByteSeq(guid[4]);
+	recvData.ReadByteSeq(guid[0]);
+	recvData.ReadByteSeq(guid[3]);
+	recvData.ReadByteSeq(guid[1]);
+	recvData.ReadByteSeq(guid[2]);
+
+	uint64 npcGuid = uint64(guid);
+
+    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(npcGuid, UNIT_NPC_FLAG_BLACK_MARKET);
+    if (!unit)
+    {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleBlackMarketRequestItems - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(npcGuid)));
+        return;
+    }
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleBlackMarketRequestItems - unk = %u", unk);
+
+	//SendBlackMarketRequestItemsResult(npcGuid);
+
+}
+
+void WorldSession::SendBlackMarketRequestItemsResult(uint64 npcGuid)
+{
+
+
+
 }
