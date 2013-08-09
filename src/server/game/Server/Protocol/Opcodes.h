@@ -92,6 +92,7 @@ enum Opcodes
     CMSG_BATTLEMASTER_JOIN_RATED                      = 0x015E,//16357
     CMSG_BATTLE_PET_NAME_QUERY                        = 0x0E60,//16357 NEW OF MOP
     CMSG_BEGIN_TRADE                                  = 0x04EB,//16357
+	CMSG_BLACK_MARKET_HELLO							  = 0x06E6,//16357 NEW OF MOP
     CMSG_BINDER_ACTIVATE                              = 0x030C,//16357
     CMSG_BOT_DETECTED2                                = 0x1058,
     CMSG_BUG                                          = 0x01E0,//16357
@@ -752,6 +753,11 @@ enum Opcodes
     SMSG_BATTLE_PET_LICENSE_CHANGED                   = 0x03F9,//16357 NEW OF MOP
     SMSG_BATTLE_PET_TRAP_LEVEL                        = 0x0339,//16357 NEW OF MOP
     SMSG_BATTLE_PET_UPDATES                           = 0x0CFC,//16357 NEW OF MOP
+	SMSG_BLACK_MARKET_HELLO                           = 0xED0, //16357
+    SMSG_BLACK_MARKET_REQUEST_ITEM_RESULT			  = 0x751, //16357
+    SMSG_BLACK_MARKET_BID_RESULT                      = 0xB18, //16357
+    SMSG_BLACK_MARKET_OUT_BID                         = 0x1DC, //16357
+    SMSG_BLACK_MARKET_BID_WON                         = 0x975, //16357
     SMSG_BINDER_CONFIRM                               = 0x0949,//16357
     SMSG_BINDPOINTUPDATE                              = 0x070D,//16357
     SMSG_BINDZONEREPLY                                = 0x1655,

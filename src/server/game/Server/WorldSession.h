@@ -917,6 +917,10 @@ class WorldSession
         void HandleReforgeItemOpcode(WorldPacket& recvData);
         void SendReforgeResult(bool success);
 
+		// Black Market
+		void HandleBlackMarketHelloOpcode(WorldPacket& recvData);
+		void SendBlackMarketHello(uint64 guid, Creature* unit);
+
         // Miscellaneous
         void HandleSpellClick(WorldPacket& recvData);
         void HandleMirrorImageDataRequest(WorldPacket& recvData);
