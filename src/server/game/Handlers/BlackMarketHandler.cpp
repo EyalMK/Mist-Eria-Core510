@@ -103,7 +103,7 @@ void WorldSession::SendBlackMarketHello(uint64 npcGuid, Creature* unit)
 	data.WriteBit(guid[5]);
 	data.WriteBit(guid[3]);
 
-	data.FlushBits;
+	data.FlushBits();
 
 	data.WriteByteSeq(guid[5]);
 	data.WriteByteSeq(guid[7]);
