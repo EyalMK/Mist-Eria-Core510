@@ -228,8 +228,13 @@ void BlackMarketMgr::CreateAuctions(uint32 number, SQLTransaction& trans)
 
 		for(BMAuctionTemplateMap::const_iterator itr = GetTemplatesBegin(); itr != GetTemplatesEnd(); ++itr)
 		{
+			sLog->outInfo(LOG_FILTER_NETWORKIO, ">> Chances are : %u / %u", itr->second->chance, rand);
 			if(itr->second->chance >= rand)
+			{
 				templateList.push_back(itr->first);
+				sLog->outInfo(LOG_FILTER_NETWORKIO, ">> Pushed Back !");
+			}
+
 		}
 
 		if(templateList.empty())
