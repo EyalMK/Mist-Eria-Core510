@@ -29,8 +29,9 @@ class Item;
 class Player;
 class WorldPacket;
 
-#define MAX_AUCTION_ITEMS 160
+#define MAX_BM_AUCTION_ITEMS 160
 
+/*
 enum BMAuctionError
 {
     ERR_AUCTION_OK                  = 0,
@@ -61,6 +62,8 @@ enum BMMailAuctionAnswers
     AUCTION_CANCELED            = 5,
     AUCTION_SALE_PENDING        = 6
 };
+
+*/
 
 struct BMAuctionTemplate
 {
