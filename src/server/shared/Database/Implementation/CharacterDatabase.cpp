@@ -618,6 +618,6 @@ void CharacterDatabaseConnection::DoPrepareStatements()
 	PrepareStatement(CHAR_INS_BLACKMARKET_AUCTION, "INSERT INTO blackmarket VALUES (?, ?, ?, ?, ?) ;", CONNECTION_ASYNC);
 	PrepareStatement(CHAR_DEL_BLACKMARKET_AUCTION, "DELETE FROM blackmarket WHERE id = ? ;", CONNECTION_ASYNC);
 	PrepareStatement(CHAR_UPD_BLACKMARKET_AUCTION, "UPDATE blackmarket SET bid = ?, bidder = ? WHERE id = ? ;", CONNECTION_ASYNC);
-	PrepareStatement(CHAR_SEL_BLACKMARKET_AUCTIONS, "SELECT id, templateId, startTime, bid, bidder FROM blackmarket ;", CONNECTION_ASYNC);
+	PrepareStatement(CHAR_SEL_BLACKMARKET_AUCTIONS, "SELECT id, templateId, startTime, bid, bidder FROM blackmarket ;", CONNECTION_SYNCH);
 
 }
