@@ -1584,7 +1584,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
 
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
-        if(citr->guid == player->GetGUID())
+		if(citr->guid == slot->guid)
             continue;
 
         ObjectGuid memberGuid = citr->guid;
@@ -1626,7 +1626,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
 
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
-        if(citr->guid == player->GetGUID())
+		if(citr->guid == slot->guid)
             continue;
 
 		Player* member = ObjectAccessor::FindPlayer(citr->guid);
