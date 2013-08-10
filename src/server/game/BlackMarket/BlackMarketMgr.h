@@ -62,25 +62,32 @@ enum BMMailAuctionAnswers
     AUCTION_SALE_PENDING        = 6
 };
 
+struct BMAuctionTemplate
+{
+    uint32 id;
+    uint32 itemEntry;
+    uint32 itemCount;
+    uint32 seller;
+	uint32 duration;
+	uint32 startBid;
+	uint32 chance;
+};
+
 struct BMAuctionEntry
 {
     uint32 id;
 	uint32 templateId;
-    uint32 itemEntry;
-    uint32 itemCount;
-    uint32 seller;
     uint32 startTime;
-	uint32 duration;
 	uint32 bid;
     uint32 bidder;
-	bool isActive;
+	BMAuctionTemplate* bm_template;
 
     // helpers
     void DeleteFromDB(SQLTransaction& trans);
     void SaveToDB(SQLTransaction& trans);
     bool LoadFromDB(Field* fields);
-	uint32 TimeLeft() { return startTime + duration - time(NULL); }
-
+	uint32 TimeLeft() { return startTime + bm_template->duration - time(NULL); }
+	bool IsActive() { return (time(NULL) >= startTime); }
 };
 
 
@@ -92,11 +99,25 @@ class BlackMarketMgr
         BlackMarketMgr();
         ~BlackMarketMgr();
 
+		typedef std::map<uint32, BMAuctionTemplate*> BMAuctionTemplateMap;
 		typedef std::map<uint32, BMAuctionEntry*> BMAuctionEntryMap;
 
+		BMAuctionTemplateMap BMTemplatesMap;
 		BMAuctionEntryMap BMAuctionsMap;
 
 	public:
+
+		BMAuctionTemplate* GetTemplate(uint32 id) const
+		{
+			BMAuctionTemplateMap::const_iterator itr = BMTemplatesMap.find(id);
+			return itr != BMTemplatesMap.end() ? itr->second : NULL;
+		}
+
+		uint32 GetTemplatesCount() { return BMTemplatesMap.size(); }
+
+		BMAuctionTemplateMap::iterator GetTemplatesBegin() { return BMTemplatesMap.begin(); }
+		BMAuctionTemplateMap::iterator GetTemplatesEnd() { return BMTemplatesMap.end(); }
+
 
 		BMAuctionEntry* GetAuction(uint32 id) const
 		{
@@ -114,10 +135,7 @@ class BlackMarketMgr
         void SendAuctionWonMail(BMAuctionEntry* auction, SQLTransaction& trans);
         void SendAuctionOutbiddedMail(BMAuctionEntry* auction, uint32 newPrice, Player* newBidder, SQLTransaction& trans);
 
-
-        // Used primarily at server start to avoid loading a list of expired auctions
-        void DeleteExpiredAuctionsAtStartup();
-
+		void LoadTemplates();
         void LoadAuctions();
 
 		void AddAuction(BMAuctionEntry* auction);

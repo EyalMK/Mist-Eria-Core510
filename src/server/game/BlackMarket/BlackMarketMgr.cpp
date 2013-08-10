@@ -32,13 +32,20 @@
 #include "Log.h"
 #include <vector>
 
+// BMAuctionEntry
 
 bool BMAuctionEntry::LoadFromDB(Field* fields)
 {
-	// TODO
     id = fields[0].GetUInt32();
-    bidder = fields[8].GetUInt32();
-    bid = fields[9].GetUInt32();
+	templateId = fields[1].GetUInt32();
+	startTime = fields[2].GetUInt32();
+	bid = fields[3].GetUInt64();
+    bidder = fields[3].GetUInt32();
+
+    bm_template = sBlackMarketMgr->GetTemplate(templateId);
+	if (!bm_template)
+		return false;
+	return true;
 }
 
 void BMAuctionEntry::SaveToDB(SQLTransaction& trans)
@@ -60,8 +67,7 @@ void BMAuctionEntry::DeleteFromDB(SQLTransaction& trans)
 }
 
 
-
-
+// BlackMarketMgr
 
 BlackMarketMgr::BlackMarketMgr()
 {
@@ -69,75 +75,89 @@ BlackMarketMgr::BlackMarketMgr()
 
 BlackMarketMgr::~BlackMarketMgr()
 {
-	/*
-    for (ItemMap::iterator itr = mAitems.begin(); itr != mAitems.end(); ++itr)
+	for(BMAuctionEntryMap::const_iterator itr = GetAuctionsBegin(); itr != GetAuctionsEnd(); ++itr)
         delete itr->second;
-	*/
+    for(BMAuctionTemplateMap::const_iterator itr = GetTemplatesBegin(); itr != GetTemplatesEnd(); ++itr)
+        delete itr->second;
 }
 
-void BlackMarketMgr::DeleteExpiredAuctionsAtStartup()
+
+void BlackMarketMgr::LoadTemplates()
 {
+	uint32 oldMSTime = getMSTime();
 
-	/*
-    // Deletes expired auctions. Should be called at server start before loading auctions.
+	PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_BLACKMARKET_TEMPLATE);
+	PreparedQueryResult result = WorldDatabase.Query(stmt);
 
-    // DO NOT USE after auctions are already loaded since this deletes from the DB
-    //  and assumes the auctions HAVE NOT been loaded into a list or AuctionEntryMap yet
-
-    uint32 oldMSTime = getMSTime();
-    uint32 expirecount = 0;
-    time_t curTime = sWorld->GetGameTime();
-
-    // Query the DB to see if there are any expired auctions
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_BLACKMARKET_EXPIRED_AUCTIONS);
-    stmt->setUInt32(0, (uint32)curTime+60);
-    PreparedQueryResult expAuctions = CharacterDatabase.Query(stmt);
-
-    if (!expAuctions)
+	if (!result)
     {
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> No expired blackmarket auctions to delete");
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 BlackMarket templates. DB table `blackmarket_template` is empty.");
 
         return;
     }
 
+	uint32 count = 0;
+
+	do
+    {
+        Field* fields = result->Fetch();
+
+        BMAuctionTemplate* bm_template = new BMAuctionTemplate();
+        bm_template->id			= fields[0].GetUInt32();
+		bm_template->itemEntry	= fields[1].GetUInt32();
+		bm_template->itemCount	= fields[2].GetUInt32();
+		bm_template->seller		= fields[3].GetUInt32();
+		bm_template->startBid	= fields[4].GetUInt64();
+		bm_template->duration	= fields[5].GetUInt32();
+		bm_template->chance		= fields[6].GetUInt32();
+
+		BMTemplatesMap[bm_template->id] = bm_template;
+
+        ++count;
+    } while (result->NextRow());
+
+	sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u BlackMarket templates in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+	
+}
+
+void BlackMarketMgr::LoadAuctions()
+{
+	uint32 oldMSTime = getMSTime();
+
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_BLACKMARKET_AUCTIONS);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (!result)
+    {
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 BlackMarket Auctions. DB table `blackmarket` is empty.");
+
+        return;
+    }
+
+    uint32 count = 0;
+
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
     do
     {
-        Field* fields = expAuctions->Fetch();
+        Field* fields = result->Fetch();
 
         BMAuctionEntry* auction = new BMAuctionEntry();
-
-        // Can't use LoadFromDB() because it assumes the auction map is loaded
-        if (!auction->LoadFromFieldList(fields))
+        if (!auction->LoadFromDB(fields))
         {
-            // For some reason the record in the DB is broken (possibly corrupt
-            //  faction info). Delete the object and move on.
+			auction->DeleteFromDB(trans);
             delete auction;
             continue;
         }
 
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+		BMAuctionsMap[auction->id] = auction;
 
-        if (auction->bidder)
-        {
-            // Send the item to the winner
-            sBlackMarketMgr->SendAuctionWonMail(auction, trans);
-        }
+        ++count;
 
+    } while (result->NextRow());
 
-        // Delete the auction from the DB
-        auction->DeleteFromDB(trans);
-        CharacterDatabase.CommitTransaction(trans);
+    CharacterDatabase.CommitTransaction(trans);
 
-        // Release memory
-        delete auction;
-        ++expirecount;
-
-    } while (expAuctions->NextRow());
-
-    sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Deleted %u expired auctions in %u ms", expirecount, GetMSTimeDiffToNow(oldMSTime));
-
-	*/
-
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u BlackMarket Auctions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 
 }
 
@@ -152,7 +172,7 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 	{
 		BMAuctionEntry* auction = itr->second;
 
-		if (!auction->isActive)
+		if (!auction->IsActive())
 			continue;
 
 		data.WriteBit((guidLow == auction->bidder));
@@ -163,24 +183,21 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 	{
 		BMAuctionEntry* auction = itr->second;
 
-		if (!auction->isActive)
+		if (!auction->IsActive())
 			continue;
 
-		data << uint32(auction->seller); //seller
+		data << uint32(auction->bm_template->seller); //seller
 		data << uint32(auction->TimeLeft()); //time left
 		data << uint64(0); //unk
 		data << uint64(0); //unk
 		data << uint64(auction->bid); // price
 		data << uint32(0); //unk
 		data << uint32(0); //unk
-		data << uint32(auction->itemCount); //stack count
-		data << uint32(auction->itemEntry); //item id
+		data << uint32(auction->bm_template->itemCount); //stack count
+		data << uint32(auction->bm_template->itemEntry); //item id
 		data << uint32(0); //unk
 	}
 
 	data.PutBits<uint32>(4, count, 20);
-
-
-
 
 }

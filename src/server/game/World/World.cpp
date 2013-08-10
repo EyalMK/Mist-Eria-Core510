@@ -81,6 +81,7 @@
 #include "Warden.h"
 #include "CalendarMgr.h"
 #include "BattlefieldMgr.h"
+#include "BlackMarket/BlackMarketMgr.h"
 
 ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
@@ -1613,12 +1614,19 @@ void World::SetInitialWorldSettings()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Deleting expired auctions...");
     sAuctionMgr->DeleteExpiredAuctionsAtStartup();
 
+
     ///- Load dynamic data tables from the database
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Item Auctions...");
     sAuctionMgr->LoadAuctionItems();
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Auctions...");
     sAuctionMgr->LoadAuctions();
+
+	sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading BlackMarket Templates...");
+    sBlackMarketMgr->LoadTemplates();
+
+	sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading BlackMarket Auctions...");
+    sBlackMarketMgr->LoadAuctions();
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Guild XP for level...");
     sGuildMgr->LoadGuildXpForLevel();
