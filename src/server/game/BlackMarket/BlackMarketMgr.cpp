@@ -40,7 +40,7 @@ bool BMAuctionEntry::LoadFromDB(Field* fields)
 	templateId = fields[1].GetUInt32();
 	startTime = fields[2].GetUInt32();
 	bid = fields[3].GetUInt64();
-    bidder = fields[3].GetUInt32();
+    bidder = fields[4].GetUInt32();
 
     bm_template = sBlackMarketMgr->GetTemplate(templateId);
 	if (!bm_template)
@@ -54,7 +54,7 @@ void BMAuctionEntry::SaveToDB(SQLTransaction& trans)
     stmt->setUInt32(0, id);
     stmt->setUInt32(1, templateId);
     stmt->setUInt32(2, startTime);
-    stmt->setUInt32(3, bid);
+    stmt->setUInt64(3, bid);
     stmt->setUInt32(4, bidder);
     trans->Append(stmt);
 }
