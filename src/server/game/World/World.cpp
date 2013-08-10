@@ -1257,6 +1257,11 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_GUILD_DAILY_XP_CAP] = ConfigMgr::GetIntDefault("Guild.DailyXPCap", 7807500);
     m_int_configs[CONFIG_GUILD_WEEKLY_REP_CAP] = ConfigMgr::GetIntDefault("Guild.WeeklyReputationCap", 4375);
 
+	//BlackMarket
+	m_int_configs[CONFIG_BLACKMARKET_MAX_AUCTIONS] = ConfigMgr::GetIntDefault("BlackMarket.MaxAuctions", 10);
+	m_int_configs[CONFIG_BLACKMARKET_AUCTION_DELAY] = ConfigMgr::GetIntDefault("BlackMarket.AuctionDelay", 120);
+	m_int_configs[CONFIG_BLACKMARKET_AUCTION_DELAY_MOD] = ConfigMgr::GetIntDefault("BlackMarket.AuctionDelayMod", 60); 
+
     // misc
     m_bool_configs[CONFIG_PDUMP_NO_PATHS] = ConfigMgr::GetBoolDefault("PlayerDump.DisallowPaths", true);
     m_bool_configs[CONFIG_PDUMP_NO_OVERWRITE] = ConfigMgr::GetBoolDefault("PlayerDump.DisallowOverwrite", true);
@@ -1758,6 +1763,7 @@ void World::SetInitialWorldSettings()
 
     m_timers[WUPDATE_WEATHERS].SetInterval(1*IN_MILLISECONDS);
     m_timers[WUPDATE_AUCTIONS].SetInterval(MINUTE*IN_MILLISECONDS);
+	m_timers[WUPDATE_BLACKMARKET].SetInterval(MINUTE*IN_MILLISECONDS);
     m_timers[WUPDATE_UPTIME].SetInterval(m_int_configs[CONFIG_UPTIME_UPDATE]*MINUTE*IN_MILLISECONDS);
                                                             //Update "uptime" table based on configuration entry in minutes.
     m_timers[WUPDATE_CORPSES].SetInterval(20 * MINUTE * IN_MILLISECONDS);
@@ -2033,6 +2039,13 @@ void World::Update(uint32 diff)
 
         ///- Handle expired auctions
         sAuctionMgr->Update();
+    }
+
+	// Update BlackMarket
+	if (m_timers[WUPDATE_BLACKMARKET].Passed())
+    {
+        m_timers[WUPDATE_BLACKMARKET].Reset();
+        sBlackMarketMgr->Update();
     }
 
     /// <li> Handle session updates when the timer has passed

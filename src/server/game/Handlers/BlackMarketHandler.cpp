@@ -197,6 +197,23 @@ void WorldSession::HandleBlackMarketBid(WorldPacket& recvData)
         return;
     }
 
+	BMAuctionEntry *auction = sBlackMarketMgr->GetAuction(id);
+	if (!auction)
+		return;
+
+	if(auction->bid >= price)
+	{
+		//envoyer message prix trop bas
+		return;
+	}
+
+	if (GetPlayer()->GetMoney() < price)
+	{
+		//envoyer message pas assez d'argent
+		return;
+	}
+
+	sBlackMarketMgr->UpdateAuction(auction, price, GetPlayer());
 
 	SendBlackMarketBidResult();
 }
@@ -205,9 +222,9 @@ void WorldSession::SendBlackMarketBidResult()
 {
 	WorldPacket data(SMSG_BLACK_MARKET_BID_RESULT, 12);
 
+	data << uint32(1);
 	data << uint32(0);
-	data << uint32(2);
-	data << uint32(3);
+	data << uint32(0);
 
 	SendPacket(&data);
 }

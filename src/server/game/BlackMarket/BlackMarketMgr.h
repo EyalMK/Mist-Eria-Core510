@@ -29,42 +29,6 @@ class Item;
 class Player;
 class WorldPacket;
 
-#define MAX_BM_AUCTION_ITEMS 160
-
-/*
-enum BMAuctionError
-{
-    ERR_AUCTION_OK                  = 0,
-    ERR_AUCTION_INVENTORY           = 1,
-    ERR_AUCTION_DATABASE_ERROR      = 2,
-    ERR_AUCTION_NOT_ENOUGHT_MONEY   = 3,
-    ERR_AUCTION_ITEM_NOT_FOUND      = 4,
-    ERR_AUCTION_HIGHER_BID          = 5,
-    ERR_AUCTION_BID_INCREMENT       = 7,
-    ERR_AUCTION_BID_OWN             = 10,
-    ERR_RESTRICTED_ACCOUNT          = 13,
-};
-
-enum BMAuctionAction
-{
-    AUCTION_SELL_ITEM = 0,
-    AUCTION_CANCEL = 1,
-    AUCTION_PLACE_BID = 2
-};
-
-enum BMMailAuctionAnswers
-{
-    AUCTION_OUTBIDDED           = 0,
-    AUCTION_WON                 = 1,
-    AUCTION_SUCCESSFUL          = 2,
-    AUCTION_EXPIRED             = 3,
-    AUCTION_CANCELLED_TO_BIDDER = 4,
-    AUCTION_CANCELED            = 5,
-    AUCTION_SALE_PENDING        = 6
-};
-
-*/
-
 struct BMAuctionTemplate
 {
     uint32 id;
@@ -75,6 +39,7 @@ struct BMAuctionTemplate
 	uint32 startBid;
 	uint32 chance;
 };
+typedef struct BMAuctionTemplate BMAuctionTemplate;
 
 struct BMAuctionEntry
 {
@@ -89,9 +54,13 @@ struct BMAuctionEntry
     void DeleteFromDB(SQLTransaction& trans);
     void SaveToDB(SQLTransaction& trans);
     bool LoadFromDB(Field* fields);
-	uint32 TimeLeft() { return startTime + bm_template->duration - time(NULL); }
+	void UpdateToDB(SQLTransaction& trans);
+	uint32 EndTime() { return startTime + bm_template->duration; }
+	uint32 TimeLeft();
 	bool IsActive() { return (time(NULL) >= startTime); }
+	bool IsExpired() {return EndTime() < time(NULL); }
 };
+typedef struct BMAuctionEntry BMAuctionEntry;
 
 
 class BlackMarketMgr
@@ -135,13 +104,15 @@ class BlackMarketMgr
 
 
         //auction messages
-        void SendAuctionWonMail(BMAuctionEntry* auction, SQLTransaction& trans);
-        void SendAuctionOutbiddedMail(BMAuctionEntry* auction, uint32 newPrice, Player* newBidder, SQLTransaction& trans);
+        void SendAuctionWon(BMAuctionEntry* auction, SQLTransaction& trans);
+        void SendAuctionOutbidded(BMAuctionEntry* auction, uint32 newPrice, Player* newBidder, SQLTransaction& trans);
 
 		void LoadTemplates();
         void LoadAuctions();
 
-		void AddAuction(BMAuctionEntry* auction);
+		uint32 GetNewAuctionId();
+		void CreateAuctions(uint32 number, SQLTransaction& trans);
+		void UpdateAuction(BMAuctionEntry* auction, uint64 newPrice, Player* newBidder);
 
         void Update();
 

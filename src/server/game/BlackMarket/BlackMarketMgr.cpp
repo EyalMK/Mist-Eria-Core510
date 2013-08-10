@@ -66,6 +66,21 @@ void BMAuctionEntry::DeleteFromDB(SQLTransaction& trans)
 	trans->Append(stmt);
 }
 
+void BMAuctionEntry::UpdateToDB(SQLTransaction& trans)
+{
+	PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_BLACKMARKET_AUCTION);
+	stmt->setUInt64(0, bid);
+	stmt->setUInt32(1, bidder);
+	stmt->setUInt32(2, id);
+	trans->Append(stmt);
+}
+
+uint32 BMAuctionEntry::TimeLeft()
+{ 
+	uint32 endTime = startTime + bm_template->duration;
+	uint32 curTime = time(NULL);
+	return (endTime >= curTime) ? endTime - curTime : 0;
+}
 
 // BlackMarketMgr
 
@@ -161,6 +176,85 @@ void BlackMarketMgr::LoadAuctions()
 
 }
 
+void BlackMarketMgr::Update()
+{
+	uint32 curTime = time(NULL);
+
+	SQLTransaction trans = CharacterDatabase.BeginTransaction();
+
+	// Delete expired auctions
+	for(BMAuctionEntryMap::const_iterator itr = GetAuctionsBegin(); itr != GetAuctionsEnd();)
+	{
+		BMAuctionEntry* auction = itr->second;
+		if (auction->IsExpired())
+		{
+			if (auction->bidder)
+				SendAuctionWon(auction, trans);
+			auction->DeleteFromDB(trans);
+			BMAuctionsMap.erase(itr++);
+		}
+		else
+		{
+			++itr;
+			continue;
+		}
+	}
+
+	// Add New Auctions;
+	int32 add = sWorld->getIntConfig(CONFIG_BLACKMARKET_MAX_AUCTIONS) - BMAuctionsMap.size();
+	if (add > 0)
+		CreateAuctions(add, trans);
+
+	CharacterDatabase.CommitTransaction(trans);
+}
+
+uint32 BlackMarketMgr::GetNewAuctionId()
+{
+	uint32 newId = 1;
+	while(GetAuction(newId)) { ++newId; }
+	return newId;
+}
+
+void BlackMarketMgr::CreateAuctions(uint32 number, SQLTransaction& trans)
+{
+	if (BMTemplatesMap.empty())
+		return;
+
+	for(uint32 i=0; i < number; ++i)
+	{
+		// Select a template
+		std::vector<uint32> templateList;
+		uint32 rand = urand(1, 100);
+
+		for(BMAuctionTemplateMap::const_iterator itr = GetTemplatesBegin(); itr != GetTemplatesEnd();)
+		{
+			if(itr->second->chance >= rand)
+				templateList.push_back(itr->first);
+		}
+
+		if(templateList.empty())
+			continue;
+
+		BMAuctionTemplate *selTemplate = GetTemplate(templateList[urand(0, templateList.size())]);
+
+		if(!selTemplate)
+			continue;
+
+		BMAuctionEntry* auction = new BMAuctionEntry;
+		auction->id = GetNewAuctionId();
+		auction->bid = selTemplate->startBid;
+		auction->bidder = 0;
+		auction->startTime = time(NULL) + sWorld->getIntConfig(CONFIG_BLACKMARKET_AUCTION_DELAY)
+										+ urand(0, sWorld->getIntConfig(CONFIG_BLACKMARKET_AUCTION_DELAY_MOD)*2)
+										- sWorld->getIntConfig(CONFIG_BLACKMARKET_AUCTION_DELAY_MOD) / 2;
+
+		auction->bm_template = selTemplate;
+
+		BMAuctionsMap[auction->id] = auction;
+		auction->SaveToDB(trans);
+	}
+}
+
 void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 guidLow)
 {
 	uint32 count = 0;
@@ -203,4 +297,51 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 	data.PutBits<uint32>(32, count, 20);
 
 	sLog->outInfo(LOG_FILTER_NETWORKIO, ">> Sent %u BlackMarket Auctions", count);
+}
+
+void BlackMarketMgr::UpdateAuction(BMAuctionEntry* auction, uint64 newPrice, Player* newBidder)
+{
+	SQLTransaction trans = CharacterDatabase.BeginTransaction();
+	
+	if (auction->bidder)
+		SendAuctionOutbidded(auction, newPrice, newBidder, trans);
+
+	auction->bid = newPrice;
+	auction->bidder = newBidder->GetGUIDLow();
+
+	auction->UpdateToDB(trans);
+
+    CharacterDatabase.CommitTransaction(trans);
+}
+
+void BlackMarketMgr::SendAuctionOutbidded(BMAuctionEntry* auction, uint32 newPrice, Player* newBidder, SQLTransaction& trans)
+{
+	WorldPacket data(SMSG_BLACK_MARKET_OUT_BID, 12);
+
+	data << uint32(1);
+	data << uint32(1);
+	data << uint32(1);
+
+	if (Player* pl = sObjectAccessor->FindPlayer(MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER)))
+	{
+		pl->GetSession()->SendPacket(&data);
+
+		// Need to send a mail to the player with the money of his bid
+	}
+}
+
+void BlackMarketMgr::SendAuctionWon(BMAuctionEntry* auction, SQLTransaction& trans)
+{
+	WorldPacket data(SMSG_BLACK_MARKET_BID_WON, 12);
+
+	data << uint32(2);
+	data << uint32(2);
+	data << uint32(2);
+
+	if (Player* pl = sObjectAccessor->FindPlayer(MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER)))
+	{
+		pl->GetSession()->SendPacket(&data);
+
+		// Need to send a mail to the player with the item
+	}
 }
