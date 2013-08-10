@@ -220,6 +220,8 @@ void BlackMarketMgr::CreateAuctions(uint32 number, SQLTransaction& trans)
 
 	for(uint32 i=0; i < number; ++i)
 	{
+		sLog->outInfo(LOG_FILTER_NETWORKIO, ">> Creating a BlackMarket Auction");
+
 		// Select a template
 		std::vector<uint32> templateList;
 		uint32 rand = urand(1, 100);
@@ -237,6 +239,8 @@ void BlackMarketMgr::CreateAuctions(uint32 number, SQLTransaction& trans)
 
 		if(!selTemplate)
 			continue;
+
+		sLog->outInfo(LOG_FILTER_NETWORKIO, ">> Selected Template : %u", selTemplate->id);
 
 		BMAuctionEntry* auction = new BMAuctionEntry;
 		auction->id = GetNewAuctionId();
