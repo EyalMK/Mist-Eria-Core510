@@ -128,8 +128,6 @@ void BlackMarketMgr::LoadTemplates()
 
 		BMTemplatesMap[bm_template->id] = bm_template;
 
-		sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded template %u, itemEntry : %u, itemCount : %u, seller : %u, startBid : %lu, duration : %u, chance : %u", bm_template->id, bm_template->itemEntry, bm_template->itemCount, bm_template->seller, bm_template->startBid, bm_template->duration, bm_template->chance);
-
         ++count;
     } while (result->NextRow());
 
@@ -222,22 +220,22 @@ void BlackMarketMgr::CreateAuctions(uint32 number, SQLTransaction& trans)
 
 	for(uint32 i=0; i < number; ++i)
 	{
-		sLog->outInfo(LOG_FILTER_NETWORKIO, ">> Creating a BlackMarket Auction");
 
 		// Select a template
-		std::vector<uint32> templateList;
+		std::list<uint32> templateList;
 		uint32 rand = urand(1, 100);
 
 		for(BMAuctionTemplateMap::const_iterator itr = GetTemplatesBegin(); itr != GetTemplatesEnd(); ++itr)
 		{
-			sLog->outInfo(LOG_FILTER_NETWORKIO, ">> Chances are : %u / %u", itr->second->chance, rand);
 			if(itr->second->chance >= rand)
 			{
 				templateList.push_back(itr->first);
-				sLog->outInfo(LOG_FILTER_NETWORKIO, ">> Pushed Back !");
 			}
 
 		}
+
+		for(BMAuctionEntryMap::const_iterator itr = GetAuctionsBegin(); itr != GetAuctionsEnd();)
+			templateList.remove(itr->second->templateId);
 
 		if(templateList.empty())
 			continue;
@@ -247,7 +245,6 @@ void BlackMarketMgr::CreateAuctions(uint32 number, SQLTransaction& trans)
 		if(!selTemplate)
 			continue;
 
-		sLog->outInfo(LOG_FILTER_NETWORKIO, ">> Selected Template : %u", selTemplate->id);
 
 		BMAuctionEntry* auction = new BMAuctionEntry;
 		auction->id = GetNewAuctionId();
@@ -268,7 +265,7 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 {
 	uint32 count = 0;
 
-	data << uint32(1); // unk, Maybe "Hot Item!"
+	data << uint32(0); // unk, Maybe "Hot Item!"
 	data.WriteBits(count, 20); // placeholder
 
 	for(BMAuctionEntryMap::const_iterator itr = GetAuctionsBegin(); itr != GetAuctionsEnd(); ++itr)
@@ -279,7 +276,6 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 			continue;*/
 
 		data.WriteBit((guidLow == auction->bidder));
-		++count;
 	}
 
 	data.FlushBits();
@@ -296,7 +292,7 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 		data << uint64(0); //unk
 		data << uint64(0); //unk
 		data << uint64(auction->bid); // price
-		data << uint32(0); //unk
+		data << uint32(count++); //unk
 		data << uint32(0); //unk
 		data << uint32(auction->bm_template->itemCount); //stack count
 		data << uint32(auction->bm_template->itemEntry); //item id
