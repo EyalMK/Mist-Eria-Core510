@@ -1567,13 +1567,13 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
     }*/
 
     ObjectGuid leaderGuid = m_leaderGuid, groupGuid = m_guid;
-    uint8 byte10 = 0;
+	uint8 byte10 = 0; //Probably smthng with challenge mode
     uint8 hasLootRule = 0; //For testing purpose
     uint8 isLFG = 0;
-    uint8 byte74 = 0;
-    uint8 byte1C = 0;
-    uint8 byte40 = 0;
-    uint32 dword38 = 0, dword3C = 0;
+	uint8 byte74 = slot->group;
+	uint8 byte1C = slot->flags;
+	uint8 byte40 = m_groupType;
+	uint32 dword38 = m_counter++, dword3C = 0;
 
     data.WriteBit(leaderGuid[2]);
     data.WriteBit(byte10);
