@@ -191,7 +191,7 @@ void BlackMarketMgr::Update()
 			if (auction->bidder)
 				SendAuctionWon(auction, trans);
 			auction->DeleteFromDB(trans);
-			BMAuctionsMap.erase(itr++);
+			BMAuctionsMap.erase((itr++)->first);
 		}
 		else
 			++itr;
