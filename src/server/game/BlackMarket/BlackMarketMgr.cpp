@@ -128,6 +128,8 @@ void BlackMarketMgr::LoadTemplates()
 
 		BMTemplatesMap[bm_template->id] = bm_template;
 
+		sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded template %u, itemEntry : %u, itemCount : %u, seller : %u, startBid : %lu, duration : %u, chance : %u", bm_template->id, bm_template->itemEntry, bm_template->itemCount, bm_template->seller, bm_template->startBid, bm_template->duration, bm_template->chance);
+
         ++count;
     } while (result->NextRow());
 
