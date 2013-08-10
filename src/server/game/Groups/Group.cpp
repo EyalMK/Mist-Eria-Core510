@@ -1571,8 +1571,8 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
     uint8 hasLootRule = 0; //For testing purpose
     uint8 isLFG = 0;
 	uint8 byte74 = slot->group;
-	uint8 byte1C = slot->flags;
-	uint8 byte40 = m_groupType;
+	uint8 byte1C = m_groupType;
+	uint8 byte40 = slot->flags;
 	uint32 dword38 = m_counter++, dword3C = 0;
 
     data.WriteBit(leaderGuid[2]);
