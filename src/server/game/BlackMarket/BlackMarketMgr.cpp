@@ -117,6 +117,7 @@ void BlackMarketMgr::LoadTemplates()
     } while (result->NextRow());
 
 	sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u BlackMarket templates in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+	sLog->outInfo(LOG_FILTER_NETWORKIO, ">> Loaded %u BlackMarket templates in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 	
 }
 
@@ -158,6 +159,7 @@ void BlackMarketMgr::LoadAuctions()
     CharacterDatabase.CommitTransaction(trans);
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u BlackMarket Auctions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+	sLog->outInfo(LOG_FILTER_NETWORKIO, ">> Loaded %u BlackMarket Auctions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 
 }
 
@@ -178,6 +180,8 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 		data.WriteBit((guidLow == auction->bidder));
 		++count;
 	}
+
+	data.FlushBits();
 
 	for(BMAuctionEntryMap::const_iterator itr = GetAuctionsBegin(); itr != GetAuctionsEnd(); ++itr)
 	{
@@ -200,4 +204,5 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 
 	data.PutBits<uint32>(4, count, 20);
 
+	sLog->outInfo(LOG_FILTER_NETWORKIO, ">> Sent %u BlackMarket Auctions", count);
 }
