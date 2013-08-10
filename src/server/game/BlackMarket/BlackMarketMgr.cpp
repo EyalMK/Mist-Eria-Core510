@@ -224,7 +224,7 @@ void BlackMarketMgr::CreateAuctions(uint32 number, SQLTransaction& trans)
 		std::vector<uint32> templateList;
 		uint32 rand = urand(1, 100);
 
-		for(BMAuctionTemplateMap::const_iterator itr = GetTemplatesBegin(); itr != GetTemplatesEnd();)
+		for(BMAuctionTemplateMap::const_iterator itr = GetTemplatesBegin(); itr != GetTemplatesEnd(); ++itr)
 		{
 			if(itr->second->chance >= rand)
 				templateList.push_back(itr->first);
