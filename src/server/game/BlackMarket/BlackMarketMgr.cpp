@@ -194,10 +194,8 @@ void BlackMarketMgr::Update()
 			BMAuctionsMap.erase(itr++);
 		}
 		else
-		{
 			++itr;
-			continue;
-		}
+
 	}
 
 	// Add New Auctions;
