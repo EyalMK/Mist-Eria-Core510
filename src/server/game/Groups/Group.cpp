@@ -1578,14 +1578,14 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
     data.WriteBit(leaderGuid[2]);
     data.WriteBit(byte10);
     data.WriteBit(hasLootRule);
-    data.WriteBits(GetMembersCount(), 22);
+    data.WriteBits(GetMembersCount()-1, 22);
     data.WriteBit(groupGuid[6]);
     data.WriteBit(groupGuid[4]);
 
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
-        /*if(citr->guid == player->GetGUID())
-            continue;*/
+        if(citr->guid == player->GetGUID())
+            continue;
 
         ObjectGuid memberGuid = citr->guid;
         data.WriteBit(memberGuid[7]);
@@ -1626,8 +1626,8 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
 
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
-        /*if(citr->guid == player->GetGUID())
-            continue;*/
+        if(citr->guid == player->GetGUID())
+            continue;
 
 		Player* member = ObjectAccessor::FindPlayer(citr->guid);
 
