@@ -1637,7 +1637,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         data.WriteString(citr->name);
 
         ObjectGuid memberGuid = citr->guid;
-		uint8 byte39 = onlineState, byte3A = citr->flags, byte38 = citr->group, byte3B = citr->roles;
+		uint8 byte39 = citr->group, byte3A = citr->flags, byte38 = onlineState, byte3B = citr->roles;
 
         data.WriteByteSeq(memberGuid[0]);
         data.WriteByteSeq(memberGuid[7]);
