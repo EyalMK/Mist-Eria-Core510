@@ -1566,7 +1566,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         data << uint8(m_raidDifficulty);                // Raid Difficulty
     }*/
 
-    ObjectGuid leaderGuid = m_guid, groupGuid = m_leaderGuid;
+    ObjectGuid leaderGuid = m_leaderGuid, groupGuid = m_guid;
 	uint8 byte10 = 0; //Probably smthng with challenge mode
     uint8 hasLootRule = 0; //For testing purpose
     uint8 isLFG = 0;
