@@ -172,8 +172,8 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 	{
 		BMAuctionEntry* auction = itr->second;
 
-		/*if (!auction->IsActive())
-			continue;*/
+		if (!auction->IsActive())
+			continue;
 
 		data.WriteBit((guidLow == auction->bidder));
 		++count;
@@ -185,8 +185,8 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 	{
 		BMAuctionEntry* auction = itr->second;
 
-		/*if (!auction->IsActive())
-			continue;*/
+		if (!auction->IsActive())
+			continue;
 
 		data << uint32(auction->bm_template->seller); //seller
 		data << uint32(auction->TimeLeft()); //time left
@@ -200,7 +200,7 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 		data << uint32(0); //unk
 	}
 
-	data.PutBits<uint32>(4, count, 20);
+	data.PutBits<uint32>(32, count, 20);
 
 	sLog->outInfo(LOG_FILTER_NETWORKIO, ">> Sent %u BlackMarket Auctions", count);
 }
