@@ -1629,10 +1629,15 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         if(citr->guid == player->GetGUID())
             continue;
 
+		Player* member = ObjectAccessor::FindPlayer(citr->guid);
+
+        uint8 onlineState = member ? MEMBER_STATUS_ONLINE : MEMBER_STATUS_OFFLINE;
+        onlineState = onlineState | ((isBGGroup() || isBFGroup()) ? MEMBER_STATUS_PVP : 0);
+
         data.WriteString(citr->name);
 
         ObjectGuid memberGuid = citr->guid;
-        uint8 byte39 = 0, byte3A = 0, byte38 = 0, byte3B = 0;
+		uint8 byte39 = onlineState, byte3A = citr->flags, byte38 = citr->group, byte3B = citr->roles;
 
         data.WriteByteSeq(memberGuid[0]);
         data.WriteByteSeq(memberGuid[7]);
