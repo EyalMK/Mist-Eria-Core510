@@ -216,14 +216,15 @@ void WorldSession::HandleBlackMarketBid(WorldPacket& recvData)
 	sBlackMarketMgr->UpdateAuction(auction, price, GetPlayer());
 
 	SendBlackMarketBidResult();
+	SendBlackMarketRequestItemsResult();
 }
 
 void WorldSession::SendBlackMarketBidResult()
 {
 	WorldPacket data(SMSG_BLACK_MARKET_BID_RESULT, 12);
-	data << uint32(0);
-	data << uint32(2);
-	data << uint32(2);
+	data << uint32(0); //unk
+	data << uint32(2); //unk
+	data << uint32(2); //unk
 
 	SendPacket(&data);
 }
