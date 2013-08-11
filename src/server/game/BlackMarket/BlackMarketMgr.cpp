@@ -294,7 +294,7 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 		data << uint64(0); //unk
 		data << uint64(0); //unk
 		data << uint64(auction->bid); // price
-		data << uint32(auction->id); //unk
+		data << uint32(auction->id); // auction id
 		data << uint32(0); //unk
 		data << uint32(auction->bm_template->itemCount); //stack count
 		data << uint32(auction->bm_template->itemEntry); //item id
@@ -321,6 +321,26 @@ void BlackMarketMgr::UpdateAuction(BMAuctionEntry* auction, uint64 newPrice, Pla
     CharacterDatabase.CommitTransaction(trans);
 }
 
+std::string BMAuctionEntry::BuildAuctionMailSubject(BMMailAuctionAnswers response)
+{
+    std::ostringstream strm;
+    strm << itemEntry << ":0:" << response << ':' << id << ':' << itemCount;
+    return strm.str();
+}
+
+std::string BMAuctionEntry::BuildAuctionMailBody(uint32 lowGuid, uint32 bid)
+{
+    std::ostringstream strm;
+    strm.width(16);
+    strm << std::right << std::hex << MAKE_NEW_GUID(lowGuid, 0, HIGHGUID_PLAYER);   // HIGHGUID_PLAYER always present, even for empty guids
+	strm << std::dec << ':' << bid;
+	/*
+    strm << std::dec << ':' << bid << ':' << buyout;
+    strm << ':' << deposit << ':' << cut;
+	*/
+    return strm.str();
+}
+
 void BlackMarketMgr::SendAuctionOutbidded(BMAuctionEntry* auction, uint32 newPrice, Player* newBidder, SQLTransaction& trans)
 {
 	WorldPacket data(SMSG_BLACK_MARKET_OUT_BID, 12);
@@ -329,26 +349,34 @@ void BlackMarketMgr::SendAuctionOutbidded(BMAuctionEntry* auction, uint32 newPri
 	data << uint32(1);
 	data << uint32(1);
 
-	if (Player* pl = sObjectAccessor->FindPlayer(MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER)))
+	if (Player* bidder = sObjectAccessor->FindPlayer(MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER)))
 	{
-		pl->GetSession()->SendPacket(&data);
+		bidder->GetSession()->SendPacket(&data);
 
-		// Need to send a mail to the player with the money of his bid
+		MailDraft(auction->BuildAuctionMailSubject(BM_AUCTION_OUTBIDDED), auction->BuildAuctionMailBody(auction->bm_template->seller, auction->bid))
+            .AddMoney(auction->bid)
+            .SendMailTo(trans, MailReceiver(bidder, auction->bidder), auction, MAIL_CHECK_MASK_COPIED);
 	}
 }
 
 void BlackMarketMgr::SendAuctionWon(BMAuctionEntry* auction, SQLTransaction& trans)
 {
-	WorldPacket data(SMSG_BLACK_MARKET_BID_WON, 12);
-
-	data << uint32(2);
-	data << uint32(2);
-	data << uint32(2);
-
-	if (Player* pl = sObjectAccessor->FindPlayer(MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER)))
+	if (Player* bidder = sObjectAccessor->FindPlayer(MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER)))
 	{
-		pl->GetSession()->SendPacket(&data);
+		WorldPacket data(SMSG_BLACK_MARKET_BID_WON, 12);
+		data << uint32(1);
+		data << uint32(1);
+		data << uint32(1);
+		bidder->GetSession()->SendPacket(&data);
 
-		// Need to send a mail to the player with the item
+		ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(auction->bm_template->itemEntry);
+        if (!itemTemplate)
+            return;
+
+		Item* pItem = Item::CreateItem(auction->bm_template->itemEntry, auction->bm_template->itemEntry);
+
+		MailDraft(auction->BuildAuctionMailSubject(BM_AUCTION_WON), auction->BuildAuctionMailBody(auction->bidder, auction->bid))
+            .AddItem(pItem)
+            .SendMailTo(trans, MailReceiver(bidder, auction->bidder), MailSender(auction), MAIL_CHECK_MASK_COPIED);
 	}
 }

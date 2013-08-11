@@ -29,6 +29,12 @@ class Item;
 class Player;
 class WorldPacket;
 
+enum BMMailAuctionAnswers
+{
+    BM_AUCTION_OUTBIDDED           = 0,
+    BM_AUCTION_WON                 = 1,
+};
+
 struct BMAuctionTemplate
 {
     uint32 id;
@@ -55,10 +61,14 @@ struct BMAuctionEntry
     void SaveToDB(SQLTransaction& trans);
     bool LoadFromDB(Field* fields);
 	void UpdateToDB(SQLTransaction& trans);
+
 	uint32 EndTime() { return startTime + bm_template->duration; }
 	uint32 TimeLeft();
 	bool IsActive() { return (time(NULL) >= startTime); }
 	bool IsExpired() {return EndTime() < time(NULL); }
+
+	std::string BuildAuctionMailSubject(BMMailAuctionAnswers response);
+	std::string BuildAuctionMailBody(uint32 lowGuid, uint32 bid);
 };
 typedef struct BMAuctionEntry BMAuctionEntry;
 
