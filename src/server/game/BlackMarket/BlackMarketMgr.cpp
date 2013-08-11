@@ -361,9 +361,9 @@ void BlackMarketMgr::SendAuctionWon(BMAuctionEntry* auction, SQLTransaction& tra
 	if (Player* bidder = sObjectAccessor->FindPlayer(MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER)))
 	{
 		WorldPacket data(SMSG_BLACK_MARKET_BID_WON, 12);
-		data << uint32(1);
-		data << uint32(1);
 		data << uint32(auction->bm_template->itemEntry);
+		data << uint32(1);
+		data << uint32(1);
 		bidder->GetSession()->SendPacket(&data);
 
 		ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(auction->bm_template->itemEntry);
