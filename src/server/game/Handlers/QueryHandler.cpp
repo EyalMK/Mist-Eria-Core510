@@ -429,11 +429,26 @@ void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, 
     GossipText const* p_Gossip = sObjectMgr->GetGossipText(l_LocalTextID);
     std::string l_Text1 = "Greetings $N";
     std::string l_Text2 = "Greetings $N";
+    uint32 l_Language = 0;
 
-    if (p_Gossip && p_Gossip->Options[0].Text_0.size())
-        l_Text1 = p_Gossip->Options[0].Text_0;
-    if (p_Gossip && p_Gossip->Options[0].Text_1.size())
-        l_Text2 = p_Gossip->Options[0].Text_1;
+    if (!p_Gossip)
+    {
+        data << uint32(-1);
+        data << uint32(DB_QUERY_NPC_TEXT);
+        data << uint32(time(NULL)); // hotfix date
+        data << uint32(0);          // size of next block
+        return;
+    }
+
+
+
+    if (p_Gossip) {
+        if (p_Gossip->Options[0].Text_0.size())
+            l_Text1 = p_Gossip->Options[0].Text_0;
+        if (p_Gossip->Options[0].Text_1.size())
+            l_Text2 = p_Gossip->Options[0].Text_1;
+        l_Language = p_Gossip->Options[0].Language;
+    }
 
     int l_SessionLocalIndex = p_Session->GetSessionDbLocaleIndex();
     if (l_SessionLocalIndex >= 0)
@@ -447,7 +462,7 @@ void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, 
 
     p_Data << uint32(0);				/// Data size
     p_Data << uint32(l_LocalTextID);
-    p_Data << uint32(p_Gossip->Options[0].Language);
+    p_Data << uint32(l_Language);
     p_Data << uint16(l_Text1.size());
     p_Data << l_Text1;
     p_Data << uint16(l_Text2.size());
@@ -492,7 +507,7 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "DBQuery lQueryType %u", l_QueryType);
 
-    l_Count = p_ReceivedPacket.ReadBits(17);
+    l_Count = p_ReceivedPacket.ReadBits(23);
 
     std::vector<ObjectGuid> l_Guids;
     std::vector<uint32>		l_LocalTextIDs;
