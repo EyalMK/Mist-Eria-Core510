@@ -433,10 +433,10 @@ void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, 
 
     if (!p_Gossip)
     {
-        data << uint32(-1);
-        data << uint32(DB_QUERY_NPC_TEXT);
-        data << uint32(time(NULL)); // hotfix date
-        data << uint32(0);          // size of next block
+        p_Data << uint32(-1);
+        p_Data << uint32(DB_QUERY_NPC_TEXT);
+        p_Data << uint32(time(NULL));
+        p_Data << uint32(0);
         return;
     }
 
