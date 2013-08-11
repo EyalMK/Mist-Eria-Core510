@@ -430,17 +430,7 @@ void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, 
     std::string l_Text1 = "Greetings $N";
     std::string l_Text2 = "Greetings $N";
     uint32 l_Language = 0;
-
-    if (!p_Gossip)
-    {
-        p_Data << uint32(-1);
-        p_Data << uint32(DB_QUERY_NPC_TEXT);
-        p_Data << uint32(time(NULL));
-        p_Data << uint32(0);
-        return;
-    }
-
-
+    p_Data << uint32(time(0));
 
     if (p_Gossip) {
         if (p_Gossip->Options[0].Text_0.size())
@@ -460,7 +450,7 @@ void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, 
         }
     }
 
-    p_Data << uint32(0);				/// Data size
+    p_Data << uint32(0x00);				/// Data size placeholder
     p_Data << uint32(l_LocalTextID);
     p_Data << uint32(l_Language);
     p_Data << uint16(l_Text1.size());
@@ -487,12 +477,11 @@ void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, 
 
     p_Data << uint32(0);	/// unk
     p_Data << uint32(0);	/// unk
-
     p_Data << uint32(0x01);	/// unk
 
-    p_Data << uint32(time(0));
     p_Data << uint32(DB_QUERY_NPC_TEXT);
-    p_Data << uint32(l_LocalTextID);
+    p_Data << uint32(time(NULL));
+    p_Data << uint32(0);
 
     p_Data.wpos(0);
     p_Data << uint32(p_Data.size() - 16);
