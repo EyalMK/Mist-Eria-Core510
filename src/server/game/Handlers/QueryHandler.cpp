@@ -496,7 +496,7 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "DBQuery lQueryType %u", l_QueryType);
 
-    l_Count = p_ReceivedPacket.ReadBits(23);
+    l_Count = p_ReceivedPacket.ReadBits(22);
 
     std::vector<ObjectGuid> l_Guids;
     std::vector<uint32>		l_LocalTextIDs;
