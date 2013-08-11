@@ -231,7 +231,6 @@ void BlackMarketMgr::CreateAuctions(uint32 number, SQLTransaction& trans)
 			{
 				templateList.push_back(itr->first);
 			}
-
 		}
 
 		for(BMAuctionEntryMap::const_iterator itr = GetAuctionsBegin(); itr != GetAuctionsEnd(); ++itr)
@@ -255,6 +254,7 @@ void BlackMarketMgr::CreateAuctions(uint32 number, SQLTransaction& trans)
 										- sWorld->getIntConfig(CONFIG_BLACKMARKET_AUCTION_DELAY_MOD) / 2;
 
 		auction->bm_template = selTemplate;
+		auction->templateId = selTemplate->id;
 
 		BMAuctionsMap[auction->id] = auction;
 		auction->SaveToDB(trans);
@@ -265,7 +265,7 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 {
 	uint32 count = 0;
 
-	data << uint32(0); // unk, Maybe "Hot Item!"
+	data << uint32(2); // unk, Maybe "Hot Item!"
 	data.WriteBits(count, 20); // placeholder
 
 	for(BMAuctionEntryMap::const_iterator itr = GetAuctionsBegin(); itr != GetAuctionsEnd(); ++itr)
