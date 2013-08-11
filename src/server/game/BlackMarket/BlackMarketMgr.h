@@ -70,7 +70,7 @@ struct BMAuctionEntry
 	bool IsExpired() {return EndTime() < time(NULL); }
 
 	std::string BuildAuctionMailSubject(BMMailAuctionAnswers response);
-	std::string BuildAuctionMailBody(uint32 lowGuid, uint32 bid);
+	std::string BuildAuctionMailBody(uint32 lowGuid);
 };
 typedef struct BMAuctionEntry BMAuctionEntry;
 

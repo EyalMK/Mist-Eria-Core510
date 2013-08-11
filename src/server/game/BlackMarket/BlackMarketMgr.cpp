@@ -328,7 +328,7 @@ std::string BMAuctionEntry::BuildAuctionMailSubject(BMMailAuctionAnswers respons
     return strm.str();
 }
 
-std::string BMAuctionEntry::BuildAuctionMailBody(uint32 lowGuid, uint32 bid)
+std::string BMAuctionEntry::BuildAuctionMailBody(uint32 lowGuid)
 {
     std::ostringstream strm;
     strm.width(16);
@@ -350,7 +350,7 @@ void BlackMarketMgr::SendAuctionOutbidded(BMAuctionEntry* auction, uint32 newPri
 	{
 		bidder->GetSession()->SendPacket(&data);
 
-		MailDraft(auction->BuildAuctionMailSubject(BM_AUCTION_OUTBIDDED), auction->BuildAuctionMailBody(auction->bm_template->seller, auction->bid))
+		MailDraft(auction->BuildAuctionMailSubject(BM_AUCTION_OUTBIDDED), auction->BuildAuctionMailBody(auction->bm_template->seller))
             .AddMoney(auction->bid)
             .SendMailTo(trans, MailReceiver(bidder, auction->bidder), auction, MAIL_CHECK_MASK_COPIED);
 	}
@@ -362,7 +362,7 @@ void BlackMarketMgr::SendAuctionWon(BMAuctionEntry* auction, SQLTransaction& tra
 	{
 		WorldPacket data(SMSG_BLACK_MARKET_BID_WON, 12);
 		data << uint32(1);
-		data << uint32(1);
+		data << uint32(auction->bm_template->itemEntry);
 		data << uint32(1);
 		bidder->GetSession()->SendPacket(&data);
 
@@ -372,7 +372,7 @@ void BlackMarketMgr::SendAuctionWon(BMAuctionEntry* auction, SQLTransaction& tra
 
 		Item* pItem = Item::CreateItem(auction->bm_template->itemEntry, auction->bm_template->itemEntry);
 
-		MailDraft(auction->BuildAuctionMailSubject(BM_AUCTION_WON), auction->BuildAuctionMailBody(auction->bidder, auction->bid))
+		MailDraft(auction->BuildAuctionMailSubject(BM_AUCTION_WON), auction->BuildAuctionMailBody(auction->bidder))
             .AddItem(pItem)
             .SendMailTo(trans, MailReceiver(bidder, auction->bidder), MailSender(auction), MAIL_CHECK_MASK_COPIED);
 	}
