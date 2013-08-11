@@ -21,8 +21,8 @@
 
 #include "Common.h"
 #include <map>
-#include "BlackMarket/BlackMarketMgr.h"
 
+struct BMAuctionEntry;
 struct AuctionEntry;
 struct CalendarEvent;
 class Item;

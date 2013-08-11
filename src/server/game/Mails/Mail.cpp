@@ -27,7 +27,7 @@
 #include "Item.h"
 #include "AuctionHouseMgr.h"
 #include "CalendarMgr.h"
-
+#include "BlackMarket/BlackMarketMgr.h"
 
 MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery(stationery)
 {
