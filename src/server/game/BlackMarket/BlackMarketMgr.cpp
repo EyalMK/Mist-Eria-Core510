@@ -265,7 +265,7 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 {
 	uint32 count = 0;
 
-	data << uint32(0); // unk
+	data << uint32(1); // unk
 	data.WriteBits(count, 20); // placeholder
 
 	for(BMAuctionEntryMap::const_iterator itr = GetAuctionsBegin(); itr != GetAuctionsEnd(); ++itr)
