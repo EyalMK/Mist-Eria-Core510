@@ -276,6 +276,8 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 			continue;*/
 
 		data.WriteBit((guidLow == auction->bidder));
+		
+		++count;
 	}
 
 	data.FlushBits();
@@ -292,7 +294,7 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 		data << uint64(0); //unk
 		data << uint64(0); //unk
 		data << uint64(auction->bid); // price
-		data << uint32(count++); //unk
+		data << uint32(auction->id); //unk
 		data << uint32(0); //unk
 		data << uint32(auction->bm_template->itemCount); //stack count
 		data << uint32(auction->bm_template->itemEntry); //item id
