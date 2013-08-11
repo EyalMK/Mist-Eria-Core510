@@ -324,7 +324,7 @@ void BlackMarketMgr::UpdateAuction(BMAuctionEntry* auction, uint64 newPrice, Pla
 std::string BMAuctionEntry::BuildAuctionMailSubject(BMMailAuctionAnswers response)
 {
     std::ostringstream strm;
-    strm << itemEntry << ":0:" << response << ':' << id << ':' << itemCount;
+    strm << bm_template->itemEntry << ":0:" << response << ':' << id << ':' << bm_template->itemCount;
     return strm.str();
 }
 
