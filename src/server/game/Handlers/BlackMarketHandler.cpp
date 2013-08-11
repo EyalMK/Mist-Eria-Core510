@@ -185,6 +185,8 @@ void WorldSession::HandleBlackMarketBid(WorldPacket& recvData)
 	recvData.ReadByteSeq(guid[2]);
 	recvData.ReadByteSeq(guid[4]);
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, ">> HandleBid >> id : %u, price : %u, itemid : %u", id, price, itemid);
+
 	uint64 npcGuid = uint64(guid);
 
 	if (!price)
@@ -223,9 +225,9 @@ void WorldSession::SendBlackMarketBidResult()
 {
 	WorldPacket data(SMSG_BLACK_MARKET_BID_RESULT, 12);
 
-	data << uint32(1);
-	data << uint32(0);
-	data << uint32(0);
+	data << uint32(2);
+	data << uint32(2);
+	data << uint32(2);
 
 	SendPacket(&data);
 }
