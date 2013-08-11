@@ -504,6 +504,13 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
     uint32 l_QueryType;
     uint32 l_Count;
 
+
+    for (int i=0 ; i<p_ReceivedPacket.size() ; ++i) {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "%2X", p_ReceivedPacket.read<uint8>());
+    }
+    p_ReceivedPacket.rpos(0);
+
+
     p_ReceivedPacket >> l_QueryType;
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "DBQuery lQueryType %u", l_QueryType);
@@ -548,6 +555,8 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
 
     if (!l_Count)
         return;
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "Count : %u guid0 %u local0 %u", l_Count, GUID_LOPART(l_Guids[0]), l_LocalTextIDs[0]);
 
     WorldPacket l_Data(SMSG_DB_REPLY, 100);
 
