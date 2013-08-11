@@ -206,12 +206,14 @@ void WorldSession::HandleBlackMarketBid(WorldPacket& recvData)
 	if(auction->bid >= price)
 	{
 		//envoyer message prix trop bas
+		sLog->outDebug(LOG_FILTER_NETWORKIO, ">> HandleBid >> prix trop bas", id, price, itemid);
 		return;
 	}
 
 	if (GetPlayer()->GetMoney() < price)
 	{
 		//envoyer message pas assez d'argent
+		sLog->outDebug(LOG_FILTER_NETWORKIO, ">> HandleBid >> pas assez d'argent", id, price, itemid);
 		return;
 	}
 
@@ -225,7 +227,7 @@ void WorldSession::SendBlackMarketBidResult()
 {
 	WorldPacket data(SMSG_BLACK_MARKET_BID_RESULT, 12);
 
-	data << uint32(2);
+	data << uint32(0);
 	data << uint32(2);
 	data << uint32(2);
 
