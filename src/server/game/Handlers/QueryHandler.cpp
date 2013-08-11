@@ -442,7 +442,6 @@ void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, 
     std::string l_Text1 = "Greetings $N";
     std::string l_Text2 = "Greetings $N";
     uint32 l_Language = 0;
-    p_Data << uint32(time(0));
 
     if (p_Gossip) {
         if (p_Gossip->Options[0].Text_0.size())
