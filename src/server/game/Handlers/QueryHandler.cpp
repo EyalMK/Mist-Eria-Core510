@@ -553,7 +553,7 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
     if (!l_Count)
         return;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Count : %u guid0 %u local0 %u", l_Count, l_Guids[0], l_LocalTextIDs[0]);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "Count : %u guid0 %u local0 %u", l_Count, GUID_LOPART(l_Guids[0]), l_LocalTextIDs[0]);
 
     WorldPacket l_Data(SMSG_DB_REPLY, 100);
 
