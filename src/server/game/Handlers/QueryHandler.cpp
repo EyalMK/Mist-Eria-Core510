@@ -351,6 +351,9 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recvData)
 
     GossipText const* pGossip = sObjectMgr->GetGossipText(textID);
 
+	if(!pGossip)
+		return;
+
     WorldPacket data(SMSG_NPC_TEXT_UPDATE, 100);          // guess size
     data << textID;
 	data << float(1.0f);
@@ -467,7 +470,7 @@ void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, 
     p_Data << uint16(l_Text2.size());
     p_Data << l_Text2;
 
-    if (p_Gossip)
+    /*if (p_Gossip)
     {
         for (int j = 0; j < MAX_GOSSIP_TEXT_EMOTES; ++j)
         {
@@ -482,15 +485,15 @@ void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, 
             p_Data << uint32(0);
             p_Data << uint32(0);
         }
-    }
+    }*/
 
     p_Data << uint32(0);	/// unk
     p_Data << uint32(0);	/// unk
     p_Data << uint32(0x01);	/// unk
-
-    p_Data << uint32(DB_QUERY_NPC_TEXT);
+    
     p_Data << uint32(time(NULL));
-    p_Data << uint32(0);
+	p_Data << uint32(DB_QUERY_NPC_TEXT);
+    p_Data << uint32(l_LocalTextID);
 
     p_Data.wpos(0);
     p_Data << uint32(p_Data.size() - 16);
