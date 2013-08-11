@@ -216,6 +216,7 @@ void WorldSession::HandleBlackMarketBid(WorldPacket& recvData)
 	sBlackMarketMgr->UpdateAuction(auction, price, GetPlayer());
 
 	SendBlackMarketBidResult();
+	SendBlackMarketRequestItemsResult();
 }
 
 void WorldSession::SendBlackMarketBidResult()

@@ -191,7 +191,7 @@ void BlackMarketMgr::Update()
 			if (auction->bidder)
 				SendAuctionWon(auction, trans);
 			auction->DeleteFromDB(trans);
-			BMAuctionsMap.erase(itr++);
+			BMAuctionsMap.erase((itr++)->first);
 		}
 		else
 			++itr;
@@ -220,15 +220,22 @@ void BlackMarketMgr::CreateAuctions(uint32 number, SQLTransaction& trans)
 
 	for(uint32 i=0; i < number; ++i)
 	{
+
 		// Select a template
 		std::vector<uint32> templateList;
 		uint32 rand = urand(1, 100);
 
-		for(BMAuctionTemplateMap::const_iterator itr = GetTemplatesBegin(); itr != GetTemplatesEnd();)
+		for(BMAuctionTemplateMap::const_iterator itr = GetTemplatesBegin(); itr != GetTemplatesEnd(); ++itr)
 		{
 			if(itr->second->chance >= rand)
+			{
 				templateList.push_back(itr->first);
+			}
+
 		}
+
+		for(BMAuctionEntryMap::const_iterator itr = GetAuctionsBegin(); itr != GetAuctionsEnd(); ++itr)
+			templateList.erase(std::remove(templateList.begin(), templateList.end(), itr->second->templateId), templateList.end());
 
 		if(templateList.empty())
 			continue;
@@ -237,6 +244,7 @@ void BlackMarketMgr::CreateAuctions(uint32 number, SQLTransaction& trans)
 
 		if(!selTemplate)
 			continue;
+
 
 		BMAuctionEntry* auction = new BMAuctionEntry;
 		auction->id = GetNewAuctionId();
@@ -257,7 +265,7 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 {
 	uint32 count = 0;
 
-	data << uint32(1); // unk, Maybe "Hot Item!"
+	data << uint32(0); // unk, Maybe "Hot Item!"
 	data.WriteBits(count, 20); // placeholder
 
 	for(BMAuctionEntryMap::const_iterator itr = GetAuctionsBegin(); itr != GetAuctionsEnd(); ++itr)
@@ -268,7 +276,6 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 			continue;*/
 
 		data.WriteBit((guidLow == auction->bidder));
-		++count;
 	}
 
 	data.FlushBits();
@@ -285,7 +292,7 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 		data << uint64(0); //unk
 		data << uint64(0); //unk
 		data << uint64(auction->bid); // price
-		data << uint32(0); //unk
+		data << uint32(count++); //unk
 		data << uint32(0); //unk
 		data << uint32(auction->bm_template->itemCount); //stack count
 		data << uint32(auction->bm_template->itemEntry); //item id
