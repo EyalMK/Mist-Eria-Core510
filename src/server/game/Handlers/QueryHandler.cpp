@@ -353,8 +353,17 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recvData)
 
     WorldPacket data(SMSG_NPC_TEXT_UPDATE, 100);          // guess size
     data << textID;
+	data << float(1.0f);
 
-    if (!pGossip)
+	for(int i = 0 ; i < 7 ; i++)
+		data << uint32(0);
+
+	data << uint32(textID);
+
+	for(int i = 0 ; i < 7 ; i++)
+		data << uint32(0);
+
+    /*if (!pGossip)
     {
         for (uint32 i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
         {
@@ -414,7 +423,7 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recvData)
                 data << pGossip->Options[i].Emotes[j]._Emote;
             }
         }
-    }
+    }*/
 
     SendPacket(&data);
 
