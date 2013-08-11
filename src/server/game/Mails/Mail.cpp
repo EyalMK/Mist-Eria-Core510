@@ -68,7 +68,7 @@ MailSender::MailSender(AuctionEntry* sender)
 }
 
 MailSender::MailSender(BMAuctionEntry* sender)
-    : m_messageType(MAIL_AUCTION), m_senderId(sender->bm_template->seller), m_stationery(MAIL_STATIONERY_AUCTION)
+    : m_messageType(MAIL_BLACKMARKET), m_senderId(BLACKMARKET_AUCTION_HOUSE), m_stationery(MAIL_STATIONERY_AUCTION)
 {
 }
 

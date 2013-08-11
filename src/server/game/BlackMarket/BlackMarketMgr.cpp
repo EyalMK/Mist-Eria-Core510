@@ -333,11 +333,8 @@ std::string BMAuctionEntry::BuildAuctionMailBody(uint32 lowGuid, uint32 bid)
     std::ostringstream strm;
     strm.width(16);
     strm << std::right << std::hex << MAKE_NEW_GUID(lowGuid, 0, HIGHGUID_PLAYER);   // HIGHGUID_PLAYER always present, even for empty guids
-	strm << std::dec << ':' << bid;
-	/*
-    strm << std::dec << ':' << bid << ':' << buyout;
-    strm << ':' << deposit << ':' << cut;
-	*/
+    strm << std::dec << ':' << bid << ':' << 0;
+    strm << ':' << 0 << ':' << 0;
     return strm.str();
 }
 
@@ -346,7 +343,7 @@ void BlackMarketMgr::SendAuctionOutbidded(BMAuctionEntry* auction, uint32 newPri
 	WorldPacket data(SMSG_BLACK_MARKET_OUT_BID, 12);
 
 	data << uint32(1);
-	data << uint32(1);
+	data << uint32(auction->bm_template->itemEntry);
 	data << uint32(1);
 
 	if (Player* bidder = sObjectAccessor->FindPlayer(MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER)))

@@ -35,6 +35,8 @@ enum BMMailAuctionAnswers
     BM_AUCTION_WON                 = 1,
 };
 
+#define BLACKMARKET_AUCTION_HOUSE 7
+
 struct BMAuctionTemplate
 {
     uint32 id;
