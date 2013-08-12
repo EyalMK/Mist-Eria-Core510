@@ -166,13 +166,15 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     uint32 cnt1, cnt2;
                     cnt1 = recvData.ReadBits(9);
                     cnt2 = recvData.ReadBits(10);
-                    string str1 = recvData.ReadString(cnt1);
-                    string str2 = recvData.ReadString(cnt2);
+                    std::string str1 = recvData.ReadString(cnt1);
+                    std::string str2 = recvData.ReadString(cnt2)+str1;
 
-                    if (msg.empty())
+
+
+                    if (str2.empty())
                         return;
 
-                    sScriptMgr->OnPlayerChat(sender, uint32(CHAT_MSG_ADDON), lang, msg);
+                    sScriptMgr->OnPlayerChat(sender, uint32(CHAT_MSG_ADDON), lang, str2);
                 }
 
                 // Disabled addon channel?
