@@ -282,6 +282,8 @@ void WorldSession::HandleGuildFinderGetRecruits(WorldPacket& recvPacket)
 
     ByteBuffer dataBuffer(53 * recruitCount);
     WorldPacket data(SMSG_LF_GUILD_RECRUIT_LIST_UPDATED, 7 + 26 * recruitCount + 53 * recruitCount);
+
+	data << uint32(time(NULL)); // Unk time
     data.WriteBits(recruitCount, 20);
 
     for (std::vector<MembershipRequest>::const_iterator itr = recruitsList.begin(); itr != recruitsList.end(); ++itr)
@@ -289,48 +291,47 @@ void WorldSession::HandleGuildFinderGetRecruits(WorldPacket& recvPacket)
         MembershipRequest request = *itr;
         ObjectGuid playerGuid(MAKE_NEW_GUID(request.GetPlayerGUID(), 0, HIGHGUID_PLAYER));
 
+		data.WriteBit(playerGuid[7]);
+		data.WriteBit(playerGuid[4]);
         data.WriteBits(request.GetComment().size(), 11);
-        data.WriteBit(playerGuid[2]);
-        data.WriteBit(playerGuid[4]);
-        data.WriteBit(playerGuid[3]);
-        data.WriteBit(playerGuid[7]);
-        data.WriteBit(playerGuid[0]);
-        data.WriteBits(request.GetName().size(), 7);
-        data.WriteBit(playerGuid[5]);
-        data.WriteBit(playerGuid[1]);
+		data.WriteBits(request.GetName().size(), 7);
+		data.WriteBit(playerGuid[1]);
         data.WriteBit(playerGuid[6]);
+		data.WriteBit(playerGuid[3]); 
+        data.WriteBit(playerGuid[2]);  
+        data.WriteBit(playerGuid[5]);
+        data.WriteBit(playerGuid[0]);
+	}
 
-        dataBuffer.WriteByteSeq(playerGuid[4]);
+	data.FlushBits();
+	
+	for (std::vector<MembershipRequest>::const_iterator itr = recruitsList.begin(); itr != recruitsList.end(); ++itr)
+    {
+        MembershipRequest request = *itr;
+        ObjectGuid playerGuid(MAKE_NEW_GUID(request.GetPlayerGUID(), 0, HIGHGUID_PLAYER));
 
-        dataBuffer << int32(time(NULL) <= request.GetExpiryTime());
+		dataBuffer.WriteByteSeq(playerGuid[5]);
+		dataBuffer.WriteByteSeq(playerGuid[2]);
+		dataBuffer.WriteByteSeq(playerGuid[1]);
+		dataBuffer.WriteByteSeq(playerGuid[3]);
+		dataBuffer.WriteString(request.GetName());
+		dataBuffer << int32(time(NULL) <= request.GetExpiryTime());
+		dataBuffer.WriteByteSeq(playerGuid[6]);
+		dataBuffer.WriteByteSeq(playerGuid[0]);
 
-        dataBuffer.WriteByteSeq(playerGuid[3]);
-        dataBuffer.WriteByteSeq(playerGuid[0]);
-        dataBuffer.WriteByteSeq(playerGuid[1]);
-
-        dataBuffer << int32(request.GetLevel());
-
-        dataBuffer.WriteByteSeq(playerGuid[6]);
-        dataBuffer.WriteByteSeq(playerGuid[7]);
-        dataBuffer.WriteByteSeq(playerGuid[2]);
-
-        dataBuffer << int32(time(NULL) - request.GetSubmitTime()); // Time in seconds since application submitted.
+		dataBuffer << int32(time(NULL) - request.GetSubmitTime()); // Time in seconds since application submitted.
         dataBuffer << int32(request.GetAvailability());
         dataBuffer << int32(request.GetClassRoles());
-        dataBuffer << int32(request.GetInterests());
+		dataBuffer.WriteString(request.GetComment());
+		dataBuffer << int32(request.GetInterests());
         dataBuffer << int32(request.GetExpiryTime() - time(NULL)); // TIme in seconds until application expires.
-
-        dataBuffer.WriteString(request.GetName());
-        dataBuffer.WriteString(request.GetComment());
-
-        dataBuffer << int32(request.GetClass());
-
-        dataBuffer.WriteByteSeq(playerGuid[5]);
+		dataBuffer << int32(request.GetLevel());
+		dataBuffer.WriteByteSeq(playerGuid[7]);
+		dataBuffer << int32(request.GetClass());
+        dataBuffer.WriteByteSeq(playerGuid[4]);
     }
-
-    data.FlushBits();
+    
     data.append(dataBuffer);
-    data << uint32(time(NULL)); // Unk time
 
     player->SendDirectMessage(&data);
 }
