@@ -567,7 +567,7 @@ enum Opcodes
     CMSG_TRAINER_LIST                                 = 0x0CA0,//16357
     CMSG_TRANSMOGRIFY_ITEMS                           = 0x446,//16357
     CMSG_TRIGGER_CINEMATIC_CHEAT                      = 0x1511,
-    CMSG_TURN_IN_PETITION                             = 0x1512,
+    CMSG_TURN_IN_PETITION                             = 0x0D21,//16357
     CMSG_TUTORIAL_CLEAR                               = 0x0885,//16357
     CMSG_TUTORIAL_FLAG                                = 0x07AC,//16357
     CMSG_TUTORIAL_RESET                               = 0x0B05,//16357
