@@ -327,19 +327,7 @@ bool Quest::IsAutoComplete() const
 
 bool Quest::IsRaidQuest(Difficulty difficulty) const
 {
-    switch (Type)
-    {
-        case QUEST_TYPE_RAID:
-            return true;
-        case QUEST_TYPE_RAID_10:
-            return !(difficulty & RAID_DIFFICULTY_MASK_25MAN);
-        case QUEST_TYPE_RAID_25:
-            return difficulty & RAID_DIFFICULTY_MASK_25MAN;
-        default:
-            break;
-    }
-
-    return false;
+    return Type == QUEST_TYPE_RAID || Type == QUEST_TYPE_RAID_10 || Type == QUEST_TYPE_RAID_25;
 }
 
 bool Quest::IsAllowedInRaid(Difficulty difficulty) const

@@ -324,7 +324,7 @@ enum AreaFlags
 
 enum Difficulty
 {
-    INSTANCE_NONE                = 0,
+    REGULAR_DIFFICULTY           = 0,
     DUNGEON_DIFFICULTY_NORMAL    = 1, // Scenario too
     DUNGEON_DIFFICULTY_HEROIC    = 2,
 
@@ -334,7 +334,7 @@ enum Difficulty
     RAID_DIFFICULTY_25MAN_HEROIC = 6,
 
     RAID_FINDER_DIFFICULTY       = 7,
-    CHALLENGE_MODE_DIFFICULTY    = 8,
+    DUNGEON_DIFFICULTY_CHALLENGE = 8,
     RAID_DIFFICULTY_40MAN_NORMAL = 9,
 };
 

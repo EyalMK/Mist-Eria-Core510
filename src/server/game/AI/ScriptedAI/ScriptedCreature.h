@@ -215,7 +215,7 @@ struct ScriptedAI : public CreatureAI
     Difficulty GetDifficulty() const { return _difficulty; }
 
     // return true for 25 man or 25 man heroic mode
-    bool Is25ManRaid() const { return _difficulty & RAID_DIFFICULTY_MASK_25MAN; }
+    bool Is25ManRaid() const { return (_difficulty == RAID_DIFFICULTY_25MAN_NORMAL || _difficulty == RAID_DIFFICULTY_25MAN_HEROIC); }   // since 25man difficulties are 1 and 3, we can check them like that
 
     template<class T> inline
     const T& DUNGEON_MODE(const T& normal5, const T& heroic10) const
