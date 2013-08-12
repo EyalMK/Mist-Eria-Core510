@@ -524,7 +524,7 @@ void ObjectMgr::LoadCreatureTemplates()
 
             CreatureTemplate& creatureTemplate = _creatureTemplateStore[l_Entry];
 
-            if (!creatureTemplate) {
+            if (_creatureTemplateStore.find(l_Entry) == _creatureTemplateStore.end()) {
                 sLog->outInfo(LOG_FILTER_SQL, "creature_template_difficulty has a difficulty for creature %u but this creature doesn't exist", l_Entry);
             } else {
                 if (l_Difficulty < 0 || l_Difficulty > (MAX_DIFFICULTY - 2))
