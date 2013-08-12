@@ -731,12 +731,12 @@ void WorldSession::HandleRandomRollOpcode(WorldPacket& recvData)
 
     data << uint32(minimum);
 	data.WriteByteSeq(guid[3]);
-    data << uint32(maximum);
+    data << uint32(roll);
 	data.WriteByteSeq(guid[2]);
 	data.WriteByteSeq(guid[0]);
 	data.WriteByteSeq(guid[5]);
 	data.WriteByteSeq(guid[6]);
-	data << uint32(roll);
+	data << uint32(maximum);
 	data.WriteByteSeq(guid[7]);
 	data.WriteByteSeq(guid[1]);
 	data.WriteByteSeq(guid[4]);
