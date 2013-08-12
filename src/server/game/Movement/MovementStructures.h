@@ -1662,7 +1662,7 @@ MovementStatusElements MovementStopAscendSequence[] =
     MSEEnd,
 };
 
-//5.1
+//5.1.0 16357 OK
 MovementStatusElements MovementStopPitchSequence[] =
 {
 	MSEPositionZ,
@@ -1702,7 +1702,6 @@ MovementStatusElements MovementStopPitchSequence[] =
 	MSEHasTransportGuidByte7,
     MSEMovementFlags,
     MSEMovementFlags2,
-
     MSEGuidByte2,
 	MSEGuidByte0,
 	MSEGuidByte7,
