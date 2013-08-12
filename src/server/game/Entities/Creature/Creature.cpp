@@ -780,12 +780,16 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
     SetMap(map);
     SetPhaseMask(phaseMask, false);
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 1");
+
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(Entry);
     if (!cinfo)
     {
         sLog->outError(LOG_FILTER_SQL, "Creature::Create(): creature template (guidlow: %u, entry: %u) does not exist.", guidlow, Entry);
         return false;
     }
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 2");
 
     //! Relocate before CreateFromProto, to initialize coords and allow
     //! returning correct zone id for selecting OutdoorPvP/Battlefield script
@@ -795,11 +799,15 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
     if (!CreateFromProto(guidlow, Entry, vehId, team, data))
         return false;
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 3");
+
     if (!IsPositionValid())
     {
         sLog->outError(LOG_FILTER_UNITS, "Creature::Create(): given coordinates for creature (guidlow %d, entry %d) are not valid (X: %f, Y: %f, Z: %f, O: %f)", guidlow, Entry, x, y, z, ang);
         return false;
     }
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 4");
 
     switch (GetCreatureTemplate()->rank)
     {
@@ -830,6 +838,7 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
         //! Relocate again with updated Z coord
         Relocate(x, y, z, ang);
     }
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 5");
 
     uint32 displayID = GetNativeDisplayId();
     CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelRandomGender(&displayID);
@@ -839,6 +848,8 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
         SetNativeDisplayId(displayID);
         SetByteValue(UNIT_FIELD_BYTES_0, 2, minfo->gender);
     }
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 6");
 
     LastUsedScriptID = GetCreatureTemplate()->ScriptID;
 
@@ -851,6 +862,8 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
 
     if (Entry == VISUAL_WAYPOINT)
         SetVisible(false);
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 7");
 
     return true;
 }

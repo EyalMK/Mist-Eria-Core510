@@ -151,13 +151,11 @@ public:
         if (!*args)
             return false;
 
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 1");
 
         char* charID = handler->extractKeyFromLink((char*)args, "Hcreature_entry");
         if (!charID)
             return false;
 
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 2");
 
         char* team = strtok(NULL, " ");
         int32 teamval = 0;
@@ -194,7 +192,6 @@ public:
             return true;
         }
 
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 3");
 
         Creature* creature = new Creature();
         if (!creature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMgr().GetPhaseMaskForSpawn(), id, 0, (uint32)teamval, x, y, z, o))
@@ -203,7 +200,6 @@ public:
             return false;
         }
 
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 4");
         creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMgr().GetPhaseMaskForSpawn());
 
         uint32 db_guid = creature->GetDBTableGUIDLow();
@@ -214,7 +210,6 @@ public:
             delete creature;
             return false;
         }
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 5");
 
         sObjectMgr->AddCreatureToGrid(db_guid, sObjectMgr->GetCreatureData(db_guid));
         return true;
