@@ -1469,7 +1469,7 @@ void ObjectMgr::LoadCreatures()
                         offset = k-3;
                         break;
                     case RAID_FINDER_DIFFICULTY:
-                    case CHALLENGE_MODE_DIFFICULTY:
+                    case DUNGEON_DIFFICULTY_CHALLENGE:
                     case RAID_DIFFICULTY_40MAN_NORMAL:
                     default:
                         offset = 0;
