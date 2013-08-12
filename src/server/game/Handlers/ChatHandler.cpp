@@ -137,6 +137,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             }
         }
 
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lang : %u", lang);
+
         if (lang == LANG_ADDON)
         {
             // LANG_ADDON is only valid for the following message types
@@ -155,26 +157,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                         return;
 
                     sScriptMgr->OnPlayerChat(sender, uint32(CHAT_MSG_ADDON), lang, msg);
-                }
-
-                // Disabled addon channel?
-                if (!sWorld->getBoolConfig(CONFIG_ADDON_CHANNEL))
-                    return;
-                break;
-            case CHAT_MSG_WHISPER:
-                if (sWorld->getBoolConfig(CONFIG_CHATLOG_ADDON)) {
-                    uint32 cnt1, cnt2;
-                    cnt1 = recvData.ReadBits(9);
-                    cnt2 = recvData.ReadBits(10);
-                    std::string str1 = recvData.ReadString(cnt1);
-                    std::string str2 = recvData.ReadString(cnt2)+str1;
-
-
-
-                    if (str2.empty())
-                        return;
-
-                    sScriptMgr->OnPlayerChat(sender, uint32(CHAT_MSG_ADDON), lang, str2);
                 }
 
                 // Disabled addon channel?
@@ -266,10 +248,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         msg = recvData.ReadString(textLength);
         break;
     case CHAT_MSG_WHISPER:
-        receiverLength = recvData.ReadBits(10);
         textLength = recvData.ReadBits(9);
-        to = recvData.ReadString(receiverLength);
+        receiverLength = recvData.ReadBits(10);
         msg = recvData.ReadString(textLength);
+        to = recvData.ReadString(receiverLength);
         break;
     case CHAT_MSG_CHANNEL:
         receiverLength = recvData.ReadBits(10);
