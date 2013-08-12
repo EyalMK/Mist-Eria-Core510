@@ -455,6 +455,7 @@ enum Opcodes
     CMSG_QUEST_NPC_QUERY                              = 0x0952,//16357
     CMSG_QUEST_POI_QUERY                              = 0x0EC0,//16357
     CMSG_QUEST_QUERY                                  = 0x012C,//16357
+	CMSG_RANDOM_ROLL                                  = 0x012E,//16357
     CMSG_RANDOMIZE_CHAR_NAME                          = 0x04E, //16357
     CMSG_READY_FOR_ACCOUNT_DATA_TIMES                 = 0x5A5, //16357
     CMSG_READ_ITEM                                    = 0x0429,//16357
@@ -667,7 +668,6 @@ enum Opcodes
     MSG_RAID_READY_CHECK_CONFIRM                      = 0x0E98,//16357
     MSG_RAID_READY_CHECK_FINISHED                     = 0x017C,//16357
     MSG_RAID_TARGET_UPDATE                            = 0x0512,//16357
-    MSG_RANDOM_ROLL                                   = 0xA5C, //16357
     MSG_SAVE_GUILD_EMBLEM                             = 0x04CD,//16357
     MSG_SET_DUNGEON_DIFFICULTY                        = 0x0E0C,//16357
     MSG_SET_RAID_DIFFICULTY                           = 0x0E00,//16357
@@ -1251,6 +1251,7 @@ enum Opcodes
     SMSG_RAID_MARKERS_CHANGED                         = 0x930, //16357
     SMSG_RAID_READY_CHECK_THROTTLED_ERROR             = 0x2052,
     SMSG_RAID_SUMMON_FAILED                           = 0x0C31,//16357
+	SMSG_RANDOM_ROLL                                  = 0x0A5C,//16357
     SMSG_RANDOMIZE_CHAR_NAME                          = 0xB74,  //16357
     SMSG_RATED_BG_RATING                              = 0x935, //16357
     SMSG_RATED_BG_STATS                               = 0x418, //16357
