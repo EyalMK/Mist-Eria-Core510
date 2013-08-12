@@ -703,7 +703,7 @@ void WorldSession::HandleRandomRollOpcode(WorldPacket& recvData)
     recvData >> maximum;
 	recvData >> unk;
 
-	sLog->outDebug(LOG_FILTER_GENERAL, "ROLL: MIN: %u, MAX: %u, UNK: %u", minimum, maximum, unk);
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "ROLL: MIN: %u, MAX: %u, UNK: %u", minimum, maximum, unk);
 
     /** error handling **/
     if (minimum > maximum || maximum > 10000)                // < 32768 for urand call
