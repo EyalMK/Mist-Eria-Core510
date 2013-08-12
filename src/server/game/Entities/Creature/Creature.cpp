@@ -780,12 +780,14 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
     SetMap(map);
     SetPhaseMask(phaseMask, false);
 
+
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(Entry);
     if (!cinfo)
     {
         sLog->outError(LOG_FILTER_SQL, "Creature::Create(): creature template (guidlow: %u, entry: %u) does not exist.", guidlow, Entry);
         return false;
     }
+
 
     //! Relocate before CreateFromProto, to initialize coords and allow
     //! returning correct zone id for selecting OutdoorPvP/Battlefield script
@@ -795,11 +797,13 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
     if (!CreateFromProto(guidlow, Entry, vehId, team, data))
         return false;
 
+
     if (!IsPositionValid())
     {
         sLog->outError(LOG_FILTER_UNITS, "Creature::Create(): given coordinates for creature (guidlow %d, entry %d) are not valid (X: %f, Y: %f, Z: %f, O: %f)", guidlow, Entry, x, y, z, ang);
         return false;
     }
+
 
     switch (GetCreatureTemplate()->rank)
     {
@@ -840,6 +844,7 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
         SetByteValue(UNIT_FIELD_BYTES_0, 2, minfo->gender);
     }
 
+
     LastUsedScriptID = GetCreatureTemplate()->ScriptID;
 
     // TODO: Replace with spell, handle from DB
@@ -851,6 +856,7 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
 
     if (Entry == VISUAL_WAYPOINT)
         SetVisible(false);
+
 
     return true;
 }
@@ -1247,6 +1253,9 @@ float Creature::GetSpellDamageMod(int32 Rank)
 
 bool Creature::CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, uint32 team, const CreatureData* data)
 {
+	
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 1");
+
     SetZoneScript();
     if (m_zoneScript && data)
     {
@@ -1255,12 +1264,16 @@ bool Creature::CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, uint3
             return false;
     }
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 2");
+
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(Entry);
     if (!cinfo)
     {
         sLog->outError(LOG_FILTER_SQL, "Creature::CreateFromProto(): creature template (guidlow: %u, entry: %u) does not exist.", guidlow, Entry);
         return false;
     }
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 3");
 
     SetOriginalEntry(Entry);
 
@@ -1274,6 +1287,7 @@ bool Creature::CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, uint3
 
     if (!UpdateEntry(Entry, team, data))
         return false;
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 4");
 
     return true;
 }

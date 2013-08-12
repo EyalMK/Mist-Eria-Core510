@@ -151,9 +151,11 @@ public:
         if (!*args)
             return false;
 
+
         char* charID = handler->extractKeyFromLink((char*)args, "Hcreature_entry");
         if (!charID)
             return false;
+
 
         char* team = strtok(NULL, " ");
         int32 teamval = 0;
@@ -189,6 +191,7 @@ public:
 
             return true;
         }
+
 
         Creature* creature = new Creature();
         if (!creature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMgr().GetPhaseMaskForSpawn(), id, 0, (uint32)teamval, x, y, z, o))
