@@ -406,7 +406,7 @@ enum Opcodes
     CMSG_PARTY_UNSILENCE                              = 0x1357,
     CMSG_PETITION_BUY                                 = 0x0021,//16357
     CMSG_PETITION_QUERY                               = 0x0BE4,//16357
-    CMSG_PETITION_SHOWLIST                            = 0x0E80,//16357
+    CMSG_PETITION_SHOWLIST                            = 0x0000,//16357
     CMSG_PETITION_SHOW_SIGNATURES                     = 0x1361,
     CMSG_PETITION_SIGN                                = 0x0268,//16357
     CMSG_PET_ABANDON                                  = 0x1363,
