@@ -311,7 +311,7 @@ enum Opcodes
     CMSG_LFG_SET_BOOT_VOTE                            = 0x0696,//16357
     CMSG_LFG_SET_COMMENT                              = 0x0CB6,//16357
     CMSG_LFG_SET_ROLES                                = 0x0497,//16357
-    CMSG_LFG_TELEPORT                                 = 0x1267,//16357
+    CMSG_LFG_TELEPORT                                 = 0x0023,//16357
     CMSG_LF_GUILD_ADD_RECRUIT                         = 0x041E,//16357
     CMSG_LF_GUILD_BROWSE                              = 0x053F,//16357
     CMSG_LF_GUILD_DECLINE_RECRUIT                     = 0x0746,//16357
