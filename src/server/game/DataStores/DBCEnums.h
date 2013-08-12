@@ -324,24 +324,23 @@ enum AreaFlags
 
 enum Difficulty
 {
-    REGULAR_DIFFICULTY           = 0,
+    INSTANCE_NONE                = 0,
+    DUNGEON_DIFFICULTY_NORMAL    = 1, // Scenario too
+    DUNGEON_DIFFICULTY_HEROIC    = 2,
 
-    DUNGEON_DIFFICULTY_NORMAL    = 0,
-    DUNGEON_DIFFICULTY_HEROIC    = 1,
-    DUNGEON_DIFFICULTY_EPIC      = 2,
-    DUNGEON_DIFFICULTY_CHALLENGE = 3,    // 5.x.x ( challenge )
+    RAID_DIFFICULTY_10MAN_NORMAL = 3,
+    RAID_DIFFICULTY_25MAN_NORMAL = 4,
+    RAID_DIFFICULTY_10MAN_HEROIC = 5,
+    RAID_DIFFICULTY_25MAN_HEROIC = 6,
 
-    RAID_DIFFICULTY_10MAN_NORMAL = 0,
-    RAID_DIFFICULTY_25MAN_NORMAL = 1,
-    RAID_DIFFICULTY_10MAN_HEROIC = 2,
-    RAID_DIFFICULTY_25MAN_HEROIC = 3
+    RAID_FINDER_DIFFICULTY       = 7,
+    CHALLENGE_MODE_DIFFICULTY    = 8,
+    RAID_DIFFICULTY_40MAN_NORMAL = 9,
 };
 
-#define RAID_DIFFICULTY_MASK_25MAN 1    // since 25man difficulties are 1 and 3, we can check them like that
-
-#define MAX_DUNGEON_DIFFICULTY     4
-#define MAX_RAID_DIFFICULTY        4
-#define MAX_DIFFICULTY             4
+#define MAX_DUNGEON_DIFFICULTY     2 // Seems to be 2?
+#define MAX_RAID_DIFFICULTY        9 // Seems like 40Man got a difficulty...
+#define MAX_DIFFICULTY             9
 
 enum SpawnMask
 {
