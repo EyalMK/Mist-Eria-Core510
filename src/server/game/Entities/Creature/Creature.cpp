@@ -260,12 +260,16 @@ void Creature::RemoveCorpse(bool setSpawnTime)
  */
 bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data)
 {
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 3");
+
     CreatureTemplate const* normalInfo = sObjectMgr->GetCreatureTemplate(Entry);
     if (!normalInfo)
     {
         sLog->outError(LOG_FILTER_SQL, "Creature::InitEntry creature entry %u does not exist.", Entry);
         return false;
     }
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 4");
 
     // get difficulty 1 mode entry
     CreatureTemplate const* cinfo = normalInfo;
@@ -298,12 +302,16 @@ bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data
     // known valid are: CLASS_WARRIOR, CLASS_PALADIN, CLASS_ROGUE, CLASS_MAGE
     SetByteValue(UNIT_FIELD_BYTES_0, 1, uint8(cinfo->unit_class));
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 5");
+
     // Cancel load if no model defined
     if (!(cinfo->GetFirstValidModelId()))
     {
         sLog->outError(LOG_FILTER_SQL, "Creature (Entry: %u) has no model defined in table `creature_template`, can't load. ", Entry);
         return false;
     }
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 6");
 
     uint32 displayID = sObjectMgr->ChooseDisplayId(0, GetCreatureTemplate(), data);
     CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelRandomGender(&displayID);
@@ -312,6 +320,8 @@ bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data
         sLog->outError(LOG_FILTER_SQL, "Creature (Entry: %u) has no model defined in table `creature_template`, can't load. ", Entry);
         return false;
     }
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 7");
 
     SetDisplayId(displayID);
     SetNativeDisplayId(displayID);
@@ -353,8 +363,12 @@ bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data
 
 bool Creature::UpdateEntry(uint32 Entry, uint32 team, const CreatureData* data)
 {
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 1");
+
     if (!InitEntry(Entry, team, data))
         return false;
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 2");
 
     CreatureTemplate const* cInfo = GetCreatureTemplate();
 
@@ -1254,7 +1268,7 @@ float Creature::GetSpellDamageMod(int32 Rank)
 bool Creature::CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, uint32 team, const CreatureData* data)
 {
 	
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 1");
+	
 
     SetZoneScript();
     if (m_zoneScript && data)
@@ -1264,7 +1278,6 @@ bool Creature::CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, uint3
             return false;
     }
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 2");
 
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(Entry);
     if (!cinfo)
@@ -1273,7 +1286,6 @@ bool Creature::CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, uint3
         return false;
     }
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 3");
 
     SetOriginalEntry(Entry);
 
@@ -1287,7 +1299,6 @@ bool Creature::CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, uint3
 
     if (!UpdateEntry(Entry, team, data))
         return false;
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 4");
 
     return true;
 }
