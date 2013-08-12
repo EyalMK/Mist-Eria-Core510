@@ -1499,7 +1499,7 @@ class OpcodeTable
         }
 
     private:
-        template<bool isInValidRange, bool isNonZero>
+        template<bool isInValidRange>
         void ValidateAndSetOpcode(uint16 opcode, char const* name, SessionStatus status, PacketProcessing processing, pOpcodeHandler handler);
 
         // Prevent copying this structure

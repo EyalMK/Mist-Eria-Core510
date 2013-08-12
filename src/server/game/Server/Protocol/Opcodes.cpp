@@ -21,14 +21,14 @@
 
 OpcodeTable opcodeTable;
 
-template<bool isInValidRange, bool isNonZero>
+template<bool isInValidRange>
 void OpcodeTable::ValidateAndSetOpcode(uint16 /*opcode*/, char const* /*name*/, SessionStatus /*status*/, PacketProcessing /*processing*/, pOpcodeHandler /*handler*/)
 {
     // if for some reason we are here, that means NUM_OPCODE_HANDLERS == 0 (or your compiler is broken)
 }
 
 template<>
-void OpcodeTable::ValidateAndSetOpcode<true, true>(uint16 opcode, char const* name, SessionStatus status, PacketProcessing processing, pOpcodeHandler handler)
+void OpcodeTable::ValidateAndSetOpcode<true>(uint16 opcode, char const* name, SessionStatus status, PacketProcessing processing, pOpcodeHandler handler)
 {
     if (_internalTable[opcode] != NULL)
     {
@@ -40,22 +40,17 @@ void OpcodeTable::ValidateAndSetOpcode<true, true>(uint16 opcode, char const* na
 }
 
 template<>
-void OpcodeTable::ValidateAndSetOpcode<false, true>(uint16 opcode, char const* /*name*/, SessionStatus /*status*/, PacketProcessing /*processing*/, pOpcodeHandler /*handler*/)
+void OpcodeTable::ValidateAndSetOpcode<false>(uint16 opcode, char const* /*name*/, SessionStatus /*status*/, PacketProcessing /*processing*/, pOpcodeHandler /*handler*/)
 {
     sLog->outError(LOG_FILTER_NETWORKIO, "Tried to set handler for an invalid opcode %d", opcode);
 }
 
-template<>
-void OpcodeTable::ValidateAndSetOpcode<true, false>(uint16 /*opcode*/, char const* name, SessionStatus /*status*/, PacketProcessing /*processing*/, pOpcodeHandler /*handler*/)
-{
-    sLog->outError(LOG_FILTER_NETWORKIO, "Opcode %s got value 0", name);
-}
 
 /// Correspondence between opcodes and their names
 void OpcodeTable::Initialize()
 {
 #define DEFINE_OPCODE_HANDLER(opcode, status, processing, handler)                                      \
-    ValidateAndSetOpcode<(opcode < NUM_OPCODE_HANDLERS), (opcode != 0)>(opcode, #opcode, status, processing, handler);
+    ValidateAndSetOpcode<(opcode < NUM_OPCODE_HANDLERS)>(opcode, #opcode, status, processing, handler);
 	
 	DEFINE_OPCODE_HANDLER(CMSG_REALM_CACHE,                             STATUS_AUTHED,    PROCESS_THREADUNSAFE, &WorldSession::HandleRealmCache );
 	DEFINE_OPCODE_HANDLER(SMSG_REALM_CACHE,                             STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_ServerSide );
