@@ -102,19 +102,70 @@ void WorldSession::HandleLfgLeaveOpcode(WorldPacket&  /*recvData*/)
 
 void WorldSession::HandleLfgProposalResultOpcode(WorldPacket& recvData)
 {
-    uint32 lfgGroupID;                                      // Internal lfgGroupID
-    bool accept;                                           // Accept to join?
+    ObjectGuid guid;          // Instance guid.
+    ObjectGuid guid2;         // Player guid
+
+    bool accept;              // Accept to join? is actually a bool.
+    uint32 lfgGroupID;        // Internal lfgGroupID
+    uint32 time;
+    uint32 roles;
+    uint32 unk;               // Unknown
+
+	// need to check order , need to do tests
     recvData >> lfgGroupID;
-    recvData >> accept;
+    recvData >> time;
+    recvData >> roles;
+    recvData >> unk;
+
+    // Player guid
+    guid2[6] = recvData.ReadBit();
+    guid2[4] = recvData.ReadBit();
+    guid2[3] = recvData.ReadBit();
+    guid2[5] = recvData.ReadBit();
+    guid2[1] = recvData.ReadBit();
+    guid2[7] = recvData.ReadBit();
+    guid2[0] = recvData.ReadBit();
+    guid2[2] = recvData.ReadBit();
+
+    recvData.ReadByteSeq(guid2[1]);
+    recvData.ReadByteSeq(guid2[2]);
+    recvData.ReadByteSeq(guid2[5]);
+    recvData.ReadByteSeq(guid2[3]);
+    recvData.ReadByteSeq(guid2[0]);
+    recvData.ReadByteSeq(guid2[7]);
+    recvData.ReadByteSeq(guid2[4]);
+    recvData.ReadByteSeq(guid2[6]);
+
+    // Instance guid - var guid = new byte[8]; ? vector?
+    guid[5] = recvData.ReadBit();
+    guid[3] = recvData.ReadBit();
+    guid[2] = recvData.ReadBit();
+    guid[0] = recvData.ReadBit();
+    guid[7] = recvData.ReadBit();
+    guid[4] = recvData.ReadBit();
+    guid[1] = recvData.ReadBit();
+	accept =  recvData.ReadBit();
+    guid[6] = recvData.ReadBit();
+
+    recvData.ReadByteSeq(guid[5]);
+    recvData.ReadByteSeq(guid[4]);
+    recvData.ReadByteSeq(guid[6]);
+    recvData.ReadByteSeq(guid[7]);
+    recvData.ReadByteSeq(guid[2]);
+    recvData.ReadByteSeq(guid[0]);
+    recvData.ReadByteSeq(guid[1]);
+    recvData.ReadByteSeq(guid[3]);
+
+    uint64 proposalId = guid;
 
     sLog->outDebug(LOG_FILTER_LFG, "CMSG_LFG_PROPOSAL_RESULT %s proposal: %u accept: %u",
         GetPlayerInfo().c_str(), lfgGroupID, accept ? 1 : 0);
-    sLFGMgr->UpdateProposal(lfgGroupID, GetPlayer()->GetGUID(), accept);
+    sLFGMgr->UpdateProposal((uint32)proposalId, guid2, accept);
 }
 
 void WorldSession::HandleLfgSetRolesOpcode(WorldPacket& recvData)
 {
-    uint8 roles;
+    uint32 roles;
     recvData >> roles;                                     // Player Group Roles
     uint64 guid = GetPlayer()->GetGUID();
     Group* group = GetPlayer()->GetGroup();

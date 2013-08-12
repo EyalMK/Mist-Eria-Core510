@@ -311,7 +311,7 @@ enum Opcodes
     CMSG_LFG_SET_BOOT_VOTE                            = 0x0696,//16357
     CMSG_LFG_SET_COMMENT                              = 0x0CB6,//16357
     CMSG_LFG_SET_ROLES                                = 0x0497,//16357
-    CMSG_LFG_TELEPORT                                 = 0x1267,//16357
+    CMSG_LFG_TELEPORT                                 = 0x0023,//16357
     CMSG_LF_GUILD_ADD_RECRUIT                         = 0x041E,//16357
     CMSG_LF_GUILD_BROWSE                              = 0x053F,//16357
     CMSG_LF_GUILD_DECLINE_RECRUIT                     = 0x0746,//16357
@@ -407,7 +407,7 @@ enum Opcodes
     CMSG_PETITION_BUY                                 = 0x0021,//16357
     CMSG_PETITION_QUERY                               = 0x0BE4,//16357
     CMSG_PETITION_SHOWLIST                            = 0x0E80,//16357
-    CMSG_PETITION_SHOW_SIGNATURES                     = 0x1361,
+    CMSG_PETITION_SHOW_SIGNATURES                     = 0x0000,//16357
     CMSG_PETITION_SIGN                                = 0x0268,//16357
     CMSG_PET_ABANDON                                  = 0x1363,
     CMSG_PET_ACTION                                   = 0x0208,//16357
@@ -567,7 +567,7 @@ enum Opcodes
     CMSG_TRAINER_LIST                                 = 0x0CA0,//16357
     CMSG_TRANSMOGRIFY_ITEMS                           = 0x446,//16357
     CMSG_TRIGGER_CINEMATIC_CHEAT                      = 0x1511,
-    CMSG_TURN_IN_PETITION                             = 0x1512,
+    CMSG_TURN_IN_PETITION                             = 0x0D21,//16357
     CMSG_TUTORIAL_CLEAR                               = 0x0885,//16357
     CMSG_TUTORIAL_FLAG                                = 0x07AC,//16357
     CMSG_TUTORIAL_RESET                               = 0x0B05,//16357
@@ -1499,7 +1499,7 @@ class OpcodeTable
         }
 
     private:
-        template<bool isInValidRange, bool isNonZero>
+        template<bool isInValidRange>
         void ValidateAndSetOpcode(uint16 opcode, char const* name, SessionStatus status, PacketProcessing processing, pOpcodeHandler handler);
 
         // Prevent copying this structure
