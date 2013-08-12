@@ -260,7 +260,6 @@ void Creature::RemoveCorpse(bool setSpawnTime)
  */
 bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 3");
 
     CreatureTemplate const* normalInfo = sObjectMgr->GetCreatureTemplate(Entry);
     if (!normalInfo)
@@ -269,7 +268,6 @@ bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data
         return false;
     }
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 4");
 
     // get difficulty 1 mode entry
     CreatureTemplate const* cinfo = normalInfo;
@@ -302,8 +300,6 @@ bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data
     // known valid are: CLASS_WARRIOR, CLASS_PALADIN, CLASS_ROGUE, CLASS_MAGE
     SetByteValue(UNIT_FIELD_BYTES_0, 1, uint8(cinfo->unit_class));
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 5");
-
     // Cancel load if no model defined
     if (!(cinfo->GetFirstValidModelId()))
     {
@@ -311,17 +307,18 @@ bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data
         return false;
     }
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 6");
 
     uint32 displayID = sObjectMgr->ChooseDisplayId(0, GetCreatureTemplate(), data);
     CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelRandomGender(&displayID);
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> displayID = %u, minfo = %u", displayID, minfo);
+
     if (!minfo)                                             // Cancel load if no model defined
     {
         sLog->outError(LOG_FILTER_SQL, "Creature (Entry: %u) has no model defined in table `creature_template`, can't load. ", Entry);
         return false;
     }
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 7");
 
     SetDisplayId(displayID);
     SetNativeDisplayId(displayID);
@@ -363,12 +360,9 @@ bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data
 
 bool Creature::UpdateEntry(uint32 Entry, uint32 team, const CreatureData* data)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 1");
 
     if (!InitEntry(Entry, team, data))
         return false;
-
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> 2");
 
     CreatureTemplate const* cInfo = GetCreatureTemplate();
 
