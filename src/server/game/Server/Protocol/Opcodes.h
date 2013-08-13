@@ -193,6 +193,7 @@ enum Opcodes
     CMSG_DISMISS_CRITTER                              = 0x074C,//16357
     CMSG_DUEL_ACCEPTED                                = 0x082D,//16357
     CMSG_DUEL_CANCELLED                               = 0x0AA1,//16357
+	CMSG_DUEL_REQUEST                                 = 0x92B,//16357
     CMSG_DUNGEON_FINDER_GET_SYSTEM_INFO               = 0x00AF,//16357
     CMSG_EJECT_PASSENGER                              = 0x01FF,//16357
     CMSG_EMOTE                                        = 0x0B60,//16357
