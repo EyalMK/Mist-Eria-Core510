@@ -3589,7 +3589,7 @@ bool Player::addSpell(uint32 spellId, bool active, bool learning, bool dependent
     {
         uint32 next_active_spell_id = 0;
         // fix activate state for non-stackable low rank (and find next spell for !active case)
-        if (!spellInfo->IsStackableWithRanks() && spellInfo->IsRanked())
+        if (!spellInfo->IsStackableWithRanks(this) && spellInfo->IsRanked())
         {
             if (uint32 next = sSpellMgr->GetNextSpellInChain(spellId))
             {
@@ -3726,7 +3726,7 @@ bool Player::addSpell(uint32 spellId, bool active, bool learning, bool dependent
         newspell->disabled  = disabled;
 
         // replace spells in action bars and spellbook to bigger rank if only one spell rank must be accessible
-        if (newspell->active && !newspell->disabled && !spellInfo->IsStackableWithRanks() && spellInfo->IsRanked() != 0)
+        if (newspell->active && !newspell->disabled && !spellInfo->IsStackableWithRanks(this) && spellInfo->IsRanked() != 0)
         {
             for (PlayerSpellMap::iterator itr2 = m_spells.begin(); itr2 != m_spells.end(); ++itr2)
             {
@@ -4116,7 +4116,7 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
     if (uint32 prev_id = sSpellMgr->GetPrevSpellInChain(spell_id))
     {
         // if ranked non-stackable spell: need activate lesser rank and update dendence state
-        if (cur_active && !spellInfo->IsStackableWithRanks() && spellInfo->IsRanked())
+        if (cur_active && !spellInfo->IsStackableWithRanks(this) && spellInfo->IsRanked())
         {
             // need manually update dependence state (learn spell ignore like attempts)
             PlayerSpellMap::iterator prev_itr = m_spells.find(prev_id);

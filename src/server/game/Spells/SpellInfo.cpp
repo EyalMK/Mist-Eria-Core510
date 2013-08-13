@@ -1148,7 +1148,7 @@ bool SpellInfo::IsStackableWithRanks() const
 {
     if (IsPassive())
         return false;
-    if (GetPowerType(GetCaster()) != POWER_MANA && GetPowerType(GetCaster()) != POWER_HEALTH)
+    if (GetPowerType(caster) != POWER_MANA && GetPowerType(caster) != POWER_HEALTH)
         return false;
     if (IsProfessionOrRiding())
         return false;
