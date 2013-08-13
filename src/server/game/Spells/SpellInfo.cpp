@@ -822,7 +822,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effe
     SpellEquippedItemsId = spellEntry->SpellEquippedItemsId;
     SpellInterruptsId = spellEntry->SpellInterruptsId;
     SpellLevelsId = spellEntry->SpellLevelsId;
-    SpellPowerId = spellEntry->SpellPowerId;
+    SpellPowerId = 0;
     SpellReagentsId = spellEntry->SpellReagentsId;
     SpellShapeshiftId = spellEntry->SpellShapeshiftId;
     SpellTargetRestrictionsId = spellEntry->SpellTargetRestrictionsId;
@@ -932,10 +932,10 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effe
 
     // SpellPowerEntry
     SpellPowerEntry const* _power = GetSpellPower();
-    ManaCost = _power ? _power->manaCost : 0;
-    ManaCostPerlevel = _power ? _power->manaCostPerlevel : 0;
-    ManaCostPercentage = _power ? _power->ManaCostPercentage : 0;
-    ManaPerSecond = _power ? _power->manaPerSecond : 0;
+    ManaCost = _power ? _power->powerCost : 0;
+    ManaCostPerlevel = _power ? _power->powerCostPerlevel : 0;
+    ManaCostPercentage = _power ? _power->powerCostPercentage : 0;
+    ManaPerSecond = _power ? _power->powerCostPerSecond : 0;
     PowerType = _power ? _power->PowerType : 0;
 
     // SpellReagentsEntry
