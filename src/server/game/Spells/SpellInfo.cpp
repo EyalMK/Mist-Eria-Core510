@@ -2740,7 +2740,7 @@ uint32 SpellInfo::GetPowerType(Unit const* caster) const
 {
     if(!caster) return 0;
     SpellPowerEntry const* power = GetSpellPower(caster);
-    return power ? power->Id : 0;
+    return power ? power->PowerType : 0;
 }
 
 uint32 SpellInfo::GetPowerCostPerLevel(Unit const* caster) const
