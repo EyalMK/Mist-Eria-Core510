@@ -13282,7 +13282,8 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     case SPELL_AURA_MOD_POWER_COST_SCHOOL:
                         // Skip melee hits and spells ws wrong school or zero cost
                         if (procSpell &&
-                                (procSpell->GetPowerCost(this) != 0 || procSpell->GetPowerCostPercentage(this) != 0) && // Cost check                            (triggeredByAura->GetMiscValue() & procSpell->SchoolMask))          // School check
+                                (procSpell->GetPowerCost(this) != 0 || procSpell->GetPowerCostPercentage(this) != 0) && // Cost check
+                                (triggeredByAura->GetMiscValue() & procSpell->SchoolMask))          // School check
                             takeCharges = true;
                         break;
                     case SPELL_AURA_MECHANIC_IMMUNITY:
