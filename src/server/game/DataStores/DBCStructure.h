@@ -1981,7 +1981,7 @@ struct SpellLevelsEntry
 struct SpellPowerEntry
 {
     uint32    Id;                                           // 0        m_ID
-    uint32    SpellId;                                      // 1        m_spellId
+    uint32    spellId;                                      // 1        m_spellId
     uint32    difficultyMode;                               // 2        5.0.1.15589
     uint32    PowerType;                                    // 3
     uint32    powerCost;                                     // 4       m_manaCost

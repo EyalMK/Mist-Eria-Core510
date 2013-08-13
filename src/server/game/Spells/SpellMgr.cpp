@@ -3624,10 +3624,11 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 40167: // Introspection
                 spellInfo->Attributes |= SPELL_ATTR0_NEGATIVE_1;
                 break;
-            case 2378: // Minor Fortitude
-                spellInfo->ManaCost = 0;
+            /*case 2378: // Minor Fortitude
+                spellInfo->setPo = 0;
                 spellInfo->ManaPerSecond = 0;
                 break;
+                */
             // OCULUS SPELLS
             // The spells below are here, because their effect 1 is giving warning, because the triggered spell is not found in dbc and is missing from encounter sniff.
             case 49462: // Call Ruby Drake

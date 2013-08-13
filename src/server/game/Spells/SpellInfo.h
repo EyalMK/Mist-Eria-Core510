@@ -342,6 +342,7 @@ public:
     uint32 MaxLevel;
     uint32 BaseLevel;
     uint32 SpellLevel;
+    SpellDurationEntry DurationEntry;
     SpellPowerEntry const* SpellPowerId[MAX_SPELL_POWERS];
     uint8 currentInitPower;
     uint32 RuneCostID;
