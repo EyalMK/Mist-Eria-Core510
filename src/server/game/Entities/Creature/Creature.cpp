@@ -310,9 +310,6 @@ bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data
 
     uint32 displayID = sObjectMgr->ChooseDisplayId(0, GetCreatureTemplate(), data);
     CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelRandomGender(&displayID);
-
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> displayID = %u, minfo = %u", displayID, minfo);
-
     if (!minfo)                                             // Cancel load if no model defined
     {
         sLog->outError(LOG_FILTER_SQL, "Creature (Entry: %u) has no model defined in table `creature_template`, can't load. ", Entry);
