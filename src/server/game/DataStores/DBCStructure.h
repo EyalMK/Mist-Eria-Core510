@@ -1990,9 +1990,9 @@ struct SpellPowerEntry
     //uint32  PowerDisplayId;                               // 8       m_powerDisplayID - id from PowerDisplay.dbc, new in 3.1
     //uint32 Unknown;                                       // 10       5.0.1
     float    powerCostPercentage;                           // 6       m_manaCostPct
-    //uint32 Unknown;                                       // 10       5.0.1
-    //uint32 Unknown;                                       // 11       5.0.1
-    //uint32 Unknown;                                       // 12       5.0.1
+    float     channelTicCost;                               // 10
+    uint32    auraChoice;                                   // 11
+    float     maxHealthCost;                                // 12
 };
 
 struct SpellRuneCostEntry
