@@ -1291,6 +1291,8 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recvData)
 {
+	// need to find CMSG .. we can be able to do this when we can open inspect window
+
     ObjectGuid guid;
     guid[1] = recvData.ReadBit();
     guid[5] = recvData.ReadBit();
@@ -1319,26 +1321,33 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recvData)
 
     ObjectGuid playerGuid = player->GetGUID();
     WorldPacket data(SMSG_INSPECT_HONOR_STATS, 8+1+4+4);
-    data.WriteBit(playerGuid[4]);
-    data.WriteBit(playerGuid[3]);
+
+	//data << uint8(0); // not sure about this
     data.WriteBit(playerGuid[6]);
-    data.WriteBit(playerGuid[2]);
-    data.WriteBit(playerGuid[5]);
-    data.WriteBit(playerGuid[0]);
     data.WriteBit(playerGuid[7]);
+    data.WriteBit(playerGuid[2]);
+    data.WriteBit(playerGuid[0]);
+    data.WriteBit(playerGuid[5]);
+    data.WriteBit(playerGuid[3]);
     data.WriteBit(playerGuid[1]);
-    data << uint8(0);                                               // rank
-    data << uint16(player->GetUInt16Value(PLAYER_FIELD_KILLS, 1));  // yesterday kills
-    data << uint16(player->GetUInt16Value(PLAYER_FIELD_KILLS, 0));  // today kills
+    data.WriteBit(playerGuid[4]);
+
+	data << uint32(player->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS));
+
     data.WriteByteSeq(playerGuid[2]);
-    data.WriteByteSeq(playerGuid[0]);
-    data.WriteByteSeq(playerGuid[6]);
-    data.WriteByteSeq(playerGuid[3]);
     data.WriteByteSeq(playerGuid[4]);
-    data.WriteByteSeq(playerGuid[1]);
-    data.WriteByteSeq(playerGuid[5]);
-    data << uint32(player->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS));
+
+	data << uint16(player->GetUInt16Value(PLAYER_FIELD_KILLS, 1));  // yesterday kills
+	data << uint8(0);
+    data << uint16(player->GetUInt16Value(PLAYER_FIELD_KILLS, 0));  // today kills
+
     data.WriteByteSeq(playerGuid[7]);
+    data.WriteByteSeq(playerGuid[6]);
+    data.WriteByteSeq(playerGuid[5]);
+    data.WriteByteSeq(playerGuid[1]);
+    data.WriteByteSeq(playerGuid[0]);
+    data.WriteByteSeq(playerGuid[3]);
+
     SendPacket(&data);
 }
 

@@ -21315,14 +21315,24 @@ void Player::InitDataForForm(bool reapplyMods)
                 setPowerType(POWER_RAGE);
             break;
         }
-        /*case FORM_OXSTANCE:
+        case FORM_OXSTANCE:
+		{
+            if (getPowerType() != POWER_ENERGY)
+                setPowerType(POWER_ENERGY);
+            break;
+        }
         case FORM_SERPENTSTANCE:
-        case FORM_TIGERSTANCE:
-        {
+		{
             if (getPowerType() != POWER_MANA)
                 setPowerType(POWER_MANA);
             break;
-        }*/
+        }
+        case FORM_TIGERSTANCE:
+		{
+            if (getPowerType() != POWER_ENERGY)
+                setPowerType(POWER_ENERGY);
+            break;
+        }
         default:                                            // 0, for example
         {
             ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(getClass());
