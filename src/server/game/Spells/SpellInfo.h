@@ -408,11 +408,18 @@ public:
     SpellEquippedItemsEntry const* GetSpellEquippedItems() const;
     SpellInterruptsEntry const* GetSpellInterrupts() const;
     SpellLevelsEntry const* GetSpellLevels() const;
-    SpellPowerEntry const* GetSpellPower() const;
     SpellReagentsEntry const* GetSpellReagents() const;
     SpellScalingEntry const* GetSpellScaling() const;
     SpellShapeshiftEntry const* GetSpellShapeshift() const;
     SpellTotemsEntry const* GetSpellTotems() const;
+
+    //Power access functions
+    SpellPowerEntry const* GetSpellPower(const Unit* caster) const;
+    uint32 GetPowerCostPercentage(const Unit *caster) const;
+    uint32 GetPowerCost(const Unit *caster) const;
+    uint32 GetPowerType(const Unit *caster) const;
+    uint32 GetPowerCostPerLevel(const Unit *caster) const;
+    uint32 GetPowerPerSecond(const Unit *caster) const;
 
     SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effects);
     ~SpellInfo();

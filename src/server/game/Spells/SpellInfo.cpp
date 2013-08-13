@@ -822,7 +822,6 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effe
     SpellEquippedItemsId = spellEntry->SpellEquippedItemsId;
     SpellInterruptsId = spellEntry->SpellInterruptsId;
     SpellLevelsId = spellEntry->SpellLevelsId;
-    SpellPowerId = 0;
     SpellReagentsId = spellEntry->SpellReagentsId;
     SpellShapeshiftId = spellEntry->SpellShapeshiftId;
     SpellTargetRestrictionsId = spellEntry->SpellTargetRestrictionsId;
@@ -2205,46 +2204,46 @@ uint32 SpellInfo::GetRecoveryTime() const
     return RecoveryTime > CategoryRecoveryTime ? RecoveryTime : CategoryRecoveryTime;
 }
 
-int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) const
+uint32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) const
 {
     // Spell drain all exist power on cast (Only paladin lay of Hands)
     if (AttributesEx & SPELL_ATTR1_DRAIN_ALL_POWER)
     {
         // If power type - health drain all
-        if (PowerType == POWER_HEALTH)
+        if (GetPowerType(caster) == POWER_HEALTH)
             return caster->GetHealth();
         // Else drain all power
-        if (PowerType < MAX_POWERS)
-            return caster->GetPower(Powers(PowerType));
-        sLog->outError(LOG_FILTER_SPELLS_AURAS, "SpellInfo::CalcPowerCost: Unknown power type '%d' in spell %d", PowerType, Id);
+        if (GetPowerType(caster) < MAX_POWERS)
+            return caster->GetPower(Powers(GetPowerType(caster)));
+        sLog->outError(LOG_FILTER_SPELLS_AURAS, "SpellInfo::CalcPowerCost: Unknown power type '%d' in spell %d", GetPowerType(caster), Id);
         return 0;
     }
 
     // Base powerCost
-    int32 powerCost = ManaCost;
+    int32 powerCost = GetPowerCost(caster);
     // PCT cost from total amount
-    if (ManaCostPercentage)
+    if (GetPowerCostPercentage(caster))
     {
-        switch (PowerType)
+        switch (GetPowerType(caster))
         {
             // health as power used
             case POWER_HEALTH:
-                powerCost += int32(CalculatePct(caster->GetCreateHealth(), ManaCostPercentage));
+                powerCost += int32(CalculatePct(caster->GetCreateHealth(), GetPowerCostPercentage(caster)));
                 break;
             case POWER_MANA:
-                powerCost += int32(CalculatePct(caster->GetCreateMana(), ManaCostPercentage));
+                powerCost += int32(CalculatePct(caster->GetCreateMana(), GetPowerCostPercentage(caster)));
                 break;
             case POWER_RAGE:
             case POWER_FOCUS:
             case POWER_ENERGY:
-                powerCost += int32(CalculatePct(caster->GetMaxPower(Powers(PowerType)), ManaCostPercentage));
+                powerCost += int32(CalculatePct(caster->GetMaxPower(Powers(GetPowerType(caster))), GetPowerCostPercentage(caster)));
                 break;
             case POWER_RUNES:
             case POWER_RUNIC_POWER:
                 sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "CalculateManaCost: Not implemented yet!");
                 break;
             default:
-                sLog->outError(LOG_FILTER_SPELLS_AURAS, "CalculateManaCost: Unknown power type '%d' in spell %d", PowerType, Id);
+                sLog->outError(LOG_FILTER_SPELLS_AURAS, "CalculateManaCost: Unknown power type '%d' in spell %d", GetPowerType(caster), Id);
                 return 0;
         }
     }
@@ -2721,6 +2720,41 @@ SpellPowerEntry const* SpellInfo::GetSpellPower() const
 
     //Default choice 1st power
     return SpellPowerId[0];
+}
+
+float SpellInfo::GetPowerCostPercentage(Unit const* caster) const
+{
+    if(!caster) return 0;
+    SpellPowerEntry const* power = GetSpellPower(caster);
+    return power ? power->powerCostPercentage : 0;
+}
+
+uint32 SpellInfo::GetPowerCost(Unit const* caster) const
+{
+    if(!caster) return 0;
+    SpellPowerEntry const* power = GetSpellPower(caster);
+    return power ? power->powerCost : 0;
+}
+
+uint32 SpellInfo::GetPowerType(Unit const* caster) const
+{
+    if(!caster) return 0;
+    SpellPowerEntry const* power = GetSpellPower(caster);
+    return power ? power->powerId : 0;
+}
+
+uint32 SpellInfo::GetPowerCostPerLevel(Unit const* caster) const
+{
+    if(!caster) return 0;
+    SpellPowerEntry const* power = GetSpellPower(caster);
+    return power ? power->powerCostPerlevel : 0;
+}
+
+uint32 SpellInfo::GetPowerPerSecond(Unit const* caster) const
+{
+    if(!caster) return 0;
+    SpellPowerEntry const* power = GetSpellPower(caster);
+    return power ? power->powerCostPerSecond : 0;
 }
 
 SpellReagentsEntry const* SpellInfo::GetSpellReagents() const

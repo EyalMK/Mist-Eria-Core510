@@ -218,6 +218,17 @@ SpellInfo const* ScriptedAI::SelectSpell(Unit* target, uint32 school, uint32 mec
             continue;
 
         //Make sure that the spell uses the requested amount of power
+        if (powerCostMin && tempSpell->GetPowerCost(me) < powerCostMin)
+            continue;
+
+        if (powerCostMax && tempSpell->GetPowerCost(me) > powerCostMax)
+            continue;
+
+        //Continue if we don't have the mana to actually cast this spell
+        if (tempSpell->GetPowerCost(me) > (uint32)me->GetPower(Powers(tempSpell->GetPowerType(me))))
+            continue;
+
+        //Make sure that the spell uses the requested amount of power
         if (powerCostMin && tempSpell->ManaCost < powerCostMin)
             continue;
 
