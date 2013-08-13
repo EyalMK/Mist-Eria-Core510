@@ -37,10 +37,11 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     uint32 bodyLength, subjectLength, receiverLength;
     uint32 unk1, unk2;
 
+	recvData >> COD >> money;                              // money and cod
+
     recvData >> unk1;
     recvData >> unk2; // Stationery?
 
-    recvData >> COD >> money;                              // money and cod
     bodyLength = recvData.ReadBits(12);
     subjectLength = recvData.ReadBits(9);
 
