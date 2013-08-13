@@ -931,12 +931,10 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effe
     SpellLevel = _levels ? _levels->spellLevel : 0;
 
     // SpellPowerEntry
-    SpellPowerEntry const* _power = GetSpellPower();
-    ManaCost = _power ? _power->powerCost : 0;
-    ManaCostPerlevel = _power ? _power->powerCostPerlevel : 0;
-    ManaCostPercentage = _power ? _power->powerCostPercentage : 0;
-    ManaPerSecond = _power ? _power->powerCostPerSecond : 0;
-    PowerType = _power ? _power->PowerType : 0;
+    //Loaded right after the map of spells
+    currentInitPower = 0;
+    for(uint8 i = 0 ; i < MAX_SPELL_POWERS ; ++i)
+        SpellPowerId[i] = NULL;
 
     // SpellReagentsEntry
     SpellReagentsEntry const* _reagents = GetSpellReagents();
@@ -2710,7 +2708,19 @@ SpellLevelsEntry const* SpellInfo::GetSpellLevels() const
 
 SpellPowerEntry const* SpellInfo::GetSpellPower() const
 {
-    return SpellPowerId ? sSpellPowerStore.LookupEntry(SpellPowerId) : NULL;
+    if(currentInitPower == 0 && !caster) return NULL;
+    if(currentInitPower == 1) return SpellPowerId[0];
+
+    //Aura chooser
+    for (uint8 i = 0 ; i < currentInitPower ; ++i)
+    {
+        SpellPowerEntry const* power = SpellPowerId[i];
+
+        if(power->auraChoice != 0 && caster->HasAura(power->auraChoice)) return power;
+    }
+
+    //Default choice 1st power
+    return SpellPowerId[0];
 }
 
 SpellReagentsEntry const* SpellInfo::GetSpellReagents() const

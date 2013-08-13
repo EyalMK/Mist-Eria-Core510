@@ -2637,6 +2637,28 @@ void SpellMgr::LoadSpellInfoStore()
         if (SpellEntry const* spellEntry = sSpellStore.LookupEntry(i))
             mSpellInfoMap[i] = new SpellInfo(spellEntry, effectsBySpell[i].effects);
 
+    //Powers
+    for (uint32 i = 0 ; i < sSpellPowerStore.GetNumRows() ; ++i)
+    {
+        SpellPowerEntry const* power = sSpellPowerStore.LookupEntry(i);
+
+        if(!power || power->spellId > GetSpellInfoStoreSize()) continue;
+
+        SpellInfo * spell = mSpellInfoMap[power->spellId];
+
+        if(!spell) continue;
+
+        //Should never happens
+        if(spell->currentInitPower == MAX_SPELL_POWERS)
+        {
+            sLog->outError(LOG_FILTER_GENERAL, "You attempted to add a new SpellPower ( %u ) on the spell ( %u ) while his table SpellPowerId is full", power->Id, spell->Id);
+            continue;
+        }
+
+        spell->SpellPowerId[spell->currentInitPower] = power;
+        ++spell->currentInitPower;
+    }
+
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded spell info store in %u ms", GetMSTimeDiffToNow(oldMSTime));
 }
 
