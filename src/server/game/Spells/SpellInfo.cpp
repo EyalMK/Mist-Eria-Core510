@@ -1148,7 +1148,7 @@ bool SpellInfo::IsStackableWithRanks() const
 {
     if (IsPassive())
         return false;
-    if (PowerType != POWER_MANA && PowerType != POWER_HEALTH)
+    if (GetPowerType(GetCaster()) != POWER_MANA && GetPowerType(GetCaster()) != POWER_HEALTH)
         return false;
     if (IsProfessionOrRiding())
         return false;
@@ -2705,7 +2705,7 @@ SpellLevelsEntry const* SpellInfo::GetSpellLevels() const
     return SpellLevelsId ? sSpellLevelsStore.LookupEntry(SpellLevelsId) : NULL;
 }
 
-SpellPowerEntry const* SpellInfo::GetSpellPower() const
+SpellPowerEntry const* SpellInfo::GetSpellPower(Unit const* caster) const
 {
     if(currentInitPower == 0 && !caster) return NULL;
     if(currentInitPower == 1) return SpellPowerId[0];
@@ -2740,7 +2740,7 @@ uint32 SpellInfo::GetPowerType(Unit const* caster) const
 {
     if(!caster) return 0;
     SpellPowerEntry const* power = GetSpellPower(caster);
-    return power ? power->powerId : 0;
+    return power ? power->Id : 0;
 }
 
 uint32 SpellInfo::GetPowerCostPerLevel(Unit const* caster) const

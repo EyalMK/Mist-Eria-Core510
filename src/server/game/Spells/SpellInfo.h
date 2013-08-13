@@ -415,7 +415,7 @@ public:
 
     //Power access functions
     SpellPowerEntry const* GetSpellPower(const Unit* caster) const;
-    uint32 GetPowerCostPercentage(const Unit *caster) const;
+    float GetPowerCostPercentage(const Unit *caster) const;
     uint32 GetPowerCost(const Unit *caster) const;
     uint32 GetPowerType(const Unit *caster) const;
     uint32 GetPowerCostPerLevel(const Unit *caster) const;
@@ -501,7 +501,7 @@ public:
     uint32 CalcCastTime(Unit* caster = NULL, Spell* spell = NULL) const;
     uint32 GetRecoveryTime() const;
 
-    int32 CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) const;
+    uint32 CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) const;
 
     bool IsRanked() const;
     uint8 GetRank() const;
