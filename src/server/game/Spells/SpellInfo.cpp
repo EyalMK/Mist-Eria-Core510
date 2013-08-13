@@ -1144,7 +1144,7 @@ bool SpellInfo::IsAutocastable() const
     return true;
 }
 
-bool SpellInfo::IsStackableWithRanks() const
+bool SpellInfo::IsStackableWithRanks(Unit* caster) const
 {
     if (IsPassive())
         return false;

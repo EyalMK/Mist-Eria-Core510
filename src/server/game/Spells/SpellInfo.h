@@ -445,7 +445,7 @@ public:
 
     bool IsPassive() const;
     bool IsAutocastable() const;
-    bool IsStackableWithRanks() const;
+    bool IsStackableWithRanks(Unit* caster) const;
     bool IsPassiveStackableWithRanks() const;
     bool IsMultiSlotAura() const;
     bool IsDeathPersistent() const;
