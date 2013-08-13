@@ -2055,10 +2055,10 @@ struct SpellTargetRestrictionsEntry
 struct SpellReagentsEntry
 {
     uint32    Id;                                           // 0        m_ID
-    uint32    SpellId;                                      // 1        m_spellId
-    //uint32 Unknown;                                       // 2        5.0.1.15589
     int32     Reagent[MAX_SPELL_REAGENTS];                  // 3        m_reagent
     uint32    ReagentCount[MAX_SPELL_REAGENTS];             // 4        m_reagentCount
+    //uint32 unk1;
+    //uint32 unk2;
 };
 
 // SpellScaling.dbc
