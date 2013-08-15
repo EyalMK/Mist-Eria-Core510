@@ -100,7 +100,43 @@ void WorldSession::HandleGuildDeclineOpcode(WorldPacket& /*recvPacket*/)
 void WorldSession::HandleGuildRosterOpcode(WorldPacket& recvPacket)
 {
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_ROSTER [%s]", GetPlayerInfo().c_str());
-    recvPacket.rfinish();
+    
+	ObjectGuid guid;
+	ObjectGuid guid2;
+
+    guid[1] = recvPacket.ReadBit();
+	guid2[4] = recvPacket.ReadBit();
+	guid2[0] = recvPacket.ReadBit();
+	guid[0] = recvPacket.ReadBit();
+	guid2[1] = recvPacket.ReadBit();
+	guid[4] = recvPacket.ReadBit();
+	guid[2] = recvPacket.ReadBit();
+	guid2[3] = recvPacket.ReadBit();
+    guid[5] = recvPacket.ReadBit();
+    guid2[7] = recvPacket.ReadBit();
+    guid[7] = recvPacket.ReadBit();
+    guid2[5] = recvPacket.ReadBit();
+    guid2[6] = recvPacket.ReadBit();
+    guid[6] = recvPacket.ReadBit();
+    guid2[2] = recvPacket.ReadBit();
+	guid[3] = recvPacket.ReadBit();
+
+    recvPacket.ReadByteSeq(guid[2]);
+    recvPacket.ReadByteSeq(guid2[5]);
+    recvPacket.ReadByteSeq(guid2[3]);
+    recvPacket.ReadByteSeq(guid2[4]);
+    recvPacket.ReadByteSeq(guid[3]);
+    recvPacket.ReadByteSeq(guid[4]);
+    recvPacket.ReadByteSeq(guid2[2]);
+    recvPacket.ReadByteSeq(guid2[1]);
+	recvPacket.ReadByteSeq(guid[7]);
+    recvPacket.ReadByteSeq(guid[1]);
+    recvPacket.ReadByteSeq(guid2[0]);
+    recvPacket.ReadByteSeq(guid2[6]);
+    recvPacket.ReadByteSeq(guid[0]);
+    recvPacket.ReadByteSeq(guid[6]);
+    recvPacket.ReadByteSeq(guid2[7]);
+    recvPacket.ReadByteSeq(guid[5]);
 
     if (Guild* guild = GetPlayer()->GetGuild())
         guild->HandleRoster(this);
