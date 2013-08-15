@@ -343,11 +343,8 @@ public:
     uint32 BaseLevel;
     uint32 SpellLevel;
     SpellDurationEntry const* DurationEntry;
-    uint32 PowerType;
-    uint32 ManaCost;
-    uint32 ManaCostPerlevel;
-    uint32 ManaPerSecond;
-    uint32 ManaCostPercentage;
+    SpellPowerEntry const* SpellPowerId[MAX_SPELL_POWERS];
+    uint8 currentInitPower;
     uint32 RuneCostID;
     SpellRangeEntry const* RangeEntry;
     float  Speed;
@@ -383,7 +380,6 @@ public:
     uint32 SpellEquippedItemsId;
     uint32 SpellInterruptsId;
     uint32 SpellLevelsId;
-    uint32 SpellPowerId;
     uint32 SpellReagentsId;
     uint32 SpellShapeshiftId;
     uint32 SpellTargetRestrictionsId;
@@ -412,11 +408,18 @@ public:
     SpellEquippedItemsEntry const* GetSpellEquippedItems() const;
     SpellInterruptsEntry const* GetSpellInterrupts() const;
     SpellLevelsEntry const* GetSpellLevels() const;
-    SpellPowerEntry const* GetSpellPower() const;
     SpellReagentsEntry const* GetSpellReagents() const;
     SpellScalingEntry const* GetSpellScaling() const;
     SpellShapeshiftEntry const* GetSpellShapeshift() const;
     SpellTotemsEntry const* GetSpellTotems() const;
+
+    //Power access functions
+    SpellPowerEntry const* GetSpellPower(const Unit* caster) const;
+    float GetPowerCostPercentage(const Unit *caster) const;
+    uint32 GetPowerCost(const Unit *caster) const;
+    uint32 GetPowerType(const Unit *caster) const;
+    uint32 GetPowerCostPerLevel(const Unit *caster) const;
+    uint32 GetPowerPerSecond(const Unit *caster) const;
 
     SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effects);
     ~SpellInfo();
@@ -442,7 +445,7 @@ public:
 
     bool IsPassive() const;
     bool IsAutocastable() const;
-    bool IsStackableWithRanks() const;
+    bool IsStackableWithRanks(Unit* caster) const;
     bool IsPassiveStackableWithRanks() const;
     bool IsMultiSlotAura() const;
     bool IsDeathPersistent() const;
@@ -498,7 +501,7 @@ public:
     uint32 CalcCastTime(Unit* caster = NULL, Spell* spell = NULL) const;
     uint32 GetRecoveryTime() const;
 
-    int32 CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) const;
+    uint32 CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) const;
 
     bool IsRanked() const;
     uint8 GetRank() const;

@@ -5788,7 +5788,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 28719:
                 {
                     // mana back
-                    basepoints0 = int32(CalculatePct(procSpell->ManaCost, 30));
+                    basepoints0 = int32(CalculatePct(procSpell->GetPowerCost(this), 30));
                     target = this;
                     triggered_spell_id = 28742;
                     break;
@@ -7274,7 +7274,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                     {
                         if (!procSpell)
                             return false;
-                        basepoints0 = int32(CalculatePct(procSpell->ManaCost, 35));
+                        basepoints0 = int32(CalculatePct(procSpell->GetPowerCost(this), 35));
                         trigger_spell_id = 23571;
                         target = this;
                         break;
@@ -7508,7 +7508,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         // Enlightenment (trigger only from mana cost spells)
         case 35095:
         {
-            if (!procSpell || procSpell->PowerType != POWER_MANA || (procSpell->ManaCost == 0 && procSpell->ManaCostPercentage == 0 && procSpell->ManaCostPerlevel == 0))
+            if (!procSpell || procSpell->GetPowerType(this) != POWER_MANA || (procSpell->GetPowerCost(this) == 0 && procSpell->GetPowerCostPercentage(this) == 0 && procSpell->GetPowerCostPerLevel(this) == 0))
                 return false;
             break;
         }
@@ -13282,8 +13282,8 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     case SPELL_AURA_MOD_POWER_COST_SCHOOL:
                         // Skip melee hits and spells ws wrong school or zero cost
                         if (procSpell &&
-                            (procSpell->ManaCost != 0 || procSpell->ManaCostPercentage != 0) && // Cost check
-                            (triggeredByAura->GetMiscValue() & procSpell->SchoolMask))          // School check
+                                (procSpell->GetPowerCost(this) != 0 || procSpell->GetPowerCostPercentage(this) != 0) && // Cost check
+                                (triggeredByAura->GetMiscValue() & procSpell->SchoolMask))          // School check
                             takeCharges = true;
                         break;
                     case SPELL_AURA_MECHANIC_IMMUNITY:

@@ -2637,6 +2637,28 @@ void SpellMgr::LoadSpellInfoStore()
         if (SpellEntry const* spellEntry = sSpellStore.LookupEntry(i))
             mSpellInfoMap[i] = new SpellInfo(spellEntry, effectsBySpell[i].effects);
 
+    //Powers
+    for (uint32 i = 0 ; i < sSpellPowerStore.GetNumRows() ; ++i)
+    {
+        SpellPowerEntry const* power = sSpellPowerStore.LookupEntry(i);
+
+        if(!power || power->spellId > GetSpellInfoStoreSize()) continue;
+
+        SpellInfo * spell = mSpellInfoMap[power->spellId];
+
+        if(!spell) continue;
+
+        //Should never happens
+        if(spell->currentInitPower == MAX_SPELL_POWERS)
+        {
+            sLog->outError(LOG_FILTER_GENERAL, "You attempted to add a new SpellPower ( %u ) on the spell ( %u ) while his table SpellPowerId is full", power->Id, spell->Id);
+            continue;
+        }
+
+        spell->SpellPowerId[spell->currentInitPower] = power;
+        ++spell->currentInitPower;
+    }
+
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded spell info store in %u ms", GetMSTimeDiffToNow(oldMSTime));
 }
 
@@ -3602,10 +3624,11 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 40167: // Introspection
                 spellInfo->Attributes |= SPELL_ATTR0_NEGATIVE_1;
                 break;
-            case 2378: // Minor Fortitude
-                spellInfo->ManaCost = 0;
+            /*case 2378: // Minor Fortitude
+                spellInfo->setPo = 0;
                 spellInfo->ManaPerSecond = 0;
                 break;
+                */
             // OCULUS SPELLS
             // The spells below are here, because their effect 1 is giving warning, because the triggered spell is not found in dbc and is missing from encounter sniff.
             case 49462: // Call Ruby Drake

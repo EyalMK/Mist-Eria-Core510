@@ -4883,8 +4883,8 @@ void Spell::EffectDestroyAllTotems(SpellEffIndex /*effIndex*/)
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
             if (spellInfo)
             {
-                mana += spellInfo->ManaCost;
-                mana += int32(CalculatePct(m_caster->GetCreateMana(), spellInfo->ManaCostPercentage));
+                mana += spellInfo->GetPowerCost(m_caster);
+                mana += int32(CalculatePct(m_caster->GetCreateMana(), spellInfo->GetPowerCostPercentage(m_caster)));
             }
             totem->ToTotem()->UnSummon();
         }

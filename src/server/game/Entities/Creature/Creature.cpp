@@ -310,9 +310,6 @@ bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data
 
     uint32 displayID = sObjectMgr->ChooseDisplayId(0, GetCreatureTemplate(), data);
     CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelRandomGender(&displayID);
-
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "NPC ADD DEBUG >> displayID = %u, minfo = %u", displayID, minfo);
-
     if (!minfo)                                             // Cancel load if no model defined
     {
         sLog->outError(LOG_FILTER_SQL, "Creature (Entry: %u) has no model defined in table `creature_template`, can't load. ", Entry);
@@ -1776,7 +1773,7 @@ SpellInfo const* Creature::reachWithSpellAttack(Unit* victim)
         if (bcontinue)
             continue;
 
-        if (spellInfo->ManaCost > (uint32)GetPower(POWER_MANA))
+        if (spellInfo->GetPowerCost(this) > (uint32)GetPower(POWER_MANA))
             continue;
         float range = spellInfo->GetMaxRange(false);
         float minrange = spellInfo->GetMinRange(false);
@@ -1820,7 +1817,7 @@ SpellInfo const* Creature::reachWithSpellCure(Unit* victim)
         if (bcontinue)
             continue;
 
-        if (spellInfo->ManaCost > (uint32)GetPower(POWER_MANA))
+        if (spellInfo->GetPowerCost(this) > (uint32)GetPower(POWER_MANA))
             continue;
 
         float range = spellInfo->GetMaxRange(true);
