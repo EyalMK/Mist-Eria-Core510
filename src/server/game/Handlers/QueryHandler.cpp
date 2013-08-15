@@ -537,7 +537,7 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
         return;
 
     for(uint32 l_I = 0; l_I< l_Count ; l_I++){
-        WorldPacket l_Data(SMSG_DB_QUERY_RESPONSE, 100);
+        WorldPacket l_Data(SMSG_DB_REPLY, 100);
 
         switch (l_QueryType)
         {
