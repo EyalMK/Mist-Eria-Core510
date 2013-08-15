@@ -536,13 +536,13 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
     if (!l_Count)
         return;
 
-    for(uint32 l_I = 0; i< l_Count ; l_I++){
+    for(uint32 l_I = 0; l_I< l_Count ; l_I++){
         WorldPacket l_Data(SMSG_DB_QUERY_RESPONSE, 100);
 
         switch (l_QueryType)
         {
         case DB_QUERY_NPC_TEXT:
-            SendNpcTextDBQueryResponse(this, l_Data, l_LocalTextID[l_I]);
+            SendNpcTextDBQueryResponse(this, l_Data, l_LocalTextIDs[l_I]);
             break;
         default:
             sLog->outDebug(LOG_FILTER_SERVER_LOADING, "Receive non handled db query type 0x%08.8X", l_QueryType);
