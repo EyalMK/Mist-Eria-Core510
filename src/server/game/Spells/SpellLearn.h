@@ -4,7 +4,7 @@
 #include <ace/Singleton.h>
 #include "Common.h"
 #include "SharedDefines.h"
-#include "spell.h"
+#include "Spell.h"
 
 class SpellLearnMgr
 {
