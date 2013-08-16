@@ -434,10 +434,8 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recvData)
 }
 
 
-void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, std::vector<ObjectGuid> & p_Guids, std::vector<uint32> & p_LocalTextIDs)
+void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, uint32 l_LocalTextID)
 {
-    uint32 l_LocalTextID = p_LocalTextIDs[0];
-
     GossipText const* p_Gossip = sObjectMgr->GetGossipText(l_LocalTextID);
     std::string l_Text1 = "Greetings $N";
     std::string l_Text2 = "Greetings $N";
@@ -468,23 +466,6 @@ void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, 
     p_Data << l_Text1;
     p_Data << uint16(l_Text2.size());
     p_Data << l_Text2;
-
-    /*if (p_Gossip)
-    {
-        for (int j = 0; j < MAX_GOSSIP_TEXT_EMOTES; ++j)
-        {
-            p_Data << p_Gossip->Options[0].Emotes[j]._Delay;
-            p_Data << p_Gossip->Options[0].Emotes[j]._Emote;
-        }
-    }
-    else
-    {
-        for (int j = 0; j < MAX_GOSSIP_TEXT_EMOTES; ++j)
-        {
-            p_Data << uint32(0);
-            p_Data << uint32(0);
-        }
-    }*/
 
     p_Data << uint32(0);	/// unk
     p_Data << uint32(0);	/// unk
@@ -555,24 +536,21 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
     if (!l_Count)
         return;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Count : %u guid0 %u local0 %u", l_Count, GUID_LOPART(l_Guids[0]), l_LocalTextIDs[0]);
+    for(uint32 l_I = 0; l_I< l_Count ; l_I++){
+        WorldPacket l_Data(SMSG_DB_REPLY, 100);
 
-    WorldPacket l_Data(SMSG_DB_REPLY, 100);
-
-    switch (l_QueryType)
-    {
+        switch (l_QueryType)
+        {
         case DB_QUERY_NPC_TEXT:
-            SendNpcTextDBQueryResponse(this, l_Data, l_Guids, l_LocalTextIDs);
+            SendNpcTextDBQueryResponse(this, l_Data, l_LocalTextIDs[l_I]);
             break;
-
         default:
             sLog->outDebug(LOG_FILTER_SERVER_LOADING, "Receive non handled db query type 0x%08.8X", l_QueryType);
             break;
-
+        }
+        if (l_Data.size())
+            SendPacket(&l_Data);
     }
-
-    if (l_Data.size())
-        SendPacket(&l_Data);
 }
 
 
