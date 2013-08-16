@@ -8860,8 +8860,28 @@ void Player::RemovedInsignia(Player* looterPlr)
 
 void Player::SendLootRelease(uint64 guid)
 {
+	ObjectGuid oguid = guid;
+
     WorldPacket data(SMSG_LOOT_RELEASE_RESPONSE, (8+1));
-    data << uint64(guid) << uint8(1);
+
+    data.WriteBit(oguid[2]);
+	data.WriteBit(oguid[0]);
+	data.WriteBit(oguid[6]);
+	data.WriteBit(oguid[1]);
+	data.WriteBit(oguid[4]);
+	data.WriteBit(oguid[7]);
+	data.WriteBit(oguid[3]);
+	data.WriteBit(oguid[5]);
+
+	data.WriteByteSeq(oguid[7]);
+	data.WriteByteSeq(oguid[2]);
+	data.WriteByteSeq(oguid[0]);
+	data.WriteByteSeq(oguid[1]);
+	data.WriteByteSeq(oguid[5]);
+	data.WriteByteSeq(oguid[3]);
+	data.WriteByteSeq(oguid[6]);
+	data.WriteByteSeq(oguid[4]);
+
     SendDirectMessage(&data);
 }
 
