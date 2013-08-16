@@ -18,7 +18,15 @@ void SpellLearnMgr::Load()
 	{
 		if(SpecializationSpellEntry const* specialisationSpell = sSpecializationSpellStorage.LookupEntry(i))
 		{
-			sSpecializationMap.insert(specialisationSpell->SpellId, specialisationSpell->SpecId);
+			sSpecializationMap[specialisationSpell->SpellId] = specialisationSpell->SpecId;
+		}
+	}
+
+	for(uint32 i = 0 ; i < sChrClassesStore.GetNumRows() ; i++)
+	{
+		if(ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(i))
+		{
+			sSpellLearnMap[classEntry->ClassID] = new LevelsList;
 		}
 	}
 
@@ -30,7 +38,7 @@ void SpellLearnMgr::Load()
 			uint32 level = spellInfo->SpellLevel;
 			uint32 specialisationId = GetSpecializationSpecBySpell(i);
 
-
+			//sSpellLearnMap[classId][level][specialisationId]->
 		}
 	}
 }
