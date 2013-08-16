@@ -39,6 +39,6 @@
 #  define _FULLVERSION _PACKAGENAME "Rev: " _REVISION " " _BUILD_DIRECTIVE " Rev hash: " _HASH " (Win32, " _ENDIAN_STRING ")"
 # endif
 #else
-#  define _FULLVERSION _PACKAGENAME "Rev: " _REVISION " " _BUILD_DIRECTIVE " Rev hash: " _HASH " (Unix, " _ENDIAN_STRING ")"
+#  define _FULLVERSION _PACKAGENAME "Rev: " _REVISION " Debug Rev hash: " _HASH " (Unix, " _ENDIAN_STRING ")"
 #endif
 #endif

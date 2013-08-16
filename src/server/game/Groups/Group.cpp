@@ -150,7 +150,7 @@ bool Group::Create(Player* leader)
         stmt->setUInt32(index++, uint8(m_dungeonDifficulty));
         stmt->setUInt32(index++, uint8(m_raidDifficulty));
 
-        CharacterDatabase.Execute(stmt);
+        //CharacterDatabase.Execute(stmt);
 
 
         ASSERT(AddMember(leader)); // If the leader can't be added to a new group because it appears full, something is clearly wrong.
@@ -432,7 +432,7 @@ bool Group::AddMember(Player* player)
         stmt->setUInt8(3, member.group);
         stmt->setUInt8(4, member.roles);
 
-        CharacterDatabase.Execute(stmt);
+        //CharacterDatabase.Execute(stmt);
 
     }
 
@@ -1522,6 +1522,9 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         slot = &(*witr);
     }
 
+    if(GetMembersCount()-1 == 0)
+        return;
+
     WorldPacket data(SMSG_GROUP_LIST, (1+1+1+1+1+4+8+4+4+(GetMembersCount()-1)*(13+8+1+1+1+1)+8+1+8+1+1+1+1));
     /*data << uint8(m_groupType);                         // group type (flags in 3.3)
     data << uint8(slot->group);
@@ -1566,7 +1569,9 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         data << uint8(m_raidDifficulty);                // Raid Difficulty
     }*/
 
-    ObjectGuid leaderGuid = m_leaderGuid, groupGuid = m_guid;
+    std::cout << "Player " << player->GetName() << " : " << GetMembersCount()-1 << std::endl;
+
+    ObjectGuid leaderGuid = m_guid, groupGuid = m_leaderGuid;
 	uint8 byte10 = 0; //Probably smthng with challenge mode
     uint8 hasLootRule = 0; //For testing purpose
     uint8 isLFG = 0;
@@ -1636,8 +1641,10 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
 
         data.WriteString(citr->name);
 
+        std::cout << "Member : " << citr->name << std::endl;
+
         ObjectGuid memberGuid = citr->guid;
-		uint8 byte39 = citr->group, byte3A = citr->roles, byte38 = onlineState, byte3B = citr->flags;
+        uint8 byte39 = citr->group, byte3A = citr->roles, byte38 = citr->flags, byte3B = onlineState;
 
         data.WriteByteSeq(memberGuid[0]);
         data.WriteByteSeq(memberGuid[7]);
