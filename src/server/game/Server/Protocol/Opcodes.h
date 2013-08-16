@@ -929,12 +929,12 @@ enum Opcodes
     SMSG_GROUPACTION_THROTTLED                        = 0x1794,
     SMSG_GROUP_CANCEL                                 = 0x0925,//16357
     SMSG_GROUP_DECLINE                                = 0x09C1,//16357
-    SMSG_GROUP_DESTROYED                              = 0x1797,
+    SMSG_GROUP_DESTROYED                              = 0x04E1,//16357
     SMSG_GROUP_INVITE                                 = 0x0574,//16357
     SMSG_GROUP_LIST                                   = 0x087C,//16357
     SMSG_GROUP_SET_LEADER                             = 0x0D71,//16357
     SMSG_GROUP_SET_ROLE                               = 0x1801,
-    SMSG_GROUP_UNINVITE                               = 0x1802,
+    SMSG_GROUP_UNINVITE                               = 0x0C29,//16357
     SMSG_GUILD_ACHIEVEMENT_DATA                       = 0x09F5,//16357
     SMSG_GUILD_ACHIEVEMENT_DELETED                    = 0x694, //16357
     SMSG_GUILD_ACHIEVEMENT_EARNED                     = 0x474, //16357
