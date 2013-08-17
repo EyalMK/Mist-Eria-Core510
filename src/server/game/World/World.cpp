@@ -82,7 +82,7 @@
 #include "CalendarMgr.h"
 #include "BattlefieldMgr.h"
 #include "BlackMarket/BlackMarketMgr.h"
-#include "SpellMgr.h"
+#include "Spells/SpellMgr.h"
 
 ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
