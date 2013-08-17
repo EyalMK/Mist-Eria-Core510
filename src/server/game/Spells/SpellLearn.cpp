@@ -26,7 +26,10 @@ void SpellLearnMgr::Load()
 	{
 		if(ChrSpecializationEntry const* specialisation = sChrSpecializationStore.LookupEntry(i))
 		{
-			sSpecializationSpecMap[specialisation->ClassId].push_back(specialisation->Id);
+			if(ChrClassesEntry const* classe = sChrClassesStore.LookupEntry(specialisation->ClassId))
+			{
+				sSpecializationSpecMap[classe->spellfamily].push_back(specialisation->Id);
+			}
 		}
 	}
 
@@ -35,7 +38,7 @@ void SpellLearnMgr::Load()
 		if(ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(i))
 		{
 			//common branch without any spec
-			sSpecializationSpecMap[i].push_back(0);
+			sSpecializationSpecMap[classEntry->spellfamily].push_back(0);
 
 			sSpellLearnMap[classEntry->spellfamily] = new LevelsList;
 			for(uint32 y = 0 ; y < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) ; y++)
@@ -57,7 +60,7 @@ void SpellLearnMgr::Load()
 			uint32 spellFamily = spellInfo->SpellFamilyName;
 			if((spellFamily < SPELLFAMILY_MAGE || spellFamily > SPELLFAMILY_SHAMAN) && spellFamily != SPELLFAMILY_DEATHKNIGHT && spellFamily != SPELLFAMILY_MONK) continue;
 			uint32 level = spellInfo->SpellLevel - 1;
-			if(level < 0 || level > 89) continue;
+			if(level < 0 || level > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) - 1) continue;
 			uint32 specialisationId = GetSpecializationSpecBySpell(i);
 
 
