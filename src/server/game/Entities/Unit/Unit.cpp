@@ -1816,10 +1816,10 @@ void Unit::AttackerStateUpdate (Unit* victim, WeaponAttackType attType, bool ext
 
         CalcDamageInfo damageInfo;
         CalculateMeleeDamage(victim, 0, &damageInfo, attType);
-		sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN : DAMAGEBUG1 : damage : %u", damageInfo->damage);
+		sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN : DAMAGEBUG1 : damage : %u", damageInfo.damage);
         // Send log damage message to client
         DealDamageMods(victim, damageInfo.damage, &damageInfo.absorb);
-		sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN : DAMAGEBUG2 : damage : %u", damageInfo->damage);
+		sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN : DAMAGEBUG2 : damage : %u", damageInfo.damage);
         SendAttackStateUpdate(&damageInfo);
 
         //TriggerAurasProcOnEvent(damageInfo);
