@@ -62,7 +62,7 @@ void SpellLearnMgr::Load()
 		uint32 specId       	= fields[2].GetUInt32();
 		uint32 level     		= fields[3].GetUInt32();
 
-		((*((*(sSpellLearnMap[classId]))[level]))[specId])->push_back(spellId);
+		((*((*(sSpellLearnMap[classId]))[level-1]))[specId])->push_back(spellId);
 
 		++count;
 	} while (result->NextRow());
