@@ -19,20 +19,14 @@ private:
 	typedef std::map<uint32, SpellList*> SpecialisationList;
 	typedef std::vector<SpecialisationList*> LevelsList;
 	typedef std::map<uint32, LevelsList*> SpellLearnMap;
-
-	typedef std::map<uint32, uint32> SpecializationSpecBySpell;
-
 	typedef std::map<uint32, std::list<uint32> > SpecializationSpecByClass;
 
 
 	SpellLearnMap sSpellLearnMap;
-	SpecializationSpecBySpell sSpecializationMap;
-	SpecializationSpecByClass sSpecializationSpecMap;
+	SpecializationSpecByClass sSpecializationMap;
 
 public:
 	void Load();
-
-	uint32 GetSpecializationSpecBySpell(uint32 spellId);
 	std::list<uint32> GetSpellList(uint32 classe, uint32 spec, uint32 levelMin, uint32 levelMax, bool withCommon);
 	std::list<uint32> GetSpellList(uint32 classe, uint32 spec, uint32 level, bool withCommon);
 	void PlayerLevelUp(Player* player);

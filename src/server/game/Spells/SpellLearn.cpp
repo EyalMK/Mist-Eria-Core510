@@ -14,19 +14,11 @@ SpellLearnMgr::~SpellLearnMgr()
 
 void SpellLearnMgr::Load()
 {
-	for(uint32 i = 0 ; i < sSpecializationSpellStorage.GetNumRows() ; i++)
-	{
-		if(SpecializationSpellEntry const* specialisationSpell = sSpecializationSpellStorage.LookupEntry(i))
-		{
-			sSpecializationMap[specialisationSpell->SpellId] = specialisationSpell->SpecId;
-		}
-	}
-
 	for(uint32 i = 0 ; i < sChrSpecializationStore.GetNumRows() ; i++)
 	{
 		if(ChrSpecializationEntry const* specialisation = sChrSpecializationStore.LookupEntry(i))
 		{
-			sSpecializationSpecMap[specialisation->ClassId].push_back(specialisation->Id);
+			sSpecializationMap[specialisation->ClassId].push_back(specialisation->Id);
 		}
 	}
 
@@ -35,44 +27,47 @@ void SpellLearnMgr::Load()
 		if(ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(i))
 		{
 			//common branch without any spec
-			sSpecializationSpecMap[i].push_back(0);
+			sSpecializationMap[classEntry->ClassID].push_back(0);
 
-			sSpellLearnMap[classEntry->spellfamily] = new LevelsList;
+			sSpellLearnMap[classEntry->ClassID] = new LevelsList;
 			for(uint32 y = 0 ; y < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) ; y++)
 			{
-				sSpellLearnMap[classEntry->spellfamily]->push_back(new SpecialisationList);
+				sSpellLearnMap[classEntry->ClassID]->push_back(new SpecialisationList);
 				
-				for( std::list<uint32>::iterator itr = sSpecializationSpecMap[classEntry->spellfamily].begin() ; itr != sSpecializationSpecMap[classEntry->spellfamily].end() ; itr++ )
+				for( std::list<uint32>::iterator itr = sSpecializationMap[classEntry->ClassID].begin() ; itr != sSpecializationMap[classEntry->ClassID].end() ; itr++ )
 				{
-					(*((*(sSpellLearnMap[classEntry->spellfamily]))[y]))[*itr] = new SpellList;
+					(*((*(sSpellLearnMap[classEntry->ClassID]))[y]))[*itr] = new SpellList;
 				}
 			}
 		}
 	}
 
-	for(uint32 i = 0 ; i < sSpellStore.GetNumRows() ; i++)
+	uint32 oldMSTime = getMSTime();
+
+	PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_SPELLS_BY_LEVELS);
+	PreparedQueryResult result = WorldDatabase.Query(stmt);
+
+	if (!result)
 	{
-		if(SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(i))
-		{
-			uint32 spellFamily = spellInfo->SpellFamilyName;
-			if((spellFamily < SPELLFAMILY_MAGE || spellFamily > SPELLFAMILY_SHAMAN) && spellFamily != SPELLFAMILY_DEATHKNIGHT && spellFamily != SPELLFAMILY_MONK) continue;
-			uint32 level = spellInfo->SpellLevel - 1;
-			if(level < 0 || level > 89) continue;
-			uint32 specialisationId = GetSpecializationSpecBySpell(i);
-
-
-			((*((*(sSpellLearnMap[spellFamily]))[level]))[specialisationId])->push_back(spellInfo->Id);
-		}
+		sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 spells to learn. DB table `spell_to_learn` is empty.");
+		return;
 	}
-}
 
-uint32 SpellLearnMgr::GetSpecializationSpecBySpell(uint32 spellId)
-{
-	SpecializationSpecBySpell::const_iterator itr = sSpecializationMap.find(spellId);
-	if (itr == sSpecializationMap.end())
-		return 0;
+	uint32 count = 0;
+	do
+	{
+		Field* fields           = result->Fetch();
+		uint32 spellId			= fields[0].GetUInt32();
+		uint32 classId      	= fields[1].GetUInt32();
+		uint32 specId       	= fields[2].GetUInt32();
+		uint32 level     		= fields[3].GetUInt32();
 
-	return itr->second;
+		((*((*(sSpellLearnMap[classId]))[level-1]))[specId])->push_back(spellId);
+
+		++count;
+	} while (result->NextRow());
+
+	sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u spells to learn in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 
@@ -81,12 +76,11 @@ std::list<uint32> SpellLearnMgr::GetSpellList(uint32 classe, uint32 spec, uint32
 	std::list<uint32> result;
 	if(ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(classe))
 	{
-		uint32 spellfamily = classEntry->spellfamily;
 		for(uint32 i = levelMin ; i <= levelMax ; i++)
 		{
-			result.insert(result.end(), (*((*((*(sSpellLearnMap[spellfamily]))[i]))[spec])).begin(), (*((*((*(sSpellLearnMap[spellfamily]))[i]))[spec])).end());
+			result.insert(result.end(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i-1]))[spec])).begin(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i-1]))[spec])).end());
 			if(withCommon)
-				result.insert(result.end(), (*((*((*(sSpellLearnMap[spellfamily]))[i]))[0])).begin(), (*((*((*(sSpellLearnMap[spellfamily]))[i]))[0])).end());
+				result.insert(result.end(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i-1]))[0])).begin(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i-1]))[0])).end());
 		}
 	}
 	return result;
@@ -100,13 +94,13 @@ std::list<uint32> SpellLearnMgr::GetSpellList(uint32 classe, uint32 spec, uint32
 void SpellLearnMgr::PlayerLevelUp(Player* player)
 {
 	if(!player) return;
-	std::list<uint32> list = GetSpellList(player->getClass(), player->GetActiveSpec(), player->getLevel(), true);
+	std::list<uint32> list = GetSpellList(player->getClass(), player->GetActiveSpec(), 1, player->getLevel(), true);
 	if(!list.empty())
 	{
 		std::list<uint32>::const_iterator itr = list.begin();
 		for(; itr != list.end() ; itr++)
 		{
-			player->learnSpell(*itr,true);
+			if(!player->HasSpell(*itr)) player->learnSpell(*itr,true);
 		}
 	}
 }

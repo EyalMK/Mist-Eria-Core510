@@ -93,4 +93,5 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_SEL_DISABLES, "SELECT entry FROM disables WHERE entry = ? AND sourceType = ?", CONNECTION_SYNCH);
     PrepareStatement(WORLD_DEL_DISABLES, "DELETE FROM disables WHERE entry = ? AND sourceType = ?", CONNECTION_ASYNC);
 	PrepareStatement(WORLD_SEL_BLACKMARKET_TEMPLATE, "SELECT id, itemEntry, itemCount, seller, startBid, duration, chance FROM blackmarket_template;", CONNECTION_SYNCH);
+	PrepareStatement(WORLD_SEL_SPELLS_BY_LEVELS, "SELECT spellId, classId, specId, level FROM spell_to_learn", CONNECTION_SYNCH);
 }

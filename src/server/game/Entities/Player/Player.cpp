@@ -79,6 +79,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "SpellLearn.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -3096,6 +3097,8 @@ void Player::GiveLevel(uint8 level)
     _ApplyAllLevelScaleItemMods(false);
 
     SetLevel(level);
+
+	sSpellLearnMgr->PlayerLevelUp(this);
 
     UpdateSkillsForLevel();
 
@@ -17318,6 +17321,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     // after spell and quest load
     InitTalentForLevel();
     learnDefaultSpells();
+	sSpellLearnMgr->PlayerLevelUp(this);
 
     // must be before inventory (some items required reputation check)
     m_reputationMgr->LoadFromDB(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_REPUTATION));
