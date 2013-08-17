@@ -1127,12 +1127,9 @@ void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* dam
     {
         damageInfo->damage = CalcArmorReducedDamage(damageInfo->target, damage, NULL, damageInfo->attackType);
         damageInfo->cleanDamage += damage - damageInfo->damage;
-		sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN : DAMAGEBUG : damage4 : %u", damageInfo->damage);
     }
     else
         damageInfo->damage = damage;
-
-	sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN : DAMAGEBUG3 : damage : %u", damageInfo->damage);
 
     damageInfo->hitOutCome = RollMeleeOutcomeAgainst(damageInfo->target, damageInfo->attackType);
 
@@ -1478,7 +1475,6 @@ uint32 Unit::CalcArmorReducedDamage(Unit* victim, const uint32 damage, SpellInfo
 
     newdamage = uint32(damage - (damage * tmpvalue));
 
-	sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN : DAMAGEBUG5 : damage : %u", newdamage);
     return (newdamage > 1) ? newdamage : 1;
 }
 
@@ -1816,10 +1812,8 @@ void Unit::AttackerStateUpdate (Unit* victim, WeaponAttackType attType, bool ext
 
         CalcDamageInfo damageInfo;
         CalculateMeleeDamage(victim, 0, &damageInfo, attType);
-		sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN : DAMAGEBUG1 : damage : %u", damageInfo.damage);
         // Send log damage message to client
         DealDamageMods(victim, damageInfo.damage, &damageInfo.absorb);
-		sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN : DAMAGEBUG2 : damage : %u", damageInfo.damage);
         SendAttackStateUpdate(&damageInfo);
 
         //TriggerAurasProcOnEvent(damageInfo);
