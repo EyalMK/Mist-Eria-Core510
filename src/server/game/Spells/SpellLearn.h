@@ -21,14 +21,18 @@ private:
 
 	typedef std::map<uint32, uint32> SpecializationSpecBySpell;
 
+	typedef std::map<uint32, std::list<uint32> > SpecializationSpecByClass;
+
 
 	SpellLearnMap sSpellLearnMap;
 	SpecializationSpecBySpell sSpecializationMap;
+	SpecializationSpecByClass sSpecializationSpecMap;
 
 public:
 	void Load();
 
 	uint32 GetSpecializationSpecBySpell(uint32 spellId);
+	std::list<uint32> GetSpellList(uint32 classe, uint32 spec, uint32 levelMin, uint32 levelMax, bool withCommon);
 };
 
 #define sSpellLearnMgr ACE_Singleton<SpellLearnMgr, ACE_Null_Mutex>::instance()
