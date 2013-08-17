@@ -1635,7 +1635,7 @@ void World::SetInitialWorldSettings()
     sBlackMarketMgr->LoadAuctions();
 
 	sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading LearnSpell store...");
-	SpellLearnMgr->Load();
+	sSpellLearnMgr->Load();
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Guild XP for level...");
     sGuildMgr->LoadGuildXpForLevel();
