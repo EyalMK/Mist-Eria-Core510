@@ -1522,6 +1522,9 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         slot = &(*witr);
     }
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE player %s %u %u ", player->GetName(), GetMembersCount(), GUID_LOPART(m_leaderGuid));
+
+
     if(GetMembersCount()-1 == 0)
         return;
 
@@ -1571,21 +1574,21 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
 
     std::cout << "Player " << player->GetName() << " : " << GetMembersCount()-1 << std::endl;
 
-    ObjectGuid leaderGuid = m_guid, groupGuid = m_leaderGuid;
+    ObjectGuid groupGuid = m_guid, leaderGuid = m_leaderGuid;
 	uint8 byte10 = 0; //Probably smthng with challenge mode
     uint8 hasLootRule = 0; //For testing purpose
     uint8 isLFG = 0;
-	uint8 byte74 = slot->group;
-	uint8 byte1C = m_groupType;
-	uint8 byte40 = slot->flags;
-	uint32 dword38 = m_counter++, dword3C = 0;
+    uint8 byte74 = 0;
+    uint8 byte1C = 0;
+    uint8 byte40 = 0;
+    uint32 dword38 = 0, dword3C = 0;
 
-    data.WriteBit(leaderGuid[2]);
+    data.WriteBit(groupGuid[2]);
     data.WriteBit(byte10);
     data.WriteBit(hasLootRule);
     data.WriteBits(GetMembersCount()-1, 22);
-    data.WriteBit(groupGuid[6]);
-    data.WriteBit(groupGuid[4]);
+    data.WriteBit(leaderGuid[6]);
+    data.WriteBit(leaderGuid[4]);
 
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
@@ -1599,33 +1602,33 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         data.WriteBit(memberGuid[4]);
         data.WriteBit(memberGuid[1]);
         data.WriteBit(memberGuid[0]);
-        data.WriteBits(citr->name.size(), 7);
+        data.WriteBits(1, 7);
         data.WriteBit(memberGuid[6]);
         data.WriteBit(memberGuid[2]);
     }
 
     //if (hasLootRule) { 4 1 7 5 2 0 3 6 }
 
-    data.WriteBit(leaderGuid[4]);
-    data.WriteBit(groupGuid[5]);
-    data.WriteBit(groupGuid[0]);
-    data.WriteBit(leaderGuid[6]);
-    data.WriteBit(leaderGuid[7]);
-    data.WriteBit(leaderGuid[3]);
-    data.WriteBit(groupGuid[3]);
-    data.WriteBit(leaderGuid[1]);
+    data.WriteBit(groupGuid[4]);
     data.WriteBit(leaderGuid[5]);
-    data.WriteBit(groupGuid[7]);
     data.WriteBit(leaderGuid[0]);
+    data.WriteBit(groupGuid[6]);
+    data.WriteBit(groupGuid[7]);
+    data.WriteBit(groupGuid[3]);
+    data.WriteBit(leaderGuid[3]);
     data.WriteBit(groupGuid[1]);
-    data.WriteBit(groupGuid[2]);
+    data.WriteBit(groupGuid[5]);
+    data.WriteBit(leaderGuid[7]);
+    data.WriteBit(groupGuid[0]);
+    data.WriteBit(leaderGuid[1]);
+    data.WriteBit(leaderGuid[2]);
     data.WriteBit(isLFG);
 
     //if(isLFG) { ... }
 
     //if(isLFG) { ... }
 
-    data.WriteByteSeq(groupGuid[1]);
+    data.WriteByteSeq(leaderGuid[1]);
 
     //if(hasLootRule) { ... }
 
@@ -1639,7 +1642,8 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         uint8 onlineState = member ? MEMBER_STATUS_ONLINE : MEMBER_STATUS_OFFLINE;
         onlineState = onlineState | ((isBGGroup() || isBFGroup()) ? MEMBER_STATUS_PVP : 0);
 
-        data.WriteString(citr->name);
+        //data.WriteString(citr->name);
+        data << uint8(97);
 
         std::cout << "Member : " << citr->name << std::endl;
 
@@ -1660,28 +1664,28 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         data.WriteByteSeq(memberGuid[4]);
     }
 
-    data.WriteByteSeq(leaderGuid[6]);
-    data.WriteByteSeq(leaderGuid[0]);
-    data.WriteByteSeq(leaderGuid[3]);
+    data.WriteByteSeq(groupGuid[6]);
+    data.WriteByteSeq(groupGuid[0]);
+    data.WriteByteSeq(groupGuid[3]);
     data << uint32(dword38);
     data << uint32(dword3C);
-    data.WriteByteSeq(groupGuid[0]);
-    data.WriteByteSeq(leaderGuid[7]);
+    data.WriteByteSeq(leaderGuid[0]);
+    data.WriteByteSeq(groupGuid[7]);
 
     //if(byte10) { ... }
 
     data << uint8(byte74);
-    data.WriteByteSeq(groupGuid[7]);
-    data.WriteByteSeq(groupGuid[2]);
-    data.WriteByteSeq(leaderGuid[5]);
-    data.WriteByteSeq(leaderGuid[1]);
-    data << uint8(byte1C);
-    data.WriteByteSeq(groupGuid[4]);
+    data.WriteByteSeq(leaderGuid[7]);
     data.WriteByteSeq(leaderGuid[2]);
-    data.WriteByteSeq(groupGuid[3]);
     data.WriteByteSeq(groupGuid[5]);
+    data.WriteByteSeq(groupGuid[1]);
+    data << uint8(byte1C);
     data.WriteByteSeq(leaderGuid[4]);
-    data.WriteByteSeq(groupGuid[6]);
+    data.WriteByteSeq(groupGuid[2]);
+    data.WriteByteSeq(leaderGuid[3]);
+    data.WriteByteSeq(leaderGuid[5]);
+    data.WriteByteSeq(groupGuid[4]);
+    data.WriteByteSeq(leaderGuid[6]);
     data << uint8(byte40);
 
     player->GetSession()->SendPacket(&data);
