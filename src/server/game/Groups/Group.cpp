@@ -1522,7 +1522,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         slot = &(*witr);
     }
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE player %s %u %u ", player->GetName(), GetMembersCount(), GUID_LOPART(m_leaderGuid));
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE player %s %u %u ", player->GetName().c_str(), GetMembersCount(), GUID_LOPART(m_leaderGuid));
 
 
     if(GetMembersCount()-1 == 0)
@@ -1607,7 +1607,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         data.WriteBit(memberGuid[2]);
     }
 
-    //if (hasLootRule) { ... }
+    //if (hasLootRule) { 4 1 7 5 2 0 3 6 }
 
     data.WriteBit(groupGuid[4]);
     data.WriteBit(leaderGuid[5]);
