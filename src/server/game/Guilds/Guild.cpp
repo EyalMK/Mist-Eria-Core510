@@ -1368,24 +1368,24 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         size_t pubNoteLength = member->GetPublicNote().length();
         size_t offNoteLength = member->GetOfficerNote().length();
 
-        ObjectGuid guid = member->GetGUID();
-        data.WriteBit(guid[3]);
-        data.WriteBit(guid[4]);
+        uint64 guid; // as we have on CMSG_GUILD_ROSTER ; need to find what means that
+		uint64 guid2; // as we have on CMSG_GUILD_ROSTER ; need to find what means that
+
+		// and somewhere in code we will have
+
+		data << guid;
+		data << guid2;
+
+		// this is just a sketch for me ; i will continue working on it tonight ; i need to put those all in order
+
         data.WriteBit(0); // Has Authenticator
         data.WriteBit(0); // Can Scroll of Ressurect
         data.WriteBits(pubNoteLength, 8);
         data.WriteBits(offNoteLength, 8);
-        data.WriteBit(guid[0]);
         data.WriteBits(member->GetName().length(), 7);
-        data.WriteBit(guid[1]);
-        data.WriteBit(guid[2]);
-        data.WriteBit(guid[6]);
-        data.WriteBit(guid[5]);
-        data.WriteBit(guid[7]);
-
+       
         memberData << uint8(member->GetClass());
         memberData << uint32(member->GetTotalReputation());
-        memberData.WriteByteSeq(guid[0]);
         memberData << uint64(member->GetWeekActivity());
         memberData << uint32(member->GetRankId());
         memberData << uint32(member->GetAchievementPoints());
@@ -1394,29 +1394,22 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         memberData << uint32(0) << uint32(0) << uint32(0);
         memberData << uint32(0) << uint32(0) << uint32(0);
 
-        memberData.WriteByteSeq(guid[2]);
         memberData << uint8(member->GetFlags());
         memberData << uint32(member->GetZoneId());
         memberData << uint64(member->GetTotalActivity());
-        memberData.WriteByteSeq(guid[7]);
         memberData << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP) - member->GetWeekReputation());
 
         if (pubNoteLength)
             memberData.WriteString(member->GetPublicNote());
 
-        memberData.WriteByteSeq(guid[3]);
         memberData << uint8(member->GetLevel());
         memberData << int32(0);                                     // unk
-        memberData.WriteByteSeq(guid[5]);
-        memberData.WriteByteSeq(guid[4]);
         memberData << uint8(0);                                     // unk
-        memberData.WriteByteSeq(guid[1]);
         memberData << float(member->IsOnline() ? 0.0f : float(::time(NULL) - member->GetLogoutTime()) / DAY);
 
         if (offNoteLength)
             memberData.WriteString(member->GetOfficerNote());
 
-        memberData.WriteByteSeq(guid[6]);
         memberData.WriteString(member->GetName());
     }
 
