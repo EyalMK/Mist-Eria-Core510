@@ -79,6 +79,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "SpellLearn.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -3096,6 +3097,8 @@ void Player::GiveLevel(uint8 level)
     _ApplyAllLevelScaleItemMods(false);
 
     SetLevel(level);
+
+	sSpellLearnMgr->PlayerLevelUp(this);
 
     UpdateSkillsForLevel();
 

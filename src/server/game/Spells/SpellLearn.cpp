@@ -78,9 +78,9 @@ std::list<uint32> SpellLearnMgr::GetSpellList(uint32 classe, uint32 spec, uint32
 	{
 		for(uint32 i = levelMin ; i <= levelMax ; i++)
 		{
-			result.insert(result.end(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i]))[spec])).begin(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i]))[spec])).end());
+			result.insert(result.end(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i-1]))[spec])).begin(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i-1]))[spec])).end());
 			if(withCommon)
-				result.insert(result.end(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i]))[0])).begin(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i]))[0])).end());
+				result.insert(result.end(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i-1]))[0])).begin(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i-1]))[0])).end());
 		}
 	}
 	return result;
@@ -94,13 +94,13 @@ std::list<uint32> SpellLearnMgr::GetSpellList(uint32 classe, uint32 spec, uint32
 void SpellLearnMgr::PlayerLevelUp(Player* player)
 {
 	if(!player) return;
-	std::list<uint32> list = GetSpellList(player->getClass(), player->GetActiveSpec(), player->getLevel(), true);
+	std::list<uint32> list = GetSpellList(player->getClass(), player->GetActiveSpec(), 1, player->getLevel(), true);
 	if(!list.empty())
 	{
 		std::list<uint32>::const_iterator itr = list.begin();
 		for(; itr != list.end() ; itr++)
 		{
-			player->learnSpell(*itr,true);
+			if(!player->HasSpell(*itr)) player->learnSpell(*itr,true);
 		}
 	}
 }
