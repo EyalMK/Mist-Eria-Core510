@@ -99,6 +99,8 @@ void WorldSession::HandleGuildDeclineOpcode(WorldPacket& /*recvPacket*/)
 
 void WorldSession::HandleGuildRosterOpcode(WorldPacket& recvPacket)
 {
+	// this should be ok , just need to finish SMSG_GUILD_ROSTER
+
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_ROSTER [%s]", GetPlayerInfo().c_str());
     
 	ObjectGuid guid;
