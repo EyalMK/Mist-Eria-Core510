@@ -17321,6 +17321,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     // after spell and quest load
     InitTalentForLevel();
     learnDefaultSpells();
+	sSpellLearnMgr->PlayerLevelUp(this);
 
     // must be before inventory (some items required reputation check)
     m_reputationMgr->LoadFromDB(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_REPUTATION));
