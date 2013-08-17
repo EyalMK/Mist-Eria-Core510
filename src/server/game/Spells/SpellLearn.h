@@ -5,6 +5,7 @@
 #include "Common.h"
 #include "SharedDefines.h"
 #include "Spell.h"
+#include "Player.h"
 
 class SpellLearnMgr
 {
@@ -33,6 +34,8 @@ public:
 
 	uint32 GetSpecializationSpecBySpell(uint32 spellId);
 	std::list<uint32> GetSpellList(uint32 classe, uint32 spec, uint32 levelMin, uint32 levelMax, bool withCommon);
+	std::list<uint32> GetSpellList(uint32 classe, uint32 spec, uint32 level, bool withCommon);
+	void PlayerLevelUp(Player* player);
 };
 
 #define sSpellLearnMgr ACE_Singleton<SpellLearnMgr, ACE_Null_Mutex>::instance()
