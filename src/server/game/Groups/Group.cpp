@@ -1604,7 +1604,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         data.WriteBit(memberGuid[2]);
     }
 
-    //if (hasLootRule) { ... }
+    //if (hasLootRule) { 4 1 7 5 2 0 3 6 }
 
     data.WriteBit(leaderGuid[4]);
     data.WriteBit(groupGuid[5]);
