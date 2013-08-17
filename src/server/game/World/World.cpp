@@ -1607,8 +1607,6 @@ void World::SetInitialWorldSettings()
     sAchievementMgr->LoadAchievementReferenceList();
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Achievement Criteria Lists...");
     sAchievementMgr->LoadAchievementCriteriaList();
-    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Achievement Criteria Data...");
-    sAchievementMgr->LoadAchievementCriteriaData();
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Achievement Rewards...");
     sAchievementMgr->LoadRewards();
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Achievement Reward Locales...");
