@@ -272,8 +272,8 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 	{
 		BMAuctionEntry* auction = itr->second;
 
-		/*if (!auction->IsActive())
-			continue;*/
+		if (!auction->IsActive())
+			continue;
 
 		data.WriteBit((guidLow == auction->bidder));
 		
@@ -286,8 +286,8 @@ void BlackMarketMgr::BuildBlackMarketAuctionsPacket(WorldPacket& data, uint32 gu
 	{
 		BMAuctionEntry* auction = itr->second;
 
-		/*if (!auction->IsActive())
-			continue;*/
+		if (!auction->IsActive())
+			continue;
 
 		data << uint32(auction->bm_template->seller); //seller
 		data << uint32(auction->TimeLeft()); //time left
