@@ -137,8 +137,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             }
         }
 
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lang : %u", lang);
-
         if (lang == LANG_ADDON)
         {
             // LANG_ADDON is only valid for the following message types
