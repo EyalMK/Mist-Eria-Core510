@@ -1753,11 +1753,11 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
     data.WriteBit(newGuildGuid[7]);
 	data.WriteBit(newGuildGuid[3]);
 
-	data.WriteBits(pInvitee->GetGuildName().length(), 8); // this might need swapped ( need hard tests ) 
-	data.WriteBits(m_name.length(), 8); // this might need swapped ( need hard tests ) 
-	data.WriteBits(player->GetName().size(), 7); // this might need swapped ( need hard tests ) 
+	data.WriteBits(pInvitee->GetGuildName().length(), 8);
+	data.WriteBits(m_name.length(), 8); 
+	data.WriteBit(oldGuildGuid[2]);
+	data.WriteBits(player->GetName().size(), 7);
 
-    data.WriteBit(oldGuildGuid[2]);
     data.WriteBit(newGuildGuid[2]);
     data.WriteBit(oldGuildGuid[0]);
     data.WriteBit(oldGuildGuid[3]);
@@ -1766,8 +1766,9 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
     data.WriteBit(oldGuildGuid[7]);
     data.WriteBit(oldGuildGuid[4]);
     
-    data << uint32(GetLevel()); // this might need swapped ( need hard tests ) 
-    data << uint32(m_emblemInfo.GetBorderStyle()); // this might need swapped ( need hard tests ) 
+    data << uint32(GetLevel()); 
+    data << uint32(m_emblemInfo.GetBorderStyle()); 
+	data.WriteString(m_name);
 
 	data.WriteByteSeq(oldGuildGuid[7]);
 	data.WriteByteSeq(newGuildGuid[0]);
@@ -1775,35 +1776,32 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
 	data.WriteByteSeq(oldGuildGuid[6]);
 	data.WriteByteSeq(oldGuildGuid[1]);
     
-    data << uint32(m_emblemInfo.GetBorderColor()); // this might need swapped ( need hard tests ) 
+    data << uint32(m_emblemInfo.GetBorderColor()); 
 
 	data.WriteByteSeq(oldGuildGuid[2]);
 	data.WriteByteSeq(newGuildGuid[2]);
     data.WriteByteSeq(oldGuildGuid[5]);
     data.WriteByteSeq(oldGuildGuid[4]);
 
-	data << uint32(m_emblemInfo.GetStyle()); // this might need swapped ( need hard tests ) 
+	data << uint32(m_emblemInfo.GetStyle()); 
     
 	data.WriteByteSeq(oldGuildGuid[3]);
     data.WriteByteSeq(newGuildGuid[4]);
 
-	data << uint32(m_emblemInfo.GetBackgroundColor()); // this might need swapped ( need hard tests ) 
-    data << uint32(m_emblemInfo.GetColor()); // this might need swapped ( need hard tests ) 
+	data << uint32(m_emblemInfo.GetBackgroundColor()); 
+    data << uint32(m_emblemInfo.GetColor()); 
 
 	data.WriteByteSeq(newGuildGuid[7]);
     data.WriteByteSeq(newGuildGuid[6]);
     data.WriteByteSeq(newGuildGuid[5]);
+
+	if (!pInvitee->GetGuildName().empty())
+        data.WriteString(pInvitee->GetGuildName());
+
+	data.WriteString(player->GetName());
+
 	data.WriteByteSeq(newGuildGuid[3]);
-	data.WriteByteSeq(newGuildGuid[1]);
-
-    /*OLD STRUCTS i don't know if need those anymore*/
-
-    /*if (!pInvitee->GetGuildName().empty())
-        data.WriteString(pInvitee->GetGuildName());*/
-
-	//data.WriteString(player->GetName());
-    //data.FlushBits();
-    //data.WriteString(m_name);
+	data.WriteByteSeq(newGuildGuid[1]);    
 
     pInvitee->GetSession()->SendPacket(&data);
     sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_INVITE [%s]", pInvitee->GetName().c_str());
