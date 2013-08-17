@@ -1356,6 +1356,9 @@ void Guild::OnPlayerStatusChange(Player* player, uint32 flag, bool state)
 
 void Guild::HandleRoster(WorldSession* session /*= NULL*/)
 {
+	uint64 guid; // as we have on CMSG_GUILD_ROSTER ; need to find what means that
+	uint64 guid2; // as we have on CMSG_GUILD_ROSTER ; need to find what means that
+
     ByteBuffer memberData(100);
     // Guess size
     WorldPacket data(SMSG_GUILD_ROSTER, 100);
@@ -1367,16 +1370,6 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         Member* member = itr->second;
         size_t pubNoteLength = member->GetPublicNote().length();
         size_t offNoteLength = member->GetOfficerNote().length();
-
-        uint64 guid; // as we have on CMSG_GUILD_ROSTER ; need to find what means that
-		uint64 guid2; // as we have on CMSG_GUILD_ROSTER ; need to find what means that
-
-		// and somewhere in code we will have
-
-		data << guid;
-		data << guid2;
-
-		// this is just a sketch for me ; i will continue working on it tonight ; i need to put those all in order
 
         data.WriteBit(0); // Has Authenticator
         data.WriteBit(0); // Can Scroll of Ressurect
@@ -1427,6 +1420,13 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
     data << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP));
     data.AppendPackedTime(m_createdDate);
     data << uint32(0);
+
+	// and somewhere in code we will have
+
+	data << guid;
+	data << guid2;
+
+	// this is just a sketch for me ; i will continue working on it tonight ; i need to put those all in order
 
     if (session)
     {
