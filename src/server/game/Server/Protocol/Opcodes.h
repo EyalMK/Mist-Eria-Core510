@@ -680,7 +680,7 @@ enum Opcodes
     SMSG_ACCOUNT_INFO_RESPONSE                        = 0x659, //16357
     SMSG_ACCOUNT_RESTRICTED_WARNING                   = 0xCD8, //16357
     SMSG_ACHIEVEMENT_DELETED                          = 0x1614,
-    SMSG_ACHIEVEMENT_EARNED                           = 0x719, //16357
+    SMSG_ACHIEVEMENT_EARNED                           = 0x0719,//16357
     SMSG_ACTION_BUTTONS                               = 0x951, //16357
     SMSG_ACTIVATETAXIREPLY                            = 0x0E88,//16357
     SMSG_ADDON_INFO                                   = 0x760, //16357

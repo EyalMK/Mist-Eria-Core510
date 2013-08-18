@@ -625,10 +625,61 @@ void AchievementMgr<T>::SendAchievementEarned(AchievementEntry const* achievemen
     }
 
     WorldPacket data(SMSG_ACHIEVEMENT_EARNED, 8+4+8);
+
+	ObjectGuid guid1 = GetOwner()->GetGUID();
+	ObjectGuid guid2 = GetOwner()->GetGUID();
+
+	data.WriteBit(guid2[5]);
+	data.WriteBit(guid2[4]);
+	data.WriteBit(guid1[0]);
+	data.WriteBit(guid2[0]);
+	data.WriteBit(guid2[6]);
+	data.WriteBit(guid1[1]);
+	data.WriteBit(guid1[4]);
+	data.WriteBit(0); //0 - notify player | 1 - does not notify player
+
+	data.WriteBit(guid1[3]);
+	data.WriteBit(guid2[2]);
+	data.WriteBit(guid1[2]);
+	data.WriteBit(guid1[5]);
+	data.WriteBit(guid1[7]);
+	data.WriteBit(guid2[1]);
+	data.WriteBit(guid2[3]);
+	data.WriteBit(guid2[7]);
+
+	data.WriteBit(guid1[6]);
+	data.FlushBits();
+
+	data.WriteByteSeq(guid1[0]);
+
+	//sub
+
+	data.AppendPackedTime(time(NULL));
+
+	data.WriteByteSeq(guid2[7]);
+	data.WriteByteSeq(guid1[3]);
+	data.WriteByteSeq(guid2[1]);
+	data.WriteByteSeq(guid1[6]);
+	data.WriteByteSeq(guid2[2]);
+	data.WriteByteSeq(guid2[6]);
+	data.WriteByteSeq(guid1[4]);
+	data.WriteByteSeq(guid1[1]);
+	data.WriteByteSeq(guid1[5]);
+	data.WriteByteSeq(guid2[4]);
+	data.WriteByteSeq(guid2[3]);
+	data.WriteByteSeq(guid2[0]);
+	data.WriteByteSeq(guid2[5]);
+	data.WriteByteSeq(guid1[2]);
+
+	data << uint32(achievement->ID);
+
+	data.WriteByteSeq(guid1[7]);
+	/*
     data.append(GetOwner()->GetPackGUID());
     data << uint32(achievement->ID);
     data.AppendPackedTime(time(NULL));
     data << uint32(0);  // does not notify player ingame
+	*/
     GetOwner()->SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true);
 }
 
