@@ -883,7 +883,7 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
 
             sLog->outInfo(LOG_FILTER_GENERAL, "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk1);
 
-            AddonInfo addon(addonName, enabled, crc, 2, true);
+            AddonInfo addon(addonName, enabled, crc, 2, false);
 
             SavedAddon const* savedAddon = AddonMgr::GetAddonInfo(addonName);
             if (savedAddon)
@@ -952,7 +952,7 @@ void WorldSession::SendAddonsInfo()
         data << uint8(crcpub);
         if (crcpub)
         {
-            uint8 usepk = 0/*(itr->CRC != STANDARD_ADDON_CRC)*/; // If addon is Standard addon CRC
+            uint8 usepk = (itr->CRC != STANDARD_ADDON_CRC); // If addon is Standard addon CRC
             data << uint8(usepk);
             if (usepk)                                      // if CRC is wrong, add public key (client need it)
             {
