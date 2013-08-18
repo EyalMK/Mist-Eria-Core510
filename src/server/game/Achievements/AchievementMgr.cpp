@@ -2014,7 +2014,7 @@ bool AchievementMgr<T>::CanUpdateCriteria(AchievementCriteriaEntry const* criter
     }
 
 	if(AchievementEntry const * parentAchievement = sAchievementStore.LookupEntry(achievement->parentAchievement))
-		if(!referencePlayer->HasAchieved(parentAchievement))
+		if(!referencePlayer->HasAchieved(parentAchievement->ID))
 			return false;
 
     if (achievement->mapID != -1 && referencePlayer->GetMapId() != uint32(achievement->mapID))
