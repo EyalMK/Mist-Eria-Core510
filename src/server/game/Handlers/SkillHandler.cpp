@@ -26,6 +26,7 @@
 #include "UpdateMask.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "SpellLearn.h"
 
 void WorldSession::HandleSetSpecializationOpcode(WorldPacket& recvData)
 {
@@ -47,11 +48,7 @@ void WorldSession::HandleSetSpecializationOpcode(WorldPacket& recvData)
         _player->SetPrimaryTalentTree(_player->GetActiveSpec(), specId);
         _player->SendTalentsInfoData(false);
 
-        std::list<uint32> const* specSpells = GetSpecializationSpellsBySpec(specId);
-        if (specSpells)
-            for (std::list<uint32>::const_iterator itr = specSpells->begin(); itr != specSpells->end(); ++itr)
-                if (ChrSpecializationSpellsEntry const* specSpell = sChrSpecializationSpellsStore.LookupEntry(*itr))
-                    _player->learnSpell(specSpell->SpellId, false);
+        sSpellLearnMgr->UpdatePlayerSpells(_player);
     }
 }
 

@@ -97,7 +97,7 @@ std::list<uint32> SpellLearnMgr::GetSpellList(uint32 classe, uint32 spec, uint32
 	return GetSpellList(classe, spec, level, level, withCommon);
 }
 
-void SpellLearnMgr::PlayerLevelUp(Player* player)
+void SpellLearnMgr::UpdatePlayerSpells(Player* player)
 {
 	if(!player) return;
 	std::list<uint32> list = GetSpellList(player->getClass(), player->GetActiveSpec(), 1, player->getLevel(), true);
