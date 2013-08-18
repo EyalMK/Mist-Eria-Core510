@@ -653,7 +653,7 @@ void AchievementMgr<T>::SendAchievementEarned(AchievementEntry const* achievemen
 	data.WriteByteSeq(guid1[0]);
 
 	data.AppendPackedTime(time(NULL)); //sub
-	data << uint32(0);
+	data << uint32(achievement->ID);
 
 	data.WriteByteSeq(guid2[7]);
 	data.WriteByteSeq(guid1[3]);
@@ -670,7 +670,7 @@ void AchievementMgr<T>::SendAchievementEarned(AchievementEntry const* achievemen
 	data.WriteByteSeq(guid2[5]);
 	data.WriteByteSeq(guid1[2]);
 
-	data << uint32(achievement->ID);
+	data << uint32(0);
 
 	data.WriteByteSeq(guid1[7]);
 	/*
