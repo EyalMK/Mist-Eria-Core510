@@ -1962,6 +1962,10 @@ bool AchievementMgr<T>::CanUpdateCriteria(AchievementCriteriaEntry const* criter
         return false;
     }
 
+	if(AchievementEntry const * parentAchievement = sAchievementStore.LookupEntry(achievement->parentAchievement))
+		if(!referencePlayer->HasAchieved(parentAchievement))
+			return false;
+
     if (achievement->mapID != -1 && referencePlayer->GetMapId() != uint32(achievement->mapID))
     {
         sLog->outTrace(LOG_FILTER_ACHIEVEMENTSYS, "CanUpdateCriteria: %s (Id: %u Type %s) Wrong map",
