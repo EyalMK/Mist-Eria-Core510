@@ -15008,10 +15008,14 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
 {
     uint16 log_slot = FindQuestSlot(0);
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, ">>>>> QUEST DEBUG 1"); 
+
     if (log_slot >= MAX_QUEST_LOG_SIZE) // Player does not have any free slot in the quest log
         return;
 
     uint32 quest_id = quest->GetQuestId();
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, ">>>>> QUEST DEBUG 2"); 
 
     // if not exist then created with set uState == NEW and rewarded=false
     QuestStatusData& questStatusData = m_QuestStatus[quest_id];
