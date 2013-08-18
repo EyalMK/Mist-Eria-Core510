@@ -673,12 +673,6 @@ void AchievementMgr<T>::SendAchievementEarned(AchievementEntry const* achievemen
 	data << uint32(0);
 
 	data.WriteByteSeq(guid1[7]);
-	/*
-    data.append(GetOwner()->GetPackGUID());
-    data << uint32(achievement->ID);
-    data.AppendPackedTime(time(NULL));
-    data << uint32(0);  // does not notify player ingame
-	*/
     GetOwner()->SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true);
 }
 
