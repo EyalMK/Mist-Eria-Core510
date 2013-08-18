@@ -88,7 +88,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* source, WorldPacket* target)
             *target << uint8(unk1);
             if (unk1)
             {
-                uint8 unk = (crc != STANDARD_ADDON_CRC);           // If addon is Standard addon CRC
+                uint8 unk = 0/*(crc != STANDARD_ADDON_CRC)*/;           // If addon is Standard addon CRC
                 *target << uint8(unk);
                 if (unk)
                 {
