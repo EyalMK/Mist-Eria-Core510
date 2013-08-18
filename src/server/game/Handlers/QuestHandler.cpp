@@ -133,8 +133,6 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
     if (!_player->CanInteractWithQuestGiver(object))
         return;
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG >> AcceptQuest 1");
-
     if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
     {
         // prevent cheating
@@ -154,8 +152,6 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
                 _player->SetDivider(0);
             }
         }
-
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG >> AcceptQuest 2");
 
         if (_player->CanAddQuest(quest, true))
         {
