@@ -21,6 +21,7 @@
 #include "DatabaseEnv.h"
 #include "Opcodes.h"
 #include "Log.h"
+#include "AddonMgr.h"
 
 AddonHandler::AddonHandler()
 {
@@ -87,7 +88,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* source, WorldPacket* target)
             *target << uint8(unk1);
             if (unk1)
             {
-                uint8 unk = (crc != 0x4c1c776d);           // If addon is Standard addon CRC
+                uint8 unk = (crc != STANDARD_ADDON_CRC);           // If addon is Standard addon CRC
                 *target << uint8(unk);
                 if (unk)
                 {
