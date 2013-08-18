@@ -15062,7 +15062,9 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
     else
         questStatusData.Timer = 0;
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : QUEST : START QUESTLOG UPDATEFIELDS");
     SetQuestSlot(log_slot, quest_id, qtime);
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : QUEST : END QUESTLOG UPDATEFIELDS");
 
     m_QuestStatusSave[quest_id] = true;
 
