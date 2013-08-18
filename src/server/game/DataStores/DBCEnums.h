@@ -78,7 +78,8 @@ enum AchievementFlags
     ACHIEVEMENT_FLAG_GUILD                 = 0x00004000,    //
     ACHIEVEMENT_FLAG_SHOW_GUILD_MEMBERS    = 0x00008000,    //
     ACHIEVEMENT_FLAG_SHOW_CRITERIA_MEMBERS = 0x00010000,    //
-	ACHIEVEMENT_FLAG_ACCOUNT_WIDE          = 0x00020000     // new 5.2 : achievement is account-wide process
+	ACHIEVEMENT_FLAG_ACCOUNT_WIDE          = 0x00020000,    // new 5.1 : achievement is account-wide process
+	ACHIEVEMENT_FLAG_UNK4                  = 0x00040000     //
 };
 
 enum
@@ -166,8 +167,6 @@ enum AchievementCriteriaTimedTypes
     ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET     = 6,    // Timer is started by being target of spell with entry in timerStartEvent
     ACHIEVEMENT_TIMED_TYPE_CREATURE         = 7,    // Timer is started by killing creature with entry in timerStartEvent
     ACHIEVEMENT_TIMED_TYPE_ITEM             = 9,    // Timer is started by using item with entry in timerStartEvent
-    ACHIEVEMENT_TIMED_TYPE_UNK              = 10,   // Unknown
-
     ACHIEVEMENT_TIMED_TYPE_MAX
 };
 
@@ -237,7 +236,7 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2              = 69,
     ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL              = 70,
     ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT            = 72,
-    // TODO 73: Achievements 1515, 1241, 1103 (Name: Mal'Ganis)
+    ACHIEVEMENT_CRITERIA_TYPE_MAL_GANIS                     = 73, // TODO 73: Achievements 1515, 1241, 1103 (Name: Mal'Ganis)
     ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE              = 74, // TODO: title id is not mentioned in dbc
     ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS        = 75,
     ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL                      = 76,
@@ -284,10 +283,21 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILLS_GUILD         = 135,
     ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE_GUILD      = 136,
     ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE_TYPE = 138, //struct { Flag flag; uint32 count; } 1: Guild Dungeon, 2:Guild Challenge, 3:Guild battlefield
-    ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE      = 139  //struct { uint32 count; } Guild Challenge
+    ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE      = 139, //struct { uint32 count; } Guild Challenge
+	ACHIEVEMENT_CRITERIA_TYPE_UNUSED_140                    = 140, //HF doesnt exist anymore
+	ACHIEVEMENT_CRITERIA_TYPE_UNUSED_141                    = 141, //HF doesnt exist anymore
+	ACHIEVEMENT_CRITERIA_TYPE_UNUSED_142                    = 142, //HF doesnt exist anymore
+	ACHIEVEMENT_CRITERIA_TYPE_UNUSED_143                    = 143, //HF doesnt exist anymore
+	ACHIEVEMENT_CRITERIA_TYPE_UNUSED_144                    = 144, //HF doesnt exist anymore
+	ACHIEVEMENT_CRITERIA_TYPE_UNUSED_145                    = 145, //HF doesnt exist anymore
+	ACHIEVEMENT_CRITERIA_TYPE_UNUSED_146                    = 146, //HF doesnt exist anymore
+	ACHIEVEMENT_CRITERIA_TYPE_UNUSED_147                    = 147, //HF doesnt exist anymore
+	ACHIEVEMENT_CRITERIA_TYPE_UNUSED_148                    = 148, //HF doesnt exist anymore
+	ACHIEVEMENT_CRITERIA_TYPE_UNUSED_149                    = 149, //HF doesnt exist anymore
+	ACHIEVEMENT_CRITERIA_TYPE_UNUSED_150                    = 150, //HF doesnt exist anymore
 };
 
-#define ACHIEVEMENT_CRITERIA_TYPE_TOTAL 140
+#define ACHIEVEMENT_CRITERIA_TYPE_TOTAL 151
 
 enum AreaFlags
 {
