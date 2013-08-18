@@ -866,6 +866,7 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
     {
         uint32 addonsCount;
         addonInfo >> addonsCount;                         // addons count
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : ADDONS : ADDONS COUNT : %u", addonsCount);
 
         for (uint32 i = 0; i < addonsCount; ++i)
         {
@@ -880,6 +881,8 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
             addonInfo >> addonName;
 
             addonInfo >> enabled >> crc >> unk1;
+
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : ADDONS : ADDONS CRC : %u", crc);
 
             sLog->outInfo(LOG_FILTER_GENERAL, "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk1);
 
