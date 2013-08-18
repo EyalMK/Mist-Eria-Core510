@@ -74,6 +74,12 @@ void SpellLearnMgr::Load()
 std::list<uint32> SpellLearnMgr::GetSpellList(uint32 classe, uint32 spec, uint32 levelMin, uint32 levelMax, bool withCommon)
 {
 	std::list<uint32> result;
+
+	if(levelMin < 0) levelMin = 0;
+	if(levelMax < 0) levelMax = 0;
+	if(levelMin > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)) levelMin = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+	if(levelMax > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)) levelMax = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+
 	if(ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(classe))
 	{
 		for(uint32 i = levelMin ; i <= levelMax ; i++)
