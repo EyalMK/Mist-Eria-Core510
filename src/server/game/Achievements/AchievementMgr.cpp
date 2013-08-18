@@ -652,9 +652,8 @@ void AchievementMgr<T>::SendAchievementEarned(AchievementEntry const* achievemen
 
 	data.WriteByteSeq(guid1[0]);
 
-	//sub
-
-	data.AppendPackedTime(time(NULL));
+	data.AppendPackedTime(time(NULL)); //sub
+	data << uint32(0);
 
 	data.WriteByteSeq(guid2[7]);
 	data.WriteByteSeq(guid1[3]);
