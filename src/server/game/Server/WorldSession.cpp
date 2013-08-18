@@ -883,7 +883,7 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
 
             sLog->outInfo(LOG_FILTER_GENERAL, "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk1);
 
-            AddonInfo addon(addonName, enabled, crc, 2, false);
+            AddonInfo addon(addonName, enabled, crc, 2, true);
 
             SavedAddon const* savedAddon = AddonMgr::GetAddonInfo(addonName);
             if (savedAddon)
@@ -944,8 +944,42 @@ void WorldSession::SendAddonsInfo()
 
     WorldPacket data(SMSG_ADDON_INFO, 4);
 
+	data << uint8(0);
+	data << uint8(0);
+	data << uint8(0);
+	data << uint8(0);
+	data << uint8(0x15);
+	data << uint8(0x12);
+
+	data << uint8(0x49);
+	data << uint8(0x24);
+	data << uint8(0x92);
+
+	data << uint8(0x49);
+	data << uint8(0x24);
+	data << uint8(0x92);
+
+	data << uint8(0x49);
+	data << uint8(0x24);
+	data << uint8(0x92);
+
+	data << uint8(0x49);
+	data << uint8(0x24);
+	data << uint8(0x92);
+
+	data << uint8(0x49);
+	data << uint8(0x24);
+	data << uint8(0x92);
+
     for (AddonsList::iterator itr = m_addonsList.begin(); itr != m_addonsList.end(); ++itr)
     {
+		data << uint8(0x1);
+		data << uint8(0x0);
+		data << uint8(0x0);
+		data << uint8(0x0);
+		data << uint8(0x0);
+		data << uint8(0x2);
+		/*
         data << uint8(itr->State);
 
         uint8 crcpub = itr->UsePublicKeyOrCRC;
@@ -972,11 +1006,12 @@ void WorldSession::SendAddonsInfo()
             // String, length 256 (null terminated)
             data << uint8(0);
         }
+        */
     }
 
     m_addonsList.clear();
 
-    data << uint32(0); // count for an unknown for loop
+    //data << uint32(0); // count for an unknown for loop
 
     SendPacket(&data);
 }
