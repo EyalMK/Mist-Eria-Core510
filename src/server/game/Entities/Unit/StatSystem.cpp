@@ -465,20 +465,15 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
     }
 
     float value = GetTotalPercentageModValue(modGroup) + GetRatingBonusValue(cr);
-	sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN: CRITIQUE : VAL CALCULATED : %f + %f = %f", GetTotalPercentageModValue(modGroup), GetRatingBonusValue(cr), value);
     // Modify crit from weapon skill and maximized defense skill of same level victim difference
     value += (int32(GetMaxSkillValueForLevel()) - int32(GetMaxSkillValueForLevel())) * 0.04f;
-	sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN: CRITIQUE : VAL CALCULATED : old val + %i - %i * 0.04f = %f", (int32(GetMaxSkillValueForLevel()), int32(GetMaxSkillValueForLevel())), value);
     value = value < 0.0f ? 0.0f : value;
-	sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN: CRITIQUE : VAL CALCULATED : %f", value);
     SetStatFloatValue(index, value);
 }
 
 void Player::UpdateAllCritPercentages()
 {
     float value = GetMeleeCritFromAgility();
-
-	sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN ! VALUE: %f", value);
 
     SetBaseModValue(CRIT_PERCENTAGE, PCT_MOD, value);
     SetBaseModValue(OFFHAND_CRIT_PERCENTAGE, PCT_MOD, value);
