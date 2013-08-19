@@ -276,6 +276,8 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
     {
         index = UNIT_FIELD_RANGED_ATTACK_POWER;
         val2 = (level + std::max(GetStat(STAT_AGILITY) - 10.0f, 0.0f)) * entry->RAPPerAgility;
+
+		if(index == UNIT_FIELD_RANGED_ATTACK_POWER) sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN : ATTACKPOWER : RANGED : (%f + MAX(%f - 10, 0) * %u = %f", level, GetStat(STAT_AGILITY), entry->RAPPerAgility, val2);
     }
     else
     {
@@ -292,7 +294,6 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
 
     SetModifierValue(unitMod, BASE_VALUE, val2);
 
-	if(index == UNIT_FIELD_RANGED_ATTACK_POWER) sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN : ATTACKPOWER : RANGED : %f * %f", GetModifierValue(unitMod, BASE_VALUE), GetModifierValue(unitMod, BASE_PCT));
     float base_attPower  = GetModifierValue(unitMod, BASE_VALUE) * GetModifierValue(unitMod, BASE_PCT);
     float attPowerMod = GetModifierValue(unitMod, TOTAL_VALUE);
 
@@ -305,7 +306,6 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
             attPowerMod += int32(GetArmor() / (*iter)->GetAmount());
     }
 
-	if(index == UNIT_FIELD_RANGED_ATTACK_POWER) sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN : ATTACKPOWER : RANGED : %u", (uint32)base_attPower);
     SetInt32Value(index, (uint32)base_attPower);            //UNIT_FIELD_(RANGED)_ATTACK_POWER field
 
     Pet* pet = GetPet();                                //update pet's AP

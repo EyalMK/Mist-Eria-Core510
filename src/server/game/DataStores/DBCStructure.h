@@ -706,7 +706,7 @@ struct ChrClassesEntry
 {
     uint32  ClassID;                                        // 0
     uint32  powerType;                                      // 1        m_DisplayPower
-                                                            // 2        m_petNameToken
+    //uint32                                                // 2        m_petNameToken
     char* name;                                             // 3        m_name_lang
     //char*       nameFemale;                               // 4        m_name_female_lang
     //char*       nameNeutralGender;                        // 5        m_name_male_lang
@@ -714,13 +714,13 @@ struct ChrClassesEntry
     uint32  spellfamily;                                    // 7        m_spellClassSet
     //uint32 flags2;                                        // 8        m_flags (0x08 HasRelicSlot)
     uint32  CinematicSequence;                              // 9        m_cinematicSequenceID
-    uint32  expansion;                                      // 10       m_required_expansion
+    //uint32                                                // 10
     uint32 APPerStrenth;                                    // 11       Attack Power bonus per point of strength
     uint32 APPerAgility;                                    // 12       Attack Power bonus per point of agility
     uint32 RAPPerAgility;                                   // 13       Ranged Attack Power bonus per point of agility
     //uint32                                                // 14
     //uint32                                                // 15
-    //uint32                                                // 16
+    uint32  expansion;                                      // 16       m_required_expansion
 	//uint32                                                // 17
 };
 
