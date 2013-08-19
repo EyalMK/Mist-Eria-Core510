@@ -5631,7 +5631,7 @@ float Player::GetMeleeCritFromAgility()
     if (level > GT_MAX_LEVEL)
         level = GT_MAX_LEVEL;
 
-    GtChanceToMeleeCritBaseEntry const* critBase  = sGtChanceToMeleeCritBaseStore.LookupEntry(pclass-1);
+    GtChanceToMeleeCritBaseEntry const* critBase  = sGtChanceToMeleeCritBaseStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL);
     GtChanceToMeleeCritEntry     const* critRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + (sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) - level));
     if (critBase == NULL || critRatio == NULL)
         return 0.0f;
@@ -5707,7 +5707,7 @@ float Player::GetSpellCritFromIntellect()
     if (level > GT_MAX_LEVEL)
         level = GT_MAX_LEVEL;
 
-    GtChanceToSpellCritBaseEntry const* critBase = sGtChanceToSpellCritBaseStore.LookupEntry(pclass - 1);
+    GtChanceToSpellCritBaseEntry const* critBase = sGtChanceToSpellCritBaseStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL);
     GtChanceToSpellCritEntry const* critRatio = sGtChanceToSpellCritStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL + (sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) - level));
     if (critBase == NULL || critRatio == NULL)
         return 0.0f;
