@@ -971,20 +971,23 @@ void WorldSession::SendAddonsInfo()
         }
     }
 
-    m_addonsList.clear();
+    
 
-	uint32 unk = 0;
-    data << uint32(unk);
-	/* // LOGICAL FOLLOW IN IDA, BUT UNKOWN LOOP AND COUNTER IS SET TO 0 SO
-	for(uint32 i = 0 ; i < unk ; i++)
+	data << uint32(m_addonsList.size());
+	uint32 counter = 1;
+	for (AddonsList::iterator itr = m_addonsList.begin(); itr != m_addonsList.end(); ++itr)
 	{
-		data << uint32(unk);
-		data << "";
-		data << "";
-		data << uint32(unk);
-		data << uint32(unk);
+	    data << uint32(counter);
+	    data << itr->Name;
+		std::string version = "0";
+	    data << version;
+	    data << uint32(time(NULL));
+	    data << uint32(0);  // IsBanned
+		counter++;
 	}
-	*/
+
+	m_addonsList.clear();
+	
 
     SendPacket(&data);
 }
