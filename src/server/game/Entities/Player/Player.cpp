@@ -5632,12 +5632,12 @@ float Player::GetMeleeCritFromAgility()
         level = GT_MAX_LEVEL;
 
     GtChanceToMeleeCritBaseEntry const* critBase  = sGtChanceToMeleeCritBaseStore.LookupEntry(pclass-1);
-    GtChanceToMeleeCritEntry     const* critRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
+    GtChanceToMeleeCritEntry     const* critRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + (sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)-level));
     if (critBase == NULL || critRatio == NULL)
         return 0.0f;
 
-    float crit = critBase->base + GetStat(STAT_AGILITY)*critRatio->ratio;
-	sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN !! %f + %f * %f", critBase->base, GetStat(STAT_AGILITY), critRatio->ratio);
+    float crit = critBase->base + (GetStat(STAT_AGILITY)*critRatio->ratio/10000);
+	sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN !! %f + %f * %f", critBase->base, GetStat(STAT_AGILITY), critRatio->ratio/10000);
     return crit*100.0f;
 }
 
