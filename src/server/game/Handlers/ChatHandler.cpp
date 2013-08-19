@@ -255,7 +255,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 		textLength = recvData.ReadBits(9);
         receiverLength = recvData.ReadBits(10);
         msg = recvData.ReadString(textLength);
-        channel = recvData.ReadString(receiverLength);
+        channel = recvData.ReadString(receiverLength);        
         break;
     case CHAT_MSG_AFK:
     case CHAT_MSG_DND:
