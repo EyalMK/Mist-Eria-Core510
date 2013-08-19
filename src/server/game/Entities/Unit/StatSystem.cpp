@@ -468,6 +468,7 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
     // Modify crit from weapon skill and maximized defense skill of same level victim difference
     value += (int32(GetMaxSkillValueForLevel()) - int32(GetMaxSkillValueForLevel())) * 0.04f;
     value = value < 0.0f ? 0.0f : value;
+	sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN: CRITIQUE : VAL CALCULATED : %f", value);
     SetStatFloatValue(index, value);
 }
 
