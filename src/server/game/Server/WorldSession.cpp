@@ -963,10 +963,11 @@ void WorldSession::SendAddonsInfo()
             data << uint32(itr->Version);
         }
 
-        data << uint8(itr->Name.length() != 0);
-        if (itr->Name.length())
+		uint8 hasURLString = 0;
+        data << uint8(hasURLString);
+        if (hasURLString)
         {
-            data << itr->Name;
+			// URL to send
         }
     }
 
