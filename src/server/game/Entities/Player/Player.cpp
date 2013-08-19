@@ -5636,8 +5636,8 @@ float Player::GetMeleeCritFromAgility()
     if (critBase == NULL || critRatio == NULL)
         return 0.0f;
 
-    float crit = critBase->base + (GetStat(STAT_AGILITY)*critRatio->ratio/10000);
-	sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN !! %f + %f * %f", critBase->base, GetStat(STAT_AGILITY), critRatio->ratio/10000);
+    float crit = critBase->base + (GetStat(STAT_AGILITY)*critRatio->ratio/100000);
+	sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN !! %f + %f * %f", critBase->base, GetStat(STAT_AGILITY), critRatio->ratio/100000);
     return crit*100.0f;
 }
 
