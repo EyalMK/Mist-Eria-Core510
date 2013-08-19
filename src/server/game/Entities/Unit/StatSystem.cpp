@@ -292,6 +292,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
 
     SetModifierValue(unitMod, BASE_VALUE, val2);
 
+	if(index == UNIT_FIELD_RANGED_ATTACK_POWER) sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN : ATTACKPOWER : RANGED : %f * %f", GetModifierValue(unitMod, BASE_VALUE), GetModifierValue(unitMod, BASE_PCT));
     float base_attPower  = GetModifierValue(unitMod, BASE_VALUE) * GetModifierValue(unitMod, BASE_PCT);
     float attPowerMod = GetModifierValue(unitMod, TOTAL_VALUE);
 
