@@ -949,34 +949,41 @@ void WorldSession::SendAddonsInfo()
 		
         data << uint8(itr->State);
 
-        uint8 crcpub = itr->UsePublicKeyOrCRC;
-        data << uint8(crcpub);
-        if (crcpub)
+        uint8 enabled = itr->Enabled;
+        data << uint8(enabled);
+        if (enabled)
         {
-            uint8 usepk = (itr->CRC != STANDARD_ADDON_CRC); // If addon is Standard addon CRC
+            uint8 usepk = (itr->UsePublicKeyOrCRC);
             data << uint8(usepk);
-            if (usepk)                                      // if CRC is wrong, add public key (client need it)
+            if (usepk)
             {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "ADDON: CRC (0x%x) for addon %s is wrong (does not match expected 0x%x), sending pubkey",
-                    itr->CRC, itr->Name.c_str(), STANDARD_ADDON_CRC);
-
                 data.append(addonPublicKey, sizeof(addonPublicKey));
             }
 
-            data << uint32(itr->Version);                              // Version
+            data << uint32(itr->Version);
         }
 
-        data << uint8(itr->Name.length());
+        data << uint8(itr->Name.length() != 0);
         if (itr->Name.length())
         {
-            // String, length 256 (null terminated)
             data << itr->Name;
         }
     }
 
     m_addonsList.clear();
 
-    data << uint32(0); // count for an unknown for loop
+	uint32 unk = 0;
+    data << uint32(unk);
+	/* // LOGICAL FOLLOW IN IDA, BUT UNKOWN LOOP AND COUNTER IS SET TO 0 SO
+	for(uint32 i = 0 ; i < unk ; i++)
+	{
+		data << uint32(unk);
+		data << "";
+		data << "";
+		data << uint32(unk);
+		data << uint32(unk);
+	}
+	*/
 
     SendPacket(&data);
 }
