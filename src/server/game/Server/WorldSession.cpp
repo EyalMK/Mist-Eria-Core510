@@ -851,7 +851,7 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
 
     if (size > 0xFFFFF)
     {
-        sLog->outError(LOG_FILTER_GENERAL, "WorldSession::ReadAddonsInfo addon info too big, size %u", size);
+        sLog->outError(LOG_FILTER_NETWORKIO, "WorldSession::ReadAddonsInfo addon info too big, size %u", size);
         return;
     }
 
@@ -871,7 +871,7 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
         {
             std::string addonName;
             uint8 enabled;
-            uint32 crc, unk1;
+            uint32 crc, version;
 
             // check next addon data format correctness
             if (addonInfo.rpos() + 1 > addonInfo.size())
@@ -879,11 +879,11 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
 
             addonInfo >> addonName;
 
-            addonInfo >> enabled >> crc >> unk1;
+            addonInfo >> enabled >> crc >> version;
 
-            sLog->outInfo(LOG_FILTER_GENERAL, "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk1);
+            sLog->outInfo(LOG_FILTER_NETWORKIO, "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Version: 0x%x", addonName.c_str(), enabled, crc, version);
 
-            AddonInfo addon(addonName, enabled, crc, 2, true);
+            AddonInfo addon(addonName, enabled, crc, 2, true, version);
 
             SavedAddon const* savedAddon = AddonMgr::GetAddonInfo(addonName);
             if (savedAddon)
@@ -894,15 +894,15 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
                     match = false;
 
                 if (!match)
-                    sLog->outInfo(LOG_FILTER_GENERAL, "ADDON: %s was known, but didn't match known CRC (0x%x)!", addon.Name.c_str(), savedAddon->CRC);
+                    sLog->outInfo(LOG_FILTER_NETWORKIO, "ADDON: %s was known, but didn't match known CRC (0x%x)!", addon.Name.c_str(), savedAddon->CRC);
                 else
-                    sLog->outInfo(LOG_FILTER_GENERAL, "ADDON: %s was known, CRC is correct (0x%x)", addon.Name.c_str(), savedAddon->CRC);
+                    sLog->outInfo(LOG_FILTER_NETWORKIO, "ADDON: %s was known, CRC is correct (0x%x)", addon.Name.c_str(), savedAddon->CRC);
             }
             else
             {
                 AddonMgr::SaveAddon(addon);
 
-                sLog->outInfo(LOG_FILTER_GENERAL, "ADDON: %s (0x%x) was not known, saving...", addon.Name.c_str(), addon.CRC);
+                sLog->outInfo(LOG_FILTER_NETWORKIO, "ADDON: %s (0x%x) was not known, saving...", addon.Name.c_str(), addon.CRC);
             }
 
             // TODO: Find out when to not use CRC/pubkey, and other possible states.
@@ -917,7 +917,7 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
             sLog->outDebug(LOG_FILTER_NETWORKIO, "packet under-read!");
     }
     else
-        sLog->outError(LOG_FILTER_GENERAL, "Addon packet uncompress error!");
+        sLog->outError(LOG_FILTER_NETWORKIO, "Addon packet uncompress error!");
 }
 
 void WorldSession::SendAddonsInfo()
@@ -957,21 +957,20 @@ void WorldSession::SendAddonsInfo()
             data << uint8(1/*usepk*/);
             if (usepk)                                      // if CRC is wrong, add public key (client need it)
             {
-                sLog->outInfo(LOG_FILTER_GENERAL, "ADDON: CRC (0x%x) for addon %s is wrong (does not match expected 0x%x), sending pubkey",
+                sLog->outInfo(LOG_FILTER_NETWORKIO, "ADDON: CRC (0x%x) for addon %s is wrong (does not match expected 0x%x), sending pubkey",
                     itr->CRC, itr->Name.c_str(), STANDARD_ADDON_CRC);
 
                 data.append(addonPublicKey, sizeof(addonPublicKey));
             }
 
-            data << uint32(0);                              // TODO: Find out the meaning of this.
+            data << uint32(0);                              // Version
         }
 
-        uint8 unk3 = 0;                                     // 0 is sent here
-        data << uint8(unk3);
-        if (unk3)
+        data << uint8(itr->Name.length());
+        if (itr->Name.length())
         {
             // String, length 256 (null terminated)
-            data << uint8(0);
+            data << itr->Name;
         }
     }
 
