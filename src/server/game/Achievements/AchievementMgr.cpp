@@ -2524,10 +2524,12 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                 if (uint32(referencePlayer->GetMap()->GetDifficulty()) != reqValue)
                     return false;
                 break;
+				/* PROBLEMS
 			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_CREATURE_YIELDS_XP: // 21
 				if(!unit || !referencePlayer || Trinity::XP::Gain(referencePlayer, unit) < reqValue)
 					return false;
 				break;
+				*/
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_SOURCE_RACE: // 25
                 if (referencePlayer->getRace() != reqValue)
                     return false;
