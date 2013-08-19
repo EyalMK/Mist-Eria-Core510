@@ -5637,6 +5637,7 @@ float Player::GetMeleeCritFromAgility()
         return 0.0f;
 
     float crit = critBase->base + GetStat(STAT_AGILITY)*critRatio->ratio;
+	sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN !! %f + %f * %f", critBase->base, GetStat(STAT_AGILITY), critRatio->ratio);
     return crit*100.0f;
 }
 
