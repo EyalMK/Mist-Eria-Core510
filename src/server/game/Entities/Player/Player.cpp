@@ -3155,7 +3155,7 @@ void Player::GiveLevel(uint8 level)
                 ++m_grantableLevels;
 
                 if (!HasByteFlag(PLAYER_FIELD_BYTES, 1, 0x01))
-                    SetByteFlag(PLAYER_FIELD_BYTES, 1, 0x01);
+                    //SetByteFlag(PLAYER_FIELD_BYTES, 1, 0x01);
             }
 
     sScriptMgr->OnPlayerLevelChanged(this, oldLevel);
@@ -5096,7 +5096,7 @@ void Player::KillPlayer()
     //SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_IN_PVP);
 
     SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
-    ApplyModFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTE_RELEASE_TIMER, !sMapStore.LookupEntry(GetMapId())->Instanceable() && !HasAuraType(SPELL_AURA_PREVENT_RESURRECTION));
+    //ApplyModFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTE_RELEASE_TIMER, !sMapStore.LookupEntry(GetMapId())->Instanceable() && !HasAuraType(SPELL_AURA_PREVENT_RESURRECTION));
 
     // 6 minutes until repop at graveyard
     m_deathTimer = 6 * MINUTE * IN_MILLISECONDS;
@@ -16897,7 +16897,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fields[44].GetUInt32());
 
     // set which actionbars the client has active - DO NOT REMOVE EVER AGAIN (can be changed though, if it does change fieldwise)
-    SetByteValue(PLAYER_FIELD_BYTES, 2, fields[58].GetUInt8());
+    //SetByteValue(PLAYER_FIELD_BYTES, 2, fields[58].GetUInt8());
 
     InitDisplayIds();
 
@@ -17458,7 +17458,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
         SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_REFER_A_FRIEND);
 
     if (m_grantableLevels > 0)
-        SetByteValue(PLAYER_FIELD_BYTES, 1, 0x01);
+        //SetByteValue(PLAYER_FIELD_BYTES, 1, 0x01);
 
     _LoadDeclinedNames(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_DECLINED_NAMES));
 
@@ -17692,7 +17692,7 @@ void Player::LoadCorpse()
     else
     {
         if (Corpse* corpse = GetCorpse())
-            ApplyModFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTE_RELEASE_TIMER, corpse && !sMapStore.LookupEntry(corpse->GetMapId())->Instanceable());
+            //ApplyModFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTE_RELEASE_TIMER, corpse && !sMapStore.LookupEntry(corpse->GetMapId())->Instanceable());
         else
             //Prevent Dead Player login without corpse
             ResurrectPlayer(0.5f);
@@ -19007,7 +19007,7 @@ void Player::SaveToDB(bool create /*=false*/)
             ss << GetUInt32Value(PLAYER__FIELD_KNOWN_TITLES + i) << ' ';
         stmt->setString(index++, ss.str());
 
-        stmt->setUInt8(index++, GetByteValue(PLAYER_FIELD_BYTES, 2));
+        stmt->setUInt8(index++, 0/*GetByteValue(PLAYER_FIELD_BYTES, 2)*/);
         stmt->setUInt32(index++, m_grantableLevels);
     }
     else
@@ -19128,7 +19128,7 @@ void Player::SaveToDB(bool create /*=false*/)
             ss << GetUInt32Value(PLAYER__FIELD_KNOWN_TITLES + i) << ' ';
 
         stmt->setString(index++, ss.str());
-        stmt->setUInt8(index++, GetByteValue(PLAYER_FIELD_BYTES, 2));
+        stmt->setUInt8(index++, 0/*GetByteValue(PLAYER_FIELD_BYTES, 2)*/);
         stmt->setUInt32(index++, m_grantableLevels);
 
         stmt->setUInt8(index++, IsInWorld() ? 1 : 0);
