@@ -3154,7 +3154,7 @@ void Player::GiveLevel(uint8 level)
             {
                 ++m_grantableLevels;
 
-                if (!HasByteFlag(PLAYER_FIELD_BYTES, 1, 0x01))
+                //if (!HasByteFlag(PLAYER_FIELD_BYTES, 1, 0x01))
                     //SetByteFlag(PLAYER_FIELD_BYTES, 1, 0x01);
             }
 
@@ -17691,7 +17691,7 @@ void Player::LoadCorpse()
         sObjectAccessor->ConvertCorpseForPlayer(GetGUID());
     else
     {
-        if (Corpse* corpse = GetCorpse())
+        //if (Corpse* corpse = GetCorpse())
             //ApplyModFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTE_RELEASE_TIMER, corpse && !sMapStore.LookupEntry(corpse->GetMapId())->Instanceable());
         else
             //Prevent Dead Player login without corpse
