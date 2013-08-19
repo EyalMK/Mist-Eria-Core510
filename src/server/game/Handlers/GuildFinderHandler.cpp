@@ -33,29 +33,29 @@ void WorldSession::HandleGuildFinderAddRecruit(WorldPacket& recvPacket)
     uint32 availability = 0;
     uint32 guildInterests = 0;
 
-    recvPacket >> classRoles >> guildInterests >> availability;
+    recvPacket >> classRoles >> guildInterests >> availability; // need test if this is the correct order
 
     ObjectGuid guid;
     guid[3] = recvPacket.ReadBit();
-    guid[0] = recvPacket.ReadBit();
-    guid[6] = recvPacket.ReadBit();
-    guid[1] = recvPacket.ReadBit();
-    uint16 commentLength = recvPacket.ReadBits(11);
-    guid[5] = recvPacket.ReadBit();
-    guid[4] = recvPacket.ReadBit();
-    guid[7] = recvPacket.ReadBit();
-    uint8 nameLength = recvPacket.ReadBits(7);
     guid[2] = recvPacket.ReadBit();
+	uint16 commentLength = recvPacket.ReadBits(11);
+    guid[6] = recvPacket.ReadBit();
+    guid[7] = recvPacket.ReadBit();
+    guid[5] = recvPacket.ReadBit();
+    guid[1] = recvPacket.ReadBit();
+    guid[0] = recvPacket.ReadBit();
+    guid[4] = recvPacket.ReadBit();
+	uint8 nameLength = recvPacket.ReadBits(7);
 
+    recvPacket.ReadByteSeq(guid[6]);
+    recvPacket.ReadByteSeq(guid[2]);
     recvPacket.ReadByteSeq(guid[4]);
+    recvPacket.ReadByteSeq(guid[1]);
     recvPacket.ReadByteSeq(guid[5]);
-    std::string comment = recvPacket.ReadString(commentLength);
+    recvPacket.ReadByteSeq(guid[0]);
+	std::string comment = recvPacket.ReadString(commentLength);
     std::string playerName = recvPacket.ReadString(nameLength);
     recvPacket.ReadByteSeq(guid[7]);
-    recvPacket.ReadByteSeq(guid[2]);
-    recvPacket.ReadByteSeq(guid[0]);
-    recvPacket.ReadByteSeq(guid[6]);
-    recvPacket.ReadByteSeq(guid[1]);
     recvPacket.ReadByteSeq(guid[3]);
 
     uint32 guildLowGuid = GUID_LOPART(uint64(guid));
@@ -180,21 +180,21 @@ void WorldSession::HandleGuildFinderDeclineRecruit(WorldPacket& recvPacket)
 
     ObjectGuid playerGuid;
 
-    playerGuid[1] = recvPacket.ReadBit();
-    playerGuid[4] = recvPacket.ReadBit();
-    playerGuid[5] = recvPacket.ReadBit();
-    playerGuid[2] = recvPacket.ReadBit();
-    playerGuid[6] = recvPacket.ReadBit();
-    playerGuid[7] = recvPacket.ReadBit();
     playerGuid[0] = recvPacket.ReadBit();
+    playerGuid[2] = recvPacket.ReadBit();
+    playerGuid[4] = recvPacket.ReadBit();
     playerGuid[3] = recvPacket.ReadBit();
+    playerGuid[7] = recvPacket.ReadBit();
+    playerGuid[1] = recvPacket.ReadBit();
+    playerGuid[5] = recvPacket.ReadBit();
+    playerGuid[6] = recvPacket.ReadBit();
 
-    recvPacket.ReadByteSeq(playerGuid[5]);
-    recvPacket.ReadByteSeq(playerGuid[7]);
     recvPacket.ReadByteSeq(playerGuid[2]);
     recvPacket.ReadByteSeq(playerGuid[3]);
-    recvPacket.ReadByteSeq(playerGuid[4]);
+    recvPacket.ReadByteSeq(playerGuid[7]);
+    recvPacket.ReadByteSeq(playerGuid[5]);
     recvPacket.ReadByteSeq(playerGuid[1]);
+    recvPacket.ReadByteSeq(playerGuid[4]);
     recvPacket.ReadByteSeq(playerGuid[0]);
     recvPacket.ReadByteSeq(playerGuid[6]);
 
@@ -377,23 +377,23 @@ void WorldSession::HandleGuildFinderRemoveRecruit(WorldPacket& recvPacket)
 
     ObjectGuid guildGuid;
 
-    guildGuid[0] = recvPacket.ReadBit();
+    guildGuid[2] = recvPacket.ReadBit();
     guildGuid[4] = recvPacket.ReadBit();
-    guildGuid[3] = recvPacket.ReadBit();
     guildGuid[5] = recvPacket.ReadBit();
     guildGuid[7] = recvPacket.ReadBit();
-    guildGuid[6] = recvPacket.ReadBit();
-    guildGuid[2] = recvPacket.ReadBit();
     guildGuid[1] = recvPacket.ReadBit();
+    guildGuid[3] = recvPacket.ReadBit();
+    guildGuid[0] = recvPacket.ReadBit();
+    guildGuid[6] = recvPacket.ReadBit();
 
-    recvPacket.ReadByteSeq(guildGuid[4]);
-    recvPacket.ReadByteSeq(guildGuid[0]);
-    recvPacket.ReadByteSeq(guildGuid[3]);
-    recvPacket.ReadByteSeq(guildGuid[6]);
     recvPacket.ReadByteSeq(guildGuid[5]);
     recvPacket.ReadByteSeq(guildGuid[1]);
+    recvPacket.ReadByteSeq(guildGuid[3]);
     recvPacket.ReadByteSeq(guildGuid[2]);
+    recvPacket.ReadByteSeq(guildGuid[6]);
+    recvPacket.ReadByteSeq(guildGuid[4]);
     recvPacket.ReadByteSeq(guildGuid[7]);
+    recvPacket.ReadByteSeq(guildGuid[0]);
 
     if (!IS_GUILD_GUID(guildGuid))
         return;
