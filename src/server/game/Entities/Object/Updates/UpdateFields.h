@@ -317,7 +317,8 @@ enum EPlayerFields
     PLAYER_FIELD_MOD_TARGET_RESISTANCE               = UNIT_END + 0x06A1, // Size: 1, Type: INT, Flags: PRIVATE
     PLAYER_FIELD_MOD_TARGET_PHYSICAL_RESISTANCE      = UNIT_END + 0x06A2, // Size: 1, Type: INT, Flags: PRIVATE
 
-    PLAYER_FIELD_BYTES                               = UNIT_END + 0x06A3, // Size: 1, Type: BYTES, Flags: PRIVATE PLAYER_FIELD_LIFETIME_MAX_RANK?
+	PLAYER_FIELD_LIFETIME_MAX_RANK                   = UNIT_END + 0x06A3, // Size: 1, Type: INT, Flags: PRIVATE
+    //PLAYER_FIELD_BYTES                               = UNIT_END + 0x06A3, // Size: 1, Type: BYTES, Flags: PRIVATE PLAYER_FIELD_LIFETIME_MAX_RANK?
 
     PLAYER_SELF_RES_SPELL                            = UNIT_END + 0x06A4, // Size: 1, Type: INT, Flags: PRIVATE
     PLAYER_FIELD_PVP_MEDALS                          = UNIT_END + 0x06A5, // Size: 1, Type: INT, Flags: PRIVATE
@@ -401,10 +402,10 @@ enum ECorpseFields
 
 enum EAreaTriggerFields
 {
-    AREATRIGGER_CASTER                               = OBJECT_END + 0x0000,
-    AREATRIGGER_SPELLID                              = OBJECT_END + 0x0002, // Size: 1, Type: INT, Flags: PUBLIC
-    AREATRIGGER_SPELLVISUALID                        = OBJECT_END + 0x0003, // Size: 1, Type: INT, Flags: PUBLIC
-    AREATRIGGER_DURATION                             = OBJECT_END + 0x0004, // Size: 1, Type: INT, Flags: PUBLIC
+	AREATRIGGER_CASTER                               = OBJECT_END + 0x0000, // Size: 2, Type: INT, Flags: PUBLIC
+	AREATRIGGER_DURATION                             = OBJECT_END + 0x0002, // Size: 1, Type: INT, Flags: PUBLIC
+	AREATRIGGER_SPELLID                              = OBJECT_END + 0x0003, // Size: 1, Type: INT, Flags: PUBLIC
+	AREATRIGGER_SPELLVISUALID                        = OBJECT_END + 0x0004, // Size: 1, Type: INT, Flags: PUBLIC
     AREATRIGGER_END                                  = OBJECT_END + 0x0005
 };
 
