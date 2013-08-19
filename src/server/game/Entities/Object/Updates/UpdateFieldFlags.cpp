@@ -233,6 +233,7 @@ uint32 ContainerUpdateFieldFlags[CONTAINER_END] =
 
 // > Object > Unit
 uint32 UnitUpdateFieldFlags[PLAYER_END] =
+{
 	UF_FLAG_PUBLIC, // OBJECT_FIELD_GUID
 	UF_FLAG_PUBLIC, // OBJECT_FIELD_GUID
 	UF_FLAG_PUBLIC, // OBJECT_FIELD_DATA
