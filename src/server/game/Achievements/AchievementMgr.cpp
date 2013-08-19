@@ -42,6 +42,7 @@
 #include "SpellMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "Formulas.h"
 
 namespace Trinity
 {
