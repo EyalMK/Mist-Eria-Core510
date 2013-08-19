@@ -256,6 +256,15 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         receiverLength = recvData.ReadBits(10);
         msg = recvData.ReadString(textLength);
         channel = recvData.ReadString(receiverLength);
+        
+        // test
+        
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "CHAT : textlength %u", textLength);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "CHAT : receiverLength %u", receiverLength);
+        
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "CHAT : msg %s", msg);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "CHAT : channel %s", channel);
+        
         break;
     case CHAT_MSG_AFK:
     case CHAT_MSG_DND:
