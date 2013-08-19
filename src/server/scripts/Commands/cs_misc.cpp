@@ -50,6 +50,7 @@ public:
             { "remove",         SEC_ADMINISTRATOR,          false,  &HandleGroupRemoveCommand,          "", NULL },
             { "join",           SEC_ADMINISTRATOR,          false,  &HandleGroupJoinCommand,            "", NULL },
             { "list",           SEC_ADMINISTRATOR,          false,  &HandleGroupListCommand,            "", NULL },
+            { "sendupdate",     SEC_ADMINISTRATOR,          false,  &HandleGroupSendUpdateCommand,      "", NULL },
             { NULL,             0,                          false,  NULL,                               "", NULL }
         };
         static ChatCommand petCommandTable[] =
@@ -2932,6 +2933,21 @@ public:
             return false;
 
         player->StopCastingBindSight();
+        return true;
+    }
+
+    static bool HandleGroupSendUpdateCommand(ChatHandler *handler, char const* /*args*/)
+    {
+        Player *plr = handler->getSelectedPlayer();
+        if(!plr)
+            return true;
+
+        Group *grp = plr->GetGroup();
+        if(!grp)
+            return true;
+
+        grp->SendUpdate();
+
         return true;
     }
 };

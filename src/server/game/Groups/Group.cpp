@@ -1575,13 +1575,13 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
     std::cout << "Player " << player->GetName() << " : " << GetMembersCount()-1 << std::endl;
 
     ObjectGuid groupGuid = m_guid, leaderGuid = m_leaderGuid;
-	uint8 byte10 = 0; //Probably smthng with challenge mode
+    uint8 byte10 = GetMembersCount()-1; //Probably smthng with challenge mode
     uint8 hasLootRule = 0; //For testing purpose
     uint8 isLFG = 0;
-    uint8 byte74 = 0;
-    uint8 byte1C = 0;
-    uint8 byte40 = 0;
-    uint32 dword38 = 0, dword3C = 0;
+    uint8 byte74 = m_groupType; //Checked
+    uint8 byte1C = /*slot->roles*/ slot->group;
+    uint8 byte40 = slot->flags;
+    uint32 dword38 = 0, dword3C = m_counter++;
 
     data.WriteBit(groupGuid[2]);
     data.WriteBit(byte10);
@@ -1592,7 +1592,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
 
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
-		if(citr->guid == slot->guid)
+        if(citr->guid == slot->guid)
             continue;
 
         ObjectGuid memberGuid = citr->guid;
@@ -1602,12 +1602,25 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         data.WriteBit(memberGuid[4]);
         data.WriteBit(memberGuid[1]);
         data.WriteBit(memberGuid[0]);
-        data.WriteBits(1, 7);
+        data.WriteBits(citr->name.size(), 7);
         data.WriteBit(memberGuid[6]);
         data.WriteBit(memberGuid[2]);
     }
 
-    //if (hasLootRule) { 4 1 7 5 2 0 3 6 }
+    if (GetMembersCount()-1) //hasLootRule
+    {
+        /*4 1 7 5 2 0 3 6*/
+        ObjectGuid looterGuid = m_looterGuid;
+
+        data.WriteBit(looterGuid[4]);
+        data.WriteBit(looterGuid[1]);
+        data.WriteBit(looterGuid[7]);
+        data.WriteBit(looterGuid[5]);
+        data.WriteBit(looterGuid[2]);
+        data.WriteBit(looterGuid[0]);
+        data.WriteBit(looterGuid[3]);
+        data.WriteBit(looterGuid[6]);
+    }
 
     data.WriteBit(groupGuid[4]);
     data.WriteBit(leaderGuid[5]);
@@ -1630,11 +1643,25 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
 
     data.WriteByteSeq(leaderGuid[1]);
 
-    //if(hasLootRule) { ... }
+    if (GetMembersCount()-1) //hasLootRule
+    {
+        ObjectGuid looterGuid = m_looterGuid;
+
+        data << uint8(m_lootThreshold);
+        data << uint8(m_lootMethod);
+        data.WriteByteSeq(looterGuid[3]);
+        data.WriteByteSeq(looterGuid[5]);
+        data.WriteByteSeq(looterGuid[4]);
+        data.WriteByteSeq(looterGuid[7]);
+        data.WriteByteSeq(looterGuid[2]);
+        data.WriteByteSeq(looterGuid[0]);
+        data.WriteByteSeq(looterGuid[6]);
+        data.WriteByteSeq(looterGuid[1]);
+    }
 
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
-		if(citr->guid == slot->guid)
+        if(citr->guid == slot->guid)
             continue;
 
 		Player* member = ObjectAccessor::FindPlayer(citr->guid);
@@ -1642,13 +1669,13 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         uint8 onlineState = member ? MEMBER_STATUS_ONLINE : MEMBER_STATUS_OFFLINE;
         onlineState = onlineState | ((isBGGroup() || isBFGroup()) ? MEMBER_STATUS_PVP : 0);
 
-        //data.WriteString(citr->name);
-        data << uint8(97);
+        data.WriteString(citr->name);
+        //data << uint8(97);
 
         std::cout << "Member : " << citr->name << std::endl;
 
         ObjectGuid memberGuid = citr->guid;
-        uint8 byte39 = citr->group, byte3A = citr->roles, byte38 = citr->flags, byte3B = onlineState;
+        uint8 byte39 = /*citr->group*/0, byte3A = citr->flags, byte38 = onlineState, byte3B = citr->roles;
 
         data.WriteByteSeq(memberGuid[0]);
         data.WriteByteSeq(memberGuid[7]);
@@ -1672,7 +1699,11 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
     data.WriteByteSeq(leaderGuid[0]);
     data.WriteByteSeq(groupGuid[7]);
 
-    //if(byte10) { ... }
+    if(GetMembersCount()-1)
+    {
+        data << uint32(m_dungeonDifficulty);
+        data << uint32(m_raidDifficulty);
+    }
 
     data << uint8(byte74);
     data.WriteByteSeq(leaderGuid[7]);
