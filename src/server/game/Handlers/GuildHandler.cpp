@@ -205,48 +205,10 @@ void WorldSession::HandleGuildDemoteOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleGuildAssignRankOpcode(WorldPacket& recvPacket)
 {
     ObjectGuid targetGuid;
-    ObjectGuid setterGuid;
+    Member* setterGuid = GetMember(player->GetGUID());
 
     uint32 rankId;
     recvPacket >> rankId;
-
-    targetGuid[1] = recvPacket.ReadBit();
-    targetGuid[7] = recvPacket.ReadBit();
-    setterGuid[4] = recvPacket.ReadBit();
-    setterGuid[2] = recvPacket.ReadBit();
-    targetGuid[4] = recvPacket.ReadBit();
-    targetGuid[5] = recvPacket.ReadBit();
-    targetGuid[6] = recvPacket.ReadBit();
-    setterGuid[1] = recvPacket.ReadBit();
-    setterGuid[7] = recvPacket.ReadBit();
-    targetGuid[2] = recvPacket.ReadBit();
-    targetGuid[3] = recvPacket.ReadBit();
-    targetGuid[0] = recvPacket.ReadBit();
-    setterGuid[6] = recvPacket.ReadBit();
-    setterGuid[3] = recvPacket.ReadBit();
-    setterGuid[0] = recvPacket.ReadBit();
-    setterGuid[5] = recvPacket.ReadBit();
-
-    recvPacket.ReadByteSeq(targetGuid[0]);
-    recvPacket.ReadByteSeq(setterGuid[1]);
-    recvPacket.ReadByteSeq(setterGuid[3]);
-    recvPacket.ReadByteSeq(setterGuid[5]);
-    recvPacket.ReadByteSeq(targetGuid[7]);
-    recvPacket.ReadByteSeq(targetGuid[3]);
-    recvPacket.ReadByteSeq(setterGuid[0]);
-    recvPacket.ReadByteSeq(targetGuid[1]);
-    recvPacket.ReadByteSeq(setterGuid[6]);
-    recvPacket.ReadByteSeq(targetGuid[2]);
-    recvPacket.ReadByteSeq(targetGuid[5]);
-    recvPacket.ReadByteSeq(targetGuid[4]);
-    recvPacket.ReadByteSeq(setterGuid[2]);
-    recvPacket.ReadByteSeq(setterGuid[4]);
-    recvPacket.ReadByteSeq(targetGuid[6]);
-    recvPacket.ReadByteSeq(setterGuid[7]);
-
-	/*
-
-	new guid struct; Need to modify HandleSetMemberRank. And to complete struct for SMSG_GUILD_RANKS_UPDATE.
 	
 	targetGuid[4] = recvPacket.ReadBit();
     targetGuid[7] = recvPacket.ReadBit();
@@ -265,8 +227,6 @@ void WorldSession::HandleGuildAssignRankOpcode(WorldPacket& recvPacket)
     recvPacket.ReadByteSeq(targetGuid[6]);
     recvPacket.ReadByteSeq(targetGuid[1]);
     recvPacket.ReadByteSeq(targetGuid[5]);
-
-	*/
 
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_ASSIGN_MEMBER_RANK [%s]: Target: %u Rank: %u, Issuer: %u",
         GetPlayerInfo().c_str(), GUID_LOPART(targetGuid), rankId, GUID_LOPART(setterGuid));
