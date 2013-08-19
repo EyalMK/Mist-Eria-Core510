@@ -946,13 +946,14 @@ void WorldSession::SendAddonsInfo()
 
     for (AddonsList::iterator itr = m_addonsList.begin(); itr != m_addonsList.end(); ++itr)
     {
+		
         data << uint8(itr->State);
 
         uint8 crcpub = itr->UsePublicKeyOrCRC;
         data << uint8(crcpub);
         if (crcpub)
         {
-            uint8 usepk = 0/*(itr->CRC != STANDARD_ADDON_CRC)*/; // If addon is Standard addon CRC
+            uint8 usepk = (itr->CRC != STANDARD_ADDON_CRC); // If addon is Standard addon CRC
             data << uint8(usepk);
             if (usepk)                                      // if CRC is wrong, add public key (client need it)
             {
