@@ -954,7 +954,7 @@ void WorldSession::SendAddonsInfo()
         if (crcpub)
         {
             uint8 usepk = (itr->CRC != STANDARD_ADDON_CRC); // If addon is Standard addon CRC
-            data << uint8(1/*usepk*/);
+            data << uint8(usepk);
             if (usepk)                                      // if CRC is wrong, add public key (client need it)
             {
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "ADDON: CRC (0x%x) for addon %s is wrong (does not match expected 0x%x), sending pubkey",
@@ -963,7 +963,7 @@ void WorldSession::SendAddonsInfo()
                 data.append(addonPublicKey, sizeof(addonPublicKey));
             }
 
-            data << uint32(0);                              // Version
+            data << uint32(itr->Version);                              // Version
         }
 
         data << uint8(itr->Name.length());
