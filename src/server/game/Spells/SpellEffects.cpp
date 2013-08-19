@@ -4199,14 +4199,11 @@ void Spell::EffectApplyGlyph(SpellEffIndex effIndex)
     switch (m_glyphIndex)
     {
         case 0:
-        case 1:
-        case 6: minLevel = 25; break;
+        case 1: minLevel = 25; break;
         case 2:
-        case 3:
-        case 7: minLevel = 50; break;
+        case 3: minLevel = 50; break;
         case 4:
-        case 5:
-        case 8: minLevel = 75; break;
+        case 5: minLevel = 75; break;
     }
 
     if (minLevel && m_caster->getLevel() < minLevel)
