@@ -5683,7 +5683,7 @@ void Player::GetDodgeFromAgility(float &diminishing, float &nondiminishing)
         level = GT_MAX_LEVEL;
 
     // Dodge per agility is proportional to crit per agility, which is available from DBC files
-    GtChanceToMeleeCritEntry  const* dodgeRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
+    GtChanceToMeleeCritEntry  const* dodgeRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + (sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) - level));
     if (dodgeRatio == NULL || pclass > MAX_CLASSES)
         return;
 
@@ -5691,9 +5691,12 @@ void Player::GetDodgeFromAgility(float &diminishing, float &nondiminishing)
     float base_agility = GetCreateStat(STAT_AGILITY) * m_auraModifiersGroup[UNIT_MOD_STAT_START + STAT_AGILITY][BASE_PCT];
     float bonus_agility = GetStat(STAT_AGILITY) - base_agility;
 
+	float dodge_ratio = dodgeRatio->ratio / 100000;
+	if(pclass == CLASS_DEATH_KNIGHT || pclass == CLASS_PALADIN || pclass == CLASS_WARRIOR) ratio = 0;
+
     // calculate diminishing (green in char screen) and non-diminishing (white) contribution
-    diminishing = 100.0f * bonus_agility * dodgeRatio->ratio * crit_to_dodge[pclass-1];
-    nondiminishing = 100.0f * (dodge_base[pclass-1] + base_agility * dodgeRatio->ratio * crit_to_dodge[pclass-1]);
+    diminishing = 100.0f * bonus_agility * dodge_ratio * crit_to_dodge[pclass-1];
+    nondiminishing = 100.0f * (dodge_base[pclass-1] + base_agility * dodge_ratio * crit_to_dodge[pclass-1]);
 }
 
 float Player::GetSpellCritFromIntellect()
