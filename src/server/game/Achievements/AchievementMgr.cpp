@@ -2445,6 +2445,18 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
 
         switch (AchievementCriteriaAdditionalCondition(reqType))
         {
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_SOURCE_DRUNK_VALUE: // 0
+				if(!referencePlayer || referencePlayer->GetDrunkValue() < reqValue)
+					return false;
+				break;
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_ITEM_LEVEL: //3
+			{
+				// miscValue1 is itemid
+				ItemTemplate const* const item = sObjectMgr->GetItemTemplate(uint32(miscValue1));
+				if (!item || item->ItemLevel < reqValue)
+					return false;
+				break;
+			}
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_CREATURE_ENTRY: // 4
                 if (!unit || unit->GetEntry() != reqValue)
                     return false;
@@ -2468,6 +2480,7 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_HAS_AURA: // 10
                 if (!unit || !unit->HasAura(reqValue))
                     return false;
+				break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_HAS_AURA_TYPE: // 11
                 if (!unit || !unit->HasAuraType(AuraType(reqValue)))
                     return false;
@@ -2510,6 +2523,10 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                 if (uint32(referencePlayer->GetMap()->GetDifficulty()) != reqValue)
                     return false;
                 break;
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_CREATURE_YIELDS_XP: // 21
+				if(!unit || !referencePlayer || Trinity::XP::Gain(referencePlayer, unit) < reqValue)
+					return false;
+				break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_SOURCE_RACE: // 25
                 if (referencePlayer->getRace() != reqValue)
                     return false;
@@ -2559,6 +2576,7 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_ZONE: // 41
                 if (!unit || unit->GetZoneId() != reqValue)
                     return false;
+				break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_HEALTH_PERCENT_BELOW: // 46
                 if (!unit || unit->GetHealthPct() >= reqValue)
                     return false;
