@@ -1417,10 +1417,19 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
 		// for (2 professions)
         // need to make a function that return skill ids of player
 
+        /*
 		uint32 skill = 0; // 0 at this moment
+        Player* player;
+        */
 
-        memberData << uint32(skill) << uint32(member->GetSkillValue(skill)) << uint32(member->GetPureMaxSkillValue(skill)); 
-        memberData << uint32(skill) << uint32(member->GetSkillValue(skill)) << uint32(member->GetPureMaxSkillValue(skill)); 
+        /*
+        memberData << uint32(skill) << uint32(player->GetSkillValue(skill)) << uint32(player->GetPureMaxSkillValue(skill)); 
+        memberData << uint32(skill) << uint32(player->GetSkillValue(skill)) << uint32(player->GetPureMaxSkillValue(skill)); 
+        */
+        
+        memberData << uint32(0) << uint32(0) << uint32(0); 
+        memberData << uint32(0) << uint32(0) << uint32(0); 
+        
 
         memberData << uint32(member->GetTotalReputation());
         memberData << uint64(member->GetWeekActivity());
