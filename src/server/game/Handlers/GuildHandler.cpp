@@ -205,7 +205,7 @@ void WorldSession::HandleGuildDemoteOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleGuildAssignRankOpcode(WorldPacket& recvPacket)
 {
     ObjectGuid targetGuid;
-    Member* setterGuid = GetMember(player->GetGUID());
+    ObjectGuid setterGuid = this->GetPlayer()->GetGUID();
 
     uint32 rankId;
     recvPacket >> rankId;
