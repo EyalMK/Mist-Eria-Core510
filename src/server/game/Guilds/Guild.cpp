@@ -1356,14 +1356,22 @@ void Guild::OnPlayerStatusChange(Player* player, uint32 flag, bool state)
 
 void Guild::HandleRoster(WorldSession* session /*= NULL*/)
 {
-	uint64 guid; // as we have on CMSG_GUILD_ROSTER ; need to find what means that
-	uint64 guid2; // as we have on CMSG_GUILD_ROSTER ; need to find what means that
+	ObjectGuid guid;
 
     ByteBuffer memberData(100);
     // Guess size
     WorldPacket data(SMSG_GUILD_ROSTER, 100);
-    data.WriteBits(m_motd.length(), 11);
-    data.WriteBits(m_members.size(), 18);
+    
+	data << uint32(m_accountsNumber);
+    data << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP));
+    data.AppendPackedTime(m_createdDate);
+    data << uint32(0); // unk
+
+	size_t infoLength = m_info.length();
+
+	data.WriteBits(m_motd.length(), 11); 
+	data.WriteBits(infoLength, 12);
+    data.WriteBits(m_members.size(), 18); 
 
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
@@ -1371,63 +1379,80 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         size_t pubNoteLength = member->GetPublicNote().length();
         size_t offNoteLength = member->GetOfficerNote().length();
 
-        data.WriteBit(0); // Has Authenticator
-        data.WriteBit(0); // Can Scroll of Ressurect
-        data.WriteBits(pubNoteLength, 8);
-        data.WriteBits(offNoteLength, 8);
-        data.WriteBits(member->GetName().length(), 7);
-       
+		data.WriteBits(member->GetName().length(), 7);
+
+		data.WriteBit(guid[4]);
+		data.WriteBit(guid[7]);
+		data.WriteBit(guid[5]);
+		data.WriteBit(guid[6]);
+		data.WriteBit(guid[1]);
+
+		data.WriteBits(pubNoteLength, 8);
+        
+		data.WriteBit(guid[2]);
+		data.WriteBit(guid[0]);
+
+		data.WriteBit(0); // bit361
+		data.WriteBit(0); // bit360
+
+		data.WriteBits(offNoteLength, 8);
+
+		data.WriteBit(guid[3]);
+
+		data.WriteByteSeq(guid[1]);
+
         memberData << uint8(member->GetClass());
         memberData << uint32(member->GetTotalReputation());
-        memberData << uint64(member->GetWeekActivity());
-        memberData << uint32(member->GetRankId());
-        memberData << uint32(member->GetAchievementPoints());
+		memberData << uint32(member->GetRankId());
 
-        // for (2 professions)
-        memberData << uint32(0) << uint32(0) << uint32(0);
-        memberData << uint32(0) << uint32(0) << uint32(0);
-
-        memberData << uint8(member->GetFlags());
-        memberData << uint32(member->GetZoneId());
-        memberData << uint64(member->GetTotalActivity());
-        memberData << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP) - member->GetWeekReputation());
-
-        if (pubNoteLength)
+		if (pubNoteLength)
             memberData.WriteString(member->GetPublicNote());
 
-        memberData << uint8(member->GetLevel());
-        memberData << int32(0);                                     // unk
-        memberData << uint8(0);                                     // unk
-        memberData << float(member->IsOnline() ? 0.0f : float(::time(NULL) - member->GetLogoutTime()) / DAY);
+		// for (2 professions)
+        memberData << uint32(0) << uint32(0) << uint32(0); // unk
+        memberData << uint32(0) << uint32(0) << uint32(0); // unk
+
+		memberData << uint32(member->GetAchievementPoints());
+        memberData << uint64(member->GetWeekActivity());
+        
+        data.WriteByteSeq(guid[2]);
 
         if (offNoteLength)
             memberData.WriteString(member->GetOfficerNote());
 
-        memberData.WriteString(member->GetName());
+		memberData.WriteString(member->GetName());
+
+		memberData << float(member->IsOnline() ? 0.0f : float(::time(NULL) - member->GetLogoutTime()) / DAY);
+        memberData << uint8(member->GetFlags());
+
+		data.WriteByteSeq(guid[5]);
+		data.WriteByteSeq(guid[7]);
+		data.WriteByteSeq(guid[4]);
+
+        memberData << uint32(member->GetZoneId());
+
+		data.WriteByteSeq(guid[6]);
+
+		memberData << uint8(member->GetLevel());
+		memberData << uint8(0); // unk
+		memberData << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP) - member->GetWeekReputation());
+        memberData << uint64(member->GetTotalActivity());
+        
+		data.WriteByteSeq(guid[3]);
+
+        memberData << uint32(0); // unk
+
+		data.WriteByteSeq(guid[0]);   
     }
 
-    size_t infoLength = m_info.length();
-    data.WriteBits(infoLength, 12);
-
-    data.FlushBits();
+	data.FlushBits();
     data.append(memberData);
 
     if (infoLength)
         data.WriteString(m_info);
 
     data.WriteString(m_motd);
-    data << uint32(m_accountsNumber);
-    data << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP));
-    data.AppendPackedTime(m_createdDate);
-    data << uint32(0);
-
-	// and somewhere in code we will have
-
-	data << guid;
-	data << guid2;
-
-	// this is just a sketch for me ; i will continue working on it tonight ; i need to put those all in order
-
+    
     if (session)
     {
         sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_ROSTER [%s]", session->GetPlayerInfo().c_str());
