@@ -17693,7 +17693,7 @@ void Player::LoadCorpse()
     {
         //if (Corpse* corpse = GetCorpse())
             //ApplyModFlag(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTE_RELEASE_TIMER, corpse && !sMapStore.LookupEntry(corpse->GetMapId())->Instanceable());
-        else
+        //else
             //Prevent Dead Player login without corpse
             ResurrectPlayer(0.5f);
     }
