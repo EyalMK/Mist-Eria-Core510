@@ -5398,9 +5398,9 @@ void AuraEffect::HandlePreventResurrection(AuraApplication const* aurApp, uint8 
     if (aurApp->GetTarget()->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    if (apply)
+    //if (apply)
         //aurApp->GetTarget()->RemoveByteFlag(PLAYER_FIELD_BYTES, 0, PLAYER_FIELD_BYTE_RELEASE_TIMER);
-    else if (!aurApp->GetTarget()->GetBaseMap()->Instanceable())
+    //else if (!aurApp->GetTarget()->GetBaseMap()->Instanceable())
         //aurApp->GetTarget()->SetByteFlag(PLAYER_FIELD_BYTES, 0, PLAYER_FIELD_BYTE_RELEASE_TIMER);
 }
 
