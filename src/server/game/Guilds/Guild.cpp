@@ -1399,7 +1399,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
 
 		data.WriteBit(guid[3]);
 
-		data.WriteByteSeq(guid[1]);
+        memberData.WriteByteSeq(guid[1]);
 
         memberData << uint8(member->GetClass());
         memberData << uint32(member->GetTotalReputation());
@@ -1415,7 +1415,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
 		memberData << uint32(member->GetAchievementPoints());
         memberData << uint64(member->GetWeekActivity());
         
-        data.WriteByteSeq(guid[2]);
+        memberData.WriteByteSeq(guid[2]);
 
         if (offNoteLength)
             memberData.WriteString(member->GetOfficerNote());
@@ -1425,24 +1425,24 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
 		memberData << float(member->IsOnline() ? 0.0f : float(::time(NULL) - member->GetLogoutTime()) / DAY);
         memberData << uint8(member->GetFlags());
 
-		data.WriteByteSeq(guid[5]);
-		data.WriteByteSeq(guid[7]);
-		data.WriteByteSeq(guid[4]);
+        memberData.WriteByteSeq(guid[5]);
+        memberData.WriteByteSeq(guid[7]);
+        memberData.WriteByteSeq(guid[4]);
 
         memberData << uint32(member->GetZoneId());
 
-		data.WriteByteSeq(guid[6]);
+        memberData.WriteByteSeq(guid[6]);
 
 		memberData << uint8(member->GetLevel());
 		memberData << uint8(0); // unk
 		memberData << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP) - member->GetWeekReputation());
         memberData << uint64(member->GetTotalActivity());
         
-		data.WriteByteSeq(guid[3]);
+        memberData.WriteByteSeq(guid[3]);
 
         memberData << uint32(0); // unk
 
-		data.WriteByteSeq(guid[0]);   
+        memberData.WriteByteSeq(guid[0]);
     }
 
 	data.FlushBits();
