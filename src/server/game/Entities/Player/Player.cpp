@@ -5692,7 +5692,7 @@ void Player::GetDodgeFromAgility(float &diminishing, float &nondiminishing)
     float bonus_agility = GetStat(STAT_AGILITY) - base_agility;
 
 	float dodge_ratio = dodgeRatio->ratio / 100000;
-	if(pclass == CLASS_DEATH_KNIGHT || pclass == CLASS_PALADIN || pclass == CLASS_WARRIOR) ratio = 0;
+	if(pclass == CLASS_DEATH_KNIGHT || pclass == CLASS_PALADIN || pclass == CLASS_WARRIOR) dodge_ratio = 0;
 
     // calculate diminishing (green in char screen) and non-diminishing (white) contribution
     diminishing = 100.0f * bonus_agility * dodge_ratio * crit_to_dodge[pclass-1];
