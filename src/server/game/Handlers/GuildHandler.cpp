@@ -266,25 +266,25 @@ void WorldSession::HandleGuildSetNoteOpcode(WorldPacket& recvPacket)
     ObjectGuid playerGuid;
 
     playerGuid[1] = recvPacket.ReadBit();
-    playerGuid[4] = recvPacket.ReadBit();
-    playerGuid[5] = recvPacket.ReadBit();
-    playerGuid[3] = recvPacket.ReadBit();
-    playerGuid[0] = recvPacket.ReadBit();
-    playerGuid[7] = recvPacket.ReadBit();
-    bool ispublic = recvPacket.ReadBit();      // 0 == Officer, 1 == Public
-    playerGuid[6] = recvPacket.ReadBit();
-    uint32 noteLength = recvPacket.ReadBits(8);
+	uint32 noteLength = recvPacket.ReadBits(8);
     playerGuid[2] = recvPacket.ReadBit();
+    playerGuid[4] = recvPacket.ReadBit();
+    playerGuid[0] = recvPacket.ReadBit();
+    playerGuid[3] = recvPacket.ReadBit();
+    playerGuid[5] = recvPacket.ReadBit();
+    playerGuid[7] = recvPacket.ReadBit(); 
+    playerGuid[6] = recvPacket.ReadBit();
+	bool ispublic = recvPacket.ReadBit();      // 0 == Officer, 1 == Public
 
-    recvPacket.ReadByteSeq(playerGuid[4]);
-    recvPacket.ReadByteSeq(playerGuid[5]);
-    recvPacket.ReadByteSeq(playerGuid[0]);
+    recvPacket.ReadByteSeq(playerGuid[7]);
     recvPacket.ReadByteSeq(playerGuid[3]);
     recvPacket.ReadByteSeq(playerGuid[1]);
-    recvPacket.ReadByteSeq(playerGuid[6]);
-    recvPacket.ReadByteSeq(playerGuid[7]);
-    std::string note = recvPacket.ReadString(noteLength);
+    recvPacket.ReadByteSeq(playerGuid[0]);
+	std::string note = recvPacket.ReadString(noteLength);
+    recvPacket.ReadByteSeq(playerGuid[5]);
+    recvPacket.ReadByteSeq(playerGuid[4]);
     recvPacket.ReadByteSeq(playerGuid[2]);
+    recvPacket.ReadByteSeq(playerGuid[6]);
 
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_SET_NOTE [%s]: Target: %u, Note: %s, Public: %u",
         GetPlayerInfo().c_str(), GUID_LOPART(playerGuid), note.c_str(), ispublic);
