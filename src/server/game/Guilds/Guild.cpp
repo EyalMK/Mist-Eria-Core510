@@ -1415,8 +1415,12 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
             memberData.WriteString(member->GetPublicNote());
 
 		// for (2 professions)
-        memberData << uint32(0) << uint32(0) << uint32(0); // unk
-        memberData << uint32(0) << uint32(0) << uint32(0); // unk
+        // need to make a function that return skill ids of player
+
+		uint32 skill = 0; // 0 at this moment
+
+        memberData << uint32(skill) << uint32(member->GetSkillValue(skill)) << uint32(member->GetPureMaxSkillValue(skill)); 
+        memberData << uint32(skill) << uint32(member->GetSkillValue(skill)) << uint32(member->GetPureMaxSkillValue(skill)); 
 
         memberData << uint32(member->GetTotalReputation());
         memberData << uint64(member->GetWeekActivity());
