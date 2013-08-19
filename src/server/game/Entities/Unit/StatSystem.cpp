@@ -304,6 +304,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
             attPowerMod += int32(GetArmor() / (*iter)->GetAmount());
     }
 
+	if(index == UNIT_FIELD_RANGED_ATTACK_POWER) sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN : ATTACKPOWER : RANGED : %u", (uint32)base_attPower);
     SetInt32Value(index, (uint32)base_attPower);            //UNIT_FIELD_(RANGED)_ATTACK_POWER field
 
     Pet* pet = GetPet();                                //update pet's AP
