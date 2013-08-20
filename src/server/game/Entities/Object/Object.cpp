@@ -1149,7 +1149,7 @@ void Object::SetUInt32Value(uint16 index, uint32 value)
 	if(index == PLAYER_FIELD_COMBAT_RATING_1 + CR_MASTERY) 
 	{
 		sLog->outDebug(LOG_FILTER_SERVER_LOADING, "PEXIRN : MASTERY : %u", value);
-		ASSERT(value == 5);
+		//ASSERT(value == 5);
 	}
 	
     if (m_uint32Values[index] != value)
