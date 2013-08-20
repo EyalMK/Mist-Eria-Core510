@@ -1971,6 +1971,7 @@ bool Player::BuildEnumData(PreparedQueryResult result, ByteBuffer* dataBuffer, B
         uint32 visualbase = slot * 2;
         uint32 itemId = GetUInt32ValueFromArray(equipment, visualbase);
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+		sLog->outInfo(LOG_FILTER_SERVER_LOADING, "PEXIRN : CHAR : itemId : %u", itemId);
         if (!proto)
         {
             *dataBuffer << uint8(0);
