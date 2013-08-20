@@ -247,8 +247,8 @@ enum Opcodes
     CMSG_GUILD_ADD_RANK                               = 0x0846,//16357
     CMSG_GUILD_ASSIGN_MEMBER_RANK                     = 0x0A67,//16357
     CMSG_GUILD_BANKER_ACTIVATE                        = 0x06C0,//16357
-    CMSG_GUILD_BANK_BUY_TAB                           = 0x1203,
-    CMSG_GUILD_BANK_DEPOSIT_MONEY                     = 0x1204,
+    CMSG_GUILD_BANK_BUY_TAB                           = 0x45,//16357
+    CMSG_GUILD_BANK_DEPOSIT_MONEY                     = 0x42D,//16357
     CMSG_GUILD_BANK_LOG_QUERY                         = 0x1205,
     CMSG_GUILD_BANK_MONEY_WITHDRAWN_QUERY             = 0x1206,
     CMSG_GUILD_BANK_NOTE                              = 0x1207,
@@ -417,7 +417,7 @@ enum Opcodes
     CMSG_PET_LEARN_TALENT                             = 0xA9B,//16357
     CMSG_PET_NAME_CACHE                               = 0x1368,
     CMSG_PET_NAME_QUERY                               = 0x0789,//16357
-    CMSG_PET_RENAME                                   = 0x1370,
+    CMSG_PET_RENAME                                   = 0x76D,//16357
     CMSG_PET_SET_ACTION                               = 0x1371,
     CMSG_PET_SPELL_AUTOCAST                           = 0x1372,
     CMSG_PET_STOP_ATTACK                              = 0x0468,//16357
@@ -489,7 +489,7 @@ enum Opcodes
     CMSG_REQUEST_VEHICLE_SWITCH_SEAT                  = 0x1431,
     CMSG_RESET_FACTION_CHEAT                          = 0x1432,
     CMSG_RESET_INSTANCES                              = 0x0B2C,//16357
-    CMSG_RESURRECT_RESPONSE                           = 0x1434,
+    CMSG_RESURRECT_RESPONSE                           = 0x1E9,//16357
     CMSG_RETURN_TO_GRAVEYARD                          = 0x083F,//16357
     CMSG_ROLE_POLL_BEGIN                              = 0x01EB,//16357
     CMSG_SAVE_CUF_PROFILES                            = 0x08F3,//16357

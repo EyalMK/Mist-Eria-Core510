@@ -179,11 +179,12 @@ int WorldSocket::SendPacket(WorldPacket const& pct)
       //  pkt = &buff;
     //}
 
-    if (m_Session)
-        sLog->outDebug(LOG_FILTER_OPCODES, "S->C: %s %s", m_Session->GetPlayerInfo().c_str(), GetOpcodeNameForLogging(pkt->GetOpcode()).c_str());
-    else
-        sLog->outDebug(LOG_FILTER_OPCODES, "None m_Session S->C: %s", GetOpcodeNameForLogging(pkt->GetOpcode()).c_str());
-
+    if (pkt->GetOpcode()!= 677) {
+        if (m_Session)
+            sLog->outDebug(LOG_FILTER_OPCODES, "S->C: %s %s", m_Session->GetPlayerInfo().c_str(), GetOpcodeNameForLogging(pkt->GetOpcode()).c_str());
+        else
+            sLog->outDebug(LOG_FILTER_OPCODES, "None m_Session S->C: %s", GetOpcodeNameForLogging(pkt->GetOpcode()).c_str());
+    }
     sScriptMgr->OnPacketSend(this, *pkt);
 
     ServerPktHeader header(pkt->size()+2, pkt->GetOpcode());

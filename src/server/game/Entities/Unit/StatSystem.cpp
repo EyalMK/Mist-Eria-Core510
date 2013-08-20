@@ -276,8 +276,6 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
     {
         index = UNIT_FIELD_RANGED_ATTACK_POWER;
         val2 = (level + std::max(GetStat(STAT_AGILITY) - 10.0f, 0.0f)) * entry->RAPPerAgility;
-
-		if(index == UNIT_FIELD_RANGED_ATTACK_POWER) sLog->outDebug(LOG_FILTER_UNITS, "PEXIRN : ATTACKPOWER : RANGED : (%f + MAX(%f - 10, 0) * %u = %f", level, GetStat(STAT_AGILITY), entry->RAPPerAgility, val2);
     }
     else
     {

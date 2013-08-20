@@ -1993,9 +1993,9 @@ bool Player::BuildEnumData(PreparedQueryResult result, ByteBuffer* dataBuffer, B
                 break;
         }
 
-        *dataBuffer << uint32(proto->DisplayInfoID);
-        *dataBuffer << uint8(proto->InventoryType);
         *dataBuffer << uint32(enchant ? enchant->aura_id : 0);
+        *dataBuffer << uint8(proto->InventoryType);
+		*dataBuffer << uint32(proto->DisplayInfoID);
     }
 
     *dataBuffer << float(x);                                    // X
@@ -3249,6 +3249,9 @@ void Player::InitStatsForLevel(bool reapplyMods)
     //reset rating fields values
     for (uint16 index = PLAYER_FIELD_COMBAT_RATING_1; index < PLAYER_FIELD_COMBAT_RATING_1 + MAX_COMBAT_RATING; ++index)
         SetUInt32Value(index, 0);
+
+	float mastery = getLevel() >= 80 ? 8.0f : 0.0f;
+	SetFloatValue(PLAYER_MASTERY, mastery);
 
     SetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, 0);
     SetFloatValue(PLAYER_FIELD_MOD_HEALING_PCT, 1.0f);
@@ -5778,6 +5781,15 @@ float Player::OCTRegenMPPerSpirit()
 
 void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
 {
+	switch(cr)
+	{
+		case CR_MASTERY:
+		{
+			value = value / GetRatingMultiplier(CR_MASTERY);
+			break;
+		}
+	}
+
     m_baseRatingValue[cr] +=(apply ? value : -value);
 
     // explicit affected values
@@ -17308,6 +17320,12 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
 
     SetSpecsCount(fields[53].GetUInt8());
     SetActiveSpec(fields[54].GetUInt8());
+	if(getLevel() >= 80)
+	{
+		float mastery = 8.0f;
+		if(fields[54].GetUInt8() == TALENT_TREE_MAGE_FROST || fields[54].GetUInt8() == TALENT_TREE_WARRIOR_FURY) mastery = 2.0f;
+		SetFloatValue(PLAYER_MASTERY, mastery);
+	}
 
     // sanity check
     if (GetSpecsCount() > MAX_TALENT_SPECS || GetActiveSpec() > MAX_TALENT_SPEC || GetSpecsCount() < MIN_TALENT_SPECS)
@@ -25802,6 +25820,12 @@ void Player::ActivateSpec(uint8 spec)
                 RemoveAurasDueToSpell(old_gp->SpellId);
 
     SetActiveSpec(spec);
+	if(getLevel() >= 80)
+	{
+		float mastery = 8.0f;
+		if(spec == TALENT_TREE_MAGE_FROST || spec == TALENT_TREE_WARRIOR_FURY) mastery = 2.0f;
+		SetFloatValue(PLAYER_MASTERY, mastery);
+	}
     uint32 spentTalents = 0;
 
     specSpells = GetSpecializationSpellsBySpec(GetPrimaryTalentTree(GetActiveSpec()));
