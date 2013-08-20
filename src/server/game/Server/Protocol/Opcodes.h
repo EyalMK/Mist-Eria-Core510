@@ -410,7 +410,7 @@ enum Opcodes
     CMSG_PETITION_SHOWLIST                            = 0x0E80,//16357
     CMSG_PETITION_SHOW_SIGNATURES                     = 0x0000,//16357
     CMSG_PETITION_SIGN                                = 0x0268,//16357
-    CMSG_PET_ABANDON                                  = 0x1363,
+    CMSG_PET_ABANDON                                  = 0x880,//16357
     CMSG_PET_ACTION                                   = 0x0208,//16357
     CMSG_PET_CANCEL_AURA                              = 0x03AD,//16357
     CMSG_PET_CAST_SPELL                               = 0x0A4C,//16357
