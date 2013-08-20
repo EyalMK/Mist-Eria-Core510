@@ -7954,14 +7954,14 @@ void ObjectMgr::LoadTrainerSpell()
     do
     {
         Field* fields = result->Fetch();
-
+		
         uint32 entry         = fields[0].GetUInt32();
         uint32 spell         = fields[1].GetUInt32();
         uint32 spellCost     = fields[2].GetUInt32();
         uint32 reqSkill      = fields[3].GetUInt16();
         uint32 reqSkillValue = fields[4].GetUInt16();
         uint32 reqLevel      = fields[5].GetUInt8();
-
+		sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... %u %u %u %u %u %u", entry, spell, spellCost, reqSkill, reqSkillValue, reqLevel);
         AddSpellToTrainer(entry, spell, spellCost, reqSkill, reqSkillValue, reqLevel);
 
         ++count;
