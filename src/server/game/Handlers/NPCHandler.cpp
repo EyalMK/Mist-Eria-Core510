@@ -225,12 +225,13 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
                 break;
             }
             SpellsRequiringSpellMapBounds spellsRequired = sSpellMgr->GetSpellsRequiredForSpellBounds(tSpell->learnedSpell[i]);
-            for (SpellsRequiringSpellMap::const_iterator itr2 = spellsRequired.first; itr2 != spellsRequired.second && maxReq < 3; ++itr2)
+            for (SpellsRequiringSpellMap::const_iterator itr2 = spellsRequired.first; itr2 != spellsRequired.second; ++itr2)
             {
                 data << uint32(itr2->second);
 				alreadyAdded = true;
                 break;
             }
+
 			if(alreadyAdded) break;
         }
         if(!alreadyAdded) data << uint32(0);
