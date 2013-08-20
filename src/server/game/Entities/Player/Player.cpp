@@ -5782,7 +5782,7 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
 	{
 		case CR_MASTERY:
 		{
-			value = value * GetRatingMultiplier(CR_MASTERY);
+			value = value / GetRatingMultiplier(CR_MASTERY);
 			break;
 		}
 	}
