@@ -1525,8 +1525,8 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE player %s %u %u ", player->GetName().c_str(), GetMembersCount(), GUID_LOPART(m_leaderGuid));
 
 
-    if(GetMembersCount()-1 == 0)
-        return;
+    /*if(GetMembersCount()-1 == 0)
+        return;*/
 
     WorldPacket data(SMSG_GROUP_LIST, (1+1+1+1+1+4+8+4+4+(GetMembersCount()-1)*(13+8+1+1+1+1)+8+1+8+1+1+1+1));
     /*data << uint8(m_groupType);                         // group type (flags in 3.3)
@@ -1574,26 +1574,42 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
 
     std::cout << "Player " << player->GetName() << " : " << GetMembersCount()-1 << std::endl;
 
+    int memberPos = 0;
+    int i = 0;
+    for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
+    {
+        if(citr->guid == slot->guid)
+        {
+            memberPos = i;
+            break;
+        }
+        i++;
+    }
+
     ObjectGuid groupGuid = m_guid, leaderGuid = m_leaderGuid;
     uint8 byte10 = GetMembersCount()-1; //Probably smthng with challenge mode
-    uint8 hasLootRule = 0; //For testing purpose
+    uint8 hasLootRule = GetMembersCount()-1; //For testing purpose
     uint8 isLFG = 0;
     uint8 byte74 = m_groupType; //Checked
-    uint8 byte1C = /*slot->roles*/ slot->group;
+    uint8 byte1C = /*slot->roles*/ slot->roles;
     uint8 byte40 = slot->flags;
-    uint32 dword38 = 0, dword3C = m_counter++;
+    int32 dword38 = memberPos;
+    uint32 dword3C = slot->group;
+    m_counter++;
+
+    std::cout << dword38 << std::endl;
 
     data.WriteBit(groupGuid[2]);
     data.WriteBit(byte10);
     data.WriteBit(hasLootRule);
-    data.WriteBits(GetMembersCount()-1, 22);
+    data.WriteBits(GetMembersCount(), 22);
     data.WriteBit(leaderGuid[6]);
     data.WriteBit(leaderGuid[4]);
 
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
-        if(citr->guid == slot->guid)
-            continue;
+        /*if(citr->guid == slot->guid)
+            continue;*/
 
         ObjectGuid memberGuid = citr->guid;
         data.WriteBit(memberGuid[7]);
@@ -1661,8 +1677,8 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
 
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
-        if(citr->guid == slot->guid)
-            continue;
+        /*if(citr->guid == slot->guid)
+            continue;*/
 
 		Player* member = ObjectAccessor::FindPlayer(citr->guid);
 
@@ -1675,7 +1691,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         std::cout << "Member : " << citr->name << std::endl;
 
         ObjectGuid memberGuid = citr->guid;
-        uint8 byte39 = /*citr->group*/0, byte3A = citr->flags, byte38 = onlineState, byte3B = citr->roles;
+        uint8 byte39 = citr->group, byte3A = citr->flags, byte38 = onlineState, byte3B = citr->roles;
 
         data.WriteByteSeq(memberGuid[0]);
         data.WriteByteSeq(memberGuid[7]);
@@ -1694,7 +1710,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
     data.WriteByteSeq(groupGuid[6]);
     data.WriteByteSeq(groupGuid[0]);
     data.WriteByteSeq(groupGuid[3]);
-    data << uint32(dword38);
+    data << int32(dword38);
     data << uint32(dword3C);
     data.WriteByteSeq(leaderGuid[0]);
     data.WriteByteSeq(groupGuid[7]);
