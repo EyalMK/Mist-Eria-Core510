@@ -503,10 +503,29 @@ void WorldSession::HandleGroupSetLeaderOpcode(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GROUP_SET_LEADER");
 
-    uint64 guid;
-    recvData >> guid;
+    ObjectGuid guid;
 
-    Player* player = ObjectAccessor::FindPlayer(guid);
+    recvData.read_skip<uint8>();
+
+    guid[6] = recvData.ReadBit();
+    guid[7] = recvData.ReadBit();
+    guid[5] = recvData.ReadBit();
+    guid[1] = recvData.ReadBit();
+    guid[4] = recvData.ReadBit();
+    guid[2] = recvData.ReadBit();
+    guid[3] = recvData.ReadBit();
+    guid[0] = recvData.ReadBit();
+
+    recvData.ReadByteSeq(guid[2]);
+    recvData.ReadByteSeq(guid[7]);
+    recvData.ReadByteSeq(guid[1]);
+    recvData.ReadByteSeq(guid[3]);
+    recvData.ReadByteSeq(guid[5]);
+    recvData.ReadByteSeq(guid[0]);
+    recvData.ReadByteSeq(guid[6]);
+    recvData.ReadByteSeq(guid[4]);
+
+    Player* player = ObjectAccessor::FindPlayer((uint64)guid);
     Group* group = GetPlayer()->GetGroup();
 
     if (!group || !player)
@@ -516,7 +535,7 @@ void WorldSession::HandleGroupSetLeaderOpcode(WorldPacket& recvData)
         return;
 
     // Everything's fine, accepted.
-    group->ChangeLeader(guid);
+    group->ChangeLeader((uint64)guid);
     group->SendUpdate();
 }
 

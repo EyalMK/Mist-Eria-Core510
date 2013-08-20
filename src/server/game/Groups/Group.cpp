@@ -705,7 +705,10 @@ void Group::ChangeLeader(uint64 guid)
     ToggleGroupMemberFlag(slot, MEMBER_FLAG_ASSISTANT, false);
 
     WorldPacket data(SMSG_GROUP_SET_LEADER, m_leaderName.size()+1);
-    data << slot->name;
+    data << uint8(0);
+    data.WriteBits(m_leaderName.size(), 7);
+    data.FlushBits();
+    data.WriteString(m_leaderName);
     BroadcastPacket(&data, true);
 }
 
