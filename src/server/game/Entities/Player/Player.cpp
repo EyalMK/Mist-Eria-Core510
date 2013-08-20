@@ -5897,6 +5897,9 @@ void Player::UpdateRating(CombatRating cr)
             if (affectStats)
                 UpdateArmorPenetration(amount);
             break;
+		case CR_MASTERY:
+			SetStatFloatValue(PLAYER_MASTERY, 10.0f);
+			break;
     }
 }
 
