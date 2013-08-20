@@ -4332,9 +4332,10 @@ void AuraEffect::HandleModRating(AuraApplication const* aurApp, uint8 mode, bool
     if (target->GetTypeId() != TYPEID_PLAYER)
         return;
 
-	if(GetMiscValue() == CR_MASTERY)
+	if(GetMiscValue() & (1 << CR_MASTERY))
 	{
-			sLog->outInfo(LOG_FILTER_SERVER_LOADING, "PEXIRN : MASTERY : modifier = %f, final value would be = %f", target->ToPlayer()->GetRatingBonusValue(CR_MASTERY), target->ToPlayer()->GetRatingBonusValue(CR_MASTERY) * GetMiscValue());
+		sLog->outInfo(LOG_FILTER_SERVER_LOADING, "spell broken : %u", aurApp->GetBase()->GetSpellInfo()->Id);
+		sLog->outInfo(LOG_FILTER_SERVER_LOADING, "PEXIRN : MASTERY : modifier = %f, final value would be = %f", target->ToPlayer()->GetRatingBonusValue(CR_MASTERY), target->ToPlayer()->GetRatingBonusValue(CR_MASTERY) * GetAmount());
 	}
 
     for (uint32 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
