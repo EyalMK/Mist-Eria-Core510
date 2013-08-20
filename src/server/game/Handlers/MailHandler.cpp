@@ -42,9 +42,6 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     recvData >> unk1;
     recvData >> unk2; // Stationery?
 
-    bodyLength = recvData.ReadBits(12);
-    subjectLength = recvData.ReadBits(9);
-
     uint8 items_count = recvData.ReadBits(5);              // attached items count
 
     if (items_count > MAX_MAIL_ITEMS)                       // client limit
@@ -54,11 +51,9 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         return;
     }
 
-    mailbox[0] = recvData.ReadBit();
+	ObjectGuid itemGUIDs[MAX_MAIL_ITEMS];
 
-    ObjectGuid itemGUIDs[MAX_MAIL_ITEMS];
-
-    for (uint8 i = 0; i < items_count; ++i)
+    for (uint8 i = 0; i < items_count; ++i) // need help on this loop , not done yet
     {
         itemGUIDs[i][2] = recvData.ReadBit();
         itemGUIDs[i][6] = recvData.ReadBit();
@@ -70,18 +65,29 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         itemGUIDs[i][5] = recvData.ReadBit();
     }
 
-    mailbox[3] = recvData.ReadBit();
+    mailbox[0] = recvData.ReadBit();
     mailbox[4] = recvData.ReadBit();
-    receiverLength = recvData.ReadBits(7);
-    mailbox[2] = recvData.ReadBit();
+	receiverLength = recvData.ReadBits(7);
+    mailbox[5] = recvData.ReadBit();
+	subjectLength = recvData.ReadBits(9); // might need swaped with bodyLength read12bits , need test , i am not sure
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "MAIL : subjectLength %u", subjectLength);
+
     mailbox[6] = recvData.ReadBit();
+    mailbox[2] = recvData.ReadBit();
+    mailbox[3] = recvData.ReadBit();
+	bodyLength = recvData.ReadBits(12);
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "CHAT : bodyLength %u", bodyLength);
+
     mailbox[1] = recvData.ReadBit();
     mailbox[7] = recvData.ReadBit();
-    mailbox[5] = recvData.ReadBit();
 
-    recvData.ReadByteSeq(mailbox[4]);
+    recvData.ReadByteSeq(mailbox[7]);
+	subject = recvData.ReadString(subjectLength);
+    recvData.ReadByteSeq(mailbox[1]);
 
-    for (uint8 i = 0; i < items_count; ++i)
+	for (uint8 i = 0; i < items_count; ++i) // need help on this loop , not done yet
     {
         recvData.ReadByteSeq(itemGUIDs[i][6]);
         recvData.ReadByteSeq(itemGUIDs[i][1]);
@@ -94,20 +100,14 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         recvData.ReadByteSeq(itemGUIDs[i][5]);
     }
 
-    recvData.ReadByteSeq(mailbox[7]);
-    recvData.ReadByteSeq(mailbox[3]);
     recvData.ReadByteSeq(mailbox[6]);
     recvData.ReadByteSeq(mailbox[5]);
-
-    subject = recvData.ReadString(subjectLength);
-    receiver = recvData.ReadString(receiverLength);
-
+	receiver = recvData.ReadString(receiverLength);
     recvData.ReadByteSeq(mailbox[2]);
+	body = recvData.ReadString(bodyLength);
+    recvData.ReadByteSeq(mailbox[4]);
     recvData.ReadByteSeq(mailbox[0]);
-
-    body = recvData.ReadString(bodyLength);
-
-    recvData.ReadByteSeq(mailbox[1]);
+    recvData.ReadByteSeq(mailbox[3]);
 
     // packet read complete, now do check
 
