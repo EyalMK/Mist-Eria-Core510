@@ -1973,7 +1973,6 @@ bool Player::BuildEnumData(PreparedQueryResult result, ByteBuffer* dataBuffer, B
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
         if (!proto)
         {
-			sLog->outInfo(LOG_FILTER_SERVER_LOADING, "PEXIRN : CHAR : itemId not shown : %u", itemId);
             *dataBuffer << uint8(0);
             *dataBuffer << uint32(0);
             *dataBuffer << uint32(0);
@@ -1994,7 +1993,6 @@ bool Player::BuildEnumData(PreparedQueryResult result, ByteBuffer* dataBuffer, B
                 break;
         }
 
-		sLog->outInfo(LOG_FILTER_SERVER_LOADING, "PEXIRN : CHAR : itemId shown : %u", itemId);
         *dataBuffer << uint32(enchant ? enchant->aura_id : 0);
         *dataBuffer << uint8(proto->InventoryType);
 		*dataBuffer << uint32(proto->DisplayInfoID);
