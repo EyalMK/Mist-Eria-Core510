@@ -126,7 +126,6 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, uint64 objectGUID) const
     WorldPacket data(SMSG_GOSSIP_MESSAGE, 100);         // guess size
     data << uint64(objectGUID);
     data << uint32(_gossipMenu.GetMenuId());            // new 2.4.0
-	sLog->outInfo(LOG_FILTER_SERVER_LOADING, "PEXIRN : GOSSIP : %u", _gossipMenu.GetMenuId());
 	data << uint32(0);					                // new in MoP ?? friendshipFaction
     data << uint32(titleTextId);
     data << uint32(_gossipMenu.GetMenuItemCount());     // max count 0x20
@@ -135,7 +134,6 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, uint64 objectGUID) const
     {
         GossipMenuItem const& item = itr->second;
         data << uint32(itr->first);
-		sLog->outInfo(LOG_FILTER_SERVER_LOADING, "PEXIRN : GOSSIP : LOL");
         data << uint8(item.MenuItemIcon);
         data << uint8(item.IsCoded);                    // makes pop up box password
         data << uint32(item.BoxMoney);                  // money required to open menu, 2.0.3
