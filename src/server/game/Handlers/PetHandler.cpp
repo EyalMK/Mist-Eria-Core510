@@ -889,7 +889,7 @@ void WorldSession::HandlePetLearnTalent(WorldPacket& recvData)
     recvData.ReadByteSeq(guid[2]);
     recvData.ReadByteSeq(guid[7]);
 
-    _player->LearnPetTalent(guid, talentId);
+    //_player->LearnPetTalent(guid, talentId);
     _player->SendTalentsInfoData(true);
 }
 
