@@ -7954,13 +7954,19 @@ void ObjectMgr::LoadTrainerSpell()
 
     do
     {
+		sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... primary tests : loop n°%u, test 1", count);
         Field* fields = result->Fetch();
-		
+		sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... primary tests : loop n°%u, test 2", count);
         uint32 entry         = fields[0].GetUInt32();
+		sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... primary tests : loop n°%u, test 3", count);
         uint32 spell         = fields[1].GetUInt32();
+		sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... primary tests : loop n°%u, test 4", count);
         uint32 spellCost     = fields[2].GetUInt32();
+		sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... primary tests : loop n°%u, test 5", count);
         uint32 reqSkill      = fields[3].GetUInt16();
+		sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... primary tests : loop n°%u, test 6", count);
         uint32 reqSkillValue = fields[4].GetUInt16();
+		sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... primary tests : loop n°%u, test 7", count);
         uint32 reqLevel      = fields[5].GetUInt8();
 		sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... %u %u %u %u %u %u", entry, spell, spellCost, reqSkill, reqSkillValue, reqLevel);
         AddSpellToTrainer(entry, spell, spellCost, reqSkill, reqSkillValue, reqLevel);
