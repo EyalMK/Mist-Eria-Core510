@@ -1995,9 +1995,9 @@ bool Player::BuildEnumData(PreparedQueryResult result, ByteBuffer* dataBuffer, B
         }
 
 		sLog->outInfo(LOG_FILTER_SERVER_LOADING, "PEXIRN : CHAR : itemId shown : %u", itemId);
-        *dataBuffer << uint32(proto->DisplayInfoID);
-        *dataBuffer << uint8(proto->InventoryType);
         *dataBuffer << uint32(enchant ? enchant->aura_id : 0);
+        *dataBuffer << uint8(proto->InventoryType);
+		*dataBuffer << uint32(proto->DisplayInfoID);
     }
 
     *dataBuffer << float(x);                                    // X
