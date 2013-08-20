@@ -589,6 +589,23 @@ void Player::UpdateSpellCritChance(uint32 school)
     SetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1 + school, crit);
 }
 
+void Player::UpdateMastery(int32 amount)
+{
+	//Dunno why, client twice the view
+	float mastery = (getLevel() >= 80) ? 4.0f : 0.0f;
+	if(GetActiveSpec() == TALENT_TREE_WARRIOR_FURY || GetActiveSpec() == TALENT_TREE_MAGE_FROST) mastery = 1.0f;
+	float mastery_to_add = amount * GetRatingMultiplier(CR_MASTERY);
+	mastery += mastery_to_add;
+
+	SetStatFloatValue(PLAYER_MASTERY, mastery);
+}
+
+void Player::UpdatePVPPower(int32 amount)
+{
+	SetStatFloatValue(PLAYER_FIELD_PVP_POWER_DAMAGE, GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_PVP_POWER) * GetRatingMultiplier(CR_PVP_POWER));
+	SetStatFloatValue(PLAYER_FIELD_PVP_POWER_HEALING, GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_PVP_POWER) * GetRatingMultiplier(CR_PVP_POWER));
+}
+
 void Player::UpdateArmorPenetration(int32 amount)
 {
     // Store Rating Value

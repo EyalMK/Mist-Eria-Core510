@@ -1236,7 +1236,6 @@ void Object::SetFloatValue(uint16 index, float value)
 
     if (m_floatValues[index] != value)
     {
-		ASSERT(!(value == 6.0f && index == PLAYER_MASTERY));
         m_floatValues[index] = value;
         _changesMask.SetBit(index);
 

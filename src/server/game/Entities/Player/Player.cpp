@@ -5781,15 +5781,6 @@ float Player::OCTRegenMPPerSpirit()
 
 void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
 {
-	switch(cr)
-	{
-		case CR_MASTERY:
-		{
-			value = value / GetRatingMultiplier(CR_MASTERY);
-			break;
-		}
-	}
-
     m_baseRatingValue[cr] +=(apply ? value : -value);
 
     // explicit affected values
@@ -5900,6 +5891,12 @@ void Player::UpdateRating(CombatRating cr)
             if (affectStats)
                 UpdateArmorPenetration(amount);
             break;
+		case CR_MASTERY:
+			UpdateMastery(amount);
+			break;
+		case CR_PVP_POWER:
+			UpdatePVPPower(amount);
+			break;
     }
 }
 
@@ -8218,7 +8215,11 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
             case ITEM_MOD_ARCANE_RESISTANCE:
                 HandleStatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(val), apply);
                 break;
-			case ITEM_MOD_PVP_POWER: //PEXIRN NYI
+			case ITEM_MOD_PVP_POWER:
+				ApplyRatingMod(CR_PVP_POWER, int32(val), apply);
+				break;
+			case ITEM_MOD_MASTERY_RATING:
+				ApplyRatingMod(CR_MASTERY, int32(val), apply);
 				break;
 		}
     }
@@ -13653,7 +13654,11 @@ void Player::ApplyReforgeEnchantment(Item* item, bool apply)
         case ITEM_MOD_BLOCK_VALUE:
             HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, -removeValue, apply);
             break;
-		case ITEM_MOD_PVP_POWER: //PEXIRN NYI
+		case ITEM_MOD_PVP_POWER:
+			ApplyRatingMod(CR_PVP_POWER, -int32(removeValue), apply);
+			break;
+		case ITEM_MOD_MASTERY_RATING:
+			ApplyRatingMod(CR_MASTERY, -int32(removeValue), apply);
 			break;
     }
 
@@ -13765,7 +13770,11 @@ void Player::ApplyReforgeEnchantment(Item* item, bool apply)
         case ITEM_MOD_BLOCK_VALUE:
             HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, addValue, apply);
             break;
-		case ITEM_MOD_PVP_POWER: //PEXIRN NYI
+		case ITEM_MOD_PVP_POWER:
+			ApplyRatingMod(CR_PVP_POWER, int32(addValue), apply);
+			break;
+		case ITEM_MOD_MASTERY_RATING:
+			ApplyRatingMod(CR_MASTERY, int32(addValue), apply);
 			break;
     }
 }
@@ -14102,7 +14111,13 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, float(enchant_amount), apply);
                             sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "+ %u BLOCK_VALUE", enchant_amount);
                             break;
-						case ITEM_MOD_PVP_POWER: //PEXIRN NYI
+						case ITEM_MOD_PVP_POWER:
+							ApplyRatingMod(CR_PVP_POWER, enchant_amount, apply);
+							sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "+ %u PVP POWER", enchant_amount);
+							break;
+						case ITEM_MOD_MASTERY_RATING:
+							ApplyRatingMod(CR_MASTERY, enchant_amount, apply);
+							sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "+ %u MASTERY", enchant_amount);
 							break;
                         default:
                             break;
@@ -17320,13 +17335,6 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
 
     SetSpecsCount(fields[53].GetUInt8());
     SetActiveSpec(fields[54].GetUInt8());
-	if(getLevel() >= 80)
-	{
-		float mastery = 8.0f;
-		if(fields[54].GetUInt8() == TALENT_TREE_MAGE_FROST || fields[54].GetUInt8() == TALENT_TREE_WARRIOR_FURY) mastery = 2.0f;
-		SetFloatValue(PLAYER_MASTERY, mastery);
-	}
-
     // sanity check
     if (GetSpecsCount() > MAX_TALENT_SPECS || GetActiveSpec() > MAX_TALENT_SPEC || GetSpecsCount() < MIN_TALENT_SPECS)
     {
@@ -25820,12 +25828,6 @@ void Player::ActivateSpec(uint8 spec)
                 RemoveAurasDueToSpell(old_gp->SpellId);
 
     SetActiveSpec(spec);
-	if(getLevel() >= 80)
-	{
-		float mastery = 8.0f;
-		if(spec == TALENT_TREE_MAGE_FROST || spec == TALENT_TREE_WARRIOR_FURY) mastery = 2.0f;
-		SetFloatValue(PLAYER_MASTERY, mastery);
-	}
     uint32 spentTalents = 0;
 
     specSpells = GetSpecializationSpellsBySpec(GetPrimaryTalentTree(GetActiveSpec()));

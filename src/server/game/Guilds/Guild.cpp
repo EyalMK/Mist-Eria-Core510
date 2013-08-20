@@ -1531,7 +1531,15 @@ void Guild::SendGuildRankInfo(WorldSession* session) const
     WorldPacket data(SMSG_GUILD_RANK, 100);
 
     data.WriteBits(_GetRanksSize(), 18);
-	data.WriteBits(0, 7); // need to find a way to fix this ( rank name lenght )
+	
+    for (uint8 i = 0; i < _GetRanksSize(); i++)
+	{
+		RankInfo const* rankInfo = GetRankInfo(i);
+        if (!rankInfo)
+            continue;
+
+		data.WriteBits(rankInfo->GetName().length(), 7);
+	}
 
     for (uint8 i = 0; i < _GetRanksSize(); i++)
     {
@@ -2238,16 +2246,18 @@ void Guild::SendPermissions(WorldSession* session) const
     uint8 rankId = member->GetRankId();
 
     WorldPacket data(SMSG_GUILD_PERMISSIONS_QUERY_RESULTS, 4 * 15 + 1);
+
+	data.WriteBits(GUILD_BANK_MAX_TABS, 23);
+	for (uint8 tabId = 0; tabId < GUILD_BANK_MAX_TABS; ++tabId)
+	{
+		data << uint32(_GetRankBankTabRights(rankId, tabId));
+		data << uint32(_GetMemberRemainingSlots(member, tabId));
+	}
+
     data << uint32(rankId);
     data << uint32(_GetPurchasedTabsSize());
     data << uint32(_GetRankRights(rankId));
     data << uint32(_GetMemberRemainingMoney(member));
-    data.WriteBits(GUILD_BANK_MAX_TABS, 23);
-    for (uint8 tabId = 0; tabId < GUILD_BANK_MAX_TABS; ++tabId)
-    {
-        data << uint32(_GetRankBankTabRights(rankId, tabId));
-        data << uint32(_GetMemberRemainingSlots(member, tabId));
-    }
 
     session->SendPacket(&data);
     sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_PERMISSIONS_QUERY_RESULTS [%s] Rank: %u", session->GetPlayerInfo().c_str(), rankId);
