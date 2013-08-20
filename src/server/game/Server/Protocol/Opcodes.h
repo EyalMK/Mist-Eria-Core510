@@ -417,7 +417,7 @@ enum Opcodes
     CMSG_PET_LEARN_TALENT                             = 0xA9B,//16357
     CMSG_PET_NAME_CACHE                               = 0x1368,
     CMSG_PET_NAME_QUERY                               = 0x0789,//16357
-    CMSG_PET_RENAME                                   = 0x1370,
+    CMSG_PET_RENAME                                   = 0x76D,//16357
     CMSG_PET_SET_ACTION                               = 0x1371,
     CMSG_PET_SPELL_AUTOCAST                           = 0x1372,
     CMSG_PET_STOP_ATTACK                              = 0x0468,//16357
