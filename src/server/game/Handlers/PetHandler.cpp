@@ -422,10 +422,8 @@ void WorldSession::HandlePetNameQuery(WorldPacket& recvData)
     sLog->outInfo(LOG_FILTER_NETWORKIO, "HandlePetNameQuery. CMSG_PET_NAME_QUERY");
 
     uint32 petnumber;
-    uint32 unk;
     uint64 petguid;
 
-    recvData >> unk; // test
     recvData >> petnumber;
     recvData >> petguid;
 
