@@ -24965,7 +24965,7 @@ bool Player::LearnTalent(uint32 talentId, uint32 /*talentRank*/)
     return true;
 }
 
-void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
+void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 /*talentRank*/) // need to update this struct , working on this today
 {
     Pet* pet = GetPet();
 
@@ -24978,9 +24978,6 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
     uint32 CurTalentPoints = pet->GetFreeTalentPoints();
 
     if (CurTalentPoints == 0)
-        return;
-
-    if (talentRank >= MAX_PET_TALENT_RANK)
         return;
 
     TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
