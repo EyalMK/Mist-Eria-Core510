@@ -7969,8 +7969,9 @@ void ObjectMgr::LoadTrainerSpell()
         uint32 reqLevel      = fields[5].GetUInt8();
 		sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... %u %u %u %u %u %u", entry, spell, spellCost, reqSkill, reqSkillValue, reqLevel);
         AddSpellToTrainer(entry, spell, spellCost, reqSkill, reqSkillValue, reqLevel);
-
+		sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... primary tests : loop n°%u, test 8", count);
         ++count;
+		sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... primary tests : loop n°%u, test 9", count);
     }
     while (result->NextRow());
 
