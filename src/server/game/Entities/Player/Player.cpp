@@ -3251,7 +3251,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
         SetUInt32Value(index, 0);
 
 	//float mastery = getLevel() >= 80 ? 8.0f : 0.0f;
-	SetFloatValue(PLAYER_MASTERY, 0.0f/*mastery*/);
+	SetFloatValue(PLAYER_MASTERY, 1.0f/*mastery*/);
 
     SetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, 0);
     SetFloatValue(PLAYER_FIELD_MOD_HEALING_PCT, 1.0f);
