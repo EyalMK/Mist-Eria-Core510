@@ -550,21 +550,16 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod &method /*= GROUP_REMOV
 
                 // quest related GO state dependent from raid membership
                 player->UpdateForQuestWorldObjects();
-            }
-
-            WorldPacket data;
+            }            
 
             if (method == GROUP_REMOVEMETHOD_KICK || method == GROUP_REMOVEMETHOD_KICK_LFG)
             {
+                WorldPacket data;
                 data.Initialize(SMSG_GROUP_UNINVITE, 0);
                 player->GetSession()->SendPacket(&data);
             }
 
-            // Do we really need to send this opcode?
-            data.Initialize(SMSG_GROUP_LIST, 1+1+1+1+8+4+4+8);
-            data << uint8(0x10) << uint8(0) << uint8(0) << uint8(0);
-            data << uint64(m_guid) << uint32(m_counter) << uint32(0) << uint64(0);
-            player->GetSession()->SendPacket(&data);
+            SendUpdateToPlayer(guid, NULL); //Notify the player that he was remove from group
 
             _homebindIfInstance(player);
         }
@@ -759,10 +754,7 @@ void Group::Disband(bool hideDestroy /* = false */)
         }
         else
         {
-            data.Initialize(SMSG_GROUP_LIST, 1+1+1+1+8+4+4+8);
-            data << uint8(0x10) << uint8(0) << uint8(0) << uint8(0);
-            data << uint64(m_guid) << uint32(m_counter) << uint32(0) << uint64(0);
-            player->GetSession()->SendPacket(&data);
+            SendUpdateToPlayer(player->GetGUID(), NULL);
         }
 
         _homebindIfInstance(player);
@@ -1506,21 +1498,69 @@ void Group::SendUpdate()
 
 void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
 {
+    // if MemberSlot wasn't provided
     Player* player = ObjectAccessor::FindPlayer(playerGUID);
+    if(!player)
+        return;
+
+    if (!slot)
+    {
+        WorldPacket data(SMSG_GROUP_LIST, (1+1+1+1+1+4+8+4+4+(GetMembersCount()-1)*(13+8+1+1+1+1)+8+1+8+1+1+1+1));
+
+        ObjectGuid groupGuid = uint64(0), leaderGuid = uint64(0);
+
+        data.WriteBit(groupGuid[2]);
+        data.WriteBit(0);
+        data.WriteBit(0);
+        data.WriteBits(0, 22);
+        data.WriteBit(leaderGuid[6]);
+        data.WriteBit(leaderGuid[4]);
+        data.WriteBit(groupGuid[4]);
+        data.WriteBit(leaderGuid[5]);
+        data.WriteBit(leaderGuid[0]);
+        data.WriteBit(groupGuid[6]);
+        data.WriteBit(groupGuid[7]);
+        data.WriteBit(groupGuid[3]);
+        data.WriteBit(leaderGuid[3]);
+        data.WriteBit(groupGuid[1]);
+        data.WriteBit(groupGuid[5]);
+        data.WriteBit(leaderGuid[7]);
+        data.WriteBit(groupGuid[0]);
+        data.WriteBit(leaderGuid[1]);
+        data.WriteBit(leaderGuid[2]);
+        data.WriteBit(0);
+
+        data.WriteByteSeq(leaderGuid[1]);
+        data.WriteByteSeq(groupGuid[6]);
+        data.WriteByteSeq(groupGuid[0]);
+        data.WriteByteSeq(groupGuid[3]);
+        data << int32(-1);
+        data << uint32(0);
+        data.WriteByteSeq(leaderGuid[0]);
+        data.WriteByteSeq(groupGuid[7]);
+        data << uint8(0);
+        data.WriteByteSeq(leaderGuid[7]);
+        data.WriteByteSeq(leaderGuid[2]);
+        data.WriteByteSeq(groupGuid[5]);
+        data.WriteByteSeq(groupGuid[1]);
+        data << uint8(0);
+        data.WriteByteSeq(leaderGuid[4]);
+        data.WriteByteSeq(groupGuid[2]);
+        data.WriteByteSeq(leaderGuid[3]);
+        data.WriteByteSeq(leaderGuid[5]);
+        data.WriteByteSeq(groupGuid[4]);
+        data.WriteByteSeq(leaderGuid[6]);
+        data << uint8(0);
+
+        player->GetSession()->SendPacket(&data);
+
+        return;
+    }
+
+
 
     if (!player || !player->GetSession() || player->GetGroup() != this)
         return;
-
-    // if MemberSlot wasn't provided
-    if (!slot)
-    {
-        member_witerator witr = _getMemberWSlot(playerGUID);
-
-        if (witr == m_memberSlots.end()) // if there is no MemberSlot for such a player
-            return;
-
-        slot = &(*witr);
-    }
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE player %s %u %u ", player->GetName().c_str(), GetMembersCount(), GUID_LOPART(m_leaderGuid));
 
