@@ -4334,7 +4334,7 @@ void AuraEffect::HandleModRating(AuraApplication const* aurApp, uint8 mode, bool
 
 	if(GetMiscValue() == CR_MASTERY)
 	{
-			sLog->outDebug(LOG_FILTER_SERVER_LOADING, "PEXIRN : MASTERY : modifier = %f, final value would be = %f", target->ToPlayer()->GetRatingBonusValue(CR_MASTERY), target->ToPlayer()->GetRatingBonusValue(CR_MASTERY) * GetMiscValue());
+			sLog->outInfo(LOG_FILTER_SERVER_LOADING, "PEXIRN : MASTERY : modifier = %f, final value would be = %f", target->ToPlayer()->GetRatingBonusValue(CR_MASTERY), target->ToPlayer()->GetRatingBonusValue(CR_MASTERY) * GetMiscValue());
 	}
 
     for (uint32 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
