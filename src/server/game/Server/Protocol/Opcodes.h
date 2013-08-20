@@ -247,7 +247,7 @@ enum Opcodes
     CMSG_GUILD_ADD_RANK                               = 0x0846,//16357
     CMSG_GUILD_ASSIGN_MEMBER_RANK                     = 0x0A67,//16357
     CMSG_GUILD_BANKER_ACTIVATE                        = 0x06C0,//16357
-    CMSG_GUILD_BANK_BUY_TAB                           = 0x1203,
+    CMSG_GUILD_BANK_BUY_TAB                           = 0x45,//16357
     CMSG_GUILD_BANK_DEPOSIT_MONEY                     = 0x1204,
     CMSG_GUILD_BANK_LOG_QUERY                         = 0x1205,
     CMSG_GUILD_BANK_MONEY_WITHDRAWN_QUERY             = 0x1206,
