@@ -1531,6 +1531,7 @@ void Guild::SendGuildRankInfo(WorldSession* session) const
     WorldPacket data(SMSG_GUILD_RANK, 100);
 
     data.WriteBits(_GetRanksSize(), 18);
+	data.WriteBits(0, 7); // getname size
 
     for (uint8 i = 0; i < _GetRanksSize(); i++)
     {
@@ -1538,9 +1539,10 @@ void Guild::SendGuildRankInfo(WorldSession* session) const
         if (!rankInfo)
             continue;
 
-        data.WriteBits(rankInfo->GetName().length(), 7);
-
         rankData << uint32(rankInfo->GetId());
+
+		if (rankInfo->GetName().length())
+            rankData.WriteString(rankInfo->GetName());
 
         for (uint8 j = 0; j < GUILD_BANK_MAX_TABS; ++j)
         {
@@ -1550,9 +1552,6 @@ void Guild::SendGuildRankInfo(WorldSession* session) const
 
         rankData << uint32(rankInfo->GetBankMoneyPerDay());
         rankData << uint32(rankInfo->GetRights());
-
-        if (rankInfo->GetName().length())
-            rankData.WriteString(rankInfo->GetName());
 
         rankData << uint32(i);
     }
