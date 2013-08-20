@@ -1166,6 +1166,9 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
 
 	uint32 count = 0;
 
+	BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
+    BattlegroundClientIdsContainer& clientIds = it->second.m_ClientBattlegroundIds[bracketId];
+
 	for (BattlegroundClientIdsContainer::const_iterator itr = clientIds.begin(); itr != clientIds.end(); ++itr)
     {
         *data << uint32(*itr);
@@ -1178,9 +1181,6 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
 	data->WriteByteSeq(guidBytes[3]);
 	data->WriteByteSeq(guidBytes[7]);
 
-    BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
-    BattlegroundClientIdsContainer& clientIds = it->second.m_ClientBattlegroundIds[bracketId];
-    
     data->PutBits(count_pos, count, 24);                    // bg instance count
 }
 
