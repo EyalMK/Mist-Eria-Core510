@@ -600,6 +600,12 @@ void Player::UpdateMastery(int32 amount)
 	SetStatFloatValue(PLAYER_MASTERY, mastery);
 }
 
+void Player::UpdatePVPPower(int32 amount)
+{
+	SetStatFloatValue(PLAYER_FIELD_PVP_POWER_DAMAGE, GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_PVP_POWER) * GetRatingMultiplier(CR_PVP_POWER));
+	SetStatFloatValue(PLAYER_FIELD_PVP_POWER_HEALING, GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_PVP_POWER) * GetRatingMultiplier(CR_PVP_POWER));
+}
+
 void Player::UpdateArmorPenetration(int32 amount)
 {
     // Store Rating Value

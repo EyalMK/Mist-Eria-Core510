@@ -5903,6 +5903,9 @@ void Player::UpdateRating(CombatRating cr)
 		case CR_MASTERY:
 			UpdateMastery(amount);
 			break;
+		case CR_PVP_POWER:
+			UpdatePVPPower(amount);
+			break;
     }
 }
 

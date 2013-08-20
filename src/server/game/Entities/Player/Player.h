@@ -3089,7 +3089,8 @@ class Player : public Unit, public GridObject<Player>
 
         void UpdateCharmedAI();
 		void UpdateMastery(int32 amount);
-        uint32 m_lastFallTime;
+		void UpdatePVPPower(int32 amount);
+		uint32 m_lastFallTime;
         float  m_lastFallZ;
 
         int32 m_MirrorTimer[MAX_TIMERS];
