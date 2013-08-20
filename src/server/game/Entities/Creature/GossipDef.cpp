@@ -134,6 +134,7 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, uint64 objectGUID) const
     {
         GossipMenuItem const& item = itr->second;
         data << uint32(itr->first);
+		sLog->outDebug(LOG_FILTER_SERVER_LOADING, "PEXIRN : GOSSIP : %s", Item.Message);
         data << uint8(item.MenuItemIcon);
         data << uint8(item.IsCoded);                    // makes pop up box password
         data << uint32(item.BoxMoney);                  // money required to open menu, 2.0.3
