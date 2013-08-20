@@ -180,6 +180,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
     bool can_learn_primary_prof = GetPlayer()->GetFreePrimaryProfessionPoints() > 0;
 
     uint32 count = 0;
+	
     for (TrainerSpellMap::const_iterator itr = trainer_spells->spellList.begin(); itr != trainer_spells->spellList.end(); ++itr)
     {
         TrainerSpell const* tSpell = &itr->second;
@@ -213,6 +214,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
         data << uint32(tSpell->reqSkillValue);
         //prev + req or req + 0
         uint8 maxReq = 0;
+		/*
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
             if (!tSpell->learnedSpell[i])
@@ -238,14 +240,15 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
             data << uint32(0);
             ++maxReq;
         }
-
+		*/
+		data << uint32(0);
         data << uint32(primary_prof_first_rank && can_learn_primary_prof ? 1 : 0);
         // primary prof. learn confirmation dialog
         data << uint32(primary_prof_first_rank ? 1 : 0);    // must be equal prev. field to have learn button in enabled state
 
         ++count;
     }
-
+	
     data << strTitle;
 
     data.put<uint32>(count_pos, count);
