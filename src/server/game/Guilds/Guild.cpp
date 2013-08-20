@@ -1531,8 +1531,7 @@ void Guild::SendGuildRankInfo(WorldSession* session) const
     WorldPacket data(SMSG_GUILD_RANK, 100);
 
     data.WriteBits(_GetRanksSize(), 18);
-	RankInfo const* rankInfotest = GetRankInfo();
-	data.WriteBits(rankInfotest->GetName().length(), 7);
+	data.WriteBits(0, 7); // need to find a way to fix this ( rank name lenght )
 
     for (uint8 i = 0; i < _GetRanksSize(); i++)
     {
