@@ -150,7 +150,7 @@ bool Group::Create(Player* leader)
         stmt->setUInt32(index++, uint8(m_dungeonDifficulty));
         stmt->setUInt32(index++, uint8(m_raidDifficulty));
 
-        //CharacterDatabase.Execute(stmt);
+        CharacterDatabase.Execute(stmt);
 
 
         ASSERT(AddMember(leader)); // If the leader can't be added to a new group because it appears full, something is clearly wrong.
@@ -432,7 +432,7 @@ bool Group::AddMember(Player* player)
         stmt->setUInt8(3, member.group);
         stmt->setUInt8(4, member.roles);
 
-        //CharacterDatabase.Execute(stmt);
+        CharacterDatabase.Execute(stmt);
 
     }
 
