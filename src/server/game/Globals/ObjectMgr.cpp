@@ -7857,51 +7857,51 @@ void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, 
 {
     if (entry >= TRINITY_TRAINER_START_REF)
         return;
-
+	sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... test 1");
     CreatureTemplate const* cInfo = GetCreatureTemplate(entry);
     if (!cInfo)
     {
         sLog->outError(LOG_FILTER_SQL, "Table `npc_trainer` contains an entry for a non-existing creature template (Entry: %u), ignoring", entry);
         return;
     }
-
+	sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... test 2");
     if (!(cInfo->npcflag & UNIT_NPC_FLAG_TRAINER))
     {
         sLog->outError(LOG_FILTER_SQL, "Table `npc_trainer` contains an entry for a creature template (Entry: %u) without trainer flag, ignoring", entry);
         return;
     }
-
+	sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... test 3");
     SpellInfo const* spellinfo = sSpellMgr->GetSpellInfo(spell);
     if (!spellinfo)
     {
         sLog->outError(LOG_FILTER_SQL, "Table `npc_trainer` contains an entry (Entry: %u) for a non-existing spell (Spell: %u), ignoring", entry, spell);
         return;
     }
-
+	sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... test 4");
     if (!SpellMgr::IsSpellValid(spellinfo))
     {
         sLog->outError(LOG_FILTER_SQL, "Table `npc_trainer` contains an entry (Entry: %u) for a broken spell (Spell: %u), ignoring", entry, spell);
         return;
     }
-
+	sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... test 5");
     if (GetTalentSpellCost(spell))
     {
         sLog->outError(LOG_FILTER_SQL, "Table `npc_trainer` contains an entry (Entry: %u) for a non-existing spell (Spell: %u) which is a talent, ignoring", entry, spell);
         return;
     }
-
+	sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... test 6");
     TrainerSpellData& data = _cacheTrainerSpellStore[entry];
-
+	sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... test 7");
     TrainerSpell& trainerSpell = data.spellList[spell];
     trainerSpell.spell         = spell;
     trainerSpell.spellCost     = spellCost;
     trainerSpell.reqSkill      = reqSkill;
     trainerSpell.reqSkillValue = reqSkillValue;
     trainerSpell.reqLevel      = reqLevel;
-
+	sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... test 8");
     if (!trainerSpell.reqLevel)
         trainerSpell.reqLevel = spellinfo->SpellLevel;
-
+	sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... test 9");
     // calculate learned spell for profession case when stored cast-spell
     trainerSpell.learnedSpell[0] = spell;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -7917,7 +7917,7 @@ void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, 
             sLog->outError(LOG_FILTER_SQL, "Table `npc_trainer` has spell %u for trainer entry %u with learn effect which has incorrect target type, ignoring learn effect!", spell, entry);
             continue;
         }
-
+		sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... test 10");
         trainerSpell.learnedSpell[i] = spellinfo->Effects[i].TriggerSpell;
 
         if (trainerSpell.learnedSpell[i])
@@ -7926,8 +7926,9 @@ void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, 
             if (learnedSpellInfo && learnedSpellInfo->IsProfession())
                 data.trainerType = 2;
         }
+		sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... test 11");
     }
-
+	sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... test 12");
     return;
 }
 
