@@ -3250,6 +3250,9 @@ void Player::InitStatsForLevel(bool reapplyMods)
     for (uint16 index = PLAYER_FIELD_COMBAT_RATING_1; index < PLAYER_FIELD_COMBAT_RATING_1 + MAX_COMBAT_RATING; ++index)
         SetUInt32Value(index, 0);
 
+	float mastery = getLevel() >= 80 ? 8.0f : 0.0f;
+	SetFloatValue(PLAYER_MASTERY, mastery);
+
     SetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, 0);
     SetFloatValue(PLAYER_FIELD_MOD_HEALING_PCT, 1.0f);
     SetFloatValue(PLAYER_FIELD_MOD_HEALING_DONE_PCT, 1.0f);
@@ -5897,9 +5900,6 @@ void Player::UpdateRating(CombatRating cr)
             if (affectStats)
                 UpdateArmorPenetration(amount);
             break;
-		case CR_MASTERY:
-			SetStatFloatValue(PLAYER_MASTERY, 10.0f);
-			break;
     }
 }
 
@@ -17320,6 +17320,12 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
 
     SetSpecsCount(fields[53].GetUInt8());
     SetActiveSpec(fields[54].GetUInt8());
+	if(getLevel() >= 80)
+	{
+		float mastery = 8.0f;
+		if(fields[54].GetUInt8() == TALENT_TREE_MAGE_FROST || fields[54].GetUInt8() == TALENT_TREE_WARRIOR_FURY) mastery = 2.0f;
+		SetFloatValue(PLAYER_MASTERY, mastery);
+	}
 
     // sanity check
     if (GetSpecsCount() > MAX_TALENT_SPECS || GetActiveSpec() > MAX_TALENT_SPEC || GetSpecsCount() < MIN_TALENT_SPECS)
@@ -25814,6 +25820,12 @@ void Player::ActivateSpec(uint8 spec)
                 RemoveAurasDueToSpell(old_gp->SpellId);
 
     SetActiveSpec(spec);
+	if(getLevel() >= 80)
+	{
+		float mastery = 8.0f;
+		if(spec == TALENT_TREE_MAGE_FROST || spec == TALENT_TREE_WARRIOR_FURY) mastery = 2.0f;
+		SetFloatValue(PLAYER_MASTERY, mastery);
+	}
     uint32 spentTalents = 0;
 
     specSpells = GetSpecializationSpellsBySpec(GetPrimaryTalentTree(GetActiveSpec()));
