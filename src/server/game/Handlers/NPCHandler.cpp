@@ -209,7 +209,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
         data << uint8(state == TRAINER_SPELL_GREEN_DISABLED ? TRAINER_SPELL_GREEN : state);
         data << uint32(floor(tSpell->spellCost * fDiscountMod));
 
-        data << uint8(tSpell->reqLevel);
+        data << uint8(5/*tSpell->reqLevel*/);
         data << uint32(tSpell->reqSkill);
         data << uint32(tSpell->reqSkillValue);
         //prev + req or req + 0
