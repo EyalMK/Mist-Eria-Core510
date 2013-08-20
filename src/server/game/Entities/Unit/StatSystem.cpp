@@ -591,9 +591,9 @@ void Player::UpdateSpellCritChance(uint32 school)
 
 void Player::UpdateMastery(int32 amount)
 {
-	float mastery = (getLevel() >= 80) ? 8.0f : 0.0f;
-	if(GetActiveSpec() == TALENT_TREE_WARRIOR_FURY || GetActiveSpec() == TALENT_TREE_MAGE_FROST) mastery = 2.0f;
-	mastery = 4.0f;
+	//Dunno why, client twice the view
+	float mastery = (getLevel() >= 80) ? 4.0f : 0.0f;
+	if(GetActiveSpec() == TALENT_TREE_WARRIOR_FURY || GetActiveSpec() == TALENT_TREE_MAGE_FROST) mastery = 1.0f;
 	float mastery_to_add = amount * GetRatingMultiplier(CR_MASTERY);
 	mastery += mastery_to_add;
 
