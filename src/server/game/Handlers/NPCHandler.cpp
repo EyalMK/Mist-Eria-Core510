@@ -209,12 +209,11 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
         data << uint8(state == TRAINER_SPELL_GREEN_DISABLED ? TRAINER_SPELL_GREEN : state);
         data << uint32(floor(tSpell->spellCost * fDiscountMod));
 
-        data << uint8(5/*tSpell->reqLevel*/);
+        data << uint8(tSpell->reqLevel);
         data << uint32(tSpell->reqSkill);
         data << uint32(tSpell->reqSkillValue);
-        //prev + req or req + 0
-        uint8 maxReq = 0;
-		/*
+        
+		bool alreadyAdded = false;
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
             if (!tSpell->learnedSpell[i])
@@ -222,29 +221,22 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
             if (uint32 prevSpellId = sSpellMgr->GetPrevSpellInChain(tSpell->learnedSpell[i]))
             {
                 data << uint32(prevSpellId);
-                ++maxReq;
-            }
-            if (maxReq == 2)
+				alreadyAdded = true;
                 break;
+            }
             SpellsRequiringSpellMapBounds spellsRequired = sSpellMgr->GetSpellsRequiredForSpellBounds(tSpell->learnedSpell[i]);
             for (SpellsRequiringSpellMap::const_iterator itr2 = spellsRequired.first; itr2 != spellsRequired.second && maxReq < 3; ++itr2)
             {
                 data << uint32(itr2->second);
-                ++maxReq;
-            }
-            if (maxReq == 2)
+				alreadyAdded = true;
                 break;
+            }
+			if(alreadyAdded) break;
         }
-        while (maxReq < 2)
-        {
-            data << uint32(0);
-            ++maxReq;
-        }
-		*/
-		data << uint32(0);
-        data << uint32(primary_prof_first_rank && can_learn_primary_prof ? 1 : 0);
-        // primary prof. learn confirmation dialog
-        data << uint32(primary_prof_first_rank ? 1 : 0);    // must be equal prev. field to have learn button in enabled state
+        if(!alreadyAdded) data << uint32(0);
+
+        data << uint32(primary_prof_first_rank && can_learn_primary_prof ? 1 : 0); // primary prof. learn confirmation dialog
+        data << uint32(primary_prof_first_rank ? 1 : 0);                           // must be equal prev. field to have learn button in enabled state
 
         ++count;
     }
