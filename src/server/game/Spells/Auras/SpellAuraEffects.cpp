@@ -4334,7 +4334,7 @@ void AuraEffect::HandleModRating(AuraApplication const* aurApp, uint8 mode, bool
 
     for (uint32 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
         if (GetMiscValue() & (1 << rating))
-            target->ToPlayer()->ApplyRatingMod(CombatRating(rating), GetAmount(), apply);
+            target->ToPlayer()->ApplyRatingMod(CombatRating(rating), GetAmount() / target->ToPlayer()->GetRatingMultiplier(CombatRating(rating)), apply);
 }
 
 void AuraEffect::HandleModRatingFromStat(AuraApplication const* aurApp, uint8 mode, bool apply) const

@@ -5781,15 +5781,6 @@ float Player::OCTRegenMPPerSpirit()
 
 void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
 {
-	switch(cr)
-	{
-		case CR_MASTERY:
-		{
-			value = value / GetRatingMultiplier(CR_MASTERY);
-			break;
-		}
-	}
-
     m_baseRatingValue[cr] +=(apply ? value : -value);
 
     // explicit affected values
