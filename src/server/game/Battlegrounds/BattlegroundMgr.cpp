@@ -193,7 +193,6 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             
             data->Initialize(SMSG_BATTLEFIELD_STATUS_QUEUED);
 
-			data->WriteBit(1);
             data->WriteBit(playerGuid[2]);
             data->WriteBit(playerGuid[4]);
             data->WriteBit(bgGuid[6]);
