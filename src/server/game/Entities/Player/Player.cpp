@@ -8206,7 +8206,9 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
             case ITEM_MOD_ARCANE_RESISTANCE:
                 HandleStatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(val), apply);
                 break;
-        }
+			case ITEM_MOD_PVP_POWER: //PEXIRN NYI
+				break;
+		}
     }
 
     // Apply Spell Power from ScalingStatValue if set
@@ -13639,6 +13641,8 @@ void Player::ApplyReforgeEnchantment(Item* item, bool apply)
         case ITEM_MOD_BLOCK_VALUE:
             HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, -removeValue, apply);
             break;
+		case ITEM_MOD_PVP_POWER: //PEXIRN NYI
+			break;
     }
 
     switch (reforge->FinalStat)
@@ -13749,6 +13753,8 @@ void Player::ApplyReforgeEnchantment(Item* item, bool apply)
         case ITEM_MOD_BLOCK_VALUE:
             HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, addValue, apply);
             break;
+		case ITEM_MOD_PVP_POWER: //PEXIRN NYI
+			break;
     }
 }
 
@@ -14084,6 +14090,8 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, float(enchant_amount), apply);
                             sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "+ %u BLOCK_VALUE", enchant_amount);
                             break;
+						case ITEM_MOD_PVP_POWER: //PEXIRN NYI
+							break;
                         default:
                             break;
                     }
