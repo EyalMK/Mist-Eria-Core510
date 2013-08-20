@@ -8227,6 +8227,9 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
 			case ITEM_MOD_PVP_POWER:
 				ApplyRatingMod(CR_PVP_POWER, int32(val), apply);
 				break;
+			case ITEM_MOD_MASTERY_RATING:
+				ApplyRatingMod(CR_MASTERY, int32(val), apply);
+				break;
 		}
     }
 
@@ -13663,6 +13666,9 @@ void Player::ApplyReforgeEnchantment(Item* item, bool apply)
 		case ITEM_MOD_PVP_POWER:
 			ApplyRatingMod(CR_PVP_POWER, -int32(removeValue), apply);
 			break;
+		case ITEM_MOD_MASTERY_RATING:
+			ApplyRatingMod(CR_MASTERY, -int32(removeValue), apply);
+			break;
     }
 
     switch (reforge->FinalStat)
@@ -13775,6 +13781,9 @@ void Player::ApplyReforgeEnchantment(Item* item, bool apply)
             break;
 		case ITEM_MOD_PVP_POWER:
 			ApplyRatingMod(CR_PVP_POWER, int32(addValue), apply);
+			break;
+		case ITEM_MOD_MASTERY_RATING:
+			ApplyRatingMod(CR_MASTERY, int32(addValue), apply);
 			break;
     }
 }
@@ -14114,6 +14123,10 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
 						case ITEM_MOD_PVP_POWER:
 							ApplyRatingMod(CR_PVP_POWER, enchant_amount, apply);
 							sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "+ %u PVP POWER", enchant_amount);
+							break;
+						case ITEM_MOD_MASTERY_RATING:
+							ApplyRatingMod(CR_MASTERY, enchant_amount, apply);
+							sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "+ %u MASTERY", enchant_amount);
 							break;
                         default:
                             break;
