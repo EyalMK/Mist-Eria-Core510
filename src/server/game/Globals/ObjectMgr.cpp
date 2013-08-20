@@ -7929,7 +7929,6 @@ void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, 
 		sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... test 11");
     }
 	sLog->outError(LOG_FILTER_SERVER_LOADING, ">>  Loading Trainers spells ... test 12");
-    return;
 }
 
 void ObjectMgr::LoadTrainerSpell()
