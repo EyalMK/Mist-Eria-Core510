@@ -1135,11 +1135,11 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
 		  << uint32(winner_conquest)                        // Winner Conquest Reward or Random Winner Conquest Reward
           << uint32(winner_conquest)                        // Winner Conquest Reward or Random Winner Conquest Reward
           << uint32(loser_honor)                            // Loser Honor Reward or Random Loser Honor Reward
-          << uint8(bracketEntry->minLevel);                 // min level
+          << uint8(bracketEntry->minLevel)                  // min level
 		  << uint32(bgTypeId)                               // battleground id
           << uint32(loser_honor)                            // Loser Honor Reward or Random Loser Honor Reward
           << uint32(winner_honor)                           // Winner Honor Reward or Random Winner Honor Reward
-          << uint32(winner_honor)                           // Winner Honor Reward or Random Winner Honor Reward
+          << uint32(winner_honor);                          // Winner Honor Reward or Random Winner Honor Reward
 
     data->WriteBit(guidBytes[4]);
     data->WriteBit(guidBytes[1]);
@@ -1164,6 +1164,8 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
     data->WriteByteSeq(guidBytes[0]);
     data->WriteByteSeq(guidBytes[1]);
 
+	uint32 count = 0;
+
 	for (BattlegroundClientIdsContainer::const_iterator itr = clientIds.begin(); itr != clientIds.end(); ++itr)
     {
         *data << uint32(*itr);
@@ -1176,7 +1178,6 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
 	data->WriteByteSeq(guidBytes[3]);
 	data->WriteByteSeq(guidBytes[7]);
 
-    uint32 count = 0;
     BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
     BattlegroundClientIdsContainer& clientIds = it->second.m_ClientBattlegroundIds[bracketId];
     
