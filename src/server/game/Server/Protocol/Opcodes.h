@@ -414,7 +414,7 @@ enum Opcodes
     CMSG_PET_ACTION                                   = 0x0208,//16357
     CMSG_PET_CANCEL_AURA                              = 0x03AD,//16357
     CMSG_PET_CAST_SPELL                               = 0x0A4C,//16357
-    CMSG_PET_LEARN_TALENT                             = 0x1367,
+    CMSG_PET_LEARN_TALENT                             = 0xA9B,//16357
     CMSG_PET_NAME_CACHE                               = 0x1368,
     CMSG_PET_NAME_QUERY                               = 0x0789,//16357
     CMSG_PET_RENAME                                   = 0x1370,
