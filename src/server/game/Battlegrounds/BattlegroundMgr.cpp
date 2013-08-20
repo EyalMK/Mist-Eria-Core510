@@ -164,26 +164,27 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
         {
             data->Initialize(SMSG_BATTLEFIELD_STATUS);
 
-            data->WriteBit(playerGuid[0]);
+			*data << uint32(1);                         // unk, always 1
+			*data << uint32(QueueSlot);                 // Queue slot
+            *data << uint32(Time1);                     // Join Time
+
+            data->WriteBit(playerGuid[5]);
             data->WriteBit(playerGuid[4]);
             data->WriteBit(playerGuid[7]);
-            data->WriteBit(playerGuid[1]);
-            data->WriteBit(playerGuid[6]);
-            data->WriteBit(playerGuid[3]);
-            data->WriteBit(playerGuid[5]);
+            data->WriteBit(playerGuid[0]);
             data->WriteBit(playerGuid[2]);
+            data->WriteBit(playerGuid[6]);
+            data->WriteBit(playerGuid[1]);
+            data->WriteBit(playerGuid[3]);
 
-            data->WriteByteSeq(playerGuid[5]);
             data->WriteByteSeq(playerGuid[6]);
-            data->WriteByteSeq(playerGuid[7]);
-            data->WriteByteSeq(playerGuid[2]);
-            *data << uint32(1);                         // unk, always 1
-            data->WriteByteSeq(playerGuid[3]);
-            data->WriteByteSeq(playerGuid[1]);
-            *data << uint32(QueueSlot);                 // Queue slot
-            *data << uint32(Time1);                     // Join Time
             data->WriteByteSeq(playerGuid[0]);
+            data->WriteByteSeq(playerGuid[1]);
+            data->WriteByteSeq(playerGuid[2]);
+            data->WriteByteSeq(playerGuid[7]);
             data->WriteByteSeq(playerGuid[4]);
+            data->WriteByteSeq(playerGuid[5]);
+            data->WriteByteSeq(playerGuid[3]);
             break;
         }
         case STATUS_WAIT_QUEUE:
