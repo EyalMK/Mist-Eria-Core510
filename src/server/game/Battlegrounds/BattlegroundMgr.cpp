@@ -1169,6 +1169,7 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
 
 	for (BattlegroundClientIdsContainer::const_iterator itr = clientIds.begin(); itr != clientIds.end(); ++itr)
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE battlegrounds %u", uint32(*itr))
         *data << uint32(*itr);
         ++count;
     }
