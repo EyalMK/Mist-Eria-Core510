@@ -84,6 +84,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Battleground: NOBODIE %u %u %u", instanceId, unk1, unk2);
 
     asGroup = recvData.ReadBit();
+    guid[5] = recvData.ReadBit();
     guid[6] = recvData.ReadBit();
     guid[0] = recvData.ReadBit();
     guid[4] = recvData.ReadBit();
