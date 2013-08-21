@@ -871,7 +871,6 @@ bool Creature::isCanTrainingOf(Player* player, bool msg) const
     if (!isTrainer())
         return false;
 
-	sLog->outInfo(LOG_FILTER_SERVER_LOADING, "PEXIRN : GOSSIP : 1");
 
     TrainerSpellData const* trainer_spells = GetTrainerSpells();
 
@@ -882,7 +881,6 @@ bool Creature::isCanTrainingOf(Player* player, bool msg) const
         return false;
     }
 
-	sLog->outInfo(LOG_FILTER_SERVER_LOADING, "PEXIRN : GOSSIP : 2");
 
     switch (GetCreatureTemplate()->trainer_type)
     {
@@ -941,13 +939,11 @@ bool Creature::isCanTrainingOf(Player* player, bool msg) const
             }
             break;
         case TRAINER_TYPE_TRADESKILLS:
-			sLog->outInfo(LOG_FILTER_SERVER_LOADING, "PEXIRN : GOSSIP : 3");
             // There's no Blacksmith specialization on Cataclysm, conditions are not required for tradeskills
             break;
         default:
             return false;                                   // checked and error output at creature_template loading
     }
-	sLog->outInfo(LOG_FILTER_SERVER_LOADING, "PEXIRN : GOSSIP : 4");
     return true;
 }
 
