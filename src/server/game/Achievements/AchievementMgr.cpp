@@ -2620,12 +2620,46 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
 					return false;
 				break;
 			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_REQUIRES_GUILD_GROUP: // 61
+			{
+				Group* group = referencePlayer->GetGroup();
+				if (!group)
+					return false;
+
+				if (!group->IsGuildGroup(referencePlayer->GetGuildId(),true, true))
+					return false;
+				break;
+			}
 			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_GUILD_REPUTATION: // 62
+			{
+				if (uint32(referencePlayer->GetReputationMgr().GetReputation(1168)) < reqValue) // 1168 = Guild faction
+					return false;
+				break;
+			}
 			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_RATED_BATTLEGROUND: // 63
-			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_PROJECT_RARITY: // 65
-			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_PROJECT_RACE: // 66
 				return false;
 				break;
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_PROJECT_RARITY: // 65
+			{
+				return false;
+				/*
+				ResearchProject const *tmp = sResearchProjectStore.LookupEntry(miscValue1);
+				if(!tmp) return false;
+
+				if(tmp->rare != reqValue) return false;
+				break;
+				*/
+			}
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_PROJECT_RACE: // 66
+			{
+				return false;
+				/*
+				ResearchProject const *tmp = sResearchProjectStore.LookupEntry(miscValue1);
+				if(!tmp) return false;
+
+				if(tmp->race != reqValue) return false;
+				break;
+				*/
+			}
             default:
                 break;
         }
