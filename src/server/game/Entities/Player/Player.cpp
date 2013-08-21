@@ -8897,8 +8897,8 @@ void Player::SendLootRelease(uint64 guid)
 	data.WriteBit(oguid[1]);
 	data.WriteBit(oguid[4]);
 	data.WriteBit(oguid[7]);
-	data.WriteBit(oguid[3]);
 	data.WriteBit(oguid[5]);
+	data.WriteBit(oguid[3]);
 
 	data.WriteByteSeq(oguid[7]);
 	data.WriteByteSeq(oguid[2]);
