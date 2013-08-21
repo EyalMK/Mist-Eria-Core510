@@ -1143,14 +1143,13 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
 
     data->WriteBit(guidBytes[4]);
     data->WriteBit(guidBytes[1]);
+    data->WriteBit(0);
+    data->WriteBit(0);                                      // unk
     data->WriteBit(guidBytes[6]);
 	data->WriteBit(guidBytes[2]);
-	data->WriteBits(0, 24);                                 // placeholder
-    data->WriteBit(0);                                      // unk
-    
-    data->FlushBits();
     size_t count_pos = data->bitwpos();
-    
+    data->WriteBits(0, 24);                                 // placeholder
+        
     data->WriteBit(guidBytes[0]);
 	data->WriteBit(0);                                      // unk
     data->WriteBit(guidBytes[5]);
@@ -1158,7 +1157,6 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
     data->WriteBit(guidBytes[7]);
     data->WriteBit(guidBytes[3]);
 
-    data->FlushBits();
 
     data->WriteByteSeq(guidBytes[4]);
     data->WriteByteSeq(guidBytes[0]);
