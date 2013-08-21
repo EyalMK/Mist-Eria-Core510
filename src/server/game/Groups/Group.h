@@ -211,6 +211,7 @@ class Group
         bool isBGGroup()   const;
         bool isBFGroup()   const;
         bool IsCreated()   const;
+        bool IsGuildGroup(uint32 guildId, bool AllInSameMap, bool AllInSameInstanceId);
         uint64 GetLeaderGUID() const;
         uint64 GetGUID() const;
         uint32 GetLowGUID() const;
@@ -323,7 +324,7 @@ class Group
         void SubGroupCounterIncrease(uint8 subgroup);
         void SubGroupCounterDecrease(uint8 subgroup);
         void ToggleGroupMemberFlag(member_witerator slot, uint8 flag, bool apply);
-		bool IsGuildGroup(uint32 guildId, bool AllInSameMap, bool AllInSameInstanceId);
+
         MemberSlotList      m_memberSlots;
         GroupRefManager     m_memberMgr;
         InvitesList         m_invitees;
