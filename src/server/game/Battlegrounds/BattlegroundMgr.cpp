@@ -1167,9 +1167,8 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
 	BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
     BattlegroundClientIdsContainer& clientIds = it->second.m_ClientBattlegroundIds[bracketId];
 
-	for (BattlegroundClientIdsContainer::const_iterator itr = clientIds.begin(); itr != clientIds.end(); ++itr)
+    for (BattlegroundClientIdsContainer::const_iterator itr = clientIds.begin(); itr != clientIds.end();)
     {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE battlegrounds %u", uint32(*itr));
         *data << uint32(*itr);
         ++count;
     }
