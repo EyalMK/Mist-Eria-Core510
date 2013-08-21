@@ -79,36 +79,31 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
     Group* grp = NULL;
     ObjectGuid guid;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Battleground: NOBODIE 1");
     recvData >> instanceId >> unk1 >> unk2;
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Battleground: NOBODIE 2");
+
     asGroup = recvData.ReadBit();
-sLog->outDebug(LOG_FILTER_NETWORKIO, "Battleground: NOBODIE 3");
-guid[5] = recvData.ReadBit();
+    guid[5] = recvData.ReadBit();
     guid[6] = recvData.ReadBit();
     guid[0] = recvData.ReadBit();
     guid[4] = recvData.ReadBit();
     guid[1] = recvData.ReadBit();
     guid[7] = recvData.ReadBit();
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Battleground: NOBODIE 4");
     guid[3] = recvData.ReadBit();
     guid[2] = recvData.ReadBit();
 
     recvData.ReadByteSeq(guid[3]);
     recvData.ReadByteSeq(guid[4]);
     recvData.ReadByteSeq(guid[2]);
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Battleground: NOBODIE 5");
     recvData.ReadByteSeq(guid[7]);
     recvData.ReadByteSeq(guid[0]);
     recvData.ReadByteSeq(guid[5]);
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Battleground: NOBODIE 6");
     recvData.ReadByteSeq(guid[1]);
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Battleground: NOBODIE 7");
     recvData.ReadByteSeq(guid[6]);
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Battleground: NOBODIE 8");
 
     //extract from guid
     bgTypeId_ = GUID_LOPART(guid);
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "Battleground: NOBODIE %u %u %u %u "UI64FMTD, instanceId, unk1, unk2, bgTypeId_, (uint64)guid);
 
     if (!sBattleMasterListStore.LookupEntry(bgTypeId_))
     {
