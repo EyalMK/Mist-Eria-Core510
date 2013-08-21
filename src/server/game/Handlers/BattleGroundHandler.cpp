@@ -81,8 +81,6 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
 
     recvData >> instanceId >> unk1 >> unk2;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Battleground: NOBODIE %u %u %u", instanceId, unk1, unk2);
-
     asGroup = recvData.ReadBit();
     guid[5] = recvData.ReadBit();
     guid[6] = recvData.ReadBit();
@@ -104,6 +102,8 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
 
     //extract from guid
     bgTypeId_ = GUID_LOPART(guid);
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "Battleground: NOBODIE %u %u %u %u %lu", instanceId, unk1, unk2, bgTypeId_, guid);
 
     if (!sBattleMasterListStore.LookupEntry(bgTypeId_))
     {
