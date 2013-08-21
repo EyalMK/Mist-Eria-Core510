@@ -2525,7 +2525,7 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                     return false;
                 break;
 			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_CREATURE_YIELDS_XP: // 21
-				if(!unit || !referencePlayer || Trinity::XP::BaseGain(player->getLevel(), unit->getLevel(), GetContentLevelsForMapAndZone(unit->GetMapId(), unit->GetZoneId())) < reqValue)
+                if(!unit || !referencePlayer || Trinity::XP::BaseGain(referencePlayer->getLevel(), unit->getLevel(), GetContentLevelsForMapAndZone(unit->GetMapId(), unit->GetZoneId())) < reqValue)
 					return false;
 				break;
 			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_ARENA_TYPE: // 24
