@@ -73,31 +73,33 @@ void WorldSession::SendBattleGroundList(uint64 guid, BattlegroundTypeId bgTypeId
 void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
 {
     uint32 bgTypeId_;
-    uint32 instanceId;
+    uint32 instanceId, unk1, unk2, unk3;
     uint8 asGroup;
     bool isPremade = false;
     Group* grp = NULL;
     ObjectGuid guid;
 
-    recvData >> instanceId;                 // Instance Id
-    guid[2] = recvData.ReadBit();
-    guid[0] = recvData.ReadBit();
-    guid[3] = recvData.ReadBit();
-    guid[1] = recvData.ReadBit();
-    guid[5] = recvData.ReadBit();
-    asGroup = recvData.ReadBit();           // As Group
-    guid[4] = recvData.ReadBit();
-    guid[6] = recvData.ReadBit();
-    guid[7] = recvData.ReadBit();
+    recvData >> instanceId >> unk1 >> unk2;
 
-    recvData.ReadByteSeq(guid[2]);
-    recvData.ReadByteSeq(guid[6]);
-    recvData.ReadByteSeq(guid[4]);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "Battleground: NOBODIE %u %u %u", instanceId, unk1, unk2);
+
+    asGroup = recvData.ReadBit();
+    guid[6] = recvData.ReadBit();
+    guid[0] = recvData.ReadBit();
+    guid[4] = recvData.ReadBit();
+    guid[1] = recvData.ReadBit();
+    guid[7] = recvData.ReadBit();
+    guid[3] = recvData.ReadBit();
+    guid[2] = recvData.ReadBit();
+
     recvData.ReadByteSeq(guid[3]);
+    recvData.ReadByteSeq(guid[4]);
+    recvData.ReadByteSeq(guid[2]);
     recvData.ReadByteSeq(guid[7]);
     recvData.ReadByteSeq(guid[0]);
     recvData.ReadByteSeq(guid[5]);
     recvData.ReadByteSeq(guid[1]);
+    recvData.ReadByteSeq(guid[6]);
 
     //extract from guid
     bgTypeId_ = GUID_LOPART(guid);
