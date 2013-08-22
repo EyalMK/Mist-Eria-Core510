@@ -40,7 +40,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
     Loot* loot = NULL;
 	uint8 count = 0;
 
-	count = recvData.ReadBits(25);
+	count = recvData.ReadBits(33);
 
 	uint8** guid = new uint8*[count];
 	for(uint32 i = 0; i < count; i++)
