@@ -63,6 +63,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 
 	for (uint32 i = 0; i < count; ++i)
 	{
+		sLog->outDebug(LOG_FILTER_SERVER_LOADING, "PEXIRN : LOOT : i = %u | count = %u", i, count);
 		recvData.ReadByteSeq(guid[i][4]);
 		recvData.ReadByteSeq(guid[i][1]);
 		recvData.ReadByteSeq(guid[i][5]);
