@@ -711,7 +711,7 @@ void WorldSession::HandleGuildSwitchRanksOpcode(WorldPacket& recvPacket)
 	recvPacket >> rankId;
 	bool up = recvPacket.ReadBit();
 
-	sLog->outDebug(LOG_FILTER_SERVER_LOADING, "CMSG_GUILD_SWITCH_RANK : rankId : %u, monter : %b", rankId, up);
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_GUILD_SWITCH_RANK : rankId : %u, monter : %b", rankId, up);
 }
 
 void WorldSession::HandleGuildRequestPartyState(WorldPacket& recvPacket)
