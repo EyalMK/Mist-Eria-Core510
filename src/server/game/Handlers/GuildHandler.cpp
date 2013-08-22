@@ -703,6 +703,16 @@ void WorldSession::HandleGuildSetRankPermissionsOpcode(WorldPacket& recvPacket)
     guild->HandleSetRankInfo(this, newRankId, rankName, newRights, moneyPerDay, rightsAndSlots);
 }
 
+void WorldSession::HandleGuildSwitchRanksOpcode(WorldPacket& recvPacket)
+{
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GUILD_SWITCH_RANK");
+
+	uint32 unk;
+	recvPacket >> unk;
+
+	sLog->outDebug(LOG_FILTER_SERVER_LOADING, "CMSG_GUILD_SWITCH_RANK : unk : %u", unk);
+}
+
 void WorldSession::HandleGuildRequestPartyState(WorldPacket& recvPacket)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GUILD_REQUEST_PARTY_STATE");
