@@ -1362,7 +1362,7 @@ void Group::CountTheRoll(Rolls::iterator rollI)
                 if (msg == EQUIP_ERR_OK)
                 {
                     item->is_looted = true;
-                    roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
+                    roll->getLoot()->NotifyItemRemoved(roll->itemSlot, player->GetLootGUID());
                     roll->getLoot()->unlootedCount--;
                     AllowedLooterSet looters = item->GetAllowedLooters();
                     player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
@@ -1415,7 +1415,7 @@ void Group::CountTheRoll(Rolls::iterator rollI)
                     if (msg == EQUIP_ERR_OK)
                     {
                         item->is_looted = true;
-                        roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
+                        roll->getLoot()->NotifyItemRemoved(roll->itemSlot, player->GetLootGUID());
                         roll->getLoot()->unlootedCount--;
                         AllowedLooterSet looters = item->GetAllowedLooters();
                         player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
@@ -1429,7 +1429,7 @@ void Group::CountTheRoll(Rolls::iterator rollI)
                 else if (rollvote == DISENCHANT)
                 {
                     item->is_looted = true;
-                    roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
+                    roll->getLoot()->NotifyItemRemoved(roll->itemSlot, player->GetLootGUID());
                     roll->getLoot()->unlootedCount--;
                     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(roll->itemid);
                     player->AutoStoreLoot(pProto->DisenchantID, LootTemplates_Disenchant, true);

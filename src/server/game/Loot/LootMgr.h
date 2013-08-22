@@ -342,7 +342,7 @@ struct Loot
     bool empty() const { return items.empty() && gold == 0; }
     bool isLooted() const { return gold == 0 && unlootedCount == 0; }
 
-    void NotifyItemRemoved(uint8 lootIndex);
+    void NotifyItemRemoved(uint8 lootIndex, ObjectGuid guid);
     void NotifyQuestItemRemoved(uint8 questIndex);
     void NotifyMoneyRemoved();
     void AddLooter(uint64 GUID) { PlayersLooting.insert(GUID); }

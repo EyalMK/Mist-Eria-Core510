@@ -138,7 +138,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 
     for(uint32 i = 0 ; i < count ; i++) {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootSlot[i] %u %u %u", lootSlot[i], GUID_LOPART(lguid), GUID_LOPART((ObjectGuid)guids.at(i)));
-		player->StoreLootItem(lootSlot[i], loot);
+        player->StoreLootItem(lootSlot[i], loot, (ObjectGuid)guids.at(i));
     }
 
     // If player is removing the last LootItem, delete the empty container.
@@ -609,6 +609,6 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     item.count=0;
     item.is_looted=true;
 
-    loot->NotifyItemRemoved(slotid);
+    loot->NotifyItemRemoved(slotid, _player->GetLootGUID());
     --loot->unlootedCount;
 }

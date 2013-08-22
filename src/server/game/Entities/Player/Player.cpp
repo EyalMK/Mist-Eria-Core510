@@ -24712,7 +24712,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot, ObjectGuid guid)
                 //not freeforall, notify everyone
                 if (conditem)
                     conditem->is_looted = true;
-                loot->NotifyItemRemoved(lootSlot);
+                loot->NotifyItemRemoved(lootSlot, guid);
             }
         }
 

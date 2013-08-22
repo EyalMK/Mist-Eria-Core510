@@ -604,7 +604,7 @@ QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player, bool pres
 
 //===================================================
 
-void Loot::NotifyItemRemoved(uint8 lootIndex)
+void Loot::NotifyItemRemoved(uint8 lootIndex, ObjectGuid guid)
 {
     // notify all players that are looting this that the item was removed
     // convert the index to the slot the player sees
