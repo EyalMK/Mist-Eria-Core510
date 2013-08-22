@@ -436,8 +436,8 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     data << float(quest->GetRewHonorMultiplier());
 
     data << uint32(quest->GetSrcItemId());                  // source item id
-    data << uint32(quest->GetFlags() & 0xFFFF);             // quest flags
-    data << uint32(0);                                      // quest flags 2 ?
+    data << uint32(quest->GetFlags());                      // quest flags
+    data << uint32(quest->GetFlags2());                     // quest flags 2 ?
 
     data << uint32(quest->GetMinimapTargetMark());          // minimap target mark (skull, etc. missing enum)
     data << uint32(quest->GetCharTitleId());                // CharTitleId, new 2.4.0, player gets this title (id from CharTitles)
@@ -448,7 +448,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     data << uint32(quest->GetQuestGiverPortrait());         // quest giver entry ?
     data << uint32(quest->GetQuestTurnInPortrait());        // quest turnin entry ?
 
-        if (quest->HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
+    if (quest->HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
     {
         for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
             data << uint32(0) << uint32(0);
@@ -469,7 +469,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
         }
     }
 
-        for (uint8 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // reward factions ids
+    for (uint8 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // reward factions ids
         data << uint32(quest->RewardFactionId[i]);
 
     for (uint8 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // columnid+1 QuestFactionReward.dbc?
@@ -478,7 +478,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     for (uint8 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // unknown usage
         data << uint32(quest->RewardFactionValueIdOverride[i]);
 
-        for (uint32 i = 0; i < QUEST_REWARD_CURRENCY_COUNT; ++i)
+    for (uint32 i = 0; i < QUEST_REWARD_CURRENCY_COUNT; ++i)
     {
         data << uint32(quest->RewardCurrencyId[i]);
         data << uint32(quest->RewardCurrencyCount[i]);
@@ -489,7 +489,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     data << float(quest->GetPointY());
     data << uint32(quest->GetPointOpt());
 
-        if (sWorld->getBoolConfig(CONFIG_UI_QUESTLEVELS_IN_DIALOGS))
+    if (sWorld->getBoolConfig(CONFIG_UI_QUESTLEVELS_IN_DIALOGS))
         AddQuestLevelToTitle(questTitle, quest->GetQuestLevel());
 
     data << questTitle;
@@ -505,22 +505,21 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     data << uint32(quest->GetSoundAccept());
     data << uint32(quest->GetSoundTurnIn());
 
-        for (uint8 i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
+    for (uint8 i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
     {
         data << uint32(quest->RequiredSourceItemId[i]);
         data << uint32(quest->RequiredSourceItemCount[i]);
     }
 
 
-		data << uint32(QUEST_REQUIREMENT);
-        for (uint8 i = 0; i < QUEST_REQUIREMENT; ++i)
+        data << uint8(0);
+        /*for (uint8 i = 0; i < 0; ++i)
         {
                 data << uint32(0);       // unknown
 
 				uint32 reqType = quest->GetQuestRequirementType();
                 data << uint32(reqType);  
 
-				/*
 				switch(reqType)
 				{
 				    case QUEST_REQUIREMENT_CREATURE:
@@ -552,19 +551,17 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
 					default:
 						 data << uint32(requiredid[i]);
 						 break;
+                }
                         
-                // i'm not sure for all of this ^^ ( above ) , must check again in parser
-				*/
+                // i'm not sure for all of this ^^  above ) , must check again in parser
+
 
             data << uint32(0);           // requiredcount
             data << uint32(0);           // unknown
             data << questObjectiveText[i];
-            data << uint32(0);           // unknown
-
-            data << uint32(0);           // unknown
-            data << uint32(0);           // unknown
-        }
-
+            data << uint8(0);           // unknown
+            data << uint8(0);           // unknown
+        }*/
     _session->SendPacket(&data);
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_QUEST_QUERY_RESPONSE questid=%u", quest->GetQuestId());
 }
