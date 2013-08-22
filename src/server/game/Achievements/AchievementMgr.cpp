@@ -2524,12 +2524,14 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                 if (uint32(referencePlayer->GetMap()->GetDifficulty()) != reqValue)
                     return false;
                 break;
-				/* PROBLEMS
 			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_CREATURE_YIELDS_XP: // 21
-				if(!unit || !referencePlayer || Trinity::XP::Gain(referencePlayer, unit) < reqValue)
+                if(!unit || !referencePlayer || Trinity::XP::BaseGain(referencePlayer->getLevel(), unit->getLevel(), GetContentLevelsForMapAndZone(unit->GetMapId(), unit->GetZoneId())) < reqValue)
 					return false;
 				break;
-				*/
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_ARENA_TYPE: // 24
+				if(!referencePlayer || !referencePlayer->GetBattleground() || !referencePlayer->GetBattleground()->GetArenaType() != reqValue)
+					return false;
+				break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_SOURCE_RACE: // 25
                 if (referencePlayer->getRace() != reqValue)
                     return false;
@@ -2563,6 +2565,31 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                 if (referencePlayer->GetMapId() != reqValue)
                     return false;
                 break;
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_ITEM_CLASS: // 33 /!\ itemEntry has to be in MiscValue1
+				if(!sObjectMgr->GetItemTemplate(miscValue1) || sObjectMgr->GetItemTemplate(miscValue1)->Class != reqValue)
+					return false;
+				break;
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_ITEM_SUBCLASS: // 34 /!\ itemEntry has to be in MiscValue1
+				if(!sObjectMgr->GetItemTemplate(miscValue1) || sObjectMgr->GetItemTemplate(miscValue1)->SubClass != reqValue)
+					return false;
+				break;
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_COMPLETE_QUEST_NOT_IN_GROUP: // 35
+				if(!referencePlayer || referencePlayer->GetGroup() != NULL)
+					return false;
+				break;
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_MIN_PERSONAL_RATING: // 37
+			{
+				if(!referencePlayer)
+					return false;
+				bool ok = false;
+				for(uint8 i = 0 ; i < MAX_ARENA_SLOT ; i++)
+				{
+					if(referencePlayer->GetArenaPersonalRating(i) >= reqValue)
+						ok = true;
+				}
+				if(!ok) return false;
+				break;
+			}
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TITLE_BIT_INDEX: // 38
                 // miscValue1 is title's bit index
                 if (miscValue1 != reqValue)
@@ -2584,6 +2611,55 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                 if (!unit || unit->GetHealthPct() >= reqValue)
                     return false;
                 break;
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_MIN_ACHIEVEMENT_POINTS: // 56
+				if(!referencePlayer || referencePlayer->GetAchievementPoints() < reqValue)
+					return false;
+				break;
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_REQUIRES_LFG_GROUP: // 58
+				if(!referencePlayer || !referencePlayer->GetGroup() || !referencePlayer->GetGroup()->isLFGGroup())
+					return false;
+				break;
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_REQUIRES_GUILD_GROUP: // 61
+			{
+				Group* group = referencePlayer->GetGroup();
+				if (!group)
+					return false;
+
+				if (!group->IsGuildGroup(referencePlayer->GetGuildId(),true, true))
+					return false;
+				break;
+			}
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_GUILD_REPUTATION: // 62
+			{
+				if (uint32(referencePlayer->GetReputationMgr().GetReputation(1168)) < reqValue) // 1168 = Guild faction
+					return false;
+				break;
+			}
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_RATED_BATTLEGROUND: // 63
+				return false;
+				break;
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_PROJECT_RARITY: // 65
+			{
+				return false;
+				/*
+				ResearchProject const *tmp = sResearchProjectStore.LookupEntry(miscValue1);
+				if(!tmp) return false;
+
+				if(tmp->rare != reqValue) return false;
+				break;
+				*/
+			}
+			case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_PROJECT_RACE: // 66
+			{
+				return false;
+				/*
+				ResearchProject const *tmp = sResearchProjectStore.LookupEntry(miscValue1);
+				if(!tmp) return false;
+
+				if(tmp->race != reqValue) return false;
+				break;
+				*/
+			}
             default:
                 break;
         }

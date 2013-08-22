@@ -1527,7 +1527,6 @@ void Guild::HandleQuery(WorldSession* session)
 
 void Guild::SendGuildRankInfo(WorldSession* session) const
 {
-    ByteBuffer rankData(100);
     WorldPacket data(SMSG_GUILD_RANK, 100);
 
     data.WriteBits(_GetRanksSize(), 18);
@@ -1541,31 +1540,31 @@ void Guild::SendGuildRankInfo(WorldSession* session) const
 		data.WriteBits(rankInfo->GetName().length(), 7);
 	}
 
+	data.FlushBits();
+
     for (uint8 i = 0; i < _GetRanksSize(); i++)
     {
         RankInfo const* rankInfo = GetRankInfo(i);
         if (!rankInfo)
             continue;
 
-        rankData << uint32(rankInfo->GetId());
+        data << uint32(rankInfo->GetId());
 
 		if (rankInfo->GetName().length())
-            rankData.WriteString(rankInfo->GetName());
+            data.WriteString(rankInfo->GetName());
 
         for (uint8 j = 0; j < GUILD_BANK_MAX_TABS; ++j)
         {
-            rankData << uint32(rankInfo->GetBankTabSlotsPerDay(j));
-            rankData << uint32(rankInfo->GetBankTabRights(j));
+            data << uint32(rankInfo->GetBankTabSlotsPerDay(j));
+            data << uint32(rankInfo->GetBankTabRights(j));
         }
 
-        rankData << uint32(rankInfo->GetBankMoneyPerDay());
-        rankData << uint32(rankInfo->GetRights());
+        data << uint32(rankInfo->GetBankMoneyPerDay());
+        data << uint32(rankInfo->GetRights());
 
-        rankData << uint32(i);
+        data << uint32(i);
     }
 
-    data.FlushBits();
-    data.append(rankData);
     session->SendPacket(&data);
     sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_RANK [%s]", session->GetPlayerInfo().c_str());
 }
@@ -3446,6 +3445,7 @@ void Guild::SendGuildRanksUpdate(uint64 setterGuid, uint64 targetGuid, uint32 ra
     ASSERT(member);
 
     WorldPacket data(SMSG_GUILD_RANKS_UPDATE, 100);
+
     data.WriteBit(setGuid[6]);
     data.WriteBit(setGuid[3]);
     data.WriteBit(tarGuid[3]);
@@ -3453,7 +3453,6 @@ void Guild::SendGuildRanksUpdate(uint64 setterGuid, uint64 targetGuid, uint32 ra
     data.WriteBit(setGuid[0]);
     data.WriteBit(setGuid[4]);
     data.WriteBit(tarGuid[0]);
-
 	data.WriteBit(rank < member->GetRankId()); // 1 == higher, 0 = lower?
 
 	data.WriteBit(setGuid[5]);
@@ -3464,8 +3463,8 @@ void Guild::SendGuildRanksUpdate(uint64 setterGuid, uint64 targetGuid, uint32 ra
 	data.WriteBit(setGuid[1]);
     data.WriteBit(setGuid[2]);
     data.WriteBit(tarGuid[5]);
-	data.WriteBit(tarGuid[2]);
 
+	data.WriteBit(tarGuid[2]);
     data.FlushBits();
 
 	data.WriteByteSeq(tarGuid[3]);
@@ -3475,7 +3474,6 @@ void Guild::SendGuildRanksUpdate(uint64 setterGuid, uint64 targetGuid, uint32 ra
 	data.WriteByteSeq(tarGuid[5]);
     data.WriteByteSeq(setGuid[4]);
     data.WriteByteSeq(tarGuid[6]);
-    
 	data << uint32(rank);
 
     data.WriteByteSeq(setGuid[1]);
@@ -3486,7 +3484,9 @@ void Guild::SendGuildRanksUpdate(uint64 setterGuid, uint64 targetGuid, uint32 ra
 	data.WriteByteSeq(tarGuid[0]);
     data.WriteByteSeq(setGuid[5]);
     data.WriteByteSeq(setGuid[6]);
+
     data.WriteByteSeq(tarGuid[7]);
+
     BroadcastPacket(&data);
 
     member->ChangeRank(rank);

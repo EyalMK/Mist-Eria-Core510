@@ -8897,8 +8897,8 @@ void Player::SendLootRelease(uint64 guid)
 	data.WriteBit(oguid[1]);
 	data.WriteBit(oguid[4]);
 	data.WriteBit(oguid[7]);
-	data.WriteBit(oguid[3]);
 	data.WriteBit(oguid[5]);
+	data.WriteBit(oguid[3]);
 
 	data.WriteByteSeq(oguid[7]);
 	data.WriteByteSeq(oguid[2]);
@@ -9219,9 +9219,74 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
     loot->loot_type = loot_type;
 
     WorldPacket data(SMSG_LOOT_RESPONSE, 8 + 1 + 50 + 1 + 1);           // we guess size
+	ObjectGuid guid1 = uint64(guid);
+
+	data.WriteBits(0, 22); //counter1
+	data.FlushBits();
+
+	data.WriteBit(guid1[7]);
+	data.WriteBit(0); //byte18
+	data.WriteBit(0); //byte30
+	data.WriteBit(guid1[2]);
+	data.WriteBit(0); //!byte31
+	data.WriteBit(guid1[6]);
+	data.WriteBit(1); //!dword1C
+	data.WriteBit(guid1[1]);
+	data.WriteBit(guid1[4]);
+	data.WriteBits(0, 21); //counter2
+	//boucle sur counter2
+	//          bitUnk1
+	//          bitUnk2
+	//fin boucle
+	data.WriteBit(1); //!byte44
+	data.WriteBit(guid1[0]);
+	data.WriteBit(1); //!byte32
+	data.WriteBit(1); //!byte45
+	data.WriteBit(guid1[5]);
+	data.WriteBit(guid1[3]);
+	data.FlushBits();
+
+	data.WriteByteSeq(guid1[1]);
+	data.WriteByteSeq(guid1[6]);
+	//boucle sur counter2
+	//          si bitUnk2
+	//                     uint8
+	//          finsi
+	//          uint32
+	//          uint32
+	//          uint32
+	//          DataInSitu
+	//          Si ????
+	//                    Data
+	//          Sinon
+	//                    ??
+	//          finsi
+	//          si bitUnk1
+	//                    uint8
+	//          finsi
+	//          uint32
+	//          uint32
+	//          uint32
+	//fin boucle
+	data.WriteByteSeq(guid1[3]);
+	data.WriteByteSeq(guid1[2]);
+	//Si byte44 => uint8
+	//boucle sur counter1
+	//       uint32
+	//       uint8
+	//       uint32
+	//fin boucle
+	data << uint8(loot_type); //Si byte31 => uint8
+	//Si byte1C => uint8
+	data.WriteByteSeq(guid1[7]); 
+	//Si byte45 => uint8
+	data.WriteByteSeq(guid1[5]); 
+	data.WriteByteSeq(guid1[0]);
+	/*
     data << uint64(guid);
     data << uint8(loot_type);
     data << LootView(*loot, this, permission);
+	*/
 
     SendDirectMessage(&data);
 
