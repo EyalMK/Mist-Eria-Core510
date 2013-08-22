@@ -1034,7 +1034,7 @@ uint32 Object::GetUpdateFieldData(Player const* target, uint32*& flags) const
     uint32 visibleFlag = UF_FLAG_PUBLIC;
 
     if (target == this)
-        visibleFlag |= UF_FLAG_PRIVATE;
+        visibleFlag |= UF_FLAG_PRIVATE | UF_FLAG_PARTY_MEMBER;
 
     switch (GetTypeId())
     {
