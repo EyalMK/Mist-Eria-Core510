@@ -133,7 +133,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
     }
 
     for(uint32 i = 0 ; i < count ; i++) {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootSlot[i] %u %u %u", lootSlot[i], GUID_LOPART(lguid), GUID_LOPART(guid[i]));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootSlot[i] %u %u %u", lootSlot[i], GUID_LOPART(lguid), GUID_LOPART((ObjectGuid)guid[i]));
 		player->StoreLootItem(lootSlot[i], loot);
     }
 
