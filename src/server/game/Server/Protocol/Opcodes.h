@@ -1059,7 +1059,7 @@ enum Opcodes
     SMSG_LOGOUT_RESPONSE                              = 0x09A5,//16357
     SMSG_LOG_XPGAIN                                   = 0x0660,//16357
     SMSG_LOOT_ALL_PASSED                              = 0x1BD, //16357
-    SMSG_LOOT_CLEAR_MONEY                             = 0x1946,
+    SMSG_LOOT_CLEAR_MONEY                             = 0xF94, //16357
     SMSG_LOOT_CONTENTS                                = 0xDB1, //16357
     SMSG_LOOT_ITEM_NOTIFY                             = 0x1947,
     SMSG_LOOT_LIST                                    = 0x0A45, //16357

@@ -39,40 +39,40 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 	uint64 lguid = player->GetLootGUID();
     Loot* loot = NULL;
     uint8 lootSlot = 0;
-
 	uint8 count = 0;
+
 	count = recvData.ReadBits(25);
 
 	uint8** guid = new uint8*[count];
-	for(int i = 0; i < count; i++)
+	for(uint32 i = 0; i < count; i++)
 	   guid[i] = new uint8[8];
 
-for (uint32 i = 0; i < count; ++i)
-{
-	guid[i][5] = recvData.ReadBit();
-	guid[i][6] = recvData.ReadBit();
-	guid[i][7] = recvData.ReadBit();
-	guid[i][4] = recvData.ReadBit();
-	guid[i][3] = recvData.ReadBit();
-	guid[i][0] = recvData.ReadBit();
-	guid[i][2] = recvData.ReadBit();
-	guid[i][1] = recvData.ReadBit();
-}
+	for (uint32 i = 0; i < count; ++i)
+	{
+		guid[i][5] = recvData.ReadBit();
+		guid[i][6] = recvData.ReadBit();
+		guid[i][7] = recvData.ReadBit();
+		guid[i][4] = recvData.ReadBit();
+		guid[i][3] = recvData.ReadBit();
+		guid[i][0] = recvData.ReadBit();
+		guid[i][2] = recvData.ReadBit();
+		guid[i][1] = recvData.ReadBit();
+	}
 
 	recvData.FlushBits();
 
-for (uint32 i = 0; i < count; ++i)
-{
-	recvData.ReadByteSeq(guid[i][4]);
-	recvData.ReadByteSeq(guid[i][1]);
-	recvData.ReadByteSeq(guid[i][5]);
-	recvData.ReadByteSeq(guid[i][3]);
-	recvData.ReadByteSeq(guid[i][6]);
-	recvData.ReadByteSeq(guid[i][7]);
-	recvData >> lootSlot[&i];
-	recvData.ReadByteSeq(guid[i][0]);
-	recvData.ReadByteSeq(guid[i][2]);
-}
+	for (uint32 i = 0; i < count; ++i)
+	{
+		recvData.ReadByteSeq(guid[i][4]);
+		recvData.ReadByteSeq(guid[i][1]);
+		recvData.ReadByteSeq(guid[i][5]);
+		recvData.ReadByteSeq(guid[i][3]);
+		recvData.ReadByteSeq(guid[i][6]);
+		recvData.ReadByteSeq(guid[i][7]);
+		recvData >> lootSlot[&i];
+		recvData.ReadByteSeq(guid[i][0]);
+		recvData.ReadByteSeq(guid[i][2]);
+	}
 
     if (IS_GAMEOBJECT_GUID(lguid))
     {
