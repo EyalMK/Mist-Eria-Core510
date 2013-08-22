@@ -9221,14 +9221,12 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
     WorldPacket data(SMSG_LOOT_RESPONSE, 8 + 1 + 50 + 1 + 1);           // we guess size
 	ObjectGuid guid1 = uint64(guid);
 
-	data.WriteBits(0, 22); //counter1
-	data.FlushBits();
-
+    data.WriteBits(0, 22); //counter1
 	data.WriteBit(guid1[7]);
-	data.WriteBit(0); //byte18
+    data.WriteBit(permission != NONE_PERMISSION); //byte18
 	data.WriteBit(0); //byte30
 	data.WriteBit(guid1[2]);
-	data.WriteBit(0); //!byte31
+    data.WriteBit(1); //!byte31
 	data.WriteBit(guid1[6]);
 	data.WriteBit(1); //!dword1C
 	data.WriteBit(guid1[1]);
@@ -9240,8 +9238,8 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
 	//fin boucle
 	data.WriteBit(1); //!byte44
 	data.WriteBit(guid1[0]);
-	data.WriteBit(1); //!byte32
-	data.WriteBit(1); //!byte45
+    data.WriteBit(!loot_type); //!byte32
+    data.WriteBit(!permission); //!byte45
 	data.WriteBit(guid1[5]);
 	data.WriteBit(guid1[3]);
 	data.FlushBits();
@@ -9276,12 +9274,16 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
 	//       uint8
 	//       uint32
 	//fin boucle
-	data << uint8(loot_type); //Si byte31 => uint8
+    //Si byte31 => uint8
 	//Si byte1C => uint8
-	data.WriteByteSeq(guid1[7]); 
-	//Si byte45 => uint8
+	data.WriteByteSeq(guid1[7]); 	
+    if(permission) //Si byte45 => uint8
+        data << uint8(permission);
 	data.WriteByteSeq(guid1[5]); 
 	data.WriteByteSeq(guid1[0]);
+    data.WriteByteSeq(guid1[4]);
+    if(loot_type)
+        data << uint8(loot_type);
 	/*
     data << uint64(guid);
     data << uint8(loot_type);
