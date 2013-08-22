@@ -9237,8 +9237,8 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
     {
         LootItem item = loot->items[i];
 
-        data.WriteBit(!LOOT_SLOT_TYPE_MASTER);
         data.WriteBit(!i);
+        data.WriteBit(!LOOT_SLOT_TYPE_MASTER);
     }
 
 	data.WriteBit(1); //!byte44
