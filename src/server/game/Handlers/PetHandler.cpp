@@ -421,7 +421,7 @@ void WorldSession::HandlePetNameQuery(WorldPacket& recvData)
 {
     sLog->outInfo(LOG_FILTER_NETWORKIO, "HandlePetNameQuery. CMSG_PET_NAME_QUERY");
 
-    uint32 petnumber;
+    uint64 petnumber;
     uint64 petguid;
 
     recvData >> petnumber;
@@ -430,13 +430,13 @@ void WorldSession::HandlePetNameQuery(WorldPacket& recvData)
     SendPetNameQuery(petguid, petnumber);
 }
 
-void WorldSession::SendPetNameQuery(uint64 petguid, uint32 petnumber)
+void WorldSession::SendPetNameQuery(uint64 petguid, uint64 petnumber)
 {
     Creature* pet = ObjectAccessor::GetCreatureOrPetOrVehicle(*_player, petguid);
     if (!pet)
     {
         WorldPacket data(SMSG_PET_NAME_QUERY_RESPONSE, (4+1+4+1));
-        data << uint32(petnumber);
+        data << uint64(petnumber);
         data << uint8(0);
         data << uint32(0);
         data << uint8(0);
@@ -445,7 +445,7 @@ void WorldSession::SendPetNameQuery(uint64 petguid, uint32 petnumber)
     }
 
     WorldPacket data(SMSG_PET_NAME_QUERY_RESPONSE, (4+4+pet->GetName().size()+1));
-    data << uint32(petnumber);
+    data << uint64(petnumber);
     data << pet->GetName();
     data << uint32(pet->GetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP));
 
@@ -866,30 +866,11 @@ void WorldSession::HandlePetLearnTalent(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_PET_LEARN_TALENT");
 
-    ObjectGuid guid;
-    uint32 talentId;
+    uint64 guid;
+    uint32 talentId, requestedRank;
+    recvData >> guid >> talentId >> requestedRank;
 
-    recvData >> talentId;
-
-	guid[4] = recvData.ReadBit();
-    guid[2] = recvData.ReadBit();
-    guid[5] = recvData.ReadBit();
-    guid[0] = recvData.ReadBit();
-    guid[3] = recvData.ReadBit();
-    guid[6] = recvData.ReadBit();
-    guid[1] = recvData.ReadBit();
-    guid[7] = recvData.ReadBit();
-
-    recvData.ReadByteSeq(guid[5]);
-    recvData.ReadByteSeq(guid[0]);
-    recvData.ReadByteSeq(guid[1]);
-    recvData.ReadByteSeq(guid[3]);
-    recvData.ReadByteSeq(guid[4]);
-    recvData.ReadByteSeq(guid[6]);
-    recvData.ReadByteSeq(guid[2]);
-    recvData.ReadByteSeq(guid[7]);
-
-    //_player->LearnPetTalent(guid, talentId);
+    _player->LearnPetTalent(guid, talentId, requestedRank);
     _player->SendTalentsInfoData(true);
 }
 
