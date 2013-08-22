@@ -43,7 +43,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 	count = recvData.ReadBits(25);
 
 
-    std::vector<ObjectGuid*> guids;
+    std::vector<ObjectGuid> guids;
 
 	uint8* lootSlot = new uint8[count];
 
