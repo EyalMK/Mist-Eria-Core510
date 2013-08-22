@@ -10901,6 +10901,7 @@ InventoryResult Player::CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec &des
         {
             if (no_space_count)
                 *no_space_count = count;
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : LOOT : TEST");
             return EQUIP_ERR_LOOT_GONE;
         }
 
