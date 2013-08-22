@@ -9325,10 +9325,11 @@ void Player::SendNotifyLootMoneyRemoved()
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendNotifyLootItemRemoved(uint8 lootSlot)
+void Player::SendNotifyLootItemRemoved(uint8 lootSlot, ObjectGuid guid)
 {
     WorldPacket data(SMSG_LOOT_REMOVED, 1);
-	ObjectGuid guid = this->GetLootGUID();
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootSlot[i] %u %u", lootSlot, GUID_LOPART(guid));
+
 
 	data.WriteBit(guid[1]);
 	data.WriteBit(guid[3]);
@@ -16614,7 +16615,7 @@ void Player::SendQuestComplete(Quest const* quest)
 		data << questTurnTargetName;
 		data << uint32(quest->GetQuestGiverPortrait());   
 	    data << uint32(quest->GetQuestTurnInPortrait());
-		data << uint32(0);
+		data << uint8(0);
 		data << uint32(quest->GetFlags()); 
 		data << uint32(0);	//quest->GetFlags2();
 		data << uint32(0);
@@ -24655,7 +24656,7 @@ void Player::AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore cons
     }
 }
 
-void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
+void Player::StoreLootItem(uint8 lootSlot, Loot* loot, ObjectGuid guid)
 {
     QuestItem* qitem = NULL;
     QuestItem* ffaitem = NULL;
@@ -24688,8 +24689,10 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         {
             qitem->is_looted = true;
             //freeforall is 1 if everyone's supposed to get the quest item.
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 10");
+
             if (item->freeforall || loot->GetPlayerQuestItems().size() == 1)
-                SendNotifyLootItemRemoved(lootSlot);
+                SendNotifyLootItemRemoved(lootSlot, guid);
             else
                 loot->NotifyQuestItemRemoved(qitem->index);
         }
@@ -24697,16 +24700,19 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         {
             if (ffaitem)
             {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 11");
                 //freeforall case, notify only one player of the removal
                 ffaitem->is_looted = true;
-                SendNotifyLootItemRemoved(lootSlot);
+                SendNotifyLootItemRemoved(lootSlot, guid);
             }
             else
             {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 12");
+
                 //not freeforall, notify everyone
                 if (conditem)
                     conditem->is_looted = true;
-                loot->NotifyItemRemoved(lootSlot);
+                loot->NotifyItemRemoved(lootSlot, guid);
             }
         }
 
