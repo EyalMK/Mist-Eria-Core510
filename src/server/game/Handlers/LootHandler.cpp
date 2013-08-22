@@ -60,8 +60,6 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 		guid[i][1] = recvData.ReadBit();
 	}
 
-	recvData.FlushBits();
-
 	for (uint32 i = 0; i < count; ++i)
 	{
 		recvData.ReadByteSeq(guid[i][4]);
