@@ -189,10 +189,9 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
         }
         case STATUS_WAIT_QUEUE:
         {
-            // need to recheck this , maybe some bits , bytes are not in order
-            
             data->Initialize(SMSG_BATTLEFIELD_STATUS_QUEUED);
 
+            data->WriteBit(0);
             data->WriteBit(playerGuid[2]);
             data->WriteBit(playerGuid[4]);
             data->WriteBit(bgGuid[6]);
@@ -200,19 +199,18 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 			data->WriteBit(bgGuid[5]);
             data->WriteBit(bgGuid[1]);
             data->WriteBit(playerGuid[7]);
-            data->WriteBit(0);
 			data->WriteBit(playerGuid[5]);
 			data->WriteBit(bgGuid[4]);
             data->WriteBit(bgGuid[7]);
+            data->WriteBit(0);
+            data->WriteBit(0);
             data->WriteBit(bgGuid[3]);
             data->WriteBit(playerGuid[6]);
             data->WriteBit(playerGuid[0]);
-            data->WriteBit(bg->isRated());              // Is Rated
             data->WriteBit(playerGuid[1]);
+            data->WriteBit(bg->isRated());              // Is Rated
             data->WriteBit(playerGuid[3]);
 			data->WriteBit(bgGuid[2]);
-
-            data->FlushBits();
 
 			data->WriteByteSeq(bgGuid[0]);
             data->WriteByteSeq(playerGuid[5]);
@@ -243,8 +241,6 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
         }
         case STATUS_WAIT_JOIN:
         {
-            
-            // need to recheck.
             
             data->Initialize(SMSG_BATTLEFIELD_STATUS_NEEDCONFIRMATION);
 
