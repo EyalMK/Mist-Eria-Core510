@@ -9325,10 +9325,9 @@ void Player::SendNotifyLootMoneyRemoved()
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendNotifyLootItemRemoved(uint8 lootSlot)
+void Player::SendNotifyLootItemRemoved(uint8 lootSlot, ObjectGuid guid)
 {
     WorldPacket data(SMSG_LOOT_REMOVED, 1);
-	ObjectGuid guid = this->GetLootGUID();
     sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootSlot[i] %u %u", lootSlot, GUID_LOPART(guid));
 
 
@@ -24657,7 +24656,7 @@ void Player::AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore cons
     }
 }
 
-void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
+void Player::StoreLootItem(uint8 lootSlot, Loot* loot, ObjectGuid guid)
 {
     QuestItem* qitem = NULL;
     QuestItem* ffaitem = NULL;
@@ -24693,7 +24692,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
             sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 10");
 
             if (item->freeforall || loot->GetPlayerQuestItems().size() == 1)
-                SendNotifyLootItemRemoved(lootSlot);
+                SendNotifyLootItemRemoved(lootSlot, guid);
             else
                 loot->NotifyQuestItemRemoved(qitem->index);
         }
@@ -24704,7 +24703,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 11");
                 //freeforall case, notify only one player of the removal
                 ffaitem->is_looted = true;
-                SendNotifyLootItemRemoved(lootSlot);
+                SendNotifyLootItemRemoved(lootSlot, guid);
             }
             else
             {

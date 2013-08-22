@@ -614,7 +614,7 @@ void Loot::NotifyItemRemoved(uint8 lootIndex)
         i_next = i;
         ++i_next;
         if (Player* player = ObjectAccessor::FindPlayer(*i))
-            player->SendNotifyLootItemRemoved(lootIndex);
+            player->SendNotifyLootItemRemoved(lootIndex, guid);
         else
             PlayersLooting.erase(i);
     }
@@ -661,7 +661,7 @@ void Loot::NotifyQuestItemRemoved(uint8 questIndex)
                         break;
 
                 if (j < pql.size())
-                    player->SendNotifyLootItemRemoved(items.size()+j);
+                    player->SendNotifyLootItemRemoved(items.size()+j, (ObjectGuid)player->GetLootGUID());
             }
         }
         else
