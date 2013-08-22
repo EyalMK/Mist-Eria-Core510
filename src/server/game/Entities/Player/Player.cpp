@@ -9255,11 +9255,11 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
     {
         LootItem item = loot->items[i];
         if(i)
-            data << uint8(i);
+            data << uint8(LOOT_SLOT_TYPE_MASTER);
         data << uint32(0);
         data << uint32(item.count);
         data << uint32(0);
-        ;data << uint8(LOOT_SLOT_TYPE_MASTER);
+        data << uint8(i);
         data << uint32(item.itemid);
         data << uint32(sObjectMgr->GetItemTemplate(item.itemid)->DisplayInfoID);
         data << uint32(0);
@@ -9302,13 +9302,53 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
 void Player::SendNotifyLootMoneyRemoved()
 {
     WorldPacket data(SMSG_LOOT_CLEAR_MONEY, 0);
+	ObjectGuid guid = this->GetLootGUID();
+
+	data.WriteBit(guid[3]);
+	data.WriteBit(guid[0]);
+	data.WriteBit(guid[7]);
+	data.WriteBit(guid[6]);
+	data.WriteBit(guid[1]);
+	data.WriteBit(guid[5]);
+	data.WriteBit(guid[4]);
+	data.WriteBit(guid[2]);
+
+	data.WriteByteSeq(guid[2]);
+	data.WriteByteSeq(guid[3]);
+	data.WriteByteSeq(guid[6]);
+	data.WriteByteSeq(guid[5]);
+	data.WriteByteSeq(guid[0]);
+	data.WriteByteSeq(guid[4]);
+	data.WriteByteSeq(guid[7]);
+	data.WriteByteSeq(guid[1]);
+
     GetSession()->SendPacket(&data);
 }
 
 void Player::SendNotifyLootItemRemoved(uint8 lootSlot)
 {
     WorldPacket data(SMSG_LOOT_REMOVED, 1);
-    data << uint8(lootSlot);
+	ObjectGuid guid = this->GetLootGUID();
+
+	data.WriteBit(guid[1]);
+	data.WriteBit(guid[3]);
+	data.WriteBit(guid[4]);
+	data.WriteBit(guid[0]);
+	data.WriteBit(guid[6]);
+	data.WriteBit(guid[5]);
+	data.WriteBit(guid[2]);
+	data.WriteBit(guid[7]);
+
+	data.WriteByteSeq(guid[5]);
+	data.WriteByteSeq(guid[6]);
+	data.WriteByteSeq(guid[4]);
+	data << uint8(lootSlot);
+	data.WriteByteSeq(guid[0]);
+	data.WriteByteSeq(guid[3]);
+	data.WriteByteSeq(guid[2]);
+	data.WriteByteSeq(guid[7]);
+	data.WriteByteSeq(guid[1]);
+    
     GetSession()->SendPacket(&data);
 }
 
@@ -24625,6 +24665,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
 
     if (!item)
     {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : LOOT : lootSlot : %u", lootSlot);
         SendEquipError(EQUIP_ERR_LOOT_GONE, NULL, NULL);
         return;
     }

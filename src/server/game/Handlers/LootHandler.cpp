@@ -38,41 +38,40 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
     Player* player = GetPlayer();
 	uint64 lguid = player->GetLootGUID();
     Loot* loot = NULL;
-    uint8 lootSlot = 0;
-
 	uint8 count = 0;
+
 	count = recvData.ReadBits(25);
 
 	uint8** guid = new uint8*[count];
-	for(int i = 0; i < count; i++)
+	for(uint32 i = 0; i < count; i++)
 	   guid[i] = new uint8[8];
 
-for (uint32 i = 0; i < count; ++i)
-{
-	guid[i][5] = recvData.ReadBit();
-	guid[i][6] = recvData.ReadBit();
-	guid[i][7] = recvData.ReadBit();
-	guid[i][4] = recvData.ReadBit();
-	guid[i][3] = recvData.ReadBit();
-	guid[i][0] = recvData.ReadBit();
-	guid[i][2] = recvData.ReadBit();
-	guid[i][1] = recvData.ReadBit();
-}
+	uint8* lootSlot = new uint8[count];
 
-	recvData.FlushBits();
+	for (uint32 i = 0; i < count; ++i)
+	{
+		guid[i][5] = recvData.ReadBit();
+		guid[i][6] = recvData.ReadBit();
+		guid[i][7] = recvData.ReadBit();
+		guid[i][4] = recvData.ReadBit();
+		guid[i][3] = recvData.ReadBit();
+		guid[i][0] = recvData.ReadBit();
+		guid[i][2] = recvData.ReadBit();
+		guid[i][1] = recvData.ReadBit();
+	}
 
-for (uint32 i = 0; i < count; ++i)
-{
-	recvData.ReadByteSeq(guid[i][4]);
-	recvData.ReadByteSeq(guid[i][1]);
-	recvData.ReadByteSeq(guid[i][5]);
-	recvData.ReadByteSeq(guid[i][3]);
-	recvData.ReadByteSeq(guid[i][6]);
-	recvData.ReadByteSeq(guid[i][7]);
-	recvData >> lootSlot[&i];
-	recvData.ReadByteSeq(guid[i][0]);
-	recvData.ReadByteSeq(guid[i][2]);
-}
+	for (uint32 i = 0; i < count; ++i)
+	{
+		recvData.ReadByteSeq(guid[i][4]);
+		recvData.ReadByteSeq(guid[i][1]);
+		recvData.ReadByteSeq(guid[i][5]);
+		recvData.ReadByteSeq(guid[i][3]);
+		recvData.ReadByteSeq(guid[i][6]);
+		recvData.ReadByteSeq(guid[i][7]);
+		recvData >> lootSlot[i];
+		recvData.ReadByteSeq(guid[i][0]);
+		recvData.ReadByteSeq(guid[i][2]);
+	}
 
     if (IS_GAMEOBJECT_GUID(lguid))
     {
@@ -125,7 +124,8 @@ for (uint32 i = 0; i < count; ++i)
         loot = &creature->loot;
     }
 
-    player->StoreLootItem(lootSlot, loot);
+	for(uint32 i = 0 ; i < count ; i++)
+		player->StoreLootItem(lootSlot[i], loot);
 
     // If player is removing the last LootItem, delete the empty container.
     if (loot->isLooted() && IS_ITEM_GUID(lguid))
@@ -225,7 +225,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 
                 WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
                 data << uint32(goldPerPlayer);
-                data << uint8(playersNear.size() <= 1); // Controls the text displayed in chat. 0 is "Your share is..." and 1 is "You loot..."
+                data << uint8(playersNear.size() > 1); // Controls the text displayed in chat. 1 is "Your share is..." and 0 is "You loot..."
                 (*i)->GetSession()->SendPacket(&data);
             }
         }
@@ -240,7 +240,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 
             WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
             data << uint32(loot->gold);
-            data << uint8(1);   // "You loot..."
+            data << uint8(0);   // "You loot..."
             SendPacket(&data);
         }
 
