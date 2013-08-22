@@ -9302,6 +9302,26 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
 void Player::SendNotifyLootMoneyRemoved()
 {
     WorldPacket data(SMSG_LOOT_CLEAR_MONEY, 0);
+	ObjectGuid guid = this->GetLootGUID();
+
+	data.WriteBit(guid[3]);
+	data.WriteBit(guid[0]);
+	data.WriteBit(guid[7]);
+	data.WriteBit(guid[6]);
+	data.WriteBit(guid[1]);
+	data.WriteBit(guid[5]);
+	data.WriteBit(guid[4]);
+	data.WriteBit(guid[2]);
+
+	data.WriteByteSeq(guid[2]);
+	data.WriteByteSeq(guid[3]);
+	data.WriteByteSeq(guid[6]);
+	data.WriteByteSeq(guid[5]);
+	data.WriteByteSeq(guid[0]);
+	data.WriteByteSeq(guid[4]);
+	data.WriteByteSeq(guid[7]);
+	data.WriteByteSeq(guid[1]);
+
     GetSession()->SendPacket(&data);
 }
 
