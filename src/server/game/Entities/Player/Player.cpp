@@ -9329,6 +9329,8 @@ void Player::SendNotifyLootItemRemoved(uint8 lootSlot)
 {
     WorldPacket data(SMSG_LOOT_REMOVED, 1);
 	ObjectGuid guid = this->GetLootGUID();
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootSlot[i] %u %u", lootSlot, GUID_LOPART(guid));
+
 
 	data.WriteBit(guid[1]);
 	data.WriteBit(guid[3]);
