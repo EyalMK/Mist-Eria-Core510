@@ -606,7 +606,8 @@ enum Opcodes
     MSG_GM_SUMMON                                     = 0x1545,
     MSG_INSPECT_ARENA_TEAMS                           = 0x0204,//16357
     MSG_LIST_STABLED_PETS                             = 0x08E1,//16357
-    MSG_MINIMAP_PING                                  = 0x008A,//16357
+    CMSG_MINIMAP_PING                                 = 0x008A,//16357
+    SMSG_MINIMAP_PONG                                 = 0x03A9,//16357
     MSG_MOVE_CHARM_TELEPORT_CHEAT                     = 0x0217,//16357
     MSG_MOVE_FALL_LAND                                = 0x78B,//16357
     MSG_MOVE_FEATHER_FALL                             = 0x1551,
