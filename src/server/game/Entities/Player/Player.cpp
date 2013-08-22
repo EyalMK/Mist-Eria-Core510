@@ -16574,7 +16574,7 @@ void Player::SendQuestComplete(Quest const* quest)
 		data << questTurnTargetName;
 		data << uint32(quest->GetQuestGiverPortrait());   
 	    data << uint32(quest->GetQuestTurnInPortrait());
-		data << uint32(0);
+		data << uint8(0);
 		data << uint32(quest->GetFlags()); 
 		data << uint32(0);	//quest->GetFlags2();
 		data << uint32(0);

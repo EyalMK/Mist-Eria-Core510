@@ -450,7 +450,7 @@ enum Opcodes
     CMSG_QUESTGIVER_REQUEST_REWARD                    = 0x004C,//16357
     CMSG_QUESTGIVER_STATUS_MULTIPLE_QUERY             = 0x0BA1,//16357
     CMSG_QUESTGIVER_STATUS_QUERY                      = 0x0F69,//16357
-    CMSG_QUESTLOG_REMOVE_QUEST                        = 0x1400,
+    CMSG_QUESTLOG_REMOVE_QUEST                        = 0x0BF2,//16357
     CMSG_QUESTLOG_SWAP_QUEST                          = 0x1401,
     CMSG_QUEST_CONFIRM_ACCEPT                         = 0x0941,//16357
     CMSG_QUEST_NPC_QUERY                              = 0x0952,//16357
@@ -1238,7 +1238,7 @@ enum Opcodes
     SMSG_QUESTUPDATE_ADD_ITEM                         = 0x2038,
     SMSG_QUESTUPDATE_ADD_KILL                         = 0x0E61,//16357
     SMSG_QUESTUPDATE_ADD_PVP_KILL                     = 0x0629,//16357
-    SMSG_QUESTUPDATE_COMPLETE                         = 0x2039,
+    SMSG_QUESTUPDATE_COMPLETE                         = 0x00E4,//16357
     SMSG_QUESTUPDATE_FAILED                           = 0x2042,
     SMSG_QUESTUPDATE_FAILEDTIMER                      = 0x06A5,//16357
     SMSG_QUEST_NPC_QUERY_RESPONSE                     = 0x2044,
