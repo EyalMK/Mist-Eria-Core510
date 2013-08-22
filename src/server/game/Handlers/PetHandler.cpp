@@ -421,7 +421,7 @@ void WorldSession::HandlePetNameQuery(WorldPacket& recvData)
 {
     sLog->outInfo(LOG_FILTER_NETWORKIO, "HandlePetNameQuery. CMSG_PET_NAME_QUERY");
 
-    uint32 petnumber;
+    uint64 petnumber;
     uint64 petguid;
 
     recvData >> petnumber;
@@ -430,22 +430,22 @@ void WorldSession::HandlePetNameQuery(WorldPacket& recvData)
     SendPetNameQuery(petguid, petnumber);
 }
 
-void WorldSession::SendPetNameQuery(uint64 petguid, uint32 petnumber)
+void WorldSession::SendPetNameQuery(uint64 petguid, uint64 petnumber)
 {
-    Creature* pet = ObjectAccessor::GetCreatureOrPetOrVehicle(*_player, petguid);
+    Creature* pet = ObjectAccessor::GetCreatureOrPetOrVehicle(*_player, uint32(petguid));
     if (!pet)
     {
         WorldPacket data(SMSG_PET_NAME_QUERY_RESPONSE, (4+1+4+1));
-        data << uint32(petnumber);
+        data << uint64(0);
         data << uint8(0);
-        data << uint32(0);
+        data << uint32(petnumber);
         data << uint8(0);
         _player->GetSession()->SendPacket(&data);
         return;
     }
 
     WorldPacket data(SMSG_PET_NAME_QUERY_RESPONSE, (4+4+pet->GetName().size()+1));
-    data << uint32(petnumber);
+    data << uint64(petnumber);
     data << pet->GetName();
     data << uint32(pet->GetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP));
 
