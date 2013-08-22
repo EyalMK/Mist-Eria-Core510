@@ -239,33 +239,34 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             *data << uint32(bg->GetClientInstanceID()); // Client Instance ID
             break;
         }
-        case STATUS_WAIT_JOIN:
-        {
-            
-            data->Initialize(SMSG_BATTLEFIELD_STATUS_NEEDCONFIRMATION);
+		case STATUS_WAIT_JOIN:
+		{
+			data->Initialize(SMSG_BATTLEFIELD_STATUS_NEEDCONFIRMATION);
 
+			data->WriteBit(bg->isRated());
 			data->WriteBit(bgGuid[1]);
-            data->WriteBit(bgGuid[0]);
+			data->WriteBit(bgGuid[0]);
 			data->WriteBit(bgGuid[5]);
 			data->WriteBit(playerGuid[3]);
 			data->WriteBit(bgGuid[2]);
-            data->WriteBit(bgGuid[3]);
-            data->WriteBit(playerGuid[6]);
-			data->WriteBit(bg->isRated()); 
-            data->WriteBit(playerGuid[2]);
-            data->WriteBit(playerGuid[0]);
-            data->WriteBit(playerGuid[5]);
-			data->WriteBit(bgGuid[4]);
-            data->WriteBit(playerGuid[7]); 
-            data->WriteBit(playerGuid[4]);
-            data->WriteBit(bgGuid[7]);
-            data->WriteBit(bgGuid[6]);
-			data->WriteBit(0); // not sure
-            data->WriteBit(playerGuid[1]);
+			data->WriteBit(bgGuid[3]);
+			data->WriteBit(playerGuid[6]);
 
-            data->WriteByteSeq(bgGuid[0]);
+			data->WriteBit(playerGuid[2]);
+			data->WriteBit(playerGuid[0]);
+			data->WriteBit(playerGuid[5]);
+			data->WriteBit(bgGuid[4]);
+			data->WriteBit(playerGuid[7]); 
+			data->WriteBit(playerGuid[4]);
+			data->WriteBit(bgGuid[7]);
+			data->WriteBit(bgGuid[6]);
+
+			data->WriteBit(playerGuid[1]);
+			data->FlushBits();
+
+			data->WriteByteSeq(bgGuid[0]);
 			*data << uint32(bg->GetClientInstanceID()); // Client Instance ID
-            data->WriteByteSeq(bgGuid[2]);
+			data->WriteByteSeq(bgGuid[2]);
 			data->WriteByteSeq(playerGuid[5]);
 			*data << uint8(0); 
 			*data << uint8(bg->GetMinLevel());          // Min Level
@@ -273,50 +274,48 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 			*data << uint32(QueueSlot);                 // Queue slot
 			data->WriteByteSeq(bgGuid[6]);
 			data->WriteByteSeq(playerGuid[1]);
-            data->WriteByteSeq(playerGuid[2]);
+			data->WriteByteSeq(playerGuid[2]);
 			*data << uint32(Time2);                     // Join Time          
-            data->WriteByteSeq(bgGuid[7]);
-            data->WriteByteSeq(bgGuid[3]);
+			data->WriteByteSeq(bgGuid[7]);
+			data->WriteByteSeq(bgGuid[3]);
 			*data << uint32(bg->isArena() ? arenatype : 1); // Player count, 1 for bgs, 2-3-5 for arena (2v2, 3v3, 5v5)
 			*data << uint32(bg->GetMapId());            // Map Id
-            data->WriteByteSeq(playerGuid[4]);
-            data->WriteByteSeq(playerGuid[3]);
-            data->WriteByteSeq(bgGuid[4]);
-            *data << uint8(0);                          // unk
-            data->WriteByteSeq(bgGuid[1]);
-            data->WriteByteSeq(playerGuid[7]);
+			data->WriteByteSeq(playerGuid[4]);
+			data->WriteByteSeq(playerGuid[3]);
+			data->WriteByteSeq(bgGuid[4]);
+			*data << uint8(0);                          // unk
+			data->WriteByteSeq(bgGuid[1]);
+			data->WriteByteSeq(playerGuid[7]);
 			data->WriteByteSeq(playerGuid[0]);
-            data->WriteByteSeq(bgGuid[5]);
-            data->WriteByteSeq(playerGuid[6]);
-            break;
-        }
-        case STATUS_IN_PROGRESS:
-        {
-        
-            // need to recheck
-            
-            data->Initialize(SMSG_BATTLEFIELD_STATUS_ACTIVE);
+			data->WriteByteSeq(bgGuid[5]);
+			data->WriteByteSeq(playerGuid[6]);
+			break;
+		}
+		case STATUS_IN_PROGRESS:
+		{
+			data->Initialize(SMSG_BATTLEFIELD_STATUS_ACTIVE);
 
 			data->WriteBit(bgGuid[7]);
-            data->WriteBit(bgGuid[3]);
+			data->WriteBit(bgGuid[3]);
 			data->WriteBit(playerGuid[7]);
 			data->WriteBit(bgGuid[0]);
 			data->WriteBit(bgGuid[1]);
-            data->WriteBit(playerGuid[6]);
-            data->WriteBit(bgGuid[5]);
-            data->WriteBit(player->GetBGTeam() == HORDE ? 0 : 1);
+			data->WriteBit(playerGuid[6]);
+			data->WriteBit(player->GetBGTeam() == HORDE ? 0 : 1);
+			data->WriteBit(bgGuid[5]);
+
 			data->WriteBit(playerGuid[4]);
 			data->WriteBit(playerGuid[3]);
 			data->WriteBit(bgGuid[6]);
 			data->WriteBit(bgGuid[4]);
 			data->WriteBit(bgGuid[2]);
-            data->WriteBit(playerGuid[5]);
-            data->WriteBit(playerGuid[0]);
-            data->WriteBit(bg->isRated());              // Is Rated
-            data->WriteBit(playerGuid[2]);
-            data->WriteBit(playerGuid[1]);
+			data->WriteBit(bg->isRated());
+			data->WriteBit(playerGuid[5]);
+			data->WriteBit(playerGuid[0]);
 
-            data->FlushBits();
+			data->WriteBit(playerGuid[2]);
+			data->WriteBit(playerGuid[1]);
+			data->FlushBits();
 
 			data->WriteByteSeq(playerGuid[7]);
 			data->WriteByteSeq(bgGuid[7]);
@@ -325,7 +324,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 			data->WriteByteSeq(bgGuid[1]);
 			data->WriteByteSeq(bgGuid[4]);
 			*data << uint32(Time1);                     // Join Time
-            data->WriteByteSeq(playerGuid[0]);
+			data->WriteByteSeq(playerGuid[0]);
 			*data << uint32(QueueSlot);                 // Queue slot
 			data->WriteByteSeq(playerGuid[2]);
 			data->WriteByteSeq(playerGuid[6]);
@@ -343,9 +342,9 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 			*data << uint32(bg->GetRemainingTime());    // Remaining Time
 			*data << uint32(bg->GetClientInstanceID()); // Client Instance ID or faction ?
 			*data << uint8(bg->GetMinLevel());          // Min Level
-            data->WriteByteSeq(bgGuid[5]);
-            break;
-        }
+			data->WriteByteSeq(bgGuid[5]);
+			break;
+		}
         case STATUS_WAIT_LEAVE:
             break;
     }
