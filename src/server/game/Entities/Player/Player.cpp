@@ -9228,14 +9228,19 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
 	data.WriteBit(guid1[2]);
     data.WriteBit(1); //!byte31
 	data.WriteBit(guid1[6]);
-	data.WriteBit(1); //!dword1C
+    data.WriteBit(!loot->gold); //!dword1C
 	data.WriteBit(guid1[1]);
 	data.WriteBit(guid1[4]);
-	data.WriteBits(0, 21); //counter2
-	//boucle sur counter2
-	//          bitUnk1
-	//          bitUnk2
-	//fin boucle
+    data.WriteBits(loot->items.size(), 21); //counter2
+
+    for(int i = 0 ; i < loot->items.size() ; i++)
+    {
+        LootItem item = loot->items[i];
+
+        data.WriteBit(!LOOT_SLOT_TYPE_MASTER);
+        data.WriteBit(!i);
+    }
+
 	data.WriteBit(1); //!byte44
 	data.WriteBit(guid1[0]);
     data.WriteBit(!loot_type); //!byte32
@@ -9246,26 +9251,19 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
 
 	data.WriteByteSeq(guid1[1]);
 	data.WriteByteSeq(guid1[6]);
-	//boucle sur counter2
-	//          si bitUnk2
-	//                     uint8
-	//          finsi
-	//          uint32
-	//          uint32
-	//          uint32
-	//          DataInSitu
-	//          Si ????
-	//                    Data
-	//          Sinon
-	//                    ??
-	//          finsi
-	//          si bitUnk1
-	//                    uint8
-	//          finsi
-	//          uint32
-	//          uint32
-	//          uint32
-	//fin boucle
+    for(int i = 0 ; i < loot->items.size() ; i++)
+    {
+        LootItem item = loot->items[i];
+        if(i)
+            data << uint8(i);
+        data << uint32(0);
+        data << uint32(item.count);
+        data << uint32(0);
+        ;data << uint8(LOOT_SLOT_TYPE_MASTER);
+        data << uint32(item.itemid);
+        data << uint32(sObjectMgr->GetItemTemplate(item.itemid)->DisplayInfoID);
+        data << uint32(0);
+    }
 	data.WriteByteSeq(guid1[3]);
 	data.WriteByteSeq(guid1[2]);
 	//Si byte44 => uint8
@@ -9275,7 +9273,8 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
 	//       uint32
 	//fin boucle
     //Si byte31 => uint8
-	//Si byte1C => uint8
+    if(loot->gold)
+        data << uint32(loot->gold);
 	data.WriteByteSeq(guid1[7]); 	
     if(permission) //Si byte45 => uint8
         data << uint8(permission);
