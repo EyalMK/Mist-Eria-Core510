@@ -42,35 +42,39 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 
 	count = recvData.ReadBits(25);
 
-	uint8** guid = new uint8*[count];
-	for(uint32 i = 0; i < count; i++)
-	   guid[i] = new uint8[8];
+
+    std::vector<ObjectGuid*> guids;
 
 	uint8* lootSlot = new uint8[count];
 
 	for (uint32 i = 0; i < count; ++i)
 	{
-		guid[i][5] = recvData.ReadBit();
-		guid[i][6] = recvData.ReadBit();
-		guid[i][7] = recvData.ReadBit();
-		guid[i][4] = recvData.ReadBit();
-		guid[i][3] = recvData.ReadBit();
-		guid[i][0] = recvData.ReadBit();
-		guid[i][2] = recvData.ReadBit();
-		guid[i][1] = recvData.ReadBit();
+        ObjectGuid guid;
+
+        guid[5] = recvData.ReadBit();
+        guid[6] = recvData.ReadBit();
+        guid[7] = recvData.ReadBit();
+        guid[4] = recvData.ReadBit();
+        guid[3] = recvData.ReadBit();
+        guid[0] = recvData.ReadBit();
+        guid[2] = recvData.ReadBit();
+        guid[1] = recvData.ReadBit();
+
+        guids.push_back(guid);
 	}
 
 	for (uint32 i = 0; i < count; ++i)
 	{
-		recvData.ReadByteSeq(guid[i][4]);
-		recvData.ReadByteSeq(guid[i][1]);
-		recvData.ReadByteSeq(guid[i][5]);
-		recvData.ReadByteSeq(guid[i][3]);
-		recvData.ReadByteSeq(guid[i][6]);
-		recvData.ReadByteSeq(guid[i][7]);
+        ObjectGuid guid = guids.at(i);
+        recvData.ReadByteSeq(guid[4]);
+        recvData.ReadByteSeq(guid[1]);
+        recvData.ReadByteSeq(guid[5]);
+        recvData.ReadByteSeq(guid[3]);
+        recvData.ReadByteSeq(guid[6]);
+        recvData.ReadByteSeq(guid[7]);
 		recvData >> lootSlot[i];
-		recvData.ReadByteSeq(guid[i][0]);
-		recvData.ReadByteSeq(guid[i][2]);
+        recvData.ReadByteSeq(guid[0]);
+        recvData.ReadByteSeq(guid[2]);
 	}
 
     if (IS_GAMEOBJECT_GUID(lguid))
@@ -133,7 +137,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
     }
 
     for(uint32 i = 0 ; i < count ; i++) {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootSlot[i] %u %u %u", lootSlot[i], GUID_LOPART(lguid), GUID_LOPART((ObjectGuid)guid[i]));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootSlot[i] %u %u %u", lootSlot[i], GUID_LOPART(lguid), GUID_LOPART((ObjectGuid)guids.at(i)));
 		player->StoreLootItem(lootSlot[i], loot);
     }
 
