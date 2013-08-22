@@ -707,10 +707,11 @@ void WorldSession::HandleGuildSwitchRanksOpcode(WorldPacket& recvPacket)
 {
 	sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GUILD_SWITCH_RANK");
 
-	uint32 unk;
-	recvPacket >> unk;
+	uint32 rankId;
+	recvPacket >> rankId;
+	bool up = recvPacket.ReadBit();
 
-	sLog->outDebug(LOG_FILTER_SERVER_LOADING, "CMSG_GUILD_SWITCH_RANK : unk : %u", unk);
+	sLog->outDebug(LOG_FILTER_SERVER_LOADING, "CMSG_GUILD_SWITCH_RANK : rankId : %u, monter : %b", rankId, up);
 }
 
 void WorldSession::HandleGuildRequestPartyState(WorldPacket& recvPacket)
