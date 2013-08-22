@@ -225,7 +225,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 
                 WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
                 data << uint32(goldPerPlayer);
-                data << uint8(playersNear.size() <= 1); // Controls the text displayed in chat. 0 is "Your share is..." and 1 is "You loot..."
+                data << uint8(playersNear.size() > 1); // Controls the text displayed in chat. 1 is "Your share is..." and 0 is "You loot..."
                 (*i)->GetSession()->SendPacket(&data);
             }
         }
@@ -240,7 +240,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 
             WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
             data << uint32(loot->gold);
-            data << uint8(1);   // "You loot..."
+            data << uint8(0);   // "You loot..."
             SendPacket(&data);
         }
 
