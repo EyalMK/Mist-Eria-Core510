@@ -9302,13 +9302,54 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
 void Player::SendNotifyLootMoneyRemoved()
 {
     WorldPacket data(SMSG_LOOT_CLEAR_MONEY, 0);
+	ObjectGuid guid = this->GetLootGUID();
+
+	data.WriteBit(guid[3]);
+	data.WriteBit(guid[0]);
+	data.WriteBit(guid[7]);
+	data.WriteBit(guid[6]);
+	data.WriteBit(guid[1]);
+	data.WriteBit(guid[5]);
+	data.WriteBit(guid[4]);
+	data.WriteBit(guid[2]);
+
+	data.WriteByteSeq(guid[2]);
+	data.WriteByteSeq(guid[3]);
+	data.WriteByteSeq(guid[6]);
+	data.WriteByteSeq(guid[5]);
+	data.WriteByteSeq(guid[0]);
+	data.WriteByteSeq(guid[4]);
+	data.WriteByteSeq(guid[7]);
+	data.WriteByteSeq(guid[1]);
+
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendNotifyLootItemRemoved(uint8 lootSlot)
+void Player::SendNotifyLootItemRemoved(uint8 lootSlot, ObjectGuid guid)
 {
     WorldPacket data(SMSG_LOOT_REMOVED, 1);
-    data << uint8(lootSlot);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootSlot[i] %u %u", lootSlot, GUID_LOPART(guid));
+
+
+	data.WriteBit(guid[1]);
+	data.WriteBit(guid[3]);
+	data.WriteBit(guid[4]);
+	data.WriteBit(guid[0]);
+	data.WriteBit(guid[6]);
+	data.WriteBit(guid[5]);
+	data.WriteBit(guid[2]);
+	data.WriteBit(guid[7]);
+
+	data.WriteByteSeq(guid[5]);
+	data.WriteByteSeq(guid[6]);
+	data.WriteByteSeq(guid[4]);
+	data << uint8(lootSlot);
+	data.WriteByteSeq(guid[0]);
+	data.WriteByteSeq(guid[3]);
+	data.WriteByteSeq(guid[2]);
+	data.WriteByteSeq(guid[7]);
+	data.WriteByteSeq(guid[1]);
+    
     GetSession()->SendPacket(&data);
 }
 
@@ -24615,7 +24656,7 @@ void Player::AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore cons
     }
 }
 
-void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
+void Player::StoreLootItem(uint8 lootSlot, Loot* loot, ObjectGuid guid)
 {
     QuestItem* qitem = NULL;
     QuestItem* ffaitem = NULL;
@@ -24648,8 +24689,10 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         {
             qitem->is_looted = true;
             //freeforall is 1 if everyone's supposed to get the quest item.
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 10");
+
             if (item->freeforall || loot->GetPlayerQuestItems().size() == 1)
-                SendNotifyLootItemRemoved(lootSlot);
+                SendNotifyLootItemRemoved(lootSlot, guid);
             else
                 loot->NotifyQuestItemRemoved(qitem->index);
         }
@@ -24657,16 +24700,19 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         {
             if (ffaitem)
             {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 11");
                 //freeforall case, notify only one player of the removal
                 ffaitem->is_looted = true;
-                SendNotifyLootItemRemoved(lootSlot);
+                SendNotifyLootItemRemoved(lootSlot, guid);
             }
             else
             {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 12");
+
                 //not freeforall, notify everyone
                 if (conditem)
                     conditem->is_looted = true;
-                loot->NotifyItemRemoved(lootSlot);
+                loot->NotifyItemRemoved(lootSlot, guid);
             }
         }
 
