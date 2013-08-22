@@ -24688,6 +24688,8 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         {
             qitem->is_looted = true;
             //freeforall is 1 if everyone's supposed to get the quest item.
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 10");
+
             if (item->freeforall || loot->GetPlayerQuestItems().size() == 1)
                 SendNotifyLootItemRemoved(lootSlot);
             else
@@ -24697,12 +24699,15 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         {
             if (ffaitem)
             {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 11");
                 //freeforall case, notify only one player of the removal
                 ffaitem->is_looted = true;
                 SendNotifyLootItemRemoved(lootSlot);
             }
             else
             {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 12");
+
                 //not freeforall, notify everyone
                 if (conditem)
                     conditem->is_looted = true;
