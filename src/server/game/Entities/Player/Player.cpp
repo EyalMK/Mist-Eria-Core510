@@ -9240,7 +9240,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
 
 void Player::SendNotifyLootMoneyRemoved()
 {
-    WorldPacket data(SMSG_LOOT_CLEAR_MONEY, 0);
+    WorldPacket data(SMSG_LOOT_CLEAR_MONEY);
 	ObjectGuid guid = this->GetLootGUID();
 
 	data.WriteBit(guid[3]);
