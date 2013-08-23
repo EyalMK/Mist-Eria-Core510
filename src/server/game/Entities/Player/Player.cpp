@@ -7447,8 +7447,8 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
 
         WorldPacket packet(SMSG_UPDATE_CURRENCY, 12);
 
-		packet << uint32(newTotalCount / precision);
         packet << uint32(id);
+		packet << uint32(newTotalCount / precision);
 
         packet.WriteBit(weekCap != 0);
         packet.WriteBit(0); // hasSeasonCount
