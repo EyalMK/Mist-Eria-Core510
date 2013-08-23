@@ -1675,30 +1675,19 @@ void WorldSession::HandleTransmogrifyItems(WorldPacket& recvData)
 
 void WorldSession::SendReforgeResult(bool success)
 {
-    WorldPacket data(SMSG_REFORGE_RESULT, 1);
-    data.WriteBit(success);
-
-	//std::cout << "success:" << success << std::endl;
-
+    WorldPacket data(SMSG_REFORGE_RESULT);
+    data << uint8(success);
     SendPacket(&data);
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleReforgeItemOpcode - Send %s result to Player (Guid: %u Name: %s)", (success ? "TRUE" : "FALSE"), GetPlayer()->GetGUIDLow(), GetPlayer()->GetName());
 }
 
 void WorldSession::HandleReforgeItemOpcode(WorldPacket& recvData)
 {
-    uint32 slot, reforgeEntry;
+    uint32 slot, reforgeEntry, bag;
     ObjectGuid guid;
-    uint32 bag;
     Player* player = GetPlayer();
 
     recvData >> slot >> reforgeEntry >> bag;
-
-	
-	//Testing purpose only:
-	/*
-	std::cout << "reforgeEntry:" << reforgeEntry << std::endl;
-	std::cout << "bag:" << bag << std::endl;
-	std::cout << "slot:" << slot << std::endl;
-	*/
 	
     guid[3] = recvData.ReadBit();
     guid[4] = recvData.ReadBit();
@@ -1718,7 +1707,7 @@ void WorldSession::HandleReforgeItemOpcode(WorldPacket& recvData)
     recvData.ReadByteSeq(guid[1]);
     recvData.ReadByteSeq(guid[3]);
 
-	//std::cout << "guid:" << guid << std::endl;
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleReforgeItemOpcode - bag : %u - slot : %u - reforgeEntry : %u", bag, slot, reforgeEntry);
 
     if (!player->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_REFORGER))
     {
@@ -1756,12 +1745,14 @@ void WorldSession::HandleReforgeItemOpcode(WorldPacket& recvData)
 
     if (!item->GetReforgableStat(ItemModType(stats->SourceStat)) || item->GetReforgableStat(ItemModType(stats->FinalStat))) // Cheating, you cant reforge to a stat that the item already has, nor reforge from a stat that the item does not have
     {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleReforgeItemOpcode - Player (Guid: %u Name: %s) attempted to cheat with reforgeStats");
         SendReforgeResult(false);
         return;
     }
 
     if (!player->HasEnoughMoney(uint64(item->GetSpecialPrice()))) // cheating
     {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleReforgeItemOpcode - Player (Guid: %u Name: %s) attempted to cheat with reforge price");
         SendReforgeResult(false);
         return;
     }
