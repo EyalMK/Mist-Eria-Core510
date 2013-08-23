@@ -7279,6 +7279,7 @@ void Player::SendNewCurrency(uint32 id) const
 
 void Player::SendCurrencies() const
 {
+/*
     ByteBuffer currencyData;
     WorldPacket packet(SMSG_INIT_CURRENCY, 4 + _currencyStorage.size()*(5*4 + 1));
     
@@ -7322,6 +7323,7 @@ void Player::SendCurrencies() const
     packet.append(currencyData);
     packet.PutBits(count_pos, count, 23);
     GetSession()->SendPacket(&packet);
+*/
 }
 
 void Player::SendPvpRewards() const
