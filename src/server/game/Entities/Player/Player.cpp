@@ -7255,19 +7255,20 @@ void Player::SendNewCurrency(uint32 id) const
     uint32 weekCount = itr->second.weekCount / precision;
     uint32 weekCap = GetCurrencyWeekCap(entry) / precision;
 
+	packet.WriteBits(0, 4); // some flags
     packet.WriteBit(weekCount);
-    packet.WriteBits(0, 4); // some flags
     packet.WriteBit(weekCap);
     packet.WriteBit(0);     // season total earned
 
+	currencyData << uint32(entry->ID);
     currencyData << uint32(itr->second.totalCount / precision);
+
     if (weekCap)
         currencyData << uint32(weekCap);
 
     //if (seasonTotal)
     //    currencyData << uint32(seasonTotal / precision);
 
-    currencyData << uint32(entry->ID);
     if (weekCount)
         currencyData << uint32(weekCount);
 
