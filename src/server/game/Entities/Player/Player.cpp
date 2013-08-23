@@ -9254,10 +9254,9 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
     for(int i = 0 ; i < loot->items.size() ; i++)
     {
         LootItem item = loot->items[i];
-		/*
+		
         if(i)
-            data << uint8(LOOT_SLOT_TYPE_MASTER);
-			*/
+            data << uint8(LOOT_SLOT_TYPE_ALLOW_LOOT);
         data << uint32(0);
         data << uint32(item.count);
         data << uint32(0);
