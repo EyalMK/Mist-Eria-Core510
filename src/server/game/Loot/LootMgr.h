@@ -280,13 +280,16 @@ class LootValidatorRefManager : public RefManager<Loot, LootValidatorRef>
 
 //=====================================================
 struct LootView;
+struct LootItemView;
 
 ByteBuffer& operator<<(ByteBuffer& b, LootItem const& li);
 ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv);
+ByteBuffer& operator<<(ByteBuffer& b, LootItemView const& li);
 
 struct Loot
 {
     friend ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv);
+	friend ByteBuffer& operator<<(ByteBuffer& b, LootItemView const& li);
 
     QuestItemMap const& GetPlayerQuestItems() const { return PlayerQuestItems; }
     QuestItemMap const& GetPlayerFFAItems() const { return PlayerFFAItems; }
@@ -382,6 +385,14 @@ struct LootView
     PermissionTypes permission;
     LootView(Loot &_loot, Player* _viewer, PermissionTypes _permission = ALL_PERMISSION)
         : loot(_loot), viewer(_viewer), permission(_permission) {}
+};
+
+struct LootItemView
+{
+	LootItem &loot_item;
+	uint32 position;
+	LootSlotType slotType;
+	LootItemView(LootItem &_item, uint32 _pos, LootSlotType _slot) : loot_item(_item), position(_pos), slotType(_slot) { }
 };
 
 extern LootStore LootTemplates_Creature;
