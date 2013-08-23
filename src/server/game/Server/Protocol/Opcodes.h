@@ -727,7 +727,7 @@ enum Opcodes
     SMSG_AUTH_RESPONSE                                = 0xA15, //16357
     SMSG_AVAILABLE_VOICE_CHANNEL                      = 0x03E1,//16357
     SMSG_AVERAGE_ITEM_LEVEL_INFORM                    = 0x31D, //16357
-    SMSG_BARBER_SHOP_RESULT                           = 0x1648,
+    SMSG_BARBER_SHOP_RESULT                           = 0x02C8,//16357
     SMSG_BATTLEFIELD_LIST                             = 0x530, //16357
     SMSG_BATTLEFIELD_MGR_EJECTED                      = 0x7F1, //16357
     SMSG_BATTLEFIELD_MGR_EJECT_PENDING                = 0xE54, //16357
