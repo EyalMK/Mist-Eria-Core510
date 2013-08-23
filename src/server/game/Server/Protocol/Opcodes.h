@@ -189,7 +189,7 @@ enum Opcodes
     CMSG_DEL_IGNORE                                   = 0x0A01,//16357
     CMSG_DEL_VOICE_IGNORE                             = 0x0A81,//16357
     CMSG_DESTROY_ITEM                                 = 0x0DC4,//16357
-    CMSG_DISMISS_CONTROLLED_VEHICLE                   = 0x1147,
+    CMSG_DISMISS_CONTROLLED_VEHICLE                   = 0x4E7,//16357
     CMSG_DISMISS_CRITTER                              = 0x074C,//16357
     CMSG_DUEL_ACCEPTED                                = 0x082D,//16357
     CMSG_DUEL_CANCELLED                               = 0x0AA1,//16357
