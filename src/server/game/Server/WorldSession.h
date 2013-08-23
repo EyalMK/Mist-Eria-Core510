@@ -867,6 +867,7 @@ class WorldSession
         // Guild Bank
         void HandleGuildPermissions(WorldPacket& recvData);
         void HandleGuildBankMoneyWithdrawn(WorldPacket& recvData);
+        void HandleGuildBankSetTabInfo(WorldPacket& recvData);
         void HandleGuildBankerActivate(WorldPacket& recvData);
         void HandleGuildBankQueryTab(WorldPacket& recvData);
         void HandleGuildBankLogQuery(WorldPacket& recvData);

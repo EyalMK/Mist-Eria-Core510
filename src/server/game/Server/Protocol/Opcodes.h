@@ -134,7 +134,7 @@ enum Opcodes
     CMSG_CHANNEL_ANNOUNCEMENTS                        = 0x0F7B,//16357
     CMSG_CHANNEL_BAN                                  = 0x030B,//16357
     CMSG_CHANNEL_DISPLAY_LIST                         = 0x1095,
-    CMSG_CHANNEL_INVITE                               = 0x1096,
+    CMSG_CHANNEL_INVITE                               = 0x65A,//16357
     CMSG_CHANNEL_KICK                                 = 0x0C7A,//16357
     CMSG_CHANNEL_LIST                                 = 0xDDA,//16357
     CMSG_CHANNEL_MODERATE                             = 0x1099,
@@ -189,7 +189,7 @@ enum Opcodes
     CMSG_DEL_IGNORE                                   = 0x0A01,//16357
     CMSG_DEL_VOICE_IGNORE                             = 0x0A81,//16357
     CMSG_DESTROY_ITEM                                 = 0x0DC4,//16357
-    CMSG_DISMISS_CONTROLLED_VEHICLE                   = 0x1147,
+    CMSG_DISMISS_CONTROLLED_VEHICLE                   = 0x4E7,//16357
     CMSG_DISMISS_CRITTER                              = 0x074C,//16357
     CMSG_DUEL_ACCEPTED                                = 0x082D,//16357
     CMSG_DUEL_CANCELLED                               = 0x0AA1,//16357
@@ -252,6 +252,7 @@ enum Opcodes
     CMSG_GUILD_BANK_LOG_QUERY                         = 0x1205,
     CMSG_GUILD_BANK_MONEY_WITHDRAWN_QUERY             = 0x1206,
     CMSG_GUILD_BANK_NOTE                              = 0x1207,
+    CMSG_GUILD_BANK_TAB_INFO                          = 0xA42,//16357
     CMSG_GUILD_BANK_QUERY_TAB                         = 0x0F64,//16357
     CMSG_GUILD_BANK_QUERY_TEXT                        = 0x1209,
     CMSG_GUILD_BANK_SWAP_ITEMS                        = 0x0EA9,//16357
@@ -329,7 +330,7 @@ enum Opcodes
     CMSG_LOOT                                         = 0x072E,//16357
     CMSG_LOOT_CURRENCY                                = 0x08BB,//16357
     CMSG_LOOT_MASTER_GIVE                             = 0x1282,
-    CMSG_LOOT_METHOD                                  = 0x1283,
+    CMSG_LOOT_METHOD                                  = 0x0E3A,//16357
     CMSG_LOOT_MONEY                                   = 0x08D7,//16357
     CMSG_LOOT_RELEASE                                 = 0x0B13,//16357
     CMSG_LOOT_ROLL                                    = 0x1286,
@@ -450,7 +451,7 @@ enum Opcodes
     CMSG_QUESTGIVER_REQUEST_REWARD                    = 0x004C,//16357
     CMSG_QUESTGIVER_STATUS_MULTIPLE_QUERY             = 0x0BA1,//16357
     CMSG_QUESTGIVER_STATUS_QUERY                      = 0x0F69,//16357
-    CMSG_QUESTLOG_REMOVE_QUEST                        = 0x1400,
+    CMSG_QUESTLOG_REMOVE_QUEST                        = 0x0BF2,//16357
     CMSG_QUESTLOG_SWAP_QUEST                          = 0x1401,
     CMSG_QUEST_CONFIRM_ACCEPT                         = 0x0941,//16357
     CMSG_QUEST_NPC_QUERY                              = 0x0952,//16357
@@ -606,7 +607,8 @@ enum Opcodes
     MSG_GM_SUMMON                                     = 0x1545,
     MSG_INSPECT_ARENA_TEAMS                           = 0x0204,//16357
     MSG_LIST_STABLED_PETS                             = 0x08E1,//16357
-    MSG_MINIMAP_PING                                  = 0x008A,//16357
+    CMSG_MINIMAP_PING                                 = 0x008A,//16357
+    SMSG_MINIMAP_PONG                                 = 0x03A9,//16357
     MSG_MOVE_CHARM_TELEPORT_CHEAT                     = 0x0217,//16357
     MSG_MOVE_FALL_LAND                                = 0x78B,//16357
     MSG_MOVE_FEATHER_FALL                             = 0x1551,
@@ -1225,7 +1227,7 @@ enum Opcodes
     SMSG_PVP_OPTIONS_ENABLED                          = 0xA78, //16357
     SMSG_QUERY_QUESTS_COMPLETED_RESPONSE              = 0x0E7D,//16357
     SMSG_QUERY_TIME_RESPONSE                          = 0x1C5, //16357
-    SMSG_QUESTGIVER_OFFER_REWARD                      = 0x00E4,//16357
+    SMSG_QUESTGIVER_OFFER_REWARD                      = 0x2039,
     SMSG_QUESTGIVER_QUEST_COMPLETE                    = 0x0E35, //16357
     SMSG_QUESTGIVER_QUEST_DETAILS                     = 0x08A0, //16357
     SMSG_QUESTGIVER_QUEST_FAILED                      = 0x0105,//16357
@@ -1238,7 +1240,7 @@ enum Opcodes
     SMSG_QUESTUPDATE_ADD_ITEM                         = 0x2038,
     SMSG_QUESTUPDATE_ADD_KILL                         = 0x0E61,//16357
     SMSG_QUESTUPDATE_ADD_PVP_KILL                     = 0x0629,//16357
-    SMSG_QUESTUPDATE_COMPLETE                         = 0x2039,
+    SMSG_QUESTUPDATE_COMPLETE                         = 0x00E4,//16357
     SMSG_QUESTUPDATE_FAILED                           = 0x2042,
     SMSG_QUESTUPDATE_FAILEDTIMER                      = 0x06A5,//16357
     SMSG_QUEST_NPC_QUERY_RESPONSE                     = 0x2044,

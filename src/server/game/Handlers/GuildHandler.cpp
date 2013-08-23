@@ -404,6 +404,17 @@ void WorldSession::HandleGuildBankMoneyWithdrawn(WorldPacket& /* recvPacket */)
         guild->SendMoneyInfo(this);
 }
 
+void WorldSession::HandleGuildBankSetTabInfo(WorldPacket& recvData)
+{
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GUILD_BANK_TAB_INFO");
+
+	uint32 textLength = 0;
+	std::string info;
+
+	textLength = recvData.ReadBits(14);
+    info = recvData.ReadString(textLength);
+}
+
 void WorldSession::HandleGuildPermissions(WorldPacket& /* recvPacket */)
 {
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_PERMISSIONS [%s]", GetPlayerInfo().c_str());
@@ -522,10 +533,10 @@ void WorldSession::HandleGuildBankSwapItems(WorldPacket& recvPacket)
         recvPacket >> destItemEntry;
 
         recvPacket >> tabId;
-        recvPacket >> slotId;
-        recvPacket >> itemEntry;
+		recvPacket >> itemEntry;
+        recvPacket >> slotId; 
+		recvPacket >> splitedAmount;
         recvPacket.read_skip<uint8>();                       // Always 0
-        recvPacket >> splitedAmount;
 
         guild->SwapItems(GetPlayer(), tabId, slotId, destTabId, destSlotId, splitedAmount);
     }

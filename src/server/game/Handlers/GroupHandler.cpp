@@ -640,10 +640,33 @@ void WorldSession::HandleLootMethodOpcode(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_LOOT_METHOD");
 
-    uint32 lootMethod;
-    uint64 lootMaster;
+    uint8 lootMethod;
+    ObjectGuid lootMaster;
     uint32 lootThreshold;
-    recvData >> lootMethod >> lootMaster >> lootThreshold;
+
+    recvData >> lootMethod;
+    recvData.read_skip<uint8>();
+    recvData >> lootThreshold;
+
+    std::cout << lootMethod << " " << lootThreshold << " " << std::endl;
+
+    lootMaster[3] = recvData.ReadBit();
+    lootMaster[7] = recvData.ReadBit();
+    lootMaster[2] = recvData.ReadBit();
+    lootMaster[4] = recvData.ReadBit();
+    lootMaster[1] = recvData.ReadBit();
+    lootMaster[0] = recvData.ReadBit();
+    lootMaster[6] = recvData.ReadBit();
+    lootMaster[5] = recvData.ReadBit();
+
+    recvData.ReadByteSeq(lootMaster[1]);
+    recvData.ReadByteSeq(lootMaster[5]);
+    recvData.ReadByteSeq(lootMaster[4]);
+    recvData.ReadByteSeq(lootMaster[3]);
+    recvData.ReadByteSeq(lootMaster[2]);
+    recvData.ReadByteSeq(lootMaster[6]);
+    recvData.ReadByteSeq(lootMaster[7]);
+    recvData.ReadByteSeq(lootMaster[0]);
 
     Group* group = GetPlayer()->GetGroup();
     if (!group)
@@ -704,7 +727,7 @@ void WorldSession::HandleMinimapPingOpcode(WorldPacket& recvData)
     /********************/
 
     // everything's fine, do it
-    WorldPacket data(MSG_MINIMAP_PING, (8+4+4));
+    WorldPacket data(SMSG_MINIMAP_PONG, (8+4+4));
     data << uint64(GetPlayer()->GetGUID());
     data << float(x);
     data << float(y);

@@ -42,39 +42,45 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 
 	count = recvData.ReadBits(25);
 
-	uint8** guid = new uint8*[count];
-	for(uint32 i = 0; i < count; i++)
-	   guid[i] = new uint8[8];
+
+    std::vector<ObjectGuid> guids;
 
 	uint8* lootSlot = new uint8[count];
 
 	for (uint32 i = 0; i < count; ++i)
 	{
-		guid[i][5] = recvData.ReadBit();
-		guid[i][6] = recvData.ReadBit();
-		guid[i][7] = recvData.ReadBit();
-		guid[i][4] = recvData.ReadBit();
-		guid[i][3] = recvData.ReadBit();
-		guid[i][0] = recvData.ReadBit();
-		guid[i][2] = recvData.ReadBit();
-		guid[i][1] = recvData.ReadBit();
+        ObjectGuid guid;
+
+        guid[5] = recvData.ReadBit();
+        guid[6] = recvData.ReadBit();
+        guid[7] = recvData.ReadBit();
+        guid[4] = recvData.ReadBit();
+        guid[3] = recvData.ReadBit();
+        guid[0] = recvData.ReadBit();
+        guid[2] = recvData.ReadBit();
+        guid[1] = recvData.ReadBit();
+
+        guids.push_back(guid);
 	}
 
 	for (uint32 i = 0; i < count; ++i)
 	{
-		recvData.ReadByteSeq(guid[i][4]);
-		recvData.ReadByteSeq(guid[i][1]);
-		recvData.ReadByteSeq(guid[i][5]);
-		recvData.ReadByteSeq(guid[i][3]);
-		recvData.ReadByteSeq(guid[i][6]);
-		recvData.ReadByteSeq(guid[i][7]);
+        ObjectGuid guid = guids.at(i);
+        recvData.ReadByteSeq(guid[4]);
+        recvData.ReadByteSeq(guid[1]);
+        recvData.ReadByteSeq(guid[5]);
+        recvData.ReadByteSeq(guid[3]);
+        recvData.ReadByteSeq(guid[6]);
+        recvData.ReadByteSeq(guid[7]);
 		recvData >> lootSlot[i];
-		recvData.ReadByteSeq(guid[i][0]);
-		recvData.ReadByteSeq(guid[i][2]);
+        recvData.ReadByteSeq(guid[0]);
+        recvData.ReadByteSeq(guid[2]);
 	}
 
     if (IS_GAMEOBJECT_GUID(lguid))
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 1");
+
         GameObject* go = player->GetMap()->GetGameObject(lguid);
 
         // not check distance for GO in case owned GO (fishing bobber case, for example) or Fishing hole GO
@@ -88,6 +94,8 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
     }
     else if (IS_ITEM_GUID(lguid))
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 2");
+
         Item* pItem = player->GetItemByGuid(lguid);
 
         if (!pItem)
@@ -100,6 +108,8 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
     }
     else if (IS_CORPSE_GUID(lguid))
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 3");
+
         Corpse* bones = ObjectAccessor::GetCorpse(*player, lguid);
         if (!bones)
         {
@@ -111,6 +121,8 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
     }
     else
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 4");
+
         Creature* creature = GetPlayer()->GetMap()->GetCreature(lguid);
 
         bool lootAllowed = creature && creature->isAlive() == (player->getClass() == CLASS_ROGUE && creature->lootForPickPocketed);
@@ -124,8 +136,10 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         loot = &creature->loot;
     }
 
-	for(uint32 i = 0 ; i < count ; i++)
-		player->StoreLootItem(lootSlot[i], loot);
+    for(uint32 i = 0 ; i < count ; i++) {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootSlot[i] %u %u %u", lootSlot[i], GUID_LOPART(lguid), GUID_HIPART((uint64)guids.at(i)));
+        player->StoreLootItem(lootSlot[i], loot, (ObjectGuid)guids.at(i));
+    }
 
     // If player is removing the last LootItem, delete the empty container.
     if (loot->isLooted() && IS_ITEM_GUID(lguid))
@@ -595,6 +609,6 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     item.count=0;
     item.is_looted=true;
 
-    loot->NotifyItemRemoved(slotid);
+    loot->NotifyItemRemoved(slotid, _player->GetLootGUID());
     --loot->unlootedCount;
 }

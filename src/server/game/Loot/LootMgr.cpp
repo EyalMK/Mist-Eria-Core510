@@ -505,7 +505,7 @@ void Loot::FillNotNormalLootFor(Player* player, bool presentAtLooting)
         if (!item->is_looted && item->freeforall && item->AllowedForPlayer(player))
             if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item->itemid))
                 if (proto->IsCurrencyToken())
-                    player->StoreLootItem(i, this);
+                    player->StoreLootItem(i, this, player->GetLootGUID());
     }
 }
 
@@ -604,7 +604,7 @@ QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player, bool pres
 
 //===================================================
 
-void Loot::NotifyItemRemoved(uint8 lootIndex)
+void Loot::NotifyItemRemoved(uint8 lootIndex, ObjectGuid guid)
 {
     // notify all players that are looting this that the item was removed
     // convert the index to the slot the player sees
@@ -614,7 +614,7 @@ void Loot::NotifyItemRemoved(uint8 lootIndex)
         i_next = i;
         ++i_next;
         if (Player* player = ObjectAccessor::FindPlayer(*i))
-            player->SendNotifyLootItemRemoved(lootIndex);
+            player->SendNotifyLootItemRemoved(lootIndex, guid);
         else
             PlayersLooting.erase(i);
     }
@@ -661,7 +661,7 @@ void Loot::NotifyQuestItemRemoved(uint8 questIndex)
                         break;
 
                 if (j < pql.size())
-                    player->SendNotifyLootItemRemoved(items.size()+j);
+                    player->SendNotifyLootItemRemoved(items.size()+j, (ObjectGuid)player->GetLootGUID());
             }
         }
         else
