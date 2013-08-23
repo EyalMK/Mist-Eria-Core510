@@ -881,7 +881,7 @@ enum Opcodes
     SMSG_DURABILITY_DAMAGE_DEATH                      = 0x0961,//16357
     SMSG_ECHO_PARTY_SQUELCH                           = 0x03E8,//16357
     SMSG_EMOTE                                        = 0x0DC8,//16357
-    SMSG_ENABLE_BARBER_SHOP                           = 0x1752,
+    SMSG_ENABLE_BARBER_SHOP                           = 0x00A5,//16357
     SMSG_ENCHANTMENTLOG                               = 0x1753,
     SMSG_ENVIRONMENTALDAMAGELOG                       = 0x0600,//16357
     SMSG_EQUIPMENT_SET_LIST                           = 0x0061,//16357
