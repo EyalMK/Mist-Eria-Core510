@@ -252,6 +252,7 @@ enum Opcodes
     CMSG_GUILD_BANK_LOG_QUERY                         = 0x1205,
     CMSG_GUILD_BANK_MONEY_WITHDRAWN_QUERY             = 0x1206,
     CMSG_GUILD_BANK_NOTE                              = 0x1207,
+    CMSG_GUILD_BANK_TAB_INFO                          = 0xA42,//16357
     CMSG_GUILD_BANK_QUERY_TAB                         = 0x0F64,//16357
     CMSG_GUILD_BANK_QUERY_TEXT                        = 0x1209,
     CMSG_GUILD_BANK_SWAP_ITEMS                        = 0x0EA9,//16357
