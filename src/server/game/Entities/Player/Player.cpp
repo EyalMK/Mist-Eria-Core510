@@ -9267,8 +9267,6 @@ void Player::SendNotifyLootMoneyRemoved()
 void Player::SendNotifyLootItemRemoved(uint8 lootSlot, ObjectGuid guid)
 {
     WorldPacket data(SMSG_LOOT_REMOVED, 1);
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootSlot[i] %u %u", lootSlot, GUID_LOPART(guid));
-
 
 	data.WriteBit(guid[1]);
 	data.WriteBit(guid[3]);
@@ -24605,7 +24603,6 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot, ObjectGuid guid)
 
     if (!item)
     {
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : LOOT : lootSlot : %u", lootSlot);
         SendEquipError(EQUIP_ERR_LOOT_GONE, NULL, NULL);
         return;
     }
@@ -24628,8 +24625,6 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot, ObjectGuid guid)
         {
             qitem->is_looted = true;
             //freeforall is 1 if everyone's supposed to get the quest item.
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 10");
-
             if (item->freeforall || loot->GetPlayerQuestItems().size() == 1)
                 SendNotifyLootItemRemoved(lootSlot, guid);
             else
@@ -24639,15 +24634,12 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot, ObjectGuid guid)
         {
             if (ffaitem)
             {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 11");
                 //freeforall case, notify only one player of the removal
                 ffaitem->is_looted = true;
                 SendNotifyLootItemRemoved(lootSlot, guid);
             }
             else
             {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE 12");
-
                 //not freeforall, notify everyone
                 if (conditem)
                     conditem->is_looted = true;
