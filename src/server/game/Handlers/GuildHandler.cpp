@@ -411,7 +411,7 @@ void WorldSession::HandleGuildBankSetTabInfo(WorldPacket& recvData)
 	uint32 textLength = 0;
 	std::string info;
 
-	textLength = recvData.ReadBits(9);
+	textLength = recvData.ReadBits(14);
     info = recvData.ReadString(textLength);
 }
 
