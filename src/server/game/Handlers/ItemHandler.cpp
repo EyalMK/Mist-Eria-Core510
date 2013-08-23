@@ -1675,7 +1675,7 @@ void WorldSession::HandleTransmogrifyItems(WorldPacket& recvData)
 
 void WorldSession::SendReforgeResult(bool success)
 {
-    WorldPacket data(SMSG_REFORGE_RESULT);
+    WorldPacket data(SMSG_REFORGE_RESULT, 1);
     data << uint8(success);
     SendPacket(&data);
 	sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleReforgeItemOpcode - Send %s result to Player (Guid: %u Name: %s)", (success ? "TRUE" : "FALSE"), GetPlayer()->GetGUIDLow(), GetPlayer()->GetName());
