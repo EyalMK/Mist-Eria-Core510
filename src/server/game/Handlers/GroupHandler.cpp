@@ -544,32 +544,34 @@ void WorldSession::HandleGroupSetRolesOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GROUP_SET_ROLES");
 
     uint32 newRole;
+	uint8 unk;
     ObjectGuid guid1;                   // Assigner GUID
     ObjectGuid guid2;                   // Target GUID
 
     guid1 = GetPlayer()->GetGUID();
 
+	recvData >> unk;
     recvData >> newRole;
 
-    guid2[2] = recvData.ReadBit();
-    guid2[6] = recvData.ReadBit();
-    guid2[3] = recvData.ReadBit();
+    guid2[4] = recvData.ReadBit();
     guid2[7] = recvData.ReadBit();
     guid2[5] = recvData.ReadBit();
+    guid2[2] = recvData.ReadBit();
     guid2[1] = recvData.ReadBit();
+    guid2[6] = recvData.ReadBit();
+    guid2[3] = recvData.ReadBit();
     guid2[0] = recvData.ReadBit();
-    guid2[4] = recvData.ReadBit();
 
-    recvData.ReadByteSeq(guid2[6]);
-    recvData.ReadByteSeq(guid2[4]);
-    recvData.ReadByteSeq(guid2[1]);
-    recvData.ReadByteSeq(guid2[3]);
     recvData.ReadByteSeq(guid2[0]);
-    recvData.ReadByteSeq(guid2[5]);
+    recvData.ReadByteSeq(guid2[4]);
     recvData.ReadByteSeq(guid2[2]);
     recvData.ReadByteSeq(guid2[7]);
+    recvData.ReadByteSeq(guid2[1]);
+    recvData.ReadByteSeq(guid2[5]);
+    recvData.ReadByteSeq(guid2[3]);
+    recvData.ReadByteSeq(guid2[6]);
 
-    WorldPacket data(SMSG_GROUP_SET_ROLE, 24);
+    WorldPacket data(SMSG_GROUP_SET_ROLE, 24); // damn , need to find SMSG value
 
     data.WriteBit(guid1[1]);
     data.WriteBit(guid2[0]);
