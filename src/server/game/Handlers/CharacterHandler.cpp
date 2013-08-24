@@ -2364,58 +2364,31 @@ void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
 		player->SendMovieStart(116);
 	}
 
-	SQLTransaction trans = CharacterDatabase.BeginTransaction();
-
 	// Change Race
 	if (faction == TEAM_HORDE)
+	{
 		player->setFactionForRace(26);
+		player->setRace(26);
+	}
 	else
+	{
 		player->setFactionForRace(25);
+		player->setRace(25);
+	}
 
-	PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_FACTION_SELECT);
-	if (faction == TEAM_HORDE)
-		stmt->setUInt8(0, 26);
+
+	// Language
+	if (faction == TEAM_ALLIANCE)
+		player->SetSkill(98, 0, 300, 300);
 	else
-		stmt->setUInt8(0, 25);
-	stmt->setUInt32(1, player->GetGUIDLow());
-	trans->Append(stmt);
+		player->SetSkill(109, 0, 300, 300);
 
-	// Homebind
-	stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_HOMEBIND);
-    stmt->setUInt32(0, player->GetGUIDLow());
-    trans->Append(stmt);
-
-	stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_HOMEBIND);
-    stmt->setUInt32(0, player->GetGUIDLow());
-    if (faction == TEAM_ALLIANCE)
-    {
-        stmt->setUInt16(1, 0);
-        stmt->setUInt16(2, 1519);
-        stmt->setFloat (3, -8867.68f);
-        stmt->setFloat (4, 673.373f);
-        stmt->setFloat (5, 97.9034f);
-    }
-    else
-    {
-        stmt->setUInt16(1, 1);
-        stmt->setUInt16(2, 1637);
-        stmt->setFloat (3, 1633.33f);
-        stmt->setFloat (4, -4439.11f);
-        stmt->setFloat (5, 15.7588f);
-    }
-    trans->Append(stmt);
-
-	//Language
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_SKILL_LANGUAGE);
-    stmt->setUInt32(0, player->GetGUIDLow());
-    if (faction == TEAM_HORDE)
-        stmt->setUInt16(1, 109);
-    else
-        stmt->setUInt16(1, 98);
-
-    trans->Append(stmt);
+	/* TODO */
 
 	// Reputations
 
-	CharacterDatabase.CommitTransaction(trans);
+	// HomeBind
+
+
+	player->SaveToDB();
 }

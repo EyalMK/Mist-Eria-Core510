@@ -1354,6 +1354,7 @@ class Unit : public WorldObject
         uint8 getLevelForTarget(WorldObject const* /*target*/) const { return getLevel(); }
         void SetLevel(uint8 lvl);
         uint8 getRace() const { return GetByteValue(UNIT_FIELD_BYTES_0, 0); }
+		void setRace(uint8 race) { SetByteValue(UNIT_FIELD_BYTES_0, 0, race); }
         uint32 getRaceMask() const { return 1 << (getRace()-1); }
         uint8 getClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, 1); }
         uint32 getClassMask() const { return 1 << (getClass()-1); }
