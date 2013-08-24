@@ -2988,9 +2988,9 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-		WorldPacket data(SMSG_SHOW_NEUTRAL_PLAYER_FACTION_SELECT_UI, 0);
+		WorldPacket data(SMSG_SHOW_NEUTRAL_PLAYER_FACTION_SELECT_UI);
 		player->GetSession()->SendPacket(&data);
-
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "FACTION CHOICE !");
         return true;
     }
 
