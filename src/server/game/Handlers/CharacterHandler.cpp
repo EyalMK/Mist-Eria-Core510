@@ -2354,5 +2354,5 @@ void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
 	
 	recvData >> unk;
 
-	sLog->outError(LOG_FILTER_GENERAL, ">>> Select Faction : unk = %u", unk);
+	sLog->outDebug(LOG_FILTER_NETWORKIO, ">>> Select Faction : unk = %u", unk);
 }
