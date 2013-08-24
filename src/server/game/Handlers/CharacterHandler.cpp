@@ -2374,10 +2374,10 @@ void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
 
 	PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_FACTION_SELECT);
 	if (faction == TEAM_HORDE)
-		stmt->setUInt8(1, 26);
+		stmt->setUInt8(0, 26);
 	else
-		stmt->setUInt8(1, 25);
-	stmt->setUInt32(2, player->GetGUIDLow());
+		stmt->setUInt8(0, 25);
+	stmt->setUInt32(1, player->GetGUIDLow());
 	trans->Append(stmt);
 
 	// Homebind
