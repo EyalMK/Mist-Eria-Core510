@@ -497,6 +497,7 @@ enum Opcodes
     CMSG_SAVE_PLAYER                                  = 0x1438,
     CMSG_SEARCH_LFG_JOIN                              = 0x1439,
     CMSG_SEARCH_LFG_LEAVE                             = 0x1440,
+	CMSG_SELECT_FACTION								  = 0x085A,//16357
     CMSG_SELF_RES                                     = 0x0ACC,//16357
     CMSG_SELL_ITEM                                    = 0x02CC,//16357
     CMSG_SEND_MAIL                                    = 0x0E9B,//16357

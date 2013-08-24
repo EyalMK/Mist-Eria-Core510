@@ -2990,7 +2990,6 @@ public:
     {
 		WorldPacket data(SMSG_SHOW_NEUTRAL_PLAYER_FACTION_SELECT_UI);
 		player->GetSession()->SendPacket(&data);
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "FACTION CHOICE !");
         return true;
     }
 

@@ -2347,3 +2347,12 @@ void WorldSession::HandleOpeningCinematic(WorldPacket& /*recvData*/)
             _player->SendCinematicStart(raceEntry->CinematicSequence);
     }
 }
+
+void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
+{
+	uint32 unk;
+	
+	recvData >> unk;
+
+	sLog->outError(LOG_FILTER_GENERAL, ">>> Select Faction : unk = %u", unk);
+}
