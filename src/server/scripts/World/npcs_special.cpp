@@ -2981,6 +2981,21 @@ public:
     }
 };
 
+class npc_neutral_faction_select : public CreatureScript
+{
+public:
+    npc_neutral_faction_select() : CreatureScript("npc_neutral_faction_select") { }
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+		WorldPacket data(SMSG_SHOW_NEUTRAL_PLAYER_FACTION_SELECT_UI, 0);
+		player->GetSession()->SendPacket(&data);
+
+        return true;
+    }
+
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3013,4 +3028,5 @@ void AddSC_npcs_special()
     new npc_firework();
     new npc_spring_rabbit();
     new npc_generic_harpoon_cannon();
+	new npc_neutral_faction_select();
 }
