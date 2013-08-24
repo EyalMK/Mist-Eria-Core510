@@ -2353,6 +2353,8 @@ void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
 	uint32 faction;
 	recvData >> faction;
 
+	faction = 1 - faction; // Reversed
+
 	Player *player = GetPlayer();
 
 	//Complete Quest
@@ -2368,11 +2370,18 @@ void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
 	else
 		player->setFactionForRace(25);
 
+	PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_FACTION_SELECT);
+	if (faction == TEAM_HORDE)
+		stmt->setUInt8(1, 26);
+	else
+		stmt->setUInt16(1, 25);
+	stmt->setUInt8(2, player->GetGUIDLow());
+
 
 	SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
 	// Homebind
-	PreparedStatement*stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_HOMEBIND);
+	stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_HOMEBIND);
     stmt->setUInt32(0, player->GetGUIDLow());
     trans->Append(stmt);
 
@@ -2385,7 +2394,6 @@ void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
         stmt->setFloat (3, -8867.68f);
         stmt->setFloat (4, 673.373f);
         stmt->setFloat (5, 97.9034f);
-        Player::SavePositionInDB(0, -8867.68f, 673.373f, 97.9034f, 0.0f, 1519, player->GetGUIDLow());
     }
     else
     {
@@ -2394,7 +2402,6 @@ void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
         stmt->setFloat (3, 1633.33f);
         stmt->setFloat (4, -4439.11f);
         stmt->setFloat (5, 15.7588f);
-        Player::SavePositionInDB(1, 1633.33f, -4439.11f, 15.7588f, 0.0f, 1637, player->GetGUIDLow());
     }
     trans->Append(stmt);
 
