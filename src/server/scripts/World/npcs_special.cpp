@@ -2981,6 +2981,8 @@ public:
     }
 };
 
+#define GOSSIP_SELECT_FACTION "Je suis pret a prendre ma decision."
+
 class npc_neutral_faction_select : public CreatureScript
 {
 public:
@@ -2988,10 +2990,13 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-		/*if(player->hasQuest(31450))
-		{*/
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Je suis prêt à prendre ma décision." , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-		/*}*/
+		if (creature->isQuestGiver())
+            player->PrepareQuestMenu(creature->GetGUID());
+
+		if(player->hasQuest(31450))
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SELECT_FACTION , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+		}
 		player->PlayerTalkClass->SendGossipMenu(724006, creature->GetGUID());
 			
 		return true;
@@ -3006,11 +3011,8 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
                 {
-					if(player->hasQuest(31450))
-					{
-						WorldPacket data(SMSG_SHOW_NEUTRAL_PLAYER_FACTION_SELECT_UI);
-						player->GetSession()->SendPacket(&data);
-					}
+					WorldPacket data(SMSG_SHOW_NEUTRAL_PLAYER_FACTION_SELECT_UI);
+					player->GetSession()->SendPacket(&data);
                 }
                 break;
         }
