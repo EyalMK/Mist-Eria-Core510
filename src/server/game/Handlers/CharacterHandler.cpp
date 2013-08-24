@@ -2364,6 +2364,8 @@ void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
 		player->SendMovieStart(116);
 	}
 
+	SQLTransaction trans = CharacterDatabase.BeginTransaction();
+
 	// Change Race
 	if (faction == TEAM_HORDE)
 		player->setFactionForRace(26);
@@ -2376,9 +2378,7 @@ void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
 	else
 		stmt->setUInt16(1, 25);
 	stmt->setUInt8(2, player->GetGUIDLow());
-
-
-	SQLTransaction trans = CharacterDatabase.BeginTransaction();
+	trans->Append(stmt);
 
 	// Homebind
 	stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_HOMEBIND);
@@ -2404,6 +2404,18 @@ void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
         stmt->setFloat (5, 15.7588f);
     }
     trans->Append(stmt);
+
+	//Language
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_SKILL_LANGUAGE);
+    stmt->setUInt32(0, player->GetGUIDLow());
+    if (faction == TEAM_HORDE)
+        stmt->setUInt16(1, 109);
+    else
+        stmt->setUInt16(1, 98);
+
+    trans->Append(stmt);
+
+	// Reputations
 
 	CharacterDatabase.CommitTransaction(trans);
 }
