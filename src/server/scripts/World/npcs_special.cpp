@@ -2993,10 +2993,10 @@ public:
 		if (creature->isQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-		if(player->hasQuest(31450))
-		{
+		/*if(player->hasQuest(31450))
+		{*/
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SELECT_FACTION , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-		}
+		/*}*/
 		player->PlayerTalkClass->SendGossipMenu(724006, creature->GetGUID());
 			
 		return true;
