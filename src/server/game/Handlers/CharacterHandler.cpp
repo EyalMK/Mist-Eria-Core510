@@ -2376,8 +2376,8 @@ void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
 	if (faction == TEAM_HORDE)
 		stmt->setUInt8(1, 26);
 	else
-		stmt->setUInt16(1, 25);
-	stmt->setUInt8(2, player->GetGUIDLow());
+		stmt->setUInt8(1, 25);
+	stmt->setUInt32(2, player->GetGUIDLow());
 	trans->Append(stmt);
 
 	// Homebind
