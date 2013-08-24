@@ -2988,8 +2988,30 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-		WorldPacket data(SMSG_SHOW_NEUTRAL_PLAYER_FACTION_SELECT_UI);
-		player->GetSession()->SendPacket(&data);
+		if(player->hasQuest(31450))
+		{
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Je suis prêt à prendre ma décision." , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+			player->PlayerTalkClass->SendGossipMenu(724006, creature->GetGUID());
+			return true;
+		}
+		return false;
+    }
+
+	bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action)
+    {
+        player->PlayerTalkClass->ClearMenus();
+
+        switch (action)
+        {
+            case GOSSIP_ACTION_INFO_DEF + 1:
+                {
+					WorldPacket data(SMSG_SHOW_NEUTRAL_PLAYER_FACTION_SELECT_UI);
+					player->GetSession()->SendPacket(&data);
+                }
+                break;
+        }
+
+        player->PlayerTalkClass->SendCloseGossip();
         return true;
     }
 

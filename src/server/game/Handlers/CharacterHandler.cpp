@@ -2350,9 +2350,53 @@ void WorldSession::HandleOpeningCinematic(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
 {
-	uint32 unk;
-	
-	recvData >> unk;
+	uint32 faction;
+	recvData >> faction;
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, ">>> Select Faction : unk = %u", unk);
+	Player *player = GetPlayer();
+
+	//Complete Quest
+	if(player->hasQuest(31450))
+	{
+		player->CompleteQuest(31450);
+		player->SendMovieStart(116);
+	}
+
+	// Change Race
+	if (faction == TEAM_HORDE)
+		player->setFactionForRace(26);
+	else
+		player->setFactionForRace(25);
+
+
+	SQLTransaction trans = CharacterDatabase.BeginTransaction();
+
+	// Homebind
+	PreparedStatement*stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_HOMEBIND);
+    stmt->setUInt32(0, player->GetGUIDLow());
+    trans->Append(stmt);
+
+	stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_HOMEBIND);
+    stmt->setUInt32(0, player->GetGUIDLow());
+    if (faction == TEAM_ALLIANCE)
+    {
+        stmt->setUInt16(1, 0);
+        stmt->setUInt16(2, 1519);
+        stmt->setFloat (3, -8867.68f);
+        stmt->setFloat (4, 673.373f);
+        stmt->setFloat (5, 97.9034f);
+        Player::SavePositionInDB(0, -8867.68f, 673.373f, 97.9034f, 0.0f, 1519, player->GetGUIDLow());
+    }
+    else
+    {
+        stmt->setUInt16(1, 1);
+        stmt->setUInt16(2, 1637);
+        stmt->setFloat (3, 1633.33f);
+        stmt->setFloat (4, -4439.11f);
+        stmt->setFloat (5, 15.7588f);
+        Player::SavePositionInDB(1, 1633.33f, -4439.11f, 15.7588f, 0.0f, 1637, player->GetGUIDLow());
+    }
+    trans->Append(stmt);
+
+	CharacterDatabase.CommitTransaction(trans);
 }

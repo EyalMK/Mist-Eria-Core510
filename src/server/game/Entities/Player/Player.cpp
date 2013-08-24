@@ -836,6 +836,8 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this)
 
     m_runes = NULL;
 
+	m_lastMovie = 0;
+
     m_lastFallTime = 0;
     m_lastFallZ = 0;
 
@@ -6706,6 +6708,8 @@ void Player::SendCinematicStart(uint32 CinematicSequenceId)
 
 void Player::SendMovieStart(uint32 MovieId)
 {
+	m_lastMovie = MovieId;
+
     WorldPacket data(SMSG_TRIGGER_MOVIE, 4);
     data << uint32(MovieId);
     SendDirectMessage(&data);

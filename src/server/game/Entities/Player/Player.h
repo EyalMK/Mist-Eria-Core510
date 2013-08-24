@@ -2525,6 +2525,8 @@ class Player : public Unit, public GridObject<Player>
         void StopCastingCharm();
         void StopCastingBindSight();
 
+		uint32 GetLastMovie() { return m_lastMovie; }
+
         uint32 GetSaveTimer() const { return m_nextSave; }
         void   SetSaveTimer(uint32 timer) { m_nextSave = timer; }
 
@@ -3092,6 +3094,7 @@ class Player : public Unit, public GridObject<Player>
 		void UpdatePVPPower(int32 amount);
 		uint32 m_lastFallTime;
         float  m_lastFallZ;
+		uint32 m_lastMovie;
 
         int32 m_MirrorTimer[MAX_TIMERS];
         uint8 m_MirrorTimerFlags;
