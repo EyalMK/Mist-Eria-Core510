@@ -857,6 +857,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootItemView const& iv)
 	b << uint32(iv.loot_item.itemid);
 	b << uint32(sObjectMgr->GetItemTemplate(iv.loot_item.itemid)->DisplayInfoID);
 	b << uint32(0); //item->randomPropertyId ?
+	return b;
 }
 
 ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
