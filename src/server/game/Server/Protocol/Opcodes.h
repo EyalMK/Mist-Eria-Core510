@@ -790,7 +790,7 @@ enum Opcodes
     SMSG_CALENDAR_RAID_LOCKOUT_ADDED                  = 0x1676,
     SMSG_CALENDAR_RAID_LOCKOUT_REMOVED                = 0x1677,
     SMSG_CALENDAR_RAID_LOCKOUT_UPDATED                = 0x1678,
-    SMSG_CALENDAR_SEND_CALENDAR                       = 0x1679,
+    SMSG_CALENDAR_SEND_CALENDAR                       = 0x0AE9,//16357
     SMSG_CALENDAR_SEND_EVENT                          = 0x05AD,//16357
     SMSG_CALENDAR_SEND_NUM_PENDING                    = 0x0B0C,//16357
     SMSG_CALENDAR_UPDATE_INVITE_LIST                  = 0x1682,
