@@ -1096,6 +1096,26 @@ void WorldSession::HandleCompleteCinematic(WorldPacket& /*recvData*/)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_COMPLETE_CINEMATIC");
 }
 
+void WorldSession::HandleCompleteMovie(WorldPacket& /*recvData*/)
+{
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_COMPLETE_MOVIE");
+
+	switch(GetPlayer()->GetLastMovie())
+	{
+		case 116: // Pandaren Faction Choice
+		{
+			if(GetPlayer()->GetTeamId() == TEAM_ALLIANCE)
+				GetPlayer()->TeleportTo(0, -9065.f, 434.f, 93.f, 0.65f);
+			else
+				GetPlayer()->TeleportTo(1, 1365.f, -4370.f, 26.f, 0.07f);
+			break;
+		}
+
+		default:
+			break;
+	}
+}
+
 void WorldSession::HandleNextCinematicCamera(WorldPacket& /*recvData*/)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_NEXT_CINEMATIC_CAMERA");

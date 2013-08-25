@@ -2347,3 +2347,48 @@ void WorldSession::HandleOpeningCinematic(WorldPacket& /*recvData*/)
             _player->SendCinematicStart(raceEntry->CinematicSequence);
     }
 }
+
+void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
+{
+	uint32 faction;
+	recvData >> faction;
+
+	faction = 1 - faction; // Reversed
+
+	Player *player = GetPlayer();
+
+	//Complete Quest
+	if(player->hasQuest(31450))
+	{
+		player->CompleteQuest(31450);
+		player->SendMovieStart(116);
+	}
+
+	// Change Race
+	if (faction == TEAM_HORDE)
+	{
+		player->setFactionForRace(26);
+		player->setRace(26);
+	}
+	else
+	{
+		player->setFactionForRace(25);
+		player->setRace(25);
+	}
+
+
+	// Language
+	if (faction == TEAM_ALLIANCE)
+		player->SetSkill(98, 0, 300, 300);
+	else
+		player->SetSkill(109, 0, 300, 300);
+
+	/* TODO */
+
+	// Reputations
+
+	// HomeBind
+
+
+	player->SaveToDB();
+}

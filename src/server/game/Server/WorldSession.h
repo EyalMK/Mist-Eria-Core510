@@ -951,6 +951,8 @@ class WorldSession
         void HandleUpdateMissileTrajectory(WorldPacket& recvPacket);
         void HandleViolenceLevel(WorldPacket& recvPacket);
         void HandleObjectUpdateFailedOpcode(WorldPacket& recvPacket);
+		void HandleSelectFactionOpcode(WorldPacket& recvData);
+		void HandleCompleteMovie(WorldPacket& recvData);
         int32 HandleEnableNagleAlgorithm();
 
         // Compact Unit Frames (4.x)

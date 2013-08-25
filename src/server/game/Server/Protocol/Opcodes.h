@@ -497,6 +497,7 @@ enum Opcodes
     CMSG_SAVE_PLAYER                                  = 0x1438,
     CMSG_SEARCH_LFG_JOIN                              = 0x1439,
     CMSG_SEARCH_LFG_LEAVE                             = 0x1440,
+	CMSG_SELECT_FACTION								  = 0x085A,//16357
     CMSG_SELF_RES                                     = 0x0ACC,//16357
     CMSG_SELL_ITEM                                    = 0x02CC,//16357
     CMSG_SEND_MAIL                                    = 0x0E9B,//16357
@@ -727,7 +728,7 @@ enum Opcodes
     SMSG_AUTH_RESPONSE                                = 0xA15, //16357
     SMSG_AVAILABLE_VOICE_CHANNEL                      = 0x03E1,//16357
     SMSG_AVERAGE_ITEM_LEVEL_INFORM                    = 0x31D, //16357
-    SMSG_BARBER_SHOP_RESULT                           = 0x1648,
+    SMSG_BARBER_SHOP_RESULT                           = 0x02C8,//16357
     SMSG_BATTLEFIELD_LIST                             = 0x530, //16357
     SMSG_BATTLEFIELD_MGR_EJECTED                      = 0x7F1, //16357
     SMSG_BATTLEFIELD_MGR_EJECT_PENDING                = 0xE54, //16357
@@ -789,7 +790,7 @@ enum Opcodes
     SMSG_CALENDAR_RAID_LOCKOUT_ADDED                  = 0x1676,
     SMSG_CALENDAR_RAID_LOCKOUT_REMOVED                = 0x1677,
     SMSG_CALENDAR_RAID_LOCKOUT_UPDATED                = 0x1678,
-    SMSG_CALENDAR_SEND_CALENDAR                       = 0x1679,
+    SMSG_CALENDAR_SEND_CALENDAR                       = 0x0AE9,//16357
     SMSG_CALENDAR_SEND_EVENT                          = 0x05AD,//16357
     SMSG_CALENDAR_SEND_NUM_PENDING                    = 0x0B0C,//16357
     SMSG_CALENDAR_UPDATE_INVITE_LIST                  = 0x1682,
@@ -881,7 +882,7 @@ enum Opcodes
     SMSG_DURABILITY_DAMAGE_DEATH                      = 0x0961,//16357
     SMSG_ECHO_PARTY_SQUELCH                           = 0x03E8,//16357
     SMSG_EMOTE                                        = 0x0DC8,//16357
-    SMSG_ENABLE_BARBER_SHOP                           = 0x1752,
+    SMSG_ENABLE_BARBER_SHOP                           = 0x00A5,//16357
     SMSG_ENCHANTMENTLOG                               = 0x1753,
     SMSG_ENVIRONMENTALDAMAGELOG                       = 0x0600,//16357
     SMSG_EQUIPMENT_SET_LIST                           = 0x0061,//16357
