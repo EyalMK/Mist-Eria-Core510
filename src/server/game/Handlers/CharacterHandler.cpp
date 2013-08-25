@@ -2378,14 +2378,40 @@ void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
 
 
 	// Language
+	player->removeSpell(108127); // Pandaren - neutral
 	if (faction == TEAM_ALLIANCE)
-		player->SetSkill(98, 0, 300, 300);
+	{
+		player->learnSpell(108130, false); // Pandaren - alliance
+		player->learnSpell(668, false); // Common
+	}
 	else
-		player->SetSkill(109, 0, 300, 300);
+	{
+		player->learnSpell(108131, false); // Pandaren - horde
+		player->learnSpell(669, false); // Orcish
+	}
 
-	/* TODO */
 
 	// Reputations
+	if (faction == TEAM_ALLIANCE)
+	{
+		player->SetReputation(69, 100);
+		player->SetReputation(930, 100);
+		player->SetReputation(47, 100);
+		player->SetReputation(1134, 100);
+		player->SetReputation(54, 100);
+		player->SetReputation(72, 100);
+		player->SetReputation(1353, 1000);
+	}
+	else
+	{
+		player->SetReputation(1133, 100);
+		player->SetReputation(68, 100);
+		player->SetReputation(81, 100);
+		player->SetReputation(911, 100);
+		player->SetReputation(76, 100);
+		player->SetReputation(530, 100);
+		player->SetReputation(1352, 1000);
+	}
 
 	// HomeBind
 
