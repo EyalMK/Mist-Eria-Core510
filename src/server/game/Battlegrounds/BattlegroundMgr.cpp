@@ -191,7 +191,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
         {
             data->Initialize(SMSG_BATTLEFIELD_STATUS_QUEUED);
 
-            data->WriteBit(0);
+            data->WriteBit(1);
             data->WriteBit(playerGuid[2]);
             data->WriteBit(playerGuid[4]);
             data->WriteBit(bgGuid[6]);
@@ -203,7 +203,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 			data->WriteBit(bgGuid[4]);
             data->WriteBit(bgGuid[7]);
             data->WriteBit(0);
-            data->WriteBit(0);
+			data->WriteBit(0);
             data->WriteBit(bgGuid[3]);
             data->WriteBit(playerGuid[6]);
             data->WriteBit(playerGuid[0]);
@@ -211,6 +211,8 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             data->WriteBit(bg->isRated());              // Is Rated
             data->WriteBit(playerGuid[3]);
 			data->WriteBit(bgGuid[2]);
+
+			data->FlushBits();
 
 			data->WriteByteSeq(bgGuid[0]);
             data->WriteByteSeq(playerGuid[5]);
@@ -221,7 +223,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             data->WriteByteSeq(bgGuid[7]);
 			data->WriteByteSeq(bgGuid[1]);
             *data << uint32(Time1);                     // Estimated Wait Time
-            *data << uint8(0);   
+            *data << uint8(bg->GetMinLevel());          // Min Level   
             data->WriteByteSeq(bgGuid[4]);
 			*data << uint32(Time2); 
             data->WriteByteSeq(bgGuid[5]);
@@ -230,12 +232,12 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 			data->WriteByteSeq(bgGuid[3]);
 			data->WriteByteSeq(playerGuid[2]);
 			data->WriteByteSeq(bgGuid[6]);
-            *data << uint8(0);                          // unk
+            *data << uint8(0);
             data->WriteByteSeq(playerGuid[7]);
             data->WriteByteSeq(playerGuid[0]);
             *data << uint32(GetMSTimeDiffToNow(Time2)); // Time since joined
             data->WriteByteSeq(bgGuid[2]);
-            *data << uint8(bg->GetMinLevel());          // Min Level                   
+            *data << uint8(bg->GetMaxLevel());                          // unk                   
             *data << uint32(bg->GetClientInstanceID()); // Client Instance ID
             break;
         }
