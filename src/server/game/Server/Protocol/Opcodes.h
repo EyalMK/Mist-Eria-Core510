@@ -82,7 +82,7 @@ enum Opcodes
     CMSG_BATTLEFIELD_MGR_EXIT_REQUEST                 = 0x063E,//16357
     CMSG_BATTLEFIELD_MGR_QUEUE_INVITE_RESPONSE        = 0x0733,//16357
     CMSG_BATTLEFIELD_MGR_QUEUE_REQUEST                = 0x0AF2,//16357
-    CMSG_BATTLEFIELD_PORT                             = 0x1049,
+    CMSG_BATTLEFIELD_PORT                             = 0x0277,//16357
     CMSG_BATTLEFIELD_REQUEST_SCORE_DATA               = 0x1050,
     CMSG_BATTLEFIELD_STATUS                           = 0x1051,
     CMSG_BATTLEGROUND_PLAYER_POSITIONS                = 0x1052,
