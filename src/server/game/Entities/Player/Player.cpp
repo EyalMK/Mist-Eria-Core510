@@ -16590,46 +16590,7 @@ void Player::SendQuestComplete(Quest const* quest)
             data << uint32(rewIt->DisplayInfoID);
         }
 
-        data << uint32(quest->GetRewItemsCount());
-
-        for(int i = 0 ; i < QUEST_REWARDS_COUNT ; i++)
-            data << uint32(quest->RewardItemId[i]);
-        for(int i = 0 ; i < QUEST_REWARDS_COUNT ; i++)
-            data << uint32(quest->RewardItemIdCount[i]);
-        for(int i = 0 ; QUEST_REWARDS_COUNT ; i++)
-        {
-            const ItemTemplate *rewIt = sObjectMgr->GetItemTemplate(quest->RewardItemId[i]);
-            if(!rewIt)
-            {
-                data << uint32(0);
-                continue;
-            }
-            data << uint32(rewIt->DisplayInfoID);
-        }
-
-        data << uint32(quest->GetRewOrReqMoney());
-        data << uint32(quest->GetXPId());
-        data << uint32(quest->GetCharTitleId());
-        data << uint32(quest->GetBonusTalents());
-        data << uint32(quest->GetRewardReputationMask());
-
-        for(int i = 0 ; i < QUEST_REPUTATIONS_COUNT ; i++)
-            data << uint32(quest->RewardFactionId[i]);
-        for(int i = 0 ; i < QUEST_REPUTATIONS_COUNT ; i++)
-            data << uint32(quest->RewardFactionValueId[i]);
-        for(int i = 0 ; i < QUEST_REPUTATIONS_COUNT ; i++)
-            data << uint32(quest->RewardFactionValueIdOverride[i]);
-
-        data << uint32(quest->GetRewSpell());
-        data << uint32(quest->GetRewSpellCast());
-
-        for(int i = 0 ; i < QUEST_REWARD_CURRENCY_COUNT ; i++)
-            data << uint32(quest->RewardCurrencyId[i]);
-        for(int i = 0 ; i < QUEST_REWARD_CURRENCY_COUNT ; i++)
-            data << uint32(quest->RewardCurrencyCount[i]);
-
-        data << uint32(quest->GetRewardSkillId());
-        data << uint32(quest->GetRewardSkillPoints());
+        quest->BuildExtraQuestInfo(data, this);
 
         GetSession()->SendPacket(&data);
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_QUESTUPDATE_COMPLETE quest = %u", quest->GetQuestId());
