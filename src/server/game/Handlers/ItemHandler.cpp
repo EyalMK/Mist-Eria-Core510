@@ -1680,9 +1680,9 @@ void WorldSession::SendReforgeResult(bool success)
     data << uint8(result);
     SendPacket(&data);
 	if(success)
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleReforgeItemOpcode - Sent TRUE result to Player (Guid: %u Name: %s)", GetPlayer()->GetGUIDLow(), GetPlayer()->GetName());
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleReforgeItemOpcode - Sent TRUE result to Player (Guid: %u Name: %s)", GetPlayer()->GetGUIDLow(), GetPlayer()->GetName().c_str());
 	else
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleReforgeItemOpcode - Sent FALSE result to Player (Guid: %u Name: %s)", GetPlayer()->GetGUIDLow(), GetPlayer()->GetName());
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleReforgeItemOpcode - Sent FALSE result to Player (Guid: %u Name: %s)", GetPlayer()->GetGUIDLow(), GetPlayer()->GetName().c_str());
 }
 
 void WorldSession::HandleReforgeItemOpcode(WorldPacket& recvData)
