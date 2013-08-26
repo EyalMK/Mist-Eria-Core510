@@ -996,11 +996,11 @@ enum Opcodes
     SMSG_INITIAL_SPELLS                               = 0x155, //16357
     SMSG_INIT_CURRENCY                                = 0x04D0,//16357
     SMSG_INIT_WORLD_STATES                            = 0x010C,//16357
-    SMSG_INSPECT                                      = 0x4DD,//16357
+    SMSG_INSPECT                                      = 0x0000,
     SMSG_INSPECT_HONOR_STATS                          = 0x5D0, //16357
     SMSG_INSPECT_RATED_BG_STATS                       = 0x2B5, //16357
     SMSG_INSPECT_RESULTS_UPDATE                       = 0x4DD, //16357
-    SMSG_INSPECT_TALENT                               = 0x1902,
+    SMSG_INSPECT_TALENT                               = 0x1902,// need value
     SMSG_INSTANCE_DIFFICULTY                          = 0x1903,
     SMSG_INSTANCE_LOCK_WARNING_QUERY                  = 0x1904,
     SMSG_INSTANCE_RESET                               = 0x08C0,//16357
