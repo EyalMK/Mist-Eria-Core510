@@ -23,6 +23,7 @@
 #include "Opcodes.h"
 #include "UpdateData.h"
 #include "Player.h"
+#include "ObjectAccessor.h"
 
 void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 {
@@ -98,6 +99,12 @@ void WorldSession::HandleDuelRequest(WorldPacket& recvPacket)
     recvPacket.ReadByteSeq(guid[6]);
     recvPacket.ReadByteSeq(guid[7]);
     recvPacket.ReadByteSeq(guid[5]);
+
+    if(GetPlayer()->duel)
+        return;
+
+    Player *opponent = sObjectAccessor->GetPlayer(*GetPlayer(), (uint64)guid);
+    GetPlayer()->CastSpell(opponent, 7266, false);
 
 	sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_DUEL_REQUEST");
 }
