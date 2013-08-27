@@ -2415,6 +2415,16 @@ void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
 
 	// HomeBind
 
+	if (faction == TEAM_ALLIANCE)
+	{
+		WorldLocation homeA(0, -8867.68f, 673.373f, 97.9034f);
+		player->SetHomebind(homeA, 1519);
+	}
+	else
+	{
+		WorldLocation homeH(1, 1633.33f, -4439.11f, 15.7588f);
+		player->SetHomebind(homeH, 1637);
+	}
 
 	player->SaveToDB();
 }
