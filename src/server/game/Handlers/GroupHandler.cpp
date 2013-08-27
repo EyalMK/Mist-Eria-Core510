@@ -966,9 +966,45 @@ void WorldSession::HandleRaidReadyCheckOpcode(WorldPacket& recvData)
             return;
         /********************/
 
+        ObjectGuid grp = group->GetGUID(), player = GetPlayer()->GetGUID();
+
         // everything's fine, do it
-        WorldPacket data(MSG_RAID_READY_CHECK, 8);
-        data << GetPlayer()->GetGUID();
+        WorldPacket data(SMSG_RAID_READY_CHECK_STARTED);
+        data.WriteBit(grp[4]);
+        data.WriteBit(grp[7]);
+        data.WriteBit(player[4]);
+        data.WriteBit(player[0]);
+        data.WriteBit(grp[6]);
+        data.WriteBit(grp[5]);
+        data.WriteBit(grp[1]);
+        data.WriteBit(player[5]);
+        data.WriteBit(player[2]);
+        data.WriteBit(grp[0]);
+        data.WriteBit(player[3]);
+        data.WriteBit(grp[2]);
+        data.WriteBit(grp[3]);
+        data.WriteBit(player[1]);
+        data.WriteBit(player[6]);
+        data.WriteBit(player[7]);
+
+        data.WriteByteSeq(player[1]);
+        data << uint32(30000); //Duration of the check (30 sec)
+        data.WriteByteSeq(grp[1]);
+        data.WriteByteSeq(grp[7]);
+        data.WriteByteSeq(grp[2]);
+        data.WriteByteSeq(grp[5]);
+        data.WriteByteSeq(grp[0]);
+        data.WriteByteSeq(player[4]);
+        data.WriteByteSeq(player[5]);
+        data.WriteByteSeq(player[6]);
+        data << uint8(1); //Apparently unused
+        data.WriteByteSeq(player[3]);
+        data.WriteByteSeq(player[0]);
+        data.WriteByteSeq(player[7]);
+        data.WriteByteSeq(player[2]);
+        data.WriteByteSeq(grp[4]);
+        data.WriteByteSeq(grp[3]);
+        data.WriteByteSeq(grp[6]);
         group->BroadcastPacket(&data, false, -1);
 
         group->OfflineReadyCheck();

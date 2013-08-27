@@ -668,7 +668,8 @@ enum Opcodes
     MSG_PVP_LOG_DATA                                  = 0x1598,
     MSG_QUERY_NEXT_MAIL_TIME                          = 0x0609,//16357
     MSG_QUEST_PUSH_RESULT                             = 0x09A4,//16357
-    MSG_RAID_READY_CHECK                              = 0x069E,//16357
+    CMSG_RAID_READY_CHECK                              = 0x069E,//16357
+    SMSG_RAID_READY_CHECK_STARTED                     = 0x04B0,//16357
     MSG_RAID_READY_CHECK_CONFIRM                      = 0x0E98,//16357
     MSG_RAID_READY_CHECK_FINISHED                     = 0x017C,//16357
     MSG_RAID_TARGET_UPDATE                            = 0x0512,//16357
