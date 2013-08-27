@@ -817,6 +817,7 @@ class WorldSession
         void HandleLfrJoinOpcode(WorldPacket& recvData);
         void HandleLfrLeaveOpcode(WorldPacket& recvData);
         void HandleLfgGetStatus(WorldPacket& recvData);
+		void HandleDungeonFinderGetSystemInfo(WorldPacket& recvData);
 
         void SendLfgUpdatePlayer(LfgUpdateData const& updateData);
         void SendLfgUpdateParty(LfgUpdateData const& updateData);

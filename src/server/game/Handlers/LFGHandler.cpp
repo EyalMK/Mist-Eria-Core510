@@ -705,6 +705,14 @@ void WorldSession::SendLfgTeleportError(uint8 err)
     SendPacket(&data);
 }
 
+void WorldSession::HandleDungeonFinderGetSystemInfo(WorldPacket& recvData)
+{
+    sLog->outDebug(LOG_FILTER_NETWORKIO,"CMSG_DUNGEON_FINDER_GET_SYSTEM_INFO [" UI64FMTD "]", GetPlayer()->GetGUID());
+    bool unk1 = recvData.ReadBit();
+
+    recvData.hexlike();
+}
+
 /*
 void WorldSession::SendLfrUpdateListOpcode(uint32 dungeonEntry)
 {
