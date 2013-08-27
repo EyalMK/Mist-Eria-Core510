@@ -72,7 +72,7 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
 	recvData >> roles;
 	recvData >> count;
 
-    uint32 length = recvData.ReadBits(9);
+    uint32 length = recvData.ReadBits(24);
 
     comment = recvData.ReadString(length);
 
