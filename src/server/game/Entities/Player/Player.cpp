@@ -16714,6 +16714,7 @@ void Player::SendQuestUpdateAddCreatureOrGo(Quest const* quest, uint64 guid, uin
     data << uint16(old_count + add_count);
     data << uint32(quest->RequiredNpcOrGoCount[ creatureOrGO_idx ]);
     data << uint64(guid);
+    data << uint8(0);
 
 	// data << uint32(quest->requirement Type); ...
 
