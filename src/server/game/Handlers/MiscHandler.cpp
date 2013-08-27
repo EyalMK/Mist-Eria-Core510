@@ -1250,8 +1250,6 @@ void WorldSession::HandlePlayedTime(WorldPacket& recvData)
     SendPacket(&data);
 }
 
-
-// need to find value for SMSG_INSPECT and structure
 void WorldSession::HandleInspectOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
@@ -1285,28 +1283,49 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recvData)
         return;
     }
 
-    uint32 talent_points = 41;
-    WorldPacket data(SMSG_INSPECT_TALENT, 8 + 4 + 1 + 1 + talent_points + 8 + 4 + 8 + 4);
-    data << player->GetGUID();
+	/*
+	// 7CE0D0
+    WorldPacket data(SMSG_INSPECT_RESULTS_UPDATE, 150); // guess size ?
 
-    if (sWorld->getBoolConfig(CONFIG_TALENTS_INSPECTING) || _player->isGameMaster())
-        player->BuildPlayerTalentsInfoData(&data);
-    else
-    {
-        data << uint32(0);                                  // unspentTalentPoints
-        data << uint8(0);                                   // talentGroupCount
-        data << uint8(0);                                   // talentGroupIndex
-    }
+	ObjectGuid guid;
+	ObjectGuid guid2;
 
-    player->BuildEnchantmentsInfoData(&data);
-    if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
-    {
-        data << uint64(guild->GetGUID());
-        data << uint32(guild->GetLevel());
-        data << uint64(0/*guild->GetXP()*/);
-        data << uint32(guild->GetMembersCount());
-    }
+	guid2[7] = data.ReadBit();
+    guid2[4] = data.ReadBit();
+    guid2[2] = data.ReadBit();
+    guid2[6] = data.ReadBit();
+    guid2[1] = data.ReadBit();
+    guid2[0] = data.ReadBit();
+    guid[3] = data.ReadBit();
+    guid[5] = data.ReadBit();
+	guid[6] = data.ReadBit();
+    guid[4] = data.ReadBit();
+    guid[0] = data.ReadBit();
+    guid[2] = data.ReadBit();
+    guid[1] = data.ReadBit();
+    guid[7] = data.ReadBit();
+    guid2[5] = data.ReadBit();
+    guid2[3] = data.ReadBit();
+
+	data.ReadByteSeq(guid2[6]);
+    data.ReadByteSeq(guid[2]);
+    data.ReadByteSeq(guid[0]);
+    data.ReadByteSeq(guid[4]);
+    data.ReadByteSeq(guid[7]);
+    data.ReadByteSeq(guid[5]);
+    data.ReadByteSeq(guid[3]);
+    data.ReadByteSeq(guid[1]);
+	data.ReadByteSeq(guid[6]);
+    data.ReadByteSeq(guid2[7]);
+    data.ReadByteSeq(guid2[2]);
+    data.ReadByteSeq(guid2[0]);
+    data.ReadByteSeq(guid2[1]);
+    data.ReadByteSeq(guid2[4]);
+    data.ReadByteSeq(guid2[3]);
+    data.ReadByteSeq(guid2[5]);
+
     SendPacket(&data);
+	*/
 }
 
 void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recvData)
