@@ -516,7 +516,6 @@ class WorldSession
         void HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData);
         void HandleRaidTargetUpdateOpcode(WorldPacket& recvData);
         void HandleRaidReadyCheckOpcode(WorldPacket& recvData);
-        void HandleRaidRedyCheckResponse(WorldPacket& recvData);
         void HandleRaidReadyCheckFinishedOpcode(WorldPacket& recvData);
         void HandleGroupRaidConvertOpcode(WorldPacket& recvData);
         void HandleGroupChangeSubGroupOpcode(WorldPacket& recvData);
@@ -817,6 +816,7 @@ class WorldSession
         void HandleLfrJoinOpcode(WorldPacket& recvData);
         void HandleLfrLeaveOpcode(WorldPacket& recvData);
         void HandleLfgGetStatus(WorldPacket& recvData);
+		void HandleDungeonFinderGetSystemInfo(WorldPacket& recvData);
 
         void SendLfgUpdatePlayer(LfgUpdateData const& updateData);
         void SendLfgUpdateParty(LfgUpdateData const& updateData);
@@ -831,7 +831,7 @@ class WorldSession
         void SendLfgDisabled();
         void SendLfgOfferContinue(uint32 dungeonEntry);
         void SendLfgTeleportError(uint8 err);
-
+	
         // Arena Team
         void HandleInspectArenaTeamsOpcode(WorldPacket& recvData);
         void HandleArenaTeamQueryOpcode(WorldPacket& recvData);
