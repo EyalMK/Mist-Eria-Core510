@@ -92,6 +92,11 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
     }
     
     comment = recvData.ReadString(length);
+    
+    for(uint32 i=0 ; i< recvData.size() ; ++i) 
+	{
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LFG_JOIN %s packet: %u", recvData.read<uint8>());
+	}
 
     sLog->outDebug(LOG_FILTER_LFG, "CMSG_LFG_JOIN %s roles: %u, Dungeons: %u, Comment: %s",
         GetPlayerInfo().c_str(), roles, uint8(newDungeons.size()), comment.c_str());
