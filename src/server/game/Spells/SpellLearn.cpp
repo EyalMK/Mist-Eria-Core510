@@ -75,8 +75,8 @@ std::list<uint32> SpellLearnMgr::GetSpellList(uint32 classe, uint32 spec, uint32
 {
 	std::list<uint32> result;
 
-	if(levelMin < 0) levelMin = 0;
-	if(levelMax < 0) levelMax = 0;
+	if(levelMin < 1) levelMin = 1;
+	if(levelMax < 1) levelMax = 1;
 	if(levelMin > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)) levelMin = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 	if(levelMax > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)) levelMax = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 
@@ -85,7 +85,7 @@ std::list<uint32> SpellLearnMgr::GetSpellList(uint32 classe, uint32 spec, uint32
 		for(uint32 i = levelMin ; i <= levelMax ; i++)
 		{
 			result.insert(result.end(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i-1]))[spec])).begin(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i-1]))[spec])).end());
-			if(withCommon)
+			if(withCommon && spec != 0)
 				result.insert(result.end(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i-1]))[0])).begin(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i-1]))[0])).end());
 		}
 	}
