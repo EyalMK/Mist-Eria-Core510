@@ -1229,7 +1229,7 @@ enum Opcodes
     SMSG_PVP_OPTIONS_ENABLED                          = 0xA78, //16357
     SMSG_QUERY_QUESTS_COMPLETED_RESPONSE              = 0x0E7D,//16357
     SMSG_QUERY_TIME_RESPONSE                          = 0x1C5, //16357
-    SMSG_QUESTGIVER_OFFER_REWARD                      = 0x2039,
+    SMSG_QUESTGIVER_OFFER_REWARD                      = 0x00E4,
     SMSG_QUESTGIVER_QUEST_COMPLETE                    = 0x0E35, //16357
     SMSG_QUESTGIVER_QUEST_DETAILS                     = 0x08A0, //16357
     SMSG_QUESTGIVER_QUEST_FAILED                      = 0x0105,//16357
@@ -1242,7 +1242,7 @@ enum Opcodes
     SMSG_QUESTUPDATE_ADD_ITEM                         = 0x2038,
     SMSG_QUESTUPDATE_ADD_KILL                         = 0x0E61,//16357
     SMSG_QUESTUPDATE_ADD_PVP_KILL                     = 0x0629,//16357
-    SMSG_QUESTUPDATE_COMPLETE                         = 0x00E4,//16357
+    SMSG_QUESTUPDATE_COMPLETE                         = 0x2039,
     SMSG_QUESTUPDATE_FAILED                           = 0x2042,
     SMSG_QUESTUPDATE_FAILEDTIMER                      = 0x06A5,//16357
     SMSG_QUEST_NPC_QUERY_RESPONSE                     = 0x2044,

@@ -617,12 +617,16 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, uint64 npcGUID, b
         ++emoteCount;
     }
 
-    data << emoteCount;                                     // Emote Count
+    data << uint32(0);
+
+    /*data << emoteCount;                                     // Emote Count
     for (uint8 i = 0; i < emoteCount; ++i)
     {
+        if (quest->OfferRewardEmote[i] <= 0)
+            break;
         data << uint32(quest->OfferRewardEmoteDelay[i]);    // Delay Emote
         data << uint32(quest->OfferRewardEmote[i]);
-    }
+    }*/
 
     quest->BuildExtraQuestInfo(data, _session->GetPlayer());
 
