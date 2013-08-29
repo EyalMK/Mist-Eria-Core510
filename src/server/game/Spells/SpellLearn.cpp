@@ -80,7 +80,7 @@ void SpellLearnMgr::Load()
 
 		if (faction > 3) faction = 0;
 
-		uint8 level = std::min(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), level);
+		level = std::min(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), level);
 
 		// Add spell
 
@@ -103,14 +103,14 @@ void SpellLearn::UpdateForPlayer(Player *player)
 		break;
 
 	case 1: // Alliance
-		if (player->GetTeam == TEAM_ALLIANCE)
+		if (player->GetTeam() == TEAM_ALLIANCE)
 			player->learnSpell(spellId, false);
 		else
 			player->removeSpell(spellId);
 		break;
 
 	case 2: // Horde
-		if (player->GetTeam == TEAM_HORDE)
+		if (player->GetTeam() == TEAM_HORDE)
 			player->learnSpell(spellId, false);
 		else
 			player->removeSpell(spellId);
