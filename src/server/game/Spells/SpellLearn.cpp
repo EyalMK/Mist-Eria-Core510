@@ -129,7 +129,7 @@ void SpellLearnMgr::UpdatePlayerSpells(Player* player)
 {
 	if(!player) return;
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "Updating Player %s spells : guid = %u, level = %u, classid = %u, specid = %u", player->GetGUIDLow(), player->GetName(), player->getLevel(), player->getClass(), player->GetActiveSpec());
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "Updating Player %s spells : guid = %u, level = %u, classid = %u, specid = %u", player->GetName(), player->GetGUIDLow(), player->getLevel(), player->getClass(), player->GetActiveSpec());
 
 	uint8 classid = player->getClass();
 	uint8 spec = player->GetActiveSpec();
