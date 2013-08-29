@@ -4,6 +4,7 @@
 #include "SpellMgr.h"
 #include "World.h"
 
+
 SpellLearnMgr::SpellLearnMgr()
 {
 }
@@ -61,8 +62,29 @@ void SpellLearnMgr::Load()
 		uint32 classId      	= fields[1].GetUInt32();
 		uint32 specId       	= fields[2].GetUInt32();
 		uint32 level     		= fields[3].GetUInt32();
+		uint32 faction			= fields[4].GetUInt32();
 
-		((*((*(sSpellLearnMap[classId]))[level-1]))[specId])->push_back(spellId);
+		SpellLearn spell;
+		spell.spellId = spellId;
+		spell.faction = faction;
+
+		// Check informations
+
+		ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(classId);
+		if(!classEntry)
+			continue;
+
+		std::list<uint32>::iterator iter = std::find(sSpecializationMap[classId].begin(), sSpecializationMap[classId].end(), specId);
+		if (iter == sSpecializationMap[classId].end())
+			continue;
+
+		if (faction > 3) faction = 0;
+
+		uint8 level = std::min(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), level);
+
+		// Add spell
+
+		((*((*(sSpellLearnMap[classId]))[level-1]))[specId])->push_back(spell);
 
 		++count;
 	} while (result->NextRow());
@@ -71,42 +93,77 @@ void SpellLearnMgr::Load()
 }
 
 
-std::list<uint32> SpellLearnMgr::GetSpellList(uint32 classe, uint32 spec, uint32 levelMin, uint32 levelMax, bool withCommon)
+
+void SpellLearn::UpdateForPlayer(Player *player)
 {
-	std::list<uint32> result;
-
-	if(levelMin < 1) levelMin = 1;
-	if(levelMax < 1) levelMax = 1;
-	if(levelMin > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)) levelMin = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
-	if(levelMax > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)) levelMax = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
-
-	if(ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(classe))
+	switch(faction)
 	{
-		for(uint32 i = levelMin ; i <= levelMax ; i++)
-		{
-			result.insert(result.end(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i-1]))[spec])).begin(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i-1]))[spec])).end());
-			if(withCommon && spec != 0)
-				result.insert(result.end(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i-1]))[0])).begin(), (*((*((*(sSpellLearnMap[classEntry->ClassID]))[i-1]))[0])).end());
-		}
-	}
-	return result;
-}
+	case 0: // Disabled Spell
+		player->removeSpell(spellId);
+		break;
 
-std::list<uint32> SpellLearnMgr::GetSpellList(uint32 classe, uint32 spec, uint32 level, bool withCommon)
-{
-	return GetSpellList(classe, spec, level, level, withCommon);
+	case 1: // Alliance
+		if (player->GetTeam == TEAM_ALLIANCE)
+			player->learnSpell(spellId, false);
+		else
+			player->removeSpell(spellId);
+		break;
+
+	case 2: // Horde
+		if (player->GetTeam == TEAM_HORDE)
+			player->learnSpell(spellId, false);
+		else
+			player->removeSpell(spellId);
+		break;
+
+	case 3: // Both
+		player->learnSpell(spellId, false);
+		break;
+
+	default:
+		break;
+	}
 }
 
 void SpellLearnMgr::UpdatePlayerSpells(Player* player)
 {
 	if(!player) return;
-	std::list<uint32> list = GetSpellList(player->getClass(), player->GetActiveSpec(), 1, player->getLevel(), true);
-	if(!list.empty())
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "Updating Player %s spells : guid = %u, level = %u, classid = %u, specid = %u", player->GetGUIDLow(), player->GetName(), player->getLevel(), player->getClass(), player->GetActiveSpec());
+
+	uint8 classid = player->getClass();
+	uint8 spec = player->GetActiveSpec();
+	uint8 level = std::min(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), (uint32)player->getLevel());
+
+
+	// Check for cheating/errors
+
+	ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(player->getClass());
+	if(!classEntry)
+		return;
+
+
+	std::list<uint32>::iterator iter = std::find(sSpecializationMap[classid].begin(), sSpecializationMap[classid].end(), spec);
+	if (iter == sSpecializationMap[classid].end())
+		return;
+		
+
+	for(uint32 i = 1 ; i <= level ; i++)
 	{
-		std::list<uint32>::const_iterator itr = list.begin();
-		for(; itr != list.end() ; itr++)
+		if (LevelsList *levelsList = sSpellLearnMap[classid])
 		{
-			if(!player->HasSpell(*itr)) player->learnSpell(*itr,true);
+			if (SpecialisationList *specList = (*levelsList)[i-1])
+			{
+				if (SpellList *spellList = (*specList)[spec])
+					for(SpellList::iterator itr = spellList->begin(); itr != spellList->end(); ++itr)
+						itr->UpdateForPlayer(player);
+
+				if (spec != 0)
+					if (SpellList *spellList = (*specList)[0])
+						for(SpellList::iterator itr = spellList->begin(); itr != spellList->end(); ++itr)
+							itr->UpdateForPlayer(player);
+			}
 		}
 	}
+
 }
