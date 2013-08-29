@@ -249,18 +249,17 @@ void Quest::BuildExtraQuestInfo(WorldPacket& data, Player* player) const
 {
     data << uint32(GetRewChoiceItemsCount());
     for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
-        data << uint32(RewardChoiceItemId[i]);
-    for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
-        data << uint32(RewardChoiceItemCount[i]);
-    for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
     {
+        data << uint32(RewardChoiceItemId[i]);   
+        data << uint32(RewardChoiceItemCount[i]);
         if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(RewardChoiceItemId[i]))
             data << uint32(itemTemplate->DisplayInfoID);
         else
             data << uint32(0);
     }
 
-    data << uint32(GetReqItemsCount());
+    data << uint32(GetRewItemsCount());
+
     for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
         data << uint32(RewardItemId[i]);
     for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
