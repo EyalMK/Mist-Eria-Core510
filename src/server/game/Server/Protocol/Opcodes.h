@@ -919,8 +919,8 @@ enum Opcodes
     SMSG_GMRESPONSE_RECEIVED                          = 0x0D64,//16357
     SMSG_GMRESPONSE_STATUS_UPDATE                     = 0x01A8,//16357
     SMSG_GMTICKET_CREATE                              = 0x0568,//16357
-    SMSG_GMTICKET_DELETETICKET                        = 0x1783,
-    SMSG_GMTICKET_GETTICKET                           = 0x1784,
+    SMSG_GMTICKET_DELETETICKET                        = 0x05E8,//16357 // maybe need swap with next opcode
+    SMSG_GMTICKET_GETTICKET                           = 0x0DA9,//16357 // maybe need swap with previous opcode
     SMSG_GMTICKET_SYSTEMSTATUS                        = 0x0EF4,//16357
     SMSG_GMTICKET_UPDATETEXT                          = 0x0501,//16357
     SMSG_GM_MESSAGECHAT                               = 0x036D,//16357
