@@ -750,11 +750,8 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, uint64 npcGUID, 
     }
 
     data << uint32(quest->GetReqCurrencyCount());
-    for (int i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; ++i)
+    for (int i = 0; i < quest->GetReqCurrencyCount(); ++i)
     {
-        if (!quest->RequiredCurrencyId[i])
-            continue;
-
         data << uint32(quest->RequiredCurrencyId[i]);
         data << uint32(quest->RequiredCurrencyCount[i]);
     }
