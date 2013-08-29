@@ -512,56 +512,106 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     }
 
 
-        data << uint8(0);
-        /*for (uint8 i = 0; i < 0; ++i)
+    /*data << uint8(0);
+    for (uint8 i = 0; i < 1; ++i)
+    {
+        data << uint32(0);       // unknown
+
+        uint32 reqType = quest->GetQuestRequirementType();
+        data << uint32(reqType);
+
+        switch(reqType)
         {
-                data << uint32(0);       // unknown
+            case QUEST_REQUIREMENT_CREATURE:
+            case QUEST_REQUIREMENT_UNK3:
+                data << uint32(quest->RequiredNpcOrGo[i]);
+                break;
 
-				uint32 reqType = quest->GetQuestRequirementType();
-                data << uint32(reqType);  
+            case QUEST_REQUIREMENT_ITEM:
+                 data << uint32(quest->RequiredItemId[i]);
+                 break;
 
-				switch(reqType)
-				{
-				    case QUEST_REQUIREMENT_CREATURE:
+            case QUEST_REQUIREMENT_GAMEOBJECT:
+                 data << uint32(RequiredNpcOrGo[i]);
+                 break;
 
-					case QUEST_REQUIREMENT_UNK3:
-                         data << uint32(RequiredNpcOrGo[i]);
-						 break;
-
-					case QUEST_REQUIREMENT_ITEM:
-                         data << uint32(RequiredItemId[i]);
-						 break;
-
-					case QUEST_REQUIREMENT_GAMEOBJECT:
-                         data << uint32(RequiredNpcOrGo[i]);
-						 break;
-
-					case QUEST_REQUIREMENT_CURRENCY:
-                         data << uint32(RequiredCurrencyId[i]);
-						 break;
+            case QUEST_REQUIREMENT_CURRENCY:
+                 data << uint32(quest->RequiredCurrencyId[i]);
+                 break;
                 
-					case QUEST_REQUIREMENT_SPELL:
-                         data << uint32(RequiredSpellCast[i]);
-						 break;
+            case QUEST_REQUIREMENT_SPELL:
+                 data << uint32(quest->RequiredSpellCast[i]);
+                 break;
 
-					case QUEST_REQUIREMENT_FACTION:
-                         data << uint32(RequiredFactionId1[i]);
-						 break;
+            case QUEST_REQUIREMENT_FACTION:
+                 data << uint32(0); //NYI
+                 break;
 
-					default:
-						 data << uint32(requiredid[i]);
-						 break;
-                }
+            default:
+                 data << uint32(0); //NYI
+                 break;
+         }
                         
                 // i'm not sure for all of this ^^  above ) , must check again in parser
 
 
-            data << uint32(0);           // requiredcount
-            data << uint32(0);           // unknown
-            data << questObjectiveText[i];
-            data << uint8(0);           // unknown
-            data << uint8(0);           // unknown
-        }*/
+         data << uint32(0);           // requiredcount
+         data << uint32(0);           // unknown
+         data << questObjectiveText[i];
+         data << uint8(0);           // unknown
+         data << uint8(0);           // unknown
+    }*/
+
+    uint8 requirementCount = 0;
+    uint32 req_pos = data.wpos();
+    data << uint8(0);
+
+    for(int i = 0 ; i < QUEST_OBJECTIVES_COUNT ; i++)
+    {
+        int32 id = quest->RequiredNpcOrGo[i];
+        uint8 type = 0;
+        if(id == 0)
+            continue;
+        if(id > 0)
+            type = QUEST_REQUIREMENT_CREATURE;
+        else
+        {
+            type = QUEST_REQUIREMENT_GAMEOBJECT;
+            id *= -1;
+        }
+        requirementCount++;
+
+        data << uint32(0);
+        data << uint8(type);
+        data << uint32(id);
+        data << uint32(quest->RequiredNpcOrGoCount[i]);
+        data << uint32(0);
+        data << questObjectiveText[i];
+        data << uint8(0);           // unknown
+        data << uint8(0);           // unknown
+    }
+
+    for(int i = 0 ; i < QUEST_ITEM_OBJECTIVES_COUNT ; i++)
+    {
+        uint32 id = quest->RequiredItemId[i];
+        uint32 count = quest->RequiredItemCount[i];
+        requirementCount++;
+
+        data << uint32(0);
+        data << uint8(QUEST_REQUIREMENT_ITEM);
+        data << uint32(id);
+        data << uint32(count);
+        data << uint32(0);
+        data << uint8(0);
+        data << uint8(0);           // unknown
+        data << uint8(0);           // unknown
+    }
+
+    //Others to implement
+
+    data.wpos(req_pos);
+    data << uint8(requirementCount);
+
     _session->SendPacket(&data);
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_QUEST_QUERY_RESPONSE questid=%u", quest->GetQuestId());
 }

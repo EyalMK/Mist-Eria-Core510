@@ -232,6 +232,14 @@ struct QuestLocale
     StringVector QuestTurnTargetName;
 };
 
+struct QuestRequirement
+{
+    uint32 requirementType;
+    uint32 requirementEntry;
+    uint32 requirementCount;
+    std::string obective;
+};
+
 // This Quest class provides a convenient way to access a few pretotaled (cached) quest details,
 // all base quest information, and any utility functions such as generating the amount of
 // xp to give
@@ -367,6 +375,8 @@ class Quest
         uint32 GetReqCurrencyCount() const { return m_reqCurrencyCount; }
 
         void BuildExtraQuestInfo(WorldPacket& data, Player* player) const;
+        void WriteQuestRequirement(WorldPacket &data);
+        void BuildRequirementData();
 
         typedef std::vector<int32> PrevQuests;
         PrevQuests prevQuests;
@@ -455,6 +465,8 @@ class Quest
         std::string QuestTurnTargetName;
         uint32 SoundAccept;
         uint32 SoundTurnIn;
+
+        std::vector<QuestRequirement> m_requirement;
 
         uint32 SpecialFlags; // custom flags, not sniffed/WDB
 };
