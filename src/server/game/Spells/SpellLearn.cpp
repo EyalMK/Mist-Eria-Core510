@@ -130,7 +130,7 @@ void SpellLearnMgr::UpdatePlayerSpells(Player* player)
 {
 	if(!player) return;
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "Updating Player %s spells : guid = %u, level = %u, classid = %u, specid = %u", player->GetName(), player->GetGUIDLow(), player->getLevel(), player->getClass(), player->GetActiveSpec());
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "Updating Player %s spells : guid = %lu, level = %u, classid = %u, specid = %u", player->GetName(), player->GetGUIDLow(), player->getLevel(), player->getClass(), player->GetActiveSpec());
 
 	uint8 classid = player->getClass();
 	uint8 spec = player->GetActiveSpec();
@@ -149,7 +149,7 @@ void SpellLearnMgr::UpdatePlayerSpells(Player* player)
 		return;
 		
 
-	for(uint32 i = 1 ; i <= level ; i++)
+	for(uint32 i = 1 ; i <= level ; ++i)
 	{
 		if (LevelsList *levelsList = sSpellLearnMap[classid])
 		{
