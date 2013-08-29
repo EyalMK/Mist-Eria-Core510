@@ -81,6 +81,7 @@ void SpellLearnMgr::Load()
 		if (faction > 3) faction = 0;
 
 		level = std::min(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), level);
+		level = std::max(level, (uint32)1);
 
 		// Add spell
 
