@@ -91,6 +91,7 @@ void SpellLearnMgr::Load()
 	} while (result->NextRow());
 
 	sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u spells to learn in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+	sLog->outDebug(LOG_FILTER_NETWORKIO, ">> Loaded %u spells to learn in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 
@@ -143,15 +144,10 @@ void SpellLearnMgr::UpdatePlayerSpells(Player* player)
 	if(!classEntry)
 		return;
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG 1");
-
 
 	std::list<uint32>::iterator iter = std::find(sSpecializationMap[classid].begin(), sSpecializationMap[classid].end(), spec);
 	if (iter == sSpecializationMap[classid].end())
 		return;
-
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG 2");
-		
 
 
 	if (LevelsList *levelsList = sSpellLearnMap[classid])
@@ -171,7 +167,5 @@ void SpellLearnMgr::UpdatePlayerSpells(Player* player)
 			}
 		}
 	}
-
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG 3");
 
 }
