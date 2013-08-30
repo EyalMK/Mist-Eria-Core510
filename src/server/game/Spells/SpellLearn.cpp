@@ -91,13 +91,13 @@ void SpellLearnMgr::Load()
 	} while (result->NextRow());
 
 	sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u spells to learn in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-	sLog->outDebug(LOG_FILTER_NETWORKIO, ">> Loaded %u spells to learn in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 
 
 void SpellLearn::UpdateForPlayer(Player *player)
 {
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "### Updating Spell %u, faction %u", spellId, faction);
 	switch(faction)
 	{
 	case 0: // Disabled Spell
