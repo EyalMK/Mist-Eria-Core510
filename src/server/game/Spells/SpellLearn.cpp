@@ -149,9 +149,10 @@ void SpellLearnMgr::UpdatePlayerSpells(Player* player)
 		return;
 		
 
-	for(uint32 i = 1 ; i <= level ; ++i)
+
+	if (LevelsList *levelsList = sSpellLearnMap[classid])
 	{
-		if (LevelsList *levelsList = sSpellLearnMap[classid])
+		for(uint32 i = 1 ; i <= level ; ++i)
 		{
 			if (SpecialisationList *specList = (*levelsList)[i-1])
 			{
