@@ -97,7 +97,6 @@ void SpellLearnMgr::Load()
 
 void SpellLearn::UpdateForPlayer(Player *player)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "### Updating Spell %u, faction %u", spellId, faction);
 	switch(faction)
 	{
 	case 0: // Disabled Spell
@@ -134,9 +133,6 @@ void SpellLearnMgr::UpdatePlayerSpells(Player* player)
 	uint8 classid = player->getClass();
 	uint8 spec = player->GetActiveSpec();
 	uint8 level = std::min(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), (uint32)player->getLevel());
-
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "### Updating Player %s spells : guid = %u, level = %u, classid = %u, specid = %u", player->GetName().c_str(), player->GetGUIDLow(), player->getLevel(), player->getClass(), player->GetActiveSpec());
-
 
 	// Check for cheating/errors
 
