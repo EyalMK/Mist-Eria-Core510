@@ -25063,7 +25063,7 @@ bool Player::LearnTalent(uint32 talentId, uint32 /*talentRank*/)
     return true;
 }
 
-void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 /*talentRank*/) // need to update this struct , working on this today
+void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId)
 {
     Pet* pet = GetPet();
 
