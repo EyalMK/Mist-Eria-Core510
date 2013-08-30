@@ -130,11 +130,11 @@ void SpellLearnMgr::UpdatePlayerSpells(Player* player)
 {
 	if(!player) return;
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "Updating Player %s spells : guid = %u, level = %u, classid = %u, specid = %u", player->GetName().c_str(), player->GetGUIDLow(), player->getLevel(), player->getClass(), player->GetActiveSpec());
-
 	uint8 classid = player->getClass();
 	uint8 spec = player->GetActiveSpec();
 	uint8 level = std::min(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), (uint32)player->getLevel());
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "### Updating Player %s spells : guid = %u, level = %u, classid = %u, specid = %u", player->GetName().c_str(), player->GetGUIDLow(), player->getLevel(), player->getClass(), player->GetActiveSpec());
 
 
 	// Check for cheating/errors
@@ -143,10 +143,14 @@ void SpellLearnMgr::UpdatePlayerSpells(Player* player)
 	if(!classEntry)
 		return;
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG 1");
+
 
 	std::list<uint32>::iterator iter = std::find(sSpecializationMap[classid].begin(), sSpecializationMap[classid].end(), spec);
 	if (iter == sSpecializationMap[classid].end())
 		return;
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG 2");
 		
 
 
@@ -167,5 +171,7 @@ void SpellLearnMgr::UpdatePlayerSpells(Player* player)
 			}
 		}
 	}
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG 3");
 
 }
