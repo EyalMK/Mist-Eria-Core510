@@ -1457,6 +1457,9 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
 
 SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 area_id, Player const* player) const
 {
+	// DEBUG TERAH
+	return SPELL_CAST_OK;
+
     // normal case
     if (AreaGroupId > 0)
     {

@@ -5806,9 +5806,6 @@ SpellCastResult Spell::CheckCasterAuras() const
 
 SpellCastResult Spell::CheckArenaAndRatedBattlegroundCastRules()
 {
-	// DEBUG TERAH
-	return SPELL_CAST_OK;
-
 
     bool isRatedBattleground = false; // NYI
     bool isArena = !isRatedBattleground;
