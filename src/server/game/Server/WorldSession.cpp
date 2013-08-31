@@ -881,8 +881,6 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
 
             addonInfo >> enabled >> crc >> version;
 
-            std::cout << "Addon : " << addonName << " crc : " << crc << std::endl;
-
             sLog->outInfo(LOG_FILTER_NETWORKIO, "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Version: 0x%x", addonName.c_str(), enabled, crc, version);
 
             AddonInfo addon(addonName, enabled, crc, 2, true, version);
