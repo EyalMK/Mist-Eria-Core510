@@ -142,6 +142,8 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
     // remove fake death
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+        
+    GetPlayer()->ResetTalents();
 
     if (!_player->ResetTalents())
     {
