@@ -2206,17 +2206,17 @@ void WorldSession::SendLoadCUFProfiles()
         data.WriteBit(profile->BoolOptions[CUF_DISPLAY_PETS]);
         data.WriteBit(profile->BoolOptions[CUF_AUTO_ACTIVATE_PVP]);
 
-        byteBuffer << uint16(profile->Unk154);
-        byteBuffer << uint16(profile->FrameHeight);
-        byteBuffer << uint16(profile->Unk152);
         byteBuffer << uint8(profile->Unk147);
-        byteBuffer << uint16(profile->Unk150);
-		byteBuffer.WriteString(profile->ProfileName);
-        byteBuffer << uint8(profile->Unk146);
+		byteBuffer << uint16(profile->Unk154);
+		byteBuffer << uint8(profile->Unk146);
         byteBuffer << uint8(profile->HealthText);
         byteBuffer << uint8(profile->SortBy);
+		byteBuffer.WriteString(profile->ProfileName);
+		byteBuffer << uint16(profile->FrameHeight);
+		byteBuffer << uint8(profile->Unk148); 
+		byteBuffer << uint16(profile->Unk152);
+        byteBuffer << uint16(profile->Unk150);
         byteBuffer << uint16(profile->FrameWidth);
-        byteBuffer << uint8(profile->Unk148); 
     }
 
     data.FlushBits();
