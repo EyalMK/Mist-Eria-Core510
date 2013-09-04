@@ -4411,8 +4411,9 @@ bool Player::ResetTalents(bool no_cost)
                 removeSpell(talentInfo->SpellId, false, false);
             }
 
-    SetPrimaryTalentTree(GetActiveSpec(), 0);
-    SetFreeTalentPoints(talentPointsForLevel);
+    // to be sure that talents reset !
+	SetUInt32Value(PLAYER_MAX_TALENT_TIERS, 0);
+    SetUInt32Value(PLAYER_FIELD_CURRENT_SPEC_ID, 0);
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     _SaveTalents(trans);
