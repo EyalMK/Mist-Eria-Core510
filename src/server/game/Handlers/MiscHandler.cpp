@@ -1629,12 +1629,12 @@ void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket& recvData)
     uint32 mode;
     recvData >> mode;
 
-    sLog->outString(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 1 %u %u", mode, _player->GetDungeonDifficulty());
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 1 %u %u", mode, _player->GetDungeonDifficulty());
 
     if (Difficulty(mode) == _player->GetDungeonDifficulty())
         return;
 
-    sLog->outString(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 2");
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 2");
 
 
     // cannot reset while in an instance
@@ -1649,15 +1649,15 @@ void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket& recvData)
     Group* group = _player->GetGroup();
     if (group)
     {
-        sLog->outString(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 3");
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 3");
 
         if (group->IsLeader(_player->GetGUID()))
         {
-            sLog->outString(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 4");
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 4");
 
             for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
             {
-                sLog->outString(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 5");
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 5");
 
                 Player* groupGuy = itr->getSource();
                 if (!groupGuy)
@@ -1681,7 +1681,7 @@ void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket& recvData)
     }
     else
     {
-        sLog->outString(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 6");
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 6");
 
         _player->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY, false);
         _player->SetDungeonDifficulty(Difficulty(mode));
