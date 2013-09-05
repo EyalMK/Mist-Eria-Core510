@@ -1106,8 +1106,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
                    0,  /* Vrykul */                            0,  /* Tuskarr */
                    0,  /* Forest Troll */                      0,  /* Taunka */
                    0,  /* Northrend Skeleton */                0,  /* Ice Troll */
-               79596,  /* Worgen - Young Mastiff */
-			   // panda hunter to do
+               79596,  /* Worgen - Young Mastiff */            0,  /* Gilnean */
+			  107924,  /* Panda - Wise Turtle */
             };
 
             pCurrChar->CastSpell(pCurrChar, HunterCreatePetSpells[pCurrChar->getRace()], true);

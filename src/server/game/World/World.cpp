@@ -280,7 +280,7 @@ void World::AddSession_(WorldSession* s)
     }
 
     s->SendAuthResponse(AUTH_OK, false);
-    //s->SendAddonsInfo();
+    s->SendAddonsInfo();
     s->SendClientCacheVersion(sWorld->getIntConfig(CONFIG_CLIENTCACHE_VERSION));
     s->SendTutorialsData();
 

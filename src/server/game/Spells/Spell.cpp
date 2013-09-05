@@ -3740,6 +3740,8 @@ void Spell::finish(bool ok)
 
 void Spell::SendCastResult(SpellCastResult result)
 {
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "Send cast result %u", uint32(result));
+
     if (result == SPELL_CAST_OK)
         return;
 
@@ -5806,6 +5808,7 @@ SpellCastResult Spell::CheckCasterAuras() const
 
 SpellCastResult Spell::CheckArenaAndRatedBattlegroundCastRules()
 {
+
     bool isRatedBattleground = false; // NYI
     bool isArena = !isRatedBattleground;
 

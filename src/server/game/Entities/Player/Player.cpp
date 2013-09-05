@@ -4411,8 +4411,9 @@ bool Player::ResetTalents(bool no_cost)
                 removeSpell(talentInfo->SpellId, false, false);
             }
 
-    SetPrimaryTalentTree(GetActiveSpec(), 0);
-    SetFreeTalentPoints(talentPointsForLevel);
+    // to be sure that talents reset !
+	SetUInt32Value(PLAYER_MAX_TALENT_TIERS, 0);
+    SetUInt32Value(PLAYER_FIELD_CURRENT_SPEC_ID, 0);
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     _SaveTalents(trans);
@@ -6053,7 +6054,7 @@ bool Player::UpdateSkillPro(uint16 skillId, int32 chance, uint32 step)
     // levels sync. with spell requirement for skill levels to learn
     // bonus abilities in sSkillLineAbilityStore
     // Used only to avoid scan DBC at each skill grow
-    static uint32 bonusSkillLevels[] = { 75, 150, 225, 300, 375, 450, 525 };
+    static uint32 bonusSkillLevels[] = { 75, 150, 225, 300, 375, 450, 525, 600 };
     static const size_t bonusSkillLevelsSize = sizeof(bonusSkillLevels) / sizeof(uint32);
 
     sLog->outDebug(LOG_FILTER_PLAYER_SKILLS, "UpdateSkillPro(SkillId %d, Chance %3.1f%%)", skillId, chance / 10.0f);
@@ -25063,7 +25064,7 @@ bool Player::LearnTalent(uint32 talentId, uint32 /*talentRank*/)
     return true;
 }
 
-void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 /*talentRank*/) // need to update this struct , working on this today
+void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId)
 {
     Pet* pet = GetPet();
 

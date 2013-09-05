@@ -7,6 +7,14 @@
 #include "Spell.h"
 #include "Player.h"
 
+struct SpellLearn
+{
+	uint32 spellId;
+	uint32 faction;
+
+	void UpdateForPlayer(Player *player);
+};
+
 class SpellLearnMgr
 {
 	friend class ACE_Singleton<SpellLearnMgr, ACE_Null_Mutex>;
@@ -15,7 +23,7 @@ private:
 	SpellLearnMgr();
 	~SpellLearnMgr();
 
-	typedef std::list<uint32> SpellList;
+	typedef std::list<SpellLearn> SpellList;
 	typedef std::map<uint32, SpellList*> SpecialisationList;
 	typedef std::vector<SpecialisationList*> LevelsList;
 	typedef std::map<uint32, LevelsList*> SpellLearnMap;
@@ -27,8 +35,6 @@ private:
 
 public:
 	void Load();
-	std::list<uint32> GetSpellList(uint32 classe, uint32 spec, uint32 levelMin, uint32 levelMax, bool withCommon);
-	std::list<uint32> GetSpellList(uint32 classe, uint32 spec, uint32 level, bool withCommon);
 	void UpdatePlayerSpells(Player* player);
 };
 

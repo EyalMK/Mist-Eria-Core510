@@ -1290,39 +1290,39 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recvData)
 	ObjectGuid guid;
 	ObjectGuid guid2;
 
-	guid2[7] = data.ReadBit();
-    guid2[4] = data.ReadBit();
-    guid2[2] = data.ReadBit();
-    guid2[6] = data.ReadBit();
-    guid2[1] = data.ReadBit();
-    guid2[0] = data.ReadBit();
-    guid[3] = data.ReadBit();
-    guid[5] = data.ReadBit();
-	guid[6] = data.ReadBit();
-    guid[4] = data.ReadBit();
-    guid[0] = data.ReadBit();
-    guid[2] = data.ReadBit();
-    guid[1] = data.ReadBit();
-    guid[7] = data.ReadBit();
-    guid2[5] = data.ReadBit();
-    guid2[3] = data.ReadBit();
+	guid2[7] = data.WriteBit();
+    guid2[4] = data.WriteBit();
+    guid2[2] = data.WriteBit();
+    guid2[6] = data.WriteBit();
+    guid2[1] = data.WriteBit();
+    guid2[0] = data.WriteBit();
+    guid[3] = data.WriteBit();
+    guid[5] = data.WriteBit();
+	guid[6] = data.WriteBit();
+    guid[4] = data.WriteBit();
+    guid[0] = data.WriteBit();
+    guid[2] = data.WriteBit();
+    guid[1] = data.WriteBit();
+    guid[7] = data.WriteBit();
+    guid2[5] = data.WriteBit();
+    guid2[3] = data.WriteBit();
 
-	data.ReadByteSeq(guid2[6]);
-    data.ReadByteSeq(guid[2]);
-    data.ReadByteSeq(guid[0]);
-    data.ReadByteSeq(guid[4]);
-    data.ReadByteSeq(guid[7]);
-    data.ReadByteSeq(guid[5]);
-    data.ReadByteSeq(guid[3]);
-    data.ReadByteSeq(guid[1]);
-	data.ReadByteSeq(guid[6]);
-    data.ReadByteSeq(guid2[7]);
-    data.ReadByteSeq(guid2[2]);
-    data.ReadByteSeq(guid2[0]);
-    data.ReadByteSeq(guid2[1]);
-    data.ReadByteSeq(guid2[4]);
-    data.ReadByteSeq(guid2[3]);
-    data.ReadByteSeq(guid2[5]);
+	data.WriteByteSeq(guid2[6]);
+    data.WriteByteSeq(guid[2]);
+    data.WriteByteSeq(guid[0]);
+    data.WriteByteSeq(guid[4]);
+    data.WriteByteSeq(guid[7]);
+    data.WriteByteSeq(guid[5]);
+    data.WriteByteSeq(guid[3]);
+    data.WriteByteSeq(guid[1]);
+	data.WriteByteSeq(guid[6]);
+    data.WriteByteSeq(guid2[7]);
+    data.WriteByteSeq(guid2[2]);
+    data.WriteByteSeq(guid2[0]);
+    data.WriteByteSeq(guid2[1]);
+    data.WriteByteSeq(guid2[4]);
+    data.WriteByteSeq(guid2[3]);
+    data.WriteByteSeq(guid2[5]);
 
     SendPacket(&data);
 	*/
@@ -2132,6 +2132,7 @@ void WorldSession::HandleSaveCUFProfiles(WorldPacket& recvPacket)
         profiles[i]->BoolOptions.set(CUF_UNK_157                         , recvPacket.ReadBit());
         profiles[i]->BoolOptions.set(CUF_DISPLAY_HEAL_PREDICTION         , recvPacket.ReadBit());
         profiles[i]->BoolOptions.set(CUF_AUTO_ACTIVATE_SPEC_1            , recvPacket.ReadBit());
+		strlens[i] = (uint8)recvPacket.ReadBits(8);
         profiles[i]->BoolOptions.set(CUF_AUTO_ACTIVATE_PVP               , recvPacket.ReadBit());
         profiles[i]->BoolOptions.set(CUF_DISPLAY_POWER_BAR               , recvPacket.ReadBit());
         profiles[i]->BoolOptions.set(CUF_AUTO_ACTIVATE_15_PLAYERS        , recvPacket.ReadBit());
@@ -2148,7 +2149,6 @@ void WorldSession::HandleSaveCUFProfiles(WorldPacket& recvPacket)
         profiles[i]->BoolOptions.set(CUF_DISPLAY_BORDER                  , recvPacket.ReadBit());
         profiles[i]->BoolOptions.set(CUF_USE_CLASS_COLORS                , recvPacket.ReadBit());
         profiles[i]->BoolOptions.set(CUF_UNK_145                         , recvPacket.ReadBit());
-        strlens[i] = (uint8)recvPacket.ReadBits(8);
         profiles[i]->BoolOptions.set(CUF_AUTO_ACTIVATE_PVE               , recvPacket.ReadBit());
         profiles[i]->BoolOptions.set(CUF_DISPLAY_HORIZONTAL_GROUPS       , recvPacket.ReadBit());
         profiles[i]->BoolOptions.set(CUF_AUTO_ACTIVATE_25_PLAYERS        , recvPacket.ReadBit());
@@ -2158,9 +2158,9 @@ void WorldSession::HandleSaveCUFProfiles(WorldPacket& recvPacket)
     for (uint8 i = 0; i < count; ++i)
     {
         recvPacket >> profiles[i]->Unk146;
-        profiles[i]->ProfileName = recvPacket.ReadString(strlens[i]);
         recvPacket >> profiles[i]->Unk152;
         recvPacket >> profiles[i]->FrameHeight;
+		profiles[i]->ProfileName = recvPacket.ReadString(strlens[i]);
         recvPacket >> profiles[i]->FrameWidth;
         recvPacket >> profiles[i]->Unk150;
         recvPacket >> profiles[i]->HealthText;
@@ -2211,25 +2211,25 @@ void WorldSession::SendLoadCUFProfiles()
         data.WriteBit(profile->BoolOptions[CUF_USE_CLASS_COLORS]);
         data.WriteBit(profile->BoolOptions[CUF_DISPLAY_POWER_BAR]);
         data.WriteBit(profile->BoolOptions[CUF_AUTO_ACTIVATE_SPEC_1]);
-        data.WriteBits(profile->ProfileName.size(), 8);
         data.WriteBit(profile->BoolOptions[CUF_DISPLAY_ONLY_DISPELLABLE_DEBUFFS]);
         data.WriteBit(profile->BoolOptions[CUF_KEEP_GROUPS_TOGETHER]);
         data.WriteBit(profile->BoolOptions[CUF_UNK_145]);
+		data.WriteBits(profile->ProfileName.size(), 8);
         data.WriteBit(profile->BoolOptions[CUF_AUTO_ACTIVATE_15_PLAYERS]);
         data.WriteBit(profile->BoolOptions[CUF_DISPLAY_PETS]);
         data.WriteBit(profile->BoolOptions[CUF_AUTO_ACTIVATE_PVP]);
 
-        byteBuffer << uint16(profile->Unk154);
-        byteBuffer << uint16(profile->FrameHeight);
-        byteBuffer << uint16(profile->Unk152);
         byteBuffer << uint8(profile->Unk147);
-        byteBuffer << uint16(profile->Unk150);
-        byteBuffer << uint8(profile->Unk146);
+		byteBuffer << uint16(profile->Unk154);
+		byteBuffer << uint8(profile->Unk146);
         byteBuffer << uint8(profile->HealthText);
         byteBuffer << uint8(profile->SortBy);
+		byteBuffer.WriteString(profile->ProfileName);
+		byteBuffer << uint16(profile->FrameHeight);
+		byteBuffer << uint8(profile->Unk148); 
+		byteBuffer << uint16(profile->Unk152);
+        byteBuffer << uint16(profile->Unk150);
         byteBuffer << uint16(profile->FrameWidth);
-        byteBuffer << uint8(profile->Unk148);
-        byteBuffer.WriteString(profile->ProfileName);
     }
 
     data.FlushBits();
