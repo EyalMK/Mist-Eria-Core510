@@ -36,33 +36,33 @@ void WorldSession::SendTradeStatus(TradeStatus status)
 	ObjectGuid guid;
 
 	// i think still need work on it sub_76B9A0
-    data.Initialize(SMSG_TRADE_STATUS, 1+4+4);
+    data.Initialize(SMSG_TRADE_STATUS, 4+8);
+
 	data.WriteBits(status, 5);
+	data.WriteBit(0); // unk bit, usually 0
 
     switch (status)
     {
         case TRADE_STATUS_BEGIN_TRADE:
-			data.WriteBit(0); // unk bit, usually 0
+			data.WriteBit(guid[3]);
+    data.WriteBit(guid[0]);
+    data.WriteBit(guid[1]);
+    data.WriteBit(guid[5]);
+    data.WriteBit(guid[6]);
+    data.WriteBit(guid[2]);
+    data.WriteBit(guid[7]);
+    data.WriteBit(guid[4]);
 
-            data.WriteBit(guid[3]);
-			data.WriteBit(guid[0]);
-			data.WriteBit(guid[1]);
-			data.WriteBit(guid[5]);
-			data.WriteBit(guid[6]);
-			data.WriteBit(guid[2]);
-			data.WriteBit(guid[7]);
-			data.WriteBit(guid[4]);
+	data.FlushBits();
 
-			data.FlushBits();
-
-			data.WriteByteSeq(guid[4]);
-			data.WriteByteSeq(guid[5]);
-			data.WriteByteSeq(guid[7]);
-            data.WriteByteSeq(guid[0]);
-			data.WriteByteSeq(guid[1]);
-			data.WriteByteSeq(guid[2]);
-			data.WriteByteSeq(guid[3]);
-			data.WriteByteSeq(guid[6]);
+    data.WriteByteSeq(guid[4]);
+    data.WriteByteSeq(guid[5]);
+    data.WriteByteSeq(guid[7]);
+    data.WriteByteSeq(guid[0]);
+    data.WriteByteSeq(guid[1]);
+    data.WriteByteSeq(guid[2]);
+    data.WriteByteSeq(guid[3]);
+    data.WriteByteSeq(guid[6]);
             break;
         case TRADE_STATUS_OPEN_WINDOW:
             data.FlushBits();
@@ -764,28 +764,29 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
     pOther->m_trade = new TradeData(pOther, _player);
 
     WorldPacket data(SMSG_TRADE_STATUS, 2+7); // TO FIX . Need to fill structure
-    data.WriteBit(0); // unk bit, usually 0
+    
     data.WriteBits(TRADE_STATUS_BEGIN_TRADE, 5);
+	data.WriteBit(0); // unk bit, usually 0
 
     ObjectGuid playerGuid = _player->GetGUID();
     // WTB StartBitStream...
-    data.WriteBit(playerGuid[2]);
-    data.WriteBit(playerGuid[4]);
-    data.WriteBit(playerGuid[6]);
+    data.WriteBit(playerGuid[3]);
     data.WriteBit(playerGuid[0]);
     data.WriteBit(playerGuid[1]);
-    data.WriteBit(playerGuid[3]);
-    data.WriteBit(playerGuid[7]);
     data.WriteBit(playerGuid[5]);
+    data.WriteBit(playerGuid[6]);
+    data.WriteBit(playerGuid[2]);
+    data.WriteBit(playerGuid[7]);
+    data.WriteBit(playerGuid[4]);
 
     data.WriteByteSeq(playerGuid[4]);
+    data.WriteByteSeq(playerGuid[5]);
+    data.WriteByteSeq(playerGuid[7]);
+    data.WriteByteSeq(playerGuid[0]);
     data.WriteByteSeq(playerGuid[1]);
     data.WriteByteSeq(playerGuid[2]);
     data.WriteByteSeq(playerGuid[3]);
-    data.WriteByteSeq(playerGuid[0]);
-    data.WriteByteSeq(playerGuid[7]);
     data.WriteByteSeq(playerGuid[6]);
-    data.WriteByteSeq(playerGuid[5]);
 
     pOther->GetSession()->SendPacket(&data);
 }
