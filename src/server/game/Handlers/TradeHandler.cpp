@@ -37,11 +37,11 @@ void WorldSession::SendTradeStatus(TradeStatus status)
 	// i think still need work on it sub_76B9A0
     data.Initialize(SMSG_TRADE_STATUS, 1+4+4);
 	data.WriteBits(status, 5);
-    data.WriteBit(0); // unk bit, usually 0
 
     switch (status)
     {
         case TRADE_STATUS_BEGIN_TRADE:
+			data.WriteBit(0); // unk bit, usually 0
             data.WriteBits(0, 8); // zero guid
             data.FlushBits();
             break;
