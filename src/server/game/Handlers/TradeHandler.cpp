@@ -33,6 +33,7 @@
 void WorldSession::SendTradeStatus(TradeStatus status)
 {
     WorldPacket data;
+	ObjectGuid guid;
 
 	// i think still need work on it sub_76B9A0
     data.Initialize(SMSG_TRADE_STATUS, 1+4+4);
@@ -42,8 +43,26 @@ void WorldSession::SendTradeStatus(TradeStatus status)
     {
         case TRADE_STATUS_BEGIN_TRADE:
 			//data.WriteBit(0); // unk bit, usually 0
-            data.WriteBits(0, 8); // zero guid
-            data.FlushBits();
+
+            data.WriteBit(guid[3]);
+			data.WriteBit(guid[0]);
+			data.WriteBit(guid[1]);
+			data.WriteBit(guid[5]);
+			data.WriteBit(guid[6]);
+			data.WriteBit(guid[2]);
+			data.WriteBit(guid[7]);
+			data.WriteBit(guid[4]);
+
+			data.FlushBits();
+
+			data.WriteByteSeq(guid[4]);
+			data.WriteByteSeq(guid[5]);
+			data.WriteByteSeq(guid[7]);
+            data.WriteByteSeq(guid[0]);
+			data.WriteByteSeq(guid[1]);
+			data.WriteByteSeq(guid[2]);
+			data.WriteByteSeq(guid[3]);
+			data.WriteByteSeq(guid[6]);
             break;
         case TRADE_STATUS_OPEN_WINDOW:
             data.FlushBits();
