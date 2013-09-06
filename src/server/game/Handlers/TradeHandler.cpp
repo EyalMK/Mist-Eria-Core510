@@ -41,7 +41,7 @@ void WorldSession::SendTradeStatus(TradeStatus status)
     switch (status)
     {
         case TRADE_STATUS_BEGIN_TRADE:
-			data.WriteBit(0); // unk bit, usually 0
+			//data.WriteBit(0); // unk bit, usually 0
             data.WriteBits(0, 8); // zero guid
             data.FlushBits();
             break;
