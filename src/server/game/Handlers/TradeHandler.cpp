@@ -34,9 +34,10 @@ void WorldSession::SendTradeStatus(TradeStatus status)
 {
     WorldPacket data;
 
+	// i think still need work on it sub_76B9A0
     data.Initialize(SMSG_TRADE_STATUS, 1+4+4);
+	data.WriteBits(status, 5);
     data.WriteBit(0); // unk bit, usually 0
-    data.WriteBits(status, 5);
 
     switch (status)
     {
@@ -97,13 +98,15 @@ void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
     data << uint32(0);                                      // this value must be equal to value from TRADE_STATUS_OPEN_WINDOW status packet (different value for different players to block multiple trades?)
     data << uint32(0);                                      // unk 2
     data << uint64(view_trade->GetMoney());                 // trader gold
+	data << uint8(trader_data);                             // 1 means traders data, 0 means own
     data << uint32(view_trade->GetSpell());                 // spell casted on lowest slot item
     data << uint32(TRADE_SLOT_COUNT);                       // trade slots count/number?, = next field in most cases
     data << uint32(0);                                      // unk 5
-    data << uint8(trader_data);                             // 1 means traders data, 0 means own
     data << uint32(TRADE_SLOT_COUNT);                       // trade slots count/number?, = prev field in most cases
     data.WriteBits(count, 22);
 
+
+	// need to continue - sub_7CB870
     for (uint8 i = 0; i < TRADE_SLOT_COUNT; ++i)
     {
         Item* item = view_trade->GetItem(TradeSlots(i));
