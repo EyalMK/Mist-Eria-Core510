@@ -1333,7 +1333,7 @@ enum Opcodes
     SMSG_SPELL_GO                                     = 0x0C8D,//16357
     SMSG_SPELL_START                                  = 0x09E4,//16357
     SMSG_SPELL_UPDATE_CHAIN_TARGETS                   = 0x2110,
-    SMSG_SPIRIT_HEALER_CONFIRM                        = 0x2111,
+    SMSG_SPIRIT_HEALER_CONFIRM                        = 0x0A64,//16357
     SMSG_SPLINE_MOVE_COLLISION_DISABLE                = 0x34, //16357
     SMSG_SPLINE_MOVE_COLLISION_ENABLE                 = 0xA70, //16357
     SMSG_SPLINE_MOVE_GRAVITY_DISABLE                  = 0xB55, //16357
