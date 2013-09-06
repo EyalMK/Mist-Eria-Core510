@@ -1391,7 +1391,7 @@ enum Opcodes
     SMSG_TOGGLE_XP_GAIN                               = 0x03E5,//16357
     SMSG_TOTEM_CREATED                                = 0x0469,//16357
     SMSG_TRADE_STATUS                                 = 0x5B1, //16357
-    SMSG_TRADE_STATUS_EXTENDED                        = 0x2134,
+    SMSG_TRADE_STATUS_EXTENDED                        = 0x2BD, //16357
     SMSG_TRAINER_BUY_FAILED                           = 0x0BC8,//16357
     SMSG_TRAINER_BUY_SUCCEEDED                        = 0x2136,
     SMSG_TRAINER_LIST                                 = 0x0DCD,//16357
