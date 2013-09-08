@@ -1112,7 +1112,7 @@ class spell_dru_t10_restoration_4p_bonus : public SpellScriptLoader
             return new spell_dru_t10_restoration_4p_bonus_SpellScript();
         }
 };
-
+/*
 // Wild mushroom, 88747
 class spell_druid_wild_mushroom : public SpellScriptLoader
 {
@@ -1253,7 +1253,7 @@ class spell_druid_wild_mushroom_detonate : public SpellScriptLoader
                 return SPELL_CAST_OK;
             }
 
-            void HandleDummy(SpellEffIndex /*effIndex*/)
+            void HandleDummy(SpellEffIndex effIndex)
             {
                 if (Player* player = GetCaster()->ToPlayer())
                 {
@@ -1339,6 +1339,7 @@ class spell_druid_wild_mushroom_detonate : public SpellScriptLoader
             return new spell_druid_wild_mushroom_detonate_SpellScript();
         }
 };
+*/
 
 void AddSC_druid_spell_scripts()
 {
@@ -1366,6 +1367,6 @@ void AddSC_druid_spell_scripts()
     new spell_dru_tiger_s_fury();
     new spell_dru_typhoon();
     new spell_dru_t10_restoration_4p_bonus();
-	new spell_druid_wild_mushroom();
-	new spell_druid_wild_mushroom_detonate();
+    /*new spell_druid_wild_mushroom();
+    new spell_druid_wild_mushroom_detonate();*/
 }
