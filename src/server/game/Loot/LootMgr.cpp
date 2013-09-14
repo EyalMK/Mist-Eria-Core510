@@ -912,7 +912,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 
 	b.WriteBit(guid1[7]);
 	b.WriteBit(lv.permission != NONE_PERMISSION); //byte18
-	b.WriteBit(0); //byte30
+    b.WriteBit(1); //byte30
 	b.WriteBit(guid1[2]);
 	b.WriteBit(1); //!byte31
 	b.WriteBit(guid1[6]);

@@ -65,7 +65,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 
 	for (uint32 i = 0; i < count; ++i)
 	{
-        ObjectGuid guid = guids.at(i);
+        ObjectGuid &guid = guids.at(i);
         recvData.ReadByteSeq(guid[4]);
         recvData.ReadByteSeq(guid[1]);
         recvData.ReadByteSeq(guid[5]);
@@ -76,6 +76,11 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         recvData.ReadByteSeq(guid[0]);
         recvData.ReadByteSeq(guid[2]);
 	}
+
+    for (uint32 i = 0; i < count; ++i)
+    {
+        sLog->outInfo(LOG_FILTER_NETWORKIO, "Loot guid %u, (%u)", GUID_LOPART(guids[i]), GuidHigh2TypeId(GUID_HIPART(guids[i])));
+    }
 
     if (IS_GAMEOBJECT_GUID(lguid))
     {
@@ -129,12 +134,14 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
     }
 
     for(uint32 i = 0 ; i < count ; i++) {
-        player->StoreLootItem(lootSlot[i], loot, (ObjectGuid)guids.at(i));
+        player->StoreLootItem(lootSlot[i], loot, guids[i]);
     }
 
     // If player is removing the last LootItem, delete the empty container.
     if (loot->isLooted() && IS_ITEM_GUID(lguid))
         player->GetSession()->DoLootRelease(lguid);
+
+    delete[] lootSlot;
 }
 
 void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)

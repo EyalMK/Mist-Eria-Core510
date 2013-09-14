@@ -9299,6 +9299,8 @@ void Player::SendNotifyLootItemRemoved(uint8 lootSlot, ObjectGuid guid)
 	data.WriteByteSeq(guid[1]);
     
     GetSession()->SendPacket(&data);
+
+    sLog->outInfo(LOG_FILTER_NETWORKIO, "Sent SMSG_LOOT_REMOVED");
 }
 
 void Player::SendUpdateWorldState(uint32 Field, uint32 Value)
