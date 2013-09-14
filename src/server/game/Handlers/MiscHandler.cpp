@@ -1629,8 +1629,13 @@ void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket& recvData)
     uint32 mode;
     recvData >> mode;
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 1 %u %u", mode, _player->GetDungeonDifficulty());
+
     if (Difficulty(mode) == _player->GetDungeonDifficulty())
         return;
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 2");
+
 
     // cannot reset while in an instance
     Map* map = _player->FindMap();
@@ -1644,10 +1649,16 @@ void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket& recvData)
     Group* group = _player->GetGroup();
     if (group)
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 3");
+
         if (group->IsLeader(_player->GetGUID()))
         {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 4");
+
             for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
             {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 5");
+
                 Player* groupGuy = itr->getSource();
                 if (!groupGuy)
                     continue;
@@ -1670,6 +1681,8 @@ void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket& recvData)
     }
     else
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE dungeondifficulty 6");
+
         _player->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY, false);
         _player->SetDungeonDifficulty(Difficulty(mode));
     }
@@ -2119,6 +2132,7 @@ void WorldSession::HandleSaveCUFProfiles(WorldPacket& recvPacket)
         profiles[i]->BoolOptions.set(CUF_UNK_157                         , recvPacket.ReadBit());
         profiles[i]->BoolOptions.set(CUF_DISPLAY_HEAL_PREDICTION         , recvPacket.ReadBit());
         profiles[i]->BoolOptions.set(CUF_AUTO_ACTIVATE_SPEC_1            , recvPacket.ReadBit());
+		strlens[i] = (uint8)recvPacket.ReadBits(8);
         profiles[i]->BoolOptions.set(CUF_AUTO_ACTIVATE_PVP               , recvPacket.ReadBit());
         profiles[i]->BoolOptions.set(CUF_DISPLAY_POWER_BAR               , recvPacket.ReadBit());
         profiles[i]->BoolOptions.set(CUF_AUTO_ACTIVATE_15_PLAYERS        , recvPacket.ReadBit());
@@ -2135,7 +2149,6 @@ void WorldSession::HandleSaveCUFProfiles(WorldPacket& recvPacket)
         profiles[i]->BoolOptions.set(CUF_DISPLAY_BORDER                  , recvPacket.ReadBit());
         profiles[i]->BoolOptions.set(CUF_USE_CLASS_COLORS                , recvPacket.ReadBit());
         profiles[i]->BoolOptions.set(CUF_UNK_145                         , recvPacket.ReadBit());
-        strlens[i] = (uint8)recvPacket.ReadBits(8);
         profiles[i]->BoolOptions.set(CUF_AUTO_ACTIVATE_PVE               , recvPacket.ReadBit());
         profiles[i]->BoolOptions.set(CUF_DISPLAY_HORIZONTAL_GROUPS       , recvPacket.ReadBit());
         profiles[i]->BoolOptions.set(CUF_AUTO_ACTIVATE_25_PLAYERS        , recvPacket.ReadBit());
@@ -2145,9 +2158,9 @@ void WorldSession::HandleSaveCUFProfiles(WorldPacket& recvPacket)
     for (uint8 i = 0; i < count; ++i)
     {
         recvPacket >> profiles[i]->Unk146;
-        profiles[i]->ProfileName = recvPacket.ReadString(strlens[i]);
         recvPacket >> profiles[i]->Unk152;
         recvPacket >> profiles[i]->FrameHeight;
+		profiles[i]->ProfileName = recvPacket.ReadString(strlens[i]);
         recvPacket >> profiles[i]->FrameWidth;
         recvPacket >> profiles[i]->Unk150;
         recvPacket >> profiles[i]->HealthText;
@@ -2198,25 +2211,25 @@ void WorldSession::SendLoadCUFProfiles()
         data.WriteBit(profile->BoolOptions[CUF_USE_CLASS_COLORS]);
         data.WriteBit(profile->BoolOptions[CUF_DISPLAY_POWER_BAR]);
         data.WriteBit(profile->BoolOptions[CUF_AUTO_ACTIVATE_SPEC_1]);
-        data.WriteBits(profile->ProfileName.size(), 8);
         data.WriteBit(profile->BoolOptions[CUF_DISPLAY_ONLY_DISPELLABLE_DEBUFFS]);
         data.WriteBit(profile->BoolOptions[CUF_KEEP_GROUPS_TOGETHER]);
         data.WriteBit(profile->BoolOptions[CUF_UNK_145]);
+		data.WriteBits(profile->ProfileName.size(), 8);
         data.WriteBit(profile->BoolOptions[CUF_AUTO_ACTIVATE_15_PLAYERS]);
         data.WriteBit(profile->BoolOptions[CUF_DISPLAY_PETS]);
         data.WriteBit(profile->BoolOptions[CUF_AUTO_ACTIVATE_PVP]);
 
-        byteBuffer << uint16(profile->Unk154);
-        byteBuffer << uint16(profile->FrameHeight);
-        byteBuffer << uint16(profile->Unk152);
         byteBuffer << uint8(profile->Unk147);
-        byteBuffer << uint16(profile->Unk150);
-        byteBuffer << uint8(profile->Unk146);
+		byteBuffer << uint16(profile->Unk154);
+		byteBuffer << uint8(profile->Unk146);
         byteBuffer << uint8(profile->HealthText);
         byteBuffer << uint8(profile->SortBy);
+		byteBuffer.WriteString(profile->ProfileName);
+		byteBuffer << uint16(profile->FrameHeight);
+		byteBuffer << uint8(profile->Unk148); 
+		byteBuffer << uint16(profile->Unk152);
+        byteBuffer << uint16(profile->Unk150);
         byteBuffer << uint16(profile->FrameWidth);
-        byteBuffer << uint8(profile->Unk148);
-        byteBuffer.WriteString(profile->ProfileName);
     }
 
     data.FlushBits();

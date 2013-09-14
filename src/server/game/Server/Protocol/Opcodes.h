@@ -678,7 +678,7 @@ enum Opcodes
     MSG_SET_RAID_DIFFICULTY                           = 0x0E00,//16357
     MSG_START_MOVE_FORWARD                            = 0x1609,
     MSG_TABARDVENDOR_ACTIVATE                         = 0x0729,//16357
-    MSG_RESPEC_WIPE_CONFIRM                           = 0x052A,//16357  Talent
+    MSG_RESPEC_WIPE_CONFIRM                           = 0x0BF4,//16357  Talent
     MSG_VERIFY_CONNECTIVITY                           = 0x4F57,//16357
     SMSG_ACCOUNT_DATA_TIMES                           = 0xE48, //16357
     SMSG_ACCOUNT_INFO_RESPONSE                        = 0x659, //16357
@@ -1333,7 +1333,7 @@ enum Opcodes
     SMSG_SPELL_GO                                     = 0x0C8D,//16357
     SMSG_SPELL_START                                  = 0x09E4,//16357
     SMSG_SPELL_UPDATE_CHAIN_TARGETS                   = 0x2110,
-    SMSG_SPIRIT_HEALER_CONFIRM                        = 0x2111,
+    SMSG_SPIRIT_HEALER_CONFIRM                        = 0x0A64,//16357
     SMSG_SPLINE_MOVE_COLLISION_DISABLE                = 0x34, //16357
     SMSG_SPLINE_MOVE_COLLISION_ENABLE                 = 0xA70, //16357
     SMSG_SPLINE_MOVE_GRAVITY_DISABLE                  = 0xB55, //16357
@@ -1391,7 +1391,7 @@ enum Opcodes
     SMSG_TOGGLE_XP_GAIN                               = 0x03E5,//16357
     SMSG_TOTEM_CREATED                                = 0x0469,//16357
     SMSG_TRADE_STATUS                                 = 0x5B1, //16357
-    SMSG_TRADE_STATUS_EXTENDED                        = 0x2134,
+    SMSG_TRADE_STATUS_EXTENDED                        = 0x2BD, //16357
     SMSG_TRAINER_BUY_FAILED                           = 0x0BC8,//16357
     SMSG_TRAINER_BUY_SUCCEEDED                        = 0x2136,
     SMSG_TRAINER_LIST                                 = 0x0DCD,//16357

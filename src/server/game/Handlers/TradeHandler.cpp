@@ -33,15 +33,18 @@
 void WorldSession::SendTradeStatus(TradeStatus status)
 {
     WorldPacket data;
+	ObjectGuid guid;
 
-    data.Initialize(SMSG_TRADE_STATUS, 1+4+4);
-    data.WriteBit(0); // unk bit, usually 0
-    data.WriteBits(status, 5);
+	// i think still need work on it sub_76B9A0
+    data.Initialize(SMSG_TRADE_STATUS, 4+8);
 
+	data.WriteBits(status, 5);
+	
     switch (status)
     {
         case TRADE_STATUS_BEGIN_TRADE:
-            data.WriteBits(0, 8); // zero guid
+			data.WriteBit(0); // unk bit, usually 0
+			data.WriteBits(0, 8); // zero guid
             data.FlushBits();
             break;
         case TRADE_STATUS_OPEN_WINDOW:
@@ -97,13 +100,15 @@ void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
     data << uint32(0);                                      // this value must be equal to value from TRADE_STATUS_OPEN_WINDOW status packet (different value for different players to block multiple trades?)
     data << uint32(0);                                      // unk 2
     data << uint64(view_trade->GetMoney());                 // trader gold
+	data << uint8(trader_data);                             // 1 means traders data, 0 means own
     data << uint32(view_trade->GetSpell());                 // spell casted on lowest slot item
     data << uint32(TRADE_SLOT_COUNT);                       // trade slots count/number?, = next field in most cases
     data << uint32(0);                                      // unk 5
-    data << uint8(trader_data);                             // 1 means traders data, 0 means own
     data << uint32(TRADE_SLOT_COUNT);                       // trade slots count/number?, = prev field in most cases
     data.WriteBits(count, 22);
 
+
+	// need to continue - sub_7CB870
     for (uint8 i = 0; i < TRADE_SLOT_COUNT; ++i)
     {
         Item* item = view_trade->GetItem(TradeSlots(i));
@@ -742,28 +747,29 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
     pOther->m_trade = new TradeData(pOther, _player);
 
     WorldPacket data(SMSG_TRADE_STATUS, 2+7); // TO FIX . Need to fill structure
-    data.WriteBit(0); // unk bit, usually 0
+    
     data.WriteBits(TRADE_STATUS_BEGIN_TRADE, 5);
+	data.WriteBit(0); // unk bit, usually 0
 
     ObjectGuid playerGuid = _player->GetGUID();
     // WTB StartBitStream...
-    data.WriteBit(playerGuid[2]);
-    data.WriteBit(playerGuid[4]);
-    data.WriteBit(playerGuid[6]);
+    data.WriteBit(playerGuid[3]);
     data.WriteBit(playerGuid[0]);
     data.WriteBit(playerGuid[1]);
-    data.WriteBit(playerGuid[3]);
-    data.WriteBit(playerGuid[7]);
     data.WriteBit(playerGuid[5]);
+    data.WriteBit(playerGuid[6]);
+    data.WriteBit(playerGuid[2]);
+    data.WriteBit(playerGuid[7]);
+    data.WriteBit(playerGuid[4]);
 
     data.WriteByteSeq(playerGuid[4]);
+    data.WriteByteSeq(playerGuid[5]);
+    data.WriteByteSeq(playerGuid[7]);
+    data.WriteByteSeq(playerGuid[0]);
     data.WriteByteSeq(playerGuid[1]);
     data.WriteByteSeq(playerGuid[2]);
     data.WriteByteSeq(playerGuid[3]);
-    data.WriteByteSeq(playerGuid[0]);
-    data.WriteByteSeq(playerGuid[7]);
     data.WriteByteSeq(playerGuid[6]);
-    data.WriteByteSeq(playerGuid[5]);
 
     pOther->GetSession()->SendPacket(&data);
 }

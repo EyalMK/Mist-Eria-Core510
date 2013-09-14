@@ -349,6 +349,63 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 		}
         case STATUS_WAIT_LEAVE:
             break;
+        /*
+		{
+			data->Initialize(SMSG_BATTLEFIELD_STATUS_WAITFORGROUPS);
+
+			data->WriteBit(bgGuid[0]);
+            data->WriteBit(bgGuid[3]);
+            data->WriteBit(playerGuid[6]);
+            data->WriteBit(playerGuid[1]);
+            data->WriteBit(playerGuid[7]);
+            data->WriteBit(playerGuid[4]);
+            data->WriteBit(playerGuid[5]);
+            data->WriteBit(playerGuid[2]);
+			data->WriteBit(bg->isRated());              // Is Rated
+            data->WriteBit(bgGuid[6]);
+            data->WriteBit(bgGuid[2]);
+            data->WriteBit(bgGuid[4]);
+            data->WriteBit(playerGuid[3]);
+            data->WriteBit(bgGuid[5]);
+            data->WriteBit(bgGuid[7]);
+            data->WriteBit(playerGuid[0]);
+			data->WriteBit(0);
+            data->WriteBit(bgGuid[1]);
+            
+            data->FlushBits();
+
+			*data << uint32(QueueSlot);                 // Queue slot
+            *data << uint8(0);                          // unk
+			*data << uint32(QueueSlot);                 // not queueSlot, some form of counter
+			data->WriteByteSeq(playerGuid[6]);
+            data->WriteByteSeq(playerGuid[3]);
+			*data << uint8(0);                          // unk
+            data->WriteByteSeq(bgGuid[6]);
+			*data << uint32(bg->GetEndTime());          // Time until closed
+            data->WriteByteSeq(bgGuid[3]);
+            data->WriteByteSeq(playerGuid[0]);
+            data->WriteByteSeq(playerGuid[1]);
+            data->WriteByteSeq(playerGuid[5]);
+			*data << uint32(bg->GetMapId());            // Map Id
+            data->WriteByteSeq(bgGuid[2]);
+            data->WriteByteSeq(bgGuid[1]);
+			*data << uint32(time(NULL));                // Time
+            data->WriteByteSeq(playerGuid[4]);
+			*data << uint32(0);                         // unk
+            data->WriteByteSeq(bgGuid[4]);
+            data->WriteByteSeq(bgGuid[0]);
+            data->WriteByteSeq(playerGuid[2]);
+            data->WriteByteSeq(bgGuid[7]);
+			*data << uint8(0);                          // unk
+            *data << uint8(bg->GetMinLevel());          // Min Level
+            *data << uint8(0);                          // unk
+			*data << uint32(0);                         // unk
+            data->WriteByteSeq(playerGuid[7]);
+            data->WriteByteSeq(bgGuid[5]);
+			*data << uint8(0);                          // unk   
+            break;
+		}
+		*/
     }
 }
 
