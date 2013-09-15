@@ -493,7 +493,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
             }
         }
     }
-    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Pexirn : dont understand why damage works on spell : basePoints : %u", basePoints);
+    if(this->_spellInfo->Id == 133) sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Pexirn : dont understand why damage works on spell : basePoints : %u", basePoints);
     float value = float(basePoints);
 
     // random damage
@@ -520,7 +520,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
             //value = int32(value * (int32)getLevel() / (int32)(_spellInfo->spellLevel ? _spellInfo->spellLevel : 1));
     }
 
-    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Pexirn : dont understand why damage works on spell : result : %u", int32(value));
+    if(this->_spellInfo->Id == 133) sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Pexirn : dont understand why damage works on spell : result : %u", int32(value));
     return int32(value);
 }
 
