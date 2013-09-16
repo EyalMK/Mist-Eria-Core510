@@ -493,7 +493,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
             }
         }
     }
-
+    
     float value = float(basePoints);
 
     // random damage
