@@ -572,31 +572,31 @@ void WorldSession::HandleGroupSetRolesOpcode(WorldPacket& recvData)
 
     uint32 newRole;
 	uint8 unk;
-    ObjectGuid guid1;                   // Assigner GUID
-    ObjectGuid guid2;                   // Target GUID
+    ObjectGuid guid1;                   // Target GUID
+    ObjectGuid guid2;                   // Assigner GUID
 
-    guid1 = GetPlayer()->GetGUID();
+    guid2 = GetPlayer()->GetGUID();
 
 	recvData >> unk;
     recvData >> newRole;
 
-    guid2[4] = recvData.ReadBit();
-    guid2[7] = recvData.ReadBit();
-    guid2[5] = recvData.ReadBit();
-    guid2[2] = recvData.ReadBit();
-    guid2[1] = recvData.ReadBit();
-    guid2[6] = recvData.ReadBit();
-    guid2[3] = recvData.ReadBit();
-    guid2[0] = recvData.ReadBit();
+    guid1[4] = recvData.ReadBit();
+    guid1[7] = recvData.ReadBit();
+    guid1[5] = recvData.ReadBit();
+    guid1[2] = recvData.ReadBit();
+    guid1[1] = recvData.ReadBit();
+    guid1[6] = recvData.ReadBit();
+    guid1[3] = recvData.ReadBit();
+    guid1[0] = recvData.ReadBit();
 
-    recvData.ReadByteSeq(guid2[0]);
-    recvData.ReadByteSeq(guid2[4]);
-    recvData.ReadByteSeq(guid2[2]);
-    recvData.ReadByteSeq(guid2[7]);
-    recvData.ReadByteSeq(guid2[1]);
-    recvData.ReadByteSeq(guid2[5]);
-    recvData.ReadByteSeq(guid2[3]);
-    recvData.ReadByteSeq(guid2[6]);
+    recvData.ReadByteSeq(guid1[0]);
+    recvData.ReadByteSeq(guid1[4]);
+    recvData.ReadByteSeq(guid1[2]);
+    recvData.ReadByteSeq(guid1[7]);
+    recvData.ReadByteSeq(guid1[1]);
+    recvData.ReadByteSeq(guid1[5]);
+    recvData.ReadByteSeq(guid1[3]);
+    recvData.ReadByteSeq(guid1[6]);
 
     WorldPacket data(SMSG_GROUP_SET_ROLE, 24); // damn , need to find SMSG value
 
@@ -624,7 +624,7 @@ void WorldSession::HandleGroupSetRolesOpcode(WorldPacket& recvData)
     data.WriteByteSeq(guid1[5]);
     data.WriteByteSeq(guid2[3]);
     data.WriteByteSeq(guid2[2]);
-	data << uint32(newRole);            // New Role
+	data << uint32(0);					// Old Role
     data.WriteByteSeq(guid2[0]);
     data.WriteByteSeq(guid1[4]);
 	data << uint8(0);					// unk
@@ -633,7 +633,7 @@ void WorldSession::HandleGroupSetRolesOpcode(WorldPacket& recvData)
     data.WriteByteSeq(guid2[1]);
 	data.WriteByteSeq(guid1[1]);
     data.WriteByteSeq(guid2[6]);
-	data << uint32(0);                  // Old Role
+	data << uint32(newRole);            // New Role
     data.WriteByteSeq(guid1[0]);
     data.WriteByteSeq(guid2[5]);
     
