@@ -410,9 +410,36 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GROUP_UNINVITE_GUID");
 
     uint64 guid;
+	ObjectGuid pguid;
     std::string reason;
-    recvData >> guid;
-    recvData >> reason;
+	uint8 unk;
+	uint32 reasonSize;
+
+	recvData >> unk;
+	reasonSize = recvData.ReadBits(9);
+
+    pguid[3] = recvData.ReadBit();
+	pguid[6] = recvData.ReadBit();
+	pguid[1] = recvData.ReadBit();
+	pguid[7] = recvData.ReadBit();
+	pguid[4] = recvData.ReadBit();
+	pguid[5] = recvData.ReadBit();
+	pguid[0] = recvData.ReadBit();
+	pguid[2] = recvData.ReadBit();
+
+	recvData.ReadByteSeq(pguid[7]);
+	recvData.ReadByteSeq(pguid[0]);
+	recvData.ReadByteSeq(pguid[4]);
+
+	reason = recvData.ReadString(reasonSize);
+
+	recvData.ReadByteSeq(pguid[3]);
+	recvData.ReadByteSeq(pguid[1]);
+	recvData.ReadByteSeq(pguid[2]);
+	recvData.ReadByteSeq(pguid[5]);
+	recvData.ReadByteSeq(pguid[6]);
+
+	guid = (uint64)pguid;
 
     //can't uninvite yourself
     if (guid == GetPlayer()->GetGUID())
@@ -573,41 +600,43 @@ void WorldSession::HandleGroupSetRolesOpcode(WorldPacket& recvData)
 
     WorldPacket data(SMSG_GROUP_SET_ROLE, 24); // damn , need to find SMSG value
 
-    data.WriteBit(guid1[1]);
-    data.WriteBit(guid2[0]);
-    data.WriteBit(guid2[2]);
-    data.WriteBit(guid2[4]);
-    data.WriteBit(guid2[7]);
-    data.WriteBit(guid2[3]);
-    data.WriteBit(guid1[7]);
-    data.WriteBit(guid2[5]);
-    data.WriteBit(guid1[5]);
-    data.WriteBit(guid1[4]);
-    data.WriteBit(guid1[3]);
-    data.WriteBit(guid2[6]);
-    data.WriteBit(guid1[2]);
-    data.WriteBit(guid1[6]);
     data.WriteBit(guid2[1]);
+    data.WriteBit(guid1[4]);
+    data.WriteBit(guid2[3]);
+    data.WriteBit(guid1[2]);
+    data.WriteBit(guid2[0]);
+    data.WriteBit(guid2[7]);
+    data.WriteBit(guid1[6]);
+    data.WriteBit(guid1[5]);
     data.WriteBit(guid1[0]);
+    data.WriteBit(guid1[4]);
+    data.WriteBit(guid1[1]);
+    data.WriteBit(guid2[6]);
+    data.WriteBit(guid1[7]);
+    data.WriteBit(guid1[3]);
+    data.WriteBit(guid2[2]);
+    data.WriteBit(guid2[5]);
 
     data.WriteByteSeq(guid1[7]);
-    data.WriteByteSeq(guid2[3]);
+    data.WriteByteSeq(guid2[7]);
     data.WriteByteSeq(guid1[6]);
     data.WriteByteSeq(guid2[4]);
-    data.WriteByteSeq(guid2[0]);
-    data << uint32(newRole);            // New Role
-    data.WriteByteSeq(guid2[6]);
-    data.WriteByteSeq(guid2[2]);
-    data.WriteByteSeq(guid1[0]);
-    data.WriteByteSeq(guid1[4]);
-    data.WriteByteSeq(guid2[1]);
-    data.WriteByteSeq(guid1[3]);
     data.WriteByteSeq(guid1[5]);
+    data.WriteByteSeq(guid2[3]);
+    data.WriteByteSeq(guid2[2]);
+	data << uint32(newRole);            // New Role
+    data.WriteByteSeq(guid2[0]);
+    data.WriteByteSeq(guid1[4]);
+	data << uint8(0);					// unk
+    data.WriteByteSeq(guid1[3]);
     data.WriteByteSeq(guid1[2]);
+    data.WriteByteSeq(guid2[1]);
+	data.WriteByteSeq(guid1[1]);
+    data.WriteByteSeq(guid2[6]);
+	data << uint32(0);                  // Old Role
+    data.WriteByteSeq(guid1[0]);
     data.WriteByteSeq(guid2[5]);
-    data.WriteByteSeq(guid2[7]);
-    data.WriteByteSeq(guid1[1]);
-    data << uint32(0);                  // Old Role
+    
 
     if (GetPlayer()->GetGroup())
         GetPlayer()->GetGroup()->BroadcastPacket(&data, false);
