@@ -1362,11 +1362,17 @@ public:
 
 	static bool HandleDebugChatCommand(ChatHandler* handler, char const* args)
     {
+		if (!args)
+			return false;
+
 		int8 type;
 		std::string text;
 
 		char* typeStr = strtok((char*)args, " ");
         char* textStr = strtok(NULL, "");
+
+		if (!typeStr || !textStr)
+			return;
 
 		type = atoi(typeStr);
 		text.append(textStr);
