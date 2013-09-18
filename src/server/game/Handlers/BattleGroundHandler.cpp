@@ -412,9 +412,6 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
     recvData >> queueSlot;
     recvData >> unk;
 
-	// debug purpose to see if order is correct :
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: BattlefieldPort (Time: %u queueSlot: %u unk: %u)", time, queueSlot, unk);
-
     guid[7] = recvData.ReadBit();
     guid[4] = recvData.ReadBit();
     guid[6] = recvData.ReadBit();
@@ -434,6 +431,8 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
     recvData.ReadByteSeq(guid[5]);
     recvData.ReadByteSeq(guid[7]);
     recvData.ReadByteSeq(guid[2]);
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: BattlefieldPort (Time: %u queueSlot: %u unk: %u action: %u)", time, queueSlot, unk, action);
 
     if (!_player->InBattlegroundQueue())
     {
