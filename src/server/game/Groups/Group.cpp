@@ -2095,8 +2095,8 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
 
     if(GetMembersCount()-1)
     {
-        data << uint32(m_dungeonDifficulty);
         data << uint32(m_raidDifficulty);
+        data << uint32(m_dungeonDifficulty);
     }
 
     data << uint8(byte74);
