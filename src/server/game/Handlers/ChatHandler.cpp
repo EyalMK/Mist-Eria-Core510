@@ -373,7 +373,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
 
 		//Debug
-		type = CHAT_MSG_SAY;
+		type = CHAT_MSG_PARTY_LEADER;
 
         sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
