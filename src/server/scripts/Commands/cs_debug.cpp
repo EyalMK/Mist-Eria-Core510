@@ -1372,7 +1372,7 @@ public:
         char* textStr = strtok(NULL, "");
 
 		if (!typeStr || !textStr)
-			return;
+			return false;
 
 		type = atoi(typeStr);
 		text.append(textStr);
