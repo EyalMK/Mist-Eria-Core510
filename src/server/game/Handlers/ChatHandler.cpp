@@ -368,10 +368,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         if (group->IsLeader(GetPlayer()->GetGUID()))
             type = CHAT_MSG_PARTY_LEADER;
 
-
-		//Debug
-		type = 0x33;
-
         sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
         WorldPacket data;
