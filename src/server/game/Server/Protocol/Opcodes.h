@@ -937,7 +937,7 @@ enum Opcodes
     SMSG_GROUP_INVITE                                 = 0x0574,//16357
     SMSG_GROUP_LIST                                   = 0x087C,//16357
     SMSG_GROUP_SET_LEADER                             = 0x0D71,//16357
-    SMSG_GROUP_SET_ROLE                               = 0x1801,
+    SMSG_GROUP_SET_ROLE                               = 0x0E70,//16357
     SMSG_GROUP_UNINVITE                               = 0x0C29,//16357
     SMSG_GUILD_ACHIEVEMENT_DATA                       = 0x09F5,//16357
     SMSG_GUILD_ACHIEVEMENT_DELETED                    = 0x694, //16357
