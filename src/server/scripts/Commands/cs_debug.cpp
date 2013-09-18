@@ -32,7 +32,6 @@ EndScriptData */
 #include "GridNotifiersImpl.h"
 #include "GossipDef.h"
 #include "Language.h"
-#include "Player.h"
 
 #include <fstream>
 
@@ -1373,7 +1372,7 @@ public:
 		text.append(textStr);
 
 		WorldPacket data;
-        handler->GetSession()->GetPlayer()->BuildPlayerChat(&data, type, text, LANG_UNIVERSAL);
+		ChatHandler::FillMessageData(&data, handler->GetSession(), uint8(type), LANG_UNIVERSAL, NULL, 0, text.c_str(), NULL);
 		handler->GetSession()->SendPacket(&data);
 
         return true;
