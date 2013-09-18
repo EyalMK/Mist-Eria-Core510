@@ -92,6 +92,7 @@ public:
             { "los",            SEC_MODERATOR,      false, &HandleDebugLoSCommand,             "", NULL },
             { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "", NULL },
             { "phase",          SEC_MODERATOR,      false, &HandleDebugPhaseCommand,           "", NULL },
+			{ "chat",			SEC_MODERATOR,      false, &HandleDebugChatCommand,			   "", NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
         };
         static ChatCommand commandTable[] =
@@ -1356,6 +1357,24 @@ public:
             player = unit->ToPlayer();
 
         player->GetPhaseMgr().SendDebugReportToPlayer(handler->GetSession()->GetPlayer());
+        return true;
+    }
+
+	static bool HandleDebugChatCommand(ChatHandler* handler, char const* args)
+    {
+		int8 type;
+		std::string text;
+
+		char* typeStr = strtok((char*)args, " ");
+        char* textStr = strtok(NULL, "");
+
+		type = atoi(typeStr);
+		text.append(textStr);
+
+		WorldPacket data;
+        handler->GetSession()->GetPlayer()->BuildPlayerChat(&data, type, text, LANG_UNIVERSAL);
+		handler->GetSession()->SendPacket(&data);
+
         return true;
     }
 };

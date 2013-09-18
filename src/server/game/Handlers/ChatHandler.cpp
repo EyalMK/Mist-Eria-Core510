@@ -366,7 +366,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         }
 
         if (group->IsLeader(GetPlayer()->GetGUID()))
-            type = CHAT_MSG_PARTY_LEADER + 1;
+            type = CHAT_MSG_PARTY_LEADER + 2;
 
 
 		//Debug
