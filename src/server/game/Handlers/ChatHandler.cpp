@@ -356,7 +356,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     case CHAT_MSG_PARTY:
     case CHAT_MSG_PARTY_LEADER:
     {
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "Chat Groupe 1");
         // if player is in battleground, he cannot say to battleground members by /p
         Group* group = GetPlayer()->GetOriginalGroup();
         if (!group)
@@ -366,10 +365,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
         }
 
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "Chat Groupe 2");
-
         if (group->IsLeader(GetPlayer()->GetGUID()))
-            type = CHAT_MSG_PARTY_LEADER;
+            type = CHAT_MSG_PARTY_LEADER + 1;
 
 
 		//Debug
