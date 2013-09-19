@@ -22845,8 +22845,8 @@ void Player::SendInitialPacketsBeforeAddToMap()
     data.AppendPackedTime(sWorld->GetGameTime());           // added in 5.x.x
     data.AppendPackedTime(sWorld->GetGameTime());
     data << float(0.01666667f);                             // game speed
-    data << uint32(0);                                      // added in 3.1.2
-    data << uint32(0);                                      // added in 5.x.x
+    data << uint32(1);                                      // added in 3.1.2
+    data << uint32(1);                                      // added in 5.x.x
     GetSession()->SendPacket(&data);
 
     GetReputationMgr().SendForceReactions();                // SMSG_SET_FORCED_REACTIONS
