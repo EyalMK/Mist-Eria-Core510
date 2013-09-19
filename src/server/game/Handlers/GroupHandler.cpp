@@ -833,6 +833,8 @@ void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recvData)
 
 	uint8 y; // unknown ??
 	recvData >> y;
+    
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "RAID TARGET OPCODE (X: %u Y: %u)", x, y);
 
     /** error handling **/
     /********************/
