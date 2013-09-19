@@ -410,9 +410,36 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GROUP_UNINVITE_GUID");
 
     uint64 guid;
+	ObjectGuid pguid;
     std::string reason;
-    recvData >> guid;
-    recvData >> reason;
+	uint8 unk;
+	uint32 reasonSize;
+
+	recvData >> unk;
+	reasonSize = recvData.ReadBits(9);
+
+    pguid[3] = recvData.ReadBit();
+	pguid[6] = recvData.ReadBit();
+	pguid[1] = recvData.ReadBit();
+	pguid[7] = recvData.ReadBit();
+	pguid[4] = recvData.ReadBit();
+	pguid[5] = recvData.ReadBit();
+	pguid[0] = recvData.ReadBit();
+	pguid[2] = recvData.ReadBit();
+
+	recvData.ReadByteSeq(pguid[7]);
+	recvData.ReadByteSeq(pguid[0]);
+	recvData.ReadByteSeq(pguid[4]);
+
+	reason = recvData.ReadString(reasonSize);
+
+	recvData.ReadByteSeq(pguid[3]);
+	recvData.ReadByteSeq(pguid[1]);
+	recvData.ReadByteSeq(pguid[2]);
+	recvData.ReadByteSeq(pguid[5]);
+	recvData.ReadByteSeq(pguid[6]);
+
+	guid = (uint64)pguid;
 
     //can't uninvite yourself
     if (guid == GetPlayer()->GetGUID())
@@ -545,69 +572,71 @@ void WorldSession::HandleGroupSetRolesOpcode(WorldPacket& recvData)
 
     uint32 newRole;
 	uint8 unk;
-    ObjectGuid guid1;                   // Assigner GUID
-    ObjectGuid guid2;                   // Target GUID
+    ObjectGuid guid1;                   // Target GUID
+    ObjectGuid guid2;                   // Assigner GUID
 
-    guid1 = GetPlayer()->GetGUID();
+    guid2 = GetPlayer()->GetGUID();
 
 	recvData >> unk;
     recvData >> newRole;
 
-    guid2[4] = recvData.ReadBit();
-    guid2[7] = recvData.ReadBit();
-    guid2[5] = recvData.ReadBit();
-    guid2[2] = recvData.ReadBit();
-    guid2[1] = recvData.ReadBit();
-    guid2[6] = recvData.ReadBit();
-    guid2[3] = recvData.ReadBit();
-    guid2[0] = recvData.ReadBit();
+    guid1[4] = recvData.ReadBit();
+    guid1[7] = recvData.ReadBit();
+    guid1[5] = recvData.ReadBit();
+    guid1[2] = recvData.ReadBit();
+    guid1[1] = recvData.ReadBit();
+    guid1[6] = recvData.ReadBit();
+    guid1[3] = recvData.ReadBit();
+    guid1[0] = recvData.ReadBit();
 
-    recvData.ReadByteSeq(guid2[0]);
-    recvData.ReadByteSeq(guid2[4]);
-    recvData.ReadByteSeq(guid2[2]);
-    recvData.ReadByteSeq(guid2[7]);
-    recvData.ReadByteSeq(guid2[1]);
-    recvData.ReadByteSeq(guid2[5]);
-    recvData.ReadByteSeq(guid2[3]);
-    recvData.ReadByteSeq(guid2[6]);
+    recvData.ReadByteSeq(guid1[0]);
+    recvData.ReadByteSeq(guid1[4]);
+    recvData.ReadByteSeq(guid1[2]);
+    recvData.ReadByteSeq(guid1[7]);
+    recvData.ReadByteSeq(guid1[1]);
+    recvData.ReadByteSeq(guid1[5]);
+    recvData.ReadByteSeq(guid1[3]);
+    recvData.ReadByteSeq(guid1[6]);
 
     WorldPacket data(SMSG_GROUP_SET_ROLE, 24); // damn , need to find SMSG value
 
-    data.WriteBit(guid1[1]);
-    data.WriteBit(guid2[0]);
-    data.WriteBit(guid2[2]);
-    data.WriteBit(guid2[4]);
-    data.WriteBit(guid2[7]);
-    data.WriteBit(guid2[3]);
-    data.WriteBit(guid1[7]);
-    data.WriteBit(guid2[5]);
-    data.WriteBit(guid1[5]);
-    data.WriteBit(guid1[4]);
-    data.WriteBit(guid1[3]);
-    data.WriteBit(guid2[6]);
-    data.WriteBit(guid1[2]);
-    data.WriteBit(guid1[6]);
     data.WriteBit(guid2[1]);
+    data.WriteBit(guid1[4]);
+    data.WriteBit(guid2[3]);
+    data.WriteBit(guid1[2]);
+    data.WriteBit(guid2[0]);
+    data.WriteBit(guid2[7]);
+    data.WriteBit(guid1[6]);
+    data.WriteBit(guid1[5]);
     data.WriteBit(guid1[0]);
+    data.WriteBit(guid1[4]);
+    data.WriteBit(guid1[1]);
+    data.WriteBit(guid2[6]);
+    data.WriteBit(guid1[7]);
+    data.WriteBit(guid1[3]);
+    data.WriteBit(guid2[2]);
+    data.WriteBit(guid2[5]);
 
     data.WriteByteSeq(guid1[7]);
-    data.WriteByteSeq(guid2[3]);
+    data.WriteByteSeq(guid2[7]);
     data.WriteByteSeq(guid1[6]);
     data.WriteByteSeq(guid2[4]);
-    data.WriteByteSeq(guid2[0]);
-    data << uint32(newRole);            // New Role
-    data.WriteByteSeq(guid2[6]);
-    data.WriteByteSeq(guid2[2]);
-    data.WriteByteSeq(guid1[0]);
-    data.WriteByteSeq(guid1[4]);
-    data.WriteByteSeq(guid2[1]);
-    data.WriteByteSeq(guid1[3]);
     data.WriteByteSeq(guid1[5]);
+    data.WriteByteSeq(guid2[3]);
+    data.WriteByteSeq(guid2[2]);
+	data << uint32(0);					// Old Role
+    data.WriteByteSeq(guid2[0]);
+    data.WriteByteSeq(guid1[4]);
+	data << uint8(0);					// unk
+    data.WriteByteSeq(guid1[3]);
     data.WriteByteSeq(guid1[2]);
+    data.WriteByteSeq(guid2[1]);
+	data.WriteByteSeq(guid1[1]);
+    data.WriteByteSeq(guid2[6]);
+	data << uint32(newRole);            // New Role
+    data.WriteByteSeq(guid1[0]);
     data.WriteByteSeq(guid2[5]);
-    data.WriteByteSeq(guid2[7]);
-    data.WriteByteSeq(guid1[1]);
-    data << uint32(0);                  // Old Role
+    
 
     if (GetPlayer()->GetGroup())
         GetPlayer()->GetGroup()->BroadcastPacket(&data, false);
@@ -802,6 +831,11 @@ void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recvData)
     uint8 x;
     recvData >> x;
 
+	uint8 y; // unknown ??
+	recvData >> y;
+    
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "RAID TARGET OPCODE (X: %u Y: %u)", x, y);
+
     /** error handling **/
     /********************/
 
@@ -813,9 +847,27 @@ void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recvData)
         if (!group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
             return;
 
-        uint64 guid;
-        recvData >> guid;
-        group->SetTargetIcon(x, _player->GetGUID(), guid);
+        ObjectGuid guid;
+        
+		guid[6] = recvData.ReadBit();
+		guid[3] = recvData.ReadBit();
+		guid[7] = recvData.ReadBit();
+		guid[4] = recvData.ReadBit();
+		guid[5] = recvData.ReadBit();
+		guid[2] = recvData.ReadBit();
+		guid[0] = recvData.ReadBit();
+		guid[1] = recvData.ReadBit();
+
+		recvData.ReadByteSeq(guid[1]);
+		recvData.ReadByteSeq(guid[4]);
+		recvData.ReadByteSeq(guid[6]);
+		recvData.ReadByteSeq(guid[0]);
+		recvData.ReadByteSeq(guid[3]);
+		recvData.ReadByteSeq(guid[7]);
+		recvData.ReadByteSeq(guid[5]);
+		recvData.ReadByteSeq(guid[2]);
+
+        group->SetTargetIcon(x, _player->GetGUID(), guid); // smsg part , need to check it too !
     }
 }
 
