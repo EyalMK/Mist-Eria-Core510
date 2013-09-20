@@ -779,16 +779,17 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 
     m_playerLoading = true;
     ObjectGuid playerGuid;
+	float unk;
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd Player Logon Message");
-    playerGuid[5] = recvData.ReadBit();
-    playerGuid[7] = recvData.ReadBit();
-    playerGuid[0] = recvData.ReadBit();
     playerGuid[1] = recvData.ReadBit();
+    playerGuid[5] = recvData.ReadBit();
+    playerGuid[0] = recvData.ReadBit();
     playerGuid[2] = recvData.ReadBit();
+    playerGuid[7] = recvData.ReadBit();
+    playerGuid[6] = recvData.ReadBit();
     playerGuid[3] = recvData.ReadBit();
     playerGuid[4] = recvData.ReadBit();
-    playerGuid[6] = recvData.ReadBit();
 
     recvData.ReadByteSeq(playerGuid[6]);
     recvData.ReadByteSeq(playerGuid[4]);
@@ -799,7 +800,9 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
     recvData.ReadByteSeq(playerGuid[7]);
     recvData.ReadByteSeq(playerGuid[1]);
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Character (Guid: %u) logging in", GUID_LOPART(playerGuid));
+	recvData >> unk;
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "Character (Guid: %u, unk: %f) logging in", GUID_LOPART(playerGuid), unk);
 
     if (!CharCanLogin(GUID_LOPART(playerGuid)))
     {
