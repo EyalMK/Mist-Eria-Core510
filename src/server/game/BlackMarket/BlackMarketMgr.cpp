@@ -370,7 +370,7 @@ void BlackMarketMgr::SendAuctionWon(BMAuctionEntry* auction, SQLTransaction& tra
         if (!itemTemplate)
             return;
 
-		Item* pItem = Item::CreateItem(auction->bm_template->itemEntry, auction->bm_template->itemEntry);
+		Item* pItem = Item::CreateItem(auction->bm_template->itemEntry, auction->bm_template->itemCount, bidder);
 
 		MailDraft(auction->BuildAuctionMailSubject(BM_AUCTION_WON), auction->BuildAuctionMailBody(auction->bidder))
             .AddItem(pItem)
