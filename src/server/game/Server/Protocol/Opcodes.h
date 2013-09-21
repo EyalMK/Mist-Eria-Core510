@@ -678,7 +678,8 @@ enum Opcodes
     MSG_SET_RAID_DIFFICULTY                           = 0x0E00,//16357
     MSG_START_MOVE_FORWARD                            = 0x1609,
     MSG_TABARDVENDOR_ACTIVATE                         = 0x0729,//16357
-    MSG_RESPEC_WIPE_CONFIRM                           = 0x0BF4,//16357  Talent
+    CMSG_RESPEC_WIPE_CONFIRM                          = 0x052A,//16357
+    SMSG_RESPEC_WIPE_CONFIRM                          = 0x0BF4,//16357  Talent
     MSG_VERIFY_CONNECTIVITY                           = 0x4F57,//16357
     SMSG_ACCOUNT_DATA_TIMES                           = 0xE48, //16357
     SMSG_ACCOUNT_INFO_RESPONSE                        = 0x659, //16357

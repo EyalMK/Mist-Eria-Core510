@@ -9945,7 +9945,7 @@ void Player::SetBindPoint(uint64 guid)
 
 void Player::SendTalentWipeConfirm(uint64 pguid)
 {
-    WorldPacket data(MSG_RESPEC_WIPE_CONFIRM, (8+4));
+    WorldPacket data(SMSG_RESPEC_WIPE_CONFIRM);
 
 	ObjectGuid guid = pguid;
     uint8 unk = 0;

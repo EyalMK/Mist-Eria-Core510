@@ -108,7 +108,7 @@ void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
 
 void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_RESPEC_WIPE_CONFIRM");
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_RESPEC_WIPE_CONFIRM");
     uint8 unk;
 	ObjectGuid guid;
 
@@ -132,6 +132,8 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
     recvData.ReadByteSeq(guid[7]);
     recvData.ReadByteSeq(guid[4]);
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTalentWipeConfirmeOpcode - GUID : %u, unk : %u", GUID_LOPART(guid), unk);
+
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
     if (!unit)
     {
@@ -147,9 +149,21 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
 
     if (!_player->ResetTalents())
     {
-        WorldPacket data(MSG_RESPEC_WIPE_CONFIRM, 8+4);    //you have not any talent
-        data << uint64(0);
+        WorldPacket data(SMSG_RESPEC_WIPE_CONFIRM);    //you have not any talent
+        data << uint8(0);
         data << uint32(0);
+
+        data << uint8(0);
+        data << uint8(0);
+        data << uint8(0);
+
+        data << uint8(0);
+
+        data << uint8(0);
+        data << uint8(0);
+        data << uint8(0);
+        data << uint8(0);
+        data << uint8(0);
         SendPacket(&data);
         return;
     }
