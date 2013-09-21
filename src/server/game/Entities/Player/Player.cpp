@@ -25946,7 +25946,10 @@ void Player::ActivateSpec(uint8 spec)
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
         if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(i))
             if (HasTalent(talentInfo->TalentID, GetActiveSpec()))
+            {
                 learnSpell(talentInfo->SpellId, false);
+                spentTalents++;
+            }
 
     // set glyphs
     for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
