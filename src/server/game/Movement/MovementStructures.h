@@ -2294,25 +2294,27 @@ MovementStatusElements MoveUpdateTeleport[] =
 MovementStatusElements MoveCastSpell[] =
 {
 
-	MSEPositionX,
+
+
+    MSEPositionZ,
+    MSEPositionX,
 	MSEPositionY,
-	MSEPositionZ,
 	MSEHasGuidByte7,
-	MSEHasSpline,
+    MSEHasSpline,
 	MSEHasFallData,
     MSEHasGuidByte0,
 	MSEHasMovementFlags,
 	MSEHasTransportData,
 	MSEHasGuidByte2,
 	MSEZeroBit,
-	MSEHasCounter,
 	MSEHasMovementFlags2,
 	MSEHasGuidByte1,
 	MSEIsAlive,
 	MSEHasGuidByte3,
 	MSEHasOrientation,
 	MSEHasTimestamp,
-	MSEHasGuidByte5,
+    MSEHasCounter,
+    MSEHasGuidByte5,
 	MSEHasGuidByte6,
 	MSEHasPitch,
 	MSEHasGuidByte4,
