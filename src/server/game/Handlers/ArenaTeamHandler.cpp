@@ -405,9 +405,9 @@ void WorldSession::SendArenaTeamCommandResult(uint32 teamAction, const std::stri
 {
     WorldPacket data(SMSG_ARENA_TEAM_COMMAND_RESULT, 2 + team.length() + player.length() + 4 + 4);
 
+	data << uint32(errorId);
 	data << uint32(teamAction);
-    data << uint32(errorId);
-
+	
     data.WriteBits(player.length(), 7);
     data.WriteBits(team.length(), 8);
     data.FlushBits();
