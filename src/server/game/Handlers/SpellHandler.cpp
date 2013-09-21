@@ -37,7 +37,7 @@
 
 void WorldSession::HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlags, SpellCastTargets& targets)
 {
-    // some spell cast packet including more data (for projectiles?)
+    /*// some spell cast packet including more data (for projectiles?)
     if (castFlags & 0x02)
     {
         // not sure about these two
@@ -76,7 +76,7 @@ void WorldSession::HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlag
                     break;
             }
         }
-    }
+    }*/
 }
 
 void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
@@ -414,8 +414,58 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
     // client provided targets
     SpellCastTargets targets;
-    targets.Read(recvPacket, mover);
-    HandleClientCastFlags(recvPacket, castFlags, targets);
+
+    if(castFlags & 0x2)
+    {
+        targets.Read(recvPacket, mover);
+
+        float elevation, speed;
+        recvPacket >> elevation >> speed;
+        targets.SetElevation(elevation);
+        targets.SetSpeed(speed);
+
+        uint8 hasMovementInfo;
+        recvPacket >> hasMovementInfo;
+        if(hasMovementInfo)
+            HandleMovementOpcodes(recvPacket);
+    }
+    else
+    {
+        if(castFlags & 0x10)
+        {
+            uint8 hasMovementInfo;
+            recvPacket >> hasMovementInfo;
+            if(hasMovementInfo)
+                HandleMovementOpcodes(recvPacket);
+        }
+
+        targets.Read(recvPacket, mover);
+
+        if(castFlags & 0x8)
+        {
+            uint32 count, entry, usedCount;
+            uint8 type;
+            recvPacket >> count;
+            for (uint32 i = 0; i < count; ++i)
+            {
+                recvPacket >> type;
+                switch (type)
+                {
+                    case 2: // Keystones
+                        recvPacket >> entry;        // Item id
+                        recvPacket >> usedCount;    // Item count
+                        break;
+                    case 1: // Fragments
+                        recvPacket >> entry;        // Currency id
+                        recvPacket >> usedCount;    // Currency count
+                        break;
+                }
+            }
+        }
+    }
+
+    //targets.Read(recvPacket, mover);
+    //HandleClientCastFlags(recvPacket, castFlags, targets);
 
     // auto-selection buff level base at target level (in spellInfo)
     if (targets.GetUnitTarget())
