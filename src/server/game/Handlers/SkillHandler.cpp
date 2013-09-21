@@ -146,7 +146,7 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
         
     GetPlayer()->ResetTalents();
-    GetPlayer()->SendTalentsInfoData(false);
+
     /*
     if (!GetPlayer()->ResetTalents())
     {
