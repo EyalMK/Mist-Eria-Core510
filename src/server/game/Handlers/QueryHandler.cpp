@@ -156,7 +156,7 @@ void WorldSession::HandleQueryTimeOpcode(WorldPacket & /*recvData*/)
 
 void WorldSession::SendQueryTimeResponse()
 {
-    WorldPacket data(SMSG_QUERY_TIME_RESPONSE, 4+4);
+    WorldPacket data(SMSG_QUERY_TIME_RESPONSE, 4+4);    
     data << uint32(time(NULL));
     data << uint32(sWorld->GetNextDailyQuestsResetTime() - time(NULL));
     SendPacket(&data);
@@ -486,9 +486,9 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
     uint32 l_Count;
 
 
-    for (int i=0 ; i<p_ReceivedPacket.size() ; ++i) {
+    /*for (int i=0 ; i<p_ReceivedPacket.size() ; ++i) {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "%2X", p_ReceivedPacket.read<uint8>());
-    }
+    }*/
     p_ReceivedPacket.rpos(0);
 
 

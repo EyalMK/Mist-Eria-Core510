@@ -1886,7 +1886,7 @@ void Guild::HandleLeaveMember(WorldSession* session)
         SendCommandResult(session, GUILD_COMMAND_QUIT, ERR_GUILD_COMMAND_SUCCESS, m_name);
     }
 
-    sCalendarMgr->RemovePlayerGuildEventsAndSignups(player->GetGUID(), GetId());
+    //sCalendarMgr->RemovePlayerGuildEventsAndSignups(player->GetGUID(), GetId());
 }
 
 void Guild::HandleRemoveMember(WorldSession* session, uint64 guid)

@@ -2291,6 +2291,88 @@ MovementStatusElements MoveUpdateTeleport[] =
     MSEEnd,
 };
 
+MovementStatusElements MoveCastSpell[] =
+{
+
+
+
+    MSEPositionZ,
+    MSEPositionX,
+	MSEPositionY,
+	MSEHasGuidByte7,
+    MSEHasSpline,
+	MSEHasFallData,
+    MSEHasGuidByte0,
+	MSEHasMovementFlags,
+	MSEHasTransportData,
+	MSEHasGuidByte2,
+	MSEZeroBit,
+	MSEHasMovementFlags2,
+	MSEHasGuidByte1,
+	MSEIsAlive,
+	MSEHasGuidByte3,
+	MSEHasOrientation,
+	MSEHasTimestamp,
+    MSEHasCounter,
+    MSEHasGuidByte5,
+	MSEHasGuidByte6,
+	MSEHasPitch,
+	MSEHasGuidByte4,
+    MSEHasSplineElevation, 
+    MSEZeroBit,
+	MSEHasTransportTime2,
+	MSEHasTransportGuidByte2,
+	MSEHasTransportGuidByte3,
+	MSEHasTransportGuidByte4,
+	MSEHasTransportGuidByte0,
+	MSEHasTransportGuidByte5,
+    MSEHasTransportTime3,
+	MSEHasTransportGuidByte6,
+    MSEHasTransportGuidByte7,
+    MSEHasTransportGuidByte1,
+    MSEMovementFlags2,
+    MSEHasFallDirection,
+    MSEMovementFlags,
+    
+
+	MSEGuidByte1,
+	MSEGuidByte2,
+	MSEGuidByte5,
+	MSECounter,
+	MSEGuidByte6,
+	MSEGuidByte7,
+	MSEGuidByte4,
+	MSEGuidByte0,
+	MSEGuidByte3,
+    MSETransportTime,
+    MSETransportGuidByte5,
+    MSETransportSeat,
+	MSETransportOrientation,
+	MSETransportGuidByte7,
+	MSETransportGuidByte1,
+	MSETransportPositionZ,
+	MSETransportPositionX,
+	MSETransportGuidByte6,
+	MSETransportPositionY,
+	MSETransportGuidByte4,
+    MSETransportGuidByte2,
+	MSETransportTime3,
+	MSETransportTime2,
+	MSETransportGuidByte0,
+    MSETransportGuidByte3,
+    MSEAlive,
+    MSEOrientation,
+	MSEFallTime,
+	MSEFallCosAngle,
+	MSEFallHorizontalSpeed,
+    MSEFallSinAngle,
+	MSEFallVerticalSpeed,
+    MSETimestamp,
+    MSEPitch,
+    MSESplineElevation,
+    MSEEnd,
+};
+
 MovementStatusElements* GetMovementStatusElementsSequence(Opcodes opcode)
 {
     switch (opcode)
@@ -2351,6 +2433,8 @@ MovementStatusElements* GetMovementStatusElementsSequence(Opcodes opcode)
         return DismissControlledVehicle;
     case SMSG_MOVE_UPDATE_TELEPORT:
         return MoveUpdateTeleport;
+	case CMSG_CAST_SPELL:
+		return MoveCastSpell;
     default:
         break;
     }
