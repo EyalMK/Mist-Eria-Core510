@@ -9948,6 +9948,7 @@ void Player::SendTalentWipeConfirm(uint64 pguid)
     WorldPacket data(MSG_RESPEC_WIPE_CONFIRM, (8+4));
 
 	ObjectGuid guid = pguid;
+    uint8 unk = 0;
 
 	data.WriteBit(guid[4]);
 	data.WriteBit(guid[0]);
@@ -9964,6 +9965,7 @@ void Player::SendTalentWipeConfirm(uint64 pguid)
 	data.WriteByteSeq(guid[3]);
 	data.WriteByteSeq(guid[0]);
 	data.WriteByteSeq(guid[4]);
+    data << uint8(unk);
 	data.WriteByteSeq(guid[5]);
 	data.WriteByteSeq(guid[6]);
 	data.WriteByteSeq(guid[2]);
