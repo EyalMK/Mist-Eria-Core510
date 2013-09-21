@@ -241,10 +241,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     case CHAT_MSG_OFFICER:
     case CHAT_MSG_RAID:
     case CHAT_MSG_RAID_WARNING:
-    /*case CHAT_MSG_BATTLEGROUND:
+    //case CHAT_MSG_BATTLEGROUND:
         textLength = recvData.ReadBits(9);
         msg = recvData.ReadString(textLength);
-        break;*/
+        break;
     case CHAT_MSG_WHISPER:
         textLength = recvData.ReadBits(9);
         receiverLength = recvData.ReadBits(10);
