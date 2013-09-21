@@ -6060,7 +6060,8 @@ SpellCastResult Spell::CheckItems()
             return SPELL_FAILED_BAD_TARGETS;
 
         if (!m_targets.GetItemTarget())
-            return SPELL_FAILED_ITEM_GONE;
+			return SPELL_CAST_OK;
+            //return SPELL_FAILED_ITEM_GONE; DEBUG TERAH
 
         if (!m_targets.GetItemTarget()->IsFitToSpellRequirements(m_spellInfo))
             return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
