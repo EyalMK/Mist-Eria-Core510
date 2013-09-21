@@ -4412,7 +4412,7 @@ bool Player::ResetTalents(bool no_cost)
                 PlayerTalentMap::iterator itr = GetTalentMap(GetActiveSpec())->find(i);
                 GetTalentMap(GetActiveSpec())->erase(itr);
                 removeSpell(talentInfo->SpellId, false, false);
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD : RESET TALENT : Spell %u has removed", specSpell->SpellId);
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD : RESET TALENT : Spell %u has removed", talentInfo->SpellId);
             }
 
     this->SendTalentsInfoData(false);
