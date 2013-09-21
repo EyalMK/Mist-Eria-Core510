@@ -4396,6 +4396,8 @@ bool Player::ResetTalents(bool no_cost)
 
     RemovePet(NULL, PET_SAVE_NOT_IN_SLOT, true);
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD : RESET TALENT : CHECK");
+
     std::list<uint32> const* specSpells = GetSpecializationSpellsBySpec(GetPrimaryTalentTree(GetActiveSpec()));
     if (specSpells)
         for (std::list<uint32>::const_iterator itr = specSpells->begin(); itr != specSpells->end(); ++itr)
