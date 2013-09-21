@@ -4375,6 +4375,8 @@ bool Player::ResetTalents(bool no_cost)
     //uint32 talentPointsForLevel = CalculateTalentsPoints();
     uint32 talentPointsForLevel = getLevel()/15;
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : RESET TALENT : USEDTALENTS : %u", GetUsedTalentCount());
+
     if (!GetUsedTalentCount())
     {
         SetFreeTalentPoints(talentPointsForLevel);
