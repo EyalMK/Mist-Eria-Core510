@@ -4378,6 +4378,7 @@ bool Player::ResetTalents(bool no_cost)
     if (!GetUsedTalentCount())
     {
         SetFreeTalentPoints(talentPointsForLevel);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD : RESET TALENT : BUG1");
         return false;
     }
 
@@ -4390,6 +4391,7 @@ bool Player::ResetTalents(bool no_cost)
         if (!HasEnoughMoney(uint64(cost)))
         {
             SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD : RESET TALENT : BUG2");
             return false;
         }
     }
