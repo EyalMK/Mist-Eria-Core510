@@ -25094,6 +25094,9 @@ bool Player::LearnTalent(uint32 talentId, uint32 /*talentRank*/)
     // update free talent points
     SetFreeTalentPoints(CurTalentPoints - usePoint);
     SetUsedTalentCount(GetUsedTalentCount() + usePoint);
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH Talents : %u, %u", GetFreeTalentPoints(), GetUsedTalentCount());
+
     return true;
 }
 
