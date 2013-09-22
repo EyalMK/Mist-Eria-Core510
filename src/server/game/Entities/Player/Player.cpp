@@ -4372,15 +4372,12 @@ bool Player::ResetTalents(bool no_cost)
     if (HasAtLoginFlag(AT_LOGIN_RESET_TALENTS))
         RemoveAtLoginFlag(AT_LOGIN_RESET_TALENTS, true);
 
-    //uint32 talentPointsForLevel = CalculateTalentsPoints();
     uint32 talentPointsForLevel = getLevel()/15;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : RESET TALENT : USEDTALENTS : %u", GetUsedTalentCount());
 
     if (!GetUsedTalentCount())
     {
         SetFreeTalentPoints(talentPointsForLevel);
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD : RESET TALENT : BUG1");
         return false;
     }
 
@@ -4393,35 +4390,31 @@ bool Player::ResetTalents(bool no_cost)
         if (!HasEnoughMoney(uint64(cost)))
         {
             SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD : RESET TALENT : BUG2");
             return false;
         }
     }
 
     RemovePet(NULL, PET_SAVE_NOT_IN_SLOT, true);
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD : RESET TALENT : CHECK");
-
     std::list<uint32> const* specSpells = GetSpecializationSpellsBySpec(GetPrimaryTalentTree(GetActiveSpec()));
     if (specSpells)
         for (std::list<uint32>::const_iterator itr = specSpells->begin(); itr != specSpells->end(); ++itr)
             if (ChrSpecializationSpellsEntry const* specSpell = sChrSpecializationSpellsStore.LookupEntry(*itr))
-            {
                 removeSpell(specSpell->SpellId, false, false);
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD : RESET TALENT : Spell %u has removed", specSpell->SpellId);
-            }
 
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
         if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(i))
             if (HasTalent(talentInfo->TalentID, GetActiveSpec()))
             {
-                PlayerTalentMap::iterator itr = GetTalentMap(GetActiveSpec())->find(i);
-                GetTalentMap(GetActiveSpec())->erase(itr);
                 removeSpell(talentInfo->SpellId, false, false);
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD : RESET TALENT : Spell %u has removed", talentInfo->SpellId);
+                PlayerTalentMap::iterator itr = GetTalentMap(GetActiveSpec())->find(talentInfo->TalentID);
+                if(itr != GetTalentMap(GetActiveSpec())->end())
+                {
+                    itr->second->state = PLAYERSPELL_REMOVED;
+                }
             }
 
-    this->SendTalentsInfoData(false);
+    this->SetPrimaryTalentTree(GetActiveSpec(), TALENT_TREE_NULL);
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     _SaveTalents(trans);
@@ -4437,6 +4430,8 @@ bool Player::ResetTalents(bool no_cost)
         SetTalentResetCost(cost);
         SetTalentResetTime(time(NULL));
     }
+
+    this->SendTalentsInfoData(false);
 
     return true;
 }
@@ -17602,6 +17597,15 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
         }
     }
 
+	// Talent Count
+	uint32 spentTalents = 0;
+	for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
+        if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(i))
+            if (HasTalent(talentInfo->TalentID, GetActiveSpec()))
+                spentTalents++;
+	SetUsedTalentCount(spentTalents);
+	SetFreePrimaryProfessions(getLevel()/15 - spentTalents);
+
     // RaF stuff.
     m_grantableLevels = fields[59].GetUInt8();
     if (GetSession()->IsARecruiter() || (GetSession()->GetRecruiterId() != 0))
@@ -25094,6 +25098,7 @@ bool Player::LearnTalent(uint32 talentId, uint32 /*talentRank*/)
     // update free talent points
     SetFreeTalentPoints(CurTalentPoints - usePoint);
     SetUsedTalentCount(GetUsedTalentCount() + usePoint);
+
     return true;
 }
 
