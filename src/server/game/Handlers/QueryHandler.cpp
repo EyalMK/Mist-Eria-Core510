@@ -350,14 +350,14 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
 	data.WriteBit(guid[6]);
 	data.WriteBit(guid[2]);
 
-	data.WriteByteSeq(guid[]);
-	data.WriteByteSeq(guid[]);
-	data.WriteByteSeq(guid[]);
-	data.WriteByteSeq(guid[]);
-	data.WriteByteSeq(guid[]);
-	data.WriteByteSeq(guid[]);
-	data.WriteByteSeq(guid[]);
-	data.WriteByteSeq(guid[]);
+	data.WriteByteSeq(guid[0]);
+	data.WriteByteSeq(guid[4]);
+	data.WriteByteSeq(guid[3]);
+	data.WriteByteSeq(guid[1]);
+	data.WriteByteSeq(guid[2]);
+	data.WriteByteSeq(guid[5]);
+	data.WriteByteSeq(guid[6]);
+	data.WriteByteSeq(guid[7]);
                                  
     SendPacket(&data);
 }
