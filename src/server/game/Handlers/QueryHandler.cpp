@@ -294,48 +294,71 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
 
     Corpse* corpse = GetPlayer()->GetCorpse();
 
-    if (!corpse)
-    {
-        WorldPacket data(MSG_CORPSE_QUERY, 1);
-        data << uint8(0);                                   // corpse not found
-        SendPacket(&data);
-        return;
-    }
+	uint32 mapid = 0;
+    float x = 0;
+    float y = 0;
+    float z = 0;
+    uint32 corpsemapid = 0;
+	ObjectGuid guid = (uint64)0;
+	uint8 corpsefound = 0;
 
-    uint32 mapid = corpse->GetMapId();
-    float x = corpse->GetPositionX();
-    float y = corpse->GetPositionY();
-    float z = corpse->GetPositionZ();
-    uint32 corpsemapid = mapid;
+    if (corpse)
+	{
+		mapid = corpse->GetMapId();
+		x = corpse->GetPositionX();
+		y = corpse->GetPositionY();
+		z = corpse->GetPositionZ();
+		corpsemapid = mapid;
+		guid = corpse->GetGUID();
+		corpsefound = 1;
 
-    // if corpse at different map
-    if (mapid != _player->GetMapId())
-    {
-        // search entrance map for proper show entrance
-        if (MapEntry const* corpseMapEntry = sMapStore.LookupEntry(mapid))
-        {
-            if (corpseMapEntry->IsDungeon() && corpseMapEntry->entrance_map >= 0)
-            {
-                // if corpse map have entrance
-                if (Map const* entranceMap = sMapMgr->CreateBaseMap(corpseMapEntry->entrance_map))
-                {
-                    mapid = corpseMapEntry->entrance_map;
-                    x = corpseMapEntry->entrance_x;
-                    y = corpseMapEntry->entrance_y;
-                    z = entranceMap->GetHeight(GetPlayer()->GetPhaseMask(), x, y, MAX_HEIGHT);
-                }
-            }
-        }
-    }
+		// if corpse at different map
+		if (mapid != _player->GetMapId())
+		{
+			// search entrance map for proper show entrance
+			if (MapEntry const* corpseMapEntry = sMapStore.LookupEntry(mapid))
+			{
+				if (corpseMapEntry->IsDungeon() && corpseMapEntry->entrance_map >= 0)
+				{
+					// if corpse map have entrance
+					if (Map const* entranceMap = sMapMgr->CreateBaseMap(corpseMapEntry->entrance_map))
+					{
+						mapid = corpseMapEntry->entrance_map;
+						x = corpseMapEntry->entrance_x;
+						y = corpseMapEntry->entrance_y;
+						z = entranceMap->GetHeight(GetPlayer()->GetPhaseMask(), x, y, MAX_HEIGHT);
+					}
+				}
+			}
+		}
+	}
 
-    WorldPacket data(MSG_CORPSE_QUERY, 1+(6*4));
-    data << uint8(1);                                       // corpse found
-    data << int32(mapid);
-    data << float(x);
-    data << float(y);
-    data << float(z);
-    data << int32(corpsemapid);
-    data << uint32(0);                                      // unknown
+	WorldPacket data(SMSG_CORPSE_QUERY);
+	data << float(y);
+	data << uint32(mapid);
+	data << uint32(corpsemapid);
+	data << float(z);
+	data << float(x);
+
+	data.WriteBit(guid[0]);
+	data.WriteBit(guid[4]);
+	data.WriteBit(guid[5]);
+	data.WriteBit(guid[1]);
+	data.WriteBit(guid[3]);
+	data.WriteBit(corpsefound);
+	data.WriteBit(guid[7]);
+	data.WriteBit(guid[6]);
+	data.WriteBit(guid[2]);
+
+	data.WriteByteSeq(guid[]);
+	data.WriteByteSeq(guid[]);
+	data.WriteByteSeq(guid[]);
+	data.WriteByteSeq(guid[]);
+	data.WriteByteSeq(guid[]);
+	data.WriteByteSeq(guid[]);
+	data.WriteByteSeq(guid[]);
+	data.WriteByteSeq(guid[]);
+                                 
     SendPacket(&data);
 }
 

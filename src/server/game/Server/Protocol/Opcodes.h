@@ -179,7 +179,8 @@ enum Opcodes
     CMSG_COMPLETE_MOVIE                               = 0x078C,//16357
     CMSG_CONNECT_TO_FAILED                            = 0x01E7,//16357
     CMSG_CONTACT_LIST                                 = 0x04C1,//16357
-    CMSG_CORPSE_MAP_POSITION_QUERY                    = 0xF78, //16357 ???
+    CMSG_CORPSE_MAP_POSITION_QUERY                    = 0x025B, //16357 ???
+	CMSG_CORPSE_QUERY                                 = 0x0D13,//16357
     CMSG_CREATURE_QUERY                               = 0x285, //16357
     CMSG_DANCE_QUERY                                  = 0x06EC,//16357
     CMSG_DB_QUERY                                     = 0x0537,//16357 NEW OF MOP
@@ -602,7 +603,6 @@ enum Opcodes
     MSG_AUCTION_HELLO                                 = 0x0C80,//16357
     MSG_CHANNEL_START                                 = 0x441, //16357
     MSG_CHANNEL_UPDATE                                = 0x2CD, //16357
-    MSG_CORPSE_QUERY                                  = 0x0D13,//16357
     MSG_GM_BIND_OTHER                                 = 0x1543,
     MSG_GM_SHOWLABEL                                  = 0x1544,
     MSG_GM_SUMMON                                     = 0x1545,
@@ -850,6 +850,7 @@ enum Opcodes
     SMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE           = 0x084D, //16357
     SMSG_CORPSE_NOT_IN_INSTANCE                       = 0x0824, //16357
     SMSG_CORPSE_RECLAIM_DELAY                         = 0x0504, //16357
+	SMSG_CORPSE_QUERY                                 = 0x0F78,//16357
     SMSG_CREATURE_QUERY_RESPONSE                      = 0xAA4, //16357
     SMSG_CRITERIA_DELETED                             = 0x1728,
     SMSG_CRITERIA_UPDATE                              = 0x060D,//16357
