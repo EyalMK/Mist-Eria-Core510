@@ -349,6 +349,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
 	data.WriteBit(guid[7]);
 	data.WriteBit(guid[6]);
 	data.WriteBit(guid[2]);
+    data.FlushBits();
 
 	data.WriteByteSeq(guid[0]);
 	data.WriteByteSeq(guid[4]);
