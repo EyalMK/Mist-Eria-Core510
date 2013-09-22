@@ -1724,7 +1724,7 @@ struct SpecializationSpellEntry
 struct SpellEffectEntry
 {
     uint32    Id;                                           // 0         m_ID
-    uint32    difficultyMode;                                       // 1         5.0.1.15589
+    uint32    difficultyMode;                               // 1         5.0.1.15589
     uint32    Effect;                                       // 2         m_effect
     float     EffectValueMultiplier;                        // 3         m_effectAmplitude
     uint32    EffectApplyAuraName;                          // 4         m_effectAura
@@ -2090,14 +2090,14 @@ struct SpellItemEnchantmentEntry
     uint32      amount[MAX_ITEM_ENCHANTMENT_EFFECTS];       // 5-7      m_effectPointsMin[MAX_ITEM_ENCHANTMENT_EFFECTS]
     uint32      spellid[MAX_ITEM_ENCHANTMENT_EFFECTS];      // 8-10    m_effectArg[MAX_ITEM_ENCHANTMENT_EFFECTS]
     char*       description;                                // 11       m_name_lang
-    uint32      aura_id;                                    // 12       m_itemVisual
-    uint32      slot;                                       // 13       m_flags
-    uint32      GemID;                                      // 14       m_src_itemID
-    uint32      EnchantmentCondition;                       // 15       m_condition_id
-    uint32      requiredSkill;                              // 16       m_requiredSkillID
-    uint32      requiredSkillValue;                         // 17       m_requiredSkillRank
-    uint32      requiredLevel;                              // 18       new in 3.1
-                                                            // 19       new in 3.1
+    //uint32      descriptionFlags;                         // 12       m_description_flags
+    uint32      aura_id;                                    // 13       m_itemVisual
+    uint32      slot;                                       // 14       m_flags
+    uint32      GemID;                                      // 15       m_src_itemID
+    uint32      EnchantmentCondition;                       // 16       m_condition_id
+    uint32      requiredSkill;                              // 17       m_requiredSkillID
+    uint32      requiredSkillValue;                         // 18       m_requiredSkillRank
+    uint32      requiredLevel;                              // 19       new in 3.1
     //uint32 Unknown;                                       // 20       5.0.1
     //uint32 Unknown;                                       // 21       5.0.1
     //uint32 Unknown;                                       // 22       5.0.3
