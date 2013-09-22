@@ -4406,7 +4406,7 @@ bool Player::ResetTalents(bool no_cost)
         if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(i))
             if (HasTalent(talentInfo->TalentID, GetActiveSpec()))
             {
-                PlayerTalentMap::iterator itr = GetTalentMap(GetActiveSpec())->find(i);
+                PlayerTalentMap::iterator itr = GetTalentMap(GetActiveSpec())->find(talentInfo->TalentID);
                 GetTalentMap(GetActiveSpec())->erase(itr);
                 removeSpell(talentInfo->SpellId, false, false);
             }
