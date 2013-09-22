@@ -335,17 +335,17 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
 
 	WorldPacket data(SMSG_CORPSE_QUERY);
     data << float(z);
-    data << uint32(corpsemapid);
     data << uint32(mapid);
+    data << uint32(corpsemapid);
     data << float(y);
     data << float(x);
 
 	data.WriteBit(guid[0]);
-	data.WriteBit(guid[4]);
+    data.WriteBit(corpsefound);
+    data.WriteBit(guid[4]);
 	data.WriteBit(guid[5]);
 	data.WriteBit(guid[1]);
 	data.WriteBit(guid[3]);
-	data.WriteBit(corpsefound);
 	data.WriteBit(guid[7]);
 	data.WriteBit(guid[6]);
 	data.WriteBit(guid[2]);
