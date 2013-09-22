@@ -335,8 +335,8 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
 
 	WorldPacket data(SMSG_CORPSE_QUERY);
     data << float(z);
-	data << uint32(mapid);
-	data << uint32(corpsemapid);
+    data << uint32(corpsemapid);
+    data << uint32(mapid);
     data << float(y);
     data << float(x);
 
