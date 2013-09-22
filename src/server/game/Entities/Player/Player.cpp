@@ -4405,15 +4405,9 @@ bool Player::ResetTalents(bool no_cost)
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
         if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(i))
             if (HasTalent(talentInfo->TalentID, GetActiveSpec()))
-            {
-                PlayerTalentMap::iterator itr = GetTalentMap(GetActiveSpec())->find(talentInfo->TalentID);
-                GetTalentMap(GetActiveSpec())->erase(itr);
                 removeSpell(talentInfo->SpellId, false, false);
-            }
 
     this->SetPrimaryTalentTree(GetActiveSpec(), TALENT_TREE_NULL);
-
-    this->SendTalentsInfoData(false);
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     _SaveTalents(trans);
@@ -4429,6 +4423,8 @@ bool Player::ResetTalents(bool no_cost)
         SetTalentResetCost(cost);
         SetTalentResetTime(time(NULL));
     }
+
+    this->SendTalentsInfoData(false);
 
     return true;
 }
