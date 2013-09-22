@@ -4372,15 +4372,12 @@ bool Player::ResetTalents(bool no_cost)
     if (HasAtLoginFlag(AT_LOGIN_RESET_TALENTS))
         RemoveAtLoginFlag(AT_LOGIN_RESET_TALENTS, true);
 
-    //uint32 talentPointsForLevel = CalculateTalentsPoints();
     uint32 talentPointsForLevel = getLevel()/15;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : RESET TALENT : USEDTALENTS : %u", GetUsedTalentCount());
 
     if (!GetUsedTalentCount())
     {
         SetFreeTalentPoints(talentPointsForLevel);
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD : RESET TALENT : BUG1");
         return false;
     }
 
@@ -4393,14 +4390,11 @@ bool Player::ResetTalents(bool no_cost)
         if (!HasEnoughMoney(uint64(cost)))
         {
             SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD : RESET TALENT : BUG2");
             return false;
         }
     }
 
     RemovePet(NULL, PET_SAVE_NOT_IN_SLOT, true);
-
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD : RESET TALENT : CHECK");
 
     std::list<uint32> const* specSpells = GetSpecializationSpellsBySpec(GetPrimaryTalentTree(GetActiveSpec()));
     if (specSpells)
@@ -25103,8 +25097,6 @@ bool Player::LearnTalent(uint32 talentId, uint32 /*talentRank*/)
     // update free talent points
     SetFreeTalentPoints(CurTalentPoints - usePoint);
     SetUsedTalentCount(GetUsedTalentCount() + usePoint);
-
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH Talents : %u, %u", GetFreeTalentPoints(), GetUsedTalentCount());
 
     return true;
 }

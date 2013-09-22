@@ -145,9 +145,6 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
         
-    GetPlayer()->ResetTalents();
-
-    /*
     if (!GetPlayer()->ResetTalents())
     {
         WorldPacket data(SMSG_RESPEC_WIPE_CONFIRM);    //you have not any talent
@@ -167,7 +164,7 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
         data << uint8(0);
         SendPacket(&data);
         return;
-    }*/
+    }
 
     unit->CastSpell(_player, 14867, true);                  //spell: "Untalent Visual Effect"
 }
