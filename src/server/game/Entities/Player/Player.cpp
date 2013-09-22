@@ -4405,7 +4405,14 @@ bool Player::ResetTalents(bool no_cost)
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
         if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(i))
             if (HasTalent(talentInfo->TalentID, GetActiveSpec()))
+            {
                 removeSpell(talentInfo->SpellId, false, false);
+                PlayerTalentMap::iterator itr = GetTalentMap(GetActiveSpec())->find(talentInfo->TalentID);
+                if(itr != GetTalentMap(GetActiveSpec())->end())
+                {
+                    itr->second->state = PLAYERSPELL_REMOVED;
+                }
+            }
 
     this->SetPrimaryTalentTree(GetActiveSpec(), TALENT_TREE_NULL);
 
