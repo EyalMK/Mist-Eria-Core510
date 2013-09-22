@@ -4400,10 +4400,7 @@ bool Player::ResetTalents(bool no_cost)
     if (specSpells)
         for (std::list<uint32>::const_iterator itr = specSpells->begin(); itr != specSpells->end(); ++itr)
             if (ChrSpecializationSpellsEntry const* specSpell = sChrSpecializationSpellsStore.LookupEntry(*itr))
-            {
                 removeSpell(specSpell->SpellId, false, false);
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD : RESET TALENT : Spell %u has removed", specSpell->SpellId);
-            }
 
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
         if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(i))
@@ -4412,8 +4409,9 @@ bool Player::ResetTalents(bool no_cost)
                 PlayerTalentMap::iterator itr = GetTalentMap(GetActiveSpec())->find(i);
                 GetTalentMap(GetActiveSpec())->erase(itr);
                 removeSpell(talentInfo->SpellId, false, false);
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD : RESET TALENT : Spell %u has removed", talentInfo->SpellId);
             }
+
+    this->SetPrimaryTalentTree(GetActiveSpec(), TALENT_TREE_NULL);
 
     this->SendTalentsInfoData(false);
 
