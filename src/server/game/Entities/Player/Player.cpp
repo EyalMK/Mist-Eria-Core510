@@ -17602,6 +17602,15 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
         }
     }
 
+	// Talent Count
+	uint32 spentTalents = 0;
+	for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
+        if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(i))
+            if (HasTalent(talentInfo->TalentID, GetActiveSpec()))
+                spentTalents++;
+	SetUsedTalentCount(spentTalents);
+	SetFreePrimaryProfessions(getLevel()/15 - spentTalents);
+
     // RaF stuff.
     m_grantableLevels = fields[59].GetUInt8();
     if (GetSession()->IsARecruiter() || (GetSession()->GetRecruiterId() != 0))
