@@ -881,8 +881,6 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
 
             addonInfo >> enabled >> crc >> version;
 
-            sLog->outInfo(LOG_FILTER_NETWORKIO, "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Version: 0x%x", addonName.c_str(), enabled, crc, version);
-
             AddonInfo addon(addonName, enabled, crc, 2, true, version);
 
             SavedAddon const* savedAddon = AddonMgr::GetAddonInfo(addonName);
@@ -892,11 +890,6 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
 
                 if (addon.CRC != savedAddon->CRC)
                     match = false;
-
-                if (!match)
-                    sLog->outInfo(LOG_FILTER_NETWORKIO, "ADDON: %s was known, but didn't match known CRC (0x%x)!", addon.Name.c_str(), savedAddon->CRC);
-                else
-                    sLog->outInfo(LOG_FILTER_NETWORKIO, "ADDON: %s was known, CRC is correct (0x%x)", addon.Name.c_str(), savedAddon->CRC);
             }
             else
             {
