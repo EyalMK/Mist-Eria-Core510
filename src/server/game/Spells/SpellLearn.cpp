@@ -132,7 +132,7 @@ void SpellLearnMgr::UpdatePlayerSpells(Player* player)
 	if(!player) return;
 
 	uint8 classid = player->getClass();
-	uint8 spec = player->GetPrimaryTalentTree(player->GetActiveSpec());
+	uint32 spec = player->GetPrimaryTalentTree(player->GetActiveSpec());
 	uint8 level = std::min(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), (uint32)player->getLevel());
 
 	// Check for cheating/errors
@@ -149,9 +149,9 @@ void SpellLearnMgr::UpdatePlayerSpells(Player* player)
 
 	if (LevelsList *levelsList = sSpellLearnMap[classid])
 	{
-		for(uint32 i = 1 ; i <= level ; ++i)
+		for(uint32 i = 0 ; i < level ; ++i)
 		{
-			if (SpecialisationList *specList = (*levelsList)[i-1])
+			if (SpecialisationList *specList = (*levelsList)[i])
 			{
 				if (SpellList *spellList = (*specList)[spec])
 					for(SpellList::iterator itr = spellList->begin(); itr != spellList->end(); ++itr)
