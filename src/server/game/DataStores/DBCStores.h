@@ -75,6 +75,7 @@ CharStartOutfitEntry const* GetCharStartOutfitEntry(uint8 race, uint8 class_, ui
 
 uint32 GetPowerIndexByClass(uint32 powerType, uint32 classId);
 std::list<uint32> const* GetSpecializationSpellsBySpec(uint32 specId);
+uint32 GetSpecializationReplaceSpellBySpell(uint32 spellId);
 
 extern DBCStorage <AchievementEntry>             sAchievementStore;
 extern DBCStorage <AchievementCriteriaEntry>     sAchievementCriteriaStore;

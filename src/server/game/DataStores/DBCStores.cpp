@@ -73,6 +73,7 @@ DBCStorage <ChrPowerTypesEntry> sChrPowerTypesStore(ChrClassesXPowerTypesfmt);
 DBCStorage <ChrSpecializationEntry> sChrSpecializationStore(ChrSpecializationfmt);
 DBCStorage <ChrSpecializationSpellsEntry> sChrSpecializationSpellsStore(ChrSpecializationSpellsfmt);
 std::map<uint32, std::list<uint32> > SpecializationSpellsBySpec;
+std::map<uint32, uint32> SpecializationSpellsWithReplaceSpells;
 
 DBCStorage <CinematicSequencesEntry> sCinematicSequencesStore(CinematicSequencesEntryfmt);
 DBCStorage <CreatureDisplayInfoEntry> sCreatureDisplayInfoStore(CreatureDisplayInfofmt);
@@ -355,7 +356,11 @@ void LoadDBCStores(const std::string& dataPath)
     LoadDBC(availableDbcLocales, bad_dbc_files, sChrSpecializationSpellsStore,dbcPath, "SpecializationSpells.dbc");
     for (uint32 i = 0; i < sChrSpecializationSpellsStore.GetNumRows(); ++i)
         if (ChrSpecializationSpellsEntry const* specSpell = sChrSpecializationSpellsStore.LookupEntry(i))
+        {
             SpecializationSpellsBySpec[specSpell->SpecId].push_back(i);
+            if(specSpell->ReplaceSpellId != 0)
+                SpecializationSpellsWithReplaceSpells[specSpell->SpellId] = specSpell->ReplaceSpellId;
+        }
 
     LoadDBC(availableDbcLocales, bad_dbc_files, sChrPowerTypesStore,          dbcPath, "ChrClassesXPowerTypes.dbc");//14545
     for (uint32 i = 0; i < MAX_CLASSES; ++i)
@@ -1059,6 +1064,15 @@ std::list<uint32> const* GetSpecializationSpellsBySpec(uint32 specId)
         return NULL;
 
     return &itr->second;
+}
+
+uint32 GetSpecializationReplaceSpellBySpell(uint32 spellId)
+{
+    std::map<uint32, uint32>::iterator itr = SpecializationSpellsWithReplaceSpells.find(spellId);
+    if(itr == SpecializationSpellsWithReplaceSpells.end())
+        return 0;
+
+    return itr->second;
 }
 
 uint32 ScalingStatValuesEntry::GetStatMultiplier(uint32 inventoryType) const

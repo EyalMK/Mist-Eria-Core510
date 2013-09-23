@@ -80,6 +80,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "SpellLearn.h"
+#include "DBCStores.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -3958,13 +3959,20 @@ void Player::learnSpell(uint32 spell_id, bool dependent)
     bool learning = addSpell(spell_id, active, true, dependent, false);
 
     // prevent duplicated entires in spell book, also not send if not in world (loading)
-    if (learning && IsInWorld())
+    if (learning)
     {
-        WorldPacket data(SMSG_LEARNED_SPELL, 1+3+4);
-        data.WriteBit(0);
-        data.WriteBits(1, 24); // Spell Count
-        data << uint32(spell_id);
-        GetSession()->SendPacket(&data);
+        uint32 replaceSpell = GetSpecializationReplaceSpellBySpell(spell_id);
+        if(replaceSpell != 0)
+            removeSpell(replaceSpell, false, false);
+
+        if(IsInWorld())
+        {
+            WorldPacket data(SMSG_LEARNED_SPELL, 1+3+4);
+            data.WriteBit(0);
+            data.WriteBits(1, 24); // Spell Count
+            data << uint32(spell_id);
+            GetSession()->SendPacket(&data);
+        }
     }
 
     // learn all disabled higher ranks and required spells (recursive)
@@ -4117,6 +4125,10 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
 
     for (SpellLearnSpellMap::const_iterator itr2 = spell_bounds.first; itr2 != spell_bounds.second; ++itr2)
         removeSpell(itr2->second.spell, disabled);
+
+    uint32 replaceSpell = GetSpecializationReplaceSpellBySpell(spell_id);
+    if(replaceSpell != 0)
+        learnSpell(replaceSpell, false);
 
     // activate lesser rank in spellbook/action bar, and cast it if need
     bool prev_activate = false;
