@@ -119,7 +119,6 @@ void SpellLearn::UpdateForPlayer(Player *player)
 
 	case 3: // Both
 		player->learnSpell(spellId, false);
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : SPELLLEARN : spell %u learned", spellId);
 		break;
 
 	default:
