@@ -1900,9 +1900,6 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
     if (!player || !player->GetSession() || player->GetGroup() != this)
         return;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE player %s %u %u ", player->GetName().c_str(), GetMembersCount(), GUID_LOPART(m_leaderGuid));
-
-
     /*if(GetMembersCount()-1 == 0)
         return;*/
 
