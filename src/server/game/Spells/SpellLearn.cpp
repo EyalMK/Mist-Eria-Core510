@@ -95,7 +95,7 @@ void SpellLearnMgr::Load()
 
 
 
-void SpellLearn::UpdateForPlayer(Player *player, bool remove = false)
+void SpellLearn::UpdateForPlayer(Player *player, bool remove)
 {
     if(remove)
     {
