@@ -116,7 +116,7 @@ enum SpellModOp
     SPELLMOD_UNK2                      = 32,
     // spellmod 33
     SPELLMOD_UNK3                      = 34,
-    SPELLMOD_UNK4                      = 35
+    SPELLMOD_BOUNCE_MAX_DISTANCE       = 35
 };
 
 #define MAX_SPELLMOD 36
