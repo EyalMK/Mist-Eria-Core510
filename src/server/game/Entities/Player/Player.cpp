@@ -4375,7 +4375,7 @@ bool Player::ResetTalents(bool no_cost)
     uint32 talentPointsForLevel = getLevel()/15;
 
 
-    if (!GetUsedTalentCount())
+    if (!GetUsedTalentCount() && GetPrimaryTalentTree(GetActiveSpec()) == 0)
     {
         SetFreeTalentPoints(talentPointsForLevel);
         return false;
