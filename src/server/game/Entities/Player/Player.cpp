@@ -3961,10 +3961,11 @@ void Player::learnSpell(uint32 spell_id, bool dependent)
     // prevent duplicated entires in spell book, also not send if not in world (loading)
     if (learning)
     {
+        /* SEEMS THAT CLIENT WORKS ALREADY WITH IT WITHOUT THAT CHECK ON SERVER
         uint32 replaceSpell = GetSpecializationReplaceSpellBySpell(spell_id);
         if(replaceSpell != 0)
             removeSpell(replaceSpell, false, false);
-
+        */
         if(IsInWorld())
         {
             WorldPacket data(SMSG_LEARNED_SPELL, 1+3+4);
@@ -4126,9 +4127,11 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
     for (SpellLearnSpellMap::const_iterator itr2 = spell_bounds.first; itr2 != spell_bounds.second; ++itr2)
         removeSpell(itr2->second.spell, disabled);
 
+    /* SEEMS CLIENT WORKS WITH IT ALREADY WITHOUT THAT CHECK ON SERVER
     uint32 replaceSpell = GetSpecializationReplaceSpellBySpell(spell_id);
     if(replaceSpell != 0)
-        learnSpell(replaceSpell, false);
+        learnSpell(replaceSpell, false)
+    */
 
     // activate lesser rank in spellbook/action bar, and cast it if need
     bool prev_activate = false;
