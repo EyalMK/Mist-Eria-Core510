@@ -95,34 +95,40 @@ void SpellLearnMgr::Load()
 
 
 
-void SpellLearn::UpdateForPlayer(Player *player)
+void SpellLearn::UpdateForPlayer(Player *player, bool remove = false)
 {
+    if(remove)
+    {
+        player->removeSpell(spellId);
+        return;
+    }
+
 	switch(faction)
 	{
-	case 0: // Disabled Spell
-		player->removeSpell(spellId);
-		break;
+	    case 0: // Disabled Spell
+		    player->removeSpell(spellId);
+		    break;
 
-	case 1: // Alliance
-		if (player->GetTeam() == TEAM_ALLIANCE)
-			player->learnSpell(spellId, false);
-		else
-			player->removeSpell(spellId);
-		break;
+	    case 1: // Alliance
+		    if (player->GetTeam() == TEAM_ALLIANCE)
+			    player->learnSpell(spellId, false);
+		    else
+			    player->removeSpell(spellId);
+		    break;
 
-	case 2: // Horde
-		if (player->GetTeam() == TEAM_HORDE)
-			player->learnSpell(spellId, false);
-		else
-			player->removeSpell(spellId);
-		break;
+	    case 2: // Horde
+		    if (player->GetTeam() == TEAM_HORDE)
+			    player->learnSpell(spellId, false);
+		    else
+			    player->removeSpell(spellId);
+		    break;
 
-	case 3: // Both
-		player->learnSpell(spellId, false);
-		break;
+	    case 3: // Both
+		    player->learnSpell(spellId, false);
+		    break;
 
-	default:
-		break;
+	    default:
+		    break;
 	}
 }
 
@@ -162,6 +168,21 @@ void SpellLearnMgr::UpdatePlayerSpells(Player* player)
 							itr->UpdateForPlayer(player);
 			}
 		}
+
+        for(uint32 i = level ; i < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) ; i++)
+        {
+            if (SpecialisationList *specList = (*levelsList)[i])
+            {
+                if (SpellList *spellList = (*specList)[spec])
+                    for(SpellList::iterator itr = spellList->begin(); itr != spellList->end(); ++itr)
+                        itr->UpdateForPlayer(player, true);
+
+                if (spec != 0)
+                    if (SpellList *spellList = (*specList)[0])
+                        for(SpellList::iterator itr = spellList->begin(); itr != spellList->end(); ++itr)
+                            itr->UpdateForPlayer(player, true);
+            }
+        }
 	}
 
 }

@@ -12,7 +12,7 @@ struct SpellLearn
 	uint32 spellId;
 	uint32 faction;
 
-	void UpdateForPlayer(Player *player);
+	void UpdateForPlayer(Player *player, bool remove = false);
 };
 
 class SpellLearnMgr
