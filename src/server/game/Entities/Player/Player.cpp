@@ -14778,8 +14778,8 @@ void Player::PrepareQuestMenu(uint64 guid)
 
 		sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH == Quest id : %u", quest_id);
 
-        if (!CanTakeQuest(quest, false))
-            continue;
+        /*if (!CanTakeQuest(quest, false))
+            continue;*/
 
 		sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH == Quest id : %u", quest_id);
 
