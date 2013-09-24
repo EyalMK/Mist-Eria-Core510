@@ -14759,7 +14759,6 @@ void Player::PrepareQuestMenu(uint64 guid)
     {
         uint32 quest_id = i->second;
         QuestStatus status = GetQuestStatus(quest_id);
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH == Quest id : %u, status : %u", quest_id, status);
         if (status == QUEST_STATUS_COMPLETE)
             qm.AddMenuItem(quest_id, 4);
         else if (status == QUEST_STATUS_INCOMPLETE)
@@ -14771,12 +14770,18 @@ void Player::PrepareQuestMenu(uint64 guid)
     for (QuestRelations::const_iterator i = objectQR.first; i != objectQR.second; ++i)
     {
         uint32 quest_id = i->second;
+		
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH == Quest id : %u", quest_id);
         Quest const* quest = sObjectMgr->GetQuestTemplate(quest_id);
         if (!quest)
             continue;
 
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH == Quest id : %u", quest_id);
+
         if (!CanTakeQuest(quest, false))
             continue;
+
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH == Quest id : %u", quest_id);
 
         if (quest->IsAutoComplete())
             qm.AddMenuItem(quest_id, 4);
