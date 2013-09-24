@@ -15605,7 +15605,6 @@ bool Player::SatisfyQuestClass(Quest const* qInfo, bool msg) const
 
 bool Player::SatisfyQuestRace(Quest const* qInfo, bool msg)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH == GetRequiredRace() : %u, getRaceMask() : %u", qInfo->GetRequiredRaces(), getRaceMask());
     uint32 reqraces = qInfo->GetRequiredRaces();
     if (reqraces == 0)
         return true;
