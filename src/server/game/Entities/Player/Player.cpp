@@ -14771,17 +14771,12 @@ void Player::PrepareQuestMenu(uint64 guid)
     {
         uint32 quest_id = i->second;
 		
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH == Quest id : %u", quest_id);
         Quest const* quest = sObjectMgr->GetQuestTemplate(quest_id);
         if (!quest)
             continue;
 
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH == Quest id : %u", quest_id);
-
-        /*if (!CanTakeQuest(quest, false))
-            continue;*/
-
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH == Quest id : %u", quest_id);
+        if (!CanTakeQuest(quest, false))
+            continue;
 
         if (quest->IsAutoComplete())
             qm.AddMenuItem(quest_id, 4);
@@ -15610,6 +15605,7 @@ bool Player::SatisfyQuestClass(Quest const* qInfo, bool msg) const
 
 bool Player::SatisfyQuestRace(Quest const* qInfo, bool msg)
 {
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH == GetRequiredRace() : %u, getRaceMask() : %u", qInfo->GetRequiredRaces(), getRaceMask());
     uint32 reqraces = qInfo->GetRequiredRaces();
     if (reqraces == 0)
         return true;
