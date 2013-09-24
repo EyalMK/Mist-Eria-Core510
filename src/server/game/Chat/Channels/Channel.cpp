@@ -634,7 +634,7 @@ void Channel::Say(uint64 guid, std::string const& what, uint32 lang)
     data << uint32(what.size() + 1);
     data << what;
     Player* player = ObjectAccessor::FindPlayer(guid);
-    data << uint8(player ? player->GetChatTag() : 0);
+    data << uint16(player ? player->GetChatTag() : 0);
 
     SendToAll(&data, !playersStore[guid].IsModerator() ? guid : false);
 }
