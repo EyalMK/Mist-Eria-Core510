@@ -14759,6 +14759,7 @@ void Player::PrepareQuestMenu(uint64 guid)
     {
         uint32 quest_id = i->second;
         QuestStatus status = GetQuestStatus(quest_id);
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH == Quest id : %u, status : %u", quest_id, status);
         if (status == QUEST_STATUS_COMPLETE)
             qm.AddMenuItem(quest_id, 4);
         else if (status == QUEST_STATUS_INCOMPLETE)
