@@ -1758,6 +1758,16 @@ struct SpellEffectEntry
 #define MAX_EFFECT_MASK 1073741824
 #define MAX_SPELL_REAGENTS 8
 
+// SpellEffectScaling.dbc
+struct SpellEffectScalingEntry
+{
+    //uint32 id;                                           // 0          m_ID
+    float ScalingMultiplier;                               // 1          m_ScalingMultiplier
+    float DeltaScalingMultiplier;                          // 2          m_DeltaScalingMultiplier
+    float ComboScalingMultiplier;                          // 3          m_ComboScalingMultiplier
+    uint32 EffectSpellId;                                  // 4          m_EffectSpellId
+};
+
 // SpellAuraOptions.dbc
 struct SpellAuraOptionsEntry
 {

@@ -339,6 +339,7 @@ SpellImplicitTargetInfo::StaticData  SpellImplicitTargetInfo::_data[TOTAL_SPELL_
 SpellEffectInfo::SpellEffectInfo(SpellEntry const* /*spellEntry*/, SpellInfo const* spellInfo, uint8 effIndex, SpellEffectEntry const* _effect)
 {
     SpellScalingEntry const* scaling = spellInfo->GetSpellScaling();
+    SpellEffectScalingEntry const* effectScaling = sSpellEffectScalingStore.LookupEntry(_effect->Id);
 
     _spellInfo = spellInfo;
     _effIndex = _effect ? _effect->EffectIndex : effIndex;
@@ -364,9 +365,9 @@ SpellEffectInfo::SpellEffectInfo(SpellEntry const* /*spellEntry*/, SpellInfo con
     TriggerSpell = _effect ? _effect->EffectTriggerSpell : 0;
     SpellClassMask = _effect ? _effect->EffectSpellClassMask : flag96(0);
     ImplicitTargetConditions = NULL;
-    ScalingMultiplier = scaling ? NULL : 0.0f; // Multiplier[3] DELETE form dbcstruture. so.here need recheck
-    DeltaScalingMultiplier = scaling ? NULL : 0.0f;// RandomMultiplier[3] need recheck
-    ComboScalingMultiplier = scaling ? NULL : 0.0f;// OtherMultiplier[3] need recheck
+    ScalingMultiplier = effectScaling ? effectScaling->ScalingMultiplier : 0.0f;
+    DeltaScalingMultiplier = effectScaling ? effectScaling->DeltaScalingMultiplier : 0.0f;
+    ComboScalingMultiplier = effectScaling ? effectScaling->ComboScalingMultiplier : 0.0f;
 }
 
 bool SpellEffectInfo::IsEffect() const
@@ -451,7 +452,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
                 float preciseBasePoints = ScalingMultiplier * multiplier;
                 if (DeltaScalingMultiplier)
                 {
-                    float delta = DeltaScalingMultiplier * ScalingMultiplier * multiplier * 0.5f;
+                    float delta = DeltaScalingMultiplier * preciseBasePoints * 0.5f;
                     preciseBasePoints += frand(-delta, delta);
                 }
 
