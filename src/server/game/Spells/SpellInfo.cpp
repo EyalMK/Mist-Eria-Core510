@@ -444,10 +444,6 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
             if (GtSpellScalingEntry const* gtScaling = sGtSpellScalingStore.LookupEntry((_spellInfo->ScalingClass != -1 ? _spellInfo->ScalingClass - 1 : MAX_CLASSES - 1) * 100 + level - 1))
             {
                 float multiplier = gtScaling->value;
-                if (_spellInfo->CastTimeMax > 0 && _spellInfo->CastTimeMaxLevel > level)
-                    multiplier *= float(_spellInfo->CastTimeMin + (level - 1) * (_spellInfo->CastTimeMax - _spellInfo->CastTimeMin) / (_spellInfo->CastTimeMaxLevel - 1)) / float(_spellInfo->CastTimeMax);
-                if (_spellInfo->CoefLevelBase > level)
-                    multiplier *= (1.0f - _spellInfo->CoefBase) * (float)(level - 1) / (float)(_spellInfo->CoefLevelBase - 1) + _spellInfo->CoefBase;
 
                 float preciseBasePoints = ScalingMultiplier * multiplier;
                 if (DeltaScalingMultiplier)
@@ -475,23 +471,23 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
             level -= int32(_spellInfo->SpellLevel);
             basePoints += int32(level * basePointsPerLevel);
         }
+    }
 
-        // roll in a range <1;EffectDieSides> as of patch 3.3.3
-        int32 randomPoints = int32(DieSides);
-        switch (randomPoints)
+    // roll in a range <1;EffectDieSides> as of patch 3.3.3
+    int32 randomPoints = int32(DieSides);
+    switch (randomPoints)
+    {
+    case 0: break;
+    case 1: basePoints += 1; break;                     // range 1..1
+    default:
         {
-            case 0: break;
-            case 1: basePoints += 1; break;                     // range 1..1
-            default:
-            {
-                // range can have positive (1..rand) and negative (rand..1) values, so order its for irand
-                int32 randvalue = (randomPoints >= 1)
-                    ? irand(1, randomPoints)
-                    : irand(randomPoints, 1);
+            // range can have positive (1..rand) and negative (rand..1) values, so order its for irand
+            int32 randvalue = (randomPoints >= 1)
+                ? irand(1, randomPoints)
+                : irand(randomPoints, 1);
 
-                basePoints += randvalue;
-                break;
-            }
+            basePoints += randvalue;
+            break;
         }
     }
     

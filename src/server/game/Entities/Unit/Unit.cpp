@@ -11789,13 +11789,13 @@ float Unit::ApplyEffectModifiers(SpellInfo const* spellProto, uint8 effect_index
         modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_ALL_EFFECTS, value);
         switch (effect_index)
         {
-            case 0:
+            case EFFECT_0:
                 modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_EFFECT1, value);
                 break;
-            case 1:
+            case EFFECT_1:
                 modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_EFFECT2, value);
                 break;
-            case 2:
+            case EFFECT_2:
                 modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_EFFECT3, value);
                 break;
         }
