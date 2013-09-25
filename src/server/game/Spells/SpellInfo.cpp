@@ -339,7 +339,7 @@ SpellImplicitTargetInfo::StaticData  SpellImplicitTargetInfo::_data[TOTAL_SPELL_
 SpellEffectInfo::SpellEffectInfo(SpellEntry const* /*spellEntry*/, SpellInfo const* spellInfo, uint8 effIndex, SpellEffectEntry const* _effect)
 {
     SpellScalingEntry const* scaling = spellInfo->GetSpellScaling();
-    SpellEffectScalingEntry const* effectScaling = sSpellEffectScalingStore.LookupEntry(_effect->Id);
+    SpellEffectScalingEntry const* effectScaling = _effect ? sSpellEffectScalingStore.LookupEntry(_effect->Id) : NULL;
 
     _spellInfo = spellInfo;
     _effIndex = _effect ? _effect->EffectIndex : effIndex;
