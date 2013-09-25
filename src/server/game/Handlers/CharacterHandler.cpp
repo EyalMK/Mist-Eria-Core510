@@ -2362,10 +2362,9 @@ void WorldSession::HandleSelectFactionOpcode(WorldPacket& recvData)
 
 	//Complete Quest
 	if(player->hasQuest(31450))
-	{
 		player->CompleteQuest(31450);
-		player->SendMovieStart(116);
-	}
+
+	player->SendMovieStart(116);
 
 	// Change Race
 	if (faction == TEAM_HORDE)

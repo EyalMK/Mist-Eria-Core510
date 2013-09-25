@@ -157,7 +157,7 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, uint64 objectGUID) const
         data << int32(quest->GetQuestLevel());
         data << uint32(quest->GetFlags());              // 3.3.3 quest flags
 		data << uint32(0);								// quest flags 2 ??? new in MoP
-        data << uint8(0);                               // 3.3.3 changes icon: blue question or yellow exclamation
+        data << uint8(quest->IsDailyOrWeekly());                               // 3.3.3 changes icon: blue question or yellow exclamation
         std::string title = quest->GetTitle();
 
         int32 locale = _session->GetSessionDbLocaleIndex();
