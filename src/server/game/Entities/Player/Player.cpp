@@ -3266,7 +3266,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
     for (uint16 index = PLAYER_FIELD_COMBAT_RATING_1; index < PLAYER_FIELD_COMBAT_RATING_1 + MAX_COMBAT_RATING; ++index)
         SetUInt32Value(index, 0);
 
-	float mastery = getLevel() >= 80 ? 8.0f : 0.0f;
+	float mastery = sMasteryMgr->getMastery(TalentTree(GetPrimaryTalentTree(GetActiveSpec()))).base / 2.0f;
 	SetFloatValue(PLAYER_MASTERY, mastery);
 
     SetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, 0);
