@@ -2509,7 +2509,7 @@ void Player::RegenerateAll()
         m_holyPowerRegenTimerCount -= 10000;
     }
 
-    if(m_ChiPowerRegenTimerCount >= 10000 && getClass() == CLASS_PALADIN)
+    if(m_ChiPowerRegenTimerCount >= 10000 && getClass() == CLASS_MONK)
     {
         Regenerate(POWER_CHI);
         m_ChiPowerRegenTimerCount -= 10000;
