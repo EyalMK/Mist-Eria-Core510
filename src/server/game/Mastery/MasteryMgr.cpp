@@ -19,11 +19,13 @@ void MasteryMgr::LoadFromDB()
     {
         Field* fields = result->Fetch();
 
-		uint32 id = fields[0].GetInt32();
-		float base = fields[1].GetFloat();
-		float ratio = fields[2].GetFloat();
+		Mastery m;
 
-		masteriesMap[(TalentTree)id] = Mastery(base, ratio);
+		uint32 id = fields[0].GetInt32();
+		m.base = fields[1].GetFloat();
+		m.ratio = fields[2].GetFloat();
+
+		masteriesMap[(TalentTree)id] = m;
 
         ++count;
     } while (result->NextRow());
@@ -41,6 +43,9 @@ Mastery MasteryMgr::getMastery(TalentTree specId)
 	}
 	else // Not loaded Mastery
 	{
-		return Mastery(0.0f, 0.0f);
+		Mastery m;
+		m.base = 0.f;
+		m.ratio = 0.f;
+		return m;
 	}
 }
