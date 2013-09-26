@@ -2355,6 +2355,10 @@ void Player::ProcessDelayedOperations()
         SetPower(POWER_RAGE, 0);
         SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
         SetPower(POWER_ECLIPSE, 0);
+        SetPower(POWER_CHI, 0);
+        SetPower(POWER_HOLY_POWER, 0);
+        SetPower(POWER_RUNIC_POWER, 0);
+        SetPower(POWER_FOCUS, GetMaxPower(POWER_FOCUS));
 
         if (uint32 aura = _resurrectionData->Aura)
             CastSpell(this, aura, true, NULL, NULL, _resurrectionData->GUID);
@@ -2720,6 +2724,15 @@ void Player::ResetAllPowers()
             break;
         case POWER_ENERGY:
             SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
+            break;
+        case POWER_FOCUS:
+            SetPower(POWER_FOCUS, GetMaxPower(POWER_FOCUS));
+            break;
+        case POWER_CHI:
+            SetPower(POWER_CHI, 0);
+            break;
+        case POWER_HOLY_POWER:
+            SetPower(POWER_HOLY_POWER, 0);
             break;
         case POWER_RUNIC_POWER:
             SetPower(POWER_RUNIC_POWER, 0);
@@ -3128,7 +3141,7 @@ void Player::GiveLevel(uint8 level)
     SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
     if (GetPower(POWER_RAGE) > GetMaxPower(POWER_RAGE))
         SetPower(POWER_RAGE, GetMaxPower(POWER_RAGE));
-    SetPower(POWER_FOCUS, 0);
+    SetPower(POWER_FOCUS, GetMaxPower(POWER_FOCUS));
 
     // update level to hunter/summon pet
     if (Pet* pet = GetPet())
@@ -3365,11 +3378,10 @@ void Player::InitStatsForLevel(bool reapplyMods)
     SetFullHealth();
     SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
     SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
-    if (GetPower(POWER_RAGE) > GetMaxPower(POWER_RAGE))
-        SetPower(POWER_RAGE, GetMaxPower(POWER_RAGE));
     SetPower(POWER_FOCUS, GetMaxPower(POWER_FOCUS));
     SetPower(POWER_RUNIC_POWER, 0);
     SetPower(POWER_CHI, 0);
+    SetPower(POWER_RAGE, 0);
 
     // update level to hunter/summon pet
     if (Pet* pet = GetPet())
@@ -5058,10 +5070,13 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     {
         SetHealth(uint32(GetMaxHealth()*restore_percent));
         SetPower(POWER_MANA, uint32(GetMaxPower(POWER_MANA)*restore_percent));
-        SetPower(POWER_RAGE, 0);
         SetPower(POWER_ENERGY, uint32(GetMaxPower(POWER_ENERGY)*restore_percent));
         SetPower(POWER_FOCUS, uint32(GetMaxPower(POWER_FOCUS)*restore_percent));
+        SetPower(POWER_RAGE, 0);
         SetPower(POWER_ECLIPSE, 0);
+        SetPower(POWER_CHI, 0);
+        SetPower(POWER_HOLY_POWER, 0);
+        SetPower(POWER_RUNIC_POWER, 0);
     }
 
     // trigger update zone for alive state zone updates
@@ -23866,10 +23881,13 @@ void Player::ResurectUsingRequestData()
     else
         SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
 
-    SetPower(POWER_RAGE, 0);
     SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
     SetPower(POWER_FOCUS, GetMaxPower(POWER_FOCUS));
+    SetPower(POWER_RAGE, 0);
     SetPower(POWER_ECLIPSE, 0);
+    SetPower(POWER_CHI, 0);
+    SetPower(POWER_HOLY_POWER, 0);
+    SetPower(POWER_RUNIC_POWER, 0);
 
     if (uint32 aura = _resurrectionData->Aura)
         CastSpell(this, aura, true, NULL, NULL, _resurrectionData->GUID);
