@@ -247,7 +247,7 @@ uint8 Aura::BuildEffectMaskForOwner(SpellInfo const* spellProto, uint32 availabl
     ASSERT(spellProto);
     ASSERT(owner);
     uint32 effMask = 0;
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura buildeffect 1 %u %u", availableEffectMask, owner->GetTypeId());
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura buildeffect 1 %u %u %u", spellProto->Id, availableEffectMask, owner->GetTypeId());
 
     switch (owner->GetTypeId())
     {
