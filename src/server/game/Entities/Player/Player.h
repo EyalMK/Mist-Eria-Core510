@@ -2782,7 +2782,7 @@ class Player : public Unit, public GridObject<Player>
         WhisperListContainer WhisperList;
         uint32 m_regenTimerCount;
         uint32 m_holyPowerRegenTimerCount;
-        uint32 m_focusRegenTimerCount;
+        uint32 m_ChiPowerRegenTimerCount;
         float m_powerFraction[MAX_POWERS_PER_CLASS];
         uint32 m_contestedPvPTimer;
 
