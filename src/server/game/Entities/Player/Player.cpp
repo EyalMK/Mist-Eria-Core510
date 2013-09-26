@@ -17568,7 +17568,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
         else if (i == GetActiveSpec() && talentTree != 0)
             SetAtLoginFlag(AT_LOGIN_RESET_TALENTS); // invalid tree, reset talents
     }
-
+    UpdateMastery(GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_MASTERY));
     sLog->outDebug(LOG_FILTER_PLAYER_LOADING, "The value of player %s after load item and aura is: ", m_name.c_str());
     outDebugValues();
 
