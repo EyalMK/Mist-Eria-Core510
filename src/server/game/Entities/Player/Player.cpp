@@ -5840,11 +5840,14 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
             ApplyAttackTimePercentMod(OFF_ATTACK, RatingChange, apply);
             if (getClass() == CLASS_DEATH_KNIGHT)
                 UpdateAllRunesRegen();
+
+            ApplyMeleeHastePercentMod(value * GetRatingMultiplier(cr), apply);
             break;
         }
         case CR_HASTE_RANGED:
         {
             ApplyAttackTimePercentMod(RANGED_ATTACK, value * GetRatingMultiplier(cr), apply);
+            ApplyRangedHastePercentMod(value * GetRatingMultiplier(cr), apply);
             break;
         }
         case CR_HASTE_SPELL:

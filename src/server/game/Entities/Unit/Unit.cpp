@@ -13750,6 +13750,22 @@ void Unit::ApplyCastTimePercentMod(float val, bool apply)
     }
 }
 
+void Unit::ApplyMeleeHastePercentMod(float val, bool apply)
+{
+    if (val > 0)
+        ApplyPercentModFloatValue(UNIT_MOD_HASTE, val, !apply);
+    else
+        ApplyPercentModFloatValue(UNIT_MOD_HASTE, -val, apply);
+}
+
+void Unit::ApplyRangedHastePercentMod(float val, bool apply)
+{
+    if (val > 0)
+        ApplyPercentModFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, val, !apply);
+    else
+        ApplyPercentModFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, -val, apply);
+}
+
 uint32 Unit::GetCastingTimeForBonus(SpellInfo const* spellProto, DamageEffectType damagetype, uint32 CastingTime) const
 {
     // Not apply this to creature casted spells with casttime == 0
