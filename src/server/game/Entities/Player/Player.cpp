@@ -2555,21 +2555,19 @@ void Player::Regenerate(Powers power)
         case POWER_FOCUS:
         {
             float focusIncreaseRate = sWorld->getRate(RATE_POWER_FOCUS);
-
-            uint16 index = isInCombat() ? UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1+POWER_FOCUS : UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1+POWER_FOCUS;
             float time = 0.001f * m_regenTimer;
 
-            addvalue += GetFloatValue(index) * time * focusIncreaseRate;
+            float value = 5.0f + (0.04f * GetRatingBonusValue(CR_HASTE_RANGED));
+            addvalue += value * time * focusIncreaseRate;
             break;
         }
         case POWER_ENERGY:                                              // Regenerate energy (rogue)
         {
             float energyIncreaseRate = sWorld->getRate(RATE_POWER_ENERGY);
-
-            uint16 index = isInCombat() ? UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1+POWER_ENERGY : UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1+POWER_ENERGY;
             float time = 0.001f * m_regenTimer;
 
-            addvalue += GetFloatValue(index) * time * energyIncreaseRate;
+            float value = 10.0f + (0.01f * GetRatingBonusValue(CR_HASTE_MELEE));
+            addvalue += value * time * energyIncreaseRate;
             break;
         }
         case POWER_RUNIC_POWER:
@@ -2592,13 +2590,10 @@ void Player::Regenerate(Powers power)
             break;
     }
 
-    // Mana-Focus-Energy regen calculated in Player::UpdateXXXXXXXRegen()
-    if (power != POWER_MANA && power != POWER_FOCUS && power != POWER_ENERGY)
+    // Mana regen calculated in Player::UpdateManaRegen()
+    if (power != POWER_MANA)
     {
-        AuraEffectList const& ModPowerRegenPCTAuras = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
-        for (AuraEffectList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
-            if (Powers((*i)->GetMiscValue()) == power)
-                AddPct(addvalue, (*i)->GetAmount());
+        AddPct(addvalue, GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, power));
 
         // Butchery requires combat for this effect
         if (power != POWER_RUNIC_POWER || isInCombat())
