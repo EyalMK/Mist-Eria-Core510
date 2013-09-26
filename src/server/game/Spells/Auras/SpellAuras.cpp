@@ -242,15 +242,18 @@ void AuraApplication::ClientUpdate(bool remove)
     _target->SendMessageToSet(&data, true);
 }
 
-uint8 Aura::BuildEffectMaskForOwner(SpellInfo const* spellProto, uint32 avalibleEffectMask, WorldObject* owner)
+uint8 Aura::BuildEffectMaskForOwner(SpellInfo const* spellProto, uint32 availableEffectMask, WorldObject* owner)
 {
     ASSERT(spellProto);
     ASSERT(owner);
     uint32 effMask = 0;
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura buildeffect 1 %u %u", availableEffectMask, owner->GetTypeId());
+
     switch (owner->GetTypeId())
     {
         case TYPEID_UNIT:
         case TYPEID_PLAYER:
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura buildeffect 2 ");
             for (uint8 i = 0; i< MAX_SPELL_EFFECTS; ++i)
             {
                 if (spellProto->Effects[i].IsUnitOwnedAuraEffect())
@@ -258,6 +261,7 @@ uint8 Aura::BuildEffectMaskForOwner(SpellInfo const* spellProto, uint32 avalible
             }
             break;
         case TYPEID_DYNAMICOBJECT:
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura buildeffect 3 ");
             for (uint8 i = 0; i< MAX_SPELL_EFFECTS; ++i)
             {
                 if (spellProto->Effects[i].Effect == SPELL_EFFECT_PERSISTENT_AREA_AURA)
@@ -267,7 +271,9 @@ uint8 Aura::BuildEffectMaskForOwner(SpellInfo const* spellProto, uint32 avalible
         default:
             break;
     }
-    return effMask & avalibleEffectMask;
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura buildeffect 4 %u ", effMask);
+
+    return effMask & availableEffectMask;
 }
 
 Aura* Aura::TryRefreshStackOrCreate(SpellInfo const* spellproto, uint32 tryEffMask, WorldObject* owner, Unit* caster, int32* baseAmount /*= NULL*/, Item* castItem /*= NULL*/, uint64 casterGUID /*= 0*/, bool* refresh /*= NULL*/)
@@ -304,7 +310,7 @@ Aura* Aura::TryCreate(SpellInfo const* spellproto, uint32 tryEffMask, WorldObjec
     ASSERT(tryEffMask <= MAX_EFFECT_MASK);
     sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura trycreate 1");
     uint32 effMask = Aura::BuildEffectMaskForOwner(spellproto, tryEffMask, owner);
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura trycreate 2 %f", effMask);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura trycreate 2 %u", effMask);
     if (!effMask)
         return NULL;
     sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura trycreate 3");
