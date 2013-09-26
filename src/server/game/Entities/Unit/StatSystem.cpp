@@ -24,6 +24,7 @@
 #include "SpellAuras.h"
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
+#include "MasteryMgr.h"
 
 inline bool _ModifyUInt32(bool apply, uint32& baseValue, int32& amount)
 {
@@ -578,13 +579,17 @@ void Player::UpdateSpellCritChance(uint32 school)
 
 void Player::UpdateMastery(int32 amount)
 {
+    TalentTree masteryId = TalentTree(GetPrimaryTalentTree(GetActiveSpec()));
+
+    float value = sMasteryMgr->getMastery(masteryId).GetPourcent(amount);
+    /*
 	//Dunno why, client twice the view
 	float mastery = (getLevel() >= 80) ? 4.0f : 0.0f;
 	if(GetActiveSpec() == TALENT_TREE_WARRIOR_FURY || GetActiveSpec() == TALENT_TREE_MAGE_FROST) mastery = 1.0f;
 	float mastery_to_add = amount * GetRatingMultiplier(CR_MASTERY);
 	mastery += mastery_to_add;
-
-	SetStatFloatValue(PLAYER_MASTERY, mastery);
+    */
+	SetStatFloatValue(PLAYER_MASTERY, value);
 }
 
 void Player::UpdatePVPPower(int32 amount)

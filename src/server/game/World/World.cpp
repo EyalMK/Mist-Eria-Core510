@@ -83,6 +83,7 @@
 #include "BattlefieldMgr.h"
 #include "BlackMarket/BlackMarketMgr.h"
 #include "SpellLearn.h"
+#include "MasteryMgr.h"
 
 ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
@@ -1717,6 +1718,9 @@ void World::SetInitialWorldSettings()
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading client addons...");
     AddonMgr::LoadFromDB();
+
+	sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Masteries...");
+	sMasteryMgr->LoadFromDB();
 
     ///- Handle outdated emails (delete/return)
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Returning old mails...");
