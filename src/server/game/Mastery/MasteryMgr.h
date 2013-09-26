@@ -33,7 +33,7 @@ struct Mastery {
 
 class MasteryMgr
 {
-	friend class ACE_Singleton<MasteryMgr, ACE_Null_Mutex>;
+	friend class ACE_Singleton<MasteryMgr, ACE_Null_Mutex>; 
 
 public:
 
@@ -49,6 +49,6 @@ private:
 
 };
 
-#define sBlackMarketMgr ACE_Singleton<MasteryMgr, ACE_Null_Mutex>::instance()
+#define sMasteryMgr ACE_Singleton<MasteryMgr, ACE_Null_Mutex>::instance()
 
 #endif
