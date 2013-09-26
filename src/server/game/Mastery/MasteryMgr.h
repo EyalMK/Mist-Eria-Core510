@@ -30,8 +30,7 @@ struct Mastery {
 	float base;
 	float ratio;
 
-    Mastery(float _base, float _ratio) : base(_base), ratio(_ratio) { };
-    float GetPourcent(uint32 amount) { return base + (amount / ratio); };
+    float getPercent(uint32 amount) { return base + (amount / ratio); };
 };
 
 class MasteryMgr
