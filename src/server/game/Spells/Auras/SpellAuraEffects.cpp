@@ -5587,6 +5587,21 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                 target->ToPlayer()->RemoveRunesByAuraEffect(this);
             }
             break;
+        case SPELLFAMILY_WARLOCK:
+            if(GetSpellInfo()->Id == 629)
+            {
+                float modifier = 0.02f;
+                if(caster->HasAura(74434)) //soulburn
+                {
+                    modifier = 0.03f;
+                    caster->RemoveAura(74434);
+                }
+                int32 bp0 = int32(modifier * caster->GetMaxHealth());
+
+                if(caster)
+                    caster->CastCustomSpell(caster, 107545, &bp0, NULL, NULL, true);
+            }
+            break;
         default:
             break;
     }
