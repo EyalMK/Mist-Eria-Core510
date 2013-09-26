@@ -586,13 +586,6 @@ void Player::UpdateMastery(int32 amount)
     TalentTree masteryId = TalentTree(GetPrimaryTalentTree(GetActiveSpec()));
 
     float value = sMasteryMgr->getMastery(masteryId).getPercent(amount) / 2.f;
-    /*
-	//Dunno why, client twice the view
-	float mastery = (getLevel() >= 80) ? 4.0f : 0.0f;
-	if(GetActiveSpec() == TALENT_TREE_WARRIOR_FURY || GetActiveSpec() == TALENT_TREE_MAGE_FROST) mastery = 1.0f;
-	float mastery_to_add = amount * GetRatingMultiplier(CR_MASTERY);
-	mastery += mastery_to_add;
-    */
 	SetStatFloatValue(PLAYER_MASTERY, value);
 }
 

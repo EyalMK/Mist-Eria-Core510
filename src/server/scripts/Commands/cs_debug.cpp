@@ -73,20 +73,18 @@ public:
             { "arena",          SEC_GAMEMASTER,		false, &HandleDebugArenaCommand,           "", NULL },
             { "bg",             SEC_GAMEMASTER,		false, &HandleDebugBattlegroundCommand,    "", NULL },
             { "getitemstate",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemStateCommand,    "", NULL },
-            { "lootrecipient",  SEC_GAMEMASTER,     false, &HandleDebugGetLootRecipientCommand, "", NULL },
+            { "lootrecipient",  SEC_GAMEMASTER,     false, &HandleDebugGetLootRecipientCommand,"", NULL },
             { "getvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugGetValueCommand,        "", NULL },
             { "getitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemValueCommand,    "", NULL },
-            { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleDebugMod32ValueCommand,      "", NULL },
-            { "ModFloatValue",  SEC_ADMINISTRATOR,  false, &HandleDebugModFloatValueCommand,   "", NULL },
-            { "play",           SEC_MODERATOR,      false, NULL,              "", debugPlayCommandTable },
-            { "send",           SEC_ADMINISTRATOR,  false, NULL,              "", debugSendCommandTable },
+            { "play",           SEC_MODERATOR,      false, NULL,                               "", debugPlayCommandTable },
+            { "send",           SEC_ADMINISTRATOR,  false, NULL,                               "", debugSendCommandTable },
             { "setaurastate",   SEC_ADMINISTRATOR,  false, &HandleDebugSetAuraStateCommand,    "", NULL },
             { "setitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugSetItemValueCommand,    "", NULL },
             { "setvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugSetValueCommand,        "", NULL },
             { "spawnvehicle",   SEC_ADMINISTRATOR,  false, &HandleDebugSpawnVehicleCommand,    "", NULL },
             { "setvid",         SEC_ADMINISTRATOR,  false, &HandleDebugSetVehicleIdCommand,    "", NULL },
             { "entervehicle",   SEC_ADMINISTRATOR,  false, &HandleDebugEnterVehicleCommand,    "", NULL },
-            { "uws",            SEC_ADMINISTRATOR,  false, &HandleDebugUpdateWorldStateCommand, "", NULL },
+            { "uws",            SEC_ADMINISTRATOR,  false, &HandleDebugUpdateWorldStateCommand,"", NULL },
             { "update",         SEC_ADMINISTRATOR,  false, &HandleDebugUpdateCommand,          "", NULL },
             { "itemexpire",     SEC_ADMINISTRATOR,  false, &HandleDebugItemExpireCommand,      "", NULL },
             { "areatriggers",   SEC_ADMINISTRATOR,  false, &HandleDebugAreaTriggersCommand,    "", NULL },
@@ -96,12 +94,35 @@ public:
 			{ "chat",			SEC_MODERATOR,      false, &HandleDebugChatCommand,			   "", NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
         };
+        static ChatCommand debugSetCommandTable[] = 
+        {
+            { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsSet32ValueCommand,    "", NULL },
+            { "ModFloatValue",  SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsSetFloatValueCommand, "", NULL }
+        };
+        static ChatCommand debugModCommandTable[] = 
+        {
+            { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsMod32ValueCommand,    "", NULL },
+            { "ModFloatValue",  SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsModFloatValueCommand, "", NULL }
+        };
+        static ChatCommand debugGetCommandTable[] = 
+        {
+            { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsGet32ValueCommand,    "", NULL },
+            { "ModFloatValue",  SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsGetFloatValueCommand, "", NULL }
+        };
+        static ChatCommand debugUpdateFieldsTable[] = 
+        {
+            { "set",            SEC_ADMINISTRATOR,  false, NULL,                               "", debugSetCommandTable  },
+            { "mod",            SEC_ADMINISTRATOR,  false, NULL,                               "", debugModCommandTable  },
+            { "get",            SEC_ADMINISTRATOR,  false, NULL,                               "", debugGetCommandTable  }
+        };
         static ChatCommand commandTable[] =
         {
             { "debug",          SEC_MODERATOR,      true,  NULL,                  "", debugCommandTable },
             { "wpgps",          SEC_ADMINISTRATOR,  false, &HandleWPGPSCommand,                "", NULL },
+            { "updatefields",   SEC_ADMINISTRATOR,  false, NULL,                  "", debugUpdateFieldsTable },
             { NULL,             SEC_PLAYER,         false, NULL,                  "",              NULL }
         };
+        static 
         return commandTable;
     }
 
@@ -1195,7 +1216,7 @@ public:
         return true;
     }
 
-    static bool HandleDebugMod32ValueCommand(ChatHandler* handler, char const* args)
+    static bool HandleUpdateFieldsSet32ValueCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)
             return false;
@@ -1206,22 +1227,22 @@ public:
         if (!x || !y)
             return false;
 
-        uint32 opcode = (uint32)atoi(x);
+        uint32 field = (uint32)atoi(x);
         int value = atoi(y);
 
-        if (opcode >= handler->GetSession()->GetPlayer()->GetValuesCount())
+        if (field >= handler->GetSession()->GetPlayer()->GetValuesCount())
         {
-            handler->PSendSysMessage(LANG_TOO_BIG_INDEX, opcode, handler->GetSession()->GetPlayer()->GetGUIDLow(), handler->GetSession()->GetPlayer()->GetValuesCount());
+            handler->PSendSysMessage(LANG_TOO_BIG_INDEX, field, handler->GetSession()->GetPlayer()->GetGUIDLow(), handler->GetSession()->GetPlayer()->GetValuesCount());
             return false;
         }
-        handler->GetSession()->GetPlayer()->SetUInt32Value(opcode, (uint32)value);
+        handler->GetSession()->GetPlayer()->SetUInt32Value(field, (uint32)value);
 
-        handler->PSendSysMessage(LANG_CHANGE_32BIT_FIELD, opcode, (uint32)value);
+        handler->PSendSysMessage("You modified the value of Field:%u to Value: %u", field, (uint32)value);
 
         return true;
     }
 
-    static bool HandleDebugModFloatValueCommand(ChatHandler* handler, char const* args)
+    static bool HandleUpdateFieldsSetFloatValueCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)
             return false;
@@ -1232,17 +1253,126 @@ public:
         if (!x || !y)
             return false;
 
-        uint32 opcode = (uint32)atoi(x);
+        uint32 field = (uint32)atoi(x);
         float value = (float)atof(y);
 
-        if (opcode >= handler->GetSession()->GetPlayer()->GetValuesCount())
+        if (field >= handler->GetSession()->GetPlayer()->GetValuesCount())
         {
-            handler->PSendSysMessage(LANG_TOO_BIG_INDEX, opcode, handler->GetSession()->GetPlayer()->GetGUIDLow(), handler->GetSession()->GetPlayer()->GetValuesCount());
+            handler->PSendSysMessage(LANG_TOO_BIG_INDEX, field, handler->GetSession()->GetPlayer()->GetGUIDLow(), handler->GetSession()->GetPlayer()->GetValuesCount());
             return false;
         }
-        handler->GetSession()->GetPlayer()->SetFloatValue(opcode, (float)value);
+        handler->GetSession()->GetPlayer()->SetFloatValue(field, (float)value);
 
-        handler->PSendSysMessage("You modified the value of Field:%u to Value: %f", opcode, (float)value);
+        handler->PSendSysMessage("You modified the value of Field:%u to Value: %f", field, (float)value);
+
+        return true;
+    }
+
+    static bool HandleUpdateFieldsMod32ValueCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* x = strtok((char*)args, " ");
+        char* y = strtok(NULL, " ");
+
+        if (!x || !y)
+            return false;
+
+        uint32 field = (uint32)atoi(x);
+        uint32 value = (uint32)atoi(y);
+
+        if (field >= handler->GetSession()->GetPlayer()->GetValuesCount())
+        {
+            handler->PSendSysMessage(LANG_TOO_BIG_INDEX, field, handler->GetSession()->GetPlayer()->GetGUIDLow(), handler->GetSession()->GetPlayer()->GetValuesCount());
+            return false;
+        }
+
+        uint32 oldValue = handler->GetSession()->GetPlayer()->GetUInt32Value(field);
+
+        value += oldValue;
+
+        handler->GetSession()->GetPlayer()->SetUInt32Value(field, value);
+
+        handler->PSendSysMessage("You modified the value of Field:%u from Value: %u to Value: %u", field, oldValue, value);
+
+        return true;
+    }
+
+    static bool HandleUpdateFieldsModFloatValueCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* x = strtok((char*)args, " ");
+        char* y = strtok(NULL, " ");
+
+        if (!x || !y)
+            return false;
+
+        uint32 field = (uint32)atoi(x);
+        float value = (float)atof(y);
+
+        if (field >= handler->GetSession()->GetPlayer()->GetValuesCount())
+        {
+            handler->PSendSysMessage(LANG_TOO_BIG_INDEX, field, handler->GetSession()->GetPlayer()->GetGUIDLow(), handler->GetSession()->GetPlayer()->GetValuesCount());
+            return false;
+        }
+        float oldValue = handler->GetSession()->GetPlayer()->GetFloatValue(field);
+
+        value += oldValue;
+
+        handler->GetSession()->GetPlayer()->SetFloatValue(field, (float)value);
+
+        handler->PSendSysMessage("You modified the value of Field:%u from Value: %f to Value: %f", field, oldValue, value);
+
+        return true;
+    }
+
+    static bool HandleUpdateFieldsGet32ValueCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* x = strtok((char*)args, " ");
+
+        if (!x)
+            return false;
+
+        uint32 field = (uint32)atoi(x);
+
+        if (field >= handler->GetSession()->GetPlayer()->GetValuesCount())
+        {
+            handler->PSendSysMessage(LANG_TOO_BIG_INDEX, field, handler->GetSession()->GetPlayer()->GetGUIDLow(), handler->GetSession()->GetPlayer()->GetValuesCount());
+            return false;
+        }
+        uint32 value = handler->GetSession()->GetPlayer()->GetUInt32Value(field);
+
+        handler->PSendSysMessage("The value of Field:%u is: %u", field, value);
+
+        return true;
+    }
+
+    static bool HandleUpdateFieldsGetFloatValueCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* x = strtok((char*)args, " ");
+
+        if (!x)
+            return false;
+
+        uint32 field = (uint32)atoi(x);
+
+        if (field >= handler->GetSession()->GetPlayer()->GetValuesCount())
+        {
+            handler->PSendSysMessage(LANG_TOO_BIG_INDEX, field, handler->GetSession()->GetPlayer()->GetGUIDLow(), handler->GetSession()->GetPlayer()->GetValuesCount());
+            return false;
+        }
+        float value = handler->GetSession()->GetPlayer()->GetFloatValue(field);
+
+        handler->PSendSysMessage("The value of Field:%u is: %f", field, value);
 
         return true;
     }
