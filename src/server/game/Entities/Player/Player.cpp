@@ -5767,9 +5767,11 @@ float Player::GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const
     switch (attType)
     {
         case BASE_ATTACK:
-            return GetUInt32Value(PLAYER_EXPERTISE) / 4.0f;
+            return GetFloatValue(PLAYER_EXPERTISE) / 4.0f;
         case OFF_ATTACK:
-            return GetUInt32Value(PLAYER_OFFHAND_EXPERTISE) / 4.0f;
+            return GetFloatValue(PLAYER_OFFHAND_EXPERTISE) / 4.0f;
+        case RANGED_ATTACK:
+            return GetFloatValue(PLAYER_RANGED_EXPERTISE) / 4.0f;
         default:
             break;
     }
@@ -5913,6 +5915,7 @@ void Player::UpdateRating(CombatRating cr)
             {
                 UpdateExpertise(BASE_ATTACK);
                 UpdateExpertise(OFF_ATTACK);
+                UpdateExpertise(RANGED_ATTACK);
             }
             break;
         case CR_ARMOR_PENETRATION:
@@ -12233,6 +12236,9 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
         else if (slot == EQUIPMENT_SLOT_OFFHAND)
             UpdateExpertise(OFF_ATTACK);
 
+        else if (slot == EQUIPMENT_SLOT_RANGED)
+            UpdateExpertise(RANGED_ATTACK);
+
         switch (slot)
         {
             case EQUIPMENT_SLOT_MAINHAND:
@@ -12389,11 +12395,14 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
                     }
                     else if (slot == EQUIPMENT_SLOT_OFFHAND)
                         UpdateExpertise(OFF_ATTACK);
+                    else if (slot == EQUIPMENT_SLOT_RANGED)
+                        UpdateExpertise(RANGED_ATTACK);
                     // update armor penetration - passive auras may need it
                     switch (slot)
                     {
                         case EQUIPMENT_SLOT_MAINHAND:
                         case EQUIPMENT_SLOT_OFFHAND:
+                        case EQUIPMENT_SLOT_RANGED:
                             RecalculateRating(CR_ARMOR_PENETRATION);
                         default:
                             break;
@@ -12522,6 +12531,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
                 {
                     case EQUIPMENT_SLOT_MAINHAND:
                     case EQUIPMENT_SLOT_OFFHAND:
+                    case EQUIPMENT_SLOT_RANGED:
                         RecalculateRating(CR_ARMOR_PENETRATION);
                     default:
                         break;
@@ -12531,6 +12541,8 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
                     UpdateExpertise(BASE_ATTACK);
                 else if (slot == EQUIPMENT_SLOT_OFFHAND)
                     UpdateExpertise(OFF_ATTACK);
+                else if (slot == EQUIPMENT_SLOT_RANGED)
+                    UpdateExpertise(RANGED_ATTACK);
 
                 // equipment visual show
                 SetVisibleItemSlot(slot, NULL);
