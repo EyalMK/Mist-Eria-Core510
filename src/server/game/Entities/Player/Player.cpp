@@ -5674,7 +5674,9 @@ float Player::GetMeleeCritFromAgility()
     if (critBase == NULL || critRatio == NULL)
         return 0.0f;
 
-	float ratio = (GetStat(STAT_AGILITY) * critRatio->ratio / 100000);
+    float agilityFromStuff = GetStat(STAT_AGILITY) - GetCreateStat(STAT_AGILITY);
+
+	float ratio = (agilityFromStuff * critRatio->ratio / 100000);
 	if(pclass == CLASS_DEATH_KNIGHT || pclass == CLASS_PALADIN || pclass == CLASS_WARRIOR) ratio = 0;
 
     float crit = critBase->base + ratio;
