@@ -3653,6 +3653,11 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 5420: // Tree of Life (Passive)
                 spellInfo->Stances = 1 << (FORM_TREE - 1);
                 break;
+            case 56641:
+                spellInfo->Effects[EFFECT_2].Effect = SPELL_EFFECT_ENERGIZE;
+                spellInfo->Effects[EFFECT_2].BasePoints = 14;
+                spellInfo->Effects[EFFECT_2].MiscValue = POWER_FOCUS;
+                break;
             default:
                 break;
         }
