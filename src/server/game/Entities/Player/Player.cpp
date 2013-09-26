@@ -2564,11 +2564,11 @@ void Player::Regenerate(Powers power)
                 addvalue += -25 * RageDecreaseRate / meleeHaste;                // 2.5 rage by tick (= 2 seconds => 1.25 rage/sec)
             }
         }
+		break;
         case POWER_CHI:                                  // Regenerate chi (monk)
         {
-            float ChiRate = sWorld->getRate(RATE_POWER_CHI);
-            addvalue = 20 * ChiRate;
-            break;
+            if (!isInCombat())
+                addvalue += -1.0f;      // remove 1 each 10 sec
         }
         break;
         case POWER_FOCUS:
