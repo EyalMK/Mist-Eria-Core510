@@ -2592,7 +2592,7 @@ void Player::Regenerate(Powers power)
             break;
     }
 
-    // Mana regen calculated in Player::UpdateManaRegen()
+    // Mana-Focus-Energy regen calculated in Player::UpdateXXXXXXXRegen()
     if (power != POWER_MANA && power != POWER_FOCUS && power != POWER_ENERGY)
     {
         AuraEffectList const& ModPowerRegenPCTAuras = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
