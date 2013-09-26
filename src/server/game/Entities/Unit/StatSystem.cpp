@@ -695,7 +695,7 @@ void Player::UpdateEnergyRegen()
 {
     float value = 10.0f + (0.01f * GetRatingBonusValue(CR_HASTE_MELEE));
 
-    value *= GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_ENERGY);
+    AddPct(value, GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_ENERGY));
     value += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_ENERGY) / 5.0f;
 
     //No changes between in and out of combat regen
@@ -707,7 +707,7 @@ void Player::UpdateFocusRegen()
 {
     float value = 6.0f + (0.04f * GetRatingBonusValue(CR_HASTE_RANGED));
 
-    value *= GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_FOCUS);
+    AddPct(value, GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_FOCUS));
     value += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_FOCUS) / 5.0f;
 
     //No changes between in and out of combat regen
