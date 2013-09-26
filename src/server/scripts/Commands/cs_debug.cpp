@@ -122,7 +122,6 @@ public:
             { "updatefields",   SEC_ADMINISTRATOR,  false, NULL,                  "", debugUpdateFieldsTable },
             { NULL,             SEC_PLAYER,         false, NULL,                  "",              NULL }
         };
-        static 
         return commandTable;
     }
 
