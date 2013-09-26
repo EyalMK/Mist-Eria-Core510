@@ -17833,17 +17833,13 @@ void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             }
             else
                 remaincharges = 0;
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura loading fail 1");
             if (Aura* aura = Aura::TryCreate(spellInfo, effmask, this, NULL, &baseDamage[0], NULL, caster_guid))
             {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura loading fail 2");
                 if (!aura->CanBeSaved())
                 {
-                    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura loading fail 3");
                     aura->Remove();
                     continue;
                 }
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura loading fail 4");
                 aura->SetLoadedState(maxduration, remaintime, remaincharges, stackcount, recalculatemask, &damage[0]);
                 aura->ApplyForTargets();
                 sLog->outInfo(LOG_FILTER_PLAYER, "Added aura spellid %u, effectmask %u", spellInfo->Id, effmask);
