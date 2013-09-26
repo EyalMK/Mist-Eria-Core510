@@ -81,6 +81,7 @@
 #include "WorldSession.h"
 #include "SpellLearn.h"
 #include "DBCStores.h"
+#include "MasteryMgr.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -5816,6 +5817,13 @@ float Player::OCTRegenMPPerSpirit()
     float spirit    = GetStat(STAT_SPIRIT);
     float regen     = spirit * moreRatio->ratio;
     return regen;
+}
+
+float Player::GetPourcentOfMastery()
+{
+    TalentTree mastery = TalentTree(GetPrimaryTalentTree(GetActiveSpec()));
+    uint32 amount = GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_MASTERY);
+    return sMasteryMgr->getMastery(mastery).getPercent(amount);
 }
 
 void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
