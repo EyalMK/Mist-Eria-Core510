@@ -77,6 +77,7 @@ public:
             { "getvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugGetValueCommand,        "", NULL },
             { "getitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemValueCommand,    "", NULL },
             { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleDebugMod32ValueCommand,      "", NULL },
+            { "ModFloatValue",  SEC_ADMINISTRATOR,  false, &HandleDebugModFloatValueCommand,   "", NULL },
             { "play",           SEC_MODERATOR,      false, NULL,              "", debugPlayCommandTable },
             { "send",           SEC_ADMINISTRATOR,  false, NULL,              "", debugSendCommandTable },
             { "setaurastate",   SEC_ADMINISTRATOR,  false, &HandleDebugSetAuraStateCommand,    "", NULL },
@@ -1213,13 +1214,35 @@ public:
             handler->PSendSysMessage(LANG_TOO_BIG_INDEX, opcode, handler->GetSession()->GetPlayer()->GetGUIDLow(), handler->GetSession()->GetPlayer()->GetValuesCount());
             return false;
         }
+        handler->GetSession()->GetPlayer()->SetUInt32Value(opcode, (uint32)value);
 
-        int currentValue = (int)handler->GetSession()->GetPlayer()->GetUInt32Value(opcode);
+        handler->PSendSysMessage(LANG_CHANGE_32BIT_FIELD, opcode, (uint32)value);
 
-        currentValue += value;
-        handler->GetSession()->GetPlayer()->SetUInt32Value(opcode, (uint32)currentValue);
+        return true;
+    }
 
-        handler->PSendSysMessage(LANG_CHANGE_32BIT_FIELD, opcode, currentValue);
+    static bool HandleDebugModFloatValueCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* x = strtok((char*)args, " ");
+        char* y = strtok(NULL, " ");
+
+        if (!x || !y)
+            return false;
+
+        uint32 opcode = (uint32)atoi(x);
+        float value = (float)atof(y);
+
+        if (opcode >= handler->GetSession()->GetPlayer()->GetValuesCount())
+        {
+            handler->PSendSysMessage(LANG_TOO_BIG_INDEX, opcode, handler->GetSession()->GetPlayer()->GetGUIDLow(), handler->GetSession()->GetPlayer()->GetValuesCount());
+            return false;
+        }
+        handler->GetSession()->GetPlayer()->SetFloatValue(opcode, (float)value);
+
+        handler->PSendSysMessage("You modified the value of Field:%u to Value: %f", opcode, (float)value);
 
         return true;
     }
