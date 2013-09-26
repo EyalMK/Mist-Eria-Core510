@@ -302,9 +302,12 @@ Aura* Aura::TryCreate(SpellInfo const* spellproto, uint32 tryEffMask, WorldObjec
     ASSERT(owner);
     ASSERT(caster || casterGUID);
     ASSERT(tryEffMask <= MAX_EFFECT_MASK);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura trycreate 1");
     uint32 effMask = Aura::BuildEffectMaskForOwner(spellproto, tryEffMask, owner);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura trycreate 2 %f", effMask);
     if (!effMask)
         return NULL;
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura trycreate 3");
     return Create(spellproto, effMask, owner, caster, baseAmount, castItem, casterGUID);
 }
 
