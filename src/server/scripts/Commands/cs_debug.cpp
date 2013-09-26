@@ -96,18 +96,18 @@ public:
         };
         static ChatCommand debugSetCommandTable[] = 
         {
-            { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsSet32ValueCommand,    "", NULL },
-            { "ModFloatValue",  SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsSetFloatValueCommand, "", NULL }
+            { "uint32",     SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsSet32ValueCommand,    "", NULL },
+            { "float",      SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsSetFloatValueCommand, "", NULL }
         };
         static ChatCommand debugModCommandTable[] = 
         {
-            { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsMod32ValueCommand,    "", NULL },
-            { "ModFloatValue",  SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsModFloatValueCommand, "", NULL }
+            { "uint32",     SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsMod32ValueCommand,    "", NULL },
+            { "float",      SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsModFloatValueCommand, "", NULL }
         };
         static ChatCommand debugGetCommandTable[] = 
         {
-            { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsGet32ValueCommand,    "", NULL },
-            { "ModFloatValue",  SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsGetFloatValueCommand, "", NULL }
+            { "uint32",     SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsGet32ValueCommand,    "", NULL },
+            { "float",      SEC_ADMINISTRATOR,  false, &HandleUpdateFieldsGetFloatValueCommand, "", NULL }
         };
         static ChatCommand debugUpdateFieldsTable[] = 
         {

@@ -585,7 +585,7 @@ void Player::UpdateMastery(int32 amount)
 {
     TalentTree masteryId = TalentTree(GetPrimaryTalentTree(GetActiveSpec()));
 
-    float value = sMasteryMgr->getMastery(masteryId).getPercent(amount) / 2.f;
+    float value = sMasteryMgr->getMastery(masteryId).getPercent(amount) / 2.0f;
 	SetStatFloatValue(PLAYER_MASTERY, value);
 }
 

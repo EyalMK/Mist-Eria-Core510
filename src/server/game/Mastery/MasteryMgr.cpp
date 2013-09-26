@@ -44,8 +44,8 @@ Mastery MasteryMgr::getMastery(TalentTree specId)
 	else // Not loaded Mastery
 	{
 		Mastery m;
-		m.base = 0.f;
-		m.ratio = 0.f;
+		m.base = 0.0f;
+		m.ratio = 10000.0f;
 		return m;
 	}
 }
