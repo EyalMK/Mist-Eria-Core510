@@ -5669,18 +5669,18 @@ float Player::GetMeleeCritFromAgility()
     if (level > GT_MAX_LEVEL)
         level = GT_MAX_LEVEL;
 
-    GtChanceToMeleeCritBaseEntry const* critBase  = sGtChanceToMeleeCritBaseStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL);
-    GtChanceToMeleeCritEntry     const* critRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + (sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) - level));
+    GtChanceToMeleeCritBaseEntry const* critBase  = sGtChanceToMeleeCritBaseStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL + (level - 1));
+    GtChanceToMeleeCritEntry     const* critRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + (level - 1));
     if (critBase == NULL || critRatio == NULL)
         return 0.0f;
 
     float agilityFromStuff = GetStat(STAT_AGILITY) - GetCreateStat(STAT_AGILITY);
 
-	float ratio = (agilityFromStuff * critRatio->ratio / 100000);
+	float ratio = agilityFromStuff / critRatio->ratio;
 	if(pclass == CLASS_DEATH_KNIGHT || pclass == CLASS_PALADIN || pclass == CLASS_WARRIOR) ratio = 0;
 
-    float crit = critBase->base + ratio;
-    return crit*100.0f;
+    float crit = (critBase->base * 100.0f) + ratio;
+    return crit;
 }
 
 void Player::GetDodgeFromAgility(float &diminishing, float &nondiminishing)
