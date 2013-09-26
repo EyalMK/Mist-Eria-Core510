@@ -42,8 +42,8 @@ public:
 
 
 private:
-	MasteryMgr();
-	~MasteryMgr();
+	MasteryMgr() {};
+	~MasteryMgr() {};
 
 	std::map<TalentTree, Mastery> masteriesMap;
 
