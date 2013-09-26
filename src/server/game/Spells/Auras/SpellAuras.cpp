@@ -316,8 +316,11 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint32 effMask, WorldObject* own
     ASSERT(caster || casterGUID);
     ASSERT(effMask <= MAX_EFFECT_MASK);
     // try to get caster of aura
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura create 1");
+
     if (casterGUID)
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura create 2");
         if (owner->GetGUID() == casterGUID)
             caster = owner->ToUnit();
         else
@@ -326,6 +329,8 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint32 effMask, WorldObject* own
     else
         casterGUID = caster->GetGUID();
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura create 3");
+
     // check if aura can be owned by owner
     if (owner->isType(TYPEMASK_UNIT))
         if (!owner->IsInWorld() || ((Unit*)owner)->IsDuringRemoveFromWorld())
@@ -333,14 +338,18 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint32 effMask, WorldObject* own
             if (casterGUID != owner->GetGUID() && spellproto->IsSingleTarget())
                 return NULL;
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura create 4");
+
     Aura* aura = NULL;
     switch (owner->GetTypeId())
     {
         case TYPEID_UNIT:
         case TYPEID_PLAYER:
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura create 5");
             aura = new UnitAura(spellproto, effMask, owner, caster, baseAmount, castItem, casterGUID);
             break;
         case TYPEID_DYNAMICOBJECT:
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE aura create 6");
             aura = new DynObjAura(spellproto, effMask, owner, caster, baseAmount, castItem, casterGUID);
             break;
         default:
