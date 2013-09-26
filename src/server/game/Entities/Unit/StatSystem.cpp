@@ -581,7 +581,7 @@ void Player::UpdateMastery(int32 amount)
 {
     TalentTree masteryId = TalentTree(GetPrimaryTalentTree(GetActiveSpec()));
 
-    float value = sMasteryMgr->getMastery(masteryId).base;
+    float value = (sMasteryMgr->getMastery(masteryId).getPercent(amount) - (amount/sMasteryMgr->getMastery(masteryId).ratio)) / 2.f;
     /*
 	//Dunno why, client twice the view
 	float mastery = (getLevel() >= 80) ? 4.0f : 0.0f;
