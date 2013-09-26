@@ -241,8 +241,6 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
         {
             uint32 guidLow = (*result)[0].GetUInt32();
 
-            sLog->outInfo(LOG_FILTER_NETWORKIO, "Loading char guid %u from account %u.", guidLow, GetAccountId());
-
             Player::BuildEnumData(result, &dataBuffer, &bitBuffer);
 
             _allowedCharsToLogin.insert(guidLow);

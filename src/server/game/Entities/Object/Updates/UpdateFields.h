@@ -113,8 +113,8 @@ enum EUnitFields
     UNIT_FIELD_MAXPOWER3                             = OBJECT_END + 0x001D, // Size: 1, Type: INT, Flags: PUBLIC
     UNIT_FIELD_MAXPOWER4                             = OBJECT_END + 0x001E, // Size: 1, Type: INT, Flags: PUBLIC
     UNIT_FIELD_MAXPOWER5                             = OBJECT_END + 0x001F, // Size: 1, Type: INT, Flags: PUBLIC
-    UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER             = OBJECT_END + 0x0020, // Size: 5, Type: FLOAT, Flags: PRIVATE, OWNER, UNUSED2
-    UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER = OBJECT_END + 0x0025, // Size: 5, Type: FLOAT, Flags: PRIVATE, OWNER, UNUSED2
+    UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1            = OBJECT_END + 0x0020, // Size: 5, Type: FLOAT, Flags: PRIVATE, OWNER, UNUSED2
+    UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1= OBJECT_END + 0x0025, // Size: 5, Type: FLOAT, Flags: PRIVATE, OWNER, UNUSED2
     UNIT_FIELD_LEVEL                                 = OBJECT_END + 0x002A, // Size: 1, Type: INT, Flags: PUBLIC
     UNIT_FIELD_FACTIONTEMPLATE                       = OBJECT_END + 0x002B, // Size: 1, Type: INT, Flags: PUBLIC
     UNIT_VIRTUAL_ITEM_SLOT_ID                        = OBJECT_END + 0x002C, // Size: 3, Type: INT, Flags: PUBLIC

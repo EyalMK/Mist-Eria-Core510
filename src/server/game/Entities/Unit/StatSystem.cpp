@@ -100,6 +100,8 @@ bool Player::UpdateStats(Stats stat)
 
     UpdateSpellDamageAndHealingBonus();
     UpdateManaRegen();
+    UpdateEnergyRegen();
+    UpdateFocusRegen();
 
     // Update ratings in exist SPELL_AURA_MOD_RATING_FROM_STAT and only depends from stat
     uint32 mask = 0;
@@ -161,6 +163,8 @@ bool Player::UpdateAllStats()
     UpdateDodgePercentage();
     UpdateSpellDamageAndHealingBonus();
     UpdateManaRegen();
+    UpdateEnergyRegen();
+    UpdateFocusRegen();
     UpdateExpertise(BASE_ATTACK);
     UpdateExpertise(OFF_ATTACK);
     RecalculateRating(CR_ARMOR_PENETRATION);
@@ -581,7 +585,7 @@ void Player::UpdateMastery(int32 amount)
 {
     TalentTree masteryId = TalentTree(GetPrimaryTalentTree(GetActiveSpec()));
 
-    float value = (sMasteryMgr->getMastery(masteryId).getPercent(amount) - (amount/sMasteryMgr->getMastery(masteryId).ratio)) / 2.f;
+    float value = sMasteryMgr->getMastery(masteryId).getPercent(amount) / 2.f;
     /*
 	//Dunno why, client twice the view
 	float mastery = (getLevel() >= 80) ? 4.0f : 0.0f;
@@ -677,18 +681,38 @@ void Player::UpdateManaRegen()
     // Apply PCT bonus from SPELL_AURA_MOD_POWER_REGEN_PERCENT aura on spirit base regen
     spirit_regen *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_MANA);
 
-    // SpiritRegen(SPI, INT, LEVEL) = (0.001 + (SPI x sqrt(INT) x BASE_REGEN[LEVEL])) x 5
-    if (GetStat(STAT_INTELLECT) > 0.0f)
-        spirit_regen *= sqrt(GetStat(STAT_INTELLECT));
-
     // CombatRegen = 5% of Base Mana
     float base_regen = GetCreateMana() * 0.01f + GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_MANA) / 5.0f;
 
     // Set regen rate in cast state apply only on spirit based regen
     int32 modManaRegenInterrupt = GetTotalAuraModifier(SPELL_AURA_MOD_MANA_REGEN_INTERRUPT);
 
-    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER, base_regen + CalculatePct(spirit_regen, modManaRegenInterrupt));
-    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, 0.001f + spirit_regen + base_regen);
+    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1 + POWER_MANA, base_regen + CalculatePct(spirit_regen, modManaRegenInterrupt));
+    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1 + POWER_MANA, base_regen + spirit_regen);
+}
+
+void Player::UpdateEnergyRegen()
+{
+    float value = 10.0f + (0.01f * GetRatingBonusValue(CR_HASTE_MELEE));
+
+    value *= GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_ENERGY);
+    value += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_ENERGY) / 5.0f;
+
+    //No changes between in and out of combat regen
+    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1 + POWER_ENERGY, value);
+    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1 + POWER_ENERGY, value);
+}
+
+void Player::UpdateFocusRegen()
+{
+    float value = 6.0f + (0.04f * GetRatingBonusValue(CR_HASTE_RANGED));
+
+    value *= GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_FOCUS);
+    value += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_FOCUS) / 5.0f;
+
+    //No changes between in and out of combat regen
+    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1 + POWER_FOCUS, value);
+    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1 + POWER_FOCUS, value);
 }
 
 void Player::UpdateRuneRegen(RuneType rune)
