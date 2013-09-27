@@ -381,7 +381,7 @@ enum ItemSubclassWeapon
     ITEM_SUBCLASS_WEAPON_FISHING_POLE           = 20
 };
 
-#define ITEM_SUBCLASS_MASK_WEAPON_RANGED (\
+#define ITEM_SUBCLASS_MASK_WEAPON_RANGED ( (1 << ITEM_SUBCLASS_WEAPON_WAND) |\
     (1 << ITEM_SUBCLASS_WEAPON_BOW) | (1 << ITEM_SUBCLASS_WEAPON_GUN) |\
     (1 << ITEM_SUBCLASS_WEAPON_CROSSBOW) | (1 << ITEM_SUBCLASS_WEAPON_THROWN))
 
@@ -785,10 +785,11 @@ struct ItemTemplate
 
     bool IsRangedWeapon() const
     {
-        return Class == ITEM_CLASS_WEAPON ||
-               SubClass == ITEM_SUBCLASS_WEAPON_BOW ||
-               SubClass == ITEM_SUBCLASS_WEAPON_GUN ||
-               SubClass == ITEM_SUBCLASS_WEAPON_CROSSBOW;
+        return Class == ITEM_CLASS_WEAPON && ( SubClass == ITEM_SUBCLASS_WEAPON_BOW ||
+                                               SubClass == ITEM_SUBCLASS_WEAPON_GUN ||
+                                               SubClass == ITEM_SUBCLASS_WEAPON_CROSSBOW ||
+                                               SubClass == ITEM_SUBCLASS_WEAPON_WAND ||
+                                               SubClass == ITEM_SUBCLASS_WEAPON_THROWN);
     }
 };
 
