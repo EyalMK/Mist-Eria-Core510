@@ -473,6 +473,8 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
         }
     }
 
+    if(_spellInfo->Id == 100780) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : CHI : Calc(1) : damage : %i", basePoints);
+
     // roll in a range <1;EffectDieSides> as of patch 3.3.3
     int32 randomPoints = int32(DieSides);
     switch (randomPoints)
@@ -492,6 +494,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
     }
     
     float value = float(basePoints);
+    if(_spellInfo->Id == 100780) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : CHI : Calc(2) : damage : %i", int32(value));
 
     // random damage
     if (caster)
@@ -517,6 +520,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
             //value = int32(value * (int32)getLevel() / (int32)(_spellInfo->spellLevel ? _spellInfo->spellLevel : 1));
     }
 
+    if(_spellInfo->Id == 100780) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : CHI : Calc(3) : damage : %i", int32(value));
     return int32(value);
 }
 
