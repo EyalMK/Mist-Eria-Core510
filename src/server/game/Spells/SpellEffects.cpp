@@ -1401,6 +1401,10 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         {
             addhealth = m_spellValue->EffectBasePoints[effIndex] * CalculateDamage(effIndex, unitTarget) / m_caster->GetMaxPower(POWER_HOLY_POWER);
         }
+        else if(m_spellInfo->Id == 89653) //drain life
+        {
+            addhealth = unitTarget->GetMaxHealth() * 0.02f;
+        }
         // Swiftmend - consumes Regrowth or Rejuvenation
         else if (m_spellInfo->TargetAuraState == AURA_STATE_SWIFTMEND && unitTarget->HasAuraState(AURA_STATE_SWIFTMEND, m_spellInfo, m_caster))
         {

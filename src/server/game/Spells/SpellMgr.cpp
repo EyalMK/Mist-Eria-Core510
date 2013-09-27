@@ -3659,8 +3659,7 @@ void SpellMgr::LoadSpellInfoCorrections()
                 spellInfo->Effects[EFFECT_2].MiscValue = POWER_FOCUS;
                 break;
             case 689:
-                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
-                spellInfo->Effects[EFFECT_1].Amplitude = 1000;
+                spellInfo->Effects[EFFECT_1].TriggerSpell = 89653;
                 break;
             case 33917:
                 spellInfo->SpellVisual[0] = 0;
