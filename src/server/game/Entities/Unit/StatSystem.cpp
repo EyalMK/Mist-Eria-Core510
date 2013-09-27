@@ -634,6 +634,8 @@ void Player::UpdateExpertise(WeaponAttackType attack)
 
     Item* weapon = GetWeaponForAttack(attack, true);
 
+    bool isRanged = (weapon && weapon->IsRangedWeapon());
+
     AuraEffectList const& expAuras = GetAuraEffectsByType(SPELL_AURA_MOD_EXPERTISE);
     for (AuraEffectList::const_iterator itr = expAuras.begin(); itr != expAuras.end(); ++itr)
     {
@@ -645,12 +647,9 @@ void Player::UpdateExpertise(WeaponAttackType attack)
             expertise += (*itr)->GetAmount();
     }
 
-    if (expertise < 0)
-        expertise = 0;
-
     switch (attack)
     {
-        case BASE_ATTACK:   (!weapon->IsRangedWeapon() ? SetStatFloatValue(PLAYER_EXPERTISE, expertise) : SetStatFloatValue(PLAYER_RANGED_EXPERTISE, expertise)); break;
+        case BASE_ATTACK:   (!isRanged ? SetStatFloatValue(PLAYER_EXPERTISE, expertise) : SetStatFloatValue(PLAYER_RANGED_EXPERTISE, expertise)); break;
         case OFF_ATTACK:    SetStatFloatValue(PLAYER_OFFHAND_EXPERTISE, expertise); break;
         default: break;
     }
