@@ -17776,23 +17776,35 @@ void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
         do
         {
             Field* fields = result->Fetch();
-            int32 damage[3];
-            int32 baseDamage[3];
+
+            int32 damage[MAX_SPELL_EFFECTS];
+            int32 baseDamage[MAX_SPELL_EFFECTS];
+
             uint64 caster_guid = fields[0].GetUInt64();
             uint64 item_guid = fields[1].GetUInt64();
             uint32 spellid = fields[2].GetUInt32();
             uint32 effmask = fields[3].GetUInt32();
             uint32 recalculatemask = fields[4].GetUInt32();
             uint8 stackcount = fields[5].GetUInt8();
-            damage[0] = fields[6].GetInt32();
-            damage[1] = fields[7].GetInt32();
-            damage[2] = fields[8].GetInt32();
-            baseDamage[0] = fields[9].GetInt32();
-            baseDamage[1] = fields[10].GetInt32();
-            baseDamage[2] = fields[11].GetInt32();
-            int32 maxduration = fields[12].GetInt32();
-            int32 remaintime = fields[13].GetInt32();
-            uint8 remaincharges = fields[14].GetUInt8();
+
+            Tokenizer damageToken(fields[6].GetString(), ' ');
+            uint32 index = 0;
+            for(Tokenizer::const_iterator itr = damageToken.begin() ; index < MAX_SPELL_EFFECTS && itr != damageToken.end() ; itr++, index++)
+                damage[index] =  int32(atoi(*itr));
+            for(; index < MAX_SPELL_EFFECTS ; index++)
+                damage[index] = 0;
+
+            Tokenizer baseDamageToken(fields[7].GetString(), ' ');
+            index = 0;
+            for(Tokenizer::const_iterator itr = baseDamageToken.begin() ; index < MAX_SPELL_EFFECTS && itr != baseDamageToken.end() ; itr++, index++)
+                baseDamage[index] =  int32(atoi(*itr));
+            for(; index < MAX_SPELL_EFFECTS ; index++)
+                baseDamage[index] = 0;
+
+
+            int32 maxduration = fields[8].GetInt32();
+            int32 remaintime = fields[9].GetInt32();
+            uint8 remaincharges = fields[10].GetUInt8();
 
             Item* item = NULL;
             if(Player* caster = sObjectMgr->GetPlayerByLowGUID(GUID_LOPART(caster_guid)))
@@ -19463,6 +19475,14 @@ void Player::_SaveAuras(SQLTransaction& trans)
             }
         }
 
+        std::ostringstream damageString;
+        std::ostringstream baseDamageString;
+        for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            damageString << damage[i] << ' ';
+            baseDamageString << baseDamage[i] << ' ';
+        }
+
         uint8 index = 0;
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_AURA);
         stmt->setUInt32(index++, GetGUIDLow());
@@ -19472,12 +19492,8 @@ void Player::_SaveAuras(SQLTransaction& trans)
         stmt->setUInt32(index++, effMask);
         stmt->setUInt32(index++, recalculateMask);
         stmt->setUInt8(index++, itr->second->GetStackAmount());
-        stmt->setInt32(index++, damage[0]);
-        stmt->setInt32(index++, damage[1]);
-        stmt->setInt32(index++, damage[2]);
-        stmt->setInt32(index++, baseDamage[0]);
-        stmt->setInt32(index++, baseDamage[1]);
-        stmt->setInt32(index++, baseDamage[2]);
+        stmt->setString(index++, damageString.str());
+        stmt->setString(index++, baseDamageString.str());
         stmt->setInt32(index++, itr->second->GetMaxDuration());
         stmt->setInt32(index++, itr->second->GetDuration());
         stmt->setUInt8(index, itr->second->GetCharges());
