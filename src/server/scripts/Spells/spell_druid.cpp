@@ -64,6 +64,7 @@ enum DruidCreatures
     DRUID_NPC_WILD_MUSHROOM                 = 47649
 };
 
+// Prowl - 5215
 class spell_dru_prowl : public SpellScriptLoader
 {
     public:
@@ -76,6 +77,7 @@ class spell_dru_prowl : public SpellScriptLoader
             void Cast()
             {
                 Unit* caster = GetCaster();
+                //activate cat form (768)
                 caster->CastSpell(caster, 768, false);
             }
 
@@ -89,6 +91,35 @@ class spell_dru_prowl : public SpellScriptLoader
         {
             return new spell_dru_prowl_SpellScript;
         }
+};
+
+// Growl - 6795
+class spell_dru_growl : public SpellScriptLoader
+{
+public:
+    spell_dru_growl() : SpellScriptLoader("spell_dru_growl") { }
+
+    class spell_dru_growl_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dru_growl_SpellScript);
+
+        void Cast()
+        {
+            Unit* caster = GetCaster();
+            //activate bear form (5487)
+            caster->CastSpell(caster, 5487, false);
+        }
+
+        void Register()
+        {
+            OnCast += SpellCastFn(spell_dru_growl_SpellScript::Cast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dru_growl_SpellScript;
+    }
 };
 
 // 2912, 5176, 78674 - Starfire, Wrath, and Starsurge
@@ -1370,6 +1401,8 @@ class spell_druid_wild_mushroom_detonate : public SpellScriptLoader
 
 void AddSC_druid_spell_scripts()
 {
+    new spell_dru_prowl();
+    new spell_dru_growl();
     new spell_dru_dash();
     new spell_dru_eclipse_energize();
     new spell_dru_enrage();
