@@ -40,6 +40,7 @@ void AddSC_quest_spell_scripts();
 void AddSC_item_spell_scripts();
 void AddSC_example_spell_scripts();
 void AddSC_holiday_spell_scripts();
+void AddSC_masteries_spell_scripts();
 
 void AddSC_SmartSCripts();
 
@@ -670,6 +671,7 @@ void AddSpellScripts()
     AddSC_item_spell_scripts();
     AddSC_example_spell_scripts();
     AddSC_holiday_spell_scripts();
+    AddSC_masteries_spell_scripts();
 }
 
 void AddCommandScripts()

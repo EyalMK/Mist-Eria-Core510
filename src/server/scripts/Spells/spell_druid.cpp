@@ -64,6 +64,33 @@ enum DruidCreatures
     DRUID_NPC_WILD_MUSHROOM                 = 47649
 };
 
+class spell_dru_prowl : public SpellScriptLoader
+{
+    public:
+        spell_dru_prowl() : SpellScriptLoader("spell_dru_prowl") { }
+
+        class spell_dru_prowl_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dru_prowl_SpellScript);
+
+            void Cast()
+            {
+                Unit* caster = GetCaster();
+                caster->CastSpell(caster, 768, false);
+            }
+
+            void Register()
+            {
+                OnCast += SpellCastFn(spell_dru_prowl_SpellScript::Cast);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dru_prowl_SpellScript;
+        }
+};
+
 // 2912, 5176, 78674 - Starfire, Wrath, and Starsurge
 class spell_dru_eclipse_energize : public SpellScriptLoader
 {
