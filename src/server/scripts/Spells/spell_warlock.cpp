@@ -167,8 +167,6 @@ class spell_warl_create_healthstone : public SpellScriptLoader
         {
             PrepareSpellScript(spell_warl_create_healthstone_SpellScript);
 
-            static uint32 const iTypes[8];
-
             bool Validate(SpellInfo const* /*spellInfo*/)
             {
                 return true;
@@ -180,7 +178,7 @@ class spell_warl_create_healthstone : public SpellScriptLoader
                 {
                     uint8 spellRank = sSpellMgr->GetSpellRank(GetSpellInfo()->Id);
                     ItemPosCountVec dest;
-                    InventoryResult msg = caster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, iTypes[spellRank - 1], 1, NULL);
+                    InventoryResult msg = caster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 5512, 1, NULL);
                     if (msg != EQUIP_ERR_OK)
                         return SPELL_FAILED_TOO_MANY_OF_ITEM;
                 }
@@ -193,7 +191,7 @@ class spell_warl_create_healthstone : public SpellScriptLoader
                 {
                     uint8 spellRank = sSpellMgr->GetSpellRank(GetSpellInfo()->Id);
                     if (spellRank > 0 && spellRank <= 8)
-                        CreateItem(effIndex, iTypes[spellRank - 1]);
+                        CreateItem(effIndex, 5512);
                 }
             }
 
@@ -208,18 +206,6 @@ class spell_warl_create_healthstone : public SpellScriptLoader
         {
             return new spell_warl_create_healthstone_SpellScript();
         }
-};
-
-uint32 const spell_warl_create_healthstone::spell_warl_create_healthstone_SpellScript::iTypes[8] =
-{
-     5512,              // Minor Healthstone
-     5511,              // Lesser Healthstone
-     5509,              // Healthstone
-     5510,              // Greater Healthstone
-     9421,              // Major Healthstone
-    22103,              // Master Healthstone
-    36889,              // Demonic Healthstone
-    36892               // Fel Healthstone
 };
 
 // 603 - Bane of Doom
