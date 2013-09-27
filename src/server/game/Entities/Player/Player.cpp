@@ -12523,7 +12523,6 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
                 {
                     case EQUIPMENT_SLOT_MAINHAND:
                     case EQUIPMENT_SLOT_OFFHAND:
-                    case EQUIPMENT_SLOT_RANGED:
                         RecalculateRating(CR_ARMOR_PENETRATION);
                     default:
                         break;
