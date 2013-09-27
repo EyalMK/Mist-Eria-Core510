@@ -3514,9 +3514,6 @@ void Spell::_handle_finish_phase()
 
         if (m_spellInfo->GetPowerType(GetCaster()) == POWER_HOLY_POWER && m_caster->m_movedPlayer->getClass() == CLASS_PALADIN)
            HandleHolyPower(m_caster->m_movedPlayer);
-
-        if (m_spellInfo->GetPowerType(GetCaster()) == POWER_CHI && m_caster->m_movedPlayer->getClass() == CLASS_MONK)
-           HandleChiPower(m_caster->m_movedPlayer);
     }
 
     if (m_caster->m_extraAttacks && GetSpellInfo()->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS))
