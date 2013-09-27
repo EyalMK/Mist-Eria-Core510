@@ -64,6 +64,42 @@ enum DruidCreatures
     DRUID_NPC_WILD_MUSHROOM                 = 47649
 };
 
+// Mangle - 33917
+class spell_dru_mangle : public SpellScriptLoader
+{
+public:
+    spell_dru_mangle() : SpellScriptLoader("spell_dru_mangle") { }
+
+    class spell_dru_mangle_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dru_mangle_SpellScript);
+
+        void Cast()
+        {
+            ShapeshiftForm casterForm =  GetCaster()->GetShapeshiftForm();
+            if(casterForm == FORM_CAT)
+            {
+                GetCaster()->CastSpell(GetHitUnit(), 33876, false);
+            }
+            else if (casterForm == FORM_BEAR)
+            {
+                GetCaster()->CastSpell(GetHitUnit(), 33878, false);
+            }
+            FinishCast(SPELL_CAST_OK);
+        }
+
+        void Register()
+        {
+            OnCast += SpellCastFn(spell_dru_mangle_SpellScript::Cast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dru_mangle_SpellScript;
+    }
+};
+
 // Prowl - 5215
 class spell_dru_prowl : public SpellScriptLoader
 {
@@ -1401,6 +1437,7 @@ class spell_druid_wild_mushroom_detonate : public SpellScriptLoader
 
 void AddSC_druid_spell_scripts()
 {
+    new spell_dru_mangle();
     new spell_dru_prowl();
     new spell_dru_growl();
     new spell_dru_dash();
