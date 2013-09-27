@@ -11023,7 +11023,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
     }
 
     // Apply strongest slow aura mod to speed
-    if (int32 slow = GetMaxNegativeAuraModifier(SPELL_AURA_MOD_DECREASE_SPEED);)
+    if (int32 slow = GetMaxNegativeAuraModifier(SPELL_AURA_MOD_DECREASE_SPEED))
         AddPct(speed, slow);
 
     if (float minSpeedMod = (float)GetMaxPositiveAuraModifier(SPELL_AURA_MOD_MINIMUM_SPEED))
