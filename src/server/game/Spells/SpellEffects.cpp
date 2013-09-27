@@ -635,6 +635,8 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     m_caster->CastCustomSpell(unitTarget, 130551, &bp0, NULL, NULL, true);
                     return;
                 }
+                default:
+                    break;
             }
             break;
         case SPELLFAMILY_DEATHKNIGHT:
@@ -670,6 +672,8 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                         targets.SetDst(*m_targets.GetDstPos());
                     spell_id = CalculateDamage(0, NULL);
                     break;
+                default:
+                    break;
             }
             break;
         case SPELLFAMILY_DRUID:
@@ -688,7 +692,26 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     }
                     return;
                 }
+                default:
+                    break;
             }
+            break;
+        case SPELLFAMILY_MONK:
+            switch(m_spellInfo->Id)
+            {
+                case 109132:                        //roulade
+                {
+                    if(m_caster->HasUnitMovementFlag(MOVEMENTFLAG_BACKWARD))
+                        m_caster->CastSpell(m_caster, 109131, true);
+                    else
+                        m_caster->CastSpell(m_caster, 107427, true);
+                    return;
+                }
+                default:
+                    break;
+            }
+            break;
+        default:
             break;
     }
 
