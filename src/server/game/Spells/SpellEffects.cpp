@@ -1785,7 +1785,6 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
     if (unitTarget->GetMaxPower(power) == 0)
         return;
 
-    if(power == POWER_CHI) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : CHI : damage final : %i", damage);
     m_caster->EnergizeBySpell(unitTarget, m_spellInfo->Id, damage, power);
 
     // Mad Alchemist's Potion
