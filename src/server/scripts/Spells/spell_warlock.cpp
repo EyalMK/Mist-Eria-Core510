@@ -205,6 +205,71 @@ class spell_warl_create_healthstone : public SpellScriptLoader
         }
 };
 
+//6262 - Use HeathStone
+class spell_warl_use_healthstone : public SpellScriptLoader
+{
+public:
+    spell_warl_use_healthstone() : SpellScriptLoader("spell_warl_use_healthstone") { }
+
+    class spell_warl_use_healthstone_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_warl_use_healthstone_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/)
+        {
+            return true;
+        }
+
+        void HandleHeal(SpellEffIndex effIndex)
+        {
+            if (Unit* unitTarget = GetHitUnit())
+            {
+                if(unitTarget->HasAura(56224)) SetHitHeal(20 * unitTarget->GetMaxHealth() / 100);
+                else PreventHitHeal();
+            }
+        }
+
+        void Register()
+        {
+            OnEffectHit += SpellEffectFn(spell_warl_use_healthstone_SpellScript::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+        }
+    };
+
+    class spell_warl_use_healthstone_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_warl_use_healthstone_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/)
+        {
+            return true;
+        }
+
+        void OnPeriodicHeal(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* unitTarget = GetTarget())
+            {
+                if(unitTarget->HasAura(56224)) GetAura()->GetEffect(EFFECT_1)->SetAmount(40 * unitTarget->GetMaxHealth() / 100 * (GetAura()->GetEffect(EFFECT_1)->GetAmplitude()) / GetAura()->GetMaxDuration());
+                else GetAura()->GetEffect(EFFECT_1)->SetAmount(0);
+            }
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectRemoveFn(spell_warl_use_healthstone_AuraScript::OnPeriodicHeal, EFFECT_1, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_warl_use_healthstone_AuraScript();
+    }
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_warl_use_healthstone_SpellScript();
+    }
+};
+
 // 603 - Bane of Doom
 /// Updated 4.3.4
 class spell_warl_bane_of_doom : public SpellScriptLoader
@@ -985,6 +1050,7 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_banish();
     new spell_warl_conflagrate();
     new spell_warl_create_healthstone();
+    new spell_warl_use_healthstone();
     new spell_warl_demonic_circle_summon();
     new spell_warl_demonic_circle_teleport();
     new spell_warl_demonic_empowerment();
