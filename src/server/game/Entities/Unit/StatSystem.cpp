@@ -649,9 +649,29 @@ void Player::UpdateExpertise(WeaponAttackType attack)
 
     switch (attack)
     {
-        case BASE_ATTACK:   (!isRanged ? SetStatFloatValue(PLAYER_EXPERTISE, expertise) : SetStatFloatValue(PLAYER_RANGED_EXPERTISE, expertise)); break;
-        case OFF_ATTACK:    SetStatFloatValue(PLAYER_OFFHAND_EXPERTISE, expertise); break;
-        default: break;
+        case BASE_ATTACK:
+        {
+            if(weapon)
+            {
+                if(weapon->IsRangedWeapon())
+                    SetStatFloatValue(PLAYER_RANGED_EXPERTISE, expertise);
+                else
+                    SetStatFloatValue(PLAYER_EXPERTISE, expertise);
+            }
+            else
+            {
+                SetStatFloatValue(PLAYER_EXPERTISE, expertise);
+                SetStatFloatValue(PLAYER_RANGED_EXPERTISE, expertise);
+            }
+            break;
+        }
+        case OFF_ATTACK:
+        {
+            SetStatFloatValue(PLAYER_OFFHAND_EXPERTISE, expertise); 
+            break;
+        }
+        default: 
+            break;
     }
 }
 
