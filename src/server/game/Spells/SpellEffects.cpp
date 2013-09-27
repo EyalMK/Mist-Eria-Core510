@@ -1398,7 +1398,7 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         }
         else if(m_spellInfo->Id == 130551)  //World of glory
         {
-            addhealth = m_spellValue->EffectBasePoints[effIndex] * m_caster->SpellBaseHealingBonusDone(m_spellInfo->SchoolMask);
+            addhealth = m_spellValue->EffectBasePoints[effIndex] * m_caster->SpellBaseHealingBonusDone(SpellSchoolMask(m_spellInfo->SchoolMask));
         }
         // Swiftmend - consumes Regrowth or Rejuvenation
         else if (m_spellInfo->TargetAuraState == AURA_STATE_SWIFTMEND && unitTarget->HasAuraState(AURA_STATE_SWIFTMEND, m_spellInfo, m_caster))
