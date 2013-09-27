@@ -1360,7 +1360,7 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
     m_damage += newDamage;
 }
 
-void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
+void Spell::EffectHeal(SpellEffIndex effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
         return;
@@ -1395,6 +1395,10 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
             if (Player* player = m_caster->ToPlayer())
                 if (player->HasSkill(SKILL_ENGINEERING))
                     AddPct(addhealth, 25);
+        }
+        else if(m_spellInfo->Id == 130551)  //World of glory
+        {
+            addhealth = m_spellValue->EffectBasePoints[effIndex] * CalculateDamage(effIndex, unitTarget);
         }
         // Swiftmend - consumes Regrowth or Rejuvenation
         else if (m_spellInfo->TargetAuraState == AURA_STATE_SWIFTMEND && unitTarget->HasAuraState(AURA_STATE_SWIFTMEND, m_spellInfo, m_caster))
