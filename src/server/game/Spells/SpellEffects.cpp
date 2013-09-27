@@ -628,6 +628,13 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     // now let next effect cast spell at each target.
                     return;
                 }
+                case 85673:                            // World of Glory
+                {
+                    int32 holy = m_caster->GetPower(POWER_HOLY_POWER);
+                    int32 bp0 = holy * (damage);
+                    m_caster->CastCustomSpell(unitTarget, 130551, &bp0, NULL, NULL, true);
+                    return;
+                }
             }
             break;
         case SPELLFAMILY_DEATHKNIGHT:
