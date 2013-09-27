@@ -4738,8 +4738,6 @@ void Spell::HandleChiPower(Player* caster)
     bool hit = true;
     Player* modOwner = caster->GetSpellModOwner();
 
-    m_powerCost = caster->GetPower(POWER_CHI);
-
     if (!m_powerCost || !modOwner)
         return;
 
