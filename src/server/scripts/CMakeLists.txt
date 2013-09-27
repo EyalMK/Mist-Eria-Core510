@@ -38,6 +38,7 @@ if(SCRIPTS)
   include(Outland/CMakeLists.txt)
   include(Northrend/CMakeLists.txt)
   include(Events/CMakeLists.txt)
+  include(Pandaria/CMakeLists.txt)
 endif()
 
 GenerateProject("${CMAKE_CURRENT_SOURCE_DIR}" "${sources}")

@@ -610,6 +610,10 @@ void AddSC_shattrath_city();
 void AddSC_terokkar_forest();
 void AddSC_zangarmarsh();
 
+//Pandaria
+
+void AddSC_wandering_isle();
+
 // Events
 void AddSC_event_childrens_week();
 
@@ -642,6 +646,7 @@ void AddScripts()
     AddBattlegroundScripts();
     AddOutdoorPvPScripts();
     AddCustomScripts();
+	AddPandariaScripts();
 #endif
 }
 
@@ -1262,6 +1267,13 @@ void AddNorthrendScripts()
     AddSC_zuldrak();
     AddSC_crystalsong_forest();
     AddSC_isle_of_conquest();
+#endif
+}
+
+void AddPandariaScripts()
+{
+#ifdef SCRIPTS
+	AddSC_wandering_isle();
 #endif
 }
 

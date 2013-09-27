@@ -95,7 +95,9 @@ set(sources
   Pandaria/TerraceofEndlessSpring/boss_tsulong.cpp
   Pandaria/TerraceofEndlessSpring/instance_terrace_of_the_endless_spring.cpp
   Pandaria/TerraceofEndlessSpring/terrace_of_the_endless_spring.h
-
+  
+  Pandaria/zone_wandering_isle.cpp
+  
   )
 
 
