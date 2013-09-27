@@ -672,6 +672,24 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     break;
             }
             break;
+        case SPELLFAMILY_DRUID:
+            switch(m_spellInfo->Id)
+            {
+                case 33917:
+                {
+                    ShapeshiftForm casterForm =  m_caster->GetShapeshiftForm();
+                    if(casterForm == FORM_CAT)
+                    {
+                        m_caster->CastSpell(unitTarget, 33876, false);
+                    }
+                    else if (casterForm == FORM_BEAR)
+                    {
+                        m_caster->CastSpell(unitTarget, 33878, false);
+                    }
+                    return;
+                }
+            }
+            break;
     }
 
     //spells triggered by dummy effect should not miss
