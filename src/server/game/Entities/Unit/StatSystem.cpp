@@ -167,7 +167,6 @@ bool Player::UpdateAllStats()
     UpdateFocusRegen();
     UpdateExpertise(BASE_ATTACK);
     UpdateExpertise(OFF_ATTACK);
-    UpdateExpertise(RANGED_ATTACK);
     RecalculateRating(CR_ARMOR_PENETRATION);
     for (int i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
         UpdateResistances(i);
@@ -651,9 +650,8 @@ void Player::UpdateExpertise(WeaponAttackType attack)
 
     switch (attack)
     {
-        case BASE_ATTACK:   SetStatFloatValue(PLAYER_EXPERTISE, expertise);         break;
+        case BASE_ATTACK:   (!weapon->IsRangedWeapon() ? SetStatFloatValue(PLAYER_EXPERTISE, expertise) : SetStatFloatValue(PLAYER_RANGED_EXPERTISE, expertise)); break;
         case OFF_ATTACK:    SetStatFloatValue(PLAYER_OFFHAND_EXPERTISE, expertise); break;
-        case RANGED_ATTACK: SetStatFloatValue(PLAYER_RANGED_EXPERTISE, expertise);  break;
         default: break;
     }
 }

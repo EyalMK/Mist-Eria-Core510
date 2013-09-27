@@ -3924,7 +3924,6 @@ void AuraEffect::HandleAuraModExpertise(AuraApplication const* aurApp, uint8 mod
 
     target->ToPlayer()->UpdateExpertise(BASE_ATTACK);
     target->ToPlayer()->UpdateExpertise(OFF_ATTACK);
-    target->ToPlayer()->UpdateExpertise(RANGED_ATTACK);
 }
 
 /********************************/
