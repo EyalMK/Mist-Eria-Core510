@@ -1108,7 +1108,7 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
         SetPower(POWER_RUNES, 8);
         SetMaxPower(POWER_RUNES, 8);
         SetPower(POWER_RUNIC_POWER, 0);
-        SetMaxPower(POWER_RUNIC_POWER, 1000);
+        SetMaxPower(POWER_RUNIC_POWER, 100);
     }
 
     // original spells

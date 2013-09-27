@@ -4730,39 +4730,6 @@ void Spell::HandleHolyPower(Player* caster)
     }
 }
 
-void Spell::HandleChiPower(Player* caster)
-{
-    if (!caster)
-        return;
-
-    bool hit = true;
-    Player* modOwner = caster->GetSpellModOwner();
-
-    if (!m_powerCost || !modOwner)
-        return;
-
-    if (uint64 targetGUID = m_targets.GetUnitTargetGUID())
-    {
-        for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
-        {
-            if (ihit->targetGUID == targetGUID)
-            {
-                if (ihit->missCondition != SPELL_MISS_NONE && ihit->missCondition != SPELL_MISS_MISS)
-                    hit = false;
-
-                break;
-            }
-        }
-
-        // The spell did hit the target, apply aura cost mods if there are any.
-        if (hit)
-        {
-            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, m_powerCost);
-            m_caster->ModifyPower(POWER_CHI, -m_powerCost);
-        }
-    }
-}
-
 void Spell::HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGOTarget, uint32 i, SpellEffectHandleMode mode)
 {
     effectHandleMode = mode;

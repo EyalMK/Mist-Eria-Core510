@@ -441,7 +441,6 @@ class Spell
         void SendResurrectRequest(Player* target);
 
         void HandleHolyPower(Player* caster);
-		void HandleChiPower(Player* caster);
         void HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGOTarget, uint32 i, SpellEffectHandleMode mode);
         void HandleThreatSpells();
 
