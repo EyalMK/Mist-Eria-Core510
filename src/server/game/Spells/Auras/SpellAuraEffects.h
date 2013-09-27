@@ -252,6 +252,7 @@ class AuraEffect
         void HandleAuraModRangedAttackPowerPercent(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleAuraModAttackPowerOfArmor(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         //   damage bonus
+        void HandleModSpellPowerPct(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleModDamageDone(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleModDamagePercentDone(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleModOffhandDamagePercent(AuraApplication const* aurApp, uint8 mode, bool apply) const;

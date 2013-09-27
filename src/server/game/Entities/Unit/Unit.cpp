@@ -8908,9 +8908,6 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     // Add SPELL_AURA_MOD_DAMAGE_DONE_FOR_MECHANIC percent bonus
     AddPct(DoneTotalMod, GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_DAMAGE_DONE_FOR_MECHANIC, spellProto->Mechanic));
 
-    // bonus from SPELL_AURA_MOD_SPELL_POWER_PCT percent
-    AddPct(DoneTotalMod, GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, spellProto->SchoolMask));
-
     // done scripted mod (take it from owner)
     Unit* owner = GetOwner() ? GetOwner() : this;
     AuraEffectList const& mOverrideClassScript= owner->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
@@ -9255,6 +9252,10 @@ int32 Unit::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
                 DoneAdvertisedBenefit += int32(CalculatePct(GetTotalAttackPowerValue(BASE_ATTACK), (*i)->GetAmount()));
 
     }
+
+    // bonus from SPELL_AURA_MOD_SPELL_POWER_PCT percent
+    AddPct(DoneAdvertisedBenefit, GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask));
+
     return DoneAdvertisedBenefit;
 }
 
@@ -9775,6 +9776,10 @@ int32 Unit::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
             if ((*i)->GetMiscValue() & schoolMask)
                 AdvertisedBenefit += int32(CalculatePct(GetTotalAttackPowerValue(BASE_ATTACK), (*i)->GetAmount()));
     }
+
+    // bonus from SPELL_AURA_MOD_SPELL_POWER_PCT percent
+    AddPct(AdvertisedBenefit, GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask));
+
     return AdvertisedBenefit;
 }
 
