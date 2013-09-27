@@ -631,7 +631,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 case 85673:                            // World of Glory
                 {
                     int32 holy = m_caster->GetPower(POWER_HOLY_POWER);
-                    int32 bp0 = holy * (damage);
+                    int32 bp0 = holy /** (damage)*/;
                     m_caster->CastCustomSpell(unitTarget, 130551, &bp0, NULL, NULL, true);
                     return;
                 }
