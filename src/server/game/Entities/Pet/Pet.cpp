@@ -1206,8 +1206,9 @@ void Pet::_LoadAuras(uint32 timediff)
     {
         do
         {
-            int32 damage[3];
-            int32 baseDamage[3];
+            int32 damage[MAX_SPELL_EFFECTS];
+            int32 baseDamage[MAX_SPELL_EFFECTS];
+
             Field* fields = result->Fetch();
             uint64 caster_guid = fields[0].GetUInt64();
             // NULL guid stored - pet is the caster of the spell - see Pet::_SaveAuras
@@ -1215,17 +1216,26 @@ void Pet::_LoadAuras(uint32 timediff)
                 caster_guid = GetGUID();
             uint32 spellid = fields[1].GetUInt32();
             uint32 effmask = fields[2].GetUInt32();
-            uint8 recalculatemask = fields[3].GetUInt8();
+            uint32 recalculatemask = fields[3].GetUInt8();
             uint8 stackcount = fields[4].GetUInt8();
-            damage[0] = fields[5].GetInt32();
-            damage[1] = fields[6].GetInt32();
-            damage[2] = fields[7].GetInt32();
-            baseDamage[0] = fields[8].GetInt32();
-            baseDamage[1] = fields[9].GetInt32();
-            baseDamage[2] = fields[10].GetInt32();
-            int32 maxduration = fields[11].GetInt32();
-            int32 remaintime = fields[12].GetInt32();
-            uint8 remaincharges = fields[13].GetUInt8();
+
+            Tokenizer damageToken(fields[5].GetString(), ' ');
+            uint32 index = 0;
+            for(Tokenizer::const_iterator itr = damageToken.begin() ; index < MAX_SPELL_EFFECTS && itr != damageToken.end() ; itr++, index++)
+                damage[index] =  int32(atoi(*itr));
+            for(; index < MAX_SPELL_EFFECTS ; index++)
+                damage[index] = 0;
+
+            Tokenizer baseDamageToken(fields[6].GetString(), ' ');
+            index = 0;
+            for(Tokenizer::const_iterator itr = baseDamageToken.begin() ; index < MAX_SPELL_EFFECTS && itr != baseDamageToken.end() ; itr++, index++)
+                baseDamage[index] =  int32(atoi(*itr));
+            for(; index < MAX_SPELL_EFFECTS ; index++)
+                baseDamage[index] = 0;
+
+            int32 maxduration = fields[7].GetInt32();
+            int32 remaintime = fields[8].GetInt32();
+            uint8 remaincharges = fields[9].GetUInt8();
 
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
             if (!spellInfo)
@@ -1306,21 +1316,24 @@ void Pet::_SaveAuras(SQLTransaction& trans)
         // don't save guid of caster in case we are caster of the spell - guid for pet is generated every pet load, so it won't match saved guid anyways
         uint64 casterGUID = (itr->second->GetCasterGUID() == GetGUID()) ? 0 : itr->second->GetCasterGUID();
 
-        uint8 index = 0;
+        std::ostringstream damageString;
+        std::ostringstream baseDamageString;
+        for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            damageString << damage[i] << ' ';
+            baseDamageString << baseDamage[i] << ' ';
+        }
 
+        uint8 index = 0;
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_AURA);
         stmt->setUInt32(index++, m_charmInfo->GetPetNumber());
         stmt->setUInt64(index++, casterGUID);
         stmt->setUInt32(index++, itr->second->GetId());
-        stmt->setUInt8(index++, effMask);
-        stmt->setUInt8(index++, recalculateMask);
+        stmt->setUInt32(index++, effMask);
+        stmt->setUInt32(index++, recalculateMask);
         stmt->setUInt8(index++, itr->second->GetStackAmount());
-        stmt->setInt32(index++, damage[0]);
-        stmt->setInt32(index++, damage[1]);
-        stmt->setInt32(index++, damage[2]);
-        stmt->setInt32(index++, baseDamage[0]);
-        stmt->setInt32(index++, baseDamage[1]);
-        stmt->setInt32(index++, baseDamage[2]);
+        stmt->setString(index++, damageString.str());
+        stmt->setString(index++, baseDamageString.str());
         stmt->setInt32(index++, itr->second->GetMaxDuration());
         stmt->setInt32(index++, itr->second->GetDuration());
         stmt->setUInt8(index++, itr->second->GetCharges());
