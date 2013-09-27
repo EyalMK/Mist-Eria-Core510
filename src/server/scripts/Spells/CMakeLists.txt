@@ -25,6 +25,7 @@ set(sources
   Spells/spell_item.cpp
   Spells/spell_holiday.cpp
   Spells/spell_pet.cpp
+  Spells/spell_masteries.cpp
 )
 
 message("  -> Prepared: Spells")
