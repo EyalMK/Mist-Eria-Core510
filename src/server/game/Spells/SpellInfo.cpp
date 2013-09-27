@@ -473,8 +473,6 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
         }
     }
 
-    if(_spellInfo->Id == 100780 && _effIndex == EFFECT_1) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : CHI : Calc(1) : damage : %i", basePoints);
-
     // roll in a range <1;EffectDieSides> as of patch 3.3.3
     int32 randomPoints = int32(DieSides);
     switch (randomPoints)
@@ -494,7 +492,6 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
     }
     
     float value = float(basePoints);
-    if(_spellInfo->Id == 100780 && _effIndex == EFFECT_1) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : CHI : Calc(2) : damage : %i", int32(value));
 
     // random damage
     if (caster)
@@ -504,9 +501,8 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
             if (uint8 comboPoints = caster->m_movedPlayer->GetComboPoints())
                 value += comboDamage * comboPoints;
 
-        if(_spellInfo->Id == 100780 && _effIndex == EFFECT_1) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : CHI : Calc(3) : damage : %i", int32(value));
         value = caster->ApplyEffectModifiers(_spellInfo, _effIndex, value);
-        if(_spellInfo->Id == 100780 && _effIndex == EFFECT_1) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : CHI : Calc(4) : damage : %i", int32(value));
+
         // amount multiplication based on caster's level
         if (!_spellInfo->GetSpellScaling() && !basePointsPerLevel && (_spellInfo->Attributes & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION && _spellInfo->SpellLevel) &&
                 Effect != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
@@ -519,10 +515,8 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
                 //there are many more: slow speed, -healing pct
             value *= 0.25f * exp(caster->getLevel() * (70 - _spellInfo->SpellLevel) / 1000.0f);
             //value = int32(value * (int32)getLevel() / (int32)(_spellInfo->spellLevel ? _spellInfo->spellLevel : 1));
-        if(_spellInfo->Id == 100780 && _effIndex == EFFECT_1) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : CHI : Calc(5) : damage : %i", int32(value));
     }
 
-    if(_spellInfo->Id == 100780 && _effIndex == EFFECT_1) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : CHI : Calc(6) : damage : %i", int32(value));
     return int32(value);
 }
 

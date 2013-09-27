@@ -75,27 +75,23 @@ bool Player::UpdateStats(Stats stat)
             UpdateArmor();
             UpdateAllCritPercentages();
             UpdateDodgePercentage();
+            UpdateAttackPowerAndDamage(false);
+            UpdateAttackPowerAndDamage(true);
             break;
         case STAT_STAMINA:
             UpdateMaxHealth();
             break;
         case STAT_INTELLECT:
-            UpdateMaxPower(POWER_MANA);
             UpdateAllSpellCritChances();
             UpdateArmor();                                  //SPELL_AURA_MOD_RESISTANCE_OF_INTELLECT_PERCENT, only armor currently
+            break;
+        case STAT_STRENGTH:
+            UpdateAttackPowerAndDamage(false);
             break;
         case STAT_SPIRIT:
             break;
         default:
             break;
-    }
-
-    if (stat == STAT_STRENGTH)
-        UpdateAttackPowerAndDamage(false);
-    else if (stat == STAT_AGILITY)
-    {
-        UpdateAttackPowerAndDamage(false);
-        UpdateAttackPowerAndDamage(true);
     }
 
     UpdateSpellDamageAndHealingBonus();
