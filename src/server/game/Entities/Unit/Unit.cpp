@@ -17116,7 +17116,7 @@ void Unit::RewardRage(uint32 baseRage, bool attacker)
 
     addRage *= sWorld->getRate(RATE_POWER_RAGE_INCOME);
 
-    ModifyPower(POWER_RAGE, uint32(addRage * 10));
+    ModifyPower(POWER_RAGE, uint32(addRage));
 }
 
 void Unit::StopAttackFaction(uint32 faction_id)
