@@ -680,6 +680,8 @@ void Player::UpdateManaRegen()
 {
     if(getPowerType() != POWER_MANA) return;
 
+    int index = GetPowerIndex(POWER_MANA);
+
     // Mana regen from spirit
     float spirit_regen = OCTRegenMPPerSpirit();
     // Apply PCT bonus from SPELL_AURA_MOD_POWER_REGEN_PERCENT aura on spirit base regen
@@ -691,13 +693,15 @@ void Player::UpdateManaRegen()
     // Set regen rate in cast state apply only on spirit based regen
     int32 modManaRegenInterrupt = GetTotalAuraModifier(SPELL_AURA_MOD_MANA_REGEN_INTERRUPT);
 
-    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1, base_regen + CalculatePct(spirit_regen, modManaRegenInterrupt));
-    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1, base_regen + spirit_regen);
+    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1 + index, base_regen + CalculatePct(spirit_regen, modManaRegenInterrupt));
+    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1 + index, base_regen + spirit_regen);
 }
 
 void Player::UpdateEnergyRegen()
 {
     if(getPowerType() != POWER_ENERGY) return;
+
+    int index = GetPowerIndex(POWER_ENERGY);
 
     float value = 10.0f + (0.01f * GetRatingBonusValue(CR_HASTE_MELEE));
 
@@ -705,13 +709,15 @@ void Player::UpdateEnergyRegen()
     value += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_ENERGY) / 5.0f;
 
     //No changes between in and out of combat regen
-    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1 + 1, value - 10.0f);
-    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1 + 1, value - 10.0f);
+    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1 + index, value - 10.0f);
+    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1 + index, value - 10.0f);
 }
 
 void Player::UpdateFocusRegen()
 {
     if(getPowerType() != POWER_FOCUS) return;
+
+    int index = GetPowerIndex(POWER_FOCUS);
 
     float value = 5.0f + (0.04f * GetRatingBonusValue(CR_HASTE_RANGED));
 
@@ -719,8 +725,8 @@ void Player::UpdateFocusRegen()
     value += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_FOCUS) / 5.0f;
 
     //No changes between in and out of combat regen (Client need to added value)
-    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1, value - 5.0f);
-    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1, value - 5.0f);
+    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1 + index, value - 5.0f);
+    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1 + index, value - 5.0f);
 }
 
 void Player::UpdateRuneRegen(RuneType rune)
