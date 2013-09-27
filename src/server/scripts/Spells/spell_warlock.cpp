@@ -220,18 +220,19 @@ public:
             return true;
         }
 
-        void HandleHeal(SpellEffIndex effIndex)
+        void HandleHeal()
         {
             if (Unit* unitTarget = GetHitUnit())
             {
-                if(unitTarget->HasAura(56224)) SetHitHeal(20 * unitTarget->GetMaxHealth() / 100);
+                if(!unitTarget->HasAura(56224)) SetHitHeal(20 * unitTarget->GetMaxHealth() / 100);
                 else PreventHitHeal();
+                PreventHitDamage();
             }
         }
 
         void Register()
         {
-            OnEffectHit += SpellEffectFn(spell_warl_use_healthstone_SpellScript::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+            OnHit += SpellHitFn(spell_warl_use_healthstone_SpellScript::HandleHeal);
         }
     };
 
