@@ -2542,7 +2542,7 @@ void Player::Regenerate(Powers power)
 
                 float time = 0.001f * m_regenTimer;
 
-                addvalue -= 1.0f * time * RageDecreaseRate;               // (1 rage/sec)
+                addvalue -= 10.0f * time * RageDecreaseRate;               // (1 rage/sec)
             }
             break;
         }
@@ -2578,7 +2578,7 @@ void Player::Regenerate(Powers power)
 
                 float time = 0.001f * m_regenTimer;
 
-                addvalue -= 1.5f * time * RunicPowerDecreaseRate;         // 1.5 RunicPower by tick
+                addvalue -= 15.0f * time * RunicPowerDecreaseRate;         // 1.5 RunicPower by tick
             }
             break;
         }

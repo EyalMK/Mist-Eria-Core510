@@ -12475,7 +12475,7 @@ int32 Unit::GetCreatePowers(Powers power) const
         case POWER_MANA:
             return GetCreateMana();
         case POWER_RAGE:
-            return 100;
+            return 1000;
         case POWER_FOCUS:
             if (GetTypeId() == TYPEID_PLAYER && getClass() == CLASS_HUNTER)
                 return 100;
@@ -12483,7 +12483,7 @@ int32 Unit::GetCreatePowers(Powers power) const
         case POWER_ENERGY:
             return 100;
         case POWER_RUNIC_POWER:
-            return 100;
+            return 1000;
         case POWER_RUNES:
             return 0;
         case POWER_SOUL_SHARDS:

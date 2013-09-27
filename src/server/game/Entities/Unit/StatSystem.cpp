@@ -678,9 +678,8 @@ void Player::ApplyHealthRegenBonus(int32 amount, bool apply)
 
 void Player::UpdateManaRegen()
 {
-    if(getPowerType() != POWER_MANA) return;
-
     int index = GetPowerIndex(POWER_MANA);
+    if(index == MAX_POWERS) return;
 
     // Mana regen from spirit
     float spirit_regen = OCTRegenMPPerSpirit();
@@ -699,9 +698,8 @@ void Player::UpdateManaRegen()
 
 void Player::UpdateEnergyRegen()
 {
-    if(getPowerType() != POWER_ENERGY) return;
-
     int index = GetPowerIndex(POWER_ENERGY);
+    if(index == MAX_POWERS) return;
 
     float value = 10.0f + (0.01f * GetRatingBonusValue(CR_HASTE_MELEE));
 
@@ -715,9 +713,8 @@ void Player::UpdateEnergyRegen()
 
 void Player::UpdateFocusRegen()
 {
-    if(getPowerType() != POWER_FOCUS) return;
-
     int index = GetPowerIndex(POWER_FOCUS);
+    if(index == MAX_POWERS) return;
 
     float value = 5.0f + (0.04f * GetRatingBonusValue(CR_HASTE_RANGED));
 
