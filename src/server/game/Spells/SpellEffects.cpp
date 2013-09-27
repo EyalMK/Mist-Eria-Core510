@@ -630,7 +630,8 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 }
                 case 85673:                            // World of Glory
                 {
-                    int32 holy = m_caster->GetPower(POWER_HOLY_POWER);
+                    //DieSide will reduce it by one (seek int32 SpellEffectInfo::CalcBaseValue(int32 value) const )    FIX IT : PEXIRN
+                    int32 holy = m_caster->GetPower(POWER_HOLY_POWER) + 1;
                     m_caster->CastCustomSpell(unitTarget, 130551, &holy, NULL, NULL, true);
                     return;
                 }
@@ -1398,8 +1399,8 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         }
         else if(m_spellInfo->Id == 130551)  //World of glory
         {
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : WORD OF GLORY : HOLY_POWER : %i, DAMAGE PER HOLY : %i", m_spellValue->EffectBasePoints[effIndex], damage);
-            addhealth *= m_spellValue->EffectBasePoints[effIndex];
+            addhealth = m_spellValue->EffectBasePoints[effIndex] * CalculateDamage(effIndex, unitTarget);
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : WORD OF GLORY : HOLY_POWER : %i, DAMAGE PER HOLY : %i, TOTAL : %i", m_spellValue->EffectBasePoints[effIndex], CalculateDamage(effIndex, unitTarget), addhealth);
         }
         // Swiftmend - consumes Regrowth or Rejuvenation
         else if (m_spellInfo->TargetAuraState == AURA_STATE_SWIFTMEND && unitTarget->HasAuraState(AURA_STATE_SWIFTMEND, m_spellInfo, m_caster))
