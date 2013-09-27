@@ -251,6 +251,7 @@ void Player::UpdateMaxPower(Powers power)
     value += GetModifierValue(unitMod, TOTAL_VALUE);
     value *= GetModifierValue(unitMod, TOTAL_PCT);
 
+    if(power == POWER_CHI) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : CHI : MAXVALUE : %u", uint32(value));
     SetMaxPower(power, uint32(value));
 }
 
