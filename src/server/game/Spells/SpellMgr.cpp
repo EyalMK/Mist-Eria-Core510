@@ -3662,6 +3662,9 @@ void SpellMgr::LoadSpellInfoCorrections()
                 spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
                 spellInfo->Effects[EFFECT_1].Amplitude = 1000;
                 break;
+            case 33917:
+                spellInfo->SpellVisual[0] = 0;
+                break;
             default:
                 break;
         }
