@@ -1400,7 +1400,6 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         else if(m_spellInfo->Id == 130551)  //World of glory
         {
             addhealth = m_spellValue->EffectBasePoints[effIndex] * CalculateDamage(effIndex, unitTarget) / m_caster->GetMaxPower(POWER_HOLY_POWER);
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : WORD OF GLORY : HOLY_POWER : %i, DAMAGE PER HOLY : %i, TOTAL : %i", m_spellValue->EffectBasePoints[effIndex], CalculateDamage(effIndex, unitTarget) / m_caster->GetMaxPower(POWER_HOLY_POWER), addhealth);
         }
         // Swiftmend - consumes Regrowth or Rejuvenation
         else if (m_spellInfo->TargetAuraState == AURA_STATE_SWIFTMEND && unitTarget->HasAuraState(AURA_STATE_SWIFTMEND, m_spellInfo, m_caster))
