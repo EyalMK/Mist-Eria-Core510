@@ -1398,6 +1398,7 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         }
         else if(m_spellInfo->Id == 130551)  //World of glory
         {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : WORD OF GLORY : HOLY_POWER : %i, DAMAGE PER HOLY : %i", m_spellValue->EffectBasePoints[effIndex], damage);
             addhealth *= m_spellValue->EffectBasePoints[effIndex];
         }
         // Swiftmend - consumes Regrowth or Rejuvenation
