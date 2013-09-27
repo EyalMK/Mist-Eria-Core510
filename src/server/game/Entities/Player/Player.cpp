@@ -3275,6 +3275,10 @@ void Player::InitStatsForLevel(bool reapplyMods)
     SetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER,     0);
     SetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER, 0.0f);
 
+    SetFloatValue(PLAYER_EXPERTISE, 0.0f);
+    SetFloatValue(PLAYER_RANGED_EXPERTISE, 0.0f);
+    SetFloatValue(PLAYER_OFFHAND_EXPERTISE, 0.0f);
+
     // Base crit values (will be recalculated in UpdateAllStats() at loading and in _ApplyAllStatBonuses() at reset
     SetFloatValue(PLAYER_CRIT_PERCENTAGE, 0.0f);
     SetFloatValue(PLAYER_OFFHAND_CRIT_PERCENTAGE, 0.0f);
