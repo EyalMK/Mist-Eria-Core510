@@ -17779,19 +17779,26 @@ void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             int32 damage[3];
             int32 baseDamage[3];
             uint64 caster_guid = fields[0].GetUInt64();
-            uint32 spellid = fields[1].GetUInt32();
-            uint32 effmask = fields[2].GetUInt32();
-            uint32 recalculatemask = fields[3].GetUInt32();
-            uint8 stackcount = fields[4].GetUInt8();
-            damage[0] = fields[5].GetInt32();
-            damage[1] = fields[6].GetInt32();
-            damage[2] = fields[7].GetInt32();
-            baseDamage[0] = fields[8].GetInt32();
-            baseDamage[1] = fields[9].GetInt32();
-            baseDamage[2] = fields[10].GetInt32();
-            int32 maxduration = fields[11].GetInt32();
-            int32 remaintime = fields[12].GetInt32();
-            uint8 remaincharges = fields[13].GetUInt8();
+            uint64 item_guid = fields[1].GetUInt64();
+            uint32 spellid = fields[2].GetUInt32();
+            uint32 effmask = fields[3].GetUInt32();
+            uint32 recalculatemask = fields[4].GetUInt32();
+            uint8 stackcount = fields[5].GetUInt8();
+            damage[0] = fields[6].GetInt32();
+            damage[1] = fields[7].GetInt32();
+            damage[2] = fields[8].GetInt32();
+            baseDamage[0] = fields[9].GetInt32();
+            baseDamage[1] = fields[10].GetInt32();
+            baseDamage[2] = fields[11].GetInt32();
+            int32 maxduration = fields[12].GetInt32();
+            int32 remaintime = fields[13].GetInt32();
+            uint8 remaincharges = fields[14].GetUInt8();
+
+            Item* item = NULL;
+            if(Player* caster = sObjectMgr->GetPlayerByLowGUID(GUID_LOPART(caster_guid)))
+            {
+                item = caster->GetItemByGuid(item_guid);
+            }
 
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
             if (!spellInfo)
@@ -17819,7 +17826,7 @@ void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             }
             else
                 remaincharges = 0;
-            if (Aura* aura = Aura::TryCreate(spellInfo, effmask, this, NULL, &baseDamage[0], NULL, caster_guid))
+            if (Aura* aura = Aura::TryCreate(spellInfo, effmask, this, NULL, &baseDamage[0], item, caster_guid))
             {
                 if (!aura->CanBeSaved())
                 {
@@ -19462,8 +19469,8 @@ void Player::_SaveAuras(SQLTransaction& trans)
         stmt->setUInt64(index++, itr->second->GetCasterGUID());
         stmt->setUInt64(index++, itr->second->GetCastItemGUID());
         stmt->setUInt32(index++, itr->second->GetId());
-        stmt->setUInt8(index++, effMask);
-        stmt->setUInt8(index++, recalculateMask);
+        stmt->setUInt32(index++, effMask);
+        stmt->setUInt32(index++, recalculateMask);
         stmt->setUInt8(index++, itr->second->GetStackAmount());
         stmt->setInt32(index++, damage[0]);
         stmt->setInt32(index++, damage[1]);
