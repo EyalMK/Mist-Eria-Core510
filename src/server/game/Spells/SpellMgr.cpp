@@ -3664,6 +3664,7 @@ void SpellMgr::LoadSpellInfoCorrections()
                 break;
             case 33917:
                 spellInfo->SpellVisual[0] = 0;
+                spellInfo->AttributesEx4 &= SPELL_ATTR4_TRIGGERED;
                 break;
             default:
                 break;
