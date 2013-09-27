@@ -1188,6 +1188,15 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
     }
     // all item positions resolved
 
+	// Pandaren Starting quest
+	// TODO load those quests from DB
+	if(getRace() == 24)
+	{
+		Quest const* quest = sObjectMgr->GetQuestTemplate(450000);
+        if (quest)
+			AddQuest(quest, NULL);
+	}
+
     return true;
 }
 
