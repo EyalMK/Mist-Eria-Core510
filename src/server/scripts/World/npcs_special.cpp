@@ -3135,7 +3135,7 @@ public :
             while(uint32 eventId = events.ExecuteEvent()){
                 switch(eventId){
                 case EVENT_BLACKOUT_KICK :
-                    if(me->getVictim()())
+                    if(me->getVictim())
                         DoCast(me->getVictim(), SPELL_BLACKOUT_KICK, false);
                     events.ScheduleEvent(EVENT_BLACKOUT_KICK, urand(5000, 7000));
                     break ;
