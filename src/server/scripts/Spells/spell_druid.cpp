@@ -177,8 +177,8 @@ public:
                     data.FlushBits();
 
                     player->AddTemporarySpell(newSpell);
-                    data << uint32(SPELL_DRU_MANGLE_GENERIC);
                     data << uint32(newSpell);
+                    data << uint32(SPELL_DRU_MANGLE_GENERIC);
 
                     player->GetSession()->SendPacket(&data);
                 }
@@ -208,8 +208,8 @@ public:
                     data.FlushBits();
 
                     unitTarget->ToPlayer()->RemoveTemporarySpell(newSpell);
-                    data << uint32(newSpell);
                     data << uint32(SPELL_DRU_MANGLE_GENERIC);
+                    data << uint32(newSpell);
 
                     player->GetSession()->SendPacket(&data);
                 }
