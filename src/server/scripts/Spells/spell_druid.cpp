@@ -77,7 +77,6 @@ public:
 
         void Cast()
         {
-            return;
             ShapeshiftForm casterForm =  GetCaster()->GetShapeshiftForm();
             if(casterForm == FORM_CAT)
             {
@@ -87,7 +86,6 @@ public:
             {
                 GetCaster()->CastSpell(GetHitUnit(), 33878, false);
             }
-            FinishCast(SPELL_CAST_OK);
         }
 
         void Register()
