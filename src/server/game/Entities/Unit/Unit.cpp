@@ -12410,6 +12410,7 @@ void Unit::SetPower(Powers power, int32 val)
     if (IsInWorld())
     {
         WorldPacket data(SMSG_POWER_UPDATE, 8 + 4 + 1 + 4);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : POWER : %u updated, new val : %i", power, val);
         data.append(GetPackGUID());
         data << uint32(1); //power count
         data << uint8(powerIndex);
