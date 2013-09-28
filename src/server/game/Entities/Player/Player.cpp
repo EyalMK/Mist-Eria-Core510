@@ -25145,17 +25145,20 @@ bool Player::LearnTalent(uint32 talentId, uint32 /*talentRank*/)
         return false;
 
     uint8 usePoint = 1;
-    for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
-        if (TalentEntry const* oldTalentInfo = sTalentStore.LookupEntry(i))
-            if (talentInfo->Row == oldTalentInfo->Row)
-                if (HasTalent(oldTalentInfo->TalentID, GetActiveSpec()))
-                {
-                    PlayerTalentMap::iterator itr = GetTalentMap(GetActiveSpec())->find(talentId);
-                    GetTalentMap(GetActiveSpec())->erase(itr);
-                    removeSpell(oldTalentInfo->SpellId, false, false);
-                    usePoint = 0;
-                    break;
-                }
+
+    for(PlayerTalentMap::iterator itr = GetTalentMap(GetActiveSpec())->begin() ; itr != GetTalentMap(GetActiveSpec())->end() ; itr++)
+    {
+        if(TalentEntry const* talentRowEntry = sTalentStore.LookupEntry((*itr).first))
+        {
+            if(talentRowEntry->Row == talentInfo->Row)
+            {
+                GetTalentMap(GetActiveSpec())->erase(itr);
+                removeSpell(talentRowEntry->SpellId, false, false);
+                usePoint = 0;
+                break;
+            }
+        }
+    }
 
     if (CurTalentPoints == 0 && usePoint)
         return false;
