@@ -26,6 +26,7 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "Containers.h"
+#include "WorldSession.h"
 
 enum DruidSpells
 {
@@ -76,6 +77,7 @@ public:
 
         void Cast()
         {
+            return;
             ShapeshiftForm casterForm =  GetCaster()->GetShapeshiftForm();
             if(casterForm == FORM_CAT)
             {
@@ -127,6 +129,98 @@ class spell_dru_prowl : public SpellScriptLoader
         {
             return new spell_dru_prowl_SpellScript;
         }
+};
+
+enum SPELL_DRU_MANGLE
+{
+    SPELL_DRU_MANGLE_GENERIC = 33917,
+    SPELL_DRU_MANGLE_BEAR    = 33878,
+    SPELL_DRU_MANGLE_CAT     = 33876
+};
+
+// Bear form - 5487
+// Cat form - 768
+class spell_dru_bear_cat : public SpellScriptLoader
+{
+public:
+    spell_dru_bear_cat() : SpellScriptLoader("spell_dru_bear_cat") { }
+
+    class spell_dru_bear_cat_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dru_bear_cat_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/)
+        {
+            return true;
+        }
+
+        void OnShapeshiftApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            uint32 newSpell;
+
+            if(aurEff->GetMiscValue() == FORM_CAT)
+                newSpell = SPELL_DRU_MANGLE_CAT;
+            else if(aurEff->GetMiscValue() == FORM_BEAR)
+                newSpell = SPELL_DRU_MANGLE_BEAR;
+            else
+                return;
+
+
+            if (Unit* unitTarget = GetTarget())
+            {
+                if(unitTarget->HasSpell(SPELL_DRU_MANGLE_GENERIC) && unitTarget->GetTypeId() == TYPEID_PLAYER)
+                {
+                    Player * player = unitTarget->ToPlayer();
+                    WorldPacket data(SMSG_SUPERCEDED_SPELL, 4+4);
+
+                    player->AddTemporarySpell(newSpell);
+                    data << uint32(SPELL_DRU_MANGLE_GENERIC);
+                    data << uint32(newSpell);
+
+                    player->GetSession()->SendPacket(&data);
+                }
+            }
+        }
+
+        void OnShapeshiftRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            uint32 newSpell;
+
+            if(aurEff->GetMiscValue() == FORM_CAT)
+                newSpell = SPELL_DRU_MANGLE_CAT;
+            else if(aurEff->GetMiscValue() == FORM_BEAR)
+                newSpell = SPELL_DRU_MANGLE_BEAR;
+            else
+                return;
+
+
+            if (Unit* unitTarget = GetTarget())
+            {
+                if(unitTarget->HasSpell(SPELL_DRU_MANGLE_GENERIC) && unitTarget->GetTypeId() == TYPEID_PLAYER)
+                {                    
+                    Player * player = unitTarget->ToPlayer();
+                    WorldPacket data(SMSG_SUPERCEDED_SPELL, 4+4);
+
+                    unitTarget->ToPlayer()->RemoveTemporarySpell(newSpell);
+                    data << uint32(newSpell);
+                    data << uint32(SPELL_DRU_MANGLE_GENERIC);
+
+                    player->GetSession()->SendPacket(&data);
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_dru_bear_cat_AuraScript::OnShapeshiftApply, EFFECT_0, SPELL_AURA_MOD_SHAPESHIFT, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_dru_bear_cat_AuraScript::OnShapeshiftRemove, EFFECT_0, SPELL_AURA_MOD_SHAPESHIFT, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dru_bear_cat_AuraScript();
+    }
 };
 
 // Growl - 6795
