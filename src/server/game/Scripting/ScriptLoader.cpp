@@ -189,7 +189,7 @@ void AddSC_boss_death_knight_darkreaver();
 void AddSC_boss_theolenkrastinov();
 void AddSC_boss_illuciabarov();
 void AddSC_boss_instructormalicia();
-void AddSC_boss_jandicebarov();
+//void AddSC_boss_jandicebarov();
 void AddSC_boss_kormok();
 void AddSC_boss_lordalexeibarov();
 void AddSC_boss_lorekeeperpolkelt();
@@ -610,6 +610,10 @@ void AddSC_shattrath_city();
 void AddSC_terokkar_forest();
 void AddSC_zangarmarsh();
 
+//Pandaria
+
+void AddSC_wandering_isle();
+
 // Events
 void AddSC_event_childrens_week();
 
@@ -642,6 +646,7 @@ void AddScripts()
     AddBattlegroundScripts();
     AddOutdoorPvPScripts();
     AddCustomScripts();
+	AddPandariaScripts();
 #endif
 }
 
@@ -827,7 +832,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_theolenkrastinov();
     AddSC_boss_illuciabarov();
     AddSC_boss_instructormalicia();
-    AddSC_boss_jandicebarov();
+    //AddSC_boss_jandicebarov();
     AddSC_boss_kormok();
     AddSC_boss_lordalexeibarov();
     AddSC_boss_lorekeeperpolkelt();
@@ -1262,6 +1267,13 @@ void AddNorthrendScripts()
     AddSC_zuldrak();
     AddSC_crystalsong_forest();
     AddSC_isle_of_conquest();
+#endif
+}
+
+void AddPandariaScripts()
+{
+#ifdef SCRIPTS
+	AddSC_wandering_isle();
 #endif
 }
 

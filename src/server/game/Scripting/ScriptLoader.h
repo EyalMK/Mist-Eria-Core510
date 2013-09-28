@@ -31,5 +31,6 @@ void AddEventScripts();
 void AddBattlegroundScripts();
 void AddOutdoorPvPScripts();
 void AddCustomScripts();
+void AddPandariaScripts();
 
 #endif

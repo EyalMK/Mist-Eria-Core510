@@ -3061,6 +3061,224 @@ public:
 
 };
 
+const char* end_fight_1 = "Ce fut un beau combat. Merci." ;
+const char* end_fight_2 = "Je n?ai jamais vu de recrue avec votre talent. Je dois le dire aux autres.";
+const char* end_fight_3 = "Merci de m?avoir rappelé que je dois m?entraîner avec plus de discipline.";
+const char* end_fight_4 = "Vos compétences surpassent les miennes. L?humble combattant sait reconnaître une défaite.";
+const char* _message = "Je souhaite me mesurer à vous.";
+
+
+/* Support for quest "the lesson of stifled pride" */
+class npc_trainee_stifled_pride : public CreatureScript
+{
+public :
+    npc_trainee_stifled_pride() : CreatureScript("npc_trainee_stifled_pride")
+    {    }
+
+    bool OnGossipHello(Player *player, Creature *creature){
+        if(player && !player->isInCombat() && player->hasQuest(QUEST_STIFLED_PRIDE)){
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, _message, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->PlayerTalkClass->SendGossipMenu(0, creature->GetGUID());
+            return true ;
+        }
+        else return false ;
+    }
+
+    bool OnGossipSelect(Player *player, Creature *creature, uint32 sender, uint32 action){
+        switch(action){
+        case GOSSIP_ACTION_INFO_DEF + 1 :
+            creature->setFaction(14);
+            if(creature->GetAI()){
+                creature->GetAI()->AttackStart(player);
+                return true ;
+            }
+            else
+                return false;
+            break ;
+        default :
+            return false;
+        }
+    }
+
+    class npc_trainee_stifled_prideAI : public ScriptedAI{
+    public :
+        npc_trainee_stifled_prideAI(Creature* c) : ScriptedAI(c){
+
+        }
+
+        void EnterCombat(Unit *who){
+            ScheduleEvents();
+        }
+
+        void DamageTaken(Unit *doneBy, uint32 &amount){
+            float tenPercent = (me->GetMaxHealth()/100)*10 ;
+            if((me->GetHealth() - amount) < tenPercent){
+                if(doneBy)
+                    if(doneBy->GetTypeId() == TYPEID_PLAYER && doneBy->hasQuest(QUEST_STIFLED_PRIDE)){
+                        doneBy->ToPlayer()->KilledMonsterCredit(NPC_REWARD, 0);
+                        amount = 0 ;
+                    }
+                me->setFaction(35);
+                me->MonsterSay(RAND(end_fight_1, end_fight_2, end_fight_3, end_fight_4), LANG_COMMON, doneBy->GetGUID());
+                me->SetFullHealth();
+            }
+        }
+
+        void UpdateAI(uint32 diff){
+            if(!UpdateVictim())
+                return ;
+
+            events.Update(diff);
+
+            if(me->HasUnitState(UNIT_STATE_CASTING)) return ;
+
+            while(uint32 eventId = events.ExecuteEvent()){
+                switch(eventId){
+                case EVENT_BLACKOUT_KICK :
+                    if(me->getVictim())
+                        DoCast(me->getVictim(), SPELL_BLACKOUT_KICK, false);
+                    events.ScheduleEvent(EVENT_BLACKOUT_KICK, urand(5000, 7000));
+                    break ;
+
+                case EVENT_JAB :
+                    if(me->getVictim())
+                        DoCast(me->getVictim(), SPELL_JAB, false);
+                    events.ScheduleEvent(EVENT_JAB, urand(5000, 7000));
+                    break ;
+                }
+            }
+            DoMeleeAttackIfReady();
+        }
+
+    private :
+        EventMap events ;
+
+        inline void ScheduleEvents(){
+            switch(me->GetEntry()){
+            case NPC_H_TRAINEE_1 :
+            case NPC_H_TRAINEE_2 :
+                events.ScheduleEvent(EVENT_JAB, urand(5500, 11000));
+                break ;
+            case NPC_A_TRAINEE_1 :
+            case NPC_A_TRAINEE_2 :
+                events.ScheduleEvent(EVENT_BLACKOUT_KICK, urand(5500, 11000));
+            }
+        }
+
+    };
+
+    CreatureAI* GetAI(Creature *c) const{
+        return new npc_trainee_stifled_prideAI(c);
+    }
+
+private :
+
+    enum Misc{
+        QUEST_STIFLED_PRIDE = 29524,
+        SPELL_JAB = 109079,
+        SPELL_BLACKOUT_KICK = 109080,
+        NPC_H_TRAINEE_1 = 54586,
+        NPC_H_TRAINEE_2 = 65470,
+        NPC_A_TRAINEE_1 = 54587,
+        NPC_A_TRAINEE_2 = 65471,
+        EVENT_JAB = 1,
+        EVENT_BLACKOUT_KICK = 2,
+        NPC_REWARD = 54586
+    };
+};
+
+const char* jaomin_message = "Je relève votre défi !" ;
+const char* end_fight_5 = "C?est un honneur d?être vaincu par vous.";
+const char* end_fight_6 = "Impressionnant ! Vous ressemblez à un roseau, mais vous avez la force du chêne.";
+const char* end_fight_7 = "Le pandaren humble sait reconnaître quand son apprentissage n?est pas terminé. Merci pour cette leçon.";
+const char* end_fight_8 = "Un adversaire approche.";
+const char* end_fight_9 = "Votre entraînement a été parfait.";
+
+class mob_jaomin_ro : public CreatureScript{
+public :
+    mob_jaomin_ro() : CreatureScript("mob_jaomin_ro"){ }
+
+    bool OnGossipHello(Player *p, Creature *c){
+        if(p->hasQuest(QUEST_DISCIPLES_CHALLENGE) && !p->isInCombat() && p->GetQuestStatus(QUEST_DISCIPLES_CHALLENGE) != QUEST_STATUS_COMPLETE){
+            p->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, jaomin_message, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1) ;
+            p->PlayerTalkClass->SendGossipMenu(54611, c->GetGUID());
+            return true ;
+        }
+        else return false ;
+    }
+
+    bool OnGossipSelect(Player *p, Creature *c, uint32 sender, uint32 action){
+        p->PlayerTalkClass->ClearMenus();
+
+        switch(action){
+        case GOSSIP_ACTION_INFO_DEF + 1 :
+            c->setFaction(14);
+            if(c->GetAI()){
+                c->GetAI()->AttackStart(p);
+                return true ;
+            }
+            else return false ;
+
+        default :
+            return false ;
+        }
+    }
+
+    class mob_jaomin_roAI : public ScriptedAI{
+    public :
+        mob_jaomin_roAI(Creature* c) : ScriptedAI(c){
+
+        }
+
+        void EnterCombat(Unit *who){
+            ui_ElephantOrHawkTimer = 10000 ;
+        }
+
+        void DamageTaken(Unit *doneby, uint32 &amount){
+            float percent = me->GetMaxHealth()/100 * 1 ;
+            if(me->GetHealth() - amount < percent && doneby->GetTypeId() == TYPEID_PLAYER && doneby->hasQuest(QUEST_DISCIPLES_CHALLENGE)){
+                doneby->ToPlayer()->KilledMonsterCredit(me->GetEntry());
+                amount = 0 ;
+                me->setFaction(35);
+                me->SetFullHealth();
+                me->MonsterSay(RAND(end_fight_5, end_fight_6, end_fight_7, end_fight_8, end_fight_9), LANG_COMMON, doneby->GetGUID());
+            }
+        }
+
+        void UpdateAI(uint32 diff){
+            if(!UpdateVictim()) return ;
+
+            if(!me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                if(ui_ElephantOrHawkTimer <= diff){
+                    DoCast(RAND(SPELL_ELEPHANT, SPELL_HAWK));
+                    ui_ElephantOrHawkTimer = 10000 ;
+                }
+                else
+                    ui_ElephantOrHawkTimer -= diff ;
+
+                DoMeleeAttackIfReady();
+            }
+            else return ;
+        }
+
+    private :
+        uint32 ui_ElephantOrHawkTimer ;
+
+    };
+
+    CreatureAI* GetAI(Creature* c) const{
+        return new mob_jaomin_roAI(c);
+    }
+
+    enum Misc{
+    SPELL_ELEPHANT = 108938,
+    SPELL_HAWK = 108935,
+    QUEST_DISCIPLES_CHALLENGE = 29409
+    };
+};
+
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3095,4 +3313,6 @@ void AddSC_npcs_special()
     new npc_generic_harpoon_cannon();
 	new npc_neutral_faction_select();
 	new npc_neutral_faction_select_auto();
+    new mob_jaomin_ro();
+    new npc_trainee_stifled_pride();
 }
