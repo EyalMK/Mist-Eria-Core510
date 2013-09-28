@@ -48,7 +48,6 @@ public:
         void Reset()
         {
             timer = 0;
-            me->CastSpell(me, 61722, true);
         }
 
 
@@ -96,9 +95,13 @@ public:
 										questId = 30044;
 										break;
 									}
+
 									Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-							        if (quest && !p->hasQuest(questId))
+									if (quest && !p->hasQuest(questId) && p->CanAddQuest(quest, true) && (p->GetQuestStatus(questId) != QUEST_STATUS_COMPLETE) && (p->GetQuestStatus(questId) != QUEST_STATUS_REWARDED))
+									{
 										p->AddQuest(quest, NULL);
+										p->CompleteQuest(questId);
+									}
 								}
                         }
                     }
