@@ -97,7 +97,7 @@ public:
 									}
 
 									Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-									if (quest && !p->hasQuest(questId) && p->CanAddQuest(quest, true) && (p->GetQuestStatus(questId) != QUEST_STATUS_COMPLETE))
+									if (quest && !p->hasQuest(questId) && p->CanAddQuest(quest, true) && (p->GetQuestStatus(questId) != QUEST_STATUS_COMPLETE) && (p->GetQuestStatus(questId) != QUEST_STATUS_REWARDED))
 									{
 										p->AddQuest(quest, NULL);
 										p->CompleteQuest(questId);
