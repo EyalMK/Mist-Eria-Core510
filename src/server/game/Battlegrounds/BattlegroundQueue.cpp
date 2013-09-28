@@ -619,7 +619,7 @@ bool BattlegroundQueue::CheckPremadeMatch(BattlegroundBracketId bracket_id, uint
         if (!m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_ALLIANCE + i].empty())
         {
             GroupsQueueType::iterator itr = m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_ALLIANCE + i].begin();
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "BATTLEGROUND CRASH >> group = %u", (*itr));
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "BATTLEGROUND CRASH >> group = %u; join time = %u", (*itr), (*itr)->JoinTime);
             if (!(*itr)->IsInvitedToBGInstanceGUID && ((*itr)->JoinTime < time_before || (*itr)->Players.size() < MinPlayersPerTeam))
             {
                 //we must insert group to normal queue and erase pointer from premade queue
