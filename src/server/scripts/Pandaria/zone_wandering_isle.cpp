@@ -97,10 +97,11 @@ public:
 									}
 
 									Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-							        if (quest && !p->hasQuest(questId))
+									if (quest && !p->hasQuest(questId) && p->CanAddQuest(quest, true) && (p->GetQuestStatus(questId) != QUEST_STATUS_COMPLETE))
+									{
 										p->AddQuest(quest, NULL);
-									if (p->CanCompleteQuest(questId))
 										p->CompleteQuest(questId);
+									}
 								}
                         }
                     }
