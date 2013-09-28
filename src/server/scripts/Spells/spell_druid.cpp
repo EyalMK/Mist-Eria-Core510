@@ -172,6 +172,9 @@ public:
                 {
                     Player * player = unitTarget->ToPlayer();
                     WorldPacket data(SMSG_SUPERCEDED_SPELL, 4+4);
+                    data.WriteBits(1, 24); //second count
+                    data.WriteBits(1, 24); //first count
+                    data.FlushBits();
 
                     player->AddTemporarySpell(newSpell);
                     data << uint32(SPELL_DRU_MANGLE_GENERIC);
@@ -200,6 +203,9 @@ public:
                 {                    
                     Player * player = unitTarget->ToPlayer();
                     WorldPacket data(SMSG_SUPERCEDED_SPELL, 4+4);
+                    data.WriteBits(1, 24); //second count
+                    data.WriteBits(1, 24); //first count
+                    data.FlushBits();
 
                     unitTarget->ToPlayer()->RemoveTemporarySpell(newSpell);
                     data << uint32(newSpell);

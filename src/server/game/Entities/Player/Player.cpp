@@ -3643,6 +3643,10 @@ bool Player::addSpell(uint32 spellId, bool active, bool learning, bool dependent
                 {
                     // update spell ranks in spellbook and action bar
                     WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4);
+                    data.WriteBits(1, 24); //second count
+                    data.WriteBits(1, 24); //first count
+                    data.FlushBits();
+
                     data << uint32(spellId);
                     data << uint32(next_active_spell_id);
                     GetSession()->SendPacket(&data);
@@ -3747,6 +3751,10 @@ bool Player::addSpell(uint32 spellId, bool active, bool learning, bool dependent
                             if (IsInWorld())                 // not send spell (re-/over-)learn packets at loading
                             {
                                 WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4);
+                                data.WriteBits(1, 24); //second count
+                                data.WriteBits(1, 24); //first count
+                                data.FlushBits();
+
                                 data << uint32(itr2->first);
                                 data << uint32(spellId);
                                 GetSession()->SendPacket(&data);
@@ -3763,6 +3771,10 @@ bool Player::addSpell(uint32 spellId, bool active, bool learning, bool dependent
                             if (IsInWorld())                 // not send spell (re-/over-)learn packets at loading
                             {
                                 WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4);
+                                data.WriteBits(1, 24); //second count
+                                data.WriteBits(1, 24); //first count
+                                data.FlushBits();
+
                                 data << uint32(spellId);
                                 data << uint32(itr2->first);
                                 GetSession()->SendPacket(&data);
@@ -4151,6 +4163,10 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
                     {
                         // downgrade spell ranks in spellbook and action bar
                         WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4);
+                        data.WriteBits(1, 24); //second count
+                        data.WriteBits(1, 24); //first count
+                        data.FlushBits();
+
                         data << uint32(spell_id);
                         data << uint32(prev_id);
                         GetSession()->SendPacket(&data);
