@@ -3076,7 +3076,7 @@ public :
     {    }
 
     bool OnGossipHello(Player *player, Creature *creature){
-        if(player && !player->IsInCombat() && player->hasQuest(QUEST_STIFLED_PRIDE)){
+        if(player && !player->isInCombat() && player->hasQuest(QUEST_STIFLED_PRIDE)){
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, _message, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             player->PlayerTalkClass->SendGossipMenu(0, creature->GetGUID());
             return true ;
@@ -3135,14 +3135,14 @@ public :
             while(uint32 eventId = events.ExecuteEvent()){
                 switch(eventId){
                 case EVENT_BLACKOUT_KICK :
-                    if(me->GetVictim())
-                        DoCast(me->GetVictim(), SPELL_BLACKOUT_KICK, false);
+                    if(me->getVictim()())
+                        DoCast(me->getVictim(), SPELL_BLACKOUT_KICK, false);
                     events.ScheduleEvent(EVENT_BLACKOUT_KICK, urand(5000, 7000));
                     break ;
 
                 case EVENT_JAB :
-                    if(me->GetVictim())
-                        DoCast(me->GetVictim(), SPELL_JAB, false);
+                    if(me->getVictim())
+                        DoCast(me->getVictim(), SPELL_JAB, false);
                     events.ScheduleEvent(EVENT_JAB, urand(5000, 7000));
                     break ;
                 }
@@ -3199,7 +3199,7 @@ public :
     mob_jaomin_ro() : CreatureScript("mob_jaomin_ro"){ }
 
     bool OnGossipHello(Player *p, Creature *c){
-        if(p->hasQuest(QUEST_DISCIPLES_CHALLENGE) && !p->IsInCombat() && p->GetQuestStatus(QUEST_DISCIPLES_CHALLENGE) != QUEST_STATUS_COMPLETE){
+        if(p->hasQuest(QUEST_DISCIPLES_CHALLENGE) && !p->isInCombat() && p->GetQuestStatus(QUEST_DISCIPLES_CHALLENGE) != QUEST_STATUS_COMPLETE){
             p->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, jaomin_message, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1) ;
             p->PlayerTalkClass->SendGossipMenu(54611, c->GetGUID());
             return true ;
