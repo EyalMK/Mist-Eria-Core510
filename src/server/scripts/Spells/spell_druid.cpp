@@ -1531,6 +1531,7 @@ class spell_druid_wild_mushroom_detonate : public SpellScriptLoader
 
 void AddSC_druid_spell_scripts()
 {
+    new spell_dru_bear_cat();
     new spell_dru_mangle();
     new spell_dru_prowl();
     new spell_dru_growl();
