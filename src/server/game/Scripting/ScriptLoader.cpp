@@ -189,7 +189,7 @@ void AddSC_boss_death_knight_darkreaver();
 void AddSC_boss_theolenkrastinov();
 void AddSC_boss_illuciabarov();
 void AddSC_boss_instructormalicia();
-void AddSC_boss_jandicebarov();
+//void AddSC_boss_jandicebarov();
 void AddSC_boss_kormok();
 void AddSC_boss_lordalexeibarov();
 void AddSC_boss_lorekeeperpolkelt();
@@ -832,7 +832,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_theolenkrastinov();
     AddSC_boss_illuciabarov();
     AddSC_boss_instructormalicia();
-    AddSC_boss_jandicebarov();
+    //AddSC_boss_jandicebarov();
     AddSC_boss_kormok();
     AddSC_boss_lordalexeibarov();
     AddSC_boss_lorekeeperpolkelt();
