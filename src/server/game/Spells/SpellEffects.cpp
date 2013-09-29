@@ -4655,6 +4655,7 @@ void Spell::EffectSelfResurrect(SpellEffIndex effIndex)
     player->SetPower(POWER_RAGE, 0);
     player->SetPower(POWER_FOCUS, 0);
     player->SetPower(POWER_CHI, 0);
+	player->SetPower(POWER_CHAOS_ORB, 0);
     player->SetPower(POWER_RUNIC_POWER, 0);
     player->SetPower(POWER_HOLY_POWER, 0);
 

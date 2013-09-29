@@ -2356,6 +2356,7 @@ void Player::ProcessDelayedOperations()
         SetPower(POWER_ECLIPSE, 0);
         SetPower(POWER_CHI, 0);
         SetPower(POWER_HOLY_POWER, 0);
+		SetPower(POWER_CHAOS_ORB, 0);
         SetPower(POWER_RUNIC_POWER, 0);
         SetPower(POWER_FOCUS, GetMaxPower(POWER_FOCUS));
 
@@ -2493,6 +2494,7 @@ void Player::RegenerateAll()
     {
         if(getClass() == CLASS_PALADIN) Regenerate(POWER_HOLY_POWER);
         if(getClass() == CLASS_MONK) Regenerate(POWER_CHI);
+		if(getClass() == CLASS_PRIEST) Regenerate(POWER_CHAOS_ORB);
 
         m_regenTimerTenSec -= 10000;
     }
@@ -2547,6 +2549,7 @@ void Player::Regenerate(Powers power)
             break;
         }
         case POWER_HOLY_POWER:                                            // Regenerate holy power (paladin)
+		case POWER_CHAOS_ORB:                                             // Regenerate shadow orbs (priest)
         case POWER_CHI:                                                   // Regenerate chi (monk)
         {
             addvalue += -1.0f;      // remove 1 each 10 sec
@@ -2711,6 +2714,9 @@ void Player::ResetAllPowers()
         case POWER_HOLY_POWER:
             SetPower(POWER_HOLY_POWER, 0);
             break;
+		case POWER_CHAOS_ORB:
+			SetPower(POWER_CHAOS_ORB, 0);
+			break;
         case POWER_RUNIC_POWER:
             SetPower(POWER_RUNIC_POWER, 0);
             break;
@@ -5073,6 +5079,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         SetPower(POWER_ECLIPSE, 0);
         SetPower(POWER_CHI, 0);
         SetPower(POWER_HOLY_POWER, 0);
+		SetPower(POWER_CHAOS_ORB, 0);
         SetPower(POWER_RUNIC_POWER, 0);
     }
 
@@ -23922,6 +23929,7 @@ void Player::ResurectUsingRequestData()
     SetPower(POWER_ECLIPSE, 0);
     SetPower(POWER_CHI, 0);
     SetPower(POWER_HOLY_POWER, 0);
+	SetPower(POWER_CHAOS_ORB, 0);
     SetPower(POWER_RUNIC_POWER, 0);
 
     if (uint32 aura = _resurrectionData->Aura)

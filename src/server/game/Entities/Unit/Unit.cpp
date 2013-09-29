@@ -12503,6 +12503,8 @@ int32 Unit::GetCreatePowers(Powers power) const
             return 3;
         case POWER_CHI:         
             return 4;
+		case POWER_CHAOS_ORB:
+			return 3; // shadow priest orbs
         case POWER_HEALTH:
             return 0;
         default:
