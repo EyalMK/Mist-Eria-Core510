@@ -424,6 +424,8 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
 
     data->WriteBits(bg->GetPlayerScoresSize(), 21);
 
+    data->FlushBits();
+
     data->WriteBit(isRated);
 
     for(Battleground::BattlegroundScoreMap::const_iterator itr = bg->GetPlayerScoresBegin(); itr != bg->GetPlayerScoresEnd(); ++itr)
@@ -439,9 +441,6 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
         data->WriteBit(guid[4]);
         data->WriteBit(guid[6]);
         data->WriteBit(guid[1]);
-        data->WriteBit(field38); //field38
-        data->WriteBit(player->GetBGTeam() == HORDE ? 0 : 1); //dwordF8+12
-        data->WriteBit(guid[5]);
 
         uint32 values;
         switch(bg->GetMapId())
@@ -457,6 +456,10 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
         default:  values = 0; break;
         }
         data->WriteBits(values, 24);
+
+        data->WriteBit(field38); //field38
+        data->WriteBit(player->GetBGTeam() == HORDE ? 0 : 1); //dwordF8+12
+        data->WriteBit(guid[5]);
 
         data->WriteBit(guid[7]);
         data->WriteBit(field28);
@@ -493,14 +496,14 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
 
         if (!isArena)
         {
-            *data << uint32(itr->second->BonusHonor / 100);
             *data << uint32(itr->second->Deaths);
+            *data << uint32(itr->second->BonusHonor / 100);
             *data << uint32(itr->second->HonorableKills);
         }
 
-        *data << uint32(itr->second->KillingBlows);
+        *data << uint32(itr->second->HealingDone);
         data->WriteByteSeq(guid[6]);
-        *data << uint32(itr->second->HealingDone);             // healing done
+        *data << uint32(itr->second->KillingBlows);             // healing done
         data->WriteByteSeq(guid[7]);
         data->WriteByteSeq(guid[4]);
 
