@@ -70,7 +70,7 @@ public:
 
 									switch(p->getClass())
 									{
-									case CLASS_WARRIOR:
+									case CLASS_MONK:
 										questId = 30039;
 										break;
 									case CLASS_MAGE:
@@ -88,7 +88,7 @@ public:
 									case CLASS_SHAMAN:
 										questId = 30044;
 										break;
-									case CLASS_MONK:
+									case CLASS_WARRIOR:
 										questId = 30045;
 										break;
 									default: // Not supposed to happen but in case of
