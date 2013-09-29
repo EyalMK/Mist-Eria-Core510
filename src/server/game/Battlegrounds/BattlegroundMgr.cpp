@@ -435,11 +435,6 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
         data->WriteBit(!isArena);
         data->WriteBit(guid[3]);
 
-        data->WriteBit(field40);
-        data->WriteBit(guid[4]);
-        data->WriteBit(guid[6]);
-        data->WriteBit(guid[1]);
-
         uint32 values;
         switch(bg->GetMapId())
         {
@@ -455,9 +450,15 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
         }
         data->WriteBits(values, 24);
 
+
+        data->WriteBit(field40);
+        data->WriteBit(guid[4]);
+        data->WriteBit(guid[6]);
+        data->WriteBit(guid[1]);
         data->WriteBit(field38); //field38
         data->WriteBit(player->GetBGTeam() == HORDE ? 0 : 1); //dwordF8+12
         data->WriteBit(guid[5]);
+
 
         data->WriteBit(guid[7]);
         data->WriteBit(field28);
