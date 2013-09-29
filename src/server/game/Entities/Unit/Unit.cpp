@@ -12405,6 +12405,10 @@ void Unit::SetPower(Powers power, int32 val)
     if (maxPower < val)
         val = maxPower;
 
+    //dont update if it's the same power value than the precedent
+    if(val == GetInt32Value(UNIT_FIELD_POWER1 + powerIndex))
+        return;
+
     SetInt32Value(UNIT_FIELD_POWER1 + powerIndex, val);
 
     if (IsInWorld())
@@ -12502,6 +12506,10 @@ int32 Unit::GetCreatePowers(Powers power) const
             return 3;
         case POWER_CHI:         
             return 4;
+		case POWER_CHAOS_ORB:
+			return 3; // shadow priest orbs
+		case POWER_BURNING_EMBERS:
+			return 4; // destruction warlock embers
         case POWER_HEALTH:
             return 0;
         default:
