@@ -2356,6 +2356,8 @@ void Player::ProcessDelayedOperations()
         SetPower(POWER_ECLIPSE, 0);
         SetPower(POWER_CHI, 0);
         SetPower(POWER_HOLY_POWER, 0);
+		SetPower(POWER_CHAOS_ORB, 0);
+		SetPower(POWER_BURNING_EMBERS, 0);
         SetPower(POWER_RUNIC_POWER, 0);
         SetPower(POWER_FOCUS, GetMaxPower(POWER_FOCUS));
 
@@ -2493,6 +2495,8 @@ void Player::RegenerateAll()
     {
         if(getClass() == CLASS_PALADIN) Regenerate(POWER_HOLY_POWER);
         if(getClass() == CLASS_MONK) Regenerate(POWER_CHI);
+		if(getClass() == CLASS_PRIEST) Regenerate(POWER_CHAOS_ORB);
+		if(getClass() == CLASS_WARLOCK) Regenerate(POWER_BURNING_EMBERS);
 
         m_regenTimerTenSec -= 10000;
     }
@@ -2547,6 +2551,8 @@ void Player::Regenerate(Powers power)
             break;
         }
         case POWER_HOLY_POWER:                                            // Regenerate holy power (paladin)
+		case POWER_CHAOS_ORB:                                             // Regenerate shadow orbs (priest)
+		case POWER_BURNING_EMBERS:										  // Regenerate burning embers (warlock)
         case POWER_CHI:                                                   // Regenerate chi (monk)
         {
             addvalue += -1.0f;      // remove 1 each 10 sec
@@ -2711,6 +2717,12 @@ void Player::ResetAllPowers()
         case POWER_HOLY_POWER:
             SetPower(POWER_HOLY_POWER, 0);
             break;
+		case POWER_CHAOS_ORB:
+			SetPower(POWER_CHAOS_ORB, 0);
+			break;
+		case POWER_BURNING_EMBERS:
+			SetPower(POWER_BURNING_EMBERS, 0);
+			break;
         case POWER_RUNIC_POWER:
             SetPower(POWER_RUNIC_POWER, 0);
             break;
@@ -5073,6 +5085,8 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         SetPower(POWER_ECLIPSE, 0);
         SetPower(POWER_CHI, 0);
         SetPower(POWER_HOLY_POWER, 0);
+		SetPower(POWER_CHAOS_ORB, 0);
+		SetPower(POWER_BURNING_EMBERS, 0);
         SetPower(POWER_RUNIC_POWER, 0);
     }
 
@@ -23922,6 +23936,8 @@ void Player::ResurectUsingRequestData()
     SetPower(POWER_ECLIPSE, 0);
     SetPower(POWER_CHI, 0);
     SetPower(POWER_HOLY_POWER, 0);
+	SetPower(POWER_CHAOS_ORB, 0);
+	SetPower(POWER_BURNING_EMBERS, 0);
     SetPower(POWER_RUNIC_POWER, 0);
 
     if (uint32 aura = _resurrectionData->Aura)
@@ -25145,17 +25161,20 @@ bool Player::LearnTalent(uint32 talentId, uint32 /*talentRank*/)
         return false;
 
     uint8 usePoint = 1;
-    for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
-        if (TalentEntry const* oldTalentInfo = sTalentStore.LookupEntry(i))
-            if (talentInfo->Row == oldTalentInfo->Row)
-                if (HasTalent(oldTalentInfo->TalentID, GetActiveSpec()))
-                {
-                    PlayerTalentMap::iterator itr = GetTalentMap(GetActiveSpec())->find(talentId);
-                    GetTalentMap(GetActiveSpec())->erase(itr);
-                    removeSpell(oldTalentInfo->SpellId, false, false);
-                    usePoint = 0;
-                    break;
-                }
+
+    for(PlayerTalentMap::iterator itr = GetTalentMap(GetActiveSpec())->begin() ; itr != GetTalentMap(GetActiveSpec())->end() ; itr++)
+    {
+        if(TalentEntry const* talentRowEntry = sTalentStore.LookupEntry((*itr).first))
+        {
+            if(talentRowEntry->Row == talentInfo->Row)
+            {
+                GetTalentMap(GetActiveSpec())->erase(itr);
+                removeSpell(talentRowEntry->SpellId, false, false);
+                usePoint = 0;
+                break;
+            }
+        }
+    }
 
     if (CurTalentPoints == 0 && usePoint)
         return false;

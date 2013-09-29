@@ -12410,6 +12410,7 @@ void Unit::SetPower(Powers power, int32 val)
     if (IsInWorld())
     {
         WorldPacket data(SMSG_POWER_UPDATE, 8 + 4 + 1 + 4);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : POWER : %u updated, new val : %i", power, val);
         data.append(GetPackGUID());
         data << uint32(1); //power count
         data << uint8(powerIndex);
@@ -12502,6 +12503,10 @@ int32 Unit::GetCreatePowers(Powers power) const
             return 3;
         case POWER_CHI:         
             return 4;
+		case POWER_CHAOS_ORB:
+			return 3; // shadow priest orbs
+		case POWER_BURNING_EMBERS:
+			return 4; // destruction warlock embers
         case POWER_HEALTH:
             return 0;
         default:
