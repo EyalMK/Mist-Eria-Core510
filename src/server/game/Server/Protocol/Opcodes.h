@@ -473,7 +473,7 @@ enum Opcodes
     CMSG_REPOP_REQUEST                                = 0x0093,//16357
     CMSG_REPORT_PVP_AFK                               = 0x1414,
     CMSG_REQUEST_ACCOUNT_DATA                         = 0x0A08,//16357
-    CMSG_REQUEST_CATEGORY_COOLDOWNS                   = 0x08D2,//16357
+    CMSG_REQUEST_CATEGORY_COOLDOWNS                   = 0x1598,
     CMSG_REQUEST_CEMETERY_LIST                        = 0x1417,
     CMSG_REQUEST_HOTFIX                               = 0x1418,
     CMSG_REQUEST_INSPECT_RATED_BG_STATS               = 0x1419,
@@ -665,10 +665,10 @@ enum Opcodes
     MSG_PARTY_ASSIGNMENT                              = 0x1595,
     MSG_PETITION_DECLINE                              = 0x0405,//16357
     MSG_PETITION_RENAME                               = 0x01A1,//16357
-    MSG_PVP_LOG_DATA                                  = 0x1598,
+    MSG_PVP_LOG_DATA                                  = 0x08D2,//16357
     MSG_QUERY_NEXT_MAIL_TIME                          = 0x0609,//16357
     MSG_QUEST_PUSH_RESULT                             = 0x09A4,//16357
-    CMSG_RAID_READY_CHECK                              = 0x069E,//16357
+    CMSG_RAID_READY_CHECK                             = 0x069E,//16357
     SMSG_RAID_READY_CHECK_STARTED                     = 0x04B0,//16357
     MSG_RAID_READY_CHECK_CONFIRM                      = 0x0E98,//16357
     MSG_RAID_READY_CHECK_FINISHED                     = 0x017C,//16357
