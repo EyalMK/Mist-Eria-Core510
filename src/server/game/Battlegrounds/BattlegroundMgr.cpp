@@ -420,7 +420,23 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
 
     data->Initialize(SMSG_PVP_LOG_DATA, (1+1+4+40*bg->GetPlayerScoresSize()));
 
-    data->WriteBits(bg->GetPlayerScoresSize(), 21);
+    data->WriteBits(0, 21);
+
+    data->WriteBit(0); //rated
+
+    data->WriteBit(1); //status_wait_leave
+    data->WriteBit(0); //isarena
+
+    data->FlushBits();
+
+    *data << uint8(1); // alliance wins
+
+
+    *data << uint8(0);
+    *data << uint8(0);
+
+
+    /*data->WriteBits(bg->GetPlayerScoresSize(), 21);
 
     data->WriteBit(isRated);
 
@@ -577,19 +593,19 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
 
             sLog->outDebug(LOG_FILTER_BATTLEGROUND, "rating change: %d", rating_change);
         }
-        /* //client read like that, need to check live
-        *data << uint32(dwordE4); //        2           1
-        *data << uint32(dwordEC); //        2           3
-        *data << uint32(dwordE0); //        1           3
-        *data << uint32(dwordDC); //        1           2
-        *data << uint32(dwordE8); //        2           2
-        *data << uint32(dwordD8); //        1           1
-        */
+         //client read like that, need to check live
+        //*data << uint32(dwordE4); //        2           1
+        //*data << uint32(dwordEC); //        2           3
+        //*data << uint32(dwordE0); //        1           3
+        //*data << uint32(dwordDC); //        1           2
+        //*data << uint32(dwordE8); //        2           2
+        //*data << uint32(dwordD8); //        1           1
+
     }
 
     *data << uint8(bg->GetPlayersCountByTeam(HORDE));
     *data << uint8(bg->GetPlayersCountByTeam(ALLIANCE));
-
+*/
     /* //OLD HANDLER
     data->WriteBit(isArena);
     data->WriteBit(isRated);
