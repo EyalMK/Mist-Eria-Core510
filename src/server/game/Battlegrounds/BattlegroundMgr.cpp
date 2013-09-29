@@ -424,8 +424,6 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
 
     data->WriteBits(bg->GetPlayerScoresSize(), 21);
 
-    data->FlushBits();
-
     data->WriteBit(isRated);
 
     for(Battleground::BattlegroundScoreMap::const_iterator itr = bg->GetPlayerScoresBegin(); itr != bg->GetPlayerScoresEnd(); ++itr)
