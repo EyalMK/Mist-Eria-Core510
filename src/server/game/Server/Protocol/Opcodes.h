@@ -692,7 +692,7 @@ enum Opcodes
     SMSG_ADD_RUNE_POWER                               = 0x026D,//16357
     SMSG_AI_REACTION                                  = 0x00C4,//16357
     SMSG_ALL_ACHIEVEMENT_DATA                         = 0x618, //16357
-    SMSG_AREA_SPIRIT_HEALER_TIME                      = 0x1619,
+    SMSG_AREA_SPIRIT_HEALER_TIME                      = 0x288, //16357
     SMSG_AREA_TRIGGER_DEBUG_PLAYER_INSIDE             = 0x0131,//16357 NEW OF MOP
     SMSG_AREA_TRIGGER_DEBUG_SWEEP                     = 0x0B98,//16357 NEW OF MOP
     SMSG_AREA_TRIGGER_MESSAGE                         = 0x0F01,//16357

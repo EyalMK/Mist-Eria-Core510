@@ -4410,7 +4410,7 @@ void Spell::TakePower()
     bool hit = true;
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
     {
-        if (powerType == POWER_RAGE || powerType == POWER_ENERGY || powerType == POWER_RUNES || powerType == POWER_CHI)
+        if (powerType == POWER_RAGE || powerType == POWER_ENERGY || powerType == POWER_RUNES || powerType == POWER_CHI || powerType == POWER_CHAOS_ORB || powerType == POWER_BURNING_EMBERS)
             if (uint64 targetGUID = m_targets.GetUnitTargetGUID())
                 for (std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
                     if (ihit->targetGUID == targetGUID)

@@ -380,8 +380,8 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
     uint8 action;                       // enter battle 0x1, leave queue 0x0
     ObjectGuid guid;
 
-    recvData >> time;
     recvData >> queueSlot;
+    recvData >> time;
     recvData >> unk;
 
     guid[7] = recvData.ReadBit();
@@ -439,6 +439,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
         return;
     }
 
+
     BattlegroundTypeId bgTypeId = BattlegroundMgr::BGTemplateId(bgQueueTypeId);
     // BGTemplateId returns BATTLEGROUND_AA when it is arena queue.
     // Do instance id search as there is no AA bg instances.
@@ -492,6 +493,8 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
             action = 0;
         }
     }
+
+
 
     WorldPacket data;
     if (action)

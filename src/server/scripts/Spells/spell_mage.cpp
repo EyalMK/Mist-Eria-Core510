@@ -21,6 +21,23 @@
  * Scriptnames of files in this file should be prefixed with "spell_mage_".
  */
 
+/* UPDATE for PORTALS ( NEED TO FINISH AND APPLY IN DATABASE ):
+
+-- Mage portal updates
+-- TO DO : need to edit coordinates to blizzlike
+-- TO DO : need to edit / add rows in gameobject_template for portals object ?
+-- Example for ^ TO DO : INSERT INTO `gameobject_template` VALUES (206595, 22, 10105, 'Portal to Tol Barad', '', '', '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 88341 ( spell for teleport; in our case : 120144, 132623, 132625), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 13329);
+
+INSERT INTO `spell_target_position` (`id`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`) VALUES 
+(120145, 571, 5805.05, 624.86, 647.76, 1.710), -- Ancient Teleport Dalaran
+(120144, 571, 5805.05, 624.86, 647.76, 1.710), -- Ancient Portal Dalaran
+(132623, 870, 1217.92, 1031.91, 425.96, 1.708),  -- Portal : Valle of Eternal Blossoms
+(132625, 870, 1217.92, 1031.91, 425.96, 1.708),  -- Portal : Valle of Eternal Blossoms
+(132627, 870, 1217.92, 1031.91, 425.96, 1.708),  -- Teleport  : Valle of Eternal Blossoms
+(132621, 870, 1217.92, 1031.91, 425.96, 1.708);  -- Teleport  : Valle of Eternal Blossoms
+
+*/
+
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellScript.h"
@@ -329,7 +346,7 @@ class spell_mage_cone_of_cold : public SpellScriptLoader
 };
 
 // 42955 Conjure Refreshment
-/// Updated 4.3.4
+/// Updated 5.1.0
 struct ConjureRefreshmentData
 {
     uint32 minLevel;
@@ -337,7 +354,7 @@ struct ConjureRefreshmentData
     uint32 spellId;
 };
 
-uint8 const MAX_CONJURE_REFRESHMENT_SPELLS = 7;
+uint8 const MAX_CONJURE_REFRESHMENT_SPELLS = 8;
 ConjureRefreshmentData const _conjureData[MAX_CONJURE_REFRESHMENT_SPELLS] =
 {
     { 33, 43, 92739 },
@@ -346,7 +363,8 @@ ConjureRefreshmentData const _conjureData[MAX_CONJURE_REFRESHMENT_SPELLS] =
     { 64, 73, 92805 },
     { 74, 79, 74625 },
     { 80, 84, 92822 },
-    { 85, 85, 92727 }
+    { 85, 89, 92727 },
+	{ 90, 90, 116130},
 };
 
 // 42955 - Conjure Refreshment
