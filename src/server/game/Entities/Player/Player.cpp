@@ -2455,7 +2455,7 @@ void Player::RemoveFromWorld()
 
 void Player::RegenerateAll()
 {
-    if(getClass() == CLASS_PALADIN || getClass() == CLASS_MONK || getClass() == CLASS_PRIEST)
+    if(getClass() == CLASS_PALADIN || getClass() == CLASS_MONK)
         m_regenTimerTenSec += m_regenTimer;
 
 
