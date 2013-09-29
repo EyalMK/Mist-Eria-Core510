@@ -1163,8 +1163,8 @@ enum Opcodes
     SMSG_PAGE_TEXT_QUERY_RESPONSE                     = 0x05A4,//16357
     SMSG_PARTYKILLLOG                                 = 0x1985,
     SMSG_PARTY_COMMAND_RESULT                         = 0x0980,//16357
-    SMSG_PARTY_MEMBER_STATS                           = 0x08A9,//16357
-    SMSG_PARTY_MEMBER_STATS_FULL                      = 0x09A0,//16357
+    SMSG_PARTY_MEMBER_STATS                           = 0x09A0,//16357
+    SMSG_PARTY_MEMBER_STATS_FULL                      = 0x08A9,//16357
     SMSG_PAUSE_MIRROR_TIMER                           = 0x1989,
     SMSG_PERIODICAURALOG                              = 0x0540,//16357
     SMSG_PETGODMODE                                   = 0x0260,//16357
