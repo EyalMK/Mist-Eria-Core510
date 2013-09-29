@@ -431,7 +431,7 @@ enum Opcodes
     CMSG_PLAYER_VEHICLE_ENTER                         = 0x1377,
     CMSG_PLAY_DANCE                                   = 0x0BA8,//16357
     CMSG_PUSHQUESTTOPARTY                             = 0x06C4,//16357
-    CMSG_PVP_LOG_DATA                                 = 0x1380,
+    CMSG_PVP_LOG_DATA                                 = 0x08D2,//16357
     CMSG_QUERY_BATTLEFIELD_STATE                      = 0x1381,
     CMSG_QUERY_GUILD_MEMBERS_FOR_RECIPE               = 0x1382,
     CMSG_QUERY_GUILD_MEMBER_RECIPES                   = 0x1383,
@@ -665,7 +665,6 @@ enum Opcodes
     MSG_PARTY_ASSIGNMENT                              = 0x1595,
     MSG_PETITION_DECLINE                              = 0x0405,//16357
     MSG_PETITION_RENAME                               = 0x01A1,//16357
-    MSG_PVP_LOG_DATA                                  = 0x08D2,//16357
     MSG_QUERY_NEXT_MAIL_TIME                          = 0x0609,//16357
     MSG_QUEST_PUSH_RESULT                             = 0x09A4,//16357
     CMSG_RAID_READY_CHECK                             = 0x069E,//16357
