@@ -329,7 +329,7 @@ class spell_mage_cone_of_cold : public SpellScriptLoader
 };
 
 // 42955 Conjure Refreshment
-/// Updated 4.3.4
+/// Updated 5.1.0
 struct ConjureRefreshmentData
 {
     uint32 minLevel;
@@ -337,7 +337,7 @@ struct ConjureRefreshmentData
     uint32 spellId;
 };
 
-uint8 const MAX_CONJURE_REFRESHMENT_SPELLS = 7;
+uint8 const MAX_CONJURE_REFRESHMENT_SPELLS = 8;
 ConjureRefreshmentData const _conjureData[MAX_CONJURE_REFRESHMENT_SPELLS] =
 {
     { 33, 43, 92739 },
@@ -346,7 +346,8 @@ ConjureRefreshmentData const _conjureData[MAX_CONJURE_REFRESHMENT_SPELLS] =
     { 64, 73, 92805 },
     { 74, 79, 74625 },
     { 80, 84, 92822 },
-    { 85, 85, 92727 }
+    { 85, 89, 92727 },
+	{ 90, 90, 116130},
 };
 
 // 42955 - Conjure Refreshment
