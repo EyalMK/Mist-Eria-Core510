@@ -170,6 +170,7 @@ void ReputationMgr::SendState(FactionState const* faction)
 
     WorldPacket data(SMSG_SET_FACTION_STANDING, 17);
     data << float(0);
+    data << float(0);
     data << uint8(_sendFactionIncreased);
     _sendFactionIncreased = false; // Reset
 
@@ -183,9 +184,9 @@ void ReputationMgr::SendState(FactionState const* faction)
     {
         if (itr->second.needSend)
         {
-            itr->second.needSend = false;
             if (itr->second.ReputationListID != faction->ReputationListID)
             {
+                itr->second.needSend = false;
                 data << uint32(itr->second.Standing);
                 data << uint32(itr->second.ReputationListID);
                 ++count;
