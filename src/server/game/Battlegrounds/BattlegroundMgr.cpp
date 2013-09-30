@@ -195,12 +195,12 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             data->WriteBit(playerGuid[2]);
             data->WriteBit(playerGuid[4]);
             data->WriteBit(bgGuid[6]);
-			data->WriteBit(bgGuid[0]);
-			data->WriteBit(bgGuid[5]);
+            data->WriteBit(bgGuid[0]);
+            data->WriteBit(bgGuid[5]);
             data->WriteBit(bgGuid[1]);
             data->WriteBit(playerGuid[7]);
-			data->WriteBit(playerGuid[5]);
-			data->WriteBit(bgGuid[4]);
+            data->WriteBit(playerGuid[5]);
+            data->WriteBit(bgGuid[4]);
             data->WriteBit(bgGuid[7]);
             data->WriteBit(0);
 			data->WriteBit(0);
@@ -210,20 +210,18 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             data->WriteBit(playerGuid[1]);
             data->WriteBit(bg->isRated());              // Is Rated
             data->WriteBit(playerGuid[3]);
-			data->WriteBit(bgGuid[2]);
+            data->WriteBit(bgGuid[2]);
 
 			data->FlushBits();
 
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE BG %u %u %u %u %u %u", bg->isArena() ? arenatype : 1, Time1, Time2, QueueSlot, GetMSTimeDiffToNow(Time2), bg->GetClientInstanceID());
-
-			data->WriteByteSeq(bgGuid[0]);
+            data->WriteByteSeq(bgGuid[0]);
             data->WriteByteSeq(playerGuid[5]);
-			data->WriteByteSeq(playerGuid[1]);
-			data->WriteByteSeq(playerGuid[4]);
+            data->WriteByteSeq(playerGuid[1]);
+            data->WriteByteSeq(playerGuid[4]);
             *data << uint32(bg->isArena() ? arenatype : 1); // Player count, 1 for bgs, 2-3-5 for arena (2v2, 3v3, 5v5)
             data->WriteByteSeq(playerGuid[6]);
             data->WriteByteSeq(bgGuid[7]);
-			data->WriteByteSeq(bgGuid[1]);
+            data->WriteByteSeq(bgGuid[1]);
             *data << uint32(Time1);                     // Estimated Wait Time time1
             *data << uint8(bg->GetMinLevel());          // Min Level   
             data->WriteByteSeq(bgGuid[4]);
@@ -231,9 +229,9 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             data->WriteByteSeq(bgGuid[5]);
             data->WriteByteSeq(playerGuid[3]);
             *data << uint32(QueueSlot);
-			data->WriteByteSeq(bgGuid[3]);
-			data->WriteByteSeq(playerGuid[2]);
-			data->WriteByteSeq(bgGuid[6]);
+            data->WriteByteSeq(bgGuid[3]);
+            data->WriteByteSeq(playerGuid[2]);
+            data->WriteByteSeq(bgGuid[6]);
             *data << uint8(0);
             data->WriteByteSeq(playerGuid[7]);
             data->WriteByteSeq(playerGuid[0]);
