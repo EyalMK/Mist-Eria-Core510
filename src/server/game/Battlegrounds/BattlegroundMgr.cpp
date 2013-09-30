@@ -222,13 +222,13 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             data->WriteByteSeq(playerGuid[6]);
             data->WriteByteSeq(bgGuid[7]);
             data->WriteByteSeq(bgGuid[1]);
-            *data << uint32(3600);                     // Estimated Wait Time time1
+            *data << uint32(3600*1000);                     // Estimated Wait Time time1
             *data << uint8(bg->GetMinLevel());          // Min Level   
             data->WriteByteSeq(bgGuid[4]);
             *data << uint32(QueueSlot);  //time2
             data->WriteByteSeq(bgGuid[5]);
             data->WriteByteSeq(playerGuid[3]);
-            *data << uint32(7200);
+            *data << uint32(7200*1000);
             data->WriteByteSeq(bgGuid[3]);
             data->WriteByteSeq(playerGuid[2]);
             data->WriteByteSeq(bgGuid[6]);
