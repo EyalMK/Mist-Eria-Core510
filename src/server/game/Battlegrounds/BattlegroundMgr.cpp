@@ -272,8 +272,8 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 			data->WriteByteSeq(playerGuid[5]);
 			*data << uint8(0); 
 			*data << uint8(bg->GetMinLevel());          // Min Level
+            *data << uint32(QueueSlot);                 // Queue slot
             *data << uint32(Time1);                     // Time until closed time1
-			*data << uint32(QueueSlot);                 // Queue slot
 			data->WriteByteSeq(bgGuid[6]);
 			data->WriteByteSeq(playerGuid[1]);
 			data->WriteByteSeq(playerGuid[2]);

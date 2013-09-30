@@ -380,8 +380,8 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
     uint8 action;                       // enter battle 0x1, leave queue 0x0
     ObjectGuid guid;
 
-    recvData >> queueSlot;
     recvData >> time;
+    recvData >> queueSlot;
     recvData >> unk;
 
     guid[7] = recvData.ReadBit();
