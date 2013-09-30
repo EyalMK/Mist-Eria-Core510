@@ -228,7 +228,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             *data << uint32(QueueSlot);  //time2
             data->WriteByteSeq(bgGuid[5]);
             data->WriteByteSeq(playerGuid[3]);
-            *data << uint32(QueueSlot); //TIME2 FOR SURE
+            *data << uint32(Time2); //TIME2
             data->WriteByteSeq(bgGuid[3]);
             data->WriteByteSeq(playerGuid[2]);
             data->WriteByteSeq(bgGuid[6]);
@@ -272,12 +272,12 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 			data->WriteByteSeq(playerGuid[5]);
 			*data << uint8(0); 
 			*data << uint8(bg->GetMinLevel());          // Min Level
-            *data << uint32(Time1);                 // Queue slot
+            *data << uint32(QueueSlot);                 // Queue slot
             *data << uint32(Time2);                     // Time until closed time1
 			data->WriteByteSeq(bgGuid[6]);
 			data->WriteByteSeq(playerGuid[1]);
 			data->WriteByteSeq(playerGuid[2]);
-            *data << uint32(QueueSlot);                     // Join Time          time2
+            *data << uint32(Time1);                     // Join Time          time2
 			data->WriteByteSeq(bgGuid[7]);
 			data->WriteByteSeq(bgGuid[3]);
 			*data << uint32(bg->isArena() ? arenatype : 1); // Player count, 1 for bgs, 2-3-5 for arena (2v2, 3v3, 5v5)
