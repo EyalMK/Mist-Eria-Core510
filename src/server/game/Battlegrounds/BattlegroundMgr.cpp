@@ -218,27 +218,27 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             data->WriteByteSeq(playerGuid[5]);
             data->WriteByteSeq(playerGuid[1]);
             data->WriteByteSeq(playerGuid[4]);
-            *data << uint32(bg->isArena() ? arenatype : 1); // Player count, 1 for bgs, 2-3-5 for arena (2v2, 3v3, 5v5)
+            *data << uint32(QueueSlot); // Player count, 1 for bgs, 2-3-5 for arena (2v2, 3v3, 5v5)
             data->WriteByteSeq(playerGuid[6]);
             data->WriteByteSeq(bgGuid[7]);
             data->WriteByteSeq(bgGuid[1]);
             *data << uint32(QueueSlot);                     // Estimated Wait Time time1
             *data << uint8(bg->GetMinLevel());          // Min Level   
             data->WriteByteSeq(bgGuid[4]);
-            *data << uint32(Time2);  //time2
+            *data << uint32(QueueSlot);  //time2
             data->WriteByteSeq(bgGuid[5]);
             data->WriteByteSeq(playerGuid[3]);
-            *data << uint32(Time1);
+            *data << uint32(QueueSlot);
             data->WriteByteSeq(bgGuid[3]);
             data->WriteByteSeq(playerGuid[2]);
             data->WriteByteSeq(bgGuid[6]);
             *data << uint8(0);
             data->WriteByteSeq(playerGuid[7]);
             data->WriteByteSeq(playerGuid[0]);
-            *data << uint32(GetMSTimeDiffToNow(Time2)); // Time since joined
+            *data << uint32(QueueSlot); // Time since joined
             data->WriteByteSeq(bgGuid[2]);
             *data << uint8(bg->GetMaxLevel());                          // unk                   
-            *data << uint32(bg->GetClientInstanceID()); // Client Instance ID instanceID
+            *data << uint32(QueueSlot); // Client Instance ID instanceID
             break;
         }
 		case STATUS_WAIT_JOIN:
