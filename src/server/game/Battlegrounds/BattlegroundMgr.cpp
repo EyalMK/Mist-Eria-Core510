@@ -214,6 +214,8 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 
 			data->FlushBits();
 
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE BG %u %u %u %u %u %u", bg->isArena() ? arenatype : 1, Time1, Time2, QueueSlot, GetMSTimeDiffToNow(Time2), bg->GetClientInstanceID());
+
 			data->WriteByteSeq(bgGuid[0]);
             data->WriteByteSeq(playerGuid[5]);
 			data->WriteByteSeq(playerGuid[1]);
@@ -222,10 +224,10 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             data->WriteByteSeq(playerGuid[6]);
             data->WriteByteSeq(bgGuid[7]);
 			data->WriteByteSeq(bgGuid[1]);
-            *data << uint32(QueueSlot);                     // Estimated Wait Time time1
+            *data << uint32(Time1);                     // Estimated Wait Time time1
             *data << uint8(bg->GetMinLevel());          // Min Level   
             data->WriteByteSeq(bgGuid[4]);
-            *data << uint32(QueueSlot);  //time2
+            *data << uint32(Time2);  //time2
             data->WriteByteSeq(bgGuid[5]);
             data->WriteByteSeq(playerGuid[3]);
             *data << uint32(QueueSlot);
@@ -238,7 +240,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             *data << uint32(GetMSTimeDiffToNow(Time2)); // Time since joined
             data->WriteByteSeq(bgGuid[2]);
             *data << uint8(bg->GetMaxLevel());                          // unk                   
-            *data << uint32(QueueSlot); // Client Instance ID instanceID
+            *data << uint32(bg->GetClientInstanceID()); // Client Instance ID instanceID
             break;
         }
 		case STATUS_WAIT_JOIN:
