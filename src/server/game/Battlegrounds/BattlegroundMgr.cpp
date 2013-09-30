@@ -215,10 +215,10 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             data->FlushBits();
 
 
-            for (int i=0; i< 80 ; ++i) {
+            /*for (int i=0; i< 80 ; ++i) {
                 *data << uint8(i);
-            }
-/*            data->WriteByteSeq(bgGuid[0]);
+            }*/
+            data->WriteByteSeq(bgGuid[0]);
             data->WriteByteSeq(playerGuid[5]);
             data->WriteByteSeq(playerGuid[1]);
             data->WriteByteSeq(playerGuid[4]);
@@ -226,7 +226,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             data->WriteByteSeq(playerGuid[6]);
             data->WriteByteSeq(bgGuid[7]);
             data->WriteByteSeq(bgGuid[1]);
-            *data << uint32(40);                     // Estimated Wait Time time1
+            *data << uint32(QueueSlot);                     // Estimated Wait Time time1
             *data << uint8(bg->GetMinLevel());          // Min Level   
             data->WriteByteSeq(bgGuid[4]);
             *data << uint32(Time2);  //time2
@@ -242,7 +242,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             *data << uint32(GetMSTimeDiffToNow(Time2)); // Time since joined
             data->WriteByteSeq(bgGuid[2]);
             *data << uint8(bg->GetMaxLevel());                          // unk
-            *data << uint32(QueueSlot); // Client Instance ID instanceID*/
+            *data << uint32(QueueSlot); // Client Instance ID instanceID
             break;
         }
 		case STATUS_WAIT_JOIN:
