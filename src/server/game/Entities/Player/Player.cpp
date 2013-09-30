@@ -26100,7 +26100,8 @@ void Player::SendTimeSync()
 
 void Player::SetReputation(uint32 factionentry, uint32 value)
 {
-    GetReputationMgr().SetReputation(sFactionStore.LookupEntry(factionentry), value);
+    if(FactionEntry const* entry = sFactionStore.LookupEntry(factionentry))
+        GetReputationMgr().SetReputation(entry, value);
 }
 uint32 Player::GetReputation(uint32 factionentry) const
 {
