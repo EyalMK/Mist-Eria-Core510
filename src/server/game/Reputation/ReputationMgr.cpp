@@ -170,6 +170,7 @@ void ReputationMgr::SendState(FactionState const* faction)
 
     WorldPacket data(SMSG_SET_FACTION_STANDING, 17);
     data << float(0);
+    data << float(0);
     data << uint8(_sendFactionIncreased);
     _sendFactionIncreased = false; // Reset
 
@@ -183,9 +184,9 @@ void ReputationMgr::SendState(FactionState const* faction)
     {
         if (itr->second.needSend)
         {
-            itr->second.needSend = false;
             if (itr->second.ReputationListID != faction->ReputationListID)
             {
+                itr->second.needSend = false;
                 data << uint32(itr->second.ReputationListID);
                 data << uint32(itr->second.Standing);
                 ++count;
@@ -199,8 +200,8 @@ void ReputationMgr::SendState(FactionState const* faction)
 
 void ReputationMgr::SendInitialReputations()
 {
-    uint16 count = 256;
-    WorldPacket data(SMSG_INITIALIZE_FACTIONS, 4 + count * 5);
+    uint32 count = 256;
+    WorldPacket data(SMSG_INITIALIZE_FACTIONS);
     data << uint32(count);
 
     RepListID a = 0;
@@ -208,7 +209,7 @@ void ReputationMgr::SendInitialReputations()
     for (FactionStateList::iterator itr = _factions.begin(); itr != _factions.end(); ++itr)
     {
         // fill in absent fields
-        for (; a != itr->first; ++a)
+        for (; a < itr->first; ++a)
         {
             data << uint8(0);
             data << uint32(0);
@@ -224,7 +225,7 @@ void ReputationMgr::SendInitialReputations()
     }
 
     // fill in absent fields
-    for (; a != count; ++a)
+    for (; a < count; ++a)
     {
         data << uint8(0);
         data << uint32(0);
@@ -259,7 +260,7 @@ void ReputationMgr::Initialize()
     _exaltedFactionCount = 0;
     _sendFactionIncreased = false;
 
-    for (unsigned int i = 1; i < sFactionStore.GetNumRows(); i++)
+    for (uint32 i = 0; i < sFactionStore.GetNumRows(); i++)
     {
         FactionEntry const* factionEntry = sFactionStore.LookupEntry(i);
 

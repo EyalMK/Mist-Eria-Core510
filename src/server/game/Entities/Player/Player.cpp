@@ -3186,8 +3186,7 @@ void Player::InitTalentForLevel()
             SetActiveSpec(0);
         }
 
-        //uint32 talentPointsForLevel = CalculateTalentsPoints();
-        uint32 talentPointsForLevel = level/15;
+        uint32 talentPointsForLevel = CalculateTalentsPoints();
 
         // if used more that have then reset
         if (GetUsedTalentCount() > talentPointsForLevel)
@@ -7345,13 +7344,10 @@ void Player::SendNewCurrency(uint32 id) const
 
 void Player::SendCurrencies() const
 {
-/*
+    WorldPacket packet(SMSG_INIT_CURRENCY);
     ByteBuffer currencyData;
-    WorldPacket packet(SMSG_INIT_CURRENCY, 4 + _currencyStorage.size()*(5*4 + 1));
 
-	packet.WriteBits(_currencyStorage.size(), 22);
-    size_t count_pos = packet.bitwpos();
-
+    packet.WriteBits(_currencyStorage.size(), 22);
     size_t count = 0;
     for (PlayerCurrenciesMap::const_iterator itr = _currencyStorage.begin(); itr != _currencyStorage.end(); ++itr)
     {
@@ -7365,12 +7361,12 @@ void Player::SendCurrencies() const
         uint32 weekCount = itr->second.weekCount / precision;
         uint32 weekCap = GetCurrencyWeekCap(entry) / precision;
 
-		packet.WriteBits(0, 5); // some flags
+        packet.WriteBits(0, 5); // some flags
         packet.WriteBit(weekCap);
         packet.WriteBit(0);     // season total earned
         packet.WriteBit(weekCount);
 
-		currencyData << uint32(entry->ID);
+        currencyData << uint32(entry->ID);
         currencyData << uint32(itr->second.totalCount / precision);
 
         if (weekCap)
@@ -7387,9 +7383,9 @@ void Player::SendCurrencies() const
 
     packet.FlushBits();
     packet.append(currencyData);
-    packet.PutBits(count_pos, count, 22);
+    if(count != _currencyStorage.size()) packet.PutBits(0, count, 22);
+
     GetSession()->SendPacket(&packet);
-*/
 }
 
 void Player::SendPvpRewards() const
@@ -24825,33 +24821,14 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot, ObjectGuid guid)
 
 uint32 Player::CalculateTalentsPoints() const
 {
-    sLog->outError(LOG_FILTER_GENERAL, "Player::CalculateTalentsPoints no more NumTalentsAtLevelEntry,need fix");
-    // this dbc file has entries only up to level 100
-    /*NumTalentsAtLevelEntry const* count = sNumTalentsAtLevelStore.LookupEntry(std::min<uint32>(getLevel(), 100));
-    if (!count)
-        return 0;
+    uint32 level = getLevel();
+    uint32 result = 0;
+    if(getClass() == CLASS_DEATH_KNIGHT && level < 58)
+        result = level - 55;
+    else
+        result = level / 15;
 
-    float baseForLevel = count->Talents;
-
-    if (getClass() != CLASS_DEATH_KNIGHT || GetMapId() != 609)
-        return uint32(baseForLevel * sWorld->getRate(RATE_TALENT));
-
-    // Death Knight starting level
-    // hardcoded here - number of quest awarded talents is equal to number of talents any other class would have at level 55
-    if (getLevel() < 55)
-        return 0;
-
-    //NumTalentsAtLevelEntry const* dkBase = sNumTalentsAtLevelStore.LookupEntry(55);
-    //if (!dkBase)
-        //return 0;
-
-    float talentPointsForLevel = count->Talents - dkBase->Talents;
-    talentPointsForLevel += float(GetQuestRewardedTalentCount());
-
-    if (talentPointsForLevel > baseForLevel)
-        talentPointsForLevel = baseForLevel;*/
-
-    return 10;//uint32(talentPointsForLevel * sWorld->getRate(RATE_TALENT));
+    return std::max(result, uint32(0));
 }
 
 bool Player::IsKnowHowFlyIn(uint32 mapid, uint32 zone) const
@@ -26100,7 +26077,8 @@ void Player::SendTimeSync()
 
 void Player::SetReputation(uint32 factionentry, uint32 value)
 {
-    GetReputationMgr().SetReputation(sFactionStore.LookupEntry(factionentry), value);
+    if(FactionEntry const* entry = sFactionStore.LookupEntry(factionentry))
+        GetReputationMgr().SetReputation(entry, value);
 }
 uint32 Player::GetReputation(uint32 factionentry) const
 {

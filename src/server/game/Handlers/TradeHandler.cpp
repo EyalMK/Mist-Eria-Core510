@@ -30,10 +30,10 @@
 #include "Language.h"
 #include "AccountMgr.h"
 
-void WorldSession::SendTradeStatus(TradeStatus status)
+void WorldSession::SendTradeStatus(TradeStatus status, uint64 pguid)
 {
     WorldPacket data;
-	ObjectGuid guid;
+	ObjectGuid guid = pguid;
 
 	// i think still need work on it sub_76B9A0
     data.Initialize(SMSG_TRADE_STATUS, 4+8);
@@ -43,33 +43,51 @@ void WorldSession::SendTradeStatus(TradeStatus status)
     switch (status)
     {
         case TRADE_STATUS_BEGIN_TRADE:
-			data.WriteBit(0); // unk bit, usually 0
-			data.WriteBits(0, 8); // zero guid
-            data.FlushBits();
-            break;
-        case TRADE_STATUS_OPEN_WINDOW:
-            data.FlushBits();
-            data << uint32(0); // unk
+			data.WriteBit(guid[3]);
+			data.WriteBit(guid[0]);
+			data.WriteBit(guid[1]);
+			data.WriteBit(guid[5]);
+			data.WriteBit(guid[6]);
+			data.WriteBit(guid[2]);
+			data.WriteBit(guid[7]);
+			data.WriteBit(guid[4]);
             break;
         case TRADE_STATUS_CLOSE_WINDOW:
-            data.WriteBit(0); // unk
-            data.FlushBits();
+			data.WriteBit(0); // unk
+            break;
+    }
+
+	data.WriteBit(1); //unk
+
+	data.FlushBits();
+
+	switch (status)
+    {
+        case TRADE_STATUS_BEGIN_TRADE:
+			data.WriteByteSeq(guid[4]);
+			data.WriteByteSeq(guid[5]);
+			data.WriteByteSeq(guid[7]);
+			data.WriteByteSeq(guid[0]);
+			data.WriteByteSeq(guid[1]);
+			data.WriteByteSeq(guid[2]);
+			data.WriteByteSeq(guid[3]);
+			data.WriteByteSeq(guid[6]);
+            break;
+        case TRADE_STATUS_OPEN_WINDOW:
+			data << uint32(0); // unk
+            break;
+        case TRADE_STATUS_CLOSE_WINDOW:
             data << uint32(0); // unk
             data << uint32(0); // unk
             break;
-        case TRADE_STATUS_ONLY_CONJURED:
-        case TRADE_STATUS_NOT_ELIGIBLE:
-            data.FlushBits();
+        case TRADE_STATUS_NOT_ON_TAPLIST:
+        case TRADE_STATUS_WRONG_REALM:
             data << uint8(0); // unk
             break;
         case TRADE_STATUS_CURRENCY: // Not implemented
         case TRADE_STATUS_CURRENCY_NOT_TRADABLE: // Not implemented
-            data.FlushBits();
             data << uint32(0); // unk
             data << uint32(0); // unk
-        default:
-            data.FlushBits();
-            break;
     }
 
     SendPacket(&data);
@@ -385,7 +403,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
 
             if (item->IsBindedNotWith(trader))
             {
-                SendTradeStatus(TRADE_STATUS_NOT_ELIGIBLE);
+                SendTradeStatus(TRADE_STATUS_CURRENCY_NOT_TRADABLE);
                 SendTradeStatus(TRADE_STATUS_CLOSE_WINDOW/*TRADE_STATUS_TRADE_CANCELED*/);
                 return;
             }
@@ -606,8 +624,8 @@ void WorldSession::HandleBeginTradeOpcode(WorldPacket& /*recvPacket*/)
     if (!my_trade)
         return;
 
-    my_trade->GetTrader()->GetSession()->SendTradeStatus(TRADE_STATUS_OPEN_WINDOW);
-    SendTradeStatus(TRADE_STATUS_OPEN_WINDOW);
+    my_trade->GetTrader()->GetSession()->SendTradeStatus(TRADE_STATUS_OPEN_WINDOW, GetPlayer()->GetGUID());
+    SendTradeStatus(TRADE_STATUS_OPEN_WINDOW, GetPlayer()->GetGUID());
 }
 
 void WorldSession::SendCancelTrade()
