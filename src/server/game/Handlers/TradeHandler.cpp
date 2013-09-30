@@ -30,10 +30,10 @@
 #include "Language.h"
 #include "AccountMgr.h"
 
-void WorldSession::SendTradeStatus(TradeStatus status)
+void WorldSession::SendTradeStatus(TradeStatus status, uint64 pguid)
 {
     WorldPacket data;
-	ObjectGuid guid;
+	ObjectGuid guid = pguid;
 
 	// i think still need work on it sub_76B9A0
     data.Initialize(SMSG_TRADE_STATUS, 4+8);
@@ -43,8 +43,14 @@ void WorldSession::SendTradeStatus(TradeStatus status)
     switch (status)
     {
         case TRADE_STATUS_BEGIN_TRADE:
-			data.WriteBit(0); // unk bit, usually 0
-			data.WriteBits(0, 8); // zero guid
+			data.WriteBit(guid[3]);
+			data.WriteBit(guid[0]);
+			data.WriteBit(guid[1]);
+			data.WriteBit(guid[5]);
+			data.WriteBit(guid[6]);
+			data.WriteBit(guid[2]);
+			data.WriteBit(guid[7]);
+			data.WriteBit(guid[4]);
             break;
         case TRADE_STATUS_CLOSE_WINDOW:
 			data.WriteBit(0); // unk
@@ -58,7 +64,14 @@ void WorldSession::SendTradeStatus(TradeStatus status)
 	switch (status)
     {
         case TRADE_STATUS_BEGIN_TRADE:
-			//guidbyteseq
+			data.WriteByteSeq(guid[4]);
+			data.WriteByteSeq(guid[5]);
+			data.WriteByteSeq(guid[7]);
+			data.WriteByteSeq(guid[0]);
+			data.WriteByteSeq(guid[1]);
+			data.WriteByteSeq(guid[2]);
+			data.WriteByteSeq(guid[3]);
+			data.WriteByteSeq(guid[6]);
             break;
         case TRADE_STATUS_OPEN_WINDOW:
 			data << uint32(0); // unk
