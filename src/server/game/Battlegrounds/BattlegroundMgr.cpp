@@ -267,17 +267,17 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 			data->FlushBits();
 
 			data->WriteByteSeq(bgGuid[0]);
-            *data << uint32(bg->GetMapId()); // Client Instance ID bg->GetClientInstanceID()
+            *data << uint32(bg->GetClientInstanceID()); // Client Instance ID
 			data->WriteByteSeq(bgGuid[2]);
 			data->WriteByteSeq(playerGuid[5]);
 			*data << uint8(0); 
 			*data << uint8(bg->GetMinLevel());          // Min Level
-            *data << uint32(bg->GetMapId());                     // Time until closed time1
+            *data << uint32(Time1);                     // Time until closed time1
 			*data << uint32(QueueSlot);                 // Queue slot
 			data->WriteByteSeq(bgGuid[6]);
 			data->WriteByteSeq(playerGuid[1]);
 			data->WriteByteSeq(playerGuid[2]);
-            *data << uint32(bg->GetMapId());                     // Join Time          time2
+            *data << uint32(Time2);                     // Join Time          time2
 			data->WriteByteSeq(bgGuid[7]);
 			data->WriteByteSeq(bgGuid[3]);
 			*data << uint32(bg->isArena() ? arenatype : 1); // Player count, 1 for bgs, 2-3-5 for arena (2v2, 3v3, 5v5)
@@ -325,7 +325,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 			data->WriteByteSeq(bgGuid[6]);
 			data->WriteByteSeq(bgGuid[1]);
 			data->WriteByteSeq(bgGuid[4]);
-            *data << uint32(0);                     // Join Time time1
+            *data << uint32(Time1);                     // Join Time time1
 			data->WriteByteSeq(playerGuid[0]);
 			*data << uint32(QueueSlot);                 // Queue slot
 			data->WriteByteSeq(playerGuid[2]);
@@ -333,16 +333,16 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 			data->WriteByteSeq(playerGuid[3]);
 			data->WriteByteSeq(playerGuid[5]);
 			*data << uint32(bg->isArena() ? arenatype : 1); // Player count, 1 for bgs, 2-3-5 for arena (2v2, 3v3, 5v5)
-            *data << uint32(1);            // Map Id
+            *data << uint32(Time2);
 			*data << uint8(0);                          // unk
 			*data << uint8(0);                          // unk
 			data->WriteByteSeq(bgGuid[2]);
 			data->WriteByteSeq(playerGuid[4]);
 			data->WriteByteSeq(bgGuid[3]);
 			data->WriteByteSeq(playerGuid[1]);
-            *data << uint32(13);                     // Elapsed Time //time2
-            *data << uint32(25);    // Remaining Time bg->GetRemainingTime()
-            *data << uint32(30); // Client Instance ID or faction ? bg->GetClientInstanceID()
+            *data << uint32(bg->GetMapId());                    //Map Id
+            *data << uint32(bg->GetRemainingTime());    // Remaining Time
+            *data << uint32(bg->GetClientInstanceID()); // Client Instance ID or faction ?
 			*data << uint8(bg->GetMinLevel());          // Min Level
 			data->WriteByteSeq(bgGuid[5]);
 			break;
