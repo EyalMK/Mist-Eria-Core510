@@ -325,9 +325,9 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 			data->WriteByteSeq(bgGuid[6]);
 			data->WriteByteSeq(bgGuid[1]);
 			data->WriteByteSeq(bgGuid[4]);
-            *data << uint32(Time1);                     // Join Time time1
+            *data << uint32(QueueSlot);                     // Join Time time1
 			data->WriteByteSeq(playerGuid[0]);
-            *data << uint32(QueueSlot);                 // Queue slot
+            *data << uint32(Time1);                 // Queue slot
 			data->WriteByteSeq(playerGuid[2]);
 			data->WriteByteSeq(playerGuid[6]);
 			data->WriteByteSeq(playerGuid[3]);
