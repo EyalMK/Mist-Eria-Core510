@@ -1117,7 +1117,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
     }
 
     if(mask & GROUP_UPDATE_FLAG_UNK2)
-        data << uint(0) << uint8(0);
+        *data << uint8(0) << uint8(0);
 
     if (mask & GROUP_UPDATE_FLAG_CUR_HP)
         *data << uint32(player->GetHealth());
