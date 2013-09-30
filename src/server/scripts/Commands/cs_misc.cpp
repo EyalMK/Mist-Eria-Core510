@@ -1034,20 +1034,12 @@ public:
 
         Player* player = handler->GetSession()->GetPlayer();
 
-        uint32 zoneId = player->GetZoneId();
+        uint32 areaId = player->GetAreaId();
 
-        AreaTableEntry const* areaEntry = GetAreaEntryByAreaID(zoneId);
-        if (!areaEntry || areaEntry->zone !=0)
-        {
-            handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDWRONGZONE, graveyardId, zoneId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        if (sObjectMgr->AddGraveYardLink(graveyardId, zoneId, team))
-            handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDLINKED, graveyardId, zoneId);
+        if (sObjectMgr->AddGraveYardLink(graveyardId, areaId, team))
+            handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDLINKED, graveyardId, areaId);
         else
-            handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDALRLINKED, graveyardId, zoneId);
+            handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDALRLINKED, graveyardId, areaId);
 
         return true;
     }
