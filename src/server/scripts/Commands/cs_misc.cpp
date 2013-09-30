@@ -270,7 +270,7 @@ public:
             ignoreDoublon = true;
 
         if(ignoreDoublon) handler->PSendSysMessage("****Début du listage (doublon ignorés) ****");
-        else handler->PSendSysMessage("****Début du listage ****"));
+        else handler->PSendSysMessage("****Début du listage ****");
         
 
         for(Unit::AuraMap::const_iterator i = auras.begin() ; i != auras.end() ; ++i)
