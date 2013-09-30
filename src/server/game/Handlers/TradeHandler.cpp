@@ -45,31 +45,36 @@ void WorldSession::SendTradeStatus(TradeStatus status)
         case TRADE_STATUS_BEGIN_TRADE:
 			data.WriteBit(0); // unk bit, usually 0
 			data.WriteBits(0, 8); // zero guid
-            data.FlushBits();
-            break;
-        case TRADE_STATUS_OPEN_WINDOW:
-            data.FlushBits();
-            data << uint32(0); // unk
             break;
         case TRADE_STATUS_CLOSE_WINDOW:
-            data.WriteBit(0); // unk
-            data.FlushBits();
+			data.WriteBit(0); // unk
+            break;
+    }
+
+	data.WriteBit(0); //unk
+
+	data.FlushBits();
+
+	switch (status)
+    {
+        case TRADE_STATUS_BEGIN_TRADE:
+			//guidbyteseq
+            break;
+        case TRADE_STATUS_OPEN_WINDOW:
+			data << uint32(0); // unk
+            break;
+        case TRADE_STATUS_CLOSE_WINDOW:
             data << uint32(0); // unk
             data << uint32(0); // unk
             break;
-        case TRADE_STATUS_ONLY_CONJURED:
-        case TRADE_STATUS_NOT_ELIGIBLE:
-            data.FlushBits();
+        case TRADE_STATUS_NOT_ON_TAPLIST:
+        case TRADE_STATUS_WRONG_REALM:
             data << uint8(0); // unk
             break;
         case TRADE_STATUS_CURRENCY: // Not implemented
         case TRADE_STATUS_CURRENCY_NOT_TRADABLE: // Not implemented
-            data.FlushBits();
             data << uint32(0); // unk
             data << uint32(0); // unk
-        default:
-            data.FlushBits();
-            break;
     }
 
     SendPacket(&data);
