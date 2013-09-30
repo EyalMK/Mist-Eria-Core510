@@ -7384,7 +7384,7 @@ void Player::SendCurrencies() const
 
     packet.FlushBits();
     packet.append(currencyData);
-    packet.PutBits(0, count, 22);
+    if(count != _currencyStorage.size()) packet.PutBits(0, count, 22);
 
     GetSession()->SendPacket(&packet);
 }
