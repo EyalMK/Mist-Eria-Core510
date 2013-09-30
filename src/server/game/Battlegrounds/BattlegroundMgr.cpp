@@ -267,7 +267,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 			data->FlushBits();
 
 			data->WriteByteSeq(bgGuid[0]);
-			*data << uint32(bg->GetClientInstanceID()); // Client Instance ID
+            *data << uint32(bg->GetMapId()); // Client Instance ID bg->GetClientInstanceID()
 			data->WriteByteSeq(bgGuid[2]);
 			data->WriteByteSeq(playerGuid[5]);
 			*data << uint8(0); 
@@ -325,7 +325,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 			data->WriteByteSeq(bgGuid[6]);
 			data->WriteByteSeq(bgGuid[1]);
 			data->WriteByteSeq(bgGuid[4]);
-			*data << uint32(Time1);                     // Join Time
+            *data << uint32(bg->GetMapId());                     // Join Time time1
 			data->WriteByteSeq(playerGuid[0]);
 			*data << uint32(QueueSlot);                 // Queue slot
 			data->WriteByteSeq(playerGuid[2]);
@@ -340,9 +340,9 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 			data->WriteByteSeq(playerGuid[4]);
 			data->WriteByteSeq(bgGuid[3]);
 			data->WriteByteSeq(playerGuid[1]);
-			*data << uint32(Time2);                     // Elapsed Time
-			*data << uint32(bg->GetRemainingTime());    // Remaining Time
-			*data << uint32(bg->GetClientInstanceID()); // Client Instance ID or faction ?
+            *data << uint32(bg->GetMapId());                     // Elapsed Time //time2
+            *data << uint32(bg->GetMapId());    // Remaining Time bg->GetRemainingTime()
+            *data << uint32(bg->GetMapId()); // Client Instance ID or faction ? bg->GetClientInstanceID()
 			*data << uint8(bg->GetMinLevel());          // Min Level
 			data->WriteByteSeq(bgGuid[5]);
 			break;
