@@ -57,7 +57,7 @@ void WorldSession::SendTradeStatus(TradeStatus status, uint64 pguid)
             break;
     }
 
-	data.WriteBit(0); //unk
+	data.WriteBit(1); //unk
 
 	data.FlushBits();
 
