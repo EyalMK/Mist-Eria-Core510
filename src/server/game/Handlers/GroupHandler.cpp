@@ -1116,6 +1116,9 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
             *data << uint16(MEMBER_STATUS_OFFLINE);
     }
 
+    if(mask & GROUP_UPDATE_FLAG_UNK2)
+        *data << uint8(0) << uint8(0);
+
     if (mask & GROUP_UPDATE_FLAG_CUR_HP)
         *data << uint32(player->GetHealth());
 
@@ -1125,6 +1128,9 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
     Powers powerType = player->getPowerType();
     if (mask & GROUP_UPDATE_FLAG_POWER_TYPE)
         *data << uint8(powerType);
+
+    if(mask & GROUP_UPDATE_FLAG_POWER_TYPE2)
+        *data << uint16(0);
 
     if (mask & GROUP_UPDATE_FLAG_CUR_POWER)
         *data << uint16(player->GetPower(powerType));
@@ -1163,10 +1169,12 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
                 }
 
                 *data << uint32(aurApp->GetBase()->GetId());
-                *data << uint16(aurApp->GetFlags());
+                *data << uint8(aurApp->GetFlags());
+                *data << uint32(0);
 
                 if (aurApp->GetFlags() & AFLAG_ANY_EFFECT_AMOUNT_SENT)
                 {
+                    *data << uint8(MAX_SPELL_EFFECTS);
                     for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                     {
                         if (AuraEffect const* eff = aurApp->GetBase()->GetEffect(i))
@@ -1242,15 +1250,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
             *data << uint16(pet->GetMaxPower(pet->getPowerType()));
         else
             *data << uint16(0);
-    }
-
-    if (mask & GROUP_UPDATE_FLAG_VEHICLE_SEAT)
-    {
-        if (Vehicle* veh = player->GetVehicle())
-            *data << uint32(veh->GetVehicleInfo()->m_seatID[player->m_movementInfo.t_seat]);
-        else
-            *data << uint32(0);
-    }
+    }    
 
     if (mask & GROUP_UPDATE_FLAG_PET_AURAS)
     {
@@ -1295,10 +1295,19 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
         }
     }
 
+    if (mask & GROUP_UPDATE_FLAG_VEHICLE_SEAT)
+    {
+        if (Vehicle* veh = player->GetVehicle())
+            *data << uint32(veh->GetVehicleInfo()->m_seatID[player->m_movementInfo.t_seat]);
+        else
+            *data << uint32(0);
+    }
+
     if (mask & GROUP_UPDATE_FLAG_PHASE)
     {
         *data << uint32(8); // either 0 or 8, same unk found in SMSG_PHASESHIFT
-        *data << uint32(0); // count
+        data->WriteBits(0, 25);
+        data->FlushBits();
         // for (count) *data << uint16(phaseId)
     }
 }

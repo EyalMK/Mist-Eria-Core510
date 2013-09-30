@@ -5621,6 +5621,7 @@ WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float
     GraveYardMapBounds range = GraveYardStore.equal_range(zoneId);
     MapEntry const* map = sMapStore.LookupEntry(MapId);
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE graveyard %u %u %u", range.first == range.second?1:0, MapId, zoneId);
     // not need to check validity of map object; MapId _MUST_ be valid here
     if (range.first == range.second && !map->IsBattleArena())
     {
@@ -5650,7 +5651,7 @@ WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float
         WorldSafeLocsEntry const* entry = sWorldSafeLocsStore.LookupEntry(data.safeLocId);
         if (!entry)
         {
-            sLog->outError(LOG_FILTER_SQL, "Table `game_graveyard_zone` has record for not existing graveyard (WorldSafeLocs.dbc id) %u, skipped.", data.safeLocId);
+            sLog->outError(LOG_FILTER_NETWORKIO, "Table `game_graveyard_zone` has record for not existing graveyard (WorldSafeLocs.dbc id) %u, skipped.", data.safeLocId);
             continue;
         }
 
@@ -5744,6 +5745,9 @@ bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, uint32 team, bool per
     data.team = team;
 
     GraveYardStore.insert(GraveYardContainer::value_type(zoneId, data));
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE addgrave %u %u %u %u", id, zoneId, team, GraveYardStore.find(zoneId) != GraveYardStore.end()?1:0);
+
 
     // add link to DB
     if (persist)
