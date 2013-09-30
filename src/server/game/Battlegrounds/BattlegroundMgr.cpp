@@ -228,7 +228,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             *data << uint32(QueueSlot);  //time2
             data->WriteByteSeq(bgGuid[5]);
             data->WriteByteSeq(playerGuid[3]);
-            *data << uint32(Time2);
+            *data << uint32(QueueSlot); //TIME2 FOR SURE
             data->WriteByteSeq(bgGuid[3]);
             data->WriteByteSeq(playerGuid[2]);
             data->WriteByteSeq(bgGuid[6]);
