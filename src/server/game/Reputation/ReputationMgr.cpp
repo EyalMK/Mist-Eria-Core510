@@ -200,7 +200,7 @@ void ReputationMgr::SendState(FactionState const* faction)
 
 void ReputationMgr::SendInitialReputations()
 {
-    uint32 count = sFactionStore.GetNumRows();
+    uint32 count = 256;
     WorldPacket data(SMSG_INITIALIZE_FACTIONS);
     data << uint32(count);
 
