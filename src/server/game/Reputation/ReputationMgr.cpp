@@ -176,8 +176,8 @@ void ReputationMgr::SendState(FactionState const* faction)
     size_t p_count = data.wpos();
     data << uint32(count);
 
-    data << uint32(faction->ReputationListID);
     data << uint32(faction->Standing);
+    data << uint32(faction->ReputationListID);
 
     for (FactionStateList::iterator itr = _factions.begin(); itr != _factions.end(); ++itr)
     {
@@ -186,8 +186,8 @@ void ReputationMgr::SendState(FactionState const* faction)
             itr->second.needSend = false;
             if (itr->second.ReputationListID != faction->ReputationListID)
             {
-                data << uint32(itr->second.ReputationListID);
                 data << uint32(itr->second.Standing);
+                data << uint32(itr->second.ReputationListID);
                 ++count;
             }
         }
