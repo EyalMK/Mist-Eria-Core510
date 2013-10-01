@@ -411,7 +411,12 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             {
                 // Victory Rush
                 if (m_spellInfo->Id == 34428 && m_caster->HasAura(32216))
+                {
                     m_caster->RemoveAura(32216);
+                    //All damages are on this spell instead
+                    damage = 0;
+                    m_caster->CastSpell(unitTarget, 122979, true);
+                }
                 // Shockwave
                 else if (m_spellInfo->Id == 46968)
                 {
