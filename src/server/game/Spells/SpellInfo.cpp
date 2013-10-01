@@ -501,8 +501,9 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
             if (uint8 comboPoints = caster->m_movedPlayer->GetComboPoints())
                 value += comboDamage * comboPoints;
 
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : DAMAGE Spell Id(%u) Effect(%u) : %f damage BEFORE Modifiers", value);
         value = caster->ApplyEffectModifiers(_spellInfo, _effIndex, value);
-
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : DAMAGE Spell Id(%u) Effect(%u) : %f damage AFTER Modifiers", value);
         // amount multiplication based on caster's level
         if (!_spellInfo->GetSpellScaling() && !basePointsPerLevel && (_spellInfo->Attributes & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION && _spellInfo->SpellLevel) &&
                 Effect != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
