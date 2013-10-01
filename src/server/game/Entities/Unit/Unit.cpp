@@ -12279,7 +12279,7 @@ Powers Unit::GetPowerTypeByAuraGroup(UnitMods unitMod) const
     }
 }
 
-int32 Unit::GetTotalSpellPowerValue(SpellSchoolMask mask, bool heal) const
+int32 Unit::GetTotalSpellPowerValue(SpellSchoolMask mask, bool heal)
 {
     int32 sp = 0;
 
