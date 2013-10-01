@@ -519,12 +519,18 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
 
     if(caster)
     {
+        int32 flat = value;
         int32 sp = caster->GetTotalSpellPowerValue(_spellInfo->GetSchoolMask(), _spellInfo->_IsPositiveEffect(_effIndex, true));
         WeaponAttackType attType = (_spellInfo->IsRangedWeaponSpell() && _spellInfo->DmgClass != SPELL_DAMAGE_CLASS_MELEE) ? RANGED_ATTACK : BASE_ATTACK;
         int32 ap = (int32)caster->GetTotalAttackPowerValue(attType);
+        
+        int32 apdamage = int32(ap * _spellInfo->APMultiplier);
+        int32 spdamage = int32(sp * SPMultiplier);
 
-        value += int32(ap * _spellInfo->APMultiplier);
-        value += int32(sp * SPMultiplier);
+        value += (apdamage + spdamage);
+
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : DAMAGE : %u damage with %u flat, %u (%f %) from AP (%u AP), %u (%f %) from SP (%u SP)", 
+            value, flat, apdamage, _spellInfo->APMultiplier, ap, spdamage, SPMultiplier, sp);
     }
 
     return int32(value);
