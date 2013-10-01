@@ -12279,12 +12279,24 @@ Powers Unit::GetPowerTypeByAuraGroup(UnitMods unitMod) const
     }
 }
 
-int32 Unit::GetTotalSpellPowerValue(SpellSchoolMask mask, bool heal)
+int32 Unit::GetTotalSpellPowerValue(SpellSchoolMask mask, bool heal) const
 {
     int32 sp = 0;
-
+    
     if(heal) sp = GetInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS);
-    else sp = SpellBaseDamageBonusDone(mask);
+    else 
+    {
+        uint32 counter = 0;
+        for(uint32 i = 0 ; i < MAX_SPELL_SCHOOL ; i++)
+        {
+            if(mask & i)
+            {
+                sp += GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG+i);
+                counter++;
+            }
+        }
+        if(counter > 0) sp /= counter;
+    }
 
     if(sp < 0) sp = 0;
 
