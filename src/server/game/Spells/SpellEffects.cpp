@@ -410,8 +410,8 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             case SPELLFAMILY_WARRIOR:
             {
                 // Victory Rush
-                if (m_spellInfo->Id == 34428)
-                    ApplyPct(damage, m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                if (m_spellInfo->Id == 34428 && m_caster->HasAura(32216))
+                    m_caster->RemoveAura(32216);
                 // Shockwave
                 else if (m_spellInfo->Id == 46968)
                 {

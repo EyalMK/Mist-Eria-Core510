@@ -3665,6 +3665,10 @@ void SpellMgr::LoadSpellInfoCorrections()
                 spellInfo->SpellVisual[0] = 0;
                 spellInfo->AttributesEx4 &= SPELL_ATTR4_TRIGGERED;
                 break;
+            case 34428:
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_TRIGGER_SPELL;
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 122979;
+                break;
             default:
                 break;
         }
