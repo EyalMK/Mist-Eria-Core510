@@ -5757,9 +5757,6 @@ bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, uint32 team, bool per
 
     GraveYardStore.insert(GraveYardContainer::value_type(zoneId, data));
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE addgrave %u %u %u %u", id, zoneId, team, GraveYardStore.find(zoneId) != GraveYardStore.end()?1:0);
-
-
     // add link to DB
     if (persist)
     {
