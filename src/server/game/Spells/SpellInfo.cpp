@@ -352,7 +352,7 @@ SpellEffectInfo::SpellEffectInfo(SpellEntry const* /*spellEntry*/, SpellInfo con
     PointsPerComboPoint = _effect ? _effect->EffectPointsPerComboPoint : 0.0f;
     ValueMultiplier = _effect ? _effect->EffectValueMultiplier : 0.0f;
     DamageMultiplier = _effect ? _effect->EffectDamageMultiplier : 0.0f;
-    SPMultiplier = _effect ? _effect->EffectBonusMultiplier * 100.0f : 0.0f;
+    SPMultiplier = _effect ? _effect->EffectBonusMultiplier : 0.0f;
     MiscValue = _effect ? _effect->EffectMiscValue : 0;
     MiscValueB = _effect ? _effect->EffectMiscValueB : 0;
     Mechanic = Mechanics(_effect ? _effect->EffectMechanic : 0);
