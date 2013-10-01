@@ -12293,11 +12293,9 @@ int32 Unit::GetTotalSpellPowerValue(SpellSchoolMask mask, bool heal) const
             {
                 sp += GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS+i);
                 counter++;
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : SP : value added %i (total : %i)", GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS+i), sp);
             }
         }
         if(counter > 0) sp /= counter;
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : SP : value final : %i (divided by %i)", sp, counter);
     }
 
     if(sp < 0) sp = 0;

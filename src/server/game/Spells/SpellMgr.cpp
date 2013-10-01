@@ -3665,6 +3665,9 @@ void SpellMgr::LoadSpellInfoCorrections()
                 spellInfo->SpellVisual[0] = 0;
                 spellInfo->AttributesEx4 &= SPELL_ATTR4_TRIGGERED;
                 break;
+            case 133:
+                spellInfo->Effects[0].SPMultiplier = 1.5;
+                break;
             default:
                 break;
         }
