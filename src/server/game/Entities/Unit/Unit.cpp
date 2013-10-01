@@ -12279,6 +12279,18 @@ Powers Unit::GetPowerTypeByAuraGroup(UnitMods unitMod) const
     }
 }
 
+int32 Unit::GetTotalSpellPowerValue(SpellSchoolMask mask, bool heal) const
+{
+    int32 sp = 0;
+
+    if(heal) sp = GetInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS);
+    else sp = SpellBaseDamageBonusDone(mask);
+
+    if(sp < 0) sp = 0;
+
+    return sp;
+}
+
 float Unit::GetTotalAttackPowerValue(WeaponAttackType attType) const
 {
     if (attType == RANGED_ATTACK)

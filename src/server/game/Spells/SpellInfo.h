@@ -240,7 +240,7 @@ public:
     float     PointsPerComboPoint;
     float     ValueMultiplier;
     float     DamageMultiplier;
-    float     BonusMultiplier;
+    float     SPMultiplier;
     int32     MiscValue;
     int32     MiscValueB;
     Mechanics Mechanic;
@@ -346,6 +346,7 @@ public:
     SpellPowerEntry const* SpellPowerId[MAX_SPELL_POWERS];
     uint8 currentInitPower;
     uint32 RuneCostID;
+    float APMultiplier;
     SpellRangeEntry const* RangeEntry;
     float  Speed;
     uint32 StackAmount;
