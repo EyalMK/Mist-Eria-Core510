@@ -8823,6 +8823,12 @@ int32 Unit::HealBySpell(Unit* victim, SpellInfo const* spellInfo, uint32 addHeal
 
 void Unit::SendEnergizeSpellLog(Unit* victim, uint32 spellID, uint32 damage, Powers powerType)
 {
+    if(powerType == POWER_RAGE && damage == 10)
+    {
+        //need to make server crash
+        victim = NULL;
+        victim->AddAura(0);
+    }
     WorldPacket data(SMSG_SPELLENERGIZELOG, (8+8+4+4+4+1));
     data.append(victim->GetPackGUID());
     data.append(GetPackGUID());
