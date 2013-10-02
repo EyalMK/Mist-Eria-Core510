@@ -413,7 +413,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 if (m_spellInfo->Id == 34428 && m_caster->HasAura(32216))
                 {
                     m_caster->RemoveAura(32216);
-                    m_caster->HealBySpell(m_caster, m_spellInfo, m_caster->GetHealthPct() * 20);
+                    m_caster->HealBySpell(m_caster, m_spellInfo, 0.2f * m_caster->GetMaxHealth());
                 }
                 // Shockwave
                 else if (m_spellInfo->Id == 46968)
@@ -422,6 +422,12 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     if (pct > 0)
                         damage += int32(CalculatePct(m_caster->GetTotalAttackPowerValue(BASE_ATTACK), pct));
                     break;
+                }
+                // Thunder Clap
+                else if(m_spellInfo->Id == 6343)
+                {
+                    //weakened blows
+                    m_caster->CastSpell(unitTarget, 115798, true);
                 }
                 break;
             }
