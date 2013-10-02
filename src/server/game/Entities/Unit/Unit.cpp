@@ -12279,6 +12279,32 @@ Powers Unit::GetPowerTypeByAuraGroup(UnitMods unitMod) const
     }
 }
 
+int32 Unit::GetTotalSpellPowerValue(SpellSchoolMask mask, bool heal) const
+{
+    int32 sp = 0;
+
+    if(GetTypeId() != TYPEID_PLAYER) return sp;
+    
+    if(heal) sp = GetInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS);
+    else 
+    {
+        int32 counter = 0;
+        for(uint32 i = 0 ; i < MAX_SPELL_SCHOOL ; i++)
+        {
+            if(mask & i)
+            {
+                sp += GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS+i);
+                counter++;
+            }
+        }
+        if(counter > 0) sp /= counter;
+    }
+
+    if(sp < 0) sp = 0;
+
+    return sp;
+}
+
 float Unit::GetTotalAttackPowerValue(WeaponAttackType attType) const
 {
     if (attType == RANGED_ATTACK)
@@ -15476,35 +15502,32 @@ void Unit::UpdateObjectVisibility(bool forced)
 void Unit::SendMoveKnockBack(Player* player, float speedXY, float speedZ, float vcos, float vsin)
 {
     ObjectGuid guid = GetGUID();
-    WorldPacket data(SMSG_MOVE_KNOCK_BACK, (1+8+4+4+4+4+4));
-    data.WriteBit(guid[0]);
-    data.WriteBit(guid[3]);
-    data.WriteBit(guid[6]);
-    data.WriteBit(guid[7]);
-    data.WriteBit(guid[2]);
-    data.WriteBit(guid[5]);
+    WorldPacket data(SMSG_MOVE_KNOCK_BACK);
     data.WriteBit(guid[1]);
+    data.WriteBit(guid[2]);
+    data.WriteBit(guid[7]);
+    data.WriteBit(guid[0]);
+    data.WriteBit(guid[5]);
+    data.WriteBit(guid[6]);
+    data.WriteBit(guid[3]);
     data.WriteBit(guid[4]);
 
-    data.WriteByteSeq(guid[1]);
-
+    data << float(speedXY);  
+    data << float(speedZ);
+    data << float(vcos);
     data << float(vsin);
+
+    data.WriteByteSeq(guid[7]);
+    data.WriteByteSeq(guid[1]);
+    data.WriteByteSeq(guid[6]);
+    
     data << uint32(0);
 
-    data.WriteByteSeq(guid[6]);
-    data.WriteByteSeq(guid[7]);
-
-    data << float(speedXY);
-
+    data.WriteByteSeq(guid[0]);
     data.WriteByteSeq(guid[4]);
     data.WriteByteSeq(guid[5]);
     data.WriteByteSeq(guid[3]);
-
-    data << float(speedZ);
-    data << float(vcos);
-
     data.WriteByteSeq(guid[2]);
-    data.WriteByteSeq(guid[0]);
 
     player->GetSession()->SendPacket(&data);
 }

@@ -68,11 +68,19 @@ public:
             { "money",              SEC_ADMINISTRATOR,      true,  &HandleSendMoneyCommand,             "", NULL },
             { NULL,                 0,                      false, NULL,                                "", NULL }
         };
+
+        static ChatCommand auraCommandTable[] =
+        {
+            { "list",           SEC_ADMINISTRATOR, false, &HandleAuraListCommand, "Liste toutes les auras présentent sur le joueur ou PNJ selectionné. Si aucun PNJ ou joueur n'est selectionné, liste vos auras.\nUtilisez \".aura list nd\" pour ignorer les doublons", NULL},
+            { "",               SEC_ADMINISTRATOR, false, &HandleAuraCommand,     "", NULL},
+            { NULL,             0,                 false, NULL,                   "", NULL }
+        };
+
         static ChatCommand commandTable[] =
         {
             { "dev",                SEC_ADMINISTRATOR,      false, &HandleDevCommand,                   "", NULL },
             { "gps",                SEC_ADMINISTRATOR,      false, &HandleGPSCommand,                   "", NULL },
-            { "aura",               SEC_ADMINISTRATOR,      false, &HandleAuraCommand,                  "", NULL },
+            { "aura",               SEC_ADMINISTRATOR,      false, NULL,                    "", auraCommandTable },
             { "unaura",             SEC_ADMINISTRATOR,      false, &HandleUnAuraCommand,                "", NULL },
             { "appear",             SEC_MODERATOR,          false, &HandleAppearCommand,                "", NULL },
             { "summon",             SEC_MODERATOR,          false, &HandleSummonCommand,                "", NULL },
@@ -241,6 +249,53 @@ public:
         if (status)
             handler->PSendSysMessage(LANG_LIQUID_STATUS, liquidStatus.level, liquidStatus.depth_level, liquidStatus.entry, liquidStatus.type_flags, status);
 
+        return true;
+    }
+
+    static bool HandleAuraListCommand(ChatHandler* handler, char const* args)
+    {
+        Unit *target = handler->getSelectedUnit();
+        if(!target)
+            target = handler->GetSession()->GetPlayer();
+        if(!target)
+            return false;
+
+        Unit::AuraMap &auras = target->GetOwnedAuras();
+
+        uint32 prevAuraId = 0;
+        bool ignoreDoublon = false;
+
+        std::string arg = args;
+        if(arg == "nd")
+            ignoreDoublon = true;
+
+        if(ignoreDoublon) handler->PSendSysMessage("****Début du listage (doublon ignorés) ****");
+        else handler->PSendSysMessage("****Début du listage ****");
+        
+
+        for(Unit::AuraMap::const_iterator i = auras.begin() ; i != auras.end() ; ++i)
+        {
+            Aura *aura = i->second;
+
+            if(!aura)
+                continue;
+            Player *pTarget = target->ToPlayer();
+            if(pTarget)
+            {
+                if(pTarget->HasTalent(aura->GetId(), pTarget->GetActiveSpec()))
+                    continue;
+            }
+
+            uint32 id = aura->GetId();
+            if(ignoreDoublon && id == prevAuraId)
+                continue;
+            prevAuraId = id;
+            const char *name = aura->GetSpellInfo()->SpellName;
+
+            handler->PSendSysMessage("Aura - %d - |cffffffff|Hspell:%d|h[%s]|h (Stack : %d)", id, id, name, aura->GetStackAmount());
+        }
+
+        handler->PSendSysMessage("****Fin du listage****");
         return true;
     }
 
@@ -1034,20 +1089,12 @@ public:
 
         Player* player = handler->GetSession()->GetPlayer();
 
-        uint32 zoneId = player->GetZoneId();
+        uint32 areaId = player->GetAreaId();
 
-        AreaTableEntry const* areaEntry = GetAreaEntryByAreaID(zoneId);
-        if (!areaEntry || areaEntry->zone !=0)
-        {
-            handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDWRONGZONE, graveyardId, zoneId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        if (sObjectMgr->AddGraveYardLink(graveyardId, zoneId, team))
-            handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDLINKED, graveyardId, zoneId);
+        if (sObjectMgr->AddGraveYardLink(graveyardId, areaId, team))
+            handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDLINKED, graveyardId, areaId);
         else
-            handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDALRLINKED, graveyardId, zoneId);
+            handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDALRLINKED, graveyardId, areaId);
 
         return true;
     }

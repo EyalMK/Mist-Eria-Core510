@@ -410,8 +410,11 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             case SPELLFAMILY_WARRIOR:
             {
                 // Victory Rush
-                if (m_spellInfo->Id == 34428)
-                    ApplyPct(damage, m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                if (m_spellInfo->Id == 34428 && m_caster->HasAura(32216))
+                {
+                    m_caster->RemoveAura(32216);
+                    m_caster->HealBySpell(m_caster, m_spellInfo, 0.2f * m_caster->GetMaxHealth());
+                }
                 // Shockwave
                 else if (m_spellInfo->Id == 46968)
                 {
@@ -419,6 +422,12 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     if (pct > 0)
                         damage += int32(CalculatePct(m_caster->GetTotalAttackPowerValue(BASE_ATTACK), pct));
                     break;
+                }
+                // Thunder Clap
+                else if(m_spellInfo->Id == 6343)
+                {
+                    //weakened blows
+                    m_caster->CastSpell(unitTarget, 115798, true);
                 }
                 break;
             }
@@ -694,6 +703,16 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                         m_caster->CastSpell(m_caster, 107427, true);
                     return;
                 }
+                default:
+                    break;
+            }
+            break;
+        case SPELLFAMILY_WARLOCK:
+            switch(m_spellInfo->Id)
+            {
+                case 5782:
+                    m_caster->CastSpell(unitTarget, 12096, true);
+                    break;
                 default:
                     break;
             }
@@ -4782,10 +4801,18 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
     if (!unitTarget)
         return;
 
+    bool forward = true;
+
+    switch(m_spellInfo->Id)
+    {
+        //case 781: forward = false;
+        default: break;
+    }
+
     float speedxy = float(m_spellInfo->Effects[effIndex].MiscValue)/10;
     float speedz = float(damage/10);
-    //1891: Disengage
-    m_caster->JumpTo(speedxy, speedz, m_spellInfo->SpellIconID != 1891);
+
+    m_caster->JumpTo(speedxy, speedz, forward);
 }
 
 void Spell::EffectQuestClear(SpellEffIndex effIndex)

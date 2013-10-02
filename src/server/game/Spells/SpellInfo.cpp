@@ -352,7 +352,7 @@ SpellEffectInfo::SpellEffectInfo(SpellEntry const* /*spellEntry*/, SpellInfo con
     PointsPerComboPoint = _effect ? _effect->EffectPointsPerComboPoint : 0.0f;
     ValueMultiplier = _effect ? _effect->EffectValueMultiplier : 0.0f;
     DamageMultiplier = _effect ? _effect->EffectDamageMultiplier : 0.0f;
-    BonusMultiplier = _effect ? _effect->EffectBonusMultiplier : 0.0f;
+    SPMultiplier = _effect ? _effect->EffectBonusMultiplier : 0.0f;
     MiscValue = _effect ? _effect->EffectMiscValue : 0;
     MiscValueB = _effect ? _effect->EffectMiscValueB : 0;
     Mechanic = Mechanics(_effect ? _effect->EffectMechanic : 0);
@@ -515,6 +515,22 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
                 //there are many more: slow speed, -healing pct
             value *= 0.25f * exp(caster->getLevel() * (70 - _spellInfo->SpellLevel) / 1000.0f);
             //value = int32(value * (int32)getLevel() / (int32)(_spellInfo->spellLevel ? _spellInfo->spellLevel : 1));
+    }
+
+    if(caster)
+    {
+        float flat = value;
+        int32 sp = caster->GetTotalSpellPowerValue(_spellInfo->GetSchoolMask(), _spellInfo->_IsPositiveEffect(_effIndex, true));
+        WeaponAttackType attType = (_spellInfo->IsRangedWeaponSpell() && _spellInfo->DmgClass != SPELL_DAMAGE_CLASS_MELEE) ? RANGED_ATTACK : BASE_ATTACK;
+        int32 ap = (int32)caster->GetTotalAttackPowerValue(attType);
+        
+        float apdamage = float(ap) * _spellInfo->APMultiplier;
+        float spdamage = float(sp) * SPMultiplier;
+
+        value += apdamage + spdamage;
+
+        //sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : DAMAGE Spell Id(%u) Effect(%u) : %f damage with %f flat, %f (%f %) from AP (%i AP), %f (%f %) from SP (%i SP)", 
+            //_spellInfo->Id, _effIndex, value, flat, apdamage, _spellInfo->APMultiplier, ap, spdamage, SPMultiplier, sp);
     }
 
     return int32(value);
@@ -850,6 +866,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effe
     Rank = spellEntry->Rank;
     SchoolMask = misc ? misc->SchoolMask : 0;
     RuneCostID = spellEntry->runeCostID;
+    APMultiplier = spellEntry->APMultiplier;
 
     // SpellDifficultyEntry
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)

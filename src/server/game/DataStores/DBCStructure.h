@@ -1854,9 +1854,9 @@ struct SpellEntry
     //char* Description;                                    // 3       m_description_lang not used
     //char* ToolTip;                                        // 4       m_auraDescription_lang not used
     uint32    runeCostID;                                   // 5       m_runeCostID
-    uint32    spellMissileID;                             // 6       m_spellMissileID not used
-    uint32  spellDescriptionVariableID;                   // 7       m_spellDescriptionVariableID, 3.2.0
-    //float unk_f1;                                         // 8
+    uint32    spellMissileID;                               // 6       m_spellMissileID not used
+    uint32  spellDescriptionVariableID;                     // 7       m_spellDescriptionVariableID, 3.2.0
+    float  APMultiplier;                                    // 8
     uint32 SpellScalingId;                                  // 9       SpellScaling.dbc
     uint32 SpellAuraOptionsId;                              // 10       SpellAuraOptions.dbc
     uint32 SpellAuraRestrictionsId;                         // 11       SpellAuraRestrictions.dbc
@@ -1867,7 +1867,7 @@ struct SpellEntry
     uint32 SpellEquippedItemsId;                            // 16       SpellEquippedItems.dbc
     uint32 SpellInterruptsId;                               // 17       SpellInterrupts.dbc
     uint32 SpellLevelsId;                                   // 18       SpellLevels.dbc
-    //uint32 SpellPowerId;                                    // 19       SpellPower.dbc //NOT IN SPELL.DBC ANYMORE
+    //uint32 SpellPowerId;                                  // 19       SpellPower.dbc //NOT IN SPELL.DBC ANYMORE
     uint32 SpellReagentsId;                                 // 20       SpellReagents.dbc
     uint32 SpellShapeshiftId;                               // 21       SpellShapeshift.dbc
     uint32 SpellTargetRestrictionsId;                       // 22       SpellTargetRestrictions.dbc

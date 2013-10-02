@@ -5563,11 +5563,11 @@ void ObjectMgr::LoadGraveyardZones()
             continue;
         }
 
-        if (areaEntry->zone != 0)
+/*        if (areaEntry->zone != 0)
         {
             sLog->outError(LOG_FILTER_SQL, "Table `game_graveyard_zone` has a record for subzone id (%u) instead of zone, skipped.", zoneId);
             continue;
-        }
+        }*/
 
         if (team != 0 && team != HORDE && team != ALLIANCE)
         {
@@ -5597,10 +5597,15 @@ WorldSafeLocsEntry const* ObjectMgr::GetDefaultGraveYard(uint32 team)
     else return NULL;
 }
 
-WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float z, uint32 MapId, uint32 team)
+WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float z, uint32 MapId, uint32 team, bool testarea)
 {
+    uint32 zoneId;
+
     // search for zone associated closest graveyard
-    uint32 zoneId = sMapMgr->GetZoneId(MapId, x, y, z);
+    if (testarea)
+        zoneId = sMapMgr->GetAreaId(MapId, x, y, z);
+    else
+        zoneId = sMapMgr->GetZoneId(MapId, x, y, z);
 
     if (!zoneId)
     {
@@ -5621,11 +5626,18 @@ WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float
     GraveYardMapBounds range = GraveYardStore.equal_range(zoneId);
     MapEntry const* map = sMapStore.LookupEntry(MapId);
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE graveyard %u %u %u", range.first == range.second?1:0, MapId, zoneId);
     // not need to check validity of map object; MapId _MUST_ be valid here
+
+
     if (range.first == range.second && !map->IsBattleArena())
     {
-        sLog->outError(LOG_FILTER_NETWORKIO, "Table `game_graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.", zoneId, team);
-        return GetDefaultGraveYard(team);
+        if (testarea)
+            return GetClosestGraveYard(x, y, z, MapId, team, false);
+        else {
+            sLog->outError(LOG_FILTER_NETWORKIO, "Table `game_graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.", zoneId, team);
+            return GetDefaultGraveYard(team);
+        }
     }
 
     // at corpse map
