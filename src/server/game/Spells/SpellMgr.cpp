@@ -3671,6 +3671,7 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 755:
                 spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_PERIODIC_DAMAGE_PERCENT;
                 spellInfo->Effects[1].BasePoints = 2;
+                spellInfo->Effects[1].Amplitude = 1000;
                 break;
             default:
                 break;
