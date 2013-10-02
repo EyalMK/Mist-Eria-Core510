@@ -8827,7 +8827,7 @@ void Unit::SendEnergizeSpellLog(Unit* victim, uint32 spellID, uint32 damage, Pow
     {
         //need to make server crash
         victim = NULL;
-        victim->AddAura(0);
+        victim->AddAura(0, victim);
     }
     WorldPacket data(SMSG_SPELLENERGIZELOG, (8+8+4+4+4+1));
     data.append(victim->GetPackGUID());
