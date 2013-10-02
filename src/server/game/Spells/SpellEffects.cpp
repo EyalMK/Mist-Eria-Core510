@@ -4791,10 +4791,17 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
     if (!unitTarget)
         return;
 
+    bool forward = true;
+
+    switch(m_spellInfo->Id)
+    {
+        case 781: forward = false;
+        default: break;
+    }
+
     float speedxy = float(m_spellInfo->Effects[effIndex].MiscValue)/10;
     float speedz = float(damage/10);
-    //1891: Disengage
-    m_caster->JumpTo(speedxy, speedz, m_spellInfo->SpellIconID != 1891);
+    m_caster->JumpTo(speedxy, speedz, forward);
 }
 
 void Spell::EffectQuestClear(SpellEffIndex effIndex)
