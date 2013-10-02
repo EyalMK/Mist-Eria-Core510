@@ -1124,6 +1124,13 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
                     m_targets.SetDst(1174.85f, -763.24f, 48.72f, 6.26f, 628);
             }
             break;
+        case 126892:
+            if (Player* target = unitTarget->ToPlayer())
+            {
+                WorldSafeLocsEntry const* ClosestGrave = sObjectMgr->GetClosestGraveYard(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetMapId(), target->GetTeam());
+                target->SetPelerinageReturnPoint(ClosestGrave);
+            }
+            break;
     }
 
     // If not exist data for dest location - return
@@ -4052,6 +4059,30 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
             }
             break;
         }
+        case SPELLFAMILY_MONK:
+        {
+            switch(m_spellInfo->Id)
+            {
+                case 126895:
+                {
+                    if(Player * player = unitTarget->ToPlayer())
+                    {
+                        if(WorldSafeLocsEntry const* loc = player->GetPelerinageReturnPoint())
+                            player->TeleportTo(loc->map_id, loc->x, loc->y, loc->z, player->GetOrientation());
+                        else
+                            player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
+
+                        if(player->HasAura(126896)) player->RemoveAura(126896);
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        default:
+            break;
     }
 
     // normal DB scripted effect
