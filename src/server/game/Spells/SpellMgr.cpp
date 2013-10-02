@@ -3668,6 +3668,10 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 133:
                 spellInfo->Effects[0].SPMultiplier = 1.5;
                 break;
+            case 755:
+                spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_PERIODIC_DAMAGE_PERCENT;
+                spellInfo->Effects[1].BasePoints = 2;
+                break;
             default:
                 break;
         }
