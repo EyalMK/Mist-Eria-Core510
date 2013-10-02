@@ -4801,6 +4801,8 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
 
     float speedxy = float(m_spellInfo->Effects[effIndex].MiscValue)/10;
     float speedz = float(damage/10);
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : KNOCK BACK : SPELLEFFECT CALLED");
     m_caster->JumpTo(speedxy, speedz, forward);
 }
 
