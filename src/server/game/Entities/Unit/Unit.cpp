@@ -15513,9 +15513,9 @@ void Unit::SendMoveKnockBack(Player* player, float speedXY, float speedZ, float 
     data.WriteBit(guid[4]);
 
     data << float(speedXY); //verified
-    data << float(1.f);
-    data << float(1.f);
     data << float(0.f);
+    data << float(0.f);
+    data << float(1.f); //vcos
 
     data.WriteByteSeq(guid[7]);
     data.WriteByteSeq(guid[1]);
