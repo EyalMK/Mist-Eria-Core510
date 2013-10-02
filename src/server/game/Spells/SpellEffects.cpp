@@ -707,6 +707,16 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     break;
             }
             break;
+        case SPELLFAMILY_WARLOCK:
+            switch(m_spellInfo->Id)
+            {
+                case 5782:
+                    m_caster->CastSpell(unitTarget, 12096, true);
+                    break;
+                default:
+                    break;
+            }
+            break;
         default:
             break;
     }
