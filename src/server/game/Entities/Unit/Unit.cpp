@@ -15512,10 +15512,10 @@ void Unit::SendMoveKnockBack(Player* player, float speedXY, float speedZ, float 
     data.WriteBit(guid[3]);
     data.WriteBit(guid[4]);
 
-    data << float(0.f);
+    data << float(speedXY); //verified
     data << float(1.f);
     data << float(speedZ);
-    data << float(1.f);
+    data << float(0.f);
 
     data.WriteByteSeq(guid[7]);
     data.WriteByteSeq(guid[1]);
