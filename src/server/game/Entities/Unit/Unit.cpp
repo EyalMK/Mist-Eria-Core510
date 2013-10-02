@@ -12119,6 +12119,8 @@ bool Unit::HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, f
         return false;
     }
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : auraModif : BEFORE : %f", m_auraModifiersGroup[unitMod][modifierType]);
+
     switch (modifierType)
     {
         case BASE_VALUE:
@@ -12132,6 +12134,8 @@ bool Unit::HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, f
         default:
             break;
     }
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : auraModif : AFTER : %f", m_auraModifiersGroup[unitMod][modifierType]);
 
     if (!CanModifyStats())
         return false;
