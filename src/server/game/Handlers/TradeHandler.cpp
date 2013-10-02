@@ -767,7 +767,6 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
     WorldPacket data(SMSG_TRADE_STATUS, 2+7); // TO FIX . Need to fill structure
     
     data.WriteBits(TRADE_STATUS_BEGIN_TRADE, 5);
-	data.WriteBit(0); // unk bit, usually 0
 
     ObjectGuid playerGuid = _player->GetGUID();
     // WTB StartBitStream...
@@ -779,6 +778,8 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
     data.WriteBit(playerGuid[2]);
     data.WriteBit(playerGuid[7]);
     data.WriteBit(playerGuid[4]);
+
+    data.WriteBit(0); // unk bit, usually 0
 
     data.WriteByteSeq(playerGuid[4]);
     data.WriteByteSeq(playerGuid[5]);
