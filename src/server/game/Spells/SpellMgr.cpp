@@ -3673,6 +3673,9 @@ void SpellMgr::LoadSpellInfoCorrections()
                 spellInfo->Effects[1].BasePoints = 2;
                 spellInfo->Effects[1].Amplitude = 1000;
                 break;
+            case 126892:
+                spellInfo->CategoryRecoveryTime = 0;
+                break;
             default:
                 break;
         }
