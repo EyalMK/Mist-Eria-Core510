@@ -15512,9 +15512,9 @@ void Unit::SendMoveKnockBack(Player* player, float speedXY, float speedZ, float 
     data.WriteBit(guid[3]);
     data.WriteBit(guid[4]);
 
-    data << float(1.f);  
+    data << float(100.f);  
     data << float(vsin); //vsin
-    data << float(1.f);
+    data << float(100.f);
     data << float(vcos); //vcos
 
     data.WriteByteSeq(guid[7]);
