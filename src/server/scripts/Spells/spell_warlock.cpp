@@ -776,6 +776,21 @@ class spell_warl_life_tap : public SpellScriptLoader
                 return true;
             }
 
+            void HandleEnergize(SpellEffIndex /*effIndex*/)
+            {
+                Player* caster = GetCaster()->ToPlayer();
+                if (Unit* target = GetHitUnit())
+                {
+                    int32 damage = caster->CountPctFromMaxHealth(GetSpellInfo()->Effects[EFFECT_2].CalcValue());
+                    int32 mana = CalculatePct(damage, GetSpellInfo()->Effects[EFFECT_1].CalcValue());
+
+                    // Shouldn't Appear in Combat Log
+                    target->ModifyHealth(-damage);
+
+                    SetHitDamage(mana);
+                }
+            }
+
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
                 Player* caster = GetCaster()->ToPlayer();
@@ -812,7 +827,8 @@ class spell_warl_life_tap : public SpellScriptLoader
 
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_warl_life_tap_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+                OnEffectHitTarget += SpellEffectFn(spell_warl_life_tap_SpellScript::HandleEnergize, EFFECT_0, SPELL_EFFECT_ENERGIZE);
+                //OnEffectHitTarget += SpellEffectFn(spell_warl_life_tap_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
                 OnCheckCast += SpellCheckCastFn(spell_warl_life_tap_SpellScript::CheckCast);
             }
         };
