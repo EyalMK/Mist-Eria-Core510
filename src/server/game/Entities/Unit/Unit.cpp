@@ -15512,11 +15512,10 @@ void Unit::SendMoveKnockBack(Player* player, float speedXY, float speedZ, float 
     data.WriteBit(guid[3]);
     data.WriteBit(guid[4]);
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : KNOCK BACK : player ori : %f, vsin : %f, vcos : %f, speedXY : %f, speedZ : %f", player->GetOrientation(), vsin, vcos, speedXY, speedZ);
     data << float(speedXY);  
-    data << float(speedZ); //vsin
+    data << float(speedZ);
     data << float(vcos);
-    data << float(vsin); //vcos
+    data << float(vsin);
 
     data.WriteByteSeq(guid[7]);
     data.WriteByteSeq(guid[1]);
