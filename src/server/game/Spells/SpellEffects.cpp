@@ -578,6 +578,24 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         return;
                 break;
             }
+            case SPELLFAMILY_MONK:
+            {
+                switch(m_spellInfo->Id)
+                {
+                    case 100784:
+                    {
+                        int32 mindamage = int32(7.12f * ((0.898882f * (unitTarget->GetFloatValue(UNIT_FIELD_MINDAMAGE) * 3/2) + (unitTarget->GetTotalAttackPowerValue(BASE_ATTACK) / 14) - 1.f)));
+                        int32 maxdamage = int32(7.12f * ((0.898882f * (unitTarget->GetFloatValue(UNIT_FIELD_MAXDAMAGE) * 3/2) + (unitTarget->GetTotalAttackPowerValue(BASE_ATTACK) / 14) + 1.f)));
+                        damage = irand(mindamage, maxdamage);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                break;
+            }
+            default:
+                break;
         }
 
         if (m_originalCaster && damage > 0 && apply_direct_bonus)
