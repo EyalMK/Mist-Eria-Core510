@@ -283,8 +283,6 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
     float base_attPower  = GetModifierValue(unitMod, BASE_VALUE) * GetModifierValue(unitMod, BASE_PCT);
     float attPowerMod = GetModifierValue(unitMod, TOTAL_VALUE);
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : AP : BASE_VALUE : %f | BASE_PCT : %f | TOTAL : %f", GetModifierValue(unitMod, BASE_VALUE), GetModifierValue(unitMod, BASE_PCT), base_attPower);
-
     //add dynamic flat mods
     if (!ranged)
     {
