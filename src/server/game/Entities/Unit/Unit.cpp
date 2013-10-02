@@ -12282,6 +12282,8 @@ Powers Unit::GetPowerTypeByAuraGroup(UnitMods unitMod) const
 int32 Unit::GetTotalSpellPowerValue(SpellSchoolMask mask, bool heal) const
 {
     int32 sp = 0;
+
+    if(GetTypeId() != TYPEID_PLAYER) return sp;
     
     if(heal) sp = GetInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS);
     else 
