@@ -534,8 +534,8 @@ enum Opcodes
     CMSG_SET_TAXI_BENCHMARK_MODE                      = 0x0F08,//16357
     CMSG_SET_TITLE                                    = 0x0C44,//16357
     CMSG_SET_TRADE_CURRENCY                           = 0x1474,
-    CMSG_SET_TRADE_GOLD                               = 0x1475,
-    CMSG_SET_TRADE_ITEM                               = 0x1476,
+    CMSG_SET_TRADE_GOLD                               = 0x00FB,//16357
+    CMSG_SET_TRADE_ITEM                               = 0x07A6,//16357
     CMSG_SET_VEHICLE_REC_ID_ACK                       = 0x1477,
     CMSG_SET_WATCHED_FACTION                          = 0x0E49,//16357
     CMSG_SHOWING_CLOAK                                = 0x0685,//16357
