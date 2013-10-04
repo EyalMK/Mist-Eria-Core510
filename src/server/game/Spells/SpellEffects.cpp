@@ -739,6 +739,11 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                         m_caster->CastSpell(unitTarget, 117667, true);
                     break;
                 }
+                case 115203:
+                {
+                    m_caster->CastSpell(unitTarget, 126456, true);
+                    break;
+                }
                 default:
                     break;
             }
