@@ -1,0 +1,199 @@
+/* # Script de Sungis : Sha de la colère # */
+
+/*
+Notes :
+Sha de la colère : Script 75%	=>	A faire : vérifier si les sorts fonctionnent.
+
+UPDATE creature_template SET ScriptName = 'boss_sha_of_anger' WHERE entry = 60491;
+INSERT INTO creature_text (entry, groupid, id, text, type, language, probability, emote, duration, sound, comment) VALUES
+(60491, 0, 0, "Oui ... Oui ! Laissez parler votre rage ! Frappez-moi !", 14, 0, 100, 0, 0, 28999, "Sha of anger - Aggro"),
+(60491, 1, 0, "", 14, 0, 100, 0, 0, 29000, "Sha of anger - Death"),
+(60491, 2, 0, "Ils sont éteinds !", 14, 0, 100, 0, 0, 29001, "Sha of anger - Slay 1"),
+(60491, 2, 1, "Est-ce que vous êtes en colère ?", 14, 0, 100, 0, 0, 29002, "Sha of anger - Slay 2"),
+(60491, 2, 2, "Ressentez votre rage !", 14, 0, 100, 0, 0, 29003, "Sha of anger - Slay 3"),
+(60491, 2, 3, "Laissez votre rage vous consumer !", 14, 0, 100, 0, 0, 29004, "Sha of anger - Slay 4"),
+(60491, 3, 0, "Cédez a votre colère !", 14, 0, 100, 0, 0, 29005, "Sha of anger - Spawn 1"),
+(60491, 3, 1, "Votre rage vous donne de la force !", 14, 0, 100, 0, 0, 29006, "Sha of anger - Spawn 2"), 
+(60491, 3, 2, "Votre rage me porte !", 14, 0, 100, 0, 0, 29007, "Sha of anger - Spawn 3"),
+(60491, 3, 3, "Vous ne m'enterrerez pas à nouveau !", 14, 0, 100, 0, 0, 29008, "Sha of anger - Spawn 4"),
+(60491, 3, 4, "Laissez libre cours à mon courroux !", 14, 0, 100, 0, 0, 29009, "Sha of anger - Spawn 5"),
+(60491, 4, 0, "Nourissez-moi de votre COLÈRE !", 14, 0, 100, 0, 0, 29010, "Sha of anger - Spell 1"),
+(60491, 5, 0, "MA FUREUR SE DÉCHAÎNE !", 14, 0, 100, 0, 0, 29011, "Sha of anger - Spell 2");
+*/
+
+#include "ScriptPCH.h"
+
+enum Spells
+{
+	SPELL_SEETHE				= 119487,
+	SPELL_ENDLESS_RAGE			= 119446,
+	SPELL_BITTER_THOUGHTS		= 119601,
+	SPELL_GROWING_ANGER			= 119622,
+	SPELL_AGGRESSIVE_BEHAVIOUR	= 119626,
+	SPELL_UNLEASHED_WRATH		= 119488
+};
+
+enum Events
+{
+	EVENT_SEETHE				= 1,
+	EVENT_ENDLESS_RAGE			= 2,
+	EVENT_GROWING_ANGER			= 3,
+	EVENT_INCREASE_RAGE			= 4,
+	EVENT_DECREASE_RAGE			= 5
+};
+
+enum Phases
+{
+	PHASE_GROWING_ANGER		= 0,
+	PHASE_UNLEASHED_WRATH	= 1
+};
+
+enum Texts
+{
+	SAY_AGGRO				= 0,
+	SAY_DEATH				= 1,
+	SAY_SLAY				= 2,
+	SAY_ENDLESS_RAGE		= 3,
+	SAY_GROWING_ANGER		= 4,
+	SAY_UNLEASHED_WRATH		= 5
+};
+
+#define NPC_IRE		60579
+
+class boss_sha_of_anger : public CreatureScript
+{
+public:
+	boss_sha_of_anger() : CreatureScript("boss_sha_of_anger") { }
+
+	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	{
+		return new boss_sha_of_angerAI(creature);
+	}
+
+	struct boss_sha_of_angerAI : public ScriptedAI
+	{
+		boss_sha_of_angerAI(Creature *creature) : ScriptedAI(creature)
+		{
+		}
+
+		EventMap events;
+		
+		void Reset() OVERRIDE
+		{
+			events.Reset();
+
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+			me->SetPower(POWER_RAGE, 0);
+		}
+
+		void JustDied(Unit *pWho) OVERRIDE
+		{
+			Talk(SAY_DEATH);
+		}
+
+		void KilledUnit(Unit *pWho) OVERRIDE
+		{
+			Talk(SAY_SLAY);
+		}
+
+		void EnterCombat(Unit* /*who*/) OVERRIDE
+		{
+			Talk(SAY_AGGRO);
+
+			events.SetPhase(PHASE_GROWING_ANGER);
+			events.ScheduleEvent(EVENT_INCREASE_RAGE, urand(IN_MILLISECONDS, 3*IN_MILLISECONDS), 0, PHASE_GROWING_ANGER);
+			events.ScheduleEvent(EVENT_SEETHE, 3*IN_MILLISECONDS);
+			events.ScheduleEvent(EVENT_ENDLESS_RAGE, 22*IN_MILLISECONDS);
+			events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS));
+		}
+
+		void UpdateAI(uint32 diff) OVERRIDE
+		{
+			if(!UpdateVictim())
+				return;
+
+			ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
+			ThreatContainer::StorageType::const_iterator i = threatlist.begin();
+
+			events.Update(diff);
+
+			if (me->HasUnitState(UNIT_STATE_CASTING))
+				return;
+
+			if (me->GetPower(POWER_RAGE) > 100)
+				me->SetPower(POWER_RAGE, 100);
+
+			if (me->GetPower(POWER_RAGE) < 0)
+				me->SetPower(POWER_RAGE, 0);
+
+			if (me->GetPower(POWER_RAGE) == 100 && events.IsInPhase(PHASE_GROWING_ANGER))
+			{
+				DoCast(SPELL_UNLEASHED_WRATH);
+				Talk(SAY_UNLEASHED_WRATH);
+				events.SetPhase(PHASE_UNLEASHED_WRATH);
+				events.ScheduleEvent(EVENT_DECREASE_RAGE, urand(IN_MILLISECONDS, 3*IN_MILLISECONDS), 0, PHASE_UNLEASHED_WRATH);
+				events.ScheduleEvent(EVENT_ENDLESS_RAGE, 10*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_GROWING_ANGER, urand(20*IN_MILLISECONDS, 25*IN_MILLISECONDS));
+			}
+
+			if (me->GetPower(POWER_RAGE) == 0 && events.IsInPhase(PHASE_UNLEASHED_WRATH))
+			{
+				events.SetPhase(PHASE_GROWING_ANGER);
+				events.ScheduleEvent(EVENT_INCREASE_RAGE, urand(IN_MILLISECONDS, 3*IN_MILLISECONDS), 0, PHASE_GROWING_ANGER);
+			}
+
+			while(uint32 eventId = events.ExecuteEvent())
+			{
+				switch(eventId)
+				{
+					case EVENT_INCREASE_RAGE:
+						me->ModifyPower(POWER_RAGE, 4);
+
+						events.ScheduleEvent(EVENT_INCREASE_RAGE, urand(IN_MILLISECONDS, 3*IN_MILLISECONDS), 0, PHASE_GROWING_ANGER);
+						break;
+					
+					case EVENT_DECREASE_RAGE:
+						me->ModifyPower(POWER_RAGE, -4);
+
+						events.ScheduleEvent(EVENT_DECREASE_RAGE, 500, 1500);
+						break;
+
+					case EVENT_SEETHE:
+						for (i = threatlist.begin(); i != threatlist.end(); ++i)
+						{
+							if (Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid()))
+								if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && me->IsWithinMeleeRange(me->GetVictim()))
+									DoCast(me->GetVictim(), SPELL_SEETHE);
+						}
+
+						events.ScheduleEvent(EVENT_SEETHE, 3*IN_MILLISECONDS);
+						break;
+
+					case EVENT_ENDLESS_RAGE:
+						DoCast(SPELL_ENDLESS_RAGE);
+						Talk(SAY_ENDLESS_RAGE);
+
+						events.ScheduleEvent(EVENT_ENDLESS_RAGE, 23*IN_MILLISECONDS);
+						break;
+
+					case EVENT_GROWING_ANGER:
+						DoCast(SPELL_GROWING_ANGER);
+						Talk(SAY_GROWING_ANGER);
+						
+						events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS));
+						break;
+
+					default:
+						break;
+				}
+			}
+
+			DoMeleeAttackIfReady();
+		}
+	};
+};
+
+void AddSC_boss_sha_of_anger()
+{
+	new boss_sha_of_anger();
+};
