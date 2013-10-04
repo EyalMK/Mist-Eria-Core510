@@ -15882,6 +15882,8 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form) const
                 if (Player::TeamForRace(getRace()) == ALLIANCE)
                     return 21243;
                 return 21244;
+            case FORM_TRAVEL:
+                return 918;
             default:
                 break;
         }

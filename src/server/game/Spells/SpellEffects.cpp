@@ -578,6 +578,24 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         return;
                 break;
             }
+            case SPELLFAMILY_MONK:
+            {
+                switch(m_spellInfo->Id)
+                {
+                    case 100784:
+                    {
+                        int32 mindamage = int32(7.12f * ((0.898882f * (unitTarget->GetFloatValue(UNIT_FIELD_MINDAMAGE) * 3/2) + (unitTarget->GetTotalAttackPowerValue(BASE_ATTACK) / 14) - 1.f)));
+                        int32 maxdamage = int32(7.12f * ((0.898882f * (unitTarget->GetFloatValue(UNIT_FIELD_MAXDAMAGE) * 3/2) + (unitTarget->GetTotalAttackPowerValue(BASE_ATTACK) / 14) + 1.f)));
+                        damage = irand(mindamage, maxdamage);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+                break;
+            }
+            default:
+                break;
         }
 
         if (m_originalCaster && damage > 0 && apply_direct_bonus)
@@ -1104,6 +1122,13 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
                     m_targets.SetDst(389.57f, -832.38f, 48.65f, 3.00f, 628);
                 else
                     m_targets.SetDst(1174.85f, -763.24f, 48.72f, 6.26f, 628);
+            }
+            break;
+        case 126892:
+            if (Player* target = unitTarget->ToPlayer())
+            {
+                WorldSafeLocsEntry const* ClosestGrave = sObjectMgr->GetClosestGraveYard(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetMapId(), target->GetTeam());
+                target->SetPelerinageReturnPoint(ClosestGrave);
             }
             break;
     }
@@ -4034,6 +4059,30 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
             }
             break;
         }
+        case SPELLFAMILY_MONK:
+        {
+            switch(m_spellInfo->Id)
+            {
+                case 126895:
+                {
+                    if(Player * player = unitTarget->ToPlayer())
+                    {
+                        if(WorldSafeLocsEntry const* loc = player->GetPelerinageReturnPoint())
+                            player->TeleportTo(loc->map_id, loc->x, loc->y, loc->z, player->GetOrientation());
+                        else
+                            player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
+
+                        if(player->HasAura(126896)) player->RemoveAura(126896);
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        default:
+            break;
     }
 
     // normal DB scripted effect

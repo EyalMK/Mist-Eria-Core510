@@ -17,6 +17,29 @@
 
 #include "ScriptLoader.h"
 
+
+void AddSC_boss_gekkan();
+void AddSC_instance_mogushan_palace();
+
+//Monastere des pandashan
+void AddSC_boss_gu_cloudstrike();
+void AddSC_boss_master_snowdrift();
+void AddSC_boss_sha_of_violence();
+void AddSC_boss_taran_zhu();
+void AddSC_instance_shado_pan_monastery();
+
+// Include : Stormstout Brewery
+void AddSC_boss_hoptallus();
+void AddSC_boss_ook_ook();
+void AddSC_boss_yan_zhu();
+
+//Temple du serpent de jade
+void AddSC_boss_wise_mari();
+void AddSC_boss_lorewalker_stonestep();
+void AddSC_boss_liu_flameheart();
+void AddSC_boss_sha_of_doubt();
+void AddSC_instance_temple_of_the_jade_serpent();
+
 //examples
 void AddSC_example_creature();
 void AddSC_example_escort();
@@ -1274,6 +1297,27 @@ void AddPandariaScripts()
 {
 #ifdef SCRIPTS
 	AddSC_wandering_isle();
+
+    AddSC_boss_gekkan();
+    AddSC_instance_mogushan_palace();
+
+    AddSC_boss_gu_cloudstrike();			//Monastère des Pandashan
+    AddSC_boss_master_snowdrift();
+    AddSC_boss_sha_of_violence();
+    AddSC_boss_taran_zhu();
+    AddSC_instance_shado_pan_monastery();
+
+    // Stormstout Brewery
+    AddSC_boss_hoptallus();
+    AddSC_boss_ook_ook();
+    AddSC_boss_yan_zhu();
+
+
+    AddSC_boss_wise_mari();                 //Temple du serpent de jade
+    AddSC_boss_lorewalker_stonestep();
+    AddSC_boss_liu_flameheart();
+    AddSC_boss_sha_of_doubt();
+    AddSC_instance_temple_of_the_jade_serpent();
 #endif
 }
 

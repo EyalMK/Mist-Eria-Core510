@@ -2489,6 +2489,8 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetXPRestBonus(uint32 xp);
         uint32 GetRestTime() const { return m_restTime;}
         void SetRestTime(uint32 v) { m_restTime = v;}
+        void SetPelerinageReturnPoint(WorldSafeLocsEntry const* loc) { pelerinageReturnPoint = loc; };
+        WorldSafeLocsEntry const* GetPelerinageReturnPoint() { return pelerinageReturnPoint; };
 
         /*********************************************************/
         /***              ENVIROMENTAL SYSTEM                  ***/
@@ -3106,6 +3108,7 @@ class Player : public Unit, public GridObject<Player>
         bool m_isInWater;
 
         // Current teleport data
+        WorldSafeLocsEntry const* pelerinageReturnPoint;
         WorldLocation m_teleport_dest;
         uint32 m_teleport_options;
         bool mSemaphoreTeleport_Near;
