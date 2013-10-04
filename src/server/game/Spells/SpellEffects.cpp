@@ -722,11 +722,23 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     return;
                 }
                 case 115546:
+                {
+                    m_caster->CastSpell(unitTarget, 116189, true);
+                    m_caster->CastSpell(unitTarget, 130793, true);
+                    break;
+                }
+                case 115921:
+                {
+                    Player* caster = m_caster->ToPlayer();
+                    Player* target = unitTarget->ToPlayer();
+                    if (caster && target && caster->IsInSameGroupWith(target))
                     {
-                        m_caster->CastSpell(unitTarget, 116189, true);
-                        m_caster->CastSpell(unitTarget, 130793, true);
-                        break;
+                        caster->CastSpell(target, 117666, true);
                     }
+                    else
+                        m_caster->CastSpell(unitTarget, 117667, true);
+                    break;
+                }
                 default:
                     break;
             }
