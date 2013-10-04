@@ -120,14 +120,14 @@ void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
     data << uint64(view_trade->GetMoney());                 // trader gold
 	data << uint8(trader_data);                             // 1 means traders data, 0 means own
     data << uint32(view_trade->GetSpell());                 // spell casted on lowest slot item
-    data << uint32(TRADE_SLOT_COUNT);                       // trade slots count/number?, = next field in most cases
+    data << uint32(0);                       // trade slots count/number?, = next field in most cases
     data << uint32(0);                                      // unk 5
-    data << uint32(TRADE_SLOT_COUNT);                       // trade slots count/number?, = prev field in most cases
+    data << uint32(0);                       // trade slots count/number?, = prev field in most cases
     data.WriteBits(count, 22);
 
 
 	// need to continue - sub_7CB870
-    for (uint8 i = 0; i < TRADE_SLOT_COUNT; ++i)
+    for (uint8 i = 0; i < count; ++i)
     {
         Item* item = view_trade->GetItem(TradeSlots(i));
         if (!item)
@@ -136,52 +136,87 @@ void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
         ObjectGuid giftCreatorGuid = item->GetUInt64Value(ITEM_FIELD_GIFTCREATOR);
         ObjectGuid creatorGuid = item->GetUInt64Value(ITEM_FIELD_CREATOR);
 
-        data.WriteBit(giftCreatorGuid[7]);
+        data.WriteBit(giftCreatorGuid[2]);
+        data.WriteBit(giftCreatorGuid[4]);
         data.WriteBit(giftCreatorGuid[1]);
-        bool notWrapped = data.WriteBit(!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED));
-        data.WriteBit(giftCreatorGuid[3]);
+        data.WriteBit(giftCreatorGuid[7]);
+        data.WriteBit(giftCreatorGuid[0]);
+        data.WriteBit(giftCreatorGuid[6]);
+        bool notWrapped = data.WriteBit(!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED));        
 
         if (notWrapped)
         {
             data.WriteBit(creatorGuid[7]);
-            data.WriteBit(creatorGuid[1]);
-            data.WriteBit(creatorGuid[4]);
             data.WriteBit(creatorGuid[6]);
-            data.WriteBit(creatorGuid[2]);
             data.WriteBit(creatorGuid[3]);
-            data.WriteBit(creatorGuid[5]);
+            data.WriteBit(creatorGuid[2]);
+            data.WriteBit(creatorGuid[4]);
+            data.WriteBit(creatorGuid[1]);
             data.WriteBit(item->GetTemplate()->LockID != 0);
             data.WriteBit(creatorGuid[0]);
-
-            itemData.WriteByteSeq(creatorGuid[1]);
-
-            itemData << uint32(item->GetEnchantmentId(PERM_ENCHANTMENT_SLOT));
-            for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT+MAX_GEM_SOCKETS /*3*/; ++enchant_slot)
-                itemData << uint32(item->GetEnchantmentId(EnchantmentSlot(enchant_slot)));
-            itemData << uint32(item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY));
-
-            itemData.WriteByteSeq(creatorGuid[6]);
-            itemData.WriteByteSeq(creatorGuid[2]);
-            itemData.WriteByteSeq(creatorGuid[7]);
-            itemData.WriteByteSeq(creatorGuid[4]);
-
-            itemData << uint32(0); // reforge id, FIXME: not implemented
-            itemData << uint32(item->GetUInt32Value(ITEM_FIELD_DURABILITY));
-            itemData << uint32(item->GetItemRandomPropertyId());
-
-            itemData.WriteByteSeq(creatorGuid[3]);
-
-            itemData << uint32(0); // unk7
-
-            itemData.WriteByteSeq(creatorGuid[0]);
-
-            itemData << uint32(item->GetSpellCharges());
-            itemData << uint32(item->GetItemSuffixFactor());
-
-            itemData.WriteByteSeq(creatorGuid[5]);
+            data.WriteBit(creatorGuid[5]);
         }
 
-        data.WriteBit(giftCreatorGuid[6]);
+        data.WriteBit(giftCreatorGuid[5]);
+        data.WriteBit(giftCreatorGuid[3]);
+    }
+
+    for(uint8 i = 0 ; i < count ; i++)
+    {
+        Item* item = view_trade->GetItem(TradeSlots(i));
+        if (!item)
+            continue;
+
+        ObjectGuid giftCreatorGuid = item->GetUInt64Value(ITEM_FIELD_GIFTCREATOR);
+        ObjectGuid creatorGuid = item->GetUInt64Value(ITEM_FIELD_CREATOR);
+
+        bool notWrapped = !item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED);
+
+        if(notWrapped)
+        {
+            data.WriteByteSeq(creatorGuid[1]);
+
+            data << uint32(0); //Probably enchantment
+            //for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT+MAX_GEM_SOCKETS; ++enchant_slot)
+                //itemData << uint32(item->GetEnchantmentId(EnchantmentSlot(enchant_slot)));
+            data << uint32(1);
+            data << uint32(8);
+            data << uint32(2);
+
+            for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT+MAX_GEM_SOCKETS; ++enchant_slot)
+                data << uint32(item->GetEnchantmentId(EnchantmentSlot(enchant_slot)));
+            data << uint32(3);
+
+            data.WriteByteSeq(creatorGuid[2]);
+
+            data << uint32(4);
+            data << uint32(5);
+
+            data.WriteByteSeq(creatorGuid[5]);
+            data.WriteByteSeq(creatorGuid[4]);
+            data.WriteByteSeq(creatorGuid[3]);
+            data.WriteByteSeq(creatorGuid[7]);
+
+            data << uint32(6);
+
+            data.WriteByteSeq(creatorGuid[6]);
+            data.WriteByteSeq(creatorGuid[0]);
+        }
+
+        data.WriteByteSeq(giftCreatorGuid[6]);
+        data.WriteByteSeq(giftCreatorGuid[2]);
+        data.WriteByteSeq(giftCreatorGuid[0]);
+        data.WriteByteSeq(giftCreatorGuid[4]);
+        data << uint32(item->GetTemplate()->ItemId);
+        data.WriteByteSeq(giftCreatorGuid[5]);
+        data << uint32(item->GetCount());
+        data << uint8(i);
+        data.WriteByteSeq(giftCreatorGuid[3]);
+        data.WriteByteSeq(giftCreatorGuid[1]);
+        data.WriteByteSeq(giftCreatorGuid[7]);
+    }
+
+        /*data.WriteBit(giftCreatorGuid[6]);
         data.WriteBit(giftCreatorGuid[4]);
         data.WriteBit(giftCreatorGuid[2]);
         data.WriteBit(giftCreatorGuid[0]);
@@ -204,10 +239,10 @@ void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
 
         itemData.WriteByteSeq(giftCreatorGuid[2]);
         itemData.WriteByteSeq(giftCreatorGuid[3]);
-    }
+    }*/
 
-    data.FlushBits();
-    data.append(itemData);
+    //data.FlushBits();
+    //data.append(itemData);
 
     SendPacket(&data);
 }
@@ -813,9 +848,11 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
     uint8 bag;
     uint8 slot;
 
-    recvPacket >> slot;
     recvPacket >> tradeSlot;
+    recvPacket >> slot;
     recvPacket >> bag;
+
+    std::cout << "Unk1 : " << (int)tradeSlot << " Unk2: " << (int)slot << " unk3 : " << (int)bag << std::endl;
 
     TradeData* my_trade = _player->GetTradeData();
     if (!my_trade)
@@ -824,6 +861,7 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
     // invalid slot number
     if (tradeSlot >= TRADE_SLOT_COUNT)
     {
+        std::cout << "Ery : test1" << std::endl;
         SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
         return;
     }
@@ -832,6 +870,7 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
     Item* item = _player->GetItemByPos(bag, slot);
     if (!item || (tradeSlot != TRADE_SLOT_NONTRADED && !item->CanBeTraded(false, true)))
     {
+        std::cout << "Ery : test2" << std::endl;
         SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
         return;
     }
@@ -841,6 +880,7 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
     // prevent place single item into many trade slots using cheating and client bugs
     if (my_trade->HasItem(iGUID))
     {
+        std::cout << "Ery : test3" << std::endl;
         // cheating attempt
         SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
         return;
