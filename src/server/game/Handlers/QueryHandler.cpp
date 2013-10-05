@@ -646,10 +646,9 @@ void WorldSession::HandleCorpseMapPositionQuery(WorldPacket& recvData)
     recvData.ReadByteSeq(guid[1]);
     recvData.ReadByteSeq(guid[0]);
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CORPSE_MAP_POSITION_QUERY: Guid: %u unk %u", GUID_LOPART(guid), unk);
+
     WorldPacket data(SMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE, 4+4+4+4);
-    data << float(0);
-    data << float(0);
-    data << float(0);
     data << float(0);
     SendPacket(&data);
 }
