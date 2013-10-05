@@ -3676,7 +3676,14 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 126892:
                 spellInfo->CategoryRecoveryTime = 0;
                 break;
-			case 32268:
+			case 32268: // Portals Spells
+			case 17607:
+			case 33728:
+			case 17609:
+			case 17611:
+			case 35718:
+			case 17610:
+			case 32270:
 				spellInfo->Effects[0].Effect = SPELL_EFFECT_TELEPORT_UNITS;
 				spellInfo->Effects[0].TargetA = TARGET_DEST_DB;
 				break;
