@@ -2088,7 +2088,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
     // don't let enter battlegrounds without assigned battleground id (for example through areatrigger)...
     // don't let gm level > 1 either
-    if (!InBattleground() && mEntry->IsBattlegroundOrArena())
+    if (!InBattleground() && mEntry->IsBattlegroundOrArena() && !isGameMaster())
         return false;
 
     // client without expansion support
