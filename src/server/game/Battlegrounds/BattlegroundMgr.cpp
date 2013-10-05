@@ -1473,6 +1473,7 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
             else
             {
                 sLog->outError(LOG_FILTER_SQL, "Table `battleground_template` for id %u have non-existed WorldSafeLocs.dbc id %u in field `AllianceStartLoc`. BG not created.", data.bgTypeId, startId);
+                sLog->outError(LOG_FILTER_SERVER_LOADING, "PEXIRN : bg %u has a non existing WorldSafeLocs for alliance", data.bgTypeId);
                 continue;
             }
 
@@ -1487,12 +1488,16 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
             else
             {
                 sLog->outError(LOG_FILTER_SQL, "Table `battleground_template` for id %u have non-existed WorldSafeLocs.dbc id %u in field `HordeStartLoc`. BG not created.", data.bgTypeId, startId);
+                sLog->outError(LOG_FILTER_SERVER_LOADING, "PEXIRN : bg %u has a non existing WorldSafeLocs for horde", data.bgTypeId);
                 continue;
             }
         }
 
         if (!CreateBattleground(data))
+        {
+            sLog->outError(LOG_FILTER_SERVER_LOADING, "PEXIRN: BG %u hasnt any template, bg not created", data.bgTypeId);
             continue;
+        }
 
         if (data.IsArena)
         {
