@@ -136,12 +136,18 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
     if (!bg)
         bg = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId);
     if (!bg)
+    {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "Battleground: PEXIRN: No battleground template found");
         return;
+    }
 
     // expected bracket entry
     PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bg->GetMapId(), _player->getLevel());
     if (!bracketEntry)
+    {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "Battleground: PEXIRN: No PVPDifficultyFound for BG");
         return;
+    }
 
     GroupJoinBattlegroundResult err = ERR_BATTLEGROUND_NONE;
 
