@@ -3676,6 +3676,9 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 126892:
                 spellInfo->CategoryRecoveryTime = 0;
                 break;
+			case 32268:
+				spellInfo->Effects[0].Effect = SPELL_EFFECT_TELEPORT_UNITS;
+				break;
             default:
                 break;
         }
