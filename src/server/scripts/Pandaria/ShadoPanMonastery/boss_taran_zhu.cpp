@@ -118,7 +118,7 @@ public:
 		void Reset()
 		{
 			checkTaranZhuAlive = true;
-			checkTaranZhuAlive = me->IsAlive();
+			checkTaranZhuAlive = me->isAlive();
 						
 			events.Reset();
 
@@ -140,7 +140,7 @@ public:
 			{
 				for (Map::PlayerList::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
 				{
-					DoCast(i->GetSource(), SPELL_HAZE_OF_HATE); //A test
+					DoCast(i->getSource(), SPELL_HAZE_OF_HATE); //A test
 				}
 			}
 		}
@@ -152,7 +152,7 @@ public:
 			{
 				for (Map::PlayerList::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
 				{
-					DoCast(i->GetSource(), SPELL_MEDIDATE); //A test
+					DoCast(i->getSource(), SPELL_MEDIDATE); //A test
 				}
 			}
 		}
@@ -347,7 +347,7 @@ public:
 				{
 					for (Map::PlayerList::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
 					{
-						if (me->GetExactDist2d(i->GetSource()->GetPositionX(),i->GetSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
+						if (me->GetExactDist2d(i->getSource()->GetPositionX(),i->getSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
 						{
 							if (instance)
 								if (Creature* taran = me->GetCreature(*me, instance->GetData64(DATA_BOSS_TARAN_ZHU)))

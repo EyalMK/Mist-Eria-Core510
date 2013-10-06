@@ -201,7 +201,7 @@ public:
 		bool checkFragrantLotusDeath;
 		bool checkIntro9;
 		bool checkBallOfFire;
-		int introTerminée;
+		int introTerminee;
 		int counterShadoPanNovice;
 		
 		
@@ -212,12 +212,12 @@ public:
 			checkIntro9 = false;
 			checkFragrantLotusDeath = false;
 			checkMasterSnowdriftAlive = true;
-			checkMasterSnowdriftAlive = me->IsAlive();
+			checkMasterSnowdriftAlive = me->isAlive();
 			counterShadoPanNovice = 4;
 			
 			events.Reset();
 
-			if (introTerminée != 5)
+			if (introTerminee != 5)
 			{
 				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
 				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); 
@@ -266,11 +266,11 @@ public:
 					checkMasterSnowdriftAlive = false;
 					break;
 				case ACTION_INTRO_1:
-					if(introTerminée != 5)
+					if(introTerminee != 5)
 						Talk(SAY_INTRO_1);
 					break;
 				case ACTION_INTRO_2:
-					if(introTerminée != 5)
+					if(introTerminee != 5)
 					{
 						Talk(SAY_INTRO_2);
 						me->SummonCreature(SHADOPAN_NOVICE, spawnPos[0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30*IN_MILLISECONDS);
@@ -307,7 +307,7 @@ public:
 			{
 				instance->SetBossState(DATA_BOSS_MASTER_SNOWDRIFT, DONE);
 			}
-			introTerminée = 0;
+			introTerminee = 0;
 			//au cas ou
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -327,7 +327,7 @@ public:
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_MASTER_SNOWDRIFT, FAIL);
-			introTerminée = 5;
+			introTerminee = 5;
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -558,7 +558,7 @@ public:
 							break;
 
 						case EVENT_END:
-							introTerminée = 0;
+							introTerminee = 0;
 							me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 							me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 							if (instance)
@@ -688,7 +688,7 @@ public:
 				{
 					for (Map::PlayerList::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
 					{
-						if (me->GetExactDist2d(i->GetSource()->GetPositionX(),i->GetSource()->GetPositionY()) < 12) 
+						if (me->GetExactDist2d(i->getSource()->GetPositionX(),i->getSource()->GetPositionY()) < 12) 
 						{
 							if (instance)
 								if (Creature* master = me->GetCreature(*me, instance->GetData64(DATA_BOSS_MASTER_SNOWDRIFT)))

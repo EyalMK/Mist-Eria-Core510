@@ -78,7 +78,7 @@ public:
 		{
 			checkShaOfViolenceAlive = true;
 			checkEnrage = false;
-			checkShaOfViolenceAlive = me->IsAlive();
+			checkShaOfViolenceAlive = me->isAlive();
 
 			if(Aura* aura = me->GetAura(SPELL_ENRAGE))
 				me->RemoveAura(aura);

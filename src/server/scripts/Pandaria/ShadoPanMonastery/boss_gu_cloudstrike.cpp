@@ -134,7 +134,7 @@ public:
 		{
 			checkGuCloudstrikeAlive = true;
 			checkAzureSerpentAlive = true;
-			checkGuCloudstrikeAlive = me->IsAlive();
+			checkGuCloudstrikeAlive = me->isAlive();
 			checkSaySerpentLife = false;
 			
 			if(Aura* aura = me->GetAura(SPELL_CHARGING_SOUL))
@@ -516,7 +516,7 @@ public:
 				{
 					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 					{
-						if (me->GetExactDist2d(i->GetSource()->GetPositionX(),i->GetSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
+						if (me->GetExactDist2d(i->getSource()->GetPositionX(),i->getSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
 						{
 							if (instance)
 								if (Creature* gu = me->GetCreature(*me, instance->GetData64(DATA_BOSS_GU_CLOUDSTRIKE)))

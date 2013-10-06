@@ -155,7 +155,7 @@ public:
 					if (instance)
 					{
 						case EVENT_GROUND_SLAM:
-							DoCast(me->GetVictim(), SPELL_GROUND_SLAM);
+							DoCast(me->getVictim(), SPELL_GROUND_SLAM);
 
 							events.ScheduleEvent(EVENT_GROUND_SLAM, 20*IN_MILLISECONDS);
 							break;
