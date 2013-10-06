@@ -162,8 +162,8 @@ public:
 						for (i = threatlist.begin(); i != threatlist.end(); ++i)
 						{
 							if (Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid()))
-								if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && me->IsWithinMeleeRange(me->GetVictim()))
-									DoCast(me->GetVictim(), SPELL_SEETHE);
+								if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && me->IsWithinMeleeRange(me->getVictim()))
+									DoCast(me->getVictim(), SPELL_SEETHE);
 						}
 
 						events.ScheduleEvent(EVENT_SEETHE, 3*IN_MILLISECONDS);

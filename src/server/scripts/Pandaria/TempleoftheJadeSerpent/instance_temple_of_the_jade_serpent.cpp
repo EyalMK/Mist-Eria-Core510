@@ -95,21 +95,21 @@ class instance_temple_of_the_jade_serpent : public InstanceMapScript
 				}
 			}
 			
-			void OnGameObjectCreate(GameObject* go) OVERRIDE
+			void OnGameObjectCreate(GameObject* go)
             {
                 switch (go->GetEntry())
                 {
 				}
 			}
 			
-			void OnGameObjectRemove(GameObject* go) OVERRIDE
+			void OnGameObjectRemove(GameObject* go)
             {
                 switch (go->GetEntry())
                 {
 				}
 			}
 
-			uint64 GetData64(uint32 id) const OVERRIDE
+			uint64 GetData64(uint32 id) const
 			{
 				switch (id)
 				{
@@ -168,7 +168,7 @@ class instance_temple_of_the_jade_serpent : public InstanceMapScript
 
 		};
 
-		InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
+		InstanceScript* GetInstanceScript(InstanceMap* map) const
 		{
 			return new instance_temple_of_the_jade_serpent_InstanceMapScript(map);
 		}

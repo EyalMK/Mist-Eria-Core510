@@ -66,7 +66,7 @@ class boss_sha_of_doubt : public CreatureScript
 public:
 	boss_sha_of_doubt() : CreatureScript("boss_sha_of_doubt") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new boss_sha_of_doubtAI(creature);
 	}
@@ -87,7 +87,7 @@ public:
 		std::list<Creature*> listFigment;
 		
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkBounds1 = false;
 			checkBounds2 = false;
@@ -104,7 +104,7 @@ public:
 			
 		}
 		
-		void DoAction(int32 action) OVERRIDE
+		void DoAction(int32 action)
         {
             switch (action)
             {
@@ -117,7 +117,7 @@ public:
 			}
         }
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			Talk(SAY_DEATH);
 
@@ -132,18 +132,18 @@ public:
 			
 		}
 
-		void KilledUnit(Unit *pWho) OVERRIDE
+		void KilledUnit(Unit *pWho)
 		{
 			Talk(urand(SAY_SLAY_1, SAY_SLAY_2));
 		}
 		
-		void EnterEvadeMode() OVERRIDE
+		void EnterEvadeMode()
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, FAIL);	
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, IN_PROGRESS);
@@ -153,7 +153,7 @@ public:
 			events.ScheduleEvent(EVENT_WITHER_WILL, 6*IN_MILLISECONDS, 0, PHASE_COMBAT);
 		}
 		
-		void Verification() OVERRIDE
+		void Verification()
 		{
 			GetCreatureListWithEntryInGrid(listFigment, me, FIGMENT_OF_DOUBT, 50000.0f);
 			if(!listFigment.empty())
@@ -183,7 +183,7 @@ public:
 
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;

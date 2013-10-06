@@ -29,7 +29,7 @@ public :
 
     }
 
-    CreatureAI* GetAI(Creature *pCreature) const OVERRIDE
+    CreatureAI* GetAI(Creature *pCreature) const
     {
         return new boss_yan_zhu_AI(pCreature);
     }
@@ -42,7 +42,7 @@ public :
             p_instance = pCreature->GetInstanceScript();
         }
 
-        void Reset() OVERRIDE
+        void Reset()
         {
             RandomWheatAbility = RAND(SPELL_BLOAT, SPELL_BLACKOUT_BREW);
             RandomStoutAbility = RAND(SPELL_CARBONATION, SPELL_WALL_OF_SUDS);
@@ -59,7 +59,7 @@ public :
                 for(Map::PlayerList::const_iterator c_iter = pl.begin() ; c_iter != pl.end() ; ++c_iter)
                 {
                     Position pos ;
-                    if(Player* p = c_iter->GetSource())
+                    if(Player* p = c_iter->getSource())
                     {
                         p->GetPosition(&pos);
                         if(p->IsGameMaster())
@@ -97,7 +97,7 @@ public :
             }
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff)
         {
             if(!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return ;
@@ -209,7 +209,7 @@ public :
 
     }
 
-    CreatureAI* GetAI(Creature *pCreature) const OVERRIDE
+    CreatureAI* GetAI(Creature *pCreature) const
     {
         return new mob_yeasty_brew_elemental_AI(pCreature);
     }
@@ -222,7 +222,7 @@ public :
             p_instance = pCreature->GetInstanceScript();
         }
 
-        void JustSummoned(Creature *summon) OVERRIDE
+        void JustSummoned(Creature *summon)
         {
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_FERMENT, DUNGEON_MODE(urand(10000, 12000), urand(7000, 8000)));
@@ -237,7 +237,7 @@ public :
                 for(Map::PlayerList::const_iterator c_iter = playerList.begin() ; c_iter != playerList.end() ; ++c_iter)
                 {
                     boss = me->FindNearestCreature(BOSS_YAN_ZHU, 50000.0f, true);
-                    Player* p = c_iter->GetSource();
+                    Player* p = c_iter->getSource();
                     if(boss && p)
                         if(p->IsInBetween(me, boss))
                         {
@@ -254,7 +254,7 @@ public :
             events.ScheduleEvent(EVENT_FERMENT, DUNGEON_MODE(10000, 7500));
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff)
         {
             if(!UpdateVictim())
                 return ;
@@ -309,7 +309,7 @@ public :
 
     }
 
-    CreatureAI* GetAI(Creature *pCreature) const OVERRIDE
+    CreatureAI* GetAI(Creature *pCreature) const
     {
         return new mob_bubble_AI(pCreature);
     }
@@ -322,7 +322,7 @@ public :
             p_instance = pCreature->GetInstanceScript();
         }
  
-        void JustSummoned(Creature *summon) OVERRIDE
+        void JustSummoned(Creature *summon)
         {
             me->SetReactState(REACT_PASSIVE);
             me->SetFacingTo(me->GetOwner()->GetOrientation());
@@ -333,14 +333,14 @@ public :
                 TryBubbleTimer = 1000 ;
         }
 
-        void JustDied(Unit *killer) OVERRIDE
+        void JustDied(Unit *killer)
         {
             if(Creature* pBoss = me->FindNearestCreature(p_instance->GetData(BOSS_YAN_ZHU), 50000.0f, true))
                 if(Aura* bubble = pBoss->GetAura(SPELL_BUBBLE_SHIELD))
                     bubble->ModStackAmount(-1);
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff)
         {
             if(TryBubbleTimer <= diff)
                 if(Creature* pBoss = me->FindNearestCreature(p_instance->GetData(BOSS_YAN_ZHU), 50000.0f, true))
@@ -399,12 +399,12 @@ public :
 
     }
 
-    AuraScript* GetAuraScript() const OVERRIDE
+    AuraScript* GetAuraScript() const
     {
         return new spell_blackout_brew_AuraScript();
     }
 
-    SpellScript* GetSpellScript() const OVERRIDE
+    SpellScript* GetSpellScript() const
     {
         return new spell_blackout_brew_SpellScript();
     }
@@ -438,7 +438,7 @@ public :
             }
         }
 
-        void Register() OVERRIDE
+        void Register()
         {
             OnHit += SpellHitFn(spell_blackout_brew_SpellScript::HandleOnHit) ;
         }
@@ -464,7 +464,7 @@ public :
             }
         }
 
-        void Register() OVERRIDE
+        void Register()
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_blackout_brew_AuraScript::HandleRemoveByMove, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
         }

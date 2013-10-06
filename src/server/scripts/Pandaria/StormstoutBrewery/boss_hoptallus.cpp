@@ -33,7 +33,7 @@ public :
 
     }
 
-    CreatureAI* GetAI(Creature *pCreature) const OVERRIDE
+    CreatureAI* GetAI(Creature *pCreature) const
     {
         return new boss_hoptallus_AI(pCreature);
     }
@@ -46,19 +46,19 @@ public :
             p_instance = pCreature->GetInstanceScript();
         }
 
-        void EnterEvadeMode() OVERRIDE
+        void EnterEvadeMode()
         {
             /*if(p_instance)
                 p_instance->SetData(DATA_HOPTALLUS, FAIL);*/
         }
 
-        void Reset() OVERRIDE
+        void Reset()
         {
             /*if(p_instance)
                 p_instance->SetData(DATA_HOPTALLUS, NOT_STARTED);*/
         }
 
-        void EnterCombat(Unit *pWho) OVERRIDE
+        void EnterCombat(Unit *pWho)
         {
             /*if(p_instance)
                 p_instance->SetData(DATA_HOPTALLUS, IN_PROGRESS);*/
@@ -111,7 +111,7 @@ public :
             SubCallNPCS(Bopper, ACTION_BOPPER_JUMP);
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff)
         {
             if(!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return ;
@@ -142,12 +142,12 @@ public :
             }
         }
         
-        void KilledUnit(Unit *pWho) OVERRIDE
+        void KilledUnit(Unit *pWho)
         {
             me->MonsterYell(RAND(SAY_KILL_1, SAY_KILL_2), 0, 0);
         }
 
-        void JustDied(Unit *pKiller) OVERRIDE
+        void JustDied(Unit *pKiller)
         {
             /*if(p_instance)
                 p_instance->SetData(DATA_HOPTALLUS, DONE);*/
@@ -185,7 +185,7 @@ public :
 
     }
 
-    void UpdateAI(uint32 diff) OVERRIDE
+    void UpdateAI(uint32 diff)
     {
         if(!UpdateVictim())
             return ;
@@ -210,7 +210,7 @@ public :
 
     }
 
-    CreatureAI* GetAI(Creature *pCreature) const OVERRIDE
+    CreatureAI* GetAI(Creature *pCreature) const
     {
         return new npc_hopper_AI(pCreature);
     }
@@ -223,13 +223,13 @@ public :
 
         }
 
-        void Reset() OVERRIDE
+        void Reset()
         {
             me->SetVisible(false);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void DoAction(int32 action) OVERRIDE
+        void DoAction(int32 action)
         {
             switch(action)
             {
@@ -249,7 +249,7 @@ public :
             }
         }
 
-        void JustDied(Unit *pKiller) OVERRIDE
+        void JustDied(Unit *pKiller)
         {
             me->GetMotionMaster()->Clear(true);
             me->SetFullHealth();
@@ -265,7 +265,7 @@ public :
                 for(Map::PlayerList::const_iterator c_iter = players.begin() ; c_iter != players.end() ; ++c_iter)
                 {
                     Position pos ;
-                    Player* p = c_iter->GetSource();
+                    Player* p = c_iter->getSource();
                     p->GetPosition(&pos);
                     if(me->GetExactDist(&pos) <= 1.0f)
                     {
@@ -280,7 +280,7 @@ public :
             m_uiCheckTimer = 500 ;
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff)
         {
             npc_vermin_AI::UpdateAI(diff);
             if(m_uiCheckTimer <= diff)
@@ -306,7 +306,7 @@ public :
 
     }
 
-    CreatureAI* GetAI(Creature *pCreature) const OVERRIDE
+    CreatureAI* GetAI(Creature *pCreature) const
     {
         return new npc_bopper_AI(pCreature);
     }
@@ -319,13 +319,13 @@ public :
 
         }
 
-        void Reset() OVERRIDE
+        void Reset()
         {
             me->SetVisible(false);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void DoAction(int32 action) OVERRIDE
+        void DoAction(int32 action)
         {
             switch(action)
             {
@@ -344,7 +344,7 @@ public :
             }
         }
 
-        void JustDied(Unit *pKiller) OVERRIDE
+        void JustDied(Unit *pKiller)
         {
             Position pos ;
             me->GetPosition(&pos);
@@ -355,7 +355,7 @@ public :
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff)
         {
             npc_vermin_AI::UpdateAI(diff);
         }

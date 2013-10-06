@@ -110,7 +110,7 @@ class boss_wise_mari : public CreatureScript
 public:
 	boss_wise_mari() : CreatureScript("boss_wise_mari") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new boss_wise_mariAI(creature);
 	}
@@ -133,7 +133,7 @@ public:
 		bool checkHealthBelow21;
 		int counterLivingWater;
 		
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkHealthBelow21 = false;
 			checkMiddleLife = false;
@@ -157,7 +157,7 @@ public:
 			
 		}
 
-		void DoAction(int32 action) OVERRIDE
+		void DoAction(int32 action)
         {
             switch (action)
             {
@@ -174,7 +174,7 @@ public:
 			}
         }
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			if (instance)
 			{
@@ -187,12 +187,12 @@ public:
 		
 		}
 
-		void KilledUnit(Unit *pWho) OVERRIDE
+		void KilledUnit(Unit *pWho)
 		{	
 			Talk(urand(SAY_SLAY_1, SAY_SLAY_2));
 		}
 		
-		void EnterEvadeMode() OVERRIDE
+		void EnterEvadeMode()
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_WISE_MARI, FAIL);	
@@ -200,7 +200,7 @@ public:
 			Talk(SAY_EVADE);
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_WISE_MARI, IN_PROGRESS);
@@ -213,7 +213,7 @@ public:
 			events.ScheduleEvent(EVENT_CALL_WATER, 15*IN_MILLISECONDS, 0, PHASE_1);
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
@@ -336,7 +336,7 @@ class npc_wise_intro_trigger : public CreatureScript
 public:
 	npc_wise_intro_trigger() : CreatureScript("npc_wise_intro_trigger") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_wise_intro_triggerAI(creature);
 	}
@@ -353,7 +353,7 @@ public:
 		
 		bool checkTrigger; 
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkTrigger = true;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
@@ -363,17 +363,17 @@ public:
 			//ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilité du PNJ par les joueurs.
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			if(checkTrigger)
 			{
@@ -404,7 +404,7 @@ class npc_corrupt_living_water : public CreatureScript
 public:
 	npc_corrupt_living_water() : CreatureScript("npc_corrupt_living_water") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_corrupt_living_waterAI(creature);
 	}
@@ -419,12 +419,12 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 		
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			DoCast(me, SPELL_SHA_RESIDUE);
 			me->SummonCreature(CORRUPT_DROPLET, (me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60*IN_MILLISECONDS);
@@ -432,12 +432,12 @@ public:
 			me->SummonCreature(CORRUPT_DROPLET, (me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60*IN_MILLISECONDS);
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			
 		}
