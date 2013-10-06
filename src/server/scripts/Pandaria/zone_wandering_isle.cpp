@@ -152,6 +152,7 @@ public:
         {
             p->KilledMonsterCredit(KILL_CREDIT_BURN, 0);
             p->CastSpell(p, SPELL_NEW_PHASE, true);
+			p->RemoveAura(p->GetAura(59073));
 
             p->DestroyItemCount(FLAMME, 1, true);
             if(GameObject* go = ObjectAccessor::GetGameObject(*p, 406808))
