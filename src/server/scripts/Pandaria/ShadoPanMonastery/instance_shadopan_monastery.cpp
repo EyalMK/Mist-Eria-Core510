@@ -54,21 +54,21 @@ class instance_shado_pan_monastery : public InstanceMapScript
 				}
 			}
 			
-			void OnGameObjectCreate(GameObject* go) OVERRIDE
+			void OnGameObjectCreate(GameObject* go)
             {
                 switch (go->GetEntry())
                 {
 				}
 			}
 			
-			void OnGameObjectRemove(GameObject* go) OVERRIDE
+			void OnGameObjectRemove(GameObject* go)
             {
                 switch (go->GetEntry())
                 {
 				}
 			}
 
-			uint64 GetData64(uint32 id) const OVERRIDE
+			uint64 GetData64(uint32 id) const
 			{
 				switch (id)
 				{
@@ -97,7 +97,7 @@ class instance_shado_pan_monastery : public InstanceMapScript
 				uint64 BossTaranZhuGUID;
 		};
 
-		InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
+		InstanceScript* GetInstanceScript(InstanceMap* map) const
 		{
 			return new instance_shado_pan_monastery_InstanceMapScript(map);
 		}

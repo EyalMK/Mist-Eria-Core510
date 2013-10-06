@@ -302,7 +302,7 @@ public:
 				instance->SetData(DATA_TRIAL_OF_KING, FAIL);
 		}
 
-		void DamageTaken(Unit* who, uint32& damage) OVERRIDE
+		void DamageTaken(Unit* who, uint32& damage)
 		{
 			if (damage >= me->GetHealth())
 			{
@@ -311,7 +311,7 @@ public:
 			}
 		}
 
-		void JustDied(Unit* /*killer*/) OVERRIDE
+		void JustDied(Unit* /*killer*/)
 		{
 			if (Creature* ming = me->GetCreature(*me, instance->GetData64(DATA_MING_THE_CUNNING)))
 			{
@@ -448,7 +448,7 @@ public:
 				instance->SetData(DATA_TRIAL_OF_KING, FAIL);
 		}
 
-		void DamageTaken(Unit* who, uint32& damage) OVERRIDE
+		void DamageTaken(Unit* who, uint32& damage)
 		{
 			if (damage >= me->GetHealth())
 			{
@@ -457,7 +457,7 @@ public:
 			}
 		}
 
-		void JustDied(Unit* /*killer*/) OVERRIDE
+		void JustDied(Unit* /*killer*/)
 		{
 			if (Creature* ming = me->GetCreature(*me, instance->GetData64(DATA_MING_THE_CUNNING)))
 			{

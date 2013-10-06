@@ -111,7 +111,7 @@ class boss_gu_cloudstrike : public CreatureScript
 public:
 	boss_gu_cloudstrike() : CreatureScript("boss_gu_cloudstrike") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new boss_gu_cloudstrikeAI(creature);
 	}
@@ -130,7 +130,7 @@ public:
 		bool checkAzureSerpentAlive;
 		bool checkSaySerpentLife;
 		
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkGuCloudstrikeAlive = true;
 			checkAzureSerpentAlive = true;
@@ -161,7 +161,7 @@ public:
 			}
 		}
 
-		void DoAction(int32 action) OVERRIDE
+		void DoAction(int32 action)
         {
             switch (action)
             {
@@ -185,7 +185,7 @@ public:
 			}
         }
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			if (instance)
 			{
@@ -200,18 +200,18 @@ public:
 			Talk(SAY_DEATH);
 		}
 
-		void KilledUnit(Unit *pWho) OVERRIDE
+		void KilledUnit(Unit *pWho)
 		{
 			Talk(urand(SAY_SLAY1, SAY_SLAY3));
 		}
 		
-		void EnterEvadeMode() OVERRIDE
+		void EnterEvadeMode()
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_GU_CLOUDSTRIKE, FAIL);
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_GU_CLOUDSTRIKE, IN_PROGRESS);
@@ -225,7 +225,7 @@ public:
 
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
@@ -343,7 +343,7 @@ class npc_azure_serpent : public CreatureScript
 public:
 	npc_azure_serpent() : CreatureScript("npc_azure_serpent") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_azure_serpentAI(creature);
 	}
@@ -358,7 +358,7 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			if (instance)
 				if (Creature* gu = me->GetCreature(*me, instance->GetData64(DATA_BOSS_GU_CLOUDSTRIKE)))
@@ -374,7 +374,7 @@ public:
 			events.Reset();
 		}
 
-		void DoAction(int32 action) OVERRIDE
+		void DoAction(int32 action)
         {
             switch (action)
             {
@@ -384,7 +384,7 @@ public:
 					break;
 			}
         }
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			if (instance)
 				if (Creature* gu = me->GetCreature(*me, instance->GetData64(DATA_BOSS_GU_CLOUDSTRIKE)))
@@ -392,14 +392,14 @@ public:
 					    gu->AI()->DoAction(ACTION_AZURE_SERPENT_DIED);
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 			me->SetInCombatWithZone();
 			events.SetPhase(PHASE_1);
 			events.ScheduleEvent(EVENT_STATIC_FIELD, 1*IN_MILLISECONDS, 0, PHASE_1);
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
@@ -470,7 +470,7 @@ class npc_gu_intro_trigger : public CreatureScript
 public:
 	npc_gu_intro_trigger() : CreatureScript("npc_gu_intro_trigger") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_gu_intro_triggerAI(creature);
 	}
@@ -487,7 +487,7 @@ public:
 		
 		bool checkTrigger; 
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkTrigger = true;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
@@ -497,17 +497,17 @@ public:
 			//ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilité du PNJ par les joueurs.
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			if(checkTrigger)
 			{

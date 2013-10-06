@@ -74,7 +74,7 @@ class boss_xin_the_weaponmaster : public CreatureScript
 public:
 	boss_xin_the_weaponmaster() : CreatureScript("boss_xin_the_weaponmaster") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new boss_xin_the_weaponmasterAI(creature);
 	}
@@ -92,14 +92,14 @@ public:
 		bool healthBelowSixtyPct;
 		bool healthBelowThirtyPct;
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			healthBelowSixtyPct = false;
 			healthBelowThirtyPct = false;
 			events.Reset();
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_XIN_THE_WEAPONMASTER, DONE);
@@ -107,18 +107,18 @@ public:
 			Talk(SAY_DEATH);
 		}
 
-		void KilledUnit(Unit *pWho) OVERRIDE
+		void KilledUnit(Unit *pWho)
 		{
 			Talk(SAY_SLAY);
 		}
 		
-		void EnterEvadeMode() OVERRIDE
+		void EnterEvadeMode()
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_XIN_THE_WEAPONMASTER, FAIL);
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
 				instance->SetBossState(DATA_GEKKAN, IN_PROGRESS);
@@ -129,7 +129,7 @@ public:
 			events.ScheduleEvent(EVENT_GROUND_SLAM, 20*IN_MILLISECONDS);
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;

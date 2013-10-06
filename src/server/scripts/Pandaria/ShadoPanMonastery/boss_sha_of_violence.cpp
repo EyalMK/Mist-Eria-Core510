@@ -56,7 +56,7 @@ class boss_sha_of_violence : public CreatureScript
 public:
 	boss_sha_of_violence() : CreatureScript("boss_sha_of_violence") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new boss_sha_of_violenceAI(creature);
 	}
@@ -74,7 +74,7 @@ public:
 		bool checkShaOfViolenceAlive;
 		bool checkEnrage;
 		
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkShaOfViolenceAlive = true;
 			checkEnrage = false;
@@ -93,7 +93,7 @@ public:
 			
 		}
 
-		void DoAction(int32 action) OVERRIDE
+		void DoAction(int32 action)
         {
             switch (action)
             {
@@ -107,7 +107,7 @@ public:
 			}
         }
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			if (instance)
 			{
@@ -122,18 +122,18 @@ public:
 			
 		}
 
-		void KilledUnit(Unit *pWho) OVERRIDE
+		void KilledUnit(Unit *pWho)
 		{
 			Talk(SAY_SLAY);			
 		}
 		
-		void EnterEvadeMode() OVERRIDE
+		void EnterEvadeMode()
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_SHA_OF_VIOLENCE, FAIL);			
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_SHA_OF_VIOLENCE, IN_PROGRESS);
@@ -146,7 +146,7 @@ public:
 			events.ScheduleEvent(EVENT_SHA_SPIKE_1, 14*IN_MILLISECONDS);
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
