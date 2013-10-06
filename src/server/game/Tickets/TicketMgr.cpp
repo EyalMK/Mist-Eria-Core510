@@ -119,7 +119,7 @@ void GmTicket::DeleteFromDB()
 
 void GmTicket::WritePacket(WorldPacket& data) const
 {
-    data << uint32(9/*GMTICKET_STATUS_HASTEXT*/);
+    data << uint32(GMTICKET_STATUS_HASTEXT);
     data << uint32(_id);
     data << _message;
     data << uint8(_haveTicket);
