@@ -124,7 +124,7 @@ public:
 			me->GetPosition(&position);
 			counterMinionDeath = 0;
 			checkLiuFlameheartAlive = true;
-			checkLiuFlameheartAlive = me->IsAlive();
+			checkLiuFlameheartAlive = me->isAlive();
 			
 			events.Reset();
 

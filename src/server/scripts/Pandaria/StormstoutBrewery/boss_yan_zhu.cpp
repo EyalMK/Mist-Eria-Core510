@@ -62,7 +62,7 @@ public :
                     if(Player* p = c_iter->getSource())
                     {
                         p->GetPosition(&pos);
-                        if(p->IsGameMaster())
+                        if(p->isGameMaster())
                             continue ;
                         if(me->GetExactDist(&pos) > MELEE_RANGE)
                             count++;
