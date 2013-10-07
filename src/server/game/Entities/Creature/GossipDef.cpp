@@ -319,6 +319,10 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, uint64 npcGUID, 
     std::string questTurnTargetName  = quest->GetQuestTurnTargetName();
 
     int32 locale = _session->GetSessionDbLocaleIndex();
+
+	// Debug terah
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "locale = %d", locale);
+
     if (locale >= 0)
     {
         if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
