@@ -848,13 +848,13 @@ ByteBuffer& operator<<(ByteBuffer& b, LootItem const& li)
 
 ByteBuffer& operator<<(ByteBuffer& b, LootItemView const& iv)
 {
-	if(iv.position)
-        b << uint8(iv.position);
-	b << uint32(0);
-	b << uint32(iv.loot_item.count);
-	b << uint32(0); //item->randomSuffix ?
     if(iv.slotType)
         b << uint8(iv.slotType);
+    b << uint32(0);
+	b << uint32(iv.loot_item.count);
+	b << uint32(0); //item->randomSuffix ?
+    if(iv.position)
+        b << uint8(iv.position);
 	b << uint32(iv.loot_item.itemid);
 	b << uint32(sObjectMgr->GetItemTemplate(iv.loot_item.itemid)->DisplayInfoID);
 	b << uint32(0); //item->randomPropertyId ?
@@ -1080,8 +1080,8 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 	b.WriteBits(itemsShownList.size(), 21);                        // item count placeholder
 	for(std::list<LootItemView>::const_iterator itr = itemsShownList.begin() ; itr != itemsShownList.end() ; ++itr)
 	{
-		b.WriteBit(!itr->slotType);
 		b.WriteBit(!itr->position);
+        b.WriteBit(!itr->slotType);
 	}
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootView 2 %u", l.loot_type);
