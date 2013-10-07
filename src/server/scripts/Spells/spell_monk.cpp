@@ -55,8 +55,8 @@ public:
                     {
                         GetCaster()->CastSpell(target, 116706, true);
                         target->RemoveAura(116095);
-                        PreventHitAura();
                     }
+                    PreventHitAura();
                 }
                 
             }
