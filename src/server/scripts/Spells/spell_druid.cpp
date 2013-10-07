@@ -182,12 +182,12 @@ public:
                 for(std::map<uint32, uint32>::iterator itr = spellsToChange.begin(); itr != spellsToChange.end() ; itr++)
                 {
                     WorldPacket data(SMSG_SUPERCEDED_SPELL, 4+4);
-                    data.WriteBits(1, 24); //second count
+                    data.WriteBits(0, 24); //second count
                     data.WriteBits(1, 24); //first count
                     data.FlushBits();
                     player->AddTemporarySpell(itr->first);
                     data << uint32(itr->first);
-                    data << uint32(itr->second);
+                    //data << uint32(itr->second);
                     player->GetSession()->SendPacket(&data);
                 }
             }
@@ -220,10 +220,10 @@ public:
                 {
                     WorldPacket data(SMSG_SUPERCEDED_SPELL, 4+4);
                     data.WriteBits(1, 24); //second count
-                    data.WriteBits(1, 24); //first count
+                    data.WriteBits(0, 24); //first count
                     data.FlushBits();
                     player->AddTemporarySpell(itr->first);
-                    data << uint32(itr->first);
+                    //data << uint32(itr->first);
                     data << uint32(itr->second);
                     player->GetSession()->SendPacket(&data);
                 }
