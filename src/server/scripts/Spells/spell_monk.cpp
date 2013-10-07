@@ -22,19 +22,9 @@ public:
             }
         }
 
-        /*void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode)
-        {
-            if(aurEff->GetBase()->GetCharges())
-            {
-                GetCaster()->CastSpell(GetUnitOwner(), 116706, true);
-            }
-        }*/
-
-
         void Register()
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_monk_disable_AuraScript::PeriodicDummy, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-            //AfterEffectApply += AuraEffectApplyFn(spell_monk_disable_AuraScript::OnApply, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
@@ -60,9 +50,13 @@ public:
 
                 if(target->HasAura(116095))
                 {
-                    GetCaster()->CastSpell(target, 116706, true);
-                    target->RemoveAura(116095);
-                    PreventHitAura();
+                    AuraEffect* tickEffect = target->GetAuraEffect(116095, EFFECT_1, GetCaster()->GetGUID());
+                    if(tickEffect && tickEffect->GetTickNumber() > 1)
+                    {
+                        GetCaster()->CastSpell(target, 116706, true);
+                        target->RemoveAura(116095);
+                        PreventHitAura();
+                    }
                 }
                 
             }
