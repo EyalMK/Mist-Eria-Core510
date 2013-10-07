@@ -76,7 +76,8 @@ void WorldSession::HandleAttackStopOpcode(WorldPacket & /*recvData*/)
 void WorldSession::HandleSetSheathedOpcode(WorldPacket& recvData)
 {
     uint32 sheathed;
-    recvData >> sheathed;
+    uint8 unk;
+    recvData >> sheathed >> unk;
 
     //sLog->outDebug(LOG_FILTER_PACKETIO, "WORLD: Recvd CMSG_SETSHEATHED Message guidlow:%u value1:%u", GetPlayer()->GetGUIDLow(), sheathed);
 
