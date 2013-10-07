@@ -473,7 +473,7 @@ enum Opcodes
     CMSG_REPOP_REQUEST                                = 0x0093,//16357
     CMSG_REPORT_PVP_AFK                               = 0x1414,
     CMSG_REQUEST_ACCOUNT_DATA                         = 0x0A08,//16357
-    CMSG_REQUEST_CATEGORY_COOLDOWNS                   = 0x1598,
+    CMSG_REQUEST_CATEGORY_COOLDOWNS                   = 0x0036,//16357
     CMSG_REQUEST_CEMETERY_LIST                        = 0x1417,
     CMSG_REQUEST_HOTFIX                               = 0x1418,
     CMSG_REQUEST_INSPECT_RATED_BG_STATS               = 0x1419,
