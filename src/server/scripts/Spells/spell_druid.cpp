@@ -205,7 +205,7 @@ public:
                 }
 
                 WorldPacket data(SMSG_LEARNED_SPELL);
-                data.WriteBit(0);
+                data.WriteBit(1);
                 data.WriteBits(spellsToAdd.size(), 24); // Spell Count
                 data.FlushBits();
                 for(std::list<uint32>::iterator itr = spellsToAdd.begin(); itr != spellsToAdd.end() ; itr++)
