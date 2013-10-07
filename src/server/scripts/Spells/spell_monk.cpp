@@ -13,11 +13,6 @@ public:
     {
         PrepareAuraScript(spell_monk_disable_AuraScript);
 
-        bool Validate(SpellInfo const* /*spellInfo*/)
-        {
-            return true;
-        }
-
         void PeriodicDummy(AuraEffect const* aurEff)
         {
             if(GetUnitOwner() && GetCaster())
@@ -29,13 +24,9 @@ public:
 
         void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
-            if(aurEff->GetBase()->GetCharges() == 2)
+            if(aurEff->GetBase()->GetCharges())
             {
                 GetCaster()->CastSpell(GetUnitOwner(), 116706, true);
-                if(Aura* root = GetUnitOwner()->GetAura(116706, GetCasterGUID()))
-                {
-                    root->SetDuration(aurEff->GetBase()->GetDuration());
-                }
             }
         }
 
@@ -51,21 +42,30 @@ public:
     {
         return new spell_monk_disable_AuraScript();
     }
-    /*
+    
     class spell_monk_disable_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_monk_disable_SpellScript);
 
-        bool Validate(SpellInfo const* /*spellInfo)
-        {
-            return true;
-        }
-
         void Hit()
         {
-            //Cant apply twice
-            if(GetExplTargetUnit() && GetExplTargetUnit()->HasAura(116706))
-                PreventHitAura();
+            if (Unit* target = GetExplTargetUnit())
+            {
+                //Cant apply twice
+                if(target->HasAura(116706))
+                {
+                    PreventHitAura();
+                    return;
+                }
+
+                if(target->HasAura(116095))
+                {
+                    GetCaster()->CastSpell(target, 116706, true);
+                    target->RemoveAura(116095);
+                    PreventHitAura();
+                }
+                
+            }
         }
 
         void Register()
@@ -78,7 +78,7 @@ public:
     {
         return new spell_monk_disable_SpellScript();
     }
-    */
+    
 };
 
 
