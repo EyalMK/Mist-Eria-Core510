@@ -37,7 +37,7 @@ public:
     {
         PrepareSpellScript(spell_monk_disable_SpellScript);
 
-        void Hit()
+        void Cast()
         {
             if (Unit* target = GetExplTargetUnit())
             {
@@ -64,7 +64,7 @@ public:
 
         void Register()
         {
-            OnHit += SpellHitFn(spell_monk_disable_SpellScript::Hit);
+            OnCast += SpellCastFn(spell_monk_disable_SpellScript::Cast);
         }
     };
 
