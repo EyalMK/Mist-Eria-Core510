@@ -283,7 +283,7 @@ enum Opcodes
     CMSG_GUILD_REQUEST_MAX_DAILY_XP                   = 0x05EF,//16357
     CMSG_GUILD_REQUEST_PARTY_STATE                    = 0x0722,//16357
     CMSG_GUILD_ROSTER                                 = 0x0743,//16357
-    CMSG_GUILD_SET_ACHIEVEMENT_TRACKING               = 0x1237,
+    CMSG_GUILD_SET_ACHIEVEMENT_TRACKING               = 0x07E2,//16357
     CMSG_GUILD_SET_GUILD_MASTER                       = 0x09A2,//16357
     CMSG_GUILD_SET_NOTE                               = 0x0A83,//16357
     CMSG_GUILD_SET_RANK_PERMISSIONS                   = 0x0907,//16357
