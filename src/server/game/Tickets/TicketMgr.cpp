@@ -119,6 +119,40 @@ void GmTicket::DeleteFromDB()
 
 void GmTicket::WritePacket(WorldPacket& data) const
 {
+
+	std::string str1 = "Hello";
+	std::string str2 = "World";
+
+	data << uint32(GMTICKET_STATUS_HASTEXT);
+	data.WriteBit(_haveTicket);
+
+	if(_haveTicket)
+	{
+		data.WriteBits(str1.size(), 12);
+		data.WriteBits(str2.size(), 11);
+	}
+
+	data.FlushBits();
+
+	if(_haveTicket)
+	{
+		data << uint8(1);
+		data << uint32(1);
+		data << uint32(1);
+		data << uint32(1);
+		data << uint32(1);
+
+		data << uint8(std::min(_escalatedStatus, TICKET_IN_ESCALATION_QUEUE));                              // escalated data
+		data << uint8(_viewed ? GMTICKET_OPENEDBYGM_STATUS_OPENED : GMTICKET_OPENEDBYGM_STATUS_NOT_OPENED); // whether or not it has been viewed
+
+		data << uint32(1);
+
+		data << str2;
+		data << str1;
+	}
+
+
+	/*
     data << uint32(GMTICKET_STATUS_HASTEXT);
     data << uint32(_id);
     data << _message;
@@ -139,6 +173,7 @@ void GmTicket::WritePacket(WorldPacket& data) const
     std::string waitTimeOverrideMessage = "";
     data << waitTimeOverrideMessage;
     data << uint32(0); // waitTimeOverrideMinutes
+	*/
 }
 
 void GmTicket::SendResponse(WorldSession* session) const
