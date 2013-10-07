@@ -136,16 +136,16 @@ void GmTicket::WritePacket(WorldPacket& data) const
 
 	if(_haveTicket)
 	{
-		data << uint8(0);
-		data << uint32(0);
-		data << uint32(0);
-		data << uint32(0);
-		data << uint32(0);
+		data << uint8(1);
+		data << uint32(1);
+		data << uint32(1);
+		data << uint32(1);
+		data << uint32(1);
 
 		data << uint8(std::min(_escalatedStatus, TICKET_IN_ESCALATION_QUEUE));                              // escalated data
 		data << uint8(_viewed ? GMTICKET_OPENEDBYGM_STATUS_OPENED : GMTICKET_OPENEDBYGM_STATUS_NOT_OPENED); // whether or not it has been viewed
 
-		data << uint32(0);
+		data << uint32(1);
 
 		data << str2;
 		data << str1;
