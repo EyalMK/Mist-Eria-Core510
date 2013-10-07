@@ -463,7 +463,7 @@ enum AuraType
 	SPELL_AURA_404                                          = 404,
 	SPELL_AURA_405                                          = 405,
 	SPELL_AURA_406                                          = 406,
-	SPELL_AURA_407                                          = 407,
+	SPELL_AURA_MOD_FEAR2                                    = 407,
 	SPELL_AURA_408                                          = 408,
 	SPELL_AURA_409                                          = 409,
 	SPELL_AURA_410                                          = 410,
