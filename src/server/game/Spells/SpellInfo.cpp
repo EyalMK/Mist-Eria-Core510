@@ -2555,6 +2555,7 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                     if (Effects[effIndex].CalcValue() < 0)
                         return false;
                     break;
+                case SPELL_AURA_MOD_PHYSICAL_DAMAGE_TAKEN_PCT:
                 case SPELL_AURA_MOD_DAMAGE_TAKEN:           // dependent from bas point sign (positive -> negative)
                     if (Effects[effIndex].CalcValue() > 0)
                         return false;

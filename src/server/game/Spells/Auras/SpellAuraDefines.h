@@ -434,7 +434,7 @@ enum AuraType
 	SPELL_AURA_375                                          = 375,
 	SPELL_AURA_376                                          = 376,
 	SPELL_AURA_377                                          = 377,
-	SPELL_AURA_378                                          = 378,
+	SPELL_AURA_MOD_PHYSICAL_DAMAGE_TAKEN_PCT                = 378,  // only Molten Armor (30482)
 	SPELL_AURA_379                                          = 379,
 	SPELL_AURA_380                                          = 380,
 	SPELL_AURA_381                                          = 381,
