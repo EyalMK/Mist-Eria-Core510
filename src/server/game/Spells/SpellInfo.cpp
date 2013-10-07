@@ -369,7 +369,7 @@ SpellEffectInfo::SpellEffectInfo(SpellEntry const* /*spellEntry*/, SpellInfo con
     DeltaScalingMultiplier = effectScaling ? effectScaling->DeltaScalingMultiplier : 0.0f;
     ComboScalingMultiplier = effectScaling ? effectScaling->ComboScalingMultiplier : 0.0f;
 
-    isSPAPModified = IsSPAPModified();
+    isAPSPModified = IsAPSPModified();
 }
 
 bool SpellEffectInfo::IsAPSPModified() const
@@ -542,7 +542,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
             //value = int32(value * (int32)getLevel() / (int32)(_spellInfo->spellLevel ? _spellInfo->spellLevel : 1));
     }
 
-    if(caster && isSPAPModified)
+    if(caster && isAPSPModified)
     {
         float flat = value;
         int32 sp = caster->GetTotalSpellPowerValue(_spellInfo->GetSchoolMask(), _spellInfo->_IsPositiveEffect(_effIndex, true));

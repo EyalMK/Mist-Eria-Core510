@@ -241,7 +241,7 @@ public:
     float     ValueMultiplier;
     float     DamageMultiplier;
     float     SPMultiplier;
-    bool      isSPAPModified;
+    bool      isAPSPModified;
     int32     MiscValue;
     int32     MiscValueB;
     Mechanics Mechanic;
