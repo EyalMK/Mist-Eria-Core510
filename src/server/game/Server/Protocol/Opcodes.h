@@ -367,7 +367,7 @@ enum Opcodes
     CMSG_MOVE_CHNG_TRANSPORT                          = 0x064A,//16357
     CMSG_MOVE_ENABLE_SWIM_TO_FLY_TRANS_ACK            = 0x1312,
     CMSG_MOVE_FALL_RESET                              = 0x0AFF,//16357
-    CMSG_MOVE_FEATHER_FALL_ACK                        = 0x1314,
+    CMSG_MOVE_FEATHER_FALL_ACK                        = 0x33E,//16357
     CMSG_MOVE_FORCE_FLIGHT_BACK_SPEED_CHANGE_ACK      = 0x1315,
     CMSG_MOVE_FORCE_FLIGHT_SPEED_CHANGE_ACK           = 0x06C7,//16357
     CMSG_MOVE_FORCE_PITCH_RATE_CHANGE_ACK             = 0x1317,
@@ -612,7 +612,6 @@ enum Opcodes
     SMSG_MINIMAP_PONG                                 = 0x03A9,//16357
     MSG_MOVE_CHARM_TELEPORT_CHEAT                     = 0x0217,//16357
     MSG_MOVE_FALL_LAND                                = 0x78B,//16357
-    MSG_MOVE_FEATHER_FALL                             = 0x1551,
     MSG_MOVE_GRAVITY_CHNG                             = 0x1552,
     MSG_MOVE_HEARTBEAT                                = 0x0BD2, //16357
     MSG_MOVE_HOVER                                    = 0x1553,
