@@ -162,28 +162,53 @@ public:
             if (unitTarget && unitTarget->GetTypeId() == TYPEID_PLAYER)
             {
                 //         new
-                std::list<uint32> spellsToChange;
+                std::list<uint32> spellsToAdd;
+                //         new       old
+                std::map<uint32, uint32> spellsToChange;
                 if(aurEff->GetMiscValue() == FORM_CAT)
                 {
                     if(unitTarget->HasSpell(SPELL_DRU_MANGLE_GENERIC))
-                        spellsToChange.push_back(SPELL_DRU_MANGLE_CAT);    
+                    {
+                        spellsToAdd.push_back(SPELL_DRU_MANGLE_GENERIC);
+                        spellsToChange[SPELL_DRU_MANGLE_CAT] = SPELL_DRU_MANGLE_GENERIC;   
+                    }
                     if(unitTarget->HasSpell(SPELL_DRU_SWIPE_GENERIC))
-                        spellsToChange.push_back(SPELL_DRU_SWIPE_CAT);
+                    {
+                        spellsToAdd.push_back(SPELL_DRU_SWIPE_GENERIC);
+                        spellsToChange[SPELL_DRU_SWIPE_CAT] = SPELL_DRU_SWIPE_GENERIC;
+                    }
                 }
                 else if(aurEff->GetMiscValue() == FORM_BEAR)
                 {
                     if(unitTarget->HasSpell(SPELL_DRU_MANGLE_GENERIC))
-                        spellsToChange.push_back(SPELL_DRU_MANGLE_BEAR);    
+                    {
+                        spellsToAdd.push_back(SPELL_DRU_MANGLE_GENERIC);
+                        spellsToChange[SPELL_DRU_MANGLE_BEAR] = SPELL_DRU_MANGLE_GENERIC;  
+                    }
                     if(unitTarget->HasSpell(SPELL_DRU_SWIPE_GENERIC))
-                        spellsToChange.push_back(SPELL_DRU_SWIPE_BEAR);
+                    {
+                        spellsToAdd.push_back(SPELL_DRU_SWIPE_GENERIC);
+                        spellsToChange[SPELL_DRU_SWIPE_BEAR] = SPELL_DRU_SWIPE_GENERIC;
+                    }
                 }
 
                 Player * player = unitTarget->ToPlayer();
-                WorldPacket data(SMSG_LEARNED_SPELL, 1+3+4);
+                for(std::map<uint32, uint32>::iterator itr = spellsToChange.begin() ; itr != spellsToChange.end() ; itr++)
+                {
+                    WorldPacket data(SMSG_SUPERCEDED_SPELL);
+                    data.WriteBits(1, 24);
+                    data.WriteBits(1, 24);
+                    player->AddTemporarySpell(itr->first);
+                    data << uint32(itr->first);
+                    data << uint32(itr->second);
+                    player->GetSession()->SendPacket(&data);
+                }
+
+                WorldPacket data(SMSG_LEARNED_SPELL);
                 data.WriteBit(0);
-                data.WriteBits(spellsToChange.size(), 24); // Spell Count
+                data.WriteBits(spellsToAdd.size(), 24); // Spell Count
                 data.FlushBits();
-                for(std::list<uint32>::iterator itr = spellsToChange.begin(); itr != spellsToChange.end() ; itr++)
+                for(std::list<uint32>::iterator itr = spellsToAdd.begin(); itr != spellsToAdd.end() ; itr++)
                     data << uint32(*itr);
                 player->GetSession()->SendPacket(&data);
             }
@@ -194,31 +219,42 @@ public:
             Unit* unitTarget = GetTarget();
             if (unitTarget && unitTarget->GetTypeId() == TYPEID_PLAYER)
             {
-                //         new
-                std::list<uint32> spellsToChange;
+                //         new       old
+                std::map<uint32, uint32> spellsToChange;
                 if(aurEff->GetMiscValue() == FORM_CAT)
                 {
                     if(unitTarget->HasSpell(SPELL_DRU_MANGLE_GENERIC))
-                        spellsToChange.push_back(SPELL_DRU_MANGLE_CAT);    
+                    {
+                        spellsToChange[SPELL_DRU_MANGLE_CAT] = SPELL_DRU_MANGLE_GENERIC;   
+                    }
                     if(unitTarget->HasSpell(SPELL_DRU_SWIPE_GENERIC))
-                        spellsToChange.push_back(SPELL_DRU_SWIPE_CAT);
+                    {
+                        spellsToChange[SPELL_DRU_SWIPE_CAT] = SPELL_DRU_SWIPE_GENERIC;
+                    }
                 }
                 else if(aurEff->GetMiscValue() == FORM_BEAR)
                 {
                     if(unitTarget->HasSpell(SPELL_DRU_MANGLE_GENERIC))
-                        spellsToChange.push_back(SPELL_DRU_MANGLE_BEAR);    
+                    {
+                        spellsToChange[SPELL_DRU_MANGLE_BEAR] = SPELL_DRU_MANGLE_GENERIC;  
+                    }
                     if(unitTarget->HasSpell(SPELL_DRU_SWIPE_GENERIC))
-                        spellsToChange.push_back(SPELL_DRU_SWIPE_BEAR);
+                    {
+                        spellsToChange[SPELL_DRU_SWIPE_BEAR] = SPELL_DRU_SWIPE_GENERIC;
+                    }
                 }
 
                 Player * player = unitTarget->ToPlayer();
-                WorldPacket data(SMSG_REMOVED_SPELL, 1+3+4);
-                data.WriteBit(0);
-                data.WriteBits(spellsToChange.size(), 24); // Spell Count
-                data.FlushBits();
-                for(std::list<uint32>::iterator itr = spellsToChange.begin(); itr != spellsToChange.end() ; itr++)
-                    data << uint32(*itr);
-                player->GetSession()->SendPacket(&data);
+                for(std::map<uint32, uint32>::iterator itr = spellsToChange.begin() ; itr != spellsToChange.end() ; itr++)
+                {
+                    WorldPacket data(SMSG_SUPERCEDED_SPELL);
+                    data.WriteBits(1, 24);
+                    data.WriteBits(1, 24);
+                    player->RemoveTemporarySpell(itr->first);
+                    data << uint32(itr->second);
+                    data << uint32(itr->first);
+                    player->GetSession()->SendPacket(&data);
+                }
             }
         }
 
