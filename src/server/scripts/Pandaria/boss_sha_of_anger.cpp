@@ -65,7 +65,7 @@ class boss_sha_of_anger : public CreatureScript
 public:
 	boss_sha_of_anger() : CreatureScript("boss_sha_of_anger") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new boss_sha_of_angerAI(creature);
 	}
@@ -78,7 +78,7 @@ public:
 
 		EventMap events;
 		
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			events.Reset();
 
@@ -86,17 +86,17 @@ public:
 			me->SetPower(POWER_RAGE, 0);
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			Talk(SAY_DEATH);
 		}
 
-		void KilledUnit(Unit *pWho) OVERRIDE
+		void KilledUnit(Unit *pWho)
 		{
 			Talk(SAY_SLAY);
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 			Talk(SAY_AGGRO);
 
@@ -107,7 +107,7 @@ public:
 			events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS));
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
@@ -162,8 +162,8 @@ public:
 						for (i = threatlist.begin(); i != threatlist.end(); ++i)
 						{
 							if (Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid()))
-								if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && me->IsWithinMeleeRange(me->GetVictim()))
-									DoCast(me->GetVictim(), SPELL_SEETHE);
+								if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && me->IsWithinMeleeRange(me->getVictim()))
+									DoCast(me->getVictim(), SPELL_SEETHE);
 						}
 
 						events.ScheduleEvent(EVENT_SEETHE, 3*IN_MILLISECONDS);

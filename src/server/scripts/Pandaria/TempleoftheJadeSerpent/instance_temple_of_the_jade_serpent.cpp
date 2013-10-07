@@ -5,14 +5,13 @@
 #include "temple_of_the_jade_serpent.h"
 
 /* Notes :
-Mettre les GUID dans le header pour les Npc Sun (1 à 5)
+Mettre les GUID dans le header pour les Npc Sun (1 a 5)
 
 Instance : Script 95% 
-Wise Mari : Script 95% (terminé -- voir spells)
-Lorewalker Stonestep : Script 95% (terminé -- voir spells)
-Liu Flameheart : Script 95% (terminé -- voir spells)
-Sha of Doubt : Script 95% (terminé -- voir spells)
-
+Wise Mari : Script 95% (termine -- voir spells)
+Lorewalker Stonestep : Script 95% (termine -- voir spells)
+Liu Flameheart : Script 95% (termine -- voir spells)
+Sha of Doubt : Script 95% (termine -- voir spells)
 */
 
 
@@ -96,21 +95,21 @@ class instance_temple_of_the_jade_serpent : public InstanceMapScript
 				}
 			}
 			
-			void OnGameObjectCreate(GameObject* go) OVERRIDE
+			void OnGameObjectCreate(GameObject* go)
             {
                 switch (go->GetEntry())
                 {
 				}
 			}
 			
-			void OnGameObjectRemove(GameObject* go) OVERRIDE
+			void OnGameObjectRemove(GameObject* go)
             {
                 switch (go->GetEntry())
                 {
 				}
 			}
 
-			uint64 GetData64(uint32 id) const OVERRIDE
+			uint64 GetData64(uint32 id) const
 			{
 				switch (id)
 				{
@@ -169,7 +168,7 @@ class instance_temple_of_the_jade_serpent : public InstanceMapScript
 
 		};
 
-		InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
+		InstanceScript* GetInstanceScript(InstanceMap* map) const
 		{
 			return new instance_temple_of_the_jade_serpent_InstanceMapScript(map);
 		}
