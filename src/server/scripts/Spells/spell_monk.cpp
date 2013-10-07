@@ -3,6 +3,7 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 
+// 116095 - Disable
 class spell_monk_disable : public SpellScriptLoader
 {
 public:
@@ -50,12 +51,12 @@ public:
     {
         return new spell_monk_disable_AuraScript();
     }
-    
+    /*
     class spell_monk_disable_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_monk_disable_SpellScript);
 
-        bool Validate(SpellInfo const* /*spellInfo*/)
+        bool Validate(SpellInfo const* /*spellInfo)
         {
             return true;
         }
@@ -77,6 +78,7 @@ public:
     {
         return new spell_monk_disable_SpellScript();
     }
+    */
 };
 
 
