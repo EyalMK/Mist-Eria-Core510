@@ -1465,7 +1465,7 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         }
         else if(m_spellInfo->Id == 52042)
         {
-            addhealth = m_caster->GetOwner()->CalculateSpellDamage(unitTarget, m_spellInfo, effIndex, m_spellInfo->Effects[EFFECT_0].BasePoints);
+            addhealth = m_caster->GetOwner()->CalculateSpellDamage(unitTarget, m_spellInfo, effIndex, &m_spellInfo->Effects[EFFECT_0].BasePoints);
         }
         // Swiftmend - consumes Regrowth or Rejuvenation
         else if (m_spellInfo->TargetAuraState == AURA_STATE_SWIFTMEND && unitTarget->HasAuraState(AURA_STATE_SWIFTMEND, m_spellInfo, m_caster))
