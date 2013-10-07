@@ -175,6 +175,7 @@ public:
                     data.FlushBits();
 
                     player->AddTemporarySpell(newSpell);
+                    player->AddTemporarySpell(62078);
                     data << uint32(newSpell);
                     data << uint32(SPELL_DRU_MANGLE_GENERIC);
 
@@ -205,7 +206,8 @@ public:
                     data.WriteBits(1, 24); //first count
                     data.FlushBits();
 
-                    unitTarget->ToPlayer()->RemoveTemporarySpell(newSpell);
+                    player->RemoveTemporarySpell(newSpell);
+                    player->RemoveTemporarySpell(62078);
                     data << uint32(SPELL_DRU_MANGLE_GENERIC);
                     data << uint32(newSpell);
 
