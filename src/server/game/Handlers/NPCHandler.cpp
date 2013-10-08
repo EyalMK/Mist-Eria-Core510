@@ -293,7 +293,6 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
     // can't be learn, cheat? Or double learn with lags...
     if (_player->GetTrainerSpellState(trainer_spell) != TRAINER_SPELL_GREEN)
     {
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH BUY FAILED #####");
         SendTrainerBuyFailed(guid, spellId, 0);
         return;
     }
