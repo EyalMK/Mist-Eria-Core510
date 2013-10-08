@@ -560,7 +560,7 @@ void SendItemSparseDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Dat
     for (uint32 x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
         p_Data << int32(item->Spells[x].SpellCategoryCooldown);
 
-    p_Data << uint32(item->Bonding);
+    //p_Data << uint32(item->Bonding);
 
     // item name
     std::string name = item->Name1;
