@@ -4549,6 +4549,8 @@ bool Player::HasActiveSpell(uint32 spell) const
 
 TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell) const
 {
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 0 #####");
+
     if (!trainer_spell)
         return TRAINER_SPELL_RED;
 
@@ -4564,17 +4566,26 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
             break;
         }
     }
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 1 #####");
+
     // known spell
     if (hasSpell)
         return TRAINER_SPELL_GRAY;
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 2 #####");
 
     // check skill requirement
     if (trainer_spell->reqSkill && GetBaseSkillValue(trainer_spell->reqSkill) < trainer_spell->reqSkillValue)
         return TRAINER_SPELL_RED;
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 3 #####");
+
     // check level requirement
     if (getLevel() < trainer_spell->reqLevel)
         return TRAINER_SPELL_RED;
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 4 #####");
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
@@ -4601,6 +4612,8 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
         }
     }
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 5 #####");
+
     // check primary prof. limit
     // first rank of primary profession spell when there are no proffesions avalible is disabled
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -4611,6 +4624,8 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
         if (learnedSpellInfo && learnedSpellInfo->IsPrimaryProfessionFirstRank() && (GetFreePrimaryProfessionPoints() == 0))
             return TRAINER_SPELL_GREEN_DISABLED;
     }
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 6 #####");
 
     return TRAINER_SPELL_GREEN;
 }
