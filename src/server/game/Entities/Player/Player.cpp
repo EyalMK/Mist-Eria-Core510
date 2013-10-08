@@ -4549,6 +4549,8 @@ bool Player::HasActiveSpell(uint32 spell) const
 
 TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell) const
 {
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 0 #####");
+
     if (!trainer_spell)
         return TRAINER_SPELL_RED;
 
@@ -4564,17 +4566,26 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
             break;
         }
     }
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 1 #####");
+
     // known spell
     if (hasSpell)
         return TRAINER_SPELL_GRAY;
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 2 #####");
 
     // check skill requirement
     if (trainer_spell->reqSkill && GetBaseSkillValue(trainer_spell->reqSkill) < trainer_spell->reqSkillValue)
         return TRAINER_SPELL_RED;
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 3 #####");
+
     // check level requirement
     if (getLevel() < trainer_spell->reqLevel)
         return TRAINER_SPELL_RED;
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 4 #####");
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
@@ -4601,6 +4612,8 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
         }
     }
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 5 #####");
+
     // check primary prof. limit
     // first rank of primary profession spell when there are no proffesions avalible is disabled
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -4611,6 +4624,8 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
         if (learnedSpellInfo && learnedSpellInfo->IsPrimaryProfessionFirstRank() && (GetFreePrimaryProfessionPoints() == 0))
             return TRAINER_SPELL_GREEN_DISABLED;
     }
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 6 #####");
 
     return TRAINER_SPELL_GREEN;
 }
@@ -17658,7 +17673,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
             if (HasTalent(talentInfo->TalentID, GetActiveSpec()))
                 spentTalents++;
 	SetUsedTalentCount(spentTalents);
-	SetFreePrimaryProfessions(getLevel()/15 - spentTalents);
+	SetFreeTalentPoints(getLevel()/15 - spentTalents);
 
     // RaF stuff.
     m_grantableLevels = fields[59].GetUInt8();
@@ -25783,29 +25798,28 @@ void Player::SendClearAllCooldowns(Unit* target)
     ObjectGuid guid = target ? target->GetGUID() : 0;
 
     WorldPacket data(SMSG_CLEAR_COOLDOWNS, 4+8);
-    data.WriteBit(guid[1]);
     data.WriteBit(guid[3]);
-    data.WriteBit(guid[6]);
-    data.WriteBits(spellCount, 24); // Spell Count
     data.WriteBit(guid[7]);
-    data.WriteBit(guid[5]);
     data.WriteBit(guid[2]);
-    data.WriteBit(guid[4]);
+    data.WriteBit(guid[5]);
+    data.WriteBit(guid[6]);
+    data.WriteBit(guid[1]);
     data.WriteBit(guid[0]);
+    data.WriteBits(spellCount, 24); // Spell Count
+    data.WriteBit(guid[4]);
 
     data.FlushBits();
 
+    data.WriteByteSeq(guid[0]);
+    for (SpellCooldowns::const_iterator itr = m_spellCooldowns.begin(); itr != m_spellCooldowns.end(); ++itr)
+        data << uint32(itr->first); // Spell ID
     data.WriteByteSeq(guid[7]);
+    data.WriteByteSeq(guid[6]);
+    data.WriteByteSeq(guid[3]);
     data.WriteByteSeq(guid[2]);
     data.WriteByteSeq(guid[4]);
     data.WriteByteSeq(guid[5]);
     data.WriteByteSeq(guid[1]);
-    data.WriteByteSeq(guid[3]);
-    for (SpellCooldowns::const_iterator itr = m_spellCooldowns.begin(); itr != m_spellCooldowns.end(); ++itr)
-        data << uint32(itr->first); // Spell ID
-
-    data.WriteByteSeq(guid[0]);
-    data.WriteByteSeq(guid[6]);
 
     SendDirectMessage(&data);
 }

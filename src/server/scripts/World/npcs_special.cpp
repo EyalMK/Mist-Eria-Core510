@@ -1591,14 +1591,18 @@ public:
 ## npc_snake_trap_serpents
 ####*/
 
-#define SPELL_MIND_NUMBING_POISON    25810   //Viper
-#define SPELL_DEADLY_POISON          34655   //Venomous Snake
-#define SPELL_CRIPPLING_POISON       30981   //Viper
+enum snakeSpells 
+{
+    SPELL_MIND_NUMBING_POISON  =  25810,   //Viper
+    SPELL_DEADLY_POISON        =  34655,   //Venomous Snake
+    SPELL_CRIPPLING_POISON     =  30981,   //Viper
 
-#define VENOMOUS_SNAKE_TIMER 1500
-#define VIPER_TIMER 3000
+    VENOMOUS_SNAKE_TIMER       =  1500,
+    VIPER_TIMER                =  3000,
 
-#define C_VIPER 19921
+    C_VIPER                    = 19921
+};
+
 
 class npc_snake_trap : public CreatureScript
 {

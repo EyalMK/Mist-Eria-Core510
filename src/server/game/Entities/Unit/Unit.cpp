@@ -9254,7 +9254,7 @@ int32 Unit::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
     }
 
     // bonus from SPELL_AURA_MOD_SPELL_POWER_PCT percent
-    AddPct(DoneAdvertisedBenefit, GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask));
+    AddPct(DoneAdvertisedBenefit, GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_POWER_PCT));
 
     return DoneAdvertisedBenefit;
 }
@@ -9778,7 +9778,7 @@ int32 Unit::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
     }
 
     // bonus from SPELL_AURA_MOD_SPELL_POWER_PCT percent
-    AddPct(AdvertisedBenefit, GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask));
+    AddPct(AdvertisedBenefit, GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_POWER_PCT));
 
     return AdvertisedBenefit;
 }

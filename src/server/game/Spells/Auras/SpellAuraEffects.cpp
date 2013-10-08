@@ -436,7 +436,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS] =
     &AuraEffect::HandleNULL,                                      //375
     &AuraEffect::HandleNULL,                                      //376
     &AuraEffect::HandleNULL,                                      //377
-    &AuraEffect::HandleNULL,                                      //378
+    &AuraEffect::HandleNULL,                                      //378 SPELL_AURA_MOD_PHYSICAL_DAMAGE_TAKEN_PCT
     &AuraEffect::HandleNULL,                                      //379
     &AuraEffect::HandleNULL,                                      //380
     &AuraEffect::HandleNULL,                                      //381
@@ -465,7 +465,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS] =
     &AuraEffect::HandleNULL,                                      //404
     &AuraEffect::HandleNULL,                                      //405
     &AuraEffect::HandleNULL,                                      //406
-    &AuraEffect::HandleNULL,                                      //407
+    &AuraEffect::HandleModFear,                                   //407 SPELL_AURA_MOD_FEAR2
     &AuraEffect::HandleNULL,                                      //408
     &AuraEffect::HandleNULL,                                      //409
     &AuraEffect::HandleNULL,                                      //410

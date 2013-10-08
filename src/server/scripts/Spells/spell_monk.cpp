@@ -75,8 +75,39 @@ public:
     
 };
 
+class spell_monk_paralysis : public SpellScriptLoader
+{
+public:
+    spell_monk_paralysis() : SpellScriptLoader("spell_monk_paralysis") { }
+
+
+    class spell_monk_paralysis_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_monk_paralysis_AuraScript);
+
+        void OnAmountCalc(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            if(GetCaster() && GetTarget() && GetCaster()->isInBack(GetTarget()))
+            {
+                SetMaxDuration(GetMaxDuration()*2);
+            }
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_monk_paralysis_AuraScript::OnAmountCalc, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_monk_paralysis_AuraScript();
+    }
+};
+
 
 void AddSC_monk_spell_scripts()
 {
     new spell_monk_disable();
+    new spell_monk_paralysis();
 }

@@ -3692,6 +3692,14 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 116095:
                 spellInfo->Effects[1].Amplitude = 100;
                 break;
+            case 30482:
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
+                spellInfo->Effects[EFFECT_1].MiscValue = 1;
+                spellInfo->Effects[EFFECT_1].BasePoints = -6;
+                break;
+            case 97463:
+                spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(1); //10sec
+                break;
             default:
                 break;
         }
