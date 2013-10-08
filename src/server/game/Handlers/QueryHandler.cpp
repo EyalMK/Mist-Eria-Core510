@@ -573,19 +573,19 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
                 //void WorldSession::SendItemSparseDb2Reply(uint32 entry) //old one
                 //SendItemSparseDBQueryResponse(this, l_Data, l_requestedEntries[l_I]); //new one
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "Received non handled db item sparse query, guid : %u, entry : %u", GUID_LOPART(l_Guids[l_I]), l_requestedEntries[l_I]);
-                break;
+                return; //to disable the sent of the opcode
             }
             case DB_QUERY_ITEM:
             {
                 //void WorldSession::SendItemDb2Reply(uint32 entry) //old one
                 //SendItemDBQueryResponse(this, l_Data, l_requestedEntries[l_I]); //new one
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "Received non handled db item query, guid : %u, entry : %u", GUID_LOPART(l_Guids[l_I]), l_requestedEntries[l_I]);
-                break;
+                return; //to disable the sent of the opcode
             }
             default:
             {
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "Receive non handled db query type 0x%08.8X", l_QueryType);
-                return;
+                return; //to disable the sent of the opcode
             }
         }
 
