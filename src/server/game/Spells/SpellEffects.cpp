@@ -624,6 +624,20 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
     // selection by spell family
     switch (m_spellInfo->SpellFamilyName)
     {
+        case SPELLFAMILY_PRIEST:
+        {
+            switch(m_spellInfo->Id)
+            {
+                case 1706:
+                {
+                    m_caster->CastSpell(unitTarget, 27986, true);
+                    break;
+                }
+            default:
+                break;
+            }
+            break;
+        }
         case SPELLFAMILY_PALADIN:
             switch (m_spellInfo->Id)
             {
