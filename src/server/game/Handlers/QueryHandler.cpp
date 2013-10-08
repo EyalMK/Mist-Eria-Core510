@@ -48,12 +48,12 @@ enum DBQueryType
     BattlePetSpeciesXAbility   = 0x44237314,
     BattlePetState             = 0x8F447330,
     BattlePetVisual            = 0xC3ADEB43,*/
-    DB_QUERY_NPC_TEXT                   = 0x021826BB
+    DB_QUERY_NPC_TEXT          = 0x021826BB,
     /*Creature                   = 0xC9D6B6B3,
-    GameObjects                = 0x13C403A5,
-    ItemSparse                 = 0x919BE54E,
-    Item                       = 0x50238EC2,
-    ItemCurrencyCost           = 0x6FE05AE9,
+    GameObjects                = 0x13C403A5,*/
+    DB_QUERY_ITEM_SPARSE       = 0x919BE54E,
+    DB_QUERY_ITEM              = 0x50238EC2,
+    /*ItemCurrencyCost           = 0x6FE05AE9,
     ItemExtendedCost           = 0xBB858355,
     ItemUpgrade                = 0x7006463B,
     KeyChain                   = 0x6D8A2694,
@@ -509,13 +509,6 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
     uint32 l_QueryType;
     uint32 l_Count;
 
-
-    /*for (int i=0 ; i<p_ReceivedPacket.size() ; ++i) {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "%2X", p_ReceivedPacket.read<uint8>());
-    }*/
-    p_ReceivedPacket.rpos(0);
-
-
     p_ReceivedPacket >> l_QueryType;
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "DBQuery lQueryType %u", l_QueryType);
@@ -561,13 +554,22 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
     if (!l_Count)
         return;
 
-    for(uint32 l_I = 0; l_I< l_Count ; l_I++){
+    for(uint32 l_I = 0 ; l_I < l_Count ; l_I++)
+    {
         WorldPacket l_Data(SMSG_DB_REPLY, 100);
 
         switch (l_QueryType)
         {
             case DB_QUERY_NPC_TEXT:
                 SendNpcTextDBQueryResponse(this, l_Data, l_LocalTextIDs[l_I]);
+                break;
+            case DB_QUERY_ITEM_SPARSE:
+                //void WorldSession::SendItemSparseDb2Reply(uint32 entry)
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Received non handled db item sparse query");
+                break;
+            case DB_QUERY_ITEM:
+                //void WorldSession::SendItemDb2Reply(uint32 entry)
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Received non handled db item query");
                 break;
             default:
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "Receive non handled db query type 0x%08.8X", l_QueryType);
