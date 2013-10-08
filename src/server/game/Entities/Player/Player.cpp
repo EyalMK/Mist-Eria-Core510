@@ -17673,7 +17673,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
             if (HasTalent(talentInfo->TalentID, GetActiveSpec()))
                 spentTalents++;
 	SetUsedTalentCount(spentTalents);
-	SetFreePrimaryProfessions(getLevel()/15 - spentTalents);
+	SetFreeTalentPoints(getLevel()/15 - spentTalents);
 
     // RaF stuff.
     m_grantableLevels = fields[59].GetUInt8();
