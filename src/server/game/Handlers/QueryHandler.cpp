@@ -507,7 +507,7 @@ bool SendItemSparseDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Dat
     p_Data << uint32(item->Flags);
     p_Data << uint32(item->Flags2);
     p_Data << float(item->Unk430_1);
-    p_Data << float(item->Unk430_2);
+    //p_Data << float(item->Unk430_2);
     p_Data << uint32(item->BuyCount);
     p_Data << int32(item->BuyPrice);
     p_Data << uint32(item->SellPrice);
