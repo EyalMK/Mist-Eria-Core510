@@ -498,12 +498,129 @@ void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, 
 
 void SendItemSparseDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, uint32 p_ItemEntry)
 {
-    //PEXIRN : TODO
+    ItemTemplate const * item = sObjectMgr->GetItemTemplate(p_ItemEntry);
+
+    p_Data << uint32(item->ItemId);
+    p_Data << uint32(item->Quality);
+    p_Data << uint32(item->Flags);
+    p_Data << uint32(item->Flags2);
+    p_Data << float(item->Unk430_1);
+    p_Data << float(item->Unk430_2);
+    p_Data << uint32(item->BuyCount);
+    p_Data << int32(item->BuyPrice);
+    p_Data << uint32(item->SellPrice);
+    p_Data << uint32(item->InventoryType);
+    p_Data << int32(item->AllowableClass);
+    p_Data << int32(item->AllowableRace);
+    p_Data << uint32(item->ItemLevel);
+    p_Data << uint32(item->RequiredLevel);
+    p_Data << uint32(item->RequiredSkill);
+    p_Data << uint32(item->RequiredSkillRank);
+    p_Data << uint32(item->RequiredSpell);
+    p_Data << uint32(item->RequiredHonorRank);
+    p_Data << uint32(item->RequiredCityRank);
+    p_Data << uint32(item->RequiredReputationFaction);
+    p_Data << uint32(item->RequiredReputationRank);
+    p_Data << int32(item->MaxCount);
+    p_Data << int32(item->Stackable);
+    p_Data << uint32(item->ContainerSlots);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_STATS; ++x)
+        p_Data << uint32(item->ItemStat[x].ItemStatType);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_STATS; ++x)
+        p_Data << int32(item->ItemStat[x].ItemStatValue);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_STATS; ++x)
+        p_Data << int32(item->ItemStat[x].ItemStatUnk1);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_STATS; ++x)
+        p_Data << int32(item->ItemStat[x].ItemStatUnk2);
+
+    p_Data << uint32(item->ScalingStatDistribution);
+    p_Data << uint32(item->DamageType);
+    p_Data << uint32(item->Delay);
+    p_Data << float(item->RangedModRange);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
+        p_Data << int32(item->Spells[x].SpellId);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
+        p_Data << uint32(item->Spells[x].SpellTrigger);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
+        p_Data << int32(item->Spells[x].SpellCharges);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
+        p_Data << int32(item->Spells[x].SpellCooldown);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
+        p_Data << uint32(item->Spells[x].SpellCategory);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
+        p_Data << int32(item->Spells[x].SpellCategoryCooldown);
+
+    p_Data << uint32(item->Bonding);
+
+    // item name
+    std::string name = item->Name1;
+    p_Data << uint16(name.length());
+    if (name.length())
+        p_Data << name;
+
+    for (uint32 i = 0; i < 3; ++i) // other 3 names
+        p_Data << uint16(0);
+
+    std::string desc = item->Description;
+    p_Data << uint16(desc.length());
+    if (desc.length())
+        p_Data << desc;
+
+    p_Data << uint32(item->PageText);
+    p_Data << uint32(item->LanguageID);
+    p_Data << uint32(item->PageMaterial);
+    p_Data << uint32(item->StartQuest);
+    p_Data << uint32(item->LockID);
+    p_Data << int32(item->Material);
+    p_Data << uint32(item->Sheath);
+    p_Data << int32(item->RandomProperty);
+    p_Data << int32(item->RandomSuffix);
+    p_Data << uint32(item->ItemSet);
+
+    p_Data << uint32(item->Area);
+    p_Data << uint32(item->Map);
+    p_Data << uint32(item->BagFamily);
+    p_Data << uint32(item->TotemCategory);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_SOCKETS; ++x)
+        p_Data << uint32(item->Socket[x].Color);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_SOCKETS; ++x)
+        p_Data << uint32(item->Socket[x].Content);
+
+    p_Data << uint32(item->socketBonus);
+    p_Data << uint32(item->GemProperties);
+    p_Data << float(item->ArmorDamageModifier);
+    p_Data << int32(item->Duration);
+    p_Data << uint32(item->ItemLimitCategory);
+    p_Data << uint32(item->HolidayId);
+    p_Data << float(item->StatScalingFactor);    // StatScalingFactor
+    p_Data << uint32(item->CurrencySubstitutionId);
+    p_Data << uint32(item->CurrencySubstitutionCount);
 }
 
 void SendItemDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, uint32 p_ItemEntry)
 {
-    //PEXIRN : TODO
+    ItemTemplate const * item = sObjectMgr->GetItemTemplate(p_ItemEntry);
+
+    p_Data << uint32(item->ItemId);
+    p_Data << uint32(item->Class);
+    p_Data << uint32(item->SubClass);
+    p_Data << int32(item->SoundOverrideSubclass);
+    p_Data << uint32(item->Material);
+    p_Data << uint32(item->DisplayInfoID);
+    p_Data << uint32(item->InventoryType);
+    p_Data << uint32(item->Sheath);
 }
 
 void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
@@ -569,16 +686,16 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
             case DB_QUERY_ITEM_SPARSE:
             {
                 //void WorldSession::SendItemSparseDb2Reply(uint32 entry) //old one
-                //SendItemSparseDBQueryResponse(this, l_Data, l_requestedEntries[l_I]); //new one
+                SendItemSparseDBQueryResponse(this, l_Data, l_requestedEntries[l_I]); //new one
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "Received non handled db item sparse query, guid : %u, entry : %u", GUID_LOPART(l_Guids[l_I]), l_requestedEntries[l_I]);
-                return; //to disable the sent of the opcode
+                break; //to disable the sent of the opcode
             }
             case DB_QUERY_ITEM:
             {
                 //void WorldSession::SendItemDb2Reply(uint32 entry) //old one
-                //SendItemDBQueryResponse(this, l_Data, l_requestedEntries[l_I]); //new one
+                SendItemDBQueryResponse(this, l_Data, l_requestedEntries[l_I]); //new one
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "Received non handled db item query, guid : %u, entry : %u", GUID_LOPART(l_Guids[l_I]), l_requestedEntries[l_I]);
-                return; //to disable the sent of the opcode
+                break; //to disable the sent of the opcode
             }
             default:
             {
@@ -587,7 +704,7 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
             }
         }
 
-        l_Data << uint32(time(NULL));
+        l_Data << uint32(sObjectMgr->GetHotfixDate(l_requestedEntries[l_I], l_QueryType));
         l_Data << uint32(l_QueryType);
         l_Data << uint32(l_requestedEntries[l_I]);
 
