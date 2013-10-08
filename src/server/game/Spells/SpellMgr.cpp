@@ -3697,6 +3697,9 @@ void SpellMgr::LoadSpellInfoCorrections()
                 spellInfo->Effects[EFFECT_1].MiscValue = 1;
                 spellInfo->Effects[EFFECT_1].BasePoints = -6;
                 break;
+            case 97463:
+                spellInfo->DurationEntry = 1;
+                break;
             default:
                 break;
         }

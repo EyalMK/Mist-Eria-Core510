@@ -772,6 +772,25 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     break;
             }
             break;
+        case SPELLFAMILY_WARRIOR:
+        {
+            switch(m_spellInfo->Id)
+            {
+                case 97462:
+                {
+                    m_caster->CastSpell(unitTarget, 122507, true);
+                    break;
+                }
+                case 122507:
+                {
+                    m_caster->CastSpell(unitTarget, 97463, true);
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
         default:
             break;
     }
