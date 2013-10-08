@@ -187,7 +187,7 @@ public :
 
     bool OnGossipHello(Player *p, Creature *c)
     {
-        if(p && p->hasQuest(QUEST_THE_LESSON_OF_STIFLED_PRIDE) && !p->IsInCombat() && p->GetQuestStatus(QUEST_THE_LESSON_OF_STIFLED_PRIDE) == QUEST_STATUS_INCOMPLETE)
+        if(p && p->hasQuest(QUEST_THE_LESSON_OF_STIFLED_PRIDE) && !p->isInCombat() && p->GetQuestStatus(QUEST_THE_LESSON_OF_STIFLED_PRIDE) == QUEST_STATUS_INCOMPLETE)
         {
             m_gossipHelloMessage = "Je vous defie !";
             p->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, m_gossipHelloMessage, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
@@ -382,7 +382,7 @@ private :
         if(!me || !quester)
             return ;
 
-        if(me->IsInCombat())
+        if(me->isInCombat())
             return ;
 
         me->setFaction(14);
@@ -1073,7 +1073,7 @@ public :
             {
                 if(returnTimer <= diff)
                 {
-                    me->GetMotionMaster()->MovePoint(0, homePosition, false);
+                    me->GetMotionMaster()->MovePoint(0, homePosition);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                     canAttack = true ;
                     returnTimer = 7500 ;
