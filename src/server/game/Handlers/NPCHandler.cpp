@@ -170,7 +170,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
     WorldPacket data(SMSG_TRAINER_LIST, 8+4+4+trainer_spells->spellList.size()*38 + strTitle.size()+1);
     data << guid;
     data << uint32(trainer_spells->trainerType);
-    data << uint32(1); // different value for each trainer, also found in CMSG_TRAINER_BUY_SPELL
+    data << uint32(186); // different value for each trainer, also found in CMSG_TRAINER_BUY_SPELL
 
     size_t count_pos = data.wpos();
     data << uint32(trainer_spells->spellList.size());
@@ -270,6 +270,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
 
     if (!unit->isCanTrainingOf(_player, true))
     {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 0 #####");
         SendTrainerBuyFailed(guid, spellId, 0);
         return;
     }
@@ -278,6 +279,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
     TrainerSpellData const* trainer_spells = unit->GetTrainerSpells();
     if (!trainer_spells)
     {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 1 #####");
         SendTrainerBuyFailed(guid, spellId, 0);
         return;
     }
@@ -286,6 +288,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
     TrainerSpell const* trainer_spell = trainer_spells->Find(spellId);
     if (!trainer_spell)
     {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 2 #####");
         SendTrainerBuyFailed(guid, spellId, 0);
         return;
     }
@@ -293,6 +296,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
     // can't be learn, cheat? Or double learn with lags...
     if (_player->GetTrainerSpellState(trainer_spell) != TRAINER_SPELL_GREEN)
     {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 3 #####");
         SendTrainerBuyFailed(guid, spellId, 0);
         return;
     }
@@ -303,6 +307,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
     // check money requirement
     if (!_player->HasEnoughMoney(uint64(nSpellCost)))
     {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "##### DEBUG TERAH 4 #####");
         SendTrainerBuyFailed(guid, spellId, 1);
         return;
     }
