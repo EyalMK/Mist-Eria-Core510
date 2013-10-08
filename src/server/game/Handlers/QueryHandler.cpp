@@ -496,9 +496,11 @@ void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, 
     p_Data << uint32(0x01);	/// unk
 }
 
-void SendItemSparseDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, uint32 p_ItemEntry)
+bool SendItemSparseDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, uint32 p_ItemEntry)
 {
     ItemTemplate const * item = sObjectMgr->GetItemTemplate(p_ItemEntry);
+
+    if(!item) return false;
 
     p_Data << uint32(item->ItemId);
     p_Data << uint32(item->Quality);
@@ -607,11 +609,15 @@ void SendItemSparseDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Dat
     p_Data << float(item->StatScalingFactor);    // StatScalingFactor
     p_Data << uint32(item->CurrencySubstitutionId);
     p_Data << uint32(item->CurrencySubstitutionCount);
+
+    return true;
 }
 
-void SendItemDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, uint32 p_ItemEntry)
+bool SendItemDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, uint32 p_ItemEntry)
 {
     ItemTemplate const * item = sObjectMgr->GetItemTemplate(p_ItemEntry);
+
+    if(!item) return false;
 
     p_Data << uint32(item->ItemId);
     p_Data << uint32(item->Class);
@@ -621,6 +627,8 @@ void SendItemDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, uin
     p_Data << uint32(item->DisplayInfoID);
     p_Data << uint32(item->InventoryType);
     p_Data << uint32(item->Sheath);
+
+    return true;
 }
 
 void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
@@ -686,15 +694,13 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
             case DB_QUERY_ITEM_SPARSE:
             {
                 //void WorldSession::SendItemSparseDb2Reply(uint32 entry) //old one
-                SendItemSparseDBQueryResponse(this, l_Data, l_requestedEntries[l_I]); //new one
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "Received non handled db item sparse query, guid : %u, entry : %u", GUID_LOPART(l_Guids[l_I]), l_requestedEntries[l_I]);
+                if(!SendItemSparseDBQueryResponse(this, l_Data, l_requestedEntries[l_I])) return; //dont send if no item
                 break; //to disable the sent of the opcode
             }
             case DB_QUERY_ITEM:
             {
                 //void WorldSession::SendItemDb2Reply(uint32 entry) //old one
-                SendItemDBQueryResponse(this, l_Data, l_requestedEntries[l_I]); //new one
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "Received non handled db item query, guid : %u, entry : %u", GUID_LOPART(l_Guids[l_I]), l_requestedEntries[l_I]);
+                if(!SendItemDBQueryResponse(this, l_Data, l_requestedEntries[l_I])) return; //dont send if no item
                 break; //to disable the sent of the opcode
             }
             default:
