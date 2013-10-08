@@ -513,8 +513,6 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
 
     p_ReceivedPacket >> l_QueryType;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "DBQuery lQueryType %u", l_QueryType);
-
     l_Count = p_ReceivedPacket.ReadBits(23);
 
     std::vector<ObjectGuid> l_Guids;
@@ -584,7 +582,7 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
             }
             default:
             {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "Receive non handled db query type 0x%08.8X", l_QueryType);
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Received non handled db query type 0x%08.8X", l_QueryType);
                 return; //to disable the sent of the opcode
             }
         }
