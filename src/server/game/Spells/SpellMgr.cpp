@@ -3698,7 +3698,7 @@ void SpellMgr::LoadSpellInfoCorrections()
                 spellInfo->Effects[EFFECT_1].BasePoints = -6;
                 break;
             case 97463:
-                spellInfo->DurationEntry = 1;
+                spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(1); //10sec
                 break;
             default:
                 break;

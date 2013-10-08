@@ -258,7 +258,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
 	&Spell::EffectNULL,                                     //185 SPELL_EFFECT_185
 	&Spell::EffectNULL,                                     //186 SPELL_EFFECT_186
 	&Spell::EffectNULL,                                     //187 SPELL_EFFECT_187
-	&Spell::EffectNULL,                                     //188 SPELL_EFFECT_188
+	&Spell::EffectNULL,                                     //188 SPELL_EFFECT_STAMPEDE
 	&Spell::EffectNULL,                                     //189 SPELL_EFFECT_189
 	&Spell::EffectNULL,                                     //190 SPELL_EFFECT_190
 	&Spell::EffectNULL,                                     //191 SPELL_EFFECT_191
@@ -4192,10 +4192,17 @@ void Spell::EffectAddComboPoints(SpellEffIndex /*effIndex*/)
     if (!m_caster->m_movedPlayer)
         return;
 
-    if (damage <= 0)
+    if (damage < 0)
         return;
 
-    m_caster->m_movedPlayer->AddComboPoints(unitTarget, damage, this);
+    if(damage > 0)
+        m_caster->m_movedPlayer->AddComboPoints(unitTarget, damage, this);
+    else
+    {
+        //Redirect : Rogue
+        if(m_spellInfo->Id == 73981 && m_caster->m_movedPlayer->GetComboPoints() > 0 && m_caster->m_movedPlayer->GetComboTarget())
+            m_caster->m_movedPlayer->AddComboPoints(unitTarget, m_caster->m_movedPlayer->GetComboPoints(), this);
+    }
 }
 
 void Spell::EffectDuel(SpellEffIndex effIndex)

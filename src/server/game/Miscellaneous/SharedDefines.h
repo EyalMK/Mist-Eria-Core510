@@ -1011,7 +1011,7 @@ enum SpellEffects
 	SPELL_EFFECT_185                                = 185,
 	SPELL_EFFECT_186                                = 186,
 	SPELL_EFFECT_187                                = 187,
-	SPELL_EFFECT_188                                = 188,
+	SPELL_EFFECT_STAMPEDE                           = 188,
 	SPELL_EFFECT_189                                = 189,
 	SPELL_EFFECT_190                                = 190,
 	SPELL_EFFECT_191                                = 191,
