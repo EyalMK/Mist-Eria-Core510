@@ -458,34 +458,33 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_NPC_TEXT_UPDATE");
 }
 
-
-void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, uint32 l_LocalTextID)
+void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, uint32 p_LocalTextID)
 {
-    GossipText const* p_Gossip = sObjectMgr->GetGossipText(l_LocalTextID);
+    GossipText const* l_Gossip = sObjectMgr->GetGossipText(p_LocalTextID);
     std::string l_Text1 = "Greetings $N";
     std::string l_Text2 = "Greetings $N";
     uint32 l_Language = 0;
 
-    if (p_Gossip) {
-        if (p_Gossip->Options[0].Text_0.size())
-            l_Text1 = p_Gossip->Options[0].Text_0;
-        if (p_Gossip->Options[0].Text_1.size())
-            l_Text2 = p_Gossip->Options[0].Text_1;
-        l_Language = p_Gossip->Options[0].Language;
+    if (l_Gossip) 
+    {
+        if (l_Gossip->Options[0].Text_0.size())
+            l_Text1 = l_Gossip->Options[0].Text_0;
+        if (l_Gossip->Options[0].Text_1.size())
+            l_Text2 = l_Gossip->Options[0].Text_1;
+        l_Language = l_Gossip->Options[0].Language;
     }
 
     int l_SessionLocalIndex = p_Session->GetSessionDbLocaleIndex();
     if (l_SessionLocalIndex >= 0)
     {
-        if (NpcTextLocale const* l_LocalData = sObjectMgr->GetNpcTextLocale(l_LocalTextID))
+        if (NpcTextLocale const* l_LocalData = sObjectMgr->GetNpcTextLocale(p_LocalTextID))
         {
             ObjectMgr::GetLocaleString(l_LocalData->Text_0[0], l_SessionLocalIndex, l_Text1);
             ObjectMgr::GetLocaleString(l_LocalData->Text_1[0], l_SessionLocalIndex, l_Text2);
         }
     }
 
-    p_Data << uint32(0x00);				/// Data size placeholder
-    p_Data << uint32(l_LocalTextID);
+    p_Data << uint32(p_LocalTextID);
     p_Data << uint32(l_Language);
     p_Data << uint16(l_Text1.size());
     p_Data << l_Text1;
@@ -495,13 +494,16 @@ void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, 
     p_Data << uint32(0);	/// unk
     p_Data << uint32(0);	/// unk
     p_Data << uint32(0x01);	/// unk
-    
-    p_Data << uint32(time(NULL));
-	p_Data << uint32(DB_QUERY_NPC_TEXT);
-    p_Data << uint32(l_LocalTextID);
+}
 
-    p_Data.wpos(0);
-    p_Data << uint32(p_Data.size() - 16);
+void SendItemSparseDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, uint32 p_ItemEntry)
+{
+    //PEXIRN : TODO
+}
+
+void SendItemDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, uint32 p_ItemEntry)
+{
+    //PEXIRN : TODO
 }
 
 void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
@@ -516,7 +518,7 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
     l_Count = p_ReceivedPacket.ReadBits(23);
 
     std::vector<ObjectGuid> l_Guids;
-    std::vector<uint32>		l_LocalTextIDs;
+    std::vector<uint32>		l_requestedEntries;
 
     for (uint32 l_I = 0 ; l_I < l_Count ; l_I++)
     {
@@ -536,19 +538,19 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
 
     for (uint32 l_I = 0 ; l_I < l_Count ; l_I++)
     {
-        uint32	l_LocalTextID;
+        uint32	l_requestedEntry;
 
         p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][7]);
         p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][6]);
         p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][1]);
         p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][2]);
-        p_ReceivedPacket >> l_LocalTextID;
+        p_ReceivedPacket >> l_requestedEntry;
         p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][5]);
         p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][3]);
         p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][0]);
         p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][4]);
 
-        l_LocalTextIDs.push_back(l_LocalTextID);
+        l_requestedEntries.push_back(l_requestedEntry);
     }
 
     if (!l_Count)
@@ -556,27 +558,45 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
 
     for(uint32 l_I = 0 ; l_I < l_Count ; l_I++)
     {
-        WorldPacket l_Data(SMSG_DB_REPLY, 100);
+        WorldPacket l_Data(SMSG_DB_REPLY);
+        l_Data << uint32(0x00);				/// Data size placeholder
 
         switch (l_QueryType)
         {
             case DB_QUERY_NPC_TEXT:
-                SendNpcTextDBQueryResponse(this, l_Data, l_LocalTextIDs[l_I]);
+            {
+                SendNpcTextDBQueryResponse(this, l_Data, l_requestedEntries[l_I]);
                 break;
+            }
             case DB_QUERY_ITEM_SPARSE:
-                //void WorldSession::SendItemSparseDb2Reply(uint32 entry)
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "Received non handled db item sparse query");
+            {
+                //void WorldSession::SendItemSparseDb2Reply(uint32 entry) //old one
+                //SendItemSparseDBQueryResponse(this, l_Data, l_requestedEntries[l_I]); //new one
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Received non handled db item sparse query, guid : %u, entry : %u", GUID_LOPART(l_Guids[l_I]), l_requestedEntries[l_I]);
                 break;
+            }
             case DB_QUERY_ITEM:
-                //void WorldSession::SendItemDb2Reply(uint32 entry)
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "Received non handled db item query");
+            {
+                //void WorldSession::SendItemDb2Reply(uint32 entry) //old one
+                //SendItemDBQueryResponse(this, l_Data, l_requestedEntries[l_I]); //new one
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Received non handled db item query, guid : %u, entry : %u", GUID_LOPART(l_Guids[l_I]), l_requestedEntries[l_I]);
                 break;
+            }
             default:
+            {
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "Receive non handled db query type 0x%08.8X", l_QueryType);
-                break;
+                return;
+            }
         }
-        if (l_Data.size())
-            SendPacket(&l_Data);
+
+        l_Data << uint32(time(NULL));
+        l_Data << uint32(l_QueryType);
+        l_Data << uint32(l_requestedEntries[l_I]);
+
+        l_Data.wpos(0);
+        l_Data << uint32(l_Data.size() - 16);
+
+        SendPacket(&l_Data);
     }
 }
 
