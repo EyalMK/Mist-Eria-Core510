@@ -78,7 +78,7 @@ public:
 class spell_monk_paralysis : public SpellScriptLoader
 {
 public:
-    spell_monk_paralysis() : SpellScriptLoader("spell_monk_disable") { }
+    spell_monk_paralysis() : SpellScriptLoader("spell_monk_paralysis") { }
 
 
     class spell_monk_paralysis_AuraScript : public AuraScript
