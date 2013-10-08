@@ -693,13 +693,11 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
             }
             case DB_QUERY_ITEM_SPARSE:
             {
-                //void WorldSession::SendItemSparseDb2Reply(uint32 entry) //old one
                 if(!SendItemSparseDBQueryResponse(this, l_Data, l_requestedEntries[l_I])) return; //dont send if no item
                 break; //to disable the sent of the opcode
             }
             case DB_QUERY_ITEM:
             {
-                //void WorldSession::SendItemDb2Reply(uint32 entry) //old one
                 if(!SendItemDBQueryResponse(this, l_Data, l_requestedEntries[l_I])) return; //dont send if no item
                 break; //to disable the sent of the opcode
             }
