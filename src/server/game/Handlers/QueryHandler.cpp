@@ -502,21 +502,21 @@ bool SendItemSparseDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Dat
 
     if(!item) return false;
 
-    p_Data << uint32(item->ItemId);
-    p_Data << uint32(item->Quality);
+    p_Data << uint32(item->ItemId);//OK
+    p_Data << uint32(item->Quality);//OK
     p_Data << uint32(item->Flags);
     p_Data << uint32(item->Flags2);
     p_Data << float(item->Unk430_1);
     p_Data << float(item->Unk430_2);
     p_Data << uint32(0); //unk
-    p_Data << uint32(item->BuyCount);
-    p_Data << int32(item->BuyPrice);
-    p_Data << uint32(item->SellPrice);
+    p_Data << uint32(item->BuyCount);//OK
+    p_Data << int32(item->BuyPrice);//OK
+    p_Data << uint32(item->SellPrice);//OK
     p_Data << uint32(item->InventoryType);
-    p_Data << int32(item->AllowableClass);
-    p_Data << int32(item->AllowableRace);
-    p_Data << uint32(item->ItemLevel);
-    p_Data << uint32(item->RequiredLevel);
+    p_Data << int32(item->AllowableClass);//OK
+    p_Data << int32(item->AllowableRace);//OK
+    p_Data << uint32(item->ItemLevel);//OK
+    p_Data << uint32(item->RequiredLevel);//OK
     p_Data << uint32(item->RequiredSkill);
     p_Data << uint32(item->RequiredSkillRank);
     p_Data << uint32(item->RequiredSpell);
@@ -524,9 +524,9 @@ bool SendItemSparseDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Dat
     p_Data << uint32(item->RequiredCityRank);
     p_Data << uint32(item->RequiredReputationFaction);
     p_Data << uint32(item->RequiredReputationRank);
-    p_Data << int32(item->MaxCount);
-    p_Data << int32(item->Stackable);
-    p_Data << uint32(item->ContainerSlots);
+    p_Data << int32(item->MaxCount);//OK
+    p_Data << int32(item->Stackable);//OK
+    p_Data << uint32(item->ContainerSlots);//OK
 
     for (uint32 x = 0; x < MAX_ITEM_PROTO_STATS; ++x)
         p_Data << uint32(item->ItemStat[x].ItemStatType);
@@ -563,16 +563,16 @@ bool SendItemSparseDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Dat
     for (uint32 x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
         p_Data << int32(item->Spells[x].SpellCategoryCooldown);
 
-    p_Data << uint32(item->Bonding);
+    p_Data << uint32(item->Bonding);//OK
 
     // item name
-    std::string name = item->Name1;
+    std::string name = item->Name1;//OK
     p_Data << uint16(name.length());
     if (name.length())
         p_Data << name;
 
     for (uint32 i = 0; i < 3; ++i) // other 3 names
-        p_Data << uint16(0);
+        p_Data << uint16(0);//OK
 
     std::string desc = item->Description;
     p_Data << uint16(desc.length());
@@ -593,7 +593,6 @@ bool SendItemSparseDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Dat
     p_Data << uint32(item->Area);
     p_Data << uint32(item->Map);
     p_Data << uint32(item->BagFamily);
-    p_Data << uint32(item->TotemCategory);
 
     for (uint32 x = 0; x < MAX_ITEM_PROTO_SOCKETS; ++x)
         p_Data << uint32(item->Socket[x].Color);
