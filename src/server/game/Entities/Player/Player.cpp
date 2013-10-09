@@ -10107,6 +10107,7 @@ void Player::SetSheath(SheathState sheathed)
 uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) const
 {
     uint8 playerClass = getClass();
+    sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "NOBODIE findequipSlot %u %u %u", playerClass, slot, proto->InventoryType);
 
     uint8 slots[4];
     slots[0] = NULL_SLOT;
@@ -10235,8 +10236,13 @@ uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) c
             return NULL_SLOT;
     }
 
+    sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "NOBODIE findequipSlot 2");
+
     if (slot != NULL_SLOT)
     {
+
+        sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "NOBODIE findequipSlot 3");
+
         if (swap || !GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
             for (uint8 i = 0; i < 4; ++i)
                 if (slots[i] == slot)
@@ -10244,12 +10250,17 @@ uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) c
     }
     else
     {
+        sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "NOBODIE findequipSlot 4");
+
         // search free slot at first
         for (uint8 i = 0; i < 4; ++i)
             if (slots[i] != NULL_SLOT && !GetItemByPos(INVENTORY_SLOT_BAG_0, slots[i]))
                 // in case 2hand equipped weapon (without titan grip) offhand slot empty but not free
                 if (slots[i] != EQUIPMENT_SLOT_OFFHAND || !IsTwoHandUsed())
                     return slots[i];
+
+        sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "NOBODIE findequipSlot 5");
+
 
         // if not found free and can swap return first appropriate from used
         for (uint8 i = 0; i < 4; ++i)
