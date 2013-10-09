@@ -11490,12 +11490,18 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
 
             ScalingStatDistributionEntry const* ssd = pProto->ScalingStatDistribution ? sScalingStatDistributionStore.LookupEntry(pProto->ScalingStatDistribution) : 0;
             // check allowed level (extend range to upper values if MaxLevel more or equal max player level, this let GM set high level with 1...max range items)
-            if (ssd && ssd->MaxLevel < DEFAULT_MAX_LEVEL && ssd->MaxLevel < getLevel())
+            if (ssd && ssd->MaxLevel < DEFAULT_MAX_LEVEL && ssd->MaxLevel < getLevel()) {
+                sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "NOBODIE equipItem 1");
+
                 return EQUIP_ERR_NOT_EQUIPPABLE;
+            }
 
             uint8 eslot = FindEquipSlot(pProto, slot, swap);
-            if (eslot == NULL_SLOT)
+            if (eslot == NULL_SLOT) {
+                sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "NOBODIE equipItem 2");
+
                 return EQUIP_ERR_NOT_EQUIPPABLE;
+            }
 
             res = CanUseItem(pItem, not_loading);
             if (res != EQUIP_ERR_OK)
@@ -11576,11 +11582,17 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
             {
                 if (eslot == EQUIPMENT_SLOT_OFFHAND)
                 {
-                    if (!CanTitanGrip())
+                    if (!CanTitanGrip()) {
+                        sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "NOBODIE equipItem 3");
+
                         return EQUIP_ERR_NOT_EQUIPPABLE;
+                    }
                 }
-                else if (eslot != EQUIPMENT_SLOT_MAINHAND)
+                else if (eslot != EQUIPMENT_SLOT_MAINHAND) {
+                    sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "NOBODIE equipItem 4");
+
                     return EQUIP_ERR_NOT_EQUIPPABLE;
+                }
 
                 if (!CanTitanGrip())
                 {
