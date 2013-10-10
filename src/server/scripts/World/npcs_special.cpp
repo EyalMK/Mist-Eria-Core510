@@ -3064,6 +3064,55 @@ public:
     }
 };
 
+enum warriorBanner
+{
+    NPC_MOCKING_BANNER = 59390,
+    SPELL_MOCKING_BANNER = 114198,
+
+    NPC_DEMORALIZING_BANNER = 59398,
+    SPELL_DEMORALIZING_BANNER = 114205, //?
+
+    NPC_SKULL_BANNER = 59399,
+    SPELL_SKULL_BANNER = 114206
+};
+
+class npc_warrior_banner : public CreatureScript
+{
+public:
+    npc_warrior_banner() : CreatureScript("npc_warrior_banner") { }
+
+    struct npc_warrior_bannerAI : public ScriptedAI
+    {
+        npc_warrior_bannerAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void Reset()
+        {
+            uint32 spellId = 0;
+            switch(me->GetEntry())
+            {
+                case NPC_MOCKING_BANNER:
+                    spellId = SPELL_MOCKING_BANNER;
+                    break;
+                case NPC_DEMORALIZING_BANNER:
+                    spellId = SPELL_DEMORALIZING_BANNER;
+                    break;
+                case NPC_SKULL_BANNER:
+                    spellId = SPELL_SKULL_BANNER;
+                    break;
+                default:
+                    break;
+            }
+
+            if(spellId) me->CastSpell(me, spellId, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_warrior_bannerAI(creature);
+    }
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3098,4 +3147,5 @@ void AddSC_npcs_special()
     new npc_generic_harpoon_cannon();
     new npc_neutral_faction_select();
     new npc_neutral_faction_select_auto();
+    new npc_warrior_banner();
 }
