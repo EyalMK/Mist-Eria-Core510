@@ -242,7 +242,7 @@ enum Opcodes
     CMSG_GROUP_SWAP_SUB_GROUP                         = 0x0D9F,//16357
     CMSG_GROUP_UNINVITE                               = 0x1195,
     CMSG_GROUP_UNINVITE_GUID                          = 0x0FBE,//16357
-    CMSG_GUILD_ACCEPT                                 = 0x0E33,//16357
+    CMSG_GUILD_ACCEPT                                 = 0x0F3F,//16357
     CMSG_GUILD_ACHIEVEMENT_MEMBERS                    = 0x1198,
     CMSG_GUILD_ACHIEVEMENT_PROGRESS_QUERY             = 0x1199,
     CMSG_GUILD_ADD_RANK                               = 0x0846,//16357
