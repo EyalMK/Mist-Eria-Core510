@@ -5611,20 +5611,43 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
             }
             break;
         case SPELLFAMILY_WARLOCK:
-            if(GetSpellInfo()->Id == 629)
+        {
+            switch(GetSpellInfo()->Id)
             {
-                float modifier = 0.02f;
-                if(caster->HasAura(74434)) //soulburn
+                case 48018:
                 {
-                    modifier = 0.03f;
-                    caster->RemoveAura(74434);
+                    if (GameObject *obj = target->GetGameObject(48018))
+                    {
+                        SpellInfo const* inf = sSpellMgr->GetSpellInfo(48020);
+                        if (inf && target->IsWithinDist(obj, inf->GetMaxRange(true)))
+                        {
+                            if (!target->HasAura(62388))
+                                target->CastSpell(target, 62388, true);
+                        }
+                        else
+                            target->RemoveAura(62388);
+                    }
+                    break;
                 }
-                int32 bp0 = int32(modifier * caster->GetMaxHealth());
+                case 629:
+                {
+                    float modifier = 0.02f;
+                    if(caster->HasAura(74434)) //soulburn
+                    {
+                        modifier = 0.03f;
+                        caster->RemoveAura(74434);
+                    }
+                    int32 bp0 = int32(modifier * caster->GetMaxHealth());
 
-                if(caster)
-                    caster->CastCustomSpell(caster, 107545, &bp0, NULL, NULL, true);
+                    if(caster)
+                        caster->CastCustomSpell(caster, 107545, &bp0, NULL, NULL, true);
+                break;
+                }
+            default:
+                break;
             }
             break;
+        }            
         default:
             break;
     }
