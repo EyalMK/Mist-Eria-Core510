@@ -317,7 +317,8 @@ public:
             int32 amount = aurEff->GetAmount() * target->GetMaxHealth() / 100;
             target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float( aurEff->GetAmount() ), true);
             target->ModifyHealth( amount);
-
+            //Cast bear form
+            target->CastSpell(target, 5487, true);
             PreventDefaultAction();
         }
 
