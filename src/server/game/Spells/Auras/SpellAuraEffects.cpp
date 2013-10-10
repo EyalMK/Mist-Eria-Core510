@@ -3982,70 +3982,18 @@ void AuraEffect::HandleAuraModIncreaseHealth(AuraApplication const* aurApp, uint
 
     Unit* target = aurApp->GetTarget();
 
-    int32 amount = GetAmount();
-
-    //Modify amount
-    switch(m_spellInfo->SpellFamilyName)
-    {
-        case SPELLFAMILY_DRUID:
-        {
-            switch(m_spellInfo->Id)
-            {
-                case 106922:
-                {
-                    amount *= GetCaster()->GetMaxHealth() / 100;
-                    break;
-                }
-                default:
-                    break;
-            }
-            break;
-        }
-        default:
-            break;
-    }
-
     if (apply)
     {
-        //Handle special things on apply
-        switch(m_spellInfo->SpellFamilyName)
-        {
-            case SPELLFAMILY_DRUID:
-            {
-                switch(m_spellInfo->Id)
-                {
-                    case 106922:
-                    {
-                        GetCaster()->CastSpell(GetCaster(), 5487, true);
-                        break;
-                    }
-                    default:
-                        break;
-                }
-                break;
-            }
-            default:
-                break;
-        }
-
-        target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_VALUE, float(amount), apply);
-        target->ModifyHealth(amount);
+        target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_VALUE, float( GetAmount()), apply);
+        target->ModifyHealth( GetAmount());
     }
     else
     {
-        //Handle on remove
-        switch(m_spellInfo->SpellFamilyName)
-        {
-            default:
-                break;
-        }
-
-
-        if (int32(target->GetHealth()) > amount)
-            target->ModifyHealth(-amount);
+        if (int32(target->GetHealth()) >  GetAmount())
+            target->ModifyHealth(- GetAmount());
         else
             target->SetHealth(1);
-        target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_VALUE, float(amount), apply);
+        target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_VALUE, float( GetAmount()), apply);
     }
 }
 
