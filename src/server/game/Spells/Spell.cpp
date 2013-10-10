@@ -3968,7 +3968,7 @@ void Spell::SendSpellGo()
 
     //sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Sending SMSG_SPELL_GO id=%u", m_spellInfo->Id);
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellgo 1 %u", uint32(m_caster->GetTypeId));
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellgo 1 %u", uint32(m_caster->GetTypeId()));
 
 
     uint32 castFlags = CAST_FLAG_UNKNOWN_9;
