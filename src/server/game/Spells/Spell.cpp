@@ -3902,6 +3902,8 @@ void Spell::SendSpellStart()
     data << uint32(m_timer);                                // delay?
     data << uint32(m_casttime);
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellStart 1");
+
     m_targets.Write(data);
 
     if (castFlags & CAST_FLAG_POWER_LEFT_SELF)
@@ -3966,6 +3968,9 @@ void Spell::SendSpellGo()
 
     //sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Sending SMSG_SPELL_GO id=%u", m_spellInfo->Id);
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellgo 1 %u", uint32(m_caster->GetTypeId()));
+
+
     uint32 castFlags = CAST_FLAG_UNKNOWN_9;
 
     // triggered spells with spell visual != 0
@@ -3974,8 +3979,11 @@ void Spell::SendSpellGo()
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
         (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->isPet()))
-        && m_spellInfo->GetPowerType(GetCaster()) != POWER_HEALTH)
+            && m_spellInfo->GetPowerType(GetCaster()) != POWER_HEALTH){
+
         castFlags |= CAST_FLAG_POWER_LEFT_SELF; // should only be sent to self, but the current messaging doesn't make that possible
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellgo 2 %u", castFlags);
+    }
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER)
         && (m_caster->getClass() == CLASS_DEATH_KNIGHT)
@@ -4062,6 +4070,8 @@ void Spell::SendSpellGo()
 
     if (m_targets.GetTargetMask() & TARGET_FLAG_EXTRA_TARGETS)
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellgo 3");
+
         data << uint32(0); // Extra targets count
         /*
         for (uint8 i = 0; i < count; ++i)

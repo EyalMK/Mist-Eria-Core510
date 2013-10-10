@@ -1173,9 +1173,9 @@ enum Opcodes
     SMSG_PETITION_SIGN_RESULTS                        = 0x0129,//16357
     SMSG_PET_ACTION_FEEDBACK                          = 0x0508,//16357
     SMSG_PET_ACTION_SOUND                             = 0x0D6D,//16357
-    SMSG_PET_ADDED                                    = 0x13C, //16357
+    SMSG_PET_ADDED                                    = 0x013C,//16357
     SMSG_PET_BROKEN                                   = 0x1997,
-    SMSG_PET_CAST_FAILED                              = 0x1998,
+    SMSG_PET_CAST_FAILED                              = 0x062D,//16357
     SMSG_PET_DISMISS_SOUND                            = 0x0380,//16357
     SMSG_PET_GUIDS                                    = 0x06C9,//16357
     SMSG_PET_LEARNED_SPELL                            = 0xE71, //16357
