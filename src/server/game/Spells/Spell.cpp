@@ -3902,6 +3902,8 @@ void Spell::SendSpellStart()
     data << uint32(m_timer);                                // delay?
     data << uint32(m_casttime);
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellStart 1");
+
     m_targets.Write(data);
 
     if (castFlags & CAST_FLAG_POWER_LEFT_SELF)
@@ -3965,6 +3967,9 @@ void Spell::SendSpellGo()
         return;
 
     //sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Sending SMSG_SPELL_GO id=%u", m_spellInfo->Id);
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellgo 1 %u", m_caster->GetTypeId);
+
 
     uint32 castFlags = CAST_FLAG_UNKNOWN_9;
 
