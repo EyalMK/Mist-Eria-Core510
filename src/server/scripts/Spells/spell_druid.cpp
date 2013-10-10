@@ -300,6 +300,57 @@ public:
     }
 };
 
+// Might of Ursoc
+// 106922 - SpellId
+class spell_dru_might_of_ursoc : public SpellScriptLoader
+{
+public:
+    spell_dru_might_of_ursoc() : SpellScriptLoader("spell_dru_might_of_ursoc") { }
+
+    class spell_dru_might_of_ursoc_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dru_might_of_ursoc_AuraScript);
+
+        void EffectApply (AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* target = GetTarget();
+            int32 amount = aurEff->GetAmount() * target->GetMaxHealth() / 100;
+            target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float( aurEff->GetAmount() ), true);
+            target->ModifyHealth( amount);
+            //Cast bear form
+            target->CastSpell(target, 5487, true);
+            PreventDefaultAction();
+        }
+
+        void EffectRemove (AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* target = GetTarget();
+            int32 amount = aurEff->GetAmount() * target->GetMaxHealth() / 100;
+            
+            
+            if (int32(target->GetHealth()) >  amount)
+                target->ModifyHealth(- amount);
+            else
+                target->SetHealth(1);
+
+            target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float( aurEff->GetAmount() ), false);
+
+            PreventDefaultAction();
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_dru_might_of_ursoc_AuraScript::EffectApply, EFFECT_0, SPELL_AURA_MOD_INCREASE_HEALTH_2, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_dru_might_of_ursoc_AuraScript::EffectRemove, EFFECT_0, SPELL_AURA_MOD_INCREASE_HEALTH_2, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dru_might_of_ursoc_AuraScript;
+    }
+};
+
 // 2912, 5176, 78674 - Starfire, Wrath, and Starsurge
 class spell_dru_eclipse_energize : public SpellScriptLoader
 {
@@ -1583,6 +1634,7 @@ void AddSC_druid_spell_scripts()
     new spell_dru_mangle();
     new spell_dru_prowl();
     new spell_dru_growl();
+    new spell_dru_might_of_ursoc();
     new spell_dru_dash();
     new spell_dru_eclipse_energize();
     new spell_dru_enrage();

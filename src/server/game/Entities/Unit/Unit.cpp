@@ -7634,6 +7634,12 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
             else
                 return false;
         }
+        case 48018: //Demonic Circle: Summon
+        {
+            if (HasAura(48018)) target->RemoveAura(48018);
+            return false;
+            break;
+        }
     }
 
     if (cooldown && GetTypeId() == TYPEID_PLAYER && ToPlayer()->HasSpellCooldown(trigger_spell_id))
