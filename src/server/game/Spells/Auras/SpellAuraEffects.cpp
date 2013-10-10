@@ -5075,7 +5075,10 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                 case 76577:
                 {
                     if(apply)
+                    {
                         GetCaster()->CastSpell(GetCaster(), 88611, true);
+                        GetCaster()->CastSpell(GetCaster(), 128829, true);
+                    }
                     else
                         target->RemoveAura(88611);
                     break;
