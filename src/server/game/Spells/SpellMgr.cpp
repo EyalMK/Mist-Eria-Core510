@@ -3703,6 +3703,9 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 115750:
                 spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
                 break;
+            case 76577:
+                spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(28); //5sec
+                break;
             default:
                 break;
         }
