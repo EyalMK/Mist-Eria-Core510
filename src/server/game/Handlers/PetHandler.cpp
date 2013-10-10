@@ -144,7 +144,7 @@ void WorldSession::HandlePetStopAttack(WorldPacket &recvData)
     pet->AttackStop();
 }
 
-void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint32 spellid, uint16 flag, uint64 guid2, float x, float y, float z)
+void WorldSession::<HandlePetActionHelper(Unit* pet, uint64 guid1, uint32 spellid, uint16 flag, uint64 guid2, float x, float y, float z)
 {
     CharmInfo* charmInfo = pet->GetCharmInfo();
     if (!charmInfo)
@@ -336,21 +336,26 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint32 spellid
                 pet->GetCharmInfo()->SetIsFollowing(false);
             }
 
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE action disabled 1");
             Spell* spell = new Spell(pet, spellInfo, TRIGGERED_NONE);
 
             SpellCastResult result = spell->CheckPetCast(unit_target);
 
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE action disabled 2 %u ", result);
             //auto turn to target unless possessed
             if (result == SPELL_FAILED_UNIT_NOT_INFRONT && !pet->isPossessed() && !pet->IsVehicle())
             {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE action disabled 3");
                 if (unit_target)
                 {
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE action disabled 4");
                     pet->SetInFront(unit_target);
                     if (unit_target->GetTypeId() == TYPEID_PLAYER)
                         pet->SendUpdateToPlayer((Player*)unit_target);
                 }
                 else if (Unit* unit_target2 = spell->m_targets.GetUnitTarget())
                 {
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE action disabled 5");
                     pet->SetInFront(unit_target2);
                     if (unit_target2->GetTypeId() == TYPEID_PLAYER)
                         pet->SendUpdateToPlayer((Player*)unit_target2);
@@ -365,6 +370,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint32 spellid
 
             if (result == SPELL_CAST_OK)
             {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE action disabled 6");
                 pet->ToCreature()->AddCreatureSpellCooldown(spellid);
 
                 unit_target = spell->m_targets.GetUnitTarget();
@@ -375,14 +381,17 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint32 spellid
                     pet->SendPetTalk((uint32)PET_TALK_SPECIAL_SPELL);
                 else
                 {
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE action disabled 7");
                     pet->SendPetAIReaction(guid1);
                 }
 
                 if (unit_target && !GetPlayer()->IsFriendlyTo(unit_target) && !pet->isPossessed() && !pet->IsVehicle())
                 {
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE action disabled 8");
                     // This is true if pet has no target or has target but targets differs.
                     if (pet->getVictim() != unit_target)
                     {
+                        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE action disabled 9");
                         if (pet->getVictim())
                             pet->AttackStop();
                         pet->GetMotionMaster()->Clear();
@@ -390,25 +399,30 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint32 spellid
                             pet->ToCreature()->AI()->AttackStart(unit_target);
                     }
                 }
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE action disabled 10");
 
                 spell->prepare(&(spell->m_targets));
             }
             else
             {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE action disabled 11");
                 if (pet->isPossessed() || pet->IsVehicle())
                     Spell::SendCastResult(GetPlayer(), spellInfo, 0, result);
                 else
                     pet->SendPetCastFail(spellid, result);
 
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE action disabled 12");
                 if (!pet->ToCreature()->HasSpellCooldown(spellid))
                     GetPlayer()->SendClearCooldown(spellid, pet);
 
                 spell->finish(false);
                 delete spell;
 
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE action disabled 13");
                 // reset specific flags in case of spell fail. AI will reset other flags
                 if (pet->GetCharmInfo())
                     pet->GetCharmInfo()->SetIsCommandAttack(false);
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE action disabled 14");
             }
             break;
         }
