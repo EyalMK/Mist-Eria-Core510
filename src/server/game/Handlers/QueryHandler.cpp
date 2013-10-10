@@ -593,6 +593,7 @@ bool SendItemSparseDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Dat
     p_Data << uint32(item->Area);
     p_Data << uint32(item->Map);
     p_Data << uint32(item->BagFamily);
+    p_Data << uint32(item->TotemCategory);
 
     for (uint32 x = 0; x < MAX_ITEM_PROTO_SOCKETS; ++x)
         p_Data << uint32(item->Socket[x].Color);
