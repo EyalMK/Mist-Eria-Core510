@@ -5067,6 +5067,37 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
             //    break;
             break;
         }
+        case SPELLFAMILY_ROGUE:
+        {
+            switch(GetId())
+            {
+                // Smoke bomb
+                case 76577:
+                {
+                    if(apply)
+                    {
+                        if (SpellInfo const *spellInfo = sSpellMgr->GetSpellInfo(88611))
+                        {
+                            uint32 effMask = 0;
+                            for (uint8 i = 0; i< MAX_SPELL_EFFECTS; ++i)
+                            {
+                                if (spellInfo->Effects[i].IsUnitOwnedAuraEffect())
+                                    effMask |= 1 << i;
+                            }
+                            if(Aura* aur = Aura::TryCreate(spellInfo,effMask, target, this->GetCaster()))
+                            {
+                                aur->SetMaxDuration(GetBase()->GetDuration());
+                                aur->SetDuration(GetBase()->GetDuration());
+                            }
+                        }
+                    }
+                    else
+                        target->RemoveAura(88611);
+                    break;
+                }
+            }
+            break;
+        }
     }
 }
 
