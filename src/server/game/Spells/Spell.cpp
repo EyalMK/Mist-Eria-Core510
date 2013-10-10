@@ -3979,8 +3979,11 @@ void Spell::SendSpellGo()
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
         (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->isPet()))
-        && m_spellInfo->GetPowerType(GetCaster()) != POWER_HEALTH)
+            && m_spellInfo->GetPowerType(GetCaster()) != POWER_HEALTH){
+
         castFlags |= CAST_FLAG_POWER_LEFT_SELF; // should only be sent to self, but the current messaging doesn't make that possible
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellgo 2 %u", castFlags);
+    }
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER)
         && (m_caster->getClass() == CLASS_DEATH_KNIGHT)
@@ -4067,6 +4070,8 @@ void Spell::SendSpellGo()
 
     if (m_targets.GetTargetMask() & TARGET_FLAG_EXTRA_TARGETS)
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellgo 3");
+
         data << uint32(0); // Extra targets count
         /*
         for (uint8 i = 0; i < count; ++i)
