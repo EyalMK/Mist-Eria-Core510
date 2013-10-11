@@ -3080,13 +3080,19 @@ public:
 
         void Reset()
         {
-            me->SetDisplayId(1126);
             if(Unit* owner = me->GetOwner())
             {
                 me->SetDisplayId(owner->GetDisplayId());
 
                 owner->CastSpell(me, 119051, true);
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : RESET OK");
             }
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "#### Debug Terah : display id = %d", me->GetDisplayId());
+        }
+
+        void UpdateAI(uint32 const diff)
+        {
+            //sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : UPDATEAI : %f %f %f", me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
         }
     };
 

@@ -678,6 +678,85 @@ public:
     }
 };
 
+// Unleash Elements
+// Spell Id: 73680
+class spell_sha_unleash_elements : public SpellScriptLoader
+{
+public:
+    spell_sha_unleash_elements() : SpellScriptLoader("spell_sha_unleash_elements") { }
+
+    class spell_sha_unleash_elements_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_sha_unleash_elements_SpellScript)
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            if(!caster)
+                return;
+            Player* plr = caster->ToPlayer();
+            if(!plr)
+                return;
+
+            if(!GetHitUnit())
+                return;
+
+            Item *weapons[2];
+            weapons[0] = plr->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+            weapons[1] = plr->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+            for(int i = 0; i < 2; i++)
+            {
+                if(!weapons[i])
+                    continue;
+
+                uint32 unleashSpell = 0;
+                Unit *target = GetHitUnit();
+                bool hostileTarget = plr->IsHostileTo(target);
+                bool hostileSpell = true;
+
+                switch (weapons[i]->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
+                {
+                case 3345: // Earthliving Weapon
+                    unleashSpell = 73685; //Unleash Life
+                    hostileSpell = false;
+                    break;
+                case 5: // Flametongue Weapon
+                    unleashSpell = 73683; // Unleash Flame
+                    break;
+                case 2: // Frostbrand Weapon
+                    unleashSpell = 73682; // Unleash Frost
+                    break;
+                case 3021: // Rockbiter Weapon
+                    unleashSpell = 73684; // Unleash Earth
+                    break;
+                case 283: // Windfury Weapon
+                    unleashSpell = 73681; // Unleash Wind
+                    break;
+                }
+                if(hostileSpell && !hostileTarget)
+                    continue; // don't allow to attack non-hostile targets. TODO: check this before cast
+
+                if(!hostileSpell && hostileTarget)
+                    target = plr;   // heal ourselves instead of the enemy
+                if(unleashSpell)
+                {
+                    plr->CastSpell(target, unleashSpell, true);
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnEffectHit += SpellEffectFn(spell_sha_unleash_elements_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_sha_unleash_elements_SpellScript();
+    }
+};
+
 void AddSC_shaman_spell_scripts()
 {
     new spell_sha_ancestral_awakening_proc();
@@ -694,4 +773,5 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_mana_tide_totem();
     new spell_sha_thunderstorm();
     new spell_sha_healing_rain();
+    new spell_sha_unleash_elements();
 }

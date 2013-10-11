@@ -351,6 +351,38 @@ public:
     }
 };
 
+//Stampeding Roar
+// SpellId : 106898
+class spell_dru_stampeding_roar : public SpellScriptLoader
+{
+public:
+    spell_dru_stampeding_roar() : SpellScriptLoader("spell_dru_stampeding_roar") { }
+
+    class spell_dru_stampeding_roar_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dru_stampeding_roar_AuraScript);
+
+        void EffectApply(AuraEffect const* aurEff, AuraEffectHandleModes mode)
+        {
+            ShapeshiftForm form = GetCaster()->GetShapeshiftForm();
+            //Cast bear form
+            if(form != FORM_BEAR && form != FORM_CAT)
+                GetCaster()->CastSpell(GetCaster(), 5487, true);
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_dru_stampeding_roar_AuraScript::EffectApply, EFFECT_0, SPELL_AURA_MOD_INCREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dru_stampeding_roar_AuraScript;
+    }
+};
+
+
 // 2912, 5176, 78674 - Starfire, Wrath, and Starsurge
 class spell_dru_eclipse_energize : public SpellScriptLoader
 {
@@ -1635,6 +1667,7 @@ void AddSC_druid_spell_scripts()
     new spell_dru_prowl();
     new spell_dru_growl();
     new spell_dru_might_of_ursoc();
+    new spell_dru_stampeding_roar();
     new spell_dru_dash();
     new spell_dru_eclipse_energize();
     new spell_dru_enrage();
