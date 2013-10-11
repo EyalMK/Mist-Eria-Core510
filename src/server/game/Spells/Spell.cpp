@@ -5960,6 +5960,8 @@ SpellCastResult Spell::CheckPower()
 
     // Check power amount
     Powers powerType = Powers(m_spellInfo->GetPowerType(GetCaster()));
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE checkPower %u %u %u", powerType, m_powerCost, m_caster->GetPower(powerType));
     if (int32(m_caster->GetPower(powerType)) < m_powerCost)
         return SPELL_FAILED_NO_POWER;
     else
