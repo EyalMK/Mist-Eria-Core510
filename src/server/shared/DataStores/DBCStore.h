@@ -69,188 +69,194 @@ template<class T>
 class DBCStorage
 {
     typedef std::list<char*> StringPoolList;
-    public:
-        explicit DBCStorage(char const* f)
-            : fmt(f), nCount(0), fieldCount(0), dataTable(NULL)
+public:
+    explicit DBCStorage(char const* f)
+        : fmt(f), nCount(0), fieldCount(0), dataTable(NULL)
+    {
+        indexTable.asT = NULL;
+    }
+
+    ~DBCStorage() { Clear(); }
+
+    T const* LookupEntry(uint32 id) const
+    {
+        return (id >= nCount) ? NULL : indexTable.asT[id];
+    }
+
+    uint32  GetNumRows() const { return nCount; }
+    char const* GetFormat() const { return fmt; }
+    uint32 GetFieldCount() const { return fieldCount; }
+
+    bool Load(char const* fn, SqlDbc* sql)
+    {
+        DBCFileLoader dbc;
+        // Check if load was sucessful, only then continue
+        if (!dbc.Load(fn, fmt))
+            return false;
+
+        uint32 sqlRecordCount = 0;
+        uint32 sqlHighestIndex = 0;
+        Field* fields = NULL;
+        QueryResult result = QueryResult(NULL);
+        // Load data from sql
+        if (sql)
         {
-            indexTable.asT = NULL;
-        }
-
-        ~DBCStorage() { Clear(); }
-
-        T const* LookupEntry(uint32 id) const
-        {
-            return (id >= nCount) ? NULL : indexTable.asT[id];
-        }
-
-        uint32  GetNumRows() const { return nCount; }
-        char const* GetFormat() const { return fmt; }
-        uint32 GetFieldCount() const { return fieldCount; }
-
-        bool Load(char const* fn, SqlDbc* sql)
-        {
-            DBCFileLoader dbc;
-            // Check if load was sucessful, only then continue
-            if (!dbc.Load(fn, fmt))
-                return false;
-
-            uint32 sqlRecordCount = 0;
-            uint32 sqlHighestIndex = 0;
-            Field* fields = NULL;
-            QueryResult result = QueryResult(NULL);
-            // Load data from sql
-            if (sql)
-            {
-                std::string query = "SELECT * FROM " + sql->sqlTableName;
-                if (sql->indexPos >= 0)
-                    query +=" ORDER BY " + *sql->indexName + " DESC";
-                query += ';';
+            std::string query = "SELECT * FROM " + sql->sqlTableName;
+            if (sql->indexPos >= 0)
+                query +=" ORDER BY " + *sql->indexName + " DESC";
+            query += ';';
 
 
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE sql %s", query.c_str());
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE sql %s", query.c_str());
 
-                result = WorldDatabase.Query(query.c_str());
-                if (result)
-                {
-                    sqlRecordCount = uint32(result->GetRowCount());
-                    if (sql->indexPos >= 0)
-                    {
-                        fields = result->Fetch();
-                        sqlHighestIndex = fields[sql->sqlIndexPos].GetUInt32();
-                    }
-
-                    // Check if sql index pos is valid
-                    if (int32(result->GetFieldCount() - 1) < sql->sqlIndexPos)
-                    {
-                        sLog->outError(LOG_FILTER_SERVER_LOADING, "Invalid index pos for dbc:'%s'", sql->sqlTableName.c_str());
-                        return false;
-                    }
-                }
-            }
-
-            char* sqlDataTable = NULL;
-            fieldCount = dbc.GetCols();
-
-            dataTable = reinterpret_cast<T*>(dbc.AutoProduceData(fmt, nCount, indexTable.asChar,
-                sqlRecordCount, sqlHighestIndex, sqlDataTable));
-
-            stringPoolList.push_back(dbc.AutoProduceStrings(fmt, reinterpret_cast<char*>(dataTable)));
-
-            // Insert sql data into arrays
+            result = WorldDatabase.Query(query.c_str());
             if (result)
             {
-                if (indexTable.asT)
+                sqlRecordCount = uint32(result->GetRowCount());
+                if (sql->indexPos >= 0)
                 {
-                    uint32 offset = 0;
-                    uint32 rowIndex = dbc.GetNumRows();
-                    do
-                    {
-                        if (!fields)
-                            fields = result->Fetch();
+                    fields = result->Fetch();
+                    sqlHighestIndex = fields[sql->sqlIndexPos].GetUInt32();
+                }
 
-                        if (sql->indexPos >= 0)
-                        {
-                            uint32 id = fields[sql->sqlIndexPos].GetUInt32();
-                            if (indexTable.asT[id])
-                            {
-                                sLog->outError(LOG_FILTER_SERVER_LOADING, "Index %d already exists in dbc:'%s'", id, sql->sqlTableName.c_str());
-                                return false;
-                            }
-
-                            indexTable.asT[id] = reinterpret_cast<T*>(&sqlDataTable[offset]);
-                        }
-                        else
-                            indexTable.asT[rowIndex]= reinterpret_cast<T*>(&sqlDataTable[offset]);
-
-                        uint32 sqlColumnNumber = 0;
-
-                        for (uint32 columnNumber = 0 ; columnNumber < sql->formatString->size(); ++columnNumber) {
-                                switch (fmt[columnNumber]) {
-                                    case FT_FLOAT:
-                                        *reinterpret_cast<float*>(&sqlDataTable[offset]) = fields[sqlColumnNumber].GetFloat();
-                                        offset += 4;
-                                        break;
-                                    case FT_IND:
-                                    case FT_INT:
-                                        *reinterpret_cast<uint32*>(&sqlDataTable[offset]) = fields[sqlColumnNumber].GetUInt32();
-                                        offset += 4;
-                                        break;
-                                    case FT_BYTE:
-                                        *reinterpret_cast<uint8*>(&sqlDataTable[offset]) = fields[sqlColumnNumber].GetUInt8();
-                                        offset += 1;
-                                        break;
-                                    case FT_STRING:
-                                        *reinterpret_cast<char**>(&sqlDataTable[offset]) = stringPoolList.back();
-                                        offset += sizeof(char*);
-                                        break;
-                                    case FT_SORT:
-                                        break;
-                                    default:
-                                        break;
-                                }
-                        }
-
-                        sqlColumnNumber ++;
-
-                        fields = NULL;
-                        ++rowIndex;
-                    } while (result->NextRow());
+                // Check if sql index pos is valid
+                if (int32(result->GetFieldCount() - 1) < sql->sqlIndexPos)
+                {
+                    sLog->outError(LOG_FILTER_SERVER_LOADING, "Invalid index pos for dbc:'%s'", sql->sqlTableName.c_str());
+                    return false;
                 }
             }
-
-            // error in dbc file at loading if NULL
-            return indexTable.asT != NULL;
         }
 
-        bool LoadStringsFrom(char const* fn)
+        char* sqlDataTable = NULL;
+        fieldCount = dbc.GetCols();
+
+        dataTable = reinterpret_cast<T*>(dbc.AutoProduceData(fmt, nCount, indexTable.asChar,
+                                                             sqlRecordCount, sqlHighestIndex, sqlDataTable));
+
+        stringPoolList.push_back(dbc.AutoProduceStrings(fmt, reinterpret_cast<char*>(dataTable)));
+
+        // Insert sql data into arrays
+        if (result)
         {
-            // DBC must be already loaded using Load
-            if (!indexTable.asT)
-                return false;
-
-            DBCFileLoader dbc;
-            // Check if load was successful, only then continue
-            if (!dbc.Load(fn, fmt))
-                return false;
-
-            stringPoolList.push_back(dbc.AutoProduceStrings(fmt, reinterpret_cast<char*>(dataTable)));
-
-            return true;
-        }
-
-        void Clear()
-        {
-            if (!indexTable.asT)
-                return;
-
-            delete[] reinterpret_cast<char*>(indexTable.asT);
-            indexTable.asT = NULL;
-            delete[] reinterpret_cast<char*>(dataTable);
-            dataTable = NULL;
-
-            while (!stringPoolList.empty())
+            if (indexTable.asT)
             {
-                delete[] stringPoolList.front();
-                stringPoolList.pop_front();
+                uint32 offset = 0;
+                uint32 rowIndex = dbc.GetNumRows();
+                do
+                {
+                    if (!fields)
+                        fields = result->Fetch();
+
+                    if (sql->indexPos >= 0)
+                    {
+                        uint32 id = fields[sql->sqlIndexPos].GetUInt32();
+                        if (indexTable.asT[id])
+                        {
+                            sLog->outError(LOG_FILTER_SERVER_LOADING, "Index %d already exists in dbc:'%s'", id, sql->sqlTableName.c_str());
+                            return false;
+                        }
+
+                        indexTable.asT[id] = reinterpret_cast<T*>(&sqlDataTable[offset]);
+                    }
+                    else
+                        indexTable.asT[rowIndex]= reinterpret_cast<T*>(&sqlDataTable[offset]);
+
+                    uint32 sqlColumnNumber = 0;
+
+                    for (uint32 columnNumber = 0 ; columnNumber < sql->formatString->size(); ++columnNumber) {
+                        switch (fmt[columnNumber]) {
+                        case FT_FLOAT:
+                            *reinterpret_cast<float*>(&sqlDataTable[offset]) = fields[sqlColumnNumber].GetFloat();
+                            offset += 4;
+                            break;
+                        case FT_IND:
+                        case FT_INT:
+                            *reinterpret_cast<uint32*>(&sqlDataTable[offset]) = fields[sqlColumnNumber].GetUInt32();
+                            offset += 4;
+                            break;
+                        case FT_NA:
+                            *reinterpret_cast<uint32*>(&sqlDataTable[offset]) = 0;
+                            offset += 4;
+                            break;
+                        case FT_BYTE:
+                            *reinterpret_cast<uint8*>(&sqlDataTable[offset]) = fields[sqlColumnNumber].GetUInt8();
+                            offset += 1;
+                            break;
+                        case FT_NA_BYTE:
+                            *reinterpret_cast<uint8*>(&sqlDataTable[offset]) = 0;
+                            offset += 1;
+                            break;
+                        case FT_STRING:
+                            *reinterpret_cast<char**>(&sqlDataTable[offset]) = stringPoolList.back();
+                            offset += sizeof(char*);
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+
+                    sqlColumnNumber ++;
+
+                    fields = NULL;
+                    ++rowIndex;
+                } while (result->NextRow());
             }
-
-            nCount = 0;
         }
 
-    private:
-        char const* fmt;
-        uint32 nCount;
-        uint32 fieldCount;
+        // error in dbc file at loading if NULL
+        return indexTable.asT != NULL;
+    }
 
-        union
+    bool LoadStringsFrom(char const* fn)
+    {
+        // DBC must be already loaded using Load
+        if (!indexTable.asT)
+            return false;
+
+        DBCFileLoader dbc;
+        // Check if load was successful, only then continue
+        if (!dbc.Load(fn, fmt))
+            return false;
+
+        stringPoolList.push_back(dbc.AutoProduceStrings(fmt, reinterpret_cast<char*>(dataTable)));
+
+        return true;
+    }
+
+    void Clear()
+    {
+        if (!indexTable.asT)
+            return;
+
+        delete[] reinterpret_cast<char*>(indexTable.asT);
+        indexTable.asT = NULL;
+        delete[] reinterpret_cast<char*>(dataTable);
+        dataTable = NULL;
+
+        while (!stringPoolList.empty())
         {
-            T** asT;
-            char** asChar;
+            delete[] stringPoolList.front();
+            stringPoolList.pop_front();
         }
-        indexTable;
 
-        T* dataTable;
-        StringPoolList stringPoolList;
+        nCount = 0;
+    }
+
+private:
+    char const* fmt;
+    uint32 nCount;
+    uint32 fieldCount;
+
+    union
+    {
+        T** asT;
+        char** asChar;
+    }
+    indexTable;
+
+    T* dataTable;
+    StringPoolList stringPoolList;
 };
 
 #endif
