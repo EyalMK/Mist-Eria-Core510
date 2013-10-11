@@ -1271,30 +1271,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (target->HasAura(58039)) // Glyph of Blurred Speed
                         target->CastSpell(target, 61922, true); // Sprint (waterwalk)
                 break;
-            case SPELLFAMILY_WARLOCK:
-            {
-                switch(GetSpellInfo()->Id)
-                {
-                    case 48020: // Demonic Circle
-                    {
-                        if (target->GetTypeId() == TYPEID_PLAYER)
-                        {
-                            if (GameObject* obj = target->GetGameObject(48018))
-                            {
-                                target->NearTeleportTo(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj->GetOrientation());
-                                target->RemoveMovementImpairingAuras();
-                                if(target->HasAura(74434))
-                                {
-                                    target->RemoveAura(74434);
-                                    target->CastSpell(target, 79438, true);
-                                }
-                            }
-                        }
-                        break;
-                    }
-                }
-                break;
-            }
 
         }
     }
@@ -1357,15 +1333,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         if (spellId)
                             caster->CastSpell(target, spellId, true);
                     }
-                }
-                if(GetSpellInfo()->Id == 48018) // Demonic Circle
-                {
-                    // Do not remove GO when aura is removed by stack
-                    // to prevent remove GO added by new spell
-                    // old one is already removed
-                    if (removeMode != AURA_REMOVE_BY_CANCEL)
-                        target->RemoveGameObject(GetId(), true);
-                    target->RemoveAura(62388);
                 }
                 break;
             case SPELLFAMILY_PRIEST:
