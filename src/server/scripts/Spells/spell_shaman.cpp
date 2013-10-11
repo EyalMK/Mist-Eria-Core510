@@ -734,7 +734,7 @@ public:
                     break;
                 }
                 if(hostileSpell && !hostileTarget)
-                    return; // don't allow to attack non-hostile targets. TODO: check this before cast
+                    continue; // don't allow to attack non-hostile targets. TODO: check this before cast
 
                 if(!hostileSpell && hostileTarget)
                     target = plr;   // heal ourselves instead of the enemy
