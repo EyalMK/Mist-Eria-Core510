@@ -115,64 +115,6 @@ public:
     };
 };
 
-class npc_shang_xi_the_lesson_of_the_burning_scroll : public CreatureScript
-{
-public:
-    npc_shang_xi_the_lesson_of_the_burning_scroll() : CreatureScript("npc_shang_xi_the_lesson_of_the_burning_scroll") { }
-
-    bool OnGossipHello(Player *p, Creature *c)
-    {
-        if(p->hasQuest(QUEST_THE_LESSON_OF_THE_BURNING_SCROLL))
-        {
-            p->CastSpell(p, SPELL_CREATE_THE_FLAMME, true);
-            p->KilledMonsterCredit(KILL_CREDIT_FLAMME, 0);
-            c->Say(SHANG_XI_TALK, 0, p->GetGUID());
-
-            return true;
-        }
-    }
-private:
-    enum enums
-    {
-        QUEST_THE_LESSON_OF_THE_BURNING_SCROLL = 29408,
-        SPELL_CREATE_THE_FLAMME = 114611,
-        SHANG_XI_TALK = 0,
-        KILL_CREDIT_FLAMME = 59591
-    };
-};
-
-class gob_edict_of_temperance_the_lesson_of_the_burning_scroll : public GameObjectScript
-{
-public:
-    gob_edict_of_temperance_the_lesson_of_the_burning_scroll() : GameObjectScript("gob_edict_of_temperance_the_lesson_of_the_burning_scroll") { }
-
-    bool OnGossipHello(Player* p, GameObject* gob)
-    {
-        if(p->HasItemCount(FLAMME, 1))
-        {
-            p->KilledMonsterCredit(KILL_CREDIT_BURN, 0);
-            p->CastSpell(p, SPELL_NEW_PHASE, true);
-			p->RemoveAura(p->GetAura(59073));
-
-            p->DestroyItemCount(FLAMME, 1, true);
-            if(GameObject* go = ObjectAccessor::GetGameObject(*p, 406808))
-                if(Creature* npc = go->FindNearestCreature(TRACKER, 10, true))
-                    npc->CastSpell(npc, SPELL_BURN, true);
-        }
-
-        return true;
-    }
-private:
-    enum enums
-    {
-        TRACKER = 65490,
-        FLAMME = 80212,
-        SPELL_BURN = 88579,
-        SPELL_NEW_PHASE = 59074, // Tester si le changement de phase marche bien
-        KILL_CREDIT_BURN = 59570
-    };
-};
-
 /*******************************/
 /**The Lesson of Stifled Pride**/
 /*******************************/
@@ -1275,8 +1217,6 @@ private:
 void AddSC_wandering_isle()
 {
     new npc_first_quest_pandaren();
-    new npc_shang_xi_the_lesson_of_the_burning_scroll();
-    new gob_edict_of_temperance_the_lesson_of_the_burning_scroll();
 	
 	new npc_trainee_stifled_pride();
     new npc_aysa_cloudsinger_quest29414();
