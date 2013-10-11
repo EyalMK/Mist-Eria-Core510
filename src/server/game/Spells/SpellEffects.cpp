@@ -1319,6 +1319,8 @@ void Spell::EffectApplyAura(SpellEffIndex effIndex)
     if (!m_spellAura || !unitTarget)
         return;
     ASSERT(unitTarget == m_spellAura->GetOwner());
+
+    if(m_spellInfo->Id == 62388) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN 62388 EFFECT PASSE");
     m_spellAura->_ApplyEffectForTargets(effIndex);
 }
 
