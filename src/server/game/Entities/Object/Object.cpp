@@ -2558,6 +2558,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     if (!summon->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), this, phase, entry, vehId, team, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()))
     {
         delete summon;
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : SUMMON FAILED");
         return NULL;
     }
 
