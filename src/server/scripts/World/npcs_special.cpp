@@ -3080,6 +3080,7 @@ public:
 
         void Reset()
         {
+            me->SetDisplayId(1126);
             if(Unit* owner = me->GetOwner())
             {
                 me->SetDisplayId(owner->GetDisplayId());
