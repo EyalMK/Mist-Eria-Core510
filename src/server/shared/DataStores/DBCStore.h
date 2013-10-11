@@ -189,6 +189,9 @@ class DBCStorage
                                         break;
                                 }
                         }
+
+                        sqlColumnNumber ++;
+
                         fields = NULL;
                         ++rowIndex;
                     } while (result->NextRow());
