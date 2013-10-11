@@ -216,6 +216,16 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
 
             SetUInt32Value(UNIT_FIELD_BYTES_0, 0x800); // class = mage
 
+
+            switch (GetEntry()) {
+            case 416: //Imp
+                setPowerType(POWER_ENERGY);
+                break;
+            default:
+                setPowerType(POWER_MANA);
+                break;
+            }
+
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
                                                             // this enables popup window (pet dismiss, cancel)
             break;
@@ -246,7 +256,15 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     SetCanModifyStats(true);
 
     if (getPetType() == SUMMON_PET && !current)              //all (?) summon pets come with full health when called, but not when they are current
-        SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+        switch (GetEntry()) {
+        case 416: //Imp
+            SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
+            break;
+        default:
+            SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+            break;
+        }
+
     else
     {
         uint32 savedhealth = fields[10].GetUInt32();
@@ -256,7 +274,18 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         else
         {
             SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
-            SetPower(POWER_MANA, savedmana > uint32(GetMaxPower(POWER_MANA)) ? GetMaxPower(POWER_MANA) : savedmana);
+
+            switch (GetEntry()) {
+            case 416: //Imp
+                SetPower(POWER_ENERGY, savedmana > uint32(GetMaxPower(POWER_ENERGY)) ? GetMaxPower(POWER_ENERGY) : savedmana);
+                break;
+            default:
+                SetPower(POWER_MANA, savedmana > uint32(GetMaxPower(POWER_MANA)) ? GetMaxPower(POWER_MANA) : savedmana);
+                break;
+            }
+
+
+
         }
     }
 
@@ -1017,7 +1046,15 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     UpdateAllStats();
 
     SetFullHealth();
-    SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+
+    switch (GetEntry()) {
+    case 416: //Imp
+        SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
+        break;
+    default:
+        SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+        break;
+    }
     return true;
 }
 
