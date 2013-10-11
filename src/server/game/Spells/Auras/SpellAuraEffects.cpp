@@ -4907,10 +4907,10 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
 
     // AT APPLY & REMOVE
 
-    if(m_spellInfo->Id == 62388)
-    {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : 62388 EFFECT PASSE");
-    }
+    //if(m_spellInfo->Id == 62388)
+    //{
+    //    sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : 62388 EFFECT PASSE");
+    //}
 
     switch (m_spellInfo->SpellFamilyName)
     {
