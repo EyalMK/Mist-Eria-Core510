@@ -3092,7 +3092,7 @@ public:
 
         void UpdateAI(uint32 const diff)
         {
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : UPDATEAI : %f %f %f", me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+            //sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : UPDATEAI : %f %f %f", me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
         }
     };
 
