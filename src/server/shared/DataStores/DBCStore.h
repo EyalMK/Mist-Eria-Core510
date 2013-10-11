@@ -162,40 +162,10 @@ class DBCStorage
                         else
                             indexTable.asT[rowIndex]= reinterpret_cast<T*>(&sqlDataTable[offset]);
 
-                        uint32 columnNumber = 0;
                         uint32 sqlColumnNumber = 0;
 
-                        for (; columnNumber < sql->formatString->size(); ++columnNumber)
-                        {
-                            if ((*sql->formatString)[columnNumber] == FT_SQL_ABSENT)
-                            {
-                                switch (fmt[columnNumber])
-                                {
-                                    case FT_FLOAT:
-                                        *reinterpret_cast<float*>(&sqlDataTable[offset]) = 0.0f;
-                                        offset += 4;
-                                        break;
-                                    case FT_IND:
-                                    case FT_INT:
-                                        *reinterpret_cast<uint32*>(&sqlDataTable[offset]) = uint32(0);
-                                        offset += 4;
-                                        break;
-                                    case FT_BYTE:
-                                        *reinterpret_cast<uint8*>(&sqlDataTable[offset]) = uint8(0);
-                                        offset += 1;
-                                        break;
-                                    case FT_STRING:
-                                        // Beginning of the pool - empty string
-                                        *reinterpret_cast<char**>(&sqlDataTable[offset]) = stringPoolList.back();
-                                        offset += sizeof(char*);
-                                        break;
-                                }
-                            }
-                            else if ((*sql->formatString)[columnNumber] == FT_SQL_PRESENT)
-                            {
-                                bool validSqlColumn = true;
-                                switch (fmt[columnNumber])
-                                {
+                        for (uint32 columnNumber = 0 ; columnNumber < sql->formatString->size(); ++columnNumber) {
+                                switch (fmt[columnNumber]) {
                                     case FT_FLOAT:
                                         *reinterpret_cast<float*>(&sqlDataTable[offset]) = fields[sqlColumnNumber].GetFloat();
                                         offset += 4;
@@ -210,30 +180,16 @@ class DBCStorage
                                         offset += 1;
                                         break;
                                     case FT_STRING:
-                                        sLog->outError(LOG_FILTER_SERVER_LOADING, "Unsupported data type in table '%s' at char %d", sql->sqlTableName.c_str(), columnNumber);
-                                        return false;
+                                        *reinterpret_cast<char**>(&sqlDataTable[offset]) = stringPoolList.back();
+                                        offset += sizeof(char*);
+                                        break;
                                     case FT_SORT:
                                         break;
                                     default:
                                         validSqlColumn = false;
                                         break;
                                 }
-                                if (validSqlColumn && (columnNumber != (sql->formatString->size()-1)))
-                                    sqlColumnNumber++;
-                            }
-                            else
-                            {
-                                sLog->outError(LOG_FILTER_SERVER_LOADING, "Incorrect sql format string '%s' at char %d", sql->sqlTableName.c_str(), columnNumber);
-                                return false;
-                            }
                         }
-
-                        if (sqlColumnNumber != (result->GetFieldCount() - 1))
-                        {
-                            sLog->outError(LOG_FILTER_SERVER_LOADING, "SQL and DBC format strings are not matching for table: '%s'", sql->sqlTableName.c_str());
-                            return false;
-                        }
-
                         fields = NULL;
                         ++rowIndex;
                     } while (result->NextRow());
