@@ -2,6 +2,7 @@
 #include "ScriptMgr.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
+#include "MapManager.h"
 
 // 116095 - Disable
 class spell_monk_disable : public SpellScriptLoader
@@ -117,14 +118,20 @@ public:
 
         void Hit()
         {
-            if(Unit* target = GetHitUnit())
+            if(Creature* target = GetHitCreature())
             {
                 Position *petPos, *casterPos;
+                uint32 petMapId, casterMapId;
                 target->GetPosition(petPos);
+                petMapId = target->GetMapId();
                 GetCaster()->GetPosition(casterPos);
+                casterMapId = GetCaster()->GetMapId();
 
-                target->Relocate(casterPos);
-                GetCaster()->Relocate(petPos);
+                target->FarTeleportTo(GetCaster()->GetMap(), casterPos->GetPositionX(), casterPos->GetPositionY(), casterPos->GetPositionZ(), casterPos->GetOrientation());
+
+                if(GetCaster()->ToPlayer())
+                    GetCaster()->ToPlayer()->TeleportTo(petMapId, petPos->GetPositionX(), petPos->GetPositionY(), petPos->GetPositionZ(), petPos->GetOrientation());
+
             }
         }
 
