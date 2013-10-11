@@ -214,17 +214,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         case SUMMON_PET:
             petlevel = owner->getLevel();
 
-            //SetUInt32Value(UNIT_FIELD_BYTES_0, 0x800); // class = mage
-
-
-            switch (GetEntry()) {
-            case 416: //Imp
-                setPowerType(POWER_ENERGY);
-                break;
-            default:
-                setPowerType(POWER_MANA);
-                break;
-            }
+            SetUInt32Value(UNIT_FIELD_BYTES_0, 0x800); // class = mage
 
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
                                                             // this enables popup window (pet dismiss, cancel)
@@ -256,15 +246,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     SetCanModifyStats(true);
 
     if (getPetType() == SUMMON_PET && !current)              //all (?) summon pets come with full health when called, but not when they are current
-        switch (GetEntry()) {
-        case 416: //Imp
-            SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
-            break;
-        default:
-            SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
-            break;
-        }
-
+        SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
     else
     {
         uint32 savedhealth = fields[10].GetUInt32();
@@ -275,17 +257,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         {
             SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
 
-            switch (GetEntry()) {
-            case 416: //Imp
-                SetPower(POWER_ENERGY, savedmana > uint32(GetMaxPower(POWER_ENERGY)) ? GetMaxPower(POWER_ENERGY) : savedmana);
-                break;
-            default:
-                SetPower(POWER_MANA, savedmana > uint32(GetMaxPower(POWER_MANA)) ? GetMaxPower(POWER_MANA) : savedmana);
-                break;
-            }
-
-
-
+            SetPower(POWER_MANA, savedmana > uint32(GetMaxPower(POWER_MANA)) ? GetMaxPower(POWER_MANA) : savedmana);
         }
     }
 
@@ -1047,14 +1019,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
     SetFullHealth();
 
-    switch (GetEntry()) {
-    case 416: //Imp
-        SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
-        break;
-    default:
-        SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
-        break;
-    }
+    SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
     return true;
 }
 
