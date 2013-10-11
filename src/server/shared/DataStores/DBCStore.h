@@ -107,6 +107,8 @@ class DBCStorage
                 query += ';';
 
 
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE sql %s", query.c_str());
+
                 result = WorldDatabase.Query(query.c_str());
                 if (result)
                 {

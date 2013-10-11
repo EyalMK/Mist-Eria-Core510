@@ -272,7 +272,7 @@ inline void LoadDBC(uint32& availableDbcLocales, StoreProblemList& errors, DBCSt
     std::string dbcFilename = dbcPath + filename;
     SqlDbc * sql = NULL;
     if (customFormat)
-        sql = new SqlDbc(&filename, customFormat, customIndexName, storage.GetFormat());
+        sql = new SqlDbc(&filename, storage.GetFormat(), customIndexName, storage.GetFormat());
 
     if (storage.Load(dbcFilename.c_str(), sql))
     {
