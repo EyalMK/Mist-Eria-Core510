@@ -841,6 +841,9 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     if (pInfo)                                      // exist in DB
     {
         SetCreateHealth(pInfo->health);
+
+        //NOBODIE FCK IT ENERGY FOR PETS RIGHT NOW !
+        setPowerType(POWER_ENERGY);
         if (petType != HUNTER_PET) //hunter pet use focus
             SetCreateMana(pInfo->mana);
 
