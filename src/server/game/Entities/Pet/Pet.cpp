@@ -214,7 +214,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         case SUMMON_PET:
             petlevel = owner->getLevel();
 
-            SetUInt32Value(UNIT_FIELD_BYTES_0, 0x800); // class = mage
+            //SetUInt32Value(UNIT_FIELD_BYTES_0, 0x800); // class = mage
 
 
             switch (GetEntry()) {
