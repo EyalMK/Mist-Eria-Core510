@@ -258,7 +258,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     if (getPetType() == SUMMON_PET && !current)              //all (?) summon pets come with full health when called, but not when they are current
         switch (GetEntry()) {
         case 416: //Imp
-            SetPower(POWER_ENERGY, 100);
+            SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
             break;
         default:
             SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
@@ -277,7 +277,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
 
             switch (GetEntry()) {
             case 416: //Imp
-                SetPower(POWER_ENERGY, 100);
+                SetPower(POWER_ENERGY, savedmana > uint32(GetMaxPower(POWER_ENERGY)) ? GetMaxPower(POWER_ENERGY) : savedmana);
                 break;
             default:
                 SetPower(POWER_MANA, savedmana > uint32(GetMaxPower(POWER_MANA)) ? GetMaxPower(POWER_MANA) : savedmana);
@@ -1049,7 +1049,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
     switch (GetEntry()) {
     case 416: //Imp
-        SetPower(POWER_ENERGY, 100);
+        SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
         break;
     default:
         SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
