@@ -3078,8 +3078,6 @@ public:
     {
         npc_transcendanceAI(Creature* creature) : ScriptedAI(creature) {}
 
-        uint32 timer;
-
         void Reset()
         {
             if(Unit* owner = me->GetOwner())
@@ -3087,15 +3085,14 @@ public:
                 me->SetDisplayId(owner->GetDisplayId());
 
                 owner->CastSpell(me, 119051, true);
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : RESET OK");
             }
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "#### Debug Terah : display id = %d", me->GetDisplayId());
-            timer = 0;
         }
 
         void UpdateAI(uint32 const diff)
         {
-            timer+= diff;
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : TIMER %u", timer);
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : UPDATEAI : %u %u %u", me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
         }
     };
 
