@@ -248,6 +248,11 @@ void TempSummon::UnSummon(uint32 msTime)
     if (owner && owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsAIEnabled)
         owner->ToCreature()->AI()->SummonedCreatureDespawn(this);
 
+    if(GetEntry() == 54569)
+    {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : SUMMON JUST GOT UNSUMMONED m_type was : %u", m_type);
+    }
+
     AddObjectToRemoveList();
 }
 
