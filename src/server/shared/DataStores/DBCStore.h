@@ -186,7 +186,6 @@ class DBCStorage
                                     case FT_SORT:
                                         break;
                                     default:
-                                        validSqlColumn = false;
                                         break;
                                 }
                         }
