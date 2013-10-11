@@ -105,9 +105,45 @@ public:
     }
 };
 
+// 119996 - transcandence_transfert
+class spell_monk_transcandence_transfert : public SpellScriptLoader
+{
+public:
+    spell_monk_transcandence_transfert() : SpellScriptLoader("spell_monk_transcandence_transfert") { }
+
+    class spell_monk_transcandence_transfert_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_monk_transcandence_transfert_SpellScript);
+
+        void Hit()
+        {
+            if(Unit* target = GetHitUnit())
+            {
+                Position *petPos, *casterPos;
+                target->GetPosition(petPos);
+                GetCaster()->GetPosition(casterPos);
+
+                target->Relocate(casterPos);
+                GetCaster()->Relocate(petPos);
+            }
+        }
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_monk_transcandence_transfert_SpellScript::Hit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_monk_transcandence_transfert_SpellScript();
+    }
+};
+
 
 void AddSC_monk_spell_scripts()
 {
     new spell_monk_disable();
     new spell_monk_paralysis();
+    new spell_monk_transcandence_transfert();
 }
