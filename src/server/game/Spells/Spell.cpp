@@ -5963,8 +5963,8 @@ SpellCastResult Spell::CheckPower()
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE checkPower %u %u %u", powerType, m_powerCost, m_caster->GetPower(powerType));
 
-    for (int i=0 ; i< MAX_POWERS ; ++i) {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE power #%u : %u", i , m_caster->GetPower(i));
+    for (uint32 i=0 ; i< MAX_POWERS ; ++i) {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE power #%u : %u", i , m_caster->GetPower(Powers(i)));
     }
     if (int32(m_caster->GetPower(powerType)) < m_powerCost)
         return SPELL_FAILED_NO_POWER;
