@@ -168,13 +168,11 @@ public:
                         switch (fmt[columnNumber]) {
                         case FT_FLOAT:
                             *reinterpret_cast<float*>(&sqlDataTable[offset]) = fields[sqlColumnNumber].GetFloat();
-                            sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN 62388 data loaded : %f", (sqlDataTable[offset]) );
                             offset += 4;
                             break;
                         case FT_IND:
                         case FT_INT:
                             *reinterpret_cast<uint32*>(&sqlDataTable[offset]) = fields[sqlColumnNumber].GetUInt32();
-                            sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN 62388 data loaded : %u", (sqlDataTable[offset]) );
                             offset += 4;
                             break;
                         case FT_NA:
@@ -183,7 +181,6 @@ public:
                             break;
                         case FT_BYTE:
                             *reinterpret_cast<uint8*>(&sqlDataTable[offset]) = fields[sqlColumnNumber].GetUInt8();
-                            sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN 62388 data loaded : %u", (sqlDataTable[offset]) );
                             offset += 1;
                             break;
                         case FT_NA_BYTE:

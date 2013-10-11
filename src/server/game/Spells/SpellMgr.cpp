@@ -2630,7 +2630,7 @@ void SpellMgr::LoadSpellInfoStore()
         if (!effect)
             continue;
 
-        if(effect->EffectSpellId == 62388 && effect->EffectIndex == 0) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN 62388 correct load");
+        //if(effect->EffectSpellId == 62388 && effect->EffectIndex == 0) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN 62388 correct load");
         effectsBySpell[effect->EffectSpellId].effects[effect->EffectIndex] = effect;
     }
 
