@@ -224,8 +224,34 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recvData)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CREATURE_QUERY - NO CREATURE INFO! (GUID: %u, ENTRY: %u)",
             GUID_LOPART(guid), entry);
-        WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 4);
-        data << uint32(entry | 0x80000000);
+        WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 100);
+        data << uint32(entry);                              // creature entry
+        data << "Inconnu";
+
+        for (int i = 0; i < 7; i++)
+            data << uint8(0); // name2, ..., name8
+
+        data << "";
+        data << "";                               // "Directions" for guard, string for Icons 2.3.0
+        data << uint8(0);                                   // unk string
+        data << uint32(0);                     // flags
+        data << uint32(0);                    // unknown meaning
+        data << uint32(0);                           // CreatureType.dbc
+        data << uint32(0);                         // CreatureFamily.dbc
+        data << uint32(0);                           // Creature Rank (elite, boss, etc)
+        data << uint32(0);                  // new in 3.1, kill credit
+        data << uint32(0);                  // new in 3.1, kill credit
+        data << uint32(0);                       // Modelid1
+        data << uint32(0);                       // Modelid2
+        data << uint32(0);                       // Modelid3
+        data << uint32(0);                       // Modelid4
+        data << float(0);                       // dmg/hp modifier
+        data << float(0);                         // dmg/mana modifier
+        data << uint8(0);
+        for (uint32 i = 0; i < MAX_CREATURE_QUEST_ITEMS; ++i)
+            data << uint32(0);              // itemId[6], quest drop
+        data << uint32(0);                     // CreatureMovementInfo.dbc
+        data << uint32(0);               // unknown meaning
         SendPacket(&data);
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE");
     }
