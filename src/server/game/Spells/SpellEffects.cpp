@@ -4201,7 +4201,11 @@ void Spell::EffectAddComboPoints(SpellEffIndex /*effIndex*/)
         return;
 
     if(damage > 0)
+    {
+        //Shadow Blades
+        if(m_caster->m_movedPlayer->HasAura(121471)) damage++;
         m_caster->m_movedPlayer->AddComboPoints(unitTarget, damage, this);
+    }
     else
     {
         //Redirect : Rogue
