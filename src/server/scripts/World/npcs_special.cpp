@@ -3086,6 +3086,7 @@ public:
 
                 owner->CastSpell(me, 119051, true);
             }
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "#### Debug Terah : display id = %d", me->GetDisplayId());
         }
     };
 
