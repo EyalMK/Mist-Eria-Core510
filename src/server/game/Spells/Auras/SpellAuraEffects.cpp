@@ -5633,21 +5633,6 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
         {
             switch(GetSpellInfo()->Id)
             {
-                case 48018:
-                {
-                    if (GameObject *obj = target->GetGameObject(48018))
-                    {
-                        SpellInfo const* inf = sSpellMgr->GetSpellInfo(48020);
-                        if (inf && target->IsWithinDist(obj, inf->GetMaxRange(true)))
-                        {
-                            if (!target->HasAura(62388))
-                                target->CastSpell(target, 62388, true);
-                        }
-                        else
-                            target->RemoveAura(62388);
-                    }
-                    break;
-                }
                 case 629:
                 {
                     float modifier = 0.02f;
