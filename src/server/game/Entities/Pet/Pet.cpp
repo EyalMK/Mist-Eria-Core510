@@ -215,8 +215,6 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
             petlevel = owner->getLevel();
 
             SetUInt32Value(UNIT_FIELD_BYTES_0, 0x800); // class = mage
-            //NOBODIE FCK IT ENERGY FOR PETS RIGHT NOW !
-            setPowerType(POWER_ENERGY);
 
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
                                                             // this enables popup window (pet dismiss, cancel)
