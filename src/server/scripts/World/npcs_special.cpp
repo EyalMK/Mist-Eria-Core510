@@ -3082,7 +3082,8 @@ public:
         {
             if(Unit* owner = me->GetOwner())
             {
-                me->CastSpell(me, 119053, true);
+                me->SetDisplayId(owner->GetDisplayId());
+
                 owner->CastSpell(me, 119051, true);
             }
         }
