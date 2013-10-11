@@ -127,10 +127,10 @@ public:
                 GetCaster()->GetPosition(casterPos);
                 casterMapId = GetCaster()->GetMapId();
 
-                target->FarTeleportTo(GetCaster()->GetMap(), casterPos->GetPositionX(), casterPos->GetPositionY(), casterPos->GetPositionZ(), casterPos->GetOrientation());
+                //target->FarTeleportTo(GetCaster()->GetMap(), casterPos->GetPositionX(), casterPos->GetPositionY(), casterPos->GetPositionZ(), casterPos->GetOrientation());
 
-                if(GetCaster()->ToPlayer())
-                    GetCaster()->ToPlayer()->TeleportTo(petMapId, petPos->GetPositionX(), petPos->GetPositionY(), petPos->GetPositionZ(), petPos->GetOrientation());
+                //if(GetCaster()->ToPlayer())
+                    //GetCaster()->ToPlayer()->TeleportTo(petMapId, petPos->GetPositionX(), petPos->GetPositionY(), petPos->GetPositionZ(), petPos->GetOrientation());
 
             }
         }
