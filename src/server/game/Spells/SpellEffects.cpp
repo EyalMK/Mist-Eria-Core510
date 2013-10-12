@@ -3195,6 +3195,9 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                     if (Item* item = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
                         if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
                             totalDamagePercentMod *= 1.5f;
+
+				int32 bp0 = m_damage / 16.f; // 1/2 damage divided on 8 ticks
+				m_caster->CastCustomSpell(unitTarget, 89775, &bp0, NULL, NULL, true);
             }
             break;
         }
@@ -3360,31 +3363,6 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     uint32 damage = m_caster->MeleeDamageBonusDone(unitTarget, eff_damage, m_attackType, m_spellInfo);
 
     m_damage += unitTarget->MeleeDamageBonusTaken(m_caster, damage, m_attackType, m_spellInfo);
-
-
-
-	// Spell that apply an aura which depend of the total damage
-	switch(m_spellInfo->SpellFamilyName)
-	{
-		case SPELLFAMILY_ROGUE:
-		{
-			switch(m_spellInfo->Id)
-			{
-				case 16511:
-				{
-					int32 bp0 = m_damage / 2.f;
-					m_caster->CastCustomSpell(unitTarget, 89775, &bp0, NULL, NULL, true); 
-				}
-
-				default:
-					break;
-			}
-			break;
-		}
-		
-		default:
-			break;
-	}
 }
 
 void Spell::EffectThreat(SpellEffIndex /*effIndex*/)
