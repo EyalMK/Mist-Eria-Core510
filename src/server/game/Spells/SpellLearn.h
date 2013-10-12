@@ -30,8 +30,8 @@ private:
 	typedef std::map<uint32, std::list<uint32> > SpecializationSpecByClass;
 
 
-	SpellLearnMap sSpellLearnMap;
-	SpecializationSpecByClass sSpecializationMap;
+	SpellLearnMap * sSpellLearnMap;
+	SpecializationSpecByClass * sSpecializationMap;
 
 public:
 	void Load();
