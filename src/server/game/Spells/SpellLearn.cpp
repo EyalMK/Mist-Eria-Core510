@@ -19,7 +19,7 @@ void SpellLearnMgr::Load()
 	{
 		if(ChrSpecializationEntry const* specialisation = sChrSpecializationStore.LookupEntry(i))
 		{
-			(*sSpecializationMap)[specialisation->ClassId].push_back(specialisation->Id);
+			sSpecializationMap[specialisation->ClassId].push_back(specialisation->Id);
 		}
 	}
 
@@ -28,16 +28,16 @@ void SpellLearnMgr::Load()
 		if(ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(i))
 		{
 			//common branch without any spec
-			(*sSpecializationMap)[classEntry->ClassID].push_back(0);
+			sSpecializationMap[classEntry->ClassID].push_back(0);
 
-			(*sSpellLearnMap)[classEntry->ClassID] = new LevelsList;
+			sSpellLearnMap[classEntry->ClassID] = new LevelsList;
 			for(uint32 y = 0 ; y < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) ; y++)
 			{
-				(*sSpellLearnMap)[classEntry->ClassID]->push_back(new SpecialisationList);
+				sSpellLearnMap[classEntry->ClassID]->push_back(new SpecialisationList);
 				
-				for( std::list<uint32>::iterator itr = (*sSpecializationMap)[classEntry->ClassID].begin() ; itr != (*sSpecializationMap)[classEntry->ClassID].end() ; itr++ )
+				for( std::list<uint32>::iterator itr = sSpecializationMap[classEntry->ClassID].begin() ; itr != sSpecializationMap[classEntry->ClassID].end() ; itr++ )
 				{
-					(*((*((*sSpellLearnMap)[classEntry->ClassID]))[y]))[*itr] = new SpellList;
+					(*((*(sSpellLearnMap[classEntry->ClassID]))[y]))[*itr] = new SpellList;
 				}
 			}
 		}
@@ -74,8 +74,8 @@ void SpellLearnMgr::Load()
 		if(!classEntry)
 			continue;
 
-		std::list<uint32>::iterator iter = std::find((*sSpecializationMap)[classId].begin(), (*sSpecializationMap)[classId].end(), specId);
-		if (iter == (*sSpecializationMap)[classId].end())
+		std::list<uint32>::iterator iter = std::find(sSpecializationMap[classId].begin(), sSpecializationMap[classId].end(), specId);
+		if (iter == sSpecializationMap[classId].end())
 			continue;
 
 		if (faction > 3) faction = 0;
@@ -85,7 +85,7 @@ void SpellLearnMgr::Load()
 
 		// Add spell
 
-		((*((*((*sSpellLearnMap)[classId]))[level-1]))[specId])->push_back(spell);
+		((*((*(sSpellLearnMap[classId]))[level-1]))[specId])->push_back(spell);
 
 		++count;
 	} while (result->NextRow());
@@ -147,12 +147,12 @@ void SpellLearnMgr::UpdatePlayerSpells(Player* player)
 		return;
 
 
-	std::list<uint32>::iterator iter = std::find((*sSpecializationMap)[classid].begin(), (*sSpecializationMap)[classid].end(), spec);
-	if (iter == (*sSpecializationMap)[classid].end())
+	std::list<uint32>::iterator iter = std::find(sSpecializationMap[classid].begin(), sSpecializationMap[classid].end(), spec);
+	if (iter == sSpecializationMap[classid].end())
 		return;
 
 
-	if (LevelsList *levelsList = (*sSpellLearnMap)[classid])
+	if (LevelsList *levelsList = sSpellLearnMap[classid])
 	{
 		for(uint32 i = 0 ; i < level ; ++i)
 		{
