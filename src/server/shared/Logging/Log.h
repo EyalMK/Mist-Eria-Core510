@@ -60,7 +60,7 @@ class Log
 
     private:
         void vlog(LogFilterType f, LogLevel level, char const* str, va_list argptr);
-        void write(LogMessage* msg);
+        void write(LogMessage &msg);
 
         Logger* GetLoggerByType(LogFilterType filter);
         Appender* GetAppenderByName(std::string const& name);
