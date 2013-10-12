@@ -2630,6 +2630,7 @@ void SpellMgr::LoadSpellInfoStore()
         if (!effect)
             continue;
 
+        //if(effect->EffectSpellId == 62388 && effect->EffectIndex == 0) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN 62388 correct load");
         effectsBySpell[effect->EffectSpellId].effects[effect->EffectIndex] = effect;
     }
 
@@ -3675,6 +3676,38 @@ void SpellMgr::LoadSpellInfoCorrections()
                 break;
             case 126892:
                 spellInfo->CategoryRecoveryTime = 0;
+                break;
+			case 32268: // Portals Spells
+			case 17607:
+			case 33728:
+			case 17609:
+			case 17611:
+			case 35718:
+			case 17610:
+			case 32270:
+			case 17608:
+			case 17334:
+				spellInfo->Effects[0].Effect = SPELL_EFFECT_TELEPORT_UNITS;
+				spellInfo->Effects[0].TargetA = TARGET_DEST_DB;
+				break;
+            case 116095:
+                spellInfo->Effects[1].Amplitude = 100;
+                break;
+            case 30482:
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
+                spellInfo->Effects[EFFECT_1].MiscValue = 1;
+                spellInfo->Effects[EFFECT_1].BasePoints = -6;
+                break;
+            case 97463:
+                spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(1); //10sec
+                break;
+            case 115750:
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
+                break;
+            case 76577:
+            case 88611:
+            case 128829:
+                spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(28); //5sec
                 break;
             default:
                 break;

@@ -436,7 +436,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS] =
     &AuraEffect::HandleNULL,                                      //375
     &AuraEffect::HandleNULL,                                      //376
     &AuraEffect::HandleNULL,                                      //377
-    &AuraEffect::HandleNULL,                                      //378
+    &AuraEffect::HandleNULL,                                      //378 SPELL_AURA_MOD_PHYSICAL_DAMAGE_TAKEN_PCT
     &AuraEffect::HandleNULL,                                      //379
     &AuraEffect::HandleNULL,                                      //380
     &AuraEffect::HandleNULL,                                      //381
@@ -465,7 +465,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS] =
     &AuraEffect::HandleNULL,                                      //404
     &AuraEffect::HandleNULL,                                      //405
     &AuraEffect::HandleNULL,                                      //406
-    &AuraEffect::HandleNULL,                                      //407
+    &AuraEffect::HandleModFear,                                   //407 SPELL_AURA_MOD_FEAR2
     &AuraEffect::HandleNULL,                                      //408
     &AuraEffect::HandleNULL,                                      //409
     &AuraEffect::HandleNULL,                                      //410
@@ -3984,16 +3984,16 @@ void AuraEffect::HandleAuraModIncreaseHealth(AuraApplication const* aurApp, uint
 
     if (apply)
     {
-        target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_VALUE, float(GetAmount()), apply);
-        target->ModifyHealth(GetAmount());
+        target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_VALUE, float( GetAmount()), apply);
+        target->ModifyHealth( GetAmount());
     }
     else
     {
-        if (int32(target->GetHealth()) > GetAmount())
-            target->ModifyHealth(-GetAmount());
+        if (int32(target->GetHealth()) >  GetAmount())
+            target->ModifyHealth(- GetAmount());
         else
             target->SetHealth(1);
-        target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_VALUE, float(GetAmount()), apply);
+        target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_VALUE, float( GetAmount()), apply);
     }
 }
 
@@ -4907,6 +4907,11 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
 
     // AT APPLY & REMOVE
 
+    //if(m_spellInfo->Id == 62388)
+    //{
+    //    sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : 62388 EFFECT PASSE");
+    //}
+
     switch (m_spellInfo->SpellFamilyName)
     {
         case SPELLFAMILY_GENERIC:
@@ -5065,6 +5070,25 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
         {
             //if (!(mode & AURA_EFFECT_HANDLE_REAL))
             //    break;
+            break;
+        }
+        case SPELLFAMILY_ROGUE:
+        {
+            switch(GetId())
+            {
+                // Smoke bomb
+                case 76577:
+                {
+                    if(apply)
+                    {
+                        GetCaster()->CastSpell(GetCaster(), 88611, true);
+                        GetCaster()->CastSpell(GetCaster(), 128829, true);
+                    }
+                    else
+                        target->RemoveAura(88611);
+                    break;
+                }
+            }
             break;
         }
     }
@@ -5611,20 +5635,28 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
             }
             break;
         case SPELLFAMILY_WARLOCK:
-            if(GetSpellInfo()->Id == 629)
+        {
+            switch(GetSpellInfo()->Id)
             {
-                float modifier = 0.02f;
-                if(caster->HasAura(74434)) //soulburn
+                case 629:
                 {
-                    modifier = 0.03f;
-                    caster->RemoveAura(74434);
-                }
-                int32 bp0 = int32(modifier * caster->GetMaxHealth());
+                    float modifier = 0.02f;
+                    if(caster->HasAura(74434)) //soulburn
+                    {
+                        modifier = 0.03f;
+                        caster->RemoveAura(74434);
+                    }
+                    int32 bp0 = int32(modifier * caster->GetMaxHealth());
 
-                if(caster)
-                    caster->CastCustomSpell(caster, 107545, &bp0, NULL, NULL, true);
+                    if(caster)
+                        caster->CastCustomSpell(caster, 107545, &bp0, NULL, NULL, true);
+                break;
+                }
+            default:
+                break;
             }
             break;
+        }            
         default:
             break;
     }

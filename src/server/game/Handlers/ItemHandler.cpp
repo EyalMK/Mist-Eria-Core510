@@ -330,20 +330,20 @@ void WorldSession::SendItemSparseDb2Reply(uint32 entry)
     data << uint32(sObjectMgr->GetHotfixDate(entry, DB2_REPLY_SPARSE));
 
     ByteBuffer buff;
-    buff << uint32(entry);
-    buff << uint32(proto->Quality);
+    buff << uint32(entry); //OK
+    buff << uint32(proto->Quality);//OK
     buff << uint32(proto->Flags);
     buff << uint32(proto->Flags2);
     buff << float(proto->Unk430_1);
     buff << float(proto->Unk430_2);
-    buff << uint32(proto->BuyCount);
-    buff << int32(proto->BuyPrice);
-    buff << uint32(proto->SellPrice);
+    buff << uint32(proto->BuyCount);//OK
+    buff << int32(proto->BuyPrice);//OK
+    buff << uint32(proto->SellPrice);//OK
     buff << uint32(proto->InventoryType);
-    buff << int32(proto->AllowableClass);
-    buff << int32(proto->AllowableRace);
-    buff << uint32(proto->ItemLevel);
-    buff << uint32(proto->RequiredLevel);
+    buff << int32(proto->AllowableClass);//OK
+    buff << int32(proto->AllowableRace);//OK
+    buff << uint32(proto->ItemLevel); //OK
+    buff << uint32(proto->RequiredLevel); //OK
     buff << uint32(proto->RequiredSkill);
     buff << uint32(proto->RequiredSkillRank);
     buff << uint32(proto->RequiredSpell);
@@ -351,8 +351,8 @@ void WorldSession::SendItemSparseDb2Reply(uint32 entry)
     buff << uint32(proto->RequiredCityRank);
     buff << uint32(proto->RequiredReputationFaction);
     buff << uint32(proto->RequiredReputationRank);
-    buff << int32(proto->MaxCount);
-    buff << int32(proto->Stackable);
+    buff << int32(proto->MaxCount); //OK
+    buff << int32(proto->Stackable); //OK
     buff << uint32(proto->ContainerSlots);
 
     for (uint32 x = 0; x < MAX_ITEM_PROTO_STATS; ++x)
@@ -390,16 +390,16 @@ void WorldSession::SendItemSparseDb2Reply(uint32 entry)
     for (uint32 x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
         buff << int32(proto->Spells[x].SpellCategoryCooldown);
 
-    buff << uint32(proto->Bonding);
+    buff << uint32(proto->Bonding); //OK
 
     // item name
     std::string name = proto->Name1;
-    buff << uint16(name.length());
+    buff << uint16(name.length()); //OK
     if (name.length())
-        buff << name;
+        buff << name; //OK
 
     for (uint32 i = 0; i < 3; ++i) // other 3 names
-        buff << uint16(0);
+        buff << uint16(0); //OK
 
     std::string desc = proto->Description;
     buff << uint16(desc.length());

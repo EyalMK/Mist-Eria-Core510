@@ -258,7 +258,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
 	&Spell::EffectNULL,                                     //185 SPELL_EFFECT_185
 	&Spell::EffectNULL,                                     //186 SPELL_EFFECT_186
 	&Spell::EffectNULL,                                     //187 SPELL_EFFECT_187
-	&Spell::EffectNULL,                                     //188 SPELL_EFFECT_188
+	&Spell::EffectNULL,                                     //188 SPELL_EFFECT_STAMPEDE
 	&Spell::EffectNULL,                                     //189 SPELL_EFFECT_189
 	&Spell::EffectNULL,                                     //190 SPELL_EFFECT_190
 	&Spell::EffectNULL,                                     //191 SPELL_EFFECT_191
@@ -624,9 +624,28 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
     // selection by spell family
     switch (m_spellInfo->SpellFamilyName)
     {
+        case SPELLFAMILY_PRIEST:
+        {
+            switch(m_spellInfo->Id)
+            {
+                case 1706:
+                {
+                    m_caster->CastSpell(unitTarget, 27986, true);
+                    break;
+                }
+            default:
+                break;
+            }
+            break;
+        }
         case SPELLFAMILY_PALADIN:
             switch (m_spellInfo->Id)
             {
+                case 115750:
+                {
+                    m_caster->CastSpell(unitTarget, 105421, true);
+                    break;
+                }
                 case 31789:                                 // Righteous Defense (step 1)
                 {
                     // Clear targets for eff 1
@@ -722,11 +741,28 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     return;
                 }
                 case 115546:
+                {
+                    m_caster->CastSpell(unitTarget, 116189, true);
+                    m_caster->CastSpell(unitTarget, 130793, true);
+                    break;
+                }
+                case 115921:
+                {
+                    Player* caster = m_caster->ToPlayer();
+                    Player* target = unitTarget->ToPlayer();
+                    if (caster && target && caster->IsInSameGroupWith(target))
                     {
-                        m_caster->CastSpell(unitTarget, 116189, true);
-                        m_caster->CastSpell(unitTarget, 130793, true);
-                        break;
+                        caster->CastSpell(target, 117666, true);
                     }
+                    else
+                        m_caster->CastSpell(unitTarget, 117667, true);
+                    break;
+                }
+                case 115203:
+                {
+                    m_caster->CastSpell(unitTarget, 126456, true);
+                    break;
+                }
                 default:
                     break;
             }
@@ -741,6 +777,25 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     break;
             }
             break;
+        case SPELLFAMILY_WARRIOR:
+        {
+            switch(m_spellInfo->Id)
+            {
+                case 97462:
+                {
+                    m_caster->CastSpell(unitTarget, 122507, true);
+                    break;
+                }
+                case 122507:
+                {
+                    m_caster->CastSpell(unitTarget, 97463, true);
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -1097,11 +1152,15 @@ void Spell::CalculateJumpSpeeds(uint8 i, float dist, float & speedXY, float & sp
 
 void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
 {
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "Teleport %u", m_spellInfo->Id);
+
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
     if (!unitTarget || unitTarget->isInFlight())
         return;
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "Teleport2 %u", m_spellInfo->Id);
 
     // Pre effects
     switch (m_spellInfo->Id)
@@ -1136,7 +1195,7 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
     // If not exist data for dest location - return
     if (!m_targets.HasDst())
     {
-        sLog->outError(LOG_FILTER_SPELLS_AURAS, "Spell::EffectTeleportUnits - does not have destination for spellId %u.", m_spellInfo->Id);
+        sLog->outError(LOG_FILTER_NETWORKIO, "Spell::EffectTeleportUnits - does not have destination for spellId %u.", m_spellInfo->Id);
         return;
     }
 
@@ -1148,7 +1207,7 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
     destTarget->GetPosition(x, y, z, orientation);
     if (!orientation && m_targets.GetUnitTarget())
         orientation = m_targets.GetUnitTarget()->GetOrientation();
-    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell::EffectTeleportUnits - teleport unit to %u %f %f %f %f\n", mapid, x, y, z, orientation);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "Spell::EffectTeleportUnits - teleport unit to %u %f %f %f %f\n", mapid, x, y, z, orientation);
 
     if (mapid == unitTarget->GetMapId())
         unitTarget->NearTeleportTo(x, y, z, orientation, unitTarget == m_caster);
@@ -1260,6 +1319,8 @@ void Spell::EffectApplyAura(SpellEffIndex effIndex)
     if (!m_spellAura || !unitTarget)
         return;
     ASSERT(unitTarget == m_spellAura->GetOwner());
+
+    //if(m_spellInfo->Id == 62388) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN 62388 AURA PASSE");
     m_spellAura->_ApplyEffectForTargets(effIndex);
 }
 
@@ -1441,6 +1502,10 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         else if(m_spellInfo->Id == 89653) //drain life
         {
             addhealth = unitTarget->GetMaxHealth() * 0.02f;
+        }
+        else if(m_spellInfo->Id == 52042)
+        {
+            addhealth = m_caster->GetOwner()->CalculateSpellDamage(unitTarget, m_spellInfo, effIndex, &m_spellInfo->Effects[EFFECT_0].BasePoints);
         }
         // Swiftmend - consumes Regrowth or Rejuvenation
         else if (m_spellInfo->TargetAuraState == AURA_STATE_SWIFTMEND && unitTarget->HasAuraState(AURA_STATE_SWIFTMEND, m_spellInfo, m_caster))
@@ -4134,10 +4199,21 @@ void Spell::EffectAddComboPoints(SpellEffIndex /*effIndex*/)
     if (!m_caster->m_movedPlayer)
         return;
 
-    if (damage <= 0)
+    if (damage < 0)
         return;
 
-    m_caster->m_movedPlayer->AddComboPoints(unitTarget, damage, this);
+    if(damage > 0)
+    {
+        //Shadow Blades
+        if(m_caster->m_movedPlayer->HasAura(121471)) damage++;
+        m_caster->m_movedPlayer->AddComboPoints(unitTarget, damage, this);
+    }
+    else
+    {
+        //Redirect : Rogue
+        if(m_spellInfo->Id == 73981 && m_caster->m_movedPlayer->GetComboPoints() > 0 && m_caster->m_movedPlayer->GetComboTarget())
+            m_caster->m_movedPlayer->AddComboPoints(unitTarget, m_caster->m_movedPlayer->GetComboPoints(), this);
+    }
 }
 
 void Spell::EffectDuel(SpellEffIndex effIndex)

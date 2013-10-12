@@ -97,7 +97,7 @@ class boss_taran_zhu : public CreatureScript
 public:
 	boss_taran_zhu() : CreatureScript("boss_taran_zhu") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new boss_taran_zhuAI(creature);
 	}
@@ -115,10 +115,10 @@ public:
 		bool checkTaranZhuAlive;
 		
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkTaranZhuAlive = true;
-			checkTaranZhuAlive = me->IsAlive();
+			checkTaranZhuAlive = me->isAlive();
 						
 			events.Reset();
 
@@ -133,31 +133,31 @@ public:
 			
 		}
 		
-		void CastSpellHazeOfHate() OVERRIDE
+		void CastSpellHazeOfHate()
 		{
 			Map::PlayerList const &playerList = me->GetMap()->GetPlayers();
 			if (!playerList.isEmpty())
 			{
 				for (Map::PlayerList::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
 				{
-					DoCast(i->GetSource(), SPELL_HAZE_OF_HATE); //A test
+					DoCast(i->getSource(), SPELL_HAZE_OF_HATE); //A test
 				}
 			}
 		}
 
-		void CastSpellMedidate() OVERRIDE
+		void CastSpellMedidate()
 		{
 			Map::PlayerList const &playerList = me->GetMap()->GetPlayers();
 			if (!playerList.isEmpty())
 			{
 				for (Map::PlayerList::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
 				{
-					DoCast(i->GetSource(), SPELL_MEDIDATE); //A test
+					DoCast(i->getSource(), SPELL_MEDIDATE); //A test
 				}
 			}
 		}
 
-		void DoAction(int32 action) OVERRIDE
+		void DoAction(int32 action)
         {
             switch (action)
             {
@@ -174,7 +174,7 @@ public:
 			}
         }
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			if (instance)
 			{
@@ -195,19 +195,19 @@ public:
 			
 		}
 
-		void KilledUnit(Unit *pWho) OVERRIDE
+		void KilledUnit(Unit *pWho)
 		{
 			Talk(SAY_SLAY);
 		}
 		
-		void EnterEvadeMode() OVERRIDE
+		void EnterEvadeMode()
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_TARAN_ZHU, FAIL);	
 			Talk(SAY_EVADE);
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_TARAN_ZHU, IN_PROGRESS);
@@ -222,7 +222,7 @@ public:
 			events.ScheduleEvent(EVENT_SHA_BLAST, 180*IN_MILLISECONDS, 0, PHASE_COMBAT);
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
@@ -301,7 +301,7 @@ class npc_taran_intro_trigger : public CreatureScript
 public:
 	npc_taran_intro_trigger() : CreatureScript("npc_taran_intro_trigger") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_taran_intro_triggerAI(creature);
 	}
@@ -318,7 +318,7 @@ public:
 		
 		bool checkTrigger; 
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkTrigger = true;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
@@ -328,17 +328,17 @@ public:
 			//ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilité du PNJ par les joueurs.
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			if(checkTrigger)
 			{
@@ -347,7 +347,7 @@ public:
 				{
 					for (Map::PlayerList::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
 					{
-						if (me->GetExactDist2d(i->GetSource()->GetPositionX(),i->GetSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
+						if (me->GetExactDist2d(i->getSource()->GetPositionX(),i->getSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
 						{
 							if (instance)
 								if (Creature* taran = me->GetCreature(*me, instance->GetData64(DATA_BOSS_TARAN_ZHU)))
@@ -369,7 +369,7 @@ class npc_gripping_hatred : public CreatureScript
 public:
 	npc_gripping_hatred() : CreatureScript("npc_gripping_hatred") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_gripping_hatredAI(creature);
 	}
@@ -384,28 +384,28 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 		
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);  
 		}
 
-		void JustSummoned(Creature* creature) OVERRIDE
+		void JustSummoned(Creature* creature)
 		{
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);  
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 			events.ScheduleEvent(EVENT_POOL_OF_SHADOWS, 2*IN_MILLISECONDS);
 			events.ScheduleEvent(EVENT_GRIP_OF_HATE, 10*IN_MILLISECONDS);
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			if(!UpdateVictim())
 				return;

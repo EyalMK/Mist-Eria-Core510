@@ -162,7 +162,7 @@ class boss_lorewalker_stonestep : public CreatureScript
 public:
 	boss_lorewalker_stonestep() : CreatureScript("boss_lorewalker_stonestep") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new boss_lorewalker_stonestepAI(creature);
 	}
@@ -179,10 +179,10 @@ public:
 		
 		bool checkLorewalkerStonestepAlive;
 		
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkLorewalkerStonestepAlive = true;
-			checkLorewalkerStonestepAlive = me->IsAlive();
+			checkLorewalkerStonestepAlive = me->isAlive();
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -252,7 +252,7 @@ public:
 			
 		}
 
-		void DoAction(int32 action) OVERRIDE
+		void DoAction(int32 action)
         {
             switch (action)
             {
@@ -293,23 +293,23 @@ public:
 			}
         }
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			
 		}
 
-		void KilledUnit(Unit *pWho) OVERRIDE
+		void KilledUnit(Unit *pWho)
 		{
 
 		}
 		
-		void EnterEvadeMode() OVERRIDE
+		void EnterEvadeMode()
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, FAIL);	
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, IN_PROGRESS);
@@ -317,7 +317,7 @@ public:
 			me->SetInCombatWithZone();
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
@@ -385,7 +385,7 @@ class npc_zao_sunseeker : public CreatureScript
 public:
 	npc_zao_sunseeker() : CreatureScript("npc_zao_sunseeker") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_zao_sunseekerAI(creature);
 	}
@@ -406,13 +406,13 @@ public:
 		int checkEvadeMode;
 		bool checkTransition;
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkTransition = true;
 			counterHauntingShaDeath = 0;
 			counterHauntingShaTransition = 0;
 			checkZaoSunseekerAlive = true;
-			checkZaoSunseekerAlive = me->IsAlive();
+			checkZaoSunseekerAlive = me->isAlive();
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -437,7 +437,7 @@ public:
 
 		}
 
-		void DoAction(int32 action) OVERRIDE
+		void DoAction(int32 action)
 		{
 			switch (action)
             {
@@ -462,7 +462,7 @@ public:
 			}
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			DoCastToAllHostilePlayers(SPELL_LOREWALKERS_ALACRITY);
 			if (instance)
@@ -480,17 +480,17 @@ public:
 			}
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 			me->SetInCombatWithZone();
 		}
 
-		void EnterEvadeMode() OVERRIDE
+		void EnterEvadeMode()
 		{
 			checkEvadeMode = 1;
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			if(!UpdateVictim())
 				return;
@@ -592,7 +592,7 @@ class npc_sun : public CreatureScript
 public:
 	npc_sun() : CreatureScript("npc_sun") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_sunAI(creature);
 	}
@@ -610,10 +610,10 @@ public:
 		bool checkSunAlive;
 		int checkEvadeMode;
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkSunAlive = true;
-			checkSunAlive = me->IsAlive();
+			checkSunAlive = me->isAlive();
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -638,7 +638,7 @@ public:
 			}
 		}
 
-		void DoAction(int32 action) OVERRIDE
+		void DoAction(int32 action)
 		{
 			switch (action)
             {
@@ -657,25 +657,25 @@ public:
 			}
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			me->SummonCreature(HAUNTING_SHA, (me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 80*IN_MILLISECONDS);
 			me->AI()->DoAction(ACTION_NPC_SUN_DIED);
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 			me->SetInCombatWithZone();
 			events.SetPhase(PHASE_COMBAT);
 			events.ScheduleEvent(EVENT_SUNFIRE_RAYS, 0, 0, PHASE_COMBAT);
 		}
 
-		void EnterEvadeMode() OVERRIDE
+		void EnterEvadeMode()
 		{
 			checkEvadeMode = 1;
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			if(!UpdateVictim())
 				return;
@@ -715,7 +715,7 @@ class npc_haunting_sha : public CreatureScript
 public:
 	npc_haunting_sha() : CreatureScript("npc_haunting_sha") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_haunting_shaAI(creature);
 	}
@@ -732,7 +732,7 @@ public:
 
 		int checkEvadeMode;
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			events.Reset();
 			if(checkEvadeMode == 1)
@@ -747,7 +747,7 @@ public:
 				}
 		}
 
-		void JustSummoned(Creature* creature) OVERRIDE
+		void JustSummoned(Creature* creature)
 		{
 			events.Reset();
 			if(checkEvadeMode == 1)
@@ -762,7 +762,7 @@ public:
 				}
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			if (instance)
 			{
@@ -775,18 +775,18 @@ public:
 
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 			me->SetInCombatWithZone();
 			events.ScheduleEvent(EVENT_HAUNTING_GAZE, 6*IN_MILLISECONDS);
 		}
 
-		void EnterEvadeMode() OVERRIDE
+		void EnterEvadeMode()
 		{
 			checkEvadeMode = 1;
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			if(!UpdateVictim())
 				return;
@@ -827,7 +827,7 @@ class npc_haunting_sha_transition : public CreatureScript
 public:
 	npc_haunting_sha_transition() : CreatureScript("npc_haunting_sha_transition") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_haunting_sha_transitionAI(creature);
 	}
@@ -842,7 +842,7 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			events.Reset();
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -856,7 +856,7 @@ public:
 				}
 		}
 
-		void JustSummoned(Creature* creature) OVERRIDE
+		void JustSummoned(Creature* creature)
 		{
 			events.Reset();
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -870,20 +870,20 @@ public:
 				}
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 		}
 
-		void EnterEvadeMode() OVERRIDE
+		void EnterEvadeMode()
 		{
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			if(!UpdateVictim())
 				return;
@@ -912,7 +912,7 @@ class npc_lorewalker_intro_trigger : public CreatureScript
 public:
 	npc_lorewalker_intro_trigger() : CreatureScript("npc_lorewalker_intro_trigger") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_lorewalker_intro_triggerAI(creature);
 	}
@@ -929,7 +929,7 @@ public:
 		
 		bool checkTrigger; 
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkTrigger = true;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
@@ -939,17 +939,17 @@ public:
 			//ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilité du PNJ par les joueurs.
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			if(checkTrigger)
 			{
@@ -958,7 +958,7 @@ public:
 				{
 					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 					{
-						if (me->GetExactDist2d(i->GetSource()->GetPositionX(),i->GetSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
+						if (me->GetExactDist2d(i->getSource()->GetPositionX(),i->getSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
 						{
 							if (instance)
 								if (Creature* lorewalker = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LOREWALKER_STONESTEP)))
@@ -980,7 +980,7 @@ class npc_lorewalker_intro_trigger_2 : public CreatureScript
 public:
 	npc_lorewalker_intro_trigger_2() : CreatureScript("npc_lorewalker_intro_trigger_2") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_lorewalker_intro_trigger_2AI(creature);
 	}
@@ -997,7 +997,7 @@ public:
 		
 		bool checkTrigger; 
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkTrigger = true;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
@@ -1007,17 +1007,17 @@ public:
 			//ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilité du PNJ par les joueurs.
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			if(checkTrigger)
 			{
@@ -1026,7 +1026,7 @@ public:
 				{
 					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 					{
-						if (me->GetExactDist2d(i->GetSource()->GetPositionX(),i->GetSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
+						if (me->GetExactDist2d(i->getSource()->GetPositionX(),i->getSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
 						{
 							if (instance)
 								if (Creature* lorewalker = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LOREWALKER_STONESTEP)))
@@ -1048,7 +1048,7 @@ class npc_lorewalker_intro_trigger_3 : public CreatureScript
 public:
 	npc_lorewalker_intro_trigger_3() : CreatureScript("npc_lorewalker_intro_trigger_3") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_lorewalker_intro_trigger_3AI(creature);
 	}
@@ -1065,7 +1065,7 @@ public:
 		
 		bool checkTrigger; 
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkTrigger = true;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
@@ -1075,17 +1075,17 @@ public:
 			//ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilité du PNJ par les joueurs.
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			if(checkTrigger)
 			{
@@ -1094,7 +1094,7 @@ public:
 				{
 					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 					{
-						if (me->GetExactDist2d(i->GetSource()->GetPositionX(),i->GetSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
+						if (me->GetExactDist2d(i->getSource()->GetPositionX(),i->getSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
 						{
 							if (instance)
 								if (Creature* lorewalker = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LOREWALKER_STONESTEP)))
@@ -1116,7 +1116,7 @@ class npc_lorewalker_intro_trigger_4 : public CreatureScript
 public:
 	npc_lorewalker_intro_trigger_4() : CreatureScript("npc_lorewalker_intro_trigger_4") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_lorewalker_intro_trigger_4AI(creature);
 	}
@@ -1133,7 +1133,7 @@ public:
 		
 		bool checkTrigger; 
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkTrigger = true;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
@@ -1143,17 +1143,17 @@ public:
 			//ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilité du PNJ par les joueurs.
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			if(checkTrigger)
 			{
@@ -1162,7 +1162,7 @@ public:
 				{
 					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 					{
-						if (me->GetExactDist2d(i->GetSource()->GetPositionX(),i->GetSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
+						if (me->GetExactDist2d(i->getSource()->GetPositionX(),i->getSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
 						{
 							if (instance)
 								if (Creature* lorewalker = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LOREWALKER_STONESTEP)))
@@ -1184,7 +1184,7 @@ class npc_corrupted_scroll : public CreatureScript
 public:
 	npc_corrupted_scroll() : CreatureScript("npc_corrupted_scroll") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_corrupted_scrollAI(creature);
 	}
@@ -1200,12 +1200,12 @@ public:
 		EventMap events;
 		
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			if (instance)
 				if (Creature* lorewalker = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LOREWALKER_STONESTEP)))
@@ -1215,12 +1215,12 @@ public:
 					}
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			
 		}

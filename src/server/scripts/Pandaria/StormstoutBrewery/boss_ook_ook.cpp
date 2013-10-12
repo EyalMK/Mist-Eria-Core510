@@ -21,7 +21,7 @@ public :
 
     }
 
-    CreatureAI* GetAI(Creature *pCreature) const OVERRIDE
+    CreatureAI* GetAI(Creature *pCreature) const
     {
         return new boss_ook_ook_AI(pCreature);
     }
@@ -34,7 +34,7 @@ public :
             p_instance = pCreature->GetInstanceScript();
         }
 
-        void Reset() OVERRIDE
+        void Reset()
         {
             // if(p_instance)
             //    p_instance->SetData(DATA_OOK_OOK, NOT_STARTED);
@@ -43,7 +43,7 @@ public :
             m_bIsLifeUnder90Pct = false ;
         }
 
-        void EnterCombat(Unit *pWho) OVERRIDE
+        void EnterCombat(Unit *pWho)
         {
             // if(p_instance)
                 // p_instance->SetData(DATA_OOK_OOK, IN_PROGRESS);
@@ -52,13 +52,13 @@ public :
             events.ScheduleEvent(EVENT_GROUND_POUND, 10000);
         }
 
-        void EnterEvadeMode() OVERRIDE
+        void EnterEvadeMode()
         {
             // if(p_instance)
                 // p_instance->SetData(DATA_OOK_OOK, FAIL);
         }
 
-        void JustDied(Unit *killer) OVERRIDE
+        void JustDied(Unit *killer)
         {
             me->MonsterYell(SAY_DEATH, 0, 0);
 
@@ -66,12 +66,12 @@ public :
                 // p_instance->SetData(DATA_OOK_OOK, DONE);
         }
 
-        void KilledUnit(Unit *pWho) OVERRIDE
+        void KilledUnit(Unit *pWho)
         {
             me->MonsterYell(SAY_KILL, 0, 0);
         }
 
-        void DoAction(int32 action) OVERRIDE
+        void DoAction(int32 action)
         {
             switch(action)
             {
@@ -95,7 +95,7 @@ public :
             }
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff)
         {
             if(!UpdateVictim())
                 return ;
@@ -169,7 +169,7 @@ public :
 
     }
 
-    CreatureAI* GetAI(Creature *pCreature) const OVERRIDE
+    CreatureAI* GetAI(Creature *pCreature) const
     {
         return new npc_rolling_barrel_AI(pCreature);
     }
@@ -182,7 +182,7 @@ public :
             p_instance = pCreature->GetInstanceScript();
         }
 
-        void JustSummoned(Creature *summon) OVERRIDE
+        void JustSummoned(Creature *summon)
         {
             m_uiCheckTimer = 500 ;
             // switch(me->GetPositionX())
@@ -230,7 +230,7 @@ public :
                 for(Map::PlayerList::const_iterator citer = players.begin() ; citer != players.end() ; ++citer)
                 {
                     Position pos ;
-                    Player* p = citer->GetSource();
+                    Player* p = citer->getSource();
 
                     p->GetPosition(&pos);
 
@@ -280,7 +280,7 @@ public :
             m_uiCheckTimer = 100 ;
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff)
         {
             if(m_uiCheckTimer <= diff)
                 Check();
@@ -307,7 +307,7 @@ public :
 
     }
 
-    CreatureAI* GetAI(Creature *pCreature) const OVERRIDE
+    CreatureAI* GetAI(Creature *pCreature) const
     {
         return new npc_barrel_threwer_AI(pCreature);
     }
@@ -320,7 +320,7 @@ public :
 
         }
 
-        void Reset() OVERRIDE
+        void Reset()
         {
             m_uiThrewTimer = 10000 ;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
@@ -334,7 +334,7 @@ public :
             m_uiThrewTimer = 10000 ;
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff)
         {
             if(m_uiThrewTimer <= diff)
                 CastBarrel();
@@ -386,7 +386,7 @@ public :
             // }
         }
 
-        void Register() OVERRIDE
+        void Register()
         {
             OnEffectLaunch += SpellEffectFn(spell_ook_ook_going_banana_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }

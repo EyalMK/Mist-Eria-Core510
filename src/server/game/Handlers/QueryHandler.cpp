@@ -48,12 +48,12 @@ enum DBQueryType
     BattlePetSpeciesXAbility   = 0x44237314,
     BattlePetState             = 0x8F447330,
     BattlePetVisual            = 0xC3ADEB43,*/
-    DB_QUERY_NPC_TEXT                   = 0x021826BB
+    DB_QUERY_NPC_TEXT          = 0x021826BB,
     /*Creature                   = 0xC9D6B6B3,
-    GameObjects                = 0x13C403A5,
-    ItemSparse                 = 0x919BE54E,
-    Item                       = 0x50238EC2,
-    ItemCurrencyCost           = 0x6FE05AE9,
+    GameObjects                = 0x13C403A5,*/
+    DB_QUERY_ITEM_SPARSE       = 0x919BE54E,
+    DB_QUERY_ITEM              = 0x50238EC2,
+    /*ItemCurrencyCost           = 0x6FE05AE9,
     ItemExtendedCost           = 0xBB858355,
     ItemUpgrade                = 0x7006463B,
     KeyChain                   = 0x6D8A2694,
@@ -224,8 +224,34 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recvData)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CREATURE_QUERY - NO CREATURE INFO! (GUID: %u, ENTRY: %u)",
             GUID_LOPART(guid), entry);
-        WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 4);
-        data << uint32(entry | 0x80000000);
+        WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 100);
+        data << uint32(entry);                              // creature entry
+        data << "Inconnu";
+
+        for (int i = 0; i < 7; i++)
+            data << uint8(0); // name2, ..., name8
+
+        data << "";
+        data << "";                               // "Directions" for guard, string for Icons 2.3.0
+        data << uint8(0);                                   // unk string
+        data << uint32(0);                     // flags
+        data << uint32(0);                    // unknown meaning
+        data << uint32(0);                           // CreatureType.dbc
+        data << uint32(0);                         // CreatureFamily.dbc
+        data << uint32(0);                           // Creature Rank (elite, boss, etc)
+        data << uint32(0);                  // new in 3.1, kill credit
+        data << uint32(0);                  // new in 3.1, kill credit
+        data << uint32(0);                       // Modelid1
+        data << uint32(0);                       // Modelid2
+        data << uint32(0);                       // Modelid3
+        data << uint32(0);                       // Modelid4
+        data << float(0);                       // dmg/hp modifier
+        data << float(0);                         // dmg/mana modifier
+        data << uint8(0);
+        for (uint32 i = 0; i < MAX_CREATURE_QUEST_ITEMS; ++i)
+            data << uint32(0);              // itemId[6], quest drop
+        data << uint32(0);                     // CreatureMovementInfo.dbc
+        data << uint32(0);               // unknown meaning
         SendPacket(&data);
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE");
     }
@@ -458,34 +484,33 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_NPC_TEXT_UPDATE");
 }
 
-
-void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, uint32 l_LocalTextID)
+void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, uint32 p_LocalTextID)
 {
-    GossipText const* p_Gossip = sObjectMgr->GetGossipText(l_LocalTextID);
+    GossipText const* l_Gossip = sObjectMgr->GetGossipText(p_LocalTextID);
     std::string l_Text1 = "Greetings $N";
     std::string l_Text2 = "Greetings $N";
     uint32 l_Language = 0;
 
-    if (p_Gossip) {
-        if (p_Gossip->Options[0].Text_0.size())
-            l_Text1 = p_Gossip->Options[0].Text_0;
-        if (p_Gossip->Options[0].Text_1.size())
-            l_Text2 = p_Gossip->Options[0].Text_1;
-        l_Language = p_Gossip->Options[0].Language;
+    if (l_Gossip) 
+    {
+        if (l_Gossip->Options[0].Text_0.size())
+            l_Text1 = l_Gossip->Options[0].Text_0;
+        if (l_Gossip->Options[0].Text_1.size())
+            l_Text2 = l_Gossip->Options[0].Text_1;
+        l_Language = l_Gossip->Options[0].Language;
     }
 
     int l_SessionLocalIndex = p_Session->GetSessionDbLocaleIndex();
     if (l_SessionLocalIndex >= 0)
     {
-        if (NpcTextLocale const* l_LocalData = sObjectMgr->GetNpcTextLocale(l_LocalTextID))
+        if (NpcTextLocale const* l_LocalData = sObjectMgr->GetNpcTextLocale(p_LocalTextID))
         {
             ObjectMgr::GetLocaleString(l_LocalData->Text_0[0], l_SessionLocalIndex, l_Text1);
             ObjectMgr::GetLocaleString(l_LocalData->Text_1[0], l_SessionLocalIndex, l_Text2);
         }
     }
 
-    p_Data << uint32(0x00);				/// Data size placeholder
-    p_Data << uint32(l_LocalTextID);
+    p_Data << uint32(p_LocalTextID);
     p_Data << uint32(l_Language);
     p_Data << uint16(l_Text1.size());
     p_Data << l_Text1;
@@ -495,13 +520,142 @@ void SendNpcTextDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, 
     p_Data << uint32(0);	/// unk
     p_Data << uint32(0);	/// unk
     p_Data << uint32(0x01);	/// unk
-    
-    p_Data << uint32(time(NULL));
-	p_Data << uint32(DB_QUERY_NPC_TEXT);
-    p_Data << uint32(l_LocalTextID);
+}
 
-    p_Data.wpos(0);
-    p_Data << uint32(p_Data.size() - 16);
+bool SendItemSparseDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, uint32 p_ItemEntry)
+{
+    ItemTemplate const * item = sObjectMgr->GetItemTemplate(p_ItemEntry);
+
+    if(!item) return false;
+
+    p_Data << uint32(item->ItemId);//OK
+    p_Data << uint32(item->Quality);//OK
+    p_Data << uint32(item->Flags);
+    p_Data << uint32(item->Flags2);
+    p_Data << float(item->Unk430_1);
+    p_Data << float(item->Unk430_2);
+    p_Data << uint32(0); //unk
+    p_Data << uint32(item->BuyCount);//OK
+    p_Data << int32(item->BuyPrice);//OK
+    p_Data << uint32(item->SellPrice);//OK
+    p_Data << uint32(item->InventoryType);
+    p_Data << int32(item->AllowableClass);//OK
+    p_Data << int32(item->AllowableRace);//OK
+    p_Data << uint32(item->ItemLevel);//OK
+    p_Data << uint32(item->RequiredLevel);//OK
+    p_Data << uint32(item->RequiredSkill);
+    p_Data << uint32(item->RequiredSkillRank);
+    p_Data << uint32(item->RequiredSpell);
+    p_Data << uint32(item->RequiredHonorRank);
+    p_Data << uint32(item->RequiredCityRank);
+    p_Data << uint32(item->RequiredReputationFaction);
+    p_Data << uint32(item->RequiredReputationRank);
+    p_Data << int32(item->MaxCount);//OK
+    p_Data << int32(item->Stackable);//OK
+    p_Data << uint32(item->ContainerSlots);//OK
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_STATS; ++x)
+        p_Data << uint32(item->ItemStat[x].ItemStatType);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_STATS; ++x)
+        p_Data << int32(item->ItemStat[x].ItemStatValue);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_STATS; ++x)
+        p_Data << int32(item->ItemStat[x].ItemStatUnk1);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_STATS; ++x)
+        p_Data << int32(item->ItemStat[x].ItemStatUnk2);
+
+    p_Data << uint32(item->ScalingStatDistribution);
+    p_Data << uint32(item->DamageType);
+    p_Data << uint32(item->Delay);
+    p_Data << float(item->RangedModRange);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
+        p_Data << int32(item->Spells[x].SpellId);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
+        p_Data << uint32(item->Spells[x].SpellTrigger);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
+        p_Data << int32(item->Spells[x].SpellCharges);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
+        p_Data << int32(item->Spells[x].SpellCooldown);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
+        p_Data << uint32(item->Spells[x].SpellCategory);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
+        p_Data << int32(item->Spells[x].SpellCategoryCooldown);
+
+    p_Data << uint32(item->Bonding);//OK
+
+    // item name
+    std::string name = item->Name1;//OK
+    p_Data << uint16(name.length());
+    if (name.length())
+        p_Data << name;
+
+    for (uint32 i = 0; i < 3; ++i) // other 3 names
+        p_Data << uint16(0);//OK
+
+    std::string desc = item->Description;
+    p_Data << uint16(desc.length());
+    if (desc.length())
+        p_Data << desc;
+
+    p_Data << uint32(item->PageText);
+    p_Data << uint32(item->LanguageID);
+    p_Data << uint32(item->PageMaterial);
+    p_Data << uint32(item->StartQuest);
+    p_Data << uint32(item->LockID);
+    p_Data << int32(item->Material);
+    p_Data << uint32(item->Sheath);
+    p_Data << int32(item->RandomProperty);
+    p_Data << int32(item->RandomSuffix);
+    p_Data << uint32(item->ItemSet);
+
+    p_Data << uint32(item->Area);
+    p_Data << uint32(item->Map);
+    p_Data << uint32(item->BagFamily);
+    p_Data << uint32(item->TotemCategory);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_SOCKETS; ++x)
+        p_Data << uint32(item->Socket[x].Color);
+
+    for (uint32 x = 0; x < MAX_ITEM_PROTO_SOCKETS; ++x)
+        p_Data << uint32(item->Socket[x].Content);
+
+    p_Data << uint32(item->socketBonus);
+    p_Data << uint32(item->GemProperties);
+    p_Data << float(item->ArmorDamageModifier);
+    p_Data << int32(item->Duration);
+    p_Data << uint32(item->ItemLimitCategory);
+    p_Data << uint32(item->HolidayId);
+    p_Data << float(item->StatScalingFactor);    // StatScalingFactor
+    p_Data << uint32(item->CurrencySubstitutionId);
+    p_Data << uint32(item->CurrencySubstitutionCount);
+
+    return true;
+}
+
+bool SendItemDBQueryResponse(WorldSession * p_Session, WorldPacket & p_Data, uint32 p_ItemEntry)
+{
+    ItemTemplate const * item = sObjectMgr->GetItemTemplate(p_ItemEntry);
+
+    if(!item) return false;
+
+    p_Data << uint32(item->ItemId);
+    p_Data << uint32(item->Class);
+    p_Data << uint32(item->SubClass);
+    p_Data << int32(item->SoundOverrideSubclass);
+    p_Data << uint32(item->Material);
+    p_Data << uint32(item->DisplayInfoID);
+    p_Data << uint32(item->InventoryType);
+    p_Data << uint32(item->Sheath);
+
+    return true;
 }
 
 void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
@@ -509,21 +663,12 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
     uint32 l_QueryType;
     uint32 l_Count;
 
-
-    /*for (int i=0 ; i<p_ReceivedPacket.size() ; ++i) {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "%2X", p_ReceivedPacket.read<uint8>());
-    }*/
-    p_ReceivedPacket.rpos(0);
-
-
     p_ReceivedPacket >> l_QueryType;
-
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "DBQuery lQueryType %u", l_QueryType);
 
     l_Count = p_ReceivedPacket.ReadBits(23);
 
     std::vector<ObjectGuid> l_Guids;
-    std::vector<uint32>		l_LocalTextIDs;
+    std::vector<uint32>		l_requestedEntries;
 
     for (uint32 l_I = 0 ; l_I < l_Count ; l_I++)
     {
@@ -543,38 +688,61 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
 
     for (uint32 l_I = 0 ; l_I < l_Count ; l_I++)
     {
-        uint32	l_LocalTextID;
+        uint32	l_requestedEntry;
 
         p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][7]);
         p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][6]);
         p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][1]);
         p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][2]);
-        p_ReceivedPacket >> l_LocalTextID;
+        p_ReceivedPacket >> l_requestedEntry;
         p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][5]);
         p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][3]);
         p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][0]);
         p_ReceivedPacket.ReadByteSeq(l_Guids[l_I][4]);
 
-        l_LocalTextIDs.push_back(l_LocalTextID);
+        l_requestedEntries.push_back(l_requestedEntry);
     }
 
     if (!l_Count)
         return;
 
-    for(uint32 l_I = 0; l_I< l_Count ; l_I++){
-        WorldPacket l_Data(SMSG_DB_REPLY, 100);
+    for(uint32 l_I = 0 ; l_I < l_Count ; l_I++)
+    {
+        WorldPacket l_Data(SMSG_DB_REPLY);
+        l_Data << uint32(0x00);				/// Data size placeholder
 
         switch (l_QueryType)
         {
-        case DB_QUERY_NPC_TEXT:
-            SendNpcTextDBQueryResponse(this, l_Data, l_LocalTextIDs[l_I]);
-            break;
-        default:
-            sLog->outDebug(LOG_FILTER_SERVER_LOADING, "Receive non handled db query type 0x%08.8X", l_QueryType);
-            break;
+            case DB_QUERY_NPC_TEXT:
+            {
+                SendNpcTextDBQueryResponse(this, l_Data, l_requestedEntries[l_I]);
+                break;
+            }
+            case DB_QUERY_ITEM_SPARSE:
+            {
+                if(!SendItemSparseDBQueryResponse(this, l_Data, l_requestedEntries[l_I])) continue; //dont send if no item
+                break; //to disable the sent of the opcode
+            }
+            case DB_QUERY_ITEM:
+            {
+                if(!SendItemDBQueryResponse(this, l_Data, l_requestedEntries[l_I])) continue; //dont send if no item
+                break; //to disable the sent of the opcode
+            }
+            default:
+            {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Received non handled db query type 0x%08.8X", l_QueryType);
+                continue; //to disable the sent of the opcode
+            }
         }
-        if (l_Data.size())
-            SendPacket(&l_Data);
+
+        l_Data << uint32(sObjectMgr->GetHotfixDate(l_requestedEntries[l_I], l_QueryType));
+        l_Data << uint32(l_QueryType);
+        l_Data << uint32(l_requestedEntries[l_I]);
+
+        l_Data.wpos(0);
+        l_Data << uint32(l_Data.size() - 16);
+
+        SendPacket(&l_Data);
     }
 }
 
@@ -646,10 +814,9 @@ void WorldSession::HandleCorpseMapPositionQuery(WorldPacket& recvData)
     recvData.ReadByteSeq(guid[1]);
     recvData.ReadByteSeq(guid[0]);
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CORPSE_MAP_POSITION_QUERY: Guid: %u unk %u", GUID_LOPART(guid), unk);
+
     WorldPacket data(SMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE, 4+4+4+4);
-    data << float(0);
-    data << float(0);
-    data << float(0);
     data << float(0);
     SendPacket(&data);
 }

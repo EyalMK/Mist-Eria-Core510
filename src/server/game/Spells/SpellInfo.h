@@ -241,6 +241,7 @@ public:
     float     ValueMultiplier;
     float     DamageMultiplier;
     float     SPMultiplier;
+    bool      isAPSPModified;
     int32     MiscValue;
     int32     MiscValueB;
     Mechanics Mechanic;
@@ -275,6 +276,7 @@ public:
     int32 CalcBaseValue(int32 value) const;
     float CalcValueMultiplier(Unit* caster, Spell* spell = NULL) const;
     float CalcDamageMultiplier(Unit* caster, Spell* spell = NULL) const;
+    bool IsAPSPModified() const;
 
     bool HasRadius() const;
     bool HasMaxRadius() const;

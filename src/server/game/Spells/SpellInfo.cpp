@@ -368,6 +368,31 @@ SpellEffectInfo::SpellEffectInfo(SpellEntry const* /*spellEntry*/, SpellInfo con
     ScalingMultiplier = effectScaling ? effectScaling->ScalingMultiplier : 0.0f;
     DeltaScalingMultiplier = effectScaling ? effectScaling->DeltaScalingMultiplier : 0.0f;
     ComboScalingMultiplier = effectScaling ? effectScaling->ComboScalingMultiplier : 0.0f;
+
+    isAPSPModified = IsAPSPModified();
+}
+
+bool SpellEffectInfo::IsAPSPModified() const
+{
+    switch(Effect)
+    {
+        default:
+            break;
+    }
+
+    if(Effect == SPELL_EFFECT_APPLY_AURA)
+    {
+        switch(ApplyAuraName)
+        {
+            case SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED:
+            case SPELL_AURA_MOD_INCREASE_SWIM_SPEED:
+            case SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED:
+                return false;
+            default:
+                break;
+        }
+    }
+    return true;
 }
 
 bool SpellEffectInfo::IsEffect() const
@@ -517,7 +542,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
             //value = int32(value * (int32)getLevel() / (int32)(_spellInfo->spellLevel ? _spellInfo->spellLevel : 1));
     }
 
-    if(caster)
+    if(caster && isAPSPModified)
     {
         float flat = value;
         int32 sp = caster->GetTotalSpellPowerValue(_spellInfo->GetSchoolMask(), _spellInfo->_IsPositiveEffect(_effIndex, true));
@@ -2530,6 +2555,7 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                     if (Effects[effIndex].CalcValue() < 0)
                         return false;
                     break;
+                case SPELL_AURA_MOD_PHYSICAL_DAMAGE_TAKEN_PCT:
                 case SPELL_AURA_MOD_DAMAGE_TAKEN:           // dependent from bas point sign (positive -> negative)
                     if (Effects[effIndex].CalcValue() > 0)
                         return false;

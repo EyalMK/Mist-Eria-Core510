@@ -133,7 +133,11 @@ enum SPELL_DRU_MANGLE
 {
     SPELL_DRU_MANGLE_GENERIC = 33917,
     SPELL_DRU_MANGLE_BEAR    = 33878,
-    SPELL_DRU_MANGLE_CAT     = 33876
+    SPELL_DRU_MANGLE_CAT     = 33876,
+
+    SPELL_DRU_SWIPE_GENERIC  = 106785,
+    SPELL_DRU_SWIPE_CAT      = 62078,
+    SPELL_DRU_SWIPE_BEAR     = 779
 };
 
 // Bear form - 5487
@@ -154,61 +158,101 @@ public:
 
         void OnShapeshiftApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
-            uint32 newSpell;
-
-            if(aurEff->GetMiscValue() == FORM_CAT)
-                newSpell = SPELL_DRU_MANGLE_CAT;
-            else if(aurEff->GetMiscValue() == FORM_BEAR)
-                newSpell = SPELL_DRU_MANGLE_BEAR;
-            else
-                return;
-
-
-            if (Unit* unitTarget = GetTarget())
+            Unit* unitTarget = GetTarget();
+            if (unitTarget && unitTarget->GetTypeId() == TYPEID_PLAYER)
             {
-                if(unitTarget->HasSpell(SPELL_DRU_MANGLE_GENERIC) && unitTarget->GetTypeId() == TYPEID_PLAYER)
+                //         new
+                std::list<uint32> spellsToAdd;
+                //         new       old
+                std::map<uint32, uint32> spellsToChange;
+                if(aurEff->GetMiscValue() == FORM_CAT)
                 {
-                    Player * player = unitTarget->ToPlayer();
-                    WorldPacket data(SMSG_SUPERCEDED_SPELL, 4+4);
-                    data.WriteBits(1, 24); //second count
-                    data.WriteBits(1, 24); //first count
-                    data.FlushBits();
+                    if(unitTarget->HasSpell(SPELL_DRU_MANGLE_GENERIC))
+                    {
+                        spellsToAdd.push_back(SPELL_DRU_MANGLE_GENERIC);
+                        spellsToChange[SPELL_DRU_MANGLE_CAT] = SPELL_DRU_MANGLE_GENERIC;   
+                    }
+                    if(unitTarget->HasSpell(SPELL_DRU_SWIPE_GENERIC))
+                    {
+                        spellsToAdd.push_back(SPELL_DRU_SWIPE_GENERIC);
+                        spellsToChange[SPELL_DRU_SWIPE_CAT] = SPELL_DRU_SWIPE_GENERIC;
+                    }
+                }
+                else if(aurEff->GetMiscValue() == FORM_BEAR)
+                {
+                    if(unitTarget->HasSpell(SPELL_DRU_MANGLE_GENERIC))
+                    {
+                        spellsToAdd.push_back(SPELL_DRU_MANGLE_GENERIC);
+                        spellsToChange[SPELL_DRU_MANGLE_BEAR] = SPELL_DRU_MANGLE_GENERIC;  
+                    }
+                    if(unitTarget->HasSpell(SPELL_DRU_SWIPE_GENERIC))
+                    {
+                        spellsToAdd.push_back(SPELL_DRU_SWIPE_GENERIC);
+                        spellsToChange[SPELL_DRU_SWIPE_BEAR] = SPELL_DRU_SWIPE_GENERIC;
+                    }
+                }
 
-                    player->AddTemporarySpell(newSpell);
-                    data << uint32(newSpell);
-                    data << uint32(SPELL_DRU_MANGLE_GENERIC);
-
+                Player * player = unitTarget->ToPlayer();
+                for(std::map<uint32, uint32>::iterator itr = spellsToChange.begin() ; itr != spellsToChange.end() ; itr++)
+                {
+                    WorldPacket data(SMSG_SUPERCEDED_SPELL);
+                    data.WriteBits(1, 24);
+                    data.WriteBits(1, 24);
+                    player->AddTemporarySpell(itr->first);
+                    data << uint32(itr->first);
+                    data << uint32(itr->second);
                     player->GetSession()->SendPacket(&data);
                 }
+
+                WorldPacket data(SMSG_LEARNED_SPELL);
+                data.WriteBit(1);
+                data.WriteBits(spellsToAdd.size(), 24); // Spell Count
+                data.FlushBits();
+                for(std::list<uint32>::iterator itr = spellsToAdd.begin(); itr != spellsToAdd.end() ; itr++)
+                    data << uint32(*itr);
+                player->GetSession()->SendPacket(&data);
             }
         }
 
         void OnShapeshiftRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
-            uint32 newSpell;
-
-            if(aurEff->GetMiscValue() == FORM_CAT)
-                newSpell = SPELL_DRU_MANGLE_CAT;
-            else if(aurEff->GetMiscValue() == FORM_BEAR)
-                newSpell = SPELL_DRU_MANGLE_BEAR;
-            else
-                return;
-
-
-            if (Unit* unitTarget = GetTarget())
+            Unit* unitTarget = GetTarget();
+            if (unitTarget && unitTarget->GetTypeId() == TYPEID_PLAYER)
             {
-                if(unitTarget->HasSpell(SPELL_DRU_MANGLE_GENERIC) && unitTarget->GetTypeId() == TYPEID_PLAYER)
-                {                    
-                    Player * player = unitTarget->ToPlayer();
-                    WorldPacket data(SMSG_SUPERCEDED_SPELL, 4+4);
-                    data.WriteBits(1, 24); //second count
-                    data.WriteBits(1, 24); //first count
-                    data.FlushBits();
+                //         new       old
+                std::map<uint32, uint32> spellsToChange;
+                if(aurEff->GetMiscValue() == FORM_CAT)
+                {
+                    if(unitTarget->HasSpell(SPELL_DRU_MANGLE_GENERIC))
+                    {
+                        spellsToChange[SPELL_DRU_MANGLE_CAT] = SPELL_DRU_MANGLE_GENERIC;   
+                    }
+                    if(unitTarget->HasSpell(SPELL_DRU_SWIPE_GENERIC))
+                    {
+                        spellsToChange[SPELL_DRU_SWIPE_CAT] = SPELL_DRU_SWIPE_GENERIC;
+                    }
+                }
+                else if(aurEff->GetMiscValue() == FORM_BEAR)
+                {
+                    if(unitTarget->HasSpell(SPELL_DRU_MANGLE_GENERIC))
+                    {
+                        spellsToChange[SPELL_DRU_MANGLE_BEAR] = SPELL_DRU_MANGLE_GENERIC;  
+                    }
+                    if(unitTarget->HasSpell(SPELL_DRU_SWIPE_GENERIC))
+                    {
+                        spellsToChange[SPELL_DRU_SWIPE_BEAR] = SPELL_DRU_SWIPE_GENERIC;
+                    }
+                }
 
-                    unitTarget->ToPlayer()->RemoveTemporarySpell(newSpell);
-                    data << uint32(SPELL_DRU_MANGLE_GENERIC);
-                    data << uint32(newSpell);
-
+                Player * player = unitTarget->ToPlayer();
+                for(std::map<uint32, uint32>::iterator itr = spellsToChange.begin() ; itr != spellsToChange.end() ; itr++)
+                {
+                    WorldPacket data(SMSG_SUPERCEDED_SPELL);
+                    data.WriteBits(1, 24);
+                    data.WriteBits(1, 24);
+                    player->RemoveTemporarySpell(itr->first);
+                    data << uint32(itr->second);
+                    data << uint32(itr->first);
                     player->GetSession()->SendPacket(&data);
                 }
             }
@@ -255,6 +299,89 @@ public:
         return new spell_dru_growl_SpellScript;
     }
 };
+
+// Might of Ursoc
+// 106922 - SpellId
+class spell_dru_might_of_ursoc : public SpellScriptLoader
+{
+public:
+    spell_dru_might_of_ursoc() : SpellScriptLoader("spell_dru_might_of_ursoc") { }
+
+    class spell_dru_might_of_ursoc_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dru_might_of_ursoc_AuraScript);
+
+        void EffectApply (AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* target = GetTarget();
+            int32 amount = aurEff->GetAmount() * target->GetMaxHealth() / 100;
+            target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float( aurEff->GetAmount() ), true);
+            target->ModifyHealth( amount);
+            //Cast bear form
+            target->CastSpell(target, 5487, true);
+            PreventDefaultAction();
+        }
+
+        void EffectRemove (AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* target = GetTarget();
+            int32 amount = aurEff->GetAmount() * target->GetMaxHealth() / 100;
+            
+            
+            if (int32(target->GetHealth()) >  amount)
+                target->ModifyHealth(- amount);
+            else
+                target->SetHealth(1);
+
+            target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float( aurEff->GetAmount() ), false);
+
+            PreventDefaultAction();
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_dru_might_of_ursoc_AuraScript::EffectApply, EFFECT_0, SPELL_AURA_MOD_INCREASE_HEALTH_2, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_dru_might_of_ursoc_AuraScript::EffectRemove, EFFECT_0, SPELL_AURA_MOD_INCREASE_HEALTH_2, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dru_might_of_ursoc_AuraScript;
+    }
+};
+
+//Stampeding Roar
+// SpellId : 106898
+class spell_dru_stampeding_roar : public SpellScriptLoader
+{
+public:
+    spell_dru_stampeding_roar() : SpellScriptLoader("spell_dru_stampeding_roar") { }
+
+    class spell_dru_stampeding_roar_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_dru_stampeding_roar_AuraScript);
+
+        void EffectApply(AuraEffect const* aurEff, AuraEffectHandleModes mode)
+        {
+            ShapeshiftForm form = GetCaster()->GetShapeshiftForm();
+            //Cast bear form
+            if(form != FORM_BEAR && form != FORM_CAT)
+                GetCaster()->CastSpell(GetCaster(), 5487, true);
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_dru_stampeding_roar_AuraScript::EffectApply, EFFECT_0, SPELL_AURA_MOD_INCREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dru_stampeding_roar_AuraScript;
+    }
+};
+
 
 // 2912, 5176, 78674 - Starfire, Wrath, and Starsurge
 class spell_dru_eclipse_energize : public SpellScriptLoader
@@ -1539,6 +1666,8 @@ void AddSC_druid_spell_scripts()
     new spell_dru_mangle();
     new spell_dru_prowl();
     new spell_dru_growl();
+    new spell_dru_might_of_ursoc();
+    new spell_dru_stampeding_roar();
     new spell_dru_dash();
     new spell_dru_eclipse_energize();
     new spell_dru_enrage();

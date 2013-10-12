@@ -11,6 +11,7 @@
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
   Pandaria/boss_sha_of_anger.cpp
+  Pandaria/zone_wandering_isle.cpp
   Pandaria/MoguShanPalace/boss_gekkan.cpp
   Pandaria/MoguShanPalace/boss_xin_the_weaponmaster.cpp
   Pandaria/MoguShanPalace/instance_mogushan_palace.cpp
@@ -24,12 +25,12 @@ set(scripts_STAT_SRCS
   Pandaria/StormstoutBrewery/boss_hoptallus.cpp
   Pandaria/StormstoutBrewery/boss_ook_ook.cpp
   Pandaria/StormstoutBrewery/boss_yan_zhu.cpp
-  Pandaria/TempleOfTheJadeSerpent/temple_of_the_jade_serpent.h
-  Pandaria/TempleOfTheJadeSerpent/instance_temple_of_the_jade_serpent.cpp
-  Pandaria/TempleOfTheJadeSerpent/boss_wise_mari.cpp
-  Pandaria/TempleOfTheJadeSerpent/boss_lorewalker_stonestep.cpp
-  Pandaria/TempleOfTheJadeSerpent/boss_liu_flameheart.cpp
-  Pandaria/TempleOfTheJadeSerpent/boss_sha_of_doubt.cpp
+  Pandaria/TempleoftheJadeSerpent/temple_of_the_jade_serpent.h
+  Pandaria/TempleoftheJadeSerpent/instance_temple_of_the_jade_serpent.cpp
+  Pandaria/TempleoftheJadeSerpent/boss_wise_mari.cpp
+  Pandaria/TempleoftheJadeSerpent/boss_lorewalker_stonestep.cpp
+  Pandaria/TempleoftheJadeSerpent/boss_liu_flameheart.cpp
+  Pandaria/TempleoftheJadeSerpent/boss_sha_of_doubt.cpp
 
 )
 

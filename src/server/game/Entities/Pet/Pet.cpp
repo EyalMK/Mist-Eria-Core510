@@ -215,6 +215,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
             petlevel = owner->getLevel();
 
             SetUInt32Value(UNIT_FIELD_BYTES_0, 0x800); // class = mage
+
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
                                                             // this enables popup window (pet dismiss, cancel)
             break;
@@ -255,6 +256,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         else
         {
             SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
+
             SetPower(POWER_MANA, savedmana > uint32(GetMaxPower(POWER_MANA)) ? GetMaxPower(POWER_MANA) : savedmana);
         }
     }
@@ -841,6 +843,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     if (pInfo)                                      // exist in DB
     {
         SetCreateHealth(pInfo->health);
+
         if (petType != HUNTER_PET) //hunter pet use focus
             SetCreateMana(pInfo->mana);
 
@@ -1015,6 +1018,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     UpdateAllStats();
 
     SetFullHealth();
+
     SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
     return true;
 }

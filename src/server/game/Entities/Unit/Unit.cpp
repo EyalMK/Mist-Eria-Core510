@@ -2455,7 +2455,7 @@ float Unit::GetUnitDodgeChance() const
         else
         {
             float dodge = 5.0f;
-            dodge += GetTotalAuraModifier(SPELL_AURA_MOD_DODGE_PERCENT);
+            dodge += float(GetTotalAuraModifier(SPELL_AURA_MOD_DODGE_PERCENT)) / 100.f;
             return dodge > 0.0f ? dodge : 0.0f;
         }
     }
@@ -9254,7 +9254,7 @@ int32 Unit::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
     }
 
     // bonus from SPELL_AURA_MOD_SPELL_POWER_PCT percent
-    AddPct(DoneAdvertisedBenefit, GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask));
+    AddPct(DoneAdvertisedBenefit, GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_POWER_PCT));
 
     return DoneAdvertisedBenefit;
 }
@@ -9778,7 +9778,7 @@ int32 Unit::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
     }
 
     // bonus from SPELL_AURA_MOD_SPELL_POWER_PCT percent
-    AddPct(AdvertisedBenefit, GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_POWER_PCT, schoolMask));
+    AddPct(AdvertisedBenefit, GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_POWER_PCT));
 
     return AdvertisedBenefit;
 }
@@ -17429,11 +17429,6 @@ void Unit::SendMovementFeatherFall()
 {
     if (GetTypeId() == TYPEID_PLAYER)
         ToPlayer()->SendMovementSetFeatherFall(HasUnitMovementFlag(MOVEMENTFLAG_FALLING_SLOW));
-
-    WorldPacket data(MSG_MOVE_FEATHER_FALL, 64);
-    data.append(GetPackGUID());
-    BuildMovementPacket(&data);
-    SendMessageToSet(&data, false);
 }
 
 void Unit::SendMovementGravityChange()

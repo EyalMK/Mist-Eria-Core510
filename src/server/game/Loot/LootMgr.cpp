@@ -848,12 +848,13 @@ ByteBuffer& operator<<(ByteBuffer& b, LootItem const& li)
 
 ByteBuffer& operator<<(ByteBuffer& b, LootItemView const& iv)
 {
-	if(iv.position)
-		b << uint8(iv.slotType);
-	b << uint32(0);
+    if(iv.slotType)
+        b << uint8(iv.slotType);
+    b << uint32(0);
 	b << uint32(iv.loot_item.count);
 	b << uint32(0); //item->randomSuffix ?
-	b << uint8(iv.position);
+    if(iv.position)
+        b << uint8(iv.position);
 	b << uint32(iv.loot_item.itemid);
 	b << uint32(sObjectMgr->GetItemTemplate(iv.loot_item.itemid)->DisplayInfoID);
 	b << uint32(0); //item->randomPropertyId ?
@@ -862,47 +863,45 @@ ByteBuffer& operator<<(ByteBuffer& b, LootItemView const& iv)
 
 ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 {
-    ObjectGuid guid1 = uint64(lv.viewer->GetLootGUID());
+    ObjectGuid lootGuid = uint64(lv.viewer->GetLootGUID());
 	Loot &l = lv.loot;
 
 	uint8 itemsShown = 0;
 	uint8 currenciesShown = 0;
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootView 1 %u", lv.permission);
 	if (lv.permission == NONE_PERMISSION)
 	{
 		b.WriteBits(0, 22);                                     // currency count placeholder
 
-		b.WriteBit(guid1[7]);
+        b.WriteBit(lootGuid[7]);
 		b.WriteBit(lv.permission != NONE_PERMISSION); //byte18
 		b.WriteBit(0); //byte30
-		b.WriteBit(guid1[2]);
+        b.WriteBit(lootGuid[2]);
 		b.WriteBit(1); //!byte31
-		b.WriteBit(guid1[6]);
+        b.WriteBit(lootGuid[6]);
 		b.WriteBit(1); //!dword1C
-		b.WriteBit(guid1[1]);
-		b.WriteBit(guid1[4]);
+        b.WriteBit(lootGuid[1]);
+        b.WriteBit(lootGuid[4]);
 		b.WriteBits(0, 21);                        // item count placeholder
 		b.WriteBit(1); //!byte44
-		b.WriteBit(guid1[0]);
+        b.WriteBit(lootGuid[0]);
 		b.WriteBit(!l.loot_type); //!byte32
 		b.WriteBit(!lv.permission); //!byte45
-		b.WriteBit(guid1[5]);
-		b.WriteBit(guid1[3]);
+        b.WriteBit(lootGuid[5]);
+        b.WriteBit(lootGuid[3]);
 		b.FlushBits();
-		b.WriteByteSeq(guid1[1]);
-		b.WriteByteSeq(guid1[6]);
-		b.WriteByteSeq(guid1[3]);
-		b.WriteByteSeq(guid1[2]);
+        b.WriteByteSeq(lootGuid[1]);
+        b.WriteByteSeq(lootGuid[6]);
+        b.WriteByteSeq(lootGuid[3]);
+        b.WriteByteSeq(lootGuid[2]);
 
-		//Si byte44 => uint8
-		//Si byte31 => uint8
-
-		b.WriteByteSeq(guid1[7]); 	
+        b.WriteByteSeq(lootGuid[7]);
 		if(lv.permission) //Si byte45 => uint8
 			b << uint8(lv.permission);
-		b.WriteByteSeq(guid1[5]); 
-		b.WriteByteSeq(guid1[0]);
-		b.WriteByteSeq(guid1[4]);
+        b.WriteByteSeq(lootGuid[5]);
+        b.WriteByteSeq(lootGuid[0]);
+        b.WriteByteSeq(lootGuid[4]);
 		if(l.loot_type)
 			b << uint8(l.loot_type);
 		return b;
@@ -910,15 +909,15 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 
 	b.WriteBits(0, 22);                                     // currency count placeholder
 
-	b.WriteBit(guid1[7]);
+    b.WriteBit(lootGuid[7]);
 	b.WriteBit(lv.permission != NONE_PERMISSION); //byte18
     b.WriteBit(1); //byte30
-	b.WriteBit(guid1[2]);
+    b.WriteBit(lootGuid[2]);
 	b.WriteBit(1); //!byte31
-	b.WriteBit(guid1[6]);
+    b.WriteBit(lootGuid[6]);
 	b.WriteBit(!l.gold); //!dword1C
-	b.WriteBit(guid1[1]);
-	b.WriteBit(guid1[4]);
+    b.WriteBit(lootGuid[1]);
+    b.WriteBit(lootGuid[4]);
 
 	std::list<LootItemView> itemsShownList;
 	switch (lv.permission)
@@ -1081,20 +1080,23 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 	b.WriteBits(itemsShownList.size(), 21);                        // item count placeholder
 	for(std::list<LootItemView>::const_iterator itr = itemsShownList.begin() ; itr != itemsShownList.end() ; ++itr)
 	{
-		b.WriteBit(!itr->slotType);
 		b.WriteBit(!itr->position);
+        b.WriteBit(!itr->slotType);
 	}
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootView 2 %u", l.loot_type);
+
+
 	b.WriteBit(1); //!byte44
-	b.WriteBit(guid1[0]);
+    b.WriteBit(lootGuid[0]);
 	b.WriteBit(!l.loot_type); //!byte32
 	b.WriteBit(!lv.permission); //!byte45
-	b.WriteBit(guid1[5]);
-	b.WriteBit(guid1[3]);
+    b.WriteBit(lootGuid[5]);
+    b.WriteBit(lootGuid[3]);
 	b.FlushBits();
 
-	b.WriteByteSeq(guid1[1]);
-	b.WriteByteSeq(guid1[6]);				
+    b.WriteByteSeq(lootGuid[1]);
+    b.WriteByteSeq(lootGuid[6]);
 
 	for(std::list<LootItemView>::const_iterator itr = itemsShownList.begin() ; itr != itemsShownList.end() ; ++itr)
 	{
@@ -1102,8 +1104,8 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 		b << item;
 	}
 
-	b.WriteByteSeq(guid1[3]);
-	b.WriteByteSeq(guid1[2]);
+    b.WriteByteSeq(lootGuid[3]);
+    b.WriteByteSeq(lootGuid[2]);
 
 	//Si byte44 => uint8
 	//boucle sur currencyCounter
@@ -1115,12 +1117,12 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 	
 	if(l.gold)
 		b << uint32(l.gold);
-	b.WriteByteSeq(guid1[7]); 	
+    b.WriteByteSeq(lootGuid[7]);
 	if(lv.permission) //Si byte45 => uint8
 		b << uint8(lv.permission);
-	b.WriteByteSeq(guid1[5]); 
-	b.WriteByteSeq(guid1[0]);
-	b.WriteByteSeq(guid1[4]);
+    b.WriteByteSeq(lootGuid[5]);
+    b.WriteByteSeq(lootGuid[0]);
+    b.WriteByteSeq(lootGuid[4]);
 	if(l.loot_type)
 		b << uint8(l.loot_type);
 

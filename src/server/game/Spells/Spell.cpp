@@ -2940,6 +2940,8 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
 
     InitExplicitTargets(*targets);
 
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellPrepare 1");
     // Fill aura scaling information
     if (m_caster->IsControlledByPlayer() && !m_spellInfo->IsPassive() && m_spellInfo->SpellLevel && !m_spellInfo->IsChanneled() && !(_triggeredCastFlags & TRIGGERED_IGNORE_AURA_SCALING))
     {
@@ -2973,6 +2975,8 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     //Prevent casting at cast another spell (ServerSide check)
     if (!(_triggeredCastFlags & TRIGGERED_IGNORE_CAST_IN_PROGRESS) && m_caster->IsNonMeleeSpellCasted(false, true, true) && m_cast_count)
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellPrepare 2");
+
         SendCastResult(SPELL_FAILED_SPELL_IN_PROGRESS);
         finish(false);
         return;
@@ -2980,6 +2984,8 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
 
     if (DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, m_spellInfo->Id, m_caster))
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellPrepare 3");
+
         SendCastResult(SPELL_FAILED_SPELL_UNAVAILABLE);
         finish(false);
         return;
@@ -2998,8 +3004,13 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
         m_needComboPoints = false;
 
     SpellCastResult result = CheckCast(true);
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellPrepare 4 %u", result);
+
     if (result != SPELL_CAST_OK && !IsAutoRepeat())          //always cast autorepeat dummy for triggering
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellPrepare 5");
+
         // Periodic auras should be interrupted when aura triggers a spell which can't be cast
         // for example bladestorm aura should be removed on disarm as of patch 3.3.5
         // channeled periodic spells should be affected by this (arcane missiles, penance, etc)
@@ -3038,6 +3049,8 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     if (((m_spellInfo->IsChanneled() || m_casttime) && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->isMoving() &&
         m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT) && !m_caster->HasAuraTypeWithAffectMask(SPELL_AURA_CAST_WHILE_WALKING, m_spellInfo))
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellPrepare 6");
+
         SendCastResult(SPELL_FAILED_MOVING);
         finish(false);
         return;
@@ -3046,7 +3059,7 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     // set timer base at cast time
     ReSetTimer();
 
-    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell::prepare: spell id %u source %u caster %d customCastFlags %u mask %u", m_spellInfo->Id, m_caster->GetEntry(), m_originalCaster ? m_originalCaster->GetEntry() : -1, _triggeredCastFlags, m_targets.GetTargetMask());
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "Spell::prepare: spell id %u source %u caster %d customCastFlags %u mask %u", m_spellInfo->Id, m_caster->GetEntry(), m_originalCaster ? m_originalCaster->GetEntry() : -1, _triggeredCastFlags, m_targets.GetTargetMask());
 
     //Containers for channeled spells have to be set
     //TODO:Apply this to all casted spells if needed
@@ -3055,6 +3068,8 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
         cast(true);
     else
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellPrepare 7");
+
         // stealth must be removed at cast starting (at show channel bar)
         // skip triggered spell (item equip spell casting and other not explicit character casts/item uses)
         if (!(_triggeredCastFlags & TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && m_spellInfo->IsBreakingStealth())
@@ -3068,8 +3083,12 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
                 }
         }
 
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellPrepare 8");
+
         m_caster->SetCurrentCastedSpell(this);
         SendSpellStart();
+
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellPrepare 9");
 
         // set target for proper facing
         if ((m_casttime || m_spellInfo->IsChanneled()) && !(_triggeredCastFlags & TRIGGERED_IGNORE_SET_FACING))
@@ -3902,6 +3921,8 @@ void Spell::SendSpellStart()
     data << uint32(m_timer);                                // delay?
     data << uint32(m_casttime);
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellStart 1");
+
     m_targets.Write(data);
 
     if (castFlags & CAST_FLAG_POWER_LEFT_SELF)
@@ -3966,6 +3987,9 @@ void Spell::SendSpellGo()
 
     //sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Sending SMSG_SPELL_GO id=%u", m_spellInfo->Id);
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellgo 1 %u", uint32(m_caster->GetTypeId()));
+
+
     uint32 castFlags = CAST_FLAG_UNKNOWN_9;
 
     // triggered spells with spell visual != 0
@@ -3974,8 +3998,11 @@ void Spell::SendSpellGo()
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
         (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->isPet()))
-        && m_spellInfo->GetPowerType(GetCaster()) != POWER_HEALTH)
+            && m_spellInfo->GetPowerType(GetCaster()) != POWER_HEALTH){
+
         castFlags |= CAST_FLAG_POWER_LEFT_SELF; // should only be sent to self, but the current messaging doesn't make that possible
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellgo 2 %u", castFlags);
+    }
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER)
         && (m_caster->getClass() == CLASS_DEATH_KNIGHT)
@@ -4062,6 +4089,8 @@ void Spell::SendSpellGo()
 
     if (m_targets.GetTargetMask() & TARGET_FLAG_EXTRA_TARGETS)
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spellgo 3");
+
         data << uint32(0); // Extra targets count
         /*
         for (uint8 i = 0; i < count; ++i)
@@ -5931,6 +5960,12 @@ SpellCastResult Spell::CheckPower()
 
     // Check power amount
     Powers powerType = Powers(m_spellInfo->GetPowerType(GetCaster()));
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE checkPower %u %u %u", powerType, m_powerCost, m_caster->GetPower(powerType));
+
+    for (uint32 i=0 ; i< MAX_POWERS ; ++i) {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE power #%u : %u", i , m_caster->GetPower(Powers(i)));
+    }
     if (int32(m_caster->GetPower(powerType)) < m_powerCost)
         return SPELL_FAILED_NO_POWER;
     else

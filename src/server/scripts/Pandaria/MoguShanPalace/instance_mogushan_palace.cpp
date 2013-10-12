@@ -74,7 +74,7 @@ class instance_mogushan_palace : public InstanceMapScript
 				}
 			}
 
-			uint64 GetData64(uint32 id) const OVERRIDE
+			uint64 GetData64(uint32 id) const
 			{
 				switch (id)
 				{
@@ -121,7 +121,7 @@ class instance_mogushan_palace : public InstanceMapScript
 				uint64 BossXinTheWeaponmasterGUID;
 		};
 
-		InstanceScript* GetInstanceScript(InstanceMap* map) const OVERRIDE
+		InstanceScript* GetInstanceScript(InstanceMap* map) const
 		{
 			return new instance_mogushan_palace_InstanceMapScript(map);
 		}

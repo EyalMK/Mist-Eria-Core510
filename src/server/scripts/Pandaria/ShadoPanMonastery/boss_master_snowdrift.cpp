@@ -181,7 +181,7 @@ class boss_master_snowdrift : public CreatureScript
 public:
 	boss_master_snowdrift() : CreatureScript("boss_master_snowdrift") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new boss_master_snowdriftAI(creature);
 	}
@@ -201,23 +201,23 @@ public:
 		bool checkFragrantLotusDeath;
 		bool checkIntro9;
 		bool checkBallOfFire;
-		int introTerminée;
+		int introTerminee;
 		int counterShadoPanNovice;
 		
 		
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkBallOfFire = false;
 			checkFlyingSnowDeath = false;
 			checkIntro9 = false;
 			checkFragrantLotusDeath = false;
 			checkMasterSnowdriftAlive = true;
-			checkMasterSnowdriftAlive = me->IsAlive();
+			checkMasterSnowdriftAlive = me->isAlive();
 			counterShadoPanNovice = 4;
 			
 			events.Reset();
 
-			if (introTerminée != 5)
+			if (introTerminee != 5)
 			{
 				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
 				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); 
@@ -238,7 +238,7 @@ public:
 		
 		}
 
-		void DoAction(int32 action) OVERRIDE
+		void DoAction(int32 action)
         {
             switch (action)
             {
@@ -266,11 +266,11 @@ public:
 					checkMasterSnowdriftAlive = false;
 					break;
 				case ACTION_INTRO_1:
-					if(introTerminée != 5)
+					if(introTerminee != 5)
 						Talk(SAY_INTRO_1);
 					break;
 				case ACTION_INTRO_2:
-					if(introTerminée != 5)
+					if(introTerminee != 5)
 					{
 						Talk(SAY_INTRO_2);
 						me->SummonCreature(SHADOPAN_NOVICE, spawnPos[0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30*IN_MILLISECONDS);
@@ -301,13 +301,13 @@ public:
 			}
         }
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			if (instance)
 			{
 				instance->SetBossState(DATA_BOSS_MASTER_SNOWDRIFT, DONE);
 			}
-			introTerminée = 0;
+			introTerminee = 0;
 			//au cas ou
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -318,23 +318,23 @@ public:
 			me->SummonGameObject(GO_SNOWDRIFTS_POSSESIONS, spawnPos[5].GetPositionX(), spawnPos[5].GetPositionY(), spawnPos[5].GetPositionZ(), 0, 0, 0, 0, 0, 9000000);
 		}
 
-		void KilledUnit(Unit *pWho) OVERRIDE
+		void KilledUnit(Unit *pWho)
 		{
 			Talk(SAY_SLAY);
 		}
 		
-		void EnterEvadeMode() OVERRIDE
+		void EnterEvadeMode()
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_MASTER_SNOWDRIFT, FAIL);
-			introTerminée = 5;
+			introTerminee = 5;
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->GetMotionMaster()->MoveJump(spawnPos[2].GetPositionX(), spawnPos[2].GetPositionY(), spawnPos[2].GetPositionZ(), me->GetExactDist2d(spawnPos[2].GetPositionX(), spawnPos[2].GetPositionY()) * 10.0f / 1.0f, 1.0f); //voir pour le speedZ 1.0f
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_MASTER_SNOWDRIFT, IN_PROGRESS);
@@ -348,7 +348,7 @@ public:
 			
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
@@ -558,7 +558,7 @@ public:
 							break;
 
 						case EVENT_END:
-							introTerminée = 0;
+							introTerminee = 0;
 							me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 							me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 							if (instance)
@@ -607,7 +607,7 @@ class npc_master_trigger : public CreatureScript
 public:
 	npc_master_trigger() : CreatureScript("npc_master_trigger") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_master_triggerAI(creature);
 	}
@@ -624,7 +624,7 @@ public:
 		
 		bool checkTrigger; 
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			checkTrigger = true;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
@@ -634,17 +634,17 @@ public:
 			//ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilité du PNJ par les joueurs.
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			events.Update(diff);
 
@@ -688,7 +688,7 @@ public:
 				{
 					for (Map::PlayerList::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
 					{
-						if (me->GetExactDist2d(i->GetSource()->GetPositionX(),i->GetSource()->GetPositionY()) < 12) 
+						if (me->GetExactDist2d(i->getSource()->GetPositionX(),i->getSource()->GetPositionY()) < 12) 
 						{
 							if (instance)
 								if (Creature* master = me->GetCreature(*me, instance->GetData64(DATA_BOSS_MASTER_SNOWDRIFT)))
@@ -711,7 +711,7 @@ class npc_shadopan_novice : public CreatureScript
 public:
 	npc_shadopan_novice() : CreatureScript("npc_shadopan_novice") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_shadopan_noviceAI(creature);
 	}
@@ -727,11 +727,11 @@ public:
 		EventMap events;
 
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			if (instance)
 				if (Creature* master = me->GetCreature(*me, instance->GetData64(DATA_BOSS_MASTER_SNOWDRIFT)))
@@ -741,12 +741,12 @@ public:
 						}
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			if(!UpdateVictim())
 				return;
@@ -766,7 +766,7 @@ class npc_fragrant_lotus : public CreatureScript
 public:
 	npc_fragrant_lotus() : CreatureScript("npc_fragrant_lotus") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_fragrant_lotusAI(creature);
 	}
@@ -782,12 +782,12 @@ public:
 		EventMap events;
 
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			if (instance)
 					if (Creature* master = me->GetCreature(*me, instance->GetData64(DATA_BOSS_MASTER_SNOWDRIFT)))
@@ -797,12 +797,12 @@ public:
 							}
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			if(!UpdateVictim())
 				return;
@@ -822,7 +822,7 @@ class npc_flying_snow : public CreatureScript
 public:
 	npc_flying_snow() : CreatureScript("npc_flying_snow") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_flying_snowAI(creature);
 	}
@@ -838,12 +838,12 @@ public:
 		EventMap events;
 
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			if (instance)
 					if (Creature* master = me->GetCreature(*me, instance->GetData64(DATA_BOSS_MASTER_SNOWDRIFT)))
@@ -853,12 +853,12 @@ public:
 							}
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			if(!UpdateVictim())
 				return;
@@ -878,7 +878,7 @@ class npc_miroir_master_snowdrift : public CreatureScript
 public:
 	npc_miroir_master_snowdrift() : CreatureScript("npc_miroir_master_snowdrift") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_miroir_master_snowdriftAI(creature);
 	}
@@ -894,27 +894,27 @@ public:
 		EventMap events;
 
 
-		void Reset() OVERRIDE
+		void Reset()
 		{
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 		}
 
-		void JustSummoned(Creature* creature) OVERRIDE
+		void JustSummoned(Creature* creature)
 		{
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 	
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/)
 		{
 			events.ScheduleEvent(EVENT_NPC_BALL_OF_FIRE, 2*IN_MILLISECONDS);
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff)
 		{	
 			if(!UpdateVictim())
 				return;

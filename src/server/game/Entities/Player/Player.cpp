@@ -2088,7 +2088,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
     // don't let enter battlegrounds without assigned battleground id (for example through areatrigger)...
     // don't let gm level > 1 either
-    if (!InBattleground() && mEntry->IsBattlegroundOrArena())
+    if (!InBattleground() && mEntry->IsBattlegroundOrArena() && !isGameMaster())
         return false;
 
     // client without expansion support
@@ -4564,6 +4564,7 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
             break;
         }
     }
+
     // known spell
     if (hasSpell)
         return TRAINER_SPELL_GRAY;
@@ -17658,7 +17659,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
             if (HasTalent(talentInfo->TalentID, GetActiveSpec()))
                 spentTalents++;
 	SetUsedTalentCount(spentTalents);
-	SetFreePrimaryProfessions(getLevel()/15 - spentTalents);
+	SetFreeTalentPoints(getLevel()/15 - spentTalents);
 
     // RaF stuff.
     m_grantableLevels = fields[59].GetUInt8();
@@ -25783,29 +25784,28 @@ void Player::SendClearAllCooldowns(Unit* target)
     ObjectGuid guid = target ? target->GetGUID() : 0;
 
     WorldPacket data(SMSG_CLEAR_COOLDOWNS, 4+8);
-    data.WriteBit(guid[1]);
     data.WriteBit(guid[3]);
-    data.WriteBit(guid[6]);
-    data.WriteBits(spellCount, 24); // Spell Count
     data.WriteBit(guid[7]);
-    data.WriteBit(guid[5]);
     data.WriteBit(guid[2]);
-    data.WriteBit(guid[4]);
+    data.WriteBit(guid[5]);
+    data.WriteBit(guid[6]);
+    data.WriteBit(guid[1]);
     data.WriteBit(guid[0]);
+    data.WriteBits(spellCount, 24); // Spell Count
+    data.WriteBit(guid[4]);
 
     data.FlushBits();
 
+    data.WriteByteSeq(guid[0]);
+    for (SpellCooldowns::const_iterator itr = m_spellCooldowns.begin(); itr != m_spellCooldowns.end(); ++itr)
+        data << uint32(itr->first); // Spell ID
     data.WriteByteSeq(guid[7]);
+    data.WriteByteSeq(guid[6]);
+    data.WriteByteSeq(guid[3]);
     data.WriteByteSeq(guid[2]);
     data.WriteByteSeq(guid[4]);
     data.WriteByteSeq(guid[5]);
     data.WriteByteSeq(guid[1]);
-    data.WriteByteSeq(guid[3]);
-    for (SpellCooldowns::const_iterator itr = m_spellCooldowns.begin(); itr != m_spellCooldowns.end(); ++itr)
-        data << uint32(itr->first); // Spell ID
-
-    data.WriteByteSeq(guid[0]);
-    data.WriteByteSeq(guid[6]);
 
     SendDirectMessage(&data);
 }
@@ -26719,47 +26719,46 @@ void Player::SendMovementSetFeatherFall(bool apply)
     {
         data.Initialize(SMSG_MOVE_FEATHER_FALL, 1 + 4 + 8);
         data.WriteBit(guid[3]);
-        data.WriteBit(guid[1]);
-        data.WriteBit(guid[7]);
         data.WriteBit(guid[0]);
-        data.WriteBit(guid[4]);
-        data.WriteBit(guid[2]);
         data.WriteBit(guid[5]);
+        data.WriteBit(guid[7]);
+        data.WriteBit(guid[4]);
+        data.WriteBit(guid[1]);
         data.WriteBit(guid[6]);
+        data.WriteBit(guid[2]);
 
-        data.WriteByteSeq(guid[5]);
-        data.WriteByteSeq(guid[7]);
         data.WriteByteSeq(guid[2]);
-        data << uint32(0);          //! movement counter
-        data.WriteByteSeq(guid[0]);
-        data.WriteByteSeq(guid[3]);
-        data.WriteByteSeq(guid[4]);
-        data.WriteByteSeq(guid[1]);
         data.WriteByteSeq(guid[6]);
+        data.WriteByteSeq(guid[5]);
+        data.WriteByteSeq(guid[1]);
+        data.WriteByteSeq(guid[4]);
+        data << uint32(0);          //! movement counter
+        data.WriteByteSeq(guid[7]);
+        data.WriteByteSeq(guid[3]);
+        data.WriteByteSeq(guid[0]);
     }
     else
     {
         data.Initialize(SMSG_MOVE_NORMAL_FALL, 1 + 4 + 8);
 
-        data << uint32(0);          //! movement counter
-
-        data.WriteBit(guid[3]);
-        data.WriteBit(guid[0]);
-        data.WriteBit(guid[1]);
-        data.WriteBit(guid[5]);
-        data.WriteBit(guid[7]);
-        data.WriteBit(guid[4]);
         data.WriteBit(guid[6]);
+        data.WriteBit(guid[5]);
+        data.WriteBit(guid[3]);
+        data.WriteBit(guid[1]);
+        data.WriteBit(guid[0]);
+        data.WriteBit(guid[7]);
         data.WriteBit(guid[2]);
+        data.WriteBit(guid[4]);
 
-        data.WriteByteSeq(guid[2]);
-        data.WriteByteSeq(guid[7]);
         data.WriteByteSeq(guid[1]);
+        data.WriteByteSeq(guid[2]);
+        data.WriteByteSeq(guid[3]);
+        data.WriteByteSeq(guid[7]);
         data.WriteByteSeq(guid[4]);
+        data.WriteByteSeq(guid[6]);
+        data << uint32(0);          //! movement counter
         data.WriteByteSeq(guid[5]);
         data.WriteByteSeq(guid[0]);
-        data.WriteByteSeq(guid[3]);
-        data.WriteByteSeq(guid[6]);
     }
 
     SendDirectMessage(&data);
@@ -26853,6 +26852,8 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, getFaction());
 
     pet->setPowerType(POWER_MANA);
+
+
     pet->SetUInt32Value(UNIT_NPC_FLAGS, 0);
     pet->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
     pet->InitStatsForLevel(getLevel());
