@@ -19,7 +19,7 @@ void SpellLearnMgr::Load()
 	{
 		if(ChrSpecializationEntry const* specialisation = sChrSpecializationStore.LookupEntry(i))
 		{
-            sSpecializationMap[specialisation->ClassId]->push_back(specialisation->Id);
+            ((*sSpecializationMap)[specialisation->ClassId]).push_back(specialisation->Id);
 		}
 	}
 
