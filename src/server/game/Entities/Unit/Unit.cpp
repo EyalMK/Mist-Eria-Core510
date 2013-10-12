@@ -2455,7 +2455,7 @@ float Unit::GetUnitDodgeChance() const
         else
         {
             float dodge = 5.0f;
-            dodge += GetTotalAuraModifier(SPELL_AURA_MOD_DODGE_PERCENT);
+            dodge += float(GetTotalAuraModifier(SPELL_AURA_MOD_DODGE_PERCENT)) / 100.f;
             return dodge > 0.0f ? dodge : 0.0f;
         }
     }
