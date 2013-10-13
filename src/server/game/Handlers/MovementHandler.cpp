@@ -44,6 +44,9 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     if (!GetPlayer()->IsBeingTeleportedFar())
         return;
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE worldport 1");
+
+
     GetPlayer()->SetSemaphoreTeleportFar(false);
 
     // get the teleport destination
@@ -64,6 +67,9 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     if (GetPlayer()->m_InstanceValid == false && !mInstance)
         GetPlayer()->m_InstanceValid = true;
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE worldport 2");
+
+
     Map* oldMap = GetPlayer()->GetMap();
     if (GetPlayer()->IsInWorld())
     {
@@ -71,12 +77,16 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         oldMap->RemovePlayerFromMap(GetPlayer(), false);
     }
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE worldport 3");
+
     // relocate the player to the teleport destination
     Map* newMap = sMapMgr->CreateMap(loc.GetMapId(), GetPlayer());
     // the CanEnter checks are done in TeleporTo but conditions may change
     // while the player is in transit, for example the map may get full
     if (!newMap || !newMap->CanEnter(GetPlayer()))
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE worldport 4");
+
         sLog->outError(LOG_FILTER_NETWORKIO, "Map %d could not be created for player %d, porting player to homebind", loc.GetMapId(), GetPlayer()->GetGUIDLow());
         GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->GetOrientation());
         return;
@@ -87,9 +97,13 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     GetPlayer()->ResetMap();
     GetPlayer()->SetMap(newMap);
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE worldport 5");
+
     GetPlayer()->SendInitialPacketsBeforeAddToMap();
     if (!GetPlayer()->GetMap()->AddPlayerToMap(GetPlayer()))
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE worldport 6");
+
         sLog->outError(LOG_FILTER_NETWORKIO, "WORLD: failed to teleport player %s (%d) to map %d because of unknown reason!",
             GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow(), loc.GetMapId());
         GetPlayer()->ResetMap();
@@ -120,6 +134,8 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
     GetPlayer()->SendInitialPacketsAfterAddToMap();
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE worldport 7");
+
     // flight fast teleport case
     if (GetPlayer()->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE)
     {
@@ -140,6 +156,8 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     Corpse* corpse = GetPlayer()->GetCorpse();
     if (corpse && corpse->GetType() != CORPSE_BONES && corpse->GetMapId() == GetPlayer()->GetMapId())
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE worldport 8");
+
         if (mEntry->IsDungeon())
         {
             GetPlayer()->ResurrectPlayer(0.5f, false);
@@ -168,6 +186,8 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // mount allow check
     if (!allowMount)
         _player->RemoveAurasByType(SPELL_AURA_MOUNTED);
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE worldport 9");
 
     // update zone immediately, otherwise leave channel will cause crash in mtmap
     uint32 newzone, newarea;
