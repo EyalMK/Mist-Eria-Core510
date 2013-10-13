@@ -31,9 +31,16 @@
 #include "InstanceSaveMgr.h"
 #include "ObjectMgr.h"
 
-void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket& /*recvPacket*/)
+void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket& recvPacket)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: got MSG_MOVE_WORLDPORT_ACK.");
+    uint8 bit;
+    uint32 data;
+    bit = recvPacket.ReadBit();
+    recvPacket >> data;
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE worldportack : %u %u", bit, data);
+
     HandleMoveWorldportAckOpcode();
 }
 

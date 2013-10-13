@@ -659,7 +659,7 @@ enum Opcodes
     MSG_MOVE_UPDATE_MOUSE                             = 0x1589,
     MSG_MOVE_UPDATE_RUN_SPEED                         = 0x1590,
     MSG_MOVE_WATER_WALK                               = 0x1592,
-    MSG_MOVE_WORLDPORT_ACK                            = 0x0872,//16357
+    MSG_MOVE_WORLDPORT_ACK                            = 0x01BA,//16357
     MSG_NOTIFY_PARTY_SQUELCH                          = 0x1594,
     MSG_PARTY_ASSIGNMENT                              = 0x1595,
     MSG_PETITION_DECLINE                              = 0x0405,//16357
