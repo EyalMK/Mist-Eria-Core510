@@ -2129,6 +2129,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE m_transport at teleport");
         if (!(options & TELE_TO_NOT_LEAVE_TRANSPORT))
         {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE m_transport at teleport FCK FCK FCK");
+
             m_transport->RemovePassenger(this);
             m_transport = NULL;
             m_movementInfo.t_pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
