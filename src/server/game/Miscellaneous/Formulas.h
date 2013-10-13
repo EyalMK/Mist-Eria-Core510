@@ -131,6 +131,9 @@ namespace Trinity
                 case CONTENT_81_85:
                     nBaseExp = 1878;
                     break;
+                case CONTENT_86_90:
+                    nBaseExp = 2547;
+                    break;
                 default:
                     sLog->outError(LOG_FILTER_GENERAL, "BaseGain: Unsupported content level %u", content);
                     nBaseExp = 45;
