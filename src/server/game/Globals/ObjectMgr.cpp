@@ -5626,7 +5626,6 @@ WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float
     GraveYardMapBounds range = GraveYardStore.equal_range(zoneId);
     MapEntry const* map = sMapStore.LookupEntry(MapId);
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE graveyard %u %u %u", range.first == range.second?1:0, MapId, zoneId);
     // not need to check validity of map object; MapId _MUST_ be valid here
 
 
