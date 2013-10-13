@@ -645,6 +645,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, uint64 npcGUID, b
     WorldPacket data(SMSG_QUESTGIVER_OFFER_REWARD, 50);     // guess size
     data << uint64(npcGUID);
     data << uint32(quest->GetQuestId());
+	data << uint32(0);
     data << questTitle;
     data << questOfferRewardText;
 
@@ -658,6 +659,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, uint64 npcGUID, b
     data << uint8(enableNext ? 1 : 0);                      // Auto Finish
     data << uint32(quest->GetFlags());                      // 3.3.3 questFlags
     data << uint32(quest->GetSuggestedPlayers());           // SuggestedGroupNum
+	data << uint32(0);
 
     uint32 emoteCount = 0;
     for (uint8 i = 0; i < QUEST_EMOTE_COUNT; ++i)
