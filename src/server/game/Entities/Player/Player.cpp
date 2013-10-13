@@ -21456,7 +21456,7 @@ void Player::ContinueTaxiFlight()
 
     sLog->outDebug(LOG_FILTER_UNITS, "WORLD: Restart character %u taxi flight", GetGUIDLow());
 
-   / uint32 mountDisplayId = sObjectMgr->GetTaxiMountDisplayId(sourceNode, GetTeam(), true);
+    uint32 mountDisplayId = sObjectMgr->GetTaxiMountDisplayId(sourceNode, GetTeam(), true);
     if (!mountDisplayId)
         return;
 
@@ -21504,7 +21504,7 @@ void Player::ContinueTaxiFlight()
     GetSession()->SendDoFlight(mountDisplayId, path, startNode);*/
 
     TaxiPathNodeEntry const& node = nodeList[0];
-    TeleportTo(node.mapid, node.x, node.y, node.z);
+    TeleportTo(node.mapid, node.x, node.y, node.z, 0.0f);
     CleanupAfterTaxiFlight();
 }
 
