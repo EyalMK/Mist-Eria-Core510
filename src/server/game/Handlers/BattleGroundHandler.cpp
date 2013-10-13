@@ -103,7 +103,6 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
     //extract from guid
     bgTypeId_ = GUID_LOPART(guid);
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Battleground: NOBODIE %u %u %u %u "UI64FMTD, instanceId, unk1, unk2, bgTypeId_, (uint64)guid);
 
     if (!sBattleMasterListStore.LookupEntry(bgTypeId_))
     {

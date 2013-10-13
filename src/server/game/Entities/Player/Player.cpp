@@ -1811,8 +1811,11 @@ void Player::Update(uint32 p_time)
 
     //we should execute delayed teleports only for alive(!) players
     //because we don't want player's ghost teleported from graveyard
-    if (IsHasDelayedTeleport() && isAlive())
+    if (IsHasDelayedTeleport() && isAlive()) {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE is delayed teleport");
+
         TeleportTo(m_teleport_dest, m_teleport_options);
+    }
 }
 
 void Player::setDeathState(DeathState s)
@@ -2122,8 +2125,12 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
     if (m_transport)
     {
+
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE m_transport at teleport");
         if (!(options & TELE_TO_NOT_LEAVE_TRANSPORT))
         {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE m_transport at teleport FCK FCK FCK");
+
             m_transport->RemovePassenger(this);
             m_transport = NULL;
             m_movementInfo.t_pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
@@ -2202,6 +2209,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         //Map* map = sMapMgr->FindBaseNonInstanceMap(mapid);
         //if (!map || map->CanEnter(this))
         {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE teleportto test 1");
             //lets reset near teleport flag if it wasn't reset during chained teleports
             SetSemaphoreTeleportNear(false);
             //setup delayed teleport flag
@@ -2210,6 +2218,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             //then we need to delay it until update process will be finished
             if (IsHasDelayedTeleport())
             {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE teleportto test 2 %u %u %f %f %f", GetMapId(), mapid, x, y, z);
+
                 SetSemaphoreTeleportFar(true);
                 //lets save teleport destination for player
                 m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);

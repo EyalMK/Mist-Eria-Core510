@@ -200,8 +200,6 @@ public:
         uint32 zoneId, areaId;
         object->GetZoneAndAreaId(zoneId, areaId);
 
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE zone %u area %u", zoneId, areaId);
-
         MapEntry const* mapEntry = sMapStore.LookupEntry(object->GetMapId());
         AreaTableEntry const* zoneEntry = GetAreaEntryByAreaID(zoneId);
         AreaTableEntry const* areaEntry = GetAreaEntryByAreaID(areaId);

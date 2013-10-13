@@ -869,7 +869,6 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 	uint8 itemsShown = 0;
 	uint8 currenciesShown = 0;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootView 1 %u", lv.permission);
 	if (lv.permission == NONE_PERMISSION)
 	{
 		b.WriteBits(0, 22);                                     // currency count placeholder
@@ -1084,7 +1083,6 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         b.WriteBit(!itr->slotType);
 	}
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootView 2 %u", l.loot_type);
 
 
 	b.WriteBit(1); //!byte44
