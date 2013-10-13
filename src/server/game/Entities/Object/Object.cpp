@@ -381,22 +381,6 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         data->WriteBit(guid[7]);
         data->WriteBit(self->m_movementInfo.t_guid);                            // Has transport data
         data->WriteBit(G3D::fuzzyEq(self->GetOrientation(), 0.0f)); //G3D::fuzzyEq(self->GetOrientation(), 0.0f));             // Has Orientation
-      
-        if (self->m_movementInfo.t_guid)
-        {
-            ObjectGuid transGuid = self->m_movementInfo.t_guid;
-
-            data->WriteBit(transGuid[3]);
-            data->WriteBit(transGuid[0]);
-            data->WriteBit(transGuid[4]);
-            data->WriteBit(transGuid[5]);
-            data->WriteBit(transGuid[2]);
-            data->WriteBit(transGuid[7]);
-            data->WriteBit(transGuid[1]);
-            data->WriteBit(hasTransportTime2);                                  // Has transport time 2
-            data->WriteBit(transGuid[6]);
-            data->WriteBit(0);                                                  // Has transport time 3
-        }
 
         if (movementFlagsExtra)
             data->WriteBits(movementFlagsExtra, 13);
