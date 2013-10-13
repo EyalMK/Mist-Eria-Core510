@@ -21505,6 +21505,7 @@ void Player::ContinueTaxiFlight()
 
     TaxiPathNodeEntry const& node = nodeList[0];
     TeleportTo(node.mapid, node.x, node.y, node.z);
+    CleanupAfterTaxiFlight();
 }
 
 void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
