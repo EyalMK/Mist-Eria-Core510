@@ -21456,7 +21456,7 @@ void Player::ContinueTaxiFlight()
 
     sLog->outDebug(LOG_FILTER_UNITS, "WORLD: Restart character %u taxi flight", GetGUIDLow());
 
-    uint32 mountDisplayId = sObjectMgr->GetTaxiMountDisplayId(sourceNode, GetTeam(), true);
+   / uint32 mountDisplayId = sObjectMgr->GetTaxiMountDisplayId(sourceNode, GetTeam(), true);
     if (!mountDisplayId)
         return;
 
@@ -21467,7 +21467,7 @@ void Player::ContinueTaxiFlight()
 
     TaxiPathNodeList const& nodeList = sTaxiPathNodesByPath[path];
 
-    float distPrev = MAP_SIZE*MAP_SIZE;
+    /*float distPrev = MAP_SIZE*MAP_SIZE;
     float distNext =
         (nodeList[0].x-GetPositionX())*(nodeList[0].x-GetPositionX())+
         (nodeList[0].y-GetPositionY())*(nodeList[0].y-GetPositionY())+
@@ -21501,7 +21501,10 @@ void Player::ContinueTaxiFlight()
         }
     }
 
-    GetSession()->SendDoFlight(mountDisplayId, path, startNode);
+    GetSession()->SendDoFlight(mountDisplayId, path, startNode);*/
+
+    TaxiPathNodeEntry const& node = nodeList[0];
+    TeleportTo(node.mapid, node.x, node.y, node.z);
 }
 
 void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
