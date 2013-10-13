@@ -3195,6 +3195,9 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                     if (Item* item = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
                         if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
                             totalDamagePercentMod *= 1.5f;
+
+				int32 bp0 = m_damage / 16.f; // 1/2 damage divided on 8 ticks
+				m_caster->CastCustomSpell(unitTarget, 89775, &bp0, NULL, NULL, true);
             }
             break;
         }

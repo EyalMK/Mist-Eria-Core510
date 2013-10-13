@@ -272,21 +272,22 @@ void Log::vlog(LogFilterType filter, LogLevel level, char const* str, va_list ar
 {
     char text[MAX_QUERY_LEN];
     vsnprintf(text, MAX_QUERY_LEN, str, argptr);
-    write(new LogMessage(level, filter, text));
+    LogMessage msg(level, filter, text);
+    write(msg);
 }
 
-void Log::write(LogMessage* msg)
+void Log::write(LogMessage &msg)
 {
     if (loggers.empty())
         return;
 
-    msg->text.append("\n");
-    Logger* logger = GetLoggerByType(msg->type);
+    msg.text.append("\n");
+    Logger* logger = GetLoggerByType(msg.type);
 
     if (worker)
-        worker->enqueue(new LogOperation(logger, msg));
+        worker->enqueue(new LogOperation(logger, &msg));
     else
-        logger->write(*msg);
+        logger->write(msg);
 }
 
 std::string Log::GetTimestampStr()
@@ -434,11 +435,11 @@ void Log::outCharDump(char const* str, uint32 accountId, uint32 guid, char const
     ss << "== START DUMP == (account: " << accountId << " guid: " << guid << " name: " << name
        << ")\n" << str << "\n== END DUMP ==\n";
 
-    LogMessage* msg = new LogMessage(LOG_LEVEL_INFO, LOG_FILTER_PLAYER_DUMP, ss.str());
+    LogMessage msg(LOG_LEVEL_INFO, LOG_FILTER_PLAYER_DUMP, ss.str());
     std::ostringstream param;
     param << guid << '_' << name;
 
-    msg->param1 = param.str();
+    msg.param1 = param.str();
 
     write(msg);
 }
@@ -454,11 +455,11 @@ void Log::outCommand(uint32 account, const char * str, ...)
     vsnprintf(text, MAX_QUERY_LEN, str, ap);
     va_end(ap);
 
-    LogMessage* msg = new LogMessage(LOG_LEVEL_INFO, LOG_FILTER_GMCOMMAND, text);
+    LogMessage msg(LOG_LEVEL_INFO, LOG_FILTER_GMCOMMAND, text);
 
     std::ostringstream ss;
     ss << account;
-    msg->param1 = ss.str();
+    msg.param1 = ss.str();
 
     write(msg);
 }
