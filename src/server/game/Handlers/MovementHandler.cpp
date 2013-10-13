@@ -31,9 +31,10 @@
 #include "InstanceSaveMgr.h"
 #include "ObjectMgr.h"
 
-void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket& /*recvPacket*/)
+void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket& recvPacket)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: got MSG_MOVE_WORLDPORT_ACK.");
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: got MSG_MOVE_WORLDPORT_ACK. %u", recvPacket.size());
+    recvPacket.rfinish();
     HandleMoveWorldportAckOpcode();
 }
 
