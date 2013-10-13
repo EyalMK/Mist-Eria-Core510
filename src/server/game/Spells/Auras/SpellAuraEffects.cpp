@@ -4343,7 +4343,9 @@ void AuraEffect::HandleModRating(AuraApplication const* aurApp, uint8 mode, bool
 
     for (uint32 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
         if (GetMiscValue() & (1 << rating))
-            target->ToPlayer()->ApplyRatingMod(CombatRating(rating), GetAmount() / target->ToPlayer()->GetRatingMultiplier(CombatRating(rating)), apply);
+            target->ToPlayer()->ApplyRatingMod(CombatRating(rating), GetAmount()/* / target->ToPlayer()->GetRatingMultiplier(CombatRating(rating))*/, apply);
+    //PEXIRN : just commented this, seems totally incorrect, the rating must get that value, not necessary to devide this by the multiplier 
+    //(it's acting like the value sent by the spell IS the final value ... non sense, it depends of multiple things)
 }
 
 void AuraEffect::HandleModRatingFromStat(AuraApplication const* aurApp, uint8 mode, bool apply) const
