@@ -33,8 +33,14 @@
 
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket& recvPacket)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: got MSG_MOVE_WORLDPORT_ACK. %u", recvPacket.size());
-    recvPacket.rfinish();
+    uint8 bit;
+    uint32 data = 0;
+    bit = !recvPacket.ReadBit();
+    if (bit) {
+        recvPacket >> data;
+    }
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: got MSG_MOVE_WORLDPORT_ACK. %u %u %u", recvPacket.size(), bit, data);
+
     HandleMoveWorldportAckOpcode();
 }
 
