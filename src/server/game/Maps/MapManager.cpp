@@ -161,18 +161,25 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
     if (!entry->IsDungeon())
         return true;
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 1");
     InstanceTemplate const* instance = sObjectMgr->GetInstanceTemplate(mapid);
     if (!instance)
         return false;
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 2");
 
     Difficulty targetDifficulty = player->GetDifficulty(entry->IsRaid());
     //The player has a heroic mode and tries to enter into instance which has no a heroic mode
     MapDifficulty const* mapDiff = GetMapDifficultyData(entry->MapID, targetDifficulty);
     if (!mapDiff)
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 3");
+
         // Send aborted message for dungeons
         if (entry->IsNonRaidDungeon())
         {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 4");
+
             player->SendTransferAborted(mapid, TRANSFER_ABORT_DIFFICULTY, player->GetDungeonDifficulty());
             return false;
         }
@@ -185,14 +192,20 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
     if (player->isGameMaster())
         return true;
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 5");
+
     char const* mapName = entry->name;
 
     Group* group = player->GetGroup();
     if (entry->IsRaid())
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 6");
+
         // can only enter in a raid group
         if ((!group || !group->isRaidGroup()) && !sWorld->getBoolConfig(CONFIG_INSTANCE_IGNORE_RAID))
         {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 7");
+
             // probably there must be special opcode, because client has this string constant in GlobalStrings.lua
             // TODO: this is not a good place to send the message
             player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetTrinityString(LANG_INSTANCE_RAID_GROUP_ONLY), mapName);
