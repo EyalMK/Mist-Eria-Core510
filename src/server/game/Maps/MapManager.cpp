@@ -169,7 +169,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
 
     Difficulty targetDifficulty = player->GetDifficulty(entry->IsRaid());
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 2 %u %u %u", entry->IsRaid?1:0, entry->MapID, targetDifficulty);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 2 %u %u %u", entry->IsRaid()?1:0, entry->MapID, targetDifficulty);
 
     //The player has a heroic mode and tries to enter into instance which has no a heroic mode
     MapDifficulty const* mapDiff = GetMapDifficultyData(entry->MapID, targetDifficulty);
