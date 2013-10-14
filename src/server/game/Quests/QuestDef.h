@@ -370,6 +370,7 @@ class Quest
         uint32 GetReqItemsCount() const { return m_reqItemsCount; }
         uint32 GetReqCreatureOrGOcount() const { return m_reqNpcOrGoCount; }
         uint32 GetRewChoiceItemsCount() const { return m_rewChoiceItemsCount; }
+        uint32 GetRewardChoiceIdForEntry(rewardEntry) { return QUEST_REWARD_CHOICES_COUNT};
         uint32 GetRewItemsCount() const { return m_rewItemsCount; }
         uint32 GetRewCurrencyCount() const { return m_rewCurrencyCount; }
         uint32 GetReqCurrencyCount() const { return m_reqCurrencyCount; }

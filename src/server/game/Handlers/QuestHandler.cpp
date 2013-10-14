@@ -283,20 +283,21 @@ void WorldSession::HandleQuestQueryOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
 {
-    uint32 questId, reward;
+    uint32 questId, reward, rewardItem;
     uint64 guid;
-    recvData >> guid >> questId >> reward;
-
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_QUESTGIVER_CHOOSE_REWARD npc = %u, quest = %u, reward = %u", uint32(GUID_LOPART(guid)), questId, reward);
-
-    if (reward >= QUEST_REWARD_CHOICES_COUNT)
-    {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "Error in CMSG_QUESTGIVER_CHOOSE_REWARD: player %s (guid %d) tried to get invalid reward (%u) for quest %u (possible packet-hacking detected)", _player->GetName().c_str(), _player->GetGUIDLow(), reward, questId);
-        return;
-    }
+    recvData >> guid >> questId >> rewardItem;
 
     Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
     if (!quest)
+        return;
+
+    //reward = quest->GetRewardChoiceIdForEntry(rewardItem);
+    reward = rewardItem;
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_QUESTGIVER_CHOOSE_REWARD npc = %u, quest = %u, item = %u, reward = %u", uint32(GUID_LOPART(guid)), questId, rewardItem, reward);
+
+
+    if (reward == QUEST_REWARD_CHOICES_COUNT)
         return;
 
     Object* object = _player;
