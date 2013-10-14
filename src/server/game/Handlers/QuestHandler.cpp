@@ -295,7 +295,6 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
         return;
     }
 
-
     Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
     if (!quest)
         return;

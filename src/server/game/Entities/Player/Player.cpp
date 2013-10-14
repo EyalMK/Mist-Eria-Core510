@@ -16669,7 +16669,7 @@ void Player::SendQuestComplete(Quest const* quest)
 			data << uint32(quest->DetailsEmote[i]);
 		}
 
-        data << uint32(quest->GetRewItemsCount());
+/*        data << uint32(quest->GetRewItemsCount());
         for(int i = 0 ; i < QUEST_REWARD_CHOICES_COUNT ; i++)
         {
             const ItemTemplate *rewIt = sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[i]);
@@ -16682,7 +16682,7 @@ void Player::SendQuestComplete(Quest const* quest)
             data << uint32(quest->RewardChoiceItemId[i]);
             data << uint32(quest->RewardChoiceItemCount[i]);
             data << uint32(rewIt->DisplayInfoID);
-        }
+        }*/
 
         quest->BuildExtraQuestInfo(data, this);
 
