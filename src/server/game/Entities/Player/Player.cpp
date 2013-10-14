@@ -16634,60 +16634,12 @@ bool Player::HasQuestForItem(uint32 itemid) const
 
 void Player::SendQuestComplete(Quest const* quest)
 {
-    std::string questTitle           = quest->GetTitle();
-    std::string questDetails         = quest->GetDetails();
-    std::string questObjectives      = quest->GetObjectives();
-    std::string questEndText         = quest->GetEndText();
-    std::string questGiverTextWindow = quest->GetQuestGiverTextWindow();
-    std::string questGiverTargetName = quest->GetQuestGiverTargetName();
-    std::string questTurnTextWindow  = quest->GetQuestTurnTextWindow();
-    std::string questTurnTargetName  = quest->GetQuestTurnTargetName();
-    
     if (quest)
     {
         WorldPacket data(SMSG_QUESTUPDATE_COMPLETE, 4);
-        data << uint64(GetGUID());
         data << uint32(quest->GetQuestId());
-        data << uint32(0);
-		data << questTitle;
-		data << questDetails;                            // I hope this is CompleteText that i'm looking for
-		data << questGiverTextWindow;
-		data << questGiverTargetName;
-		data << questTurnTextWindow;
-		data << questTurnTargetName;
-		data << uint32(quest->GetQuestGiverPortrait());   
-	    data << uint32(quest->GetQuestTurnInPortrait());
-		data << uint8(0);
-		data << uint32(quest->GetFlags()); 
-        data << uint32(quest->GetFlags2());	//quest->GetFlags2();
-		data << uint32(0);
-
-		data << uint32(QUEST_EMOTE_COUNT);
-		for (uint32 i = 0; i < QUEST_EMOTE_COUNT; ++i)
-		{
-            data << uint32(quest->DetailsEmoteDelay[i]); 
-			data << uint32(quest->DetailsEmote[i]);
-		}
-
-/*        data << uint32(quest->GetRewItemsCount());
-        for(int i = 0 ; i < QUEST_REWARD_CHOICES_COUNT ; i++)
-        {
-            const ItemTemplate *rewIt = sObjectMgr->GetItemTemplate(quest->RewardChoiceItemId[i]);
-            if(!rewIt)
-            {
-                data << uint32(0) << uint32(0) << uint32(0);
-                continue;
-            }
-
-            data << uint32(quest->RewardChoiceItemId[i]);
-            data << uint32(quest->RewardChoiceItemCount[i]);
-            data << uint32(rewIt->DisplayInfoID);
-        }*/
-
-        quest->BuildExtraQuestInfo(data, this);
-
         GetSession()->SendPacket(&data);
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_QUESTUPDATE_COMPLETE quest = %u", quest->GetQuestId());
+        TC_LOG_DEBUG(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_QUESTUPDATE_COMPLETE quest = %u", quest->GetQuestId());
     }
 }
 

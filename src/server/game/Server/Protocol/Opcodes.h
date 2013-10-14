@@ -1242,7 +1242,7 @@ enum Opcodes
     SMSG_QUESTUPDATE_ADD_ITEM                         = 0x2038,
     SMSG_QUESTUPDATE_ADD_KILL                         = 0x0E61,//16357
     SMSG_QUESTUPDATE_ADD_PVP_KILL                     = 0x0629,//16357
-    SMSG_QUESTUPDATE_COMPLETE                         = 0x2039,
+    SMSG_QUESTUPDATE_COMPLETE                         = 0x0A25,//16357
     SMSG_QUESTUPDATE_FAILED                           = 0x2042,
     SMSG_QUESTUPDATE_FAILEDTIMER                      = 0x06A5,//16357
     SMSG_QUEST_NPC_QUERY_RESPONSE                     = 0x2044,
