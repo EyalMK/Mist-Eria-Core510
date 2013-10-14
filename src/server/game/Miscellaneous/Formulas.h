@@ -132,7 +132,7 @@ namespace Trinity
                     nBaseExp = 1878;
                     break;
                 case CONTENT_86_90:
-                    nBaseExp = 2547;
+                    nBaseExp = 2547; //PEXIRN : TODO find this value (if it's semi linear, should be 5634)
                     break;
                 default:
                     sLog->outError(LOG_FILTER_GENERAL, "BaseGain: Unsupported content level %u", content);
