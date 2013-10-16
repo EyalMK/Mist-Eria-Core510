@@ -1320,7 +1320,6 @@ void Spell::EffectApplyAura(SpellEffIndex effIndex)
         return;
     ASSERT(unitTarget == m_spellAura->GetOwner());
 
-    //if(m_spellInfo->Id == 62388) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN 62388 AURA PASSE");
     m_spellAura->_ApplyEffectForTargets(effIndex);
 }
 
@@ -4141,6 +4140,24 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
 
                         if(player->HasAura(126896)) player->RemoveAura(126896);
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+		case SPELLFAMILY_PRIEST:
+        {
+            switch(m_spellInfo->Id)
+            {
+                case 73325: // Leap of faith
+                {
+                    if(Player * player = unitTarget->ToPlayer())
+                    {
+                        if(GetCaster()->HasAura(64129)) // Body and Soul
+							player->CastSpell(player, 65081, true);
                     }
                     break;
                 }
