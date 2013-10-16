@@ -55,56 +55,56 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     for (uint8 i = 0; i < items_count; ++i) // need help on this loop , not done yet
     {
-        itemGUIDs[i][2] = recvData.ReadBit();
-        itemGUIDs[i][6] = recvData.ReadBit();
-        itemGUIDs[i][3] = recvData.ReadBit();
-        itemGUIDs[i][7] = recvData.ReadBit();
-        itemGUIDs[i][1] = recvData.ReadBit();
         itemGUIDs[i][0] = recvData.ReadBit();
-        itemGUIDs[i][4] = recvData.ReadBit();
         itemGUIDs[i][5] = recvData.ReadBit();
+        itemGUIDs[i][1] = recvData.ReadBit();
+        itemGUIDs[i][4] = recvData.ReadBit();
+        itemGUIDs[i][3] = recvData.ReadBit();
+        itemGUIDs[i][2] = recvData.ReadBit();
+        itemGUIDs[i][7] = recvData.ReadBit();
+        itemGUIDs[i][6] = recvData.ReadBit();
     }
 
     mailbox[0] = recvData.ReadBit();
     mailbox[4] = recvData.ReadBit();
 	receiverLength = recvData.ReadBits(7);
     mailbox[5] = recvData.ReadBit();
-	subjectLength = recvData.ReadBits(9); // might need swaped with bodyLength read12bits , need test , i am not sure
+    bodyLength = recvData.ReadBits(12);
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "MAIL : subjectLength %u", subjectLength);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CHAT : bodyLength %u", bodyLength);
 
     mailbox[6] = recvData.ReadBit();
     mailbox[2] = recvData.ReadBit();
     mailbox[3] = recvData.ReadBit();
-	bodyLength = recvData.ReadBits(12);
+    subjectLength = recvData.ReadBits(9);
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "CHAT : bodyLength %u", bodyLength);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "MAIL : subjectLength %u", subjectLength);
 
     mailbox[1] = recvData.ReadBit();
     mailbox[7] = recvData.ReadBit();
 
     recvData.ReadByteSeq(mailbox[7]);
-	subject = recvData.ReadString(subjectLength);
+    body = recvData.ReadString(bodyLength);
     recvData.ReadByteSeq(mailbox[1]);
 
 	for (uint8 i = 0; i < items_count; ++i) // need help on this loop , not done yet
     {
-        recvData.ReadByteSeq(itemGUIDs[i][6]);
+        recvData.ReadByteSeq(itemGUIDs[i][5]);
         recvData.ReadByteSeq(itemGUIDs[i][1]);
-        recvData.ReadByteSeq(itemGUIDs[i][7]);
+        recvData.ReadByteSeq(itemGUIDs[i][4]);
+        recvData.ReadByteSeq(itemGUIDs[i][3]);
+        recvData.ReadByteSeq(itemGUIDs[i][6]);
         recvData.ReadByteSeq(itemGUIDs[i][2]);
         recvData.read_skip<uint8>();            // item slot in mail, not used
-        recvData.ReadByteSeq(itemGUIDs[i][3]);
+        recvData.ReadByteSeq(itemGUIDs[i][7]);
         recvData.ReadByteSeq(itemGUIDs[i][0]);
-        recvData.ReadByteSeq(itemGUIDs[i][4]);
-        recvData.ReadByteSeq(itemGUIDs[i][5]);
     }
 
     recvData.ReadByteSeq(mailbox[6]);
     recvData.ReadByteSeq(mailbox[5]);
-	receiver = recvData.ReadString(receiverLength);
+    subject = recvData.ReadString(subjectLength);
     recvData.ReadByteSeq(mailbox[2]);
-	body = recvData.ReadString(bodyLength);
+    receiver = recvData.ReadString(receiverLength);
     recvData.ReadByteSeq(mailbox[4]);
     recvData.ReadByteSeq(mailbox[0]);
     recvData.ReadByteSeq(mailbox[3]);
