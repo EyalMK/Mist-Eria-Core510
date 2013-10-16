@@ -644,7 +644,7 @@ MovementStatusElements MovementStartBackwardSequence[] =
     MSETimestamp,
     MSEPitch,
     MSEOrientation,
-    MSEIsAlive,    
+    MSEAlive,
     MSEEnd,
 };
 
