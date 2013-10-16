@@ -37,7 +37,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     uint32 bodyLength, subjectLength, receiverLength;
     uint32 unk1, unk2;
 
-	recvData >> COD >> money;                              // money and cod
+    recvData >> money >> COD;                              // money and cod
 
     recvData >> unk1;
     recvData >> unk2; // Stationery?
