@@ -1446,6 +1446,7 @@ enum Opcodes
     SMSG_WORLD_STATE_UI_TIMER_UPDATE                  = 0x004D,//16357
     SMSG_XP_GAIN_ABORTED                              = 0x398, //16357
     SMSG_ZONE_UNDER_ATTACK                            = 0x09E9,//16357
+    SMSG_SET_TIME_ZONE                                = 0x0310,//16357
 };
 
 /// Player state

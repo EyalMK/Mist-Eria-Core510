@@ -332,8 +332,6 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     if (GetTypeId() == TYPEID_UNIT)
         movementFlags &= MOVEMENTFLAG_MASK_CREATURE_ALLOWED;
 
-//    bool isSplineEnabled = ToUnit()->IsSplineEnabled();
-    bool isSplineEnabled = false;
     bool hasGOTransPos = (flags & UPDATEFLAG_GO_TRANSPORT_POSITION);
 //    bool hasGOTransPos = false;
     bool hasTransport = (flags & UPDATEFLAG_TRANSPORT);
@@ -420,12 +418,12 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         if (hasFallData)
             data->WriteBit(hasFallDirection);
 
-        data->WriteBit(isSplineEnabled);                                // Has spline data
+        data->WriteBit(self->IsSplineEnabled());                                // Has spline data
 
         if (movementFlags)
             data->WriteBits(movementFlags, 30);
 
-        if (isSplineEnabled)
+        if (self->IsSplineEnabled())
             Movement::PacketBuilder::WriteCreateBits(*self->movespline, *data);
     }
 
@@ -520,7 +518,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 
         *data << self->GetSpeed(MOVE_FLIGHT_BACK);
 
-        if (isSplineEnabled)
+        if (self->IsSplineEnabled())
             Movement::PacketBuilder::WriteCreateData(*self->movespline, *data);
 
         *data << self->GetSpeed(MOVE_SWIM);

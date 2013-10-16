@@ -797,6 +797,19 @@ void WorldSession::SendAccountDataTimes(uint32 mask)
         if (mask & (1 << i))
             data << uint32(GetAccountData(AccountDataType(i))->Time);// also unix time
     SendPacket(&data);
+
+    std::string l_TimeZone1 = "Europe/Paris";
+    std::string l_TimeZone2 = "Europe/Paris";
+
+    WorldPacket data(SMSG_SET_TIME_ZONE);
+    data.WriteBits(l_TimeZone1.length(), 9);
+    data.WriteBits(l_TimeZone2.length(), 9);
+    data.FlushBits();
+
+    data.WriteString(l_TimeZone1);
+    data.WriteString(l_TimeZone2);
+
+    SendPacket(&data);
 }
 
 void WorldSession::LoadTutorialsData()
