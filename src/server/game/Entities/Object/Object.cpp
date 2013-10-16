@@ -375,7 +375,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         data->WriteBit(guid[5]);
         data->WriteBits(0, 24);
         data->WriteBit(!hasSplineElevation);       // Has spline elevation
-        data->WriteBit(1);
+        data->WriteBit(0); //not ?
         data->WriteBit(0);
         data->WriteBit(guid[0]);
         data->WriteBit(guid[6]);
