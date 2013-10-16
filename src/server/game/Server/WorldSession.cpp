@@ -801,15 +801,15 @@ void WorldSession::SendAccountDataTimes(uint32 mask)
     std::string l_TimeZone1 = "Europe/Paris";
     std::string l_TimeZone2 = "Europe/Paris";
 
-    WorldPacket data(SMSG_SET_TIME_ZONE);
-    data.WriteBits(l_TimeZone1.length(), 9);
-    data.WriteBits(l_TimeZone2.length(), 9);
-    data.FlushBits();
+    WorldPacket data2(SMSG_SET_TIME_ZONE);
+    data2.WriteBits(l_TimeZone1.length(), 9);
+    data2.WriteBits(l_TimeZone2.length(), 9);
+    data2.FlushBits();
 
-    data.WriteString(l_TimeZone1);
-    data.WriteString(l_TimeZone2);
+    data2.WriteString(l_TimeZone1);
+    data2.WriteString(l_TimeZone2);
 
-    SendPacket(&data);
+    SendPacket(&data2);
 }
 
 void WorldSession::LoadTutorialsData()
