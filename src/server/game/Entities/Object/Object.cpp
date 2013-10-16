@@ -365,7 +365,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 
         data->WriteBit(guid[3]);
         data->WriteBit(hasFallData);
-        data->WriteBit(1);
+        data->WriteBit(self->m_movementInfo.time==0);
         data->WriteBit(0);
         data->WriteBit(guid[2]);
         data->WriteBit(0);
@@ -375,7 +375,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         data->WriteBit(guid[5]);
         data->WriteBits(0, 24);
         data->WriteBit(!hasSplineElevation);       // Has spline elevation
-        data->WriteBit(0);
+        data->WriteBit(1);
         data->WriteBit(0);
         data->WriteBit(guid[0]);
         data->WriteBit(guid[6]);
@@ -569,14 +569,17 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         data->WriteByteSeq(guid[6]);
 
         *data << float(self->GetPositionX());
+
+        if (self->m_movementInfo.time)
+            *data << uint32(self->m_movementInfo.time);
+
         *data << self->GetSpeed(MOVE_WALK);
 
         if (hasPitch)
             *data << float(self->m_movementInfo.pitch);
 
         data->WriteByteSeq(guid[5]);
-        //if (true)   // Has time, controlled by bit
-        *data << uint32(0);//getMSTime());
+        *data << uint32(0);
         *data << self->GetSpeed(MOVE_PITCH_RATE);
         data->WriteByteSeq(guid[2]);
         *data << self->GetSpeed(MOVE_RUN);
@@ -706,7 +709,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     }
 
     if (flags & UPDATEFLAG_TRANSPORT)
-        *data << uint32(0);                       // Unknown - getMSTime is wrong
+        *data << uint32(time(NULL));                       // Unknown - getMSTime is wrong
 
 	/*
 	if (bit644)
