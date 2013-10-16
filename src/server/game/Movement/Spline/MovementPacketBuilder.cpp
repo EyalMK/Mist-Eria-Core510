@@ -155,7 +155,8 @@ namespace Movement
 
     void PacketBuilder::WriteCreateBits(MoveSpline const& moveSpline, ByteBuffer& data)
     {
-        data.WriteBit(moveSpline.Finalized())
+        if (!data.WriteBit(!moveSpline.Finalized()))
+            return;
 
         data.WriteBit(moveSpline.splineflags & (MoveSplineFlag::Parabolic | MoveSplineFlag::Animation));
         data.WriteBits(moveSpline.getPath().size(), 22);
