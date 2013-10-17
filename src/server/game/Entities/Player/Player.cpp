@@ -6748,7 +6748,7 @@ void Player::CheckUndermap() // WIP
 	sLog->outDebug(LOG_FILTER_NETWORKIO, "CHECK UNDERMAP # x : %f; y : %f; z : %f; h : %f", x, y, z, h);
 
 	if (h > z)
-		TeleportTo(GetMapId, x, y, h + 0.5f, GetOrientation());
+		TeleportTo(GetMapId(), x, y, h + 0.5f, GetOrientation());
 }
 
 void Player::SaveRecallPosition()
