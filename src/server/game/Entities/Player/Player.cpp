@@ -6747,7 +6747,7 @@ void Player::CheckUndermap() // WIP
 	if(!GetMap()->IsOutdoors(x, y, z))
 		return;
 
-	float h = GetMap()->GetHeight(x, y, z);
+	float h = GetMap()->GetHeight(x, y, z + diff);
 
 	sLog->outDebug(LOG_FILTER_NETWORKIO, "CHECK UNDERMAP # x : %f; y : %f; z : %f; h : %f", x, y, z, h);
 
