@@ -6747,12 +6747,16 @@ void Player::CheckUndermap() // WIP
 	if(!GetMap()->IsOutdoors(x, y, z))
 		return;
 
-	float h = GetMap()->GetHeight(x, y, z + diff);
+	float h = GetMap()->GetHeight(x, y, 30000);
+
+	while ((GetMap()->GetHeight(x, y, h-2)) > -150000) {
+		h = GetMap()->GetHeight(x, y, h-2);
+	}
 
 	sLog->outDebug(LOG_FILTER_NETWORKIO, "CHECK UNDERMAP # x : %f; y : %f; z : %f; h : %f", x, y, z, h);
 
 	if (h > z + diff)
-		TeleportTo(GetMapId(), x, y, h + 0.5f, GetOrientation());
+		TeleportTo(GetMapId(), x, y, h + 1.f, GetOrientation());
 }
 
 void Player::SaveRecallPosition()
