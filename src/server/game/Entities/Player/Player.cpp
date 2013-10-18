@@ -6745,7 +6745,7 @@ void Player::CheckUndermap() // WIP
 
 	float h = GetMap()->GetHeight(x, y, z + 5.f);
 
-	if (h > z + 0.5f)
+	if (h > z + 10.f)
 		TeleportTo(GetMapId(), x, y, h + 0.5f, GetOrientation());
 }
 
