@@ -418,13 +418,12 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         if (hasFallData)
             data->WriteBit(hasFallDirection);
 
-        data->WriteBit(self->IsSplineEnabled());                                // Has spline data
+        if(data->WriteBit(self->IsSplineEnabled()))                              // Has spline data
+            Movement::PacketBuilder::WriteCreateBits(*self->movespline, *data);
+
 
         if (movementFlags)
-            data->WriteBits(movementFlags, 30);
-
-        if (self->IsSplineEnabled())
-            Movement::PacketBuilder::WriteCreateBits(*self->movespline, *data);
+            data->WriteBits(movementFlags, 30);        
     }
 
     if (hasGOTransPos)
@@ -717,7 +716,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     }
 
     if (hasTransport)
-        *data << uint32(time(NULL));                       // Unknown - getMSTime is wrong
+        *data << uint32(getMSTime());                       // Unknown - getMSTime is wrong
 
 	/*
 	if (bit644)
