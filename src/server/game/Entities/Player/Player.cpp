@@ -6743,9 +6743,9 @@ void Player::CheckUndermap() // WIP
 	if(!GetMap()->IsOutdoors(x, y, z))
 		return;
 
-	float h = GetMap()->GetHeight(x, y, z + 5.f);
+	float h = GetMap()->GetHeight(x, y, z + 4.f);
 
-	if (h > z + 10.f)
+	if (h > z + 40.f)
 		TeleportTo(GetMapId(), x, y, h + 0.5f, GetOrientation());
 }
 
