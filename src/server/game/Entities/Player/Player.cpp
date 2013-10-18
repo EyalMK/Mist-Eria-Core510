@@ -6733,6 +6733,10 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation, bool t
 
 void Player::CheckUndermap() // WIP
 {
+	float diff = (float)sWorld->getIntConfig(CONFIG_UNDERMAP_LEVEL);
+	if(!diff)
+		return;
+
 	if(isGameMaster())
 		return;
 
@@ -6743,9 +6747,9 @@ void Player::CheckUndermap() // WIP
 	if(!GetMap()->IsOutdoors(x, y, z))
 		return;
 
-	float h = GetMap()->GetHeight(x, y, z + 4.f);
+	float h = GetMap()->GetHeight(x, y, z);
 
-	if (h > z + 40.f)
+	if (h > z + diff)
 		TeleportTo(GetMapId(), x, y, h + 0.5f, GetOrientation());
 }
 
