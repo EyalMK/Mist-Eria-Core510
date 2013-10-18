@@ -49,7 +49,7 @@ namespace Movement
     {
         MoveSplineFlag splineflags = move_spline.splineflags;
 
-        data << uint8(0);                                       // sets/unsets MOVEMENTFLAG2_UNK7 (0x40)
+        data << uint8(0);                                       // sets/unsets MOVEMENTFLAG2_UNK6 (0x40)
         data << move_spline.spline.getPoint(move_spline.spline.first());
         data << move_spline.GetId();
 
