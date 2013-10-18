@@ -51,7 +51,10 @@ Pet::Pet(Player* owner, PetType type) : Guardian(NULL, owner, true),
     }
 
 	if(owner->getClass() == CLASS_WARLOCK)
+	{
 		m_petType = DEMON_PET;
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "DEMONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
+	}
 
     m_name = "Pet";
     m_regenTimer = PET_FOCUS_REGEN_INTERVAL;
@@ -218,6 +221,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
             petlevel = owner->getLevel();
 
             SetUInt32Value(UNIT_FIELD_BYTES_0, 0x800); // class = mage
+			setPowerType(POWER_MANA);
 
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
                                                             // this enables popup window (pet dismiss, cancel)
@@ -271,7 +275,11 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         {
             SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
 
-            SetPower(POWER_MANA, savedmana > uint32(GetMaxPower(POWER_MANA)) ? GetMaxPower(POWER_MANA) : savedmana);
+			if (getPetType() == SUMMON_PET)
+				SetPower(POWER_MANA, savedmana > uint32(GetMaxPower(POWER_MANA)) ? GetMaxPower(POWER_MANA) : savedmana);
+			if (getPetType() == DEMON_PET)
+				SetPower(POWER_ENERGY, uint32(GetMaxPower(POWER_ENERGY)));
+
         }
     }
 
@@ -366,7 +374,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     }
 
     //set last used pet number (for use in BG's)
-    if (owner->GetTypeId() == TYPEID_PLAYER && isControlled() && !isTemporarySummoned() && (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET))
+    if (owner->GetTypeId() == TYPEID_PLAYER && isControlled() && !isTemporarySummoned() && (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET ||getPetType() == DEMON_PET))
         owner->ToPlayer()->SetLastPetNumber(pet_number);
 
     m_loading = false;
