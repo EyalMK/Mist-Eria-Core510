@@ -418,12 +418,11 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         if (hasFallData)
             data->WriteBit(hasFallDirection);
 
+        if (movementFlags)
+            data->WriteBits(movementFlags, 30);
+
         if(data->WriteBit(self->IsSplineEnabled()))                              // Has spline data
             Movement::PacketBuilder::WriteCreateBits(*self->movespline, *data);
-
-
-        if (movementFlags)
-            data->WriteBits(movementFlags, 30);        
     }
 
     if (hasGOTransPos)
