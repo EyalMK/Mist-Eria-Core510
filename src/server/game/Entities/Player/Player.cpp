@@ -6725,7 +6725,28 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation, bool t
 
     CheckAreaExploreAndOutdoor();
 
+
+	CheckUndermap();
+
     return true;
+}
+
+void Player::CheckUndermap() // WIP
+{
+	if(isGameMaster())
+		return;
+
+	float x = GetPositionX();
+	float y = GetPositionY();
+	float z = GetPositionZ();
+
+	if(!GetMap()->IsOutdoors(x, y, z))
+		return;
+
+	float h = GetMap()->GetHeight(x, y, z + 5.f);
+
+	if (h > z + 0.5f)
+		TeleportTo(GetMapId(), x, y, h + 0.5f, GetOrientation());
 }
 
 void Player::SaveRecallPosition()
