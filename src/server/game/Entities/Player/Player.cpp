@@ -6754,7 +6754,7 @@ void Player::CheckUndermap() // WIP
 	}
 
 	if (h > z + diff)
-		TeleportTo(GetMapId(), x, y, h + diff, GetOrientation());
+		TeleportTo(GetMapId(), x, y, h + 14.f, GetOrientation());
 }
 
 void Player::SaveRecallPosition()
