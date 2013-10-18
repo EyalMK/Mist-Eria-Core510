@@ -50,6 +50,9 @@ Pet::Pet(Player* owner, PetType type) : Guardian(NULL, owner, true),
         InitCharmInfo();
     }
 
+	if(owner->getClass() == CLASS_WARLOCK)
+		m_petType = DEMON_PET;
+
     m_name = "Pet";
     m_regenTimer = PET_FOCUS_REGEN_INTERVAL;
 }
@@ -228,6 +231,15 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
                                                             // this enables popup window (pet abandon, cancel)
             setPowerType(POWER_FOCUS);
             break;
+		case DEMON_PET:
+            SetUInt32Value(UNIT_FIELD_BYTES_0, 0x03020100); // class = warrior, gender = none, power = energy
+            SetSheath(SHEATH_STATE_MELEE);
+            SetByteFlag(UNIT_FIELD_BYTES_2, 2, fields[9].GetBool() ? 0 : UNIT_CAN_BE_RENAMED);
+
+            SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+                                                            // this enables popup window (pet abandon, cancel)
+            setPowerType(POWER_ENERGY);
+            break;
         default:
             if (!IsPetGhoul())
                 sLog->outError(LOG_FILTER_PETS, "Pet have incorrect type (%u) for pet loading.", getPetType());
@@ -247,6 +259,8 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
 
     if (getPetType() == SUMMON_PET && !current)              //all (?) summon pets come with full health when called, but not when they are current
         SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+	else if (getPetType() == DEMON_PET && !current)              //all (?) demon pets come with full health when called, but not when they are current
+        SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
     else
     {
         uint32 savedhealth = fields[10].GetUInt32();

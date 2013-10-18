@@ -26790,7 +26790,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
 {
     Pet* pet = new Pet(this, petType);
 
-    if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry))
+    if (petType == DEMON_PET && pet->LoadPetFromDB(this, entry))
     {
         // Remove Demonic Sacrifice auras (known pet)
         Unit::AuraEffectList const& auraClassScripts = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
@@ -26838,7 +26838,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     pet->SetCreatorGUID(GetGUID());
     pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, getFaction());
 
-    pet->setPowerType(POWER_MANA);
+    //pet->setPowerType(POWER_MANA);
 
 
     pet->SetUInt32Value(UNIT_NPC_FLAGS, 0);
@@ -26846,6 +26846,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     pet->InitStatsForLevel(getLevel());
 
     SetMinion(pet, true);
+
 
     switch (petType)
     {
@@ -26868,6 +26869,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     switch (petType)
     {
         case SUMMON_PET:
+		case DEMON_PET:
             pet->InitPetCreateSpells();
             pet->InitTalentForLevel();
             pet->SavePetToDB(PET_SAVE_AS_CURRENT);
@@ -26877,7 +26879,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
             break;
     }
 
-    if (petType == SUMMON_PET)
+    if (petType == DEMON_PET)
     {
         // Remove Demonic Sacrifice auras (known pet)
         Unit::AuraEffectList const& auraClassScripts = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
