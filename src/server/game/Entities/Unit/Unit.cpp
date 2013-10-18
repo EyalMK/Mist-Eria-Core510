@@ -8389,7 +8389,7 @@ void Unit::SetMinion(Minion *minion, bool apply)
         if (minion->IsPetGhoul())
             minion->setPowerType(POWER_ENERGY);
 
-		if (minion->GetTypeId() == DEMON_PET)
+		if (minion->GetOwner()->getClass() == CLASS_WARLOCK)
 			minion->setPowerType(POWER_ENERGY);
 
         if (GetTypeId() == TYPEID_PLAYER)
