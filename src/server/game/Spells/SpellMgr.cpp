@@ -441,6 +441,18 @@ bool SpellMgr::IsSpellValid(SpellInfo const* spellInfo, Player* player, bool msg
     return true;
 }
 
+uint32 SpellMgr::GetOverrideSpell(Player* player, uint32 id) const
+{
+	switch(id)
+	{
+	case 1752: // Sinister Strike
+		return player->HasSpell(16511) ? 16511 : 1752; // Hemorrhage
+
+	default:
+		return id;
+	}
+}
+
 //SpellDifficulty.dbc not exist any more
 /*uint32 SpellMgr::GetSpellDifficultyId(uint32 spellId) const
 {

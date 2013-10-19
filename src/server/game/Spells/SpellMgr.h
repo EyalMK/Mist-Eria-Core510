@@ -693,6 +693,9 @@ class SpellMgr
         SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : NULL; }
         uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap.size(); }
 
+		// Spell Override
+		uint32 GetOverrideSpell(Player *player, uint32 id) const;
+
     // Modifiers
     public:
 

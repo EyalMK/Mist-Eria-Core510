@@ -345,6 +345,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         return;
     }
 
+	spellId = sSpellMgr->GetOverrideSpell(GetPlayer(), spellId);
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
