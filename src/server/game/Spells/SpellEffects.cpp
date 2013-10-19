@@ -735,9 +735,23 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 case 109132:                        //roulade
                 {
                     if(m_caster->HasUnitMovementFlag(MOVEMENTFLAG_BACKWARD))
-                        m_caster->CastSpell(m_caster, 109131, true);
+					{
+                        m_caster->CastSpell(m_caster, 109131, true); // cast roll
+
+						if(m_caster->HasAura(115174)) // if monk have "Momentum" talent
+						{
+							m_caster->CastSpell(m_caster, 119085, true); // cast spell for speed
+						}
+					}
                     else
-                        m_caster->CastSpell(m_caster, 107427, true);
+					{
+                        m_caster->CastSpell(m_caster, 107427, true); // cast roll
+
+						if(m_caster->HasAura(115174)) // if monk have "Momentum" talent
+						{
+							m_caster->CastSpell(m_caster, 119085, true); // cast spell for speed
+						}
+					}
                     return;
                 }
                 case 115546:
@@ -763,6 +777,13 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     m_caster->CastSpell(unitTarget, 126456, true);
                     break;
                 }
+				case 115008: // Chi torpedo
+				{
+					if(m_caster->HasAura(115174)) // if monk have "Momentum" talent
+					{
+						m_caster->CastSpell(m_caster, 119085, true); // cast spell for speed
+					}
+				}
                 default:
                     break;
             }
