@@ -6749,8 +6749,8 @@ void Player::CheckUndermap() // WIP
 
 	float h = GetMap()->GetHeight(x, y, 30000);
 
-	while ((GetMap()->GetHeight(x, y, h-2)) > -150000) {
-		h = GetMap()->GetHeight(x, y, h-2);
+	while ((GetMap()->GetHeight(x, y, h-3.f)) > -150000) {
+		h = GetMap()->GetHeight(x, y, h-3.f);
 	}
 
 	if (h > z + diff)
