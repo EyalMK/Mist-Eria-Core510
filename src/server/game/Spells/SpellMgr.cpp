@@ -451,6 +451,8 @@ uint32 SpellMgr::GetOverrideSpell(Player* player, uint32 id) const
 		return player->HasSpell(348) ? 348 : 172; // Immolate
 	case 585: // Smite ( i think it's okay )
 		return player->HasSpell(15407) ? 15407 : 585; // Mind flay 
+	case 686: // Shadow Bolt
+		return player->HasSpell(103103) ? 103103 : 686; // Malefic Grasp
 
 	default:
 		return id;
