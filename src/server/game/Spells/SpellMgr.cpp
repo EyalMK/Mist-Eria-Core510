@@ -447,6 +447,10 @@ uint32 SpellMgr::GetOverrideSpell(Player* player, uint32 id) const
 	{
 	case 1752: // Sinister Strike
 		return player->HasSpell(16511) ? 16511 : 1752; // Hemorrhage
+	case 172: // Corruption
+		return player->HasSpell(348) ? 348 : 172; // Immolate
+	case 585: // Smite ( i think it's okay )
+		return player->HasSpell(15407) ? 15407 : 585; // Mind flay 
 
 	default:
 		return id;
