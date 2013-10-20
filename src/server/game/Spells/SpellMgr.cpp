@@ -475,6 +475,10 @@ uint32 SpellMgr::GetOverrideSpell(Player* player, uint32 id) const
 		return player->HasSpell(106707) ? 106707 : 770; // Faerie Swarm
 	case 66: // Invisibility
 		return player->HasSpell(110959) ? 110959 : 66; // Greater Invisibility
+	case 34428: // Impending Victory
+		return player->HasSpell(103840) ? 103840 : 34428; // Victory Rush
+	case 2136: // Fire Blast
+		return player->HasSpell(108853) ? 108853 : 2136; // Inferno Blast
 	default:
 		return id;
 	}
