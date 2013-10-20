@@ -446,14 +446,35 @@ uint32 SpellMgr::GetOverrideSpell(Player* player, uint32 id) const
 	switch(id)
 	{
 	case 1752: // Sinister Strike
-		return player->HasSpell(16511) ? 16511 : 1752; // Hemorrhage
+		return player->HasSpell(16511) ? 16511 : (player->HasSpell(111240) ? 111240 : 1752); // Hemorrhage - Dispatch
 	case 172: // Corruption
 		return player->HasSpell(348) ? 348 : 172; // Immolate
 	case 585: // Smite ( i think it's okay )
 		return player->HasSpell(15407) ? 15407 : 585; // Mind flay 
 	case 686: // Shadow Bolt
 		return player->HasSpell(103103) ? 103103 : 686; // Malefic Grasp
-
+	case 13165: // Aspect of the Hawk
+		return player->HasSpell(109260) ? 109260 : 13165; // Aspect of the Iron Hawk
+	case 47476: // Strangulate
+		return player->HasSpell(108194) ? 108194 : 47476; // Asphyxiate
+	case 1454: // Life Tap
+		return player->HasSpell(111546) ? 111546 : 1454; // Chaotic Energy
+	case 109132: // Roll
+		return player->HasSpell(115008) ? 115008 : 109132; // Chi tornado
+	case 7386: // Sunden Armor
+		return player->HasSpell(20243) ? 20243 : 7386; // Devastate
+	case 2484: // Earthbind Totem
+		return player->HasSpell(51485) ? 51485 : 2484; // Earthgrab Totem
+	case 2098: //Eviscerate
+		return player->HasSpell(32645) ? 32645 : 2098; // Envenom
+	case 85673: // Word of Glory
+		return player->HasSpell(114163) ? 114163 : 85673; // Eternal Flame
+	case 853: // Hammer of Justice
+		return player->HasSpell(105593) ? 105593 : 853; // Fist of Justice
+	case 770: // Faerie Fire
+		return player->HasSpell(106707) ? 106707 : 770; // Faerie Swarm
+	case 66: // Invisibility
+		return player->HasSpell(110959) ? 110959 : 66; // Greater Invisibility
 	default:
 		return id;
 	}
