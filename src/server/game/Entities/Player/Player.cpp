@@ -141,6 +141,8 @@ static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
 PlayerTaxi::PlayerTaxi()
 {
     memset(m_taximask, 0, sizeof(m_taximask));
+    m_TaxiDestinations = new std::deque<uint32>();
+
 }
 
 void PlayerTaxi::InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint8 level)
@@ -222,18 +224,18 @@ bool PlayerTaxi::LoadTaxiDestinationsFromString(const std::string& values, uint3
         AddTaxiDestination(node);
     }
 
-    if (m_TaxiDestinations.empty())
+    if (m_TaxiDestinations->empty())
         return true;
 
     // Check integrity
-    if (m_TaxiDestinations.size() < 2)
+    if (m_TaxiDestinations->size() < 2)
         return false;
 
-    for (size_t i = 1; i < m_TaxiDestinations.size(); ++i)
+    for (size_t i = 1; i < m_TaxiDestinations->size(); ++i)
     {
         uint32 cost;
         uint32 path;
-        sObjectMgr->GetTaxiPath(m_TaxiDestinations[i-1], m_TaxiDestinations[i], path, cost);
+        sObjectMgr->GetTaxiPath((*m_TaxiDestinations)[i-1], (*m_TaxiDestinations)[i], path, cost);
         if (!path)
             return false;
     }
@@ -247,26 +249,26 @@ bool PlayerTaxi::LoadTaxiDestinationsFromString(const std::string& values, uint3
 
 std::string PlayerTaxi::SaveTaxiDestinationsToString()
 {
-    if (m_TaxiDestinations.empty())
+    if (m_TaxiDestinations->empty())
         return "";
 
     std::ostringstream ss;
 
-    for (size_t i=0; i < m_TaxiDestinations.size(); ++i)
-        ss << m_TaxiDestinations[i] << ' ';
+    for (size_t i=0; i < m_TaxiDestinations->size(); ++i)
+        ss << (*m_TaxiDestinations)[i] << ' ';
 
     return ss.str();
 }
 
 uint32 PlayerTaxi::GetCurrentTaxiPath() const
 {
-    if (m_TaxiDestinations.size() < 2)
+    if (m_TaxiDestinations->size() < 2)
         return 0;
 
     uint32 path;
     uint32 cost;
 
-    sObjectMgr->GetTaxiPath(m_TaxiDestinations[0], m_TaxiDestinations[1], path, cost);
+    sObjectMgr->GetTaxiPath((*m_TaxiDestinations)[0], (*m_TaxiDestinations)[1], path, cost);
 
     return path;
 }
