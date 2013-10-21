@@ -6743,7 +6743,8 @@ void Player::CheckUndermap() // WIP
 	if(!IsFalling())
 		return;
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "######## DEBUG TERAH ######## lastFallZ = %f ; lastFallTime = %u", m_lastFallZ, m_lastFallTime);
+	if(m_lastFallTime)
+		return;
 
 	float x = GetPositionX();
 	float y = GetPositionY();
