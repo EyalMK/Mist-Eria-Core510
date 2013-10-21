@@ -6742,6 +6742,12 @@ void Player::CheckUndermap() // WIP
 	if(isGameMaster())
 		return;
 
+	if(!IsFalling())
+		return;
+
+	if(m_lastFallTime)
+		return;
+
 	float x = GetPositionX();
 	float y = GetPositionY();
 	float z = GetPositionZ();
