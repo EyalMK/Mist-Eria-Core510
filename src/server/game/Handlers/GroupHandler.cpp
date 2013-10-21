@@ -1147,8 +1147,11 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
     if (mask & GROUP_UPDATE_FLAG_UNK100)
         *data << uint16(0);
 
-    if (mask & GROUP_UPDATE_FLAG_POSITION)
-        *data << uint16(player->GetPositionY()) << uint16(player->GetPositionX()) << uint16(player->GetPositionZ());
+    if (mask & GROUP_UPDATE_FLAG_POSITION) {
+        *data << uint16(player->GetPositionX());
+        *data << uint16(player->GetPositionY());
+        *data << uint16(player->GetPositionZ());
+    }
 
     if (mask & GROUP_UPDATE_FLAG_AURAS)
     {
@@ -1392,9 +1395,9 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
     if (mask1 & GROUP_UPDATE_FLAG_UNK100)
         data << uint16(0);
     if (mask1 & GROUP_UPDATE_FLAG_POSITION) {
-        data << uint16(player->GetPositionZ());               // GROUP_UPDATE_FLAG_POSITION
         data << uint16(player->GetPositionX());               // GROUP_UPDATE_FLAG_POSITION
         data << uint16(player->GetPositionY());               // GROUP_UPDATE_FLAG_POSITION
+        data << uint16(player->GetPositionZ());               // GROUP_UPDATE_FLAG_POSITION
     }
 
     if (mask1 & GROUP_UPDATE_FLAG_AURAS) {
