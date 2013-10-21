@@ -477,7 +477,7 @@ enum Opcodes
     CMSG_REQUEST_CEMETERY_LIST                        = 0x1417,
     CMSG_REQUEST_HOTFIX                               = 0x1418,
     CMSG_REQUEST_INSPECT_RATED_BG_STATS               = 0x1419,
-    CMSG_REQUEST_PARTY_MEMBER_STATS                   = 0x1420,
+    CMSG_REQUEST_PARTY_MEMBER_STATS                   = 0x0183,//16357
     CMSG_REQUEST_PET_INFO                             = 0x0068,//16357
     CMSG_REQUEST_PVP_OPTIONS_ENABLED                  = 0x0417,//16357
     CMSG_REQUEST_PVP_REWARDS                          = 0x1423,
