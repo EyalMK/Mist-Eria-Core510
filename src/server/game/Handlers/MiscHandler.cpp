@@ -1109,6 +1109,7 @@ void WorldSession::HandleCompleteMovie(WorldPacket& /*recvData*/)
 			else
 				GetPlayer()->TeleportTo(1, 1365.f, -4370.f, 26.f, 0.07f);
 			break;
+			GetPlayer()->RemoveAllAuras();
 			GetPlayer()->SetPhaseMask(1, true);
 		}
 
