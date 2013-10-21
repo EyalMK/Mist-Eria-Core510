@@ -21492,7 +21492,7 @@ void Player::ContinueTaxiFlight()
         }
     }
 
-    GetSession()->SendDoFlight(mountDisplayId, path, startNode);*/
+    GetSession()->SendDoFlight(mountDisplayId, path, startNode);
 
     /*TaxiPathNodeEntry const& node = nodeList[0];
     TeleportTo(node.mapid, node.x, node.y, node.z, 0.0f);
