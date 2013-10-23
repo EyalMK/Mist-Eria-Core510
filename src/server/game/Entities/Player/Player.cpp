@@ -141,7 +141,7 @@ static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
 PlayerTaxi::PlayerTaxi()
 {
     memset(m_taximask, 0, sizeof(m_taximask));
-    m_TaxiDestinations = new std::deque<uint32>();
+
 
 }
 
@@ -224,18 +224,26 @@ bool PlayerTaxi::LoadTaxiDestinationsFromString(const std::string& values, uint3
         AddTaxiDestination(node);
     }
 
-    if (m_TaxiDestinations->empty())
+    if (m_TaxiDestinations.empty())
         return true;
 
     // Check integrity
-    if (m_TaxiDestinations->size() < 2)
+    if (m_TaxiDestinations.size() < 2)
         return false;
 
-    for (size_t i = 1; i < m_TaxiDestinations->size(); ++i)
+    for (size_t i = 1; i < m_TaxiDestinations.size(); ++i)
     {
         uint32 cost;
         uint32 path;
-        sObjectMgr->GetTaxiPath((*m_TaxiDestinations)[i-1], (*m_TaxiDestinations)[i], path, cost);
+
+        std::list<uint32>::iterator it1 = m_TaxiDestinations.begin();
+        std::advance(it1, i-1);
+
+        std::list<uint32>::iterator it2 = m_TaxiDestinations.begin();
+        std::advance(it2, i);
+
+
+        sObjectMgr->GetTaxiPath(*it1, *it2, path, cost);
         if (!path)
             return false;
     }
@@ -254,21 +262,33 @@ std::string PlayerTaxi::SaveTaxiDestinationsToString()
 
     std::ostringstream ss;
 
-    for (size_t i=0; i < m_TaxiDestinations->size(); ++i)
-        ss << (*m_TaxiDestinations)[i] << ' ';
+    for (std::list<uint32>::iterator it = m_TaxiDestinations.begin() ; it != m_TaxiDestinations.end() ; ++it)
+        ss << *it << ' ';
 
     return ss.str();
 }
 
+uint32 PlayerTaxi::GetTaxiDestination() const
+{
+    if (m_TaxiDestinations.size() < 2) return 0;
+
+    std::list<uint32>::iterator i = m_TaxiDestinations.begin();
+    std::advance(i, 1);
+    return *i;
+}
+
 uint32 PlayerTaxi::GetCurrentTaxiPath() const
 {
-    if (m_TaxiDestinations->size() < 2)
+    if (m_TaxiDestinations.size() < 2)
         return 0;
 
     uint32 path;
     uint32 cost;
 
-    sObjectMgr->GetTaxiPath((*m_TaxiDestinations)[0], (*m_TaxiDestinations)[1], path, cost);
+    std::list<uint32>::iterator i = m_TaxiDestinations.begin();
+    std::advance(i, 1);
+
+    sObjectMgr->GetTaxiPath(m_TaxiDestinations.front(), *i, path, cost);
 
     return path;
 }
