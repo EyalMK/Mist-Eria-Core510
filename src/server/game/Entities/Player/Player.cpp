@@ -285,7 +285,7 @@ uint32 PlayerTaxi::GetCurrentTaxiPath() const
     uint32 path;
     uint32 cost;
 
-    std::list<uint32>::iterator i = m_TaxiDestinations.begin();
+    std::list<uint32>::const_iterator i = m_TaxiDestinations.begin();
     std::advance(i, 1);
 
     sObjectMgr->GetTaxiPath(m_TaxiDestinations.front(), *i, path, cost);
