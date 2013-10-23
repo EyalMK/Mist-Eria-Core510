@@ -257,7 +257,7 @@ bool PlayerTaxi::LoadTaxiDestinationsFromString(const std::string& values, uint3
 
 std::string PlayerTaxi::SaveTaxiDestinationsToString()
 {
-    if (m_TaxiDestinations->empty())
+    if (m_TaxiDestinations.empty())
         return "";
 
     std::ostringstream ss;
