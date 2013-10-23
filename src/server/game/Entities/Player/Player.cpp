@@ -262,7 +262,7 @@ std::string PlayerTaxi::SaveTaxiDestinationsToString()
 
     std::ostringstream ss;
 
-    for (std::list<uint32>::iterator it = m_TaxiDestinations.begin() ; it != m_TaxiDestinations.end() ; ++it)
+    for (std::list<uint32>::const_iterator it = m_TaxiDestinations.begin() ; it != m_TaxiDestinations.end() ; ++it)
         ss << *it << ' ';
 
     return ss.str();
@@ -272,7 +272,7 @@ uint32 PlayerTaxi::GetTaxiDestination() const
 {
     if (m_TaxiDestinations.size() < 2) return 0;
 
-    std::list<uint32>::iterator i = m_TaxiDestinations.begin();
+    std::list<uint32>::const_iterator i = m_TaxiDestinations.begin();
     std::advance(i, 1);
     return *i;
 }
