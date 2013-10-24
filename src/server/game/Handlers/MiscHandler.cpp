@@ -2162,16 +2162,17 @@ void WorldSession::HandleSaveCUFProfiles(WorldPacket& recvPacket)
     for (uint8 i = 0; i < count; ++i)
     {
         recvPacket >> profiles[i]->Unk146;
+		recvPacket >> profiles[i]->HealthText;
         recvPacket >> profiles[i]->Unk152;
-        recvPacket >> profiles[i]->FrameHeight;
 		profiles[i]->ProfileName = recvPacket.ReadString(strlens[i]);
+		recvPacket >> profiles[i]->Unk147;
+        recvPacket >> profiles[i]->SortBy;
+		recvPacket >> profiles[i]->FrameHeight;
+		recvPacket >> profiles[i]->Unk148;
         recvPacket >> profiles[i]->FrameWidth;
         recvPacket >> profiles[i]->Unk150;
-        recvPacket >> profiles[i]->HealthText;
-        recvPacket >> profiles[i]->Unk147;
-        recvPacket >> profiles[i]->SortBy;
         recvPacket >> profiles[i]->Unk154;
-        recvPacket >> profiles[i]->Unk148;
+        
 
         GetPlayer()->SaveCUFProfile(i, profiles[i]);
     }
