@@ -262,9 +262,12 @@ std::string PlayerTaxi::SaveTaxiDestinationsToString()
 
     std::ostringstream ss;
 
-    for (std::list<uint32>::const_iterator it = m_TaxiDestinations.begin() ; it != m_TaxiDestinations.end() ; ++it)
-        ss << *it << ' ';
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE Taxi size : %u", m_TaxiDestinations.size());
 
+    for (std::list<uint32>::const_iterator it = m_TaxiDestinations.begin() ; it != m_TaxiDestinations.end() ; ++it) {
+        ss << *it << ' ';
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE Taxi : %u", *it);
+    }
     return ss.str();
 }
 
