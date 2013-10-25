@@ -19199,7 +19199,7 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setUInt32(index++, uint32(m_deathExpireTime));
 
         ss.str("");
-//        ss << m_taxi.SaveTaxiDestinationsToString(); //NOBODIE temporary delete this shit
+        ss << m_taxi.SaveTaxiDestinationsToString(); //NOBODIE temporary delete this shit
 
         stmt->setString(index++, ss.str());
         stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS));
@@ -19319,7 +19319,7 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setUInt32(index++, uint32(m_deathExpireTime));
 
         ss.str("");
-        //        ss << m_taxi.SaveTaxiDestinationsToString(); //NOBODIE temporary delete this shit
+        ss << m_taxi.SaveTaxiDestinationsToString(); //NOBODIE temporary delete this shit
 
         stmt->setString(index++, ss.str());
         stmt->setUInt32(index++, GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS));
