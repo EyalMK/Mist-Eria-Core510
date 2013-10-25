@@ -3358,6 +3358,115 @@ void Guild::SendBankList(WorldSession* session, uint8 tabId, bool withContent, b
 
     ByteBuffer tabData;
     WorldPacket data(SMSG_GUILD_BANK_LIST, 500);
+
+	data << int32(tabId);
+	data << int64(m_bankMoney);
+	data << int32(_GetMemberRemainingSlots(member, tabId));
+
+	uint32 itemCount = 0;
+    if (withContent && _MemberHasTabRights(session->GetPlayer()->GetGUID(), tabId, GUILD_BANK_RIGHT_VIEW_TAB))
+        if (BankTab const* tab = GetBankTab(tabId))
+            for (uint8 slotId = 0; slotId < GUILD_BANK_MAX_SLOTS; ++slotId)
+                if (tab->GetItem(slotId))
+                    ++itemCount;
+
+	data.WriteBits(itemCount, 20);
+
+	if (withContent && _MemberHasTabRights(session->GetPlayer()->GetGUID(), tabId, GUILD_BANK_RIGHT_VIEW_TAB))
+    {
+        if (BankTab const* tab = GetBankTab(tabId))
+        {
+            for (uint8 slotId = 0; slotId < GUILD_BANK_MAX_SLOTS; ++slotId)
+            {
+                if (Item* tabItem = tab->GetItem(slotId))
+                {
+                    uint32 enchants = 0;
+                    for (uint32 ench = 0; ench < MAX_ENCHANTMENT_SLOT; ++ench)
+                    {
+                        if (uint32 enchantId = tabItem->GetEnchantmentId(EnchantmentSlot(ench)))
+                        {
+                            ++enchants;
+                        }
+                    }
+
+                    data.WriteBits(enchants, 23);
+					data.WriteBit(0);
+                }
+            }
+        }
+    }
+
+
+	data.WriteBits(withTabInfo ? _GetPurchasedTabsSize() : 0, 22);
+	data.WriteBit(0);
+
+	if (withTabInfo)
+    {
+        for (uint8 i = 0; i < _GetPurchasedTabsSize(); ++i)
+        {
+            data.WriteBits(m_bankTabs[i]->GetName().length(), 7);
+			data.WriteBits(m_bankTabs[i]->GetIcon().length(), 9);
+        }
+    }
+
+    data.FlushBits();
+
+    if (withTabInfo)
+    {
+        for (uint8 i = 0; i < _GetPurchasedTabsSize(); ++i)
+        {
+			data.WriteString(m_bankTabs[i]->GetName());
+            data << uint32(i);
+            data.WriteString(m_bankTabs[i]->GetIcon());
+        }
+    }
+
+	if (withContent && _MemberHasTabRights(session->GetPlayer()->GetGUID(), tabId, GUILD_BANK_RIGHT_VIEW_TAB))
+    {
+        if (BankTab const* tab = GetBankTab(tabId))
+        {
+            for (uint8 slotId = 0; slotId < GUILD_BANK_MAX_SLOTS; ++slotId)
+            {
+                if (Item* tabItem = tab->GetItem(slotId))
+                {
+					data << uint32(0);
+                    data << uint32(0);
+                    data << uint32(0);
+
+					for (uint32 ench = 0; ench < MAX_ENCHANTMENT_SLOT; ++ench)
+                    {
+                        if (uint32 enchantId = tabItem->GetEnchantmentId(EnchantmentSlot(ench)))
+                        {
+                            data << uint32(enchantId);
+                            data << uint32(ench);
+                        }
+                    }
+
+					data << uint32(0); // GetDataInSitu with this size
+
+					data << uint32(1);
+					data << uint32(2);
+					data << uint32(3);
+					data << uint32(4);
+					data << uint32(5);
+					data << uint32(6);
+
+					/*
+                    tabData << uint32(tabItem->GetCount());                 // ITEM_FIELD_STACK_COUNT
+                    tabData << uint32(slotId);
+                    tabData << uint32(tabItem->GetEntry());
+                    tabData << uint32(tabItem->GetItemRandomPropertyId());
+                    tabData << uint32(abs(tabItem->GetSpellCharges()));     // Spell charges
+                    tabData << uint32(tabItem->GetItemSuffixFactor());      // SuffixFactor
+					*/
+                }
+            }
+        }
+    }
+
+
+
+	/*
     data.WriteBit(0);
     uint32 itemCount = 0;
     if (withContent && _MemberHasTabRights(session->GetPlayer()->GetGUID(), tabId, GUILD_BANK_RIGHT_VIEW_TAB))
@@ -3433,6 +3542,7 @@ void Guild::SendBankList(WorldSession* session, uint8 tabId, bool withContent, b
 
     data << uint32(tabId);
     data << uint32(_GetMemberRemainingSlots(member, tabId));
+	*/
 
     session->SendPacket(&data);
 
