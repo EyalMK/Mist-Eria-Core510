@@ -1550,7 +1550,7 @@ void Guild::SendGuildRankInfo(WorldSession* session) const
         if (!rankInfo)
             continue;
 
-        data << uint32(0);
+        data << uint32(rankInfo->GetId());
 
 		if (rankInfo->GetName().length())
             data.WriteString(rankInfo->GetName());
@@ -1561,12 +1561,11 @@ void Guild::SendGuildRankInfo(WorldSession* session) const
             data << uint32(rankInfo->GetBankTabRights(j));
         }
 
-		data << uint32(rankInfo->GetId());
+		data << uint32(i);
 
 		data << uint32(rankInfo->GetRights());
 
-		data << uint32(5);
-        //data << uint32(rankInfo->GetBankMoneyPerDay());
+        data << uint32(rankInfo->GetBankMoneyPerDay());
     }
 
     session->SendPacket(&data);
