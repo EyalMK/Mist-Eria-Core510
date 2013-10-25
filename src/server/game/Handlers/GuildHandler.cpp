@@ -709,6 +709,8 @@ void WorldSession::HandleGuildSetRankPermissionsOpcode(WorldPacket& recvPacket)
     uint32 nameLength = recvPacket.ReadBits(7);
     std::string rankName = recvPacket.ReadString(nameLength);
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "1: %u ; 2: %u ; 3: %u ; 4: %u ; 5: %u", oldRankId, oldRights, newRights, moneyPerDay, newRankId);
+
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_SET_RANK_PERMISSIONS [%s]: Rank: %s (%u)", GetPlayerInfo().c_str(), rankName.c_str(), newRankId);
 
     guild->HandleSetRankInfo(this, newRankId, rankName, newRights, moneyPerDay, rightsAndSlots);
