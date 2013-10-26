@@ -121,8 +121,7 @@ public:
 
         void Cast()
 		{
-			Position* position;
-			if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()) != NULL && GetCaster()->GetExactDist2d(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionX(), GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionY()) <= 40.0f)
+			if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()) != NULL && GetCaster()->ToPlayer()->GetExactDist2d(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionX(), GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionY()) <= 40.0f)
 			  {
 						float petX, petY, petZ, casterX, casterY, casterZ;
 						uint32 petMapId;
@@ -224,8 +223,13 @@ public:
 		{
 			secondTimer = 900000;
 		}
-
+		
 		void JustDied(Unit *pWho)
+		{
+			me->GetOwner()->ToPlayer()->SetTranscendenceSpirit(NULL);
+		}
+
+		void CorpseRemoved()
 		{
 			me->GetOwner()->ToPlayer()->SetTranscendenceSpirit(NULL);
 		}
