@@ -690,7 +690,7 @@ void WorldSession::HandleGuildSetRankPermissionsOpcode(WorldPacket& recvPacket)
 
     recvPacket >> oldRankId;
     recvPacket >> oldRights;
-    recvPacket >> newRights;
+	recvPacket >> newRankId;
 
     GuildBankRightsAndSlotsVec rightsAndSlots(GUILD_BANK_MAX_TABS);
     for (uint8 tabId = 0; tabId < GUILD_BANK_MAX_TABS; ++tabId)
@@ -704,10 +704,13 @@ void WorldSession::HandleGuildSetRankPermissionsOpcode(WorldPacket& recvPacket)
         rightsAndSlots[tabId] = GuildBankRightsAndSlots(tabId, uint8(bankRights), slots);
     }
 
+	recvPacket >> newRights;
     recvPacket >> moneyPerDay;
-    recvPacket >> newRankId;
+
     uint32 nameLength = recvPacket.ReadBits(7);
     std::string rankName = recvPacket.ReadString(nameLength);
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "1: %u ; 2: %u ; 3: %u ; 4: %u ; 5: %u", oldRankId, oldRights, newRights, moneyPerDay, newRankId);
 
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_SET_RANK_PERMISSIONS [%s]: Rank: %s (%u)", GetPlayerInfo().c_str(), rankName.c_str(), newRankId);
 
