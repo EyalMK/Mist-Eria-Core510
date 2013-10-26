@@ -802,6 +802,7 @@ public:
     void SendEventLog(WorldSession* session) const;
     void SendBankLog(WorldSession* session, uint8 tabId) const;
     void SendBankList(WorldSession* session, uint8 tabId, bool withContent, bool withTabInfo) const;
+	void SendBankListAll(WorldSession* session, bool withContent, bool withTabInfo) const;
     void SendGuildXP(WorldSession* session = NULL) const;
     void SendBankTabText(WorldSession* session, uint8 tabId) const;
     void SendPermissions(WorldSession* session) const;

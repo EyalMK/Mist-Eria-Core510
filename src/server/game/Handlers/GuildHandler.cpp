@@ -410,9 +410,14 @@ void WorldSession::HandleGuildBankSetTabInfo(WorldPacket& recvData)
 
 	uint32 textLength = 0;
 	std::string info;
+	uint32 tabId;
 
+	recvData >> tabId;
 	textLength = recvData.ReadBits(14);
     info = recvData.ReadString(textLength);
+
+	if (Guild* guild = GetPlayer()->GetGuild())
+        guild->SetBankTabText(tabId, info);
 }
 
 void WorldSession::HandleGuildPermissions(WorldPacket& /* recvPacket */)
@@ -444,7 +449,8 @@ void WorldSession::HandleGuildBankerActivate(WorldPacket& recvPacket)
         return;
     }
 
-    guild->SendBankList(this, 0, true, true);
+	guild->SendBankList(this, 0, true, true);
+	guild->_GetPurchasedTabsSize()
 }
 
 // Called when opening guild bank tab only (first one)
@@ -619,10 +625,16 @@ void WorldSession::HandleGuildBankLogQuery(WorldPacket& recvPacket)
 
 void WorldSession::HandleQueryGuildBankTabText(WorldPacket &recvPacket)
 {
+	uint64 unk;
+	uint8 unk2;
     uint8 tabId;
-    recvPacket >> tabId;
 
-    sLog->outDebug(LOG_FILTER_GUILD, "MSG_QUERY_GUILD_BANK_TEXT [%s]: TabId: %u", GetPlayerInfo().c_str(), tabId);
+	recvPacket >> unk;
+    recvPacket >> tabId;
+	recvPacket >> unk2;
+
+    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_QUERY_TEXT [%s]: TabId: %u, unk: %lu, unk2: %u", GetPlayerInfo().c_str(), tabId, unk, unk2);
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_GUILD_BANK_QUERY_TEXT [%s]: TabId: %u, unk: %lu, unk2: %u", GetPlayerInfo().c_str(), tabId, unk, unk2);
 
     if (Guild* guild = GetPlayer()->GetGuild())
         guild->SendBankTabText(this, tabId);
