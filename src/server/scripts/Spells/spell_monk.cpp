@@ -119,16 +119,16 @@ public:
     {
         PrepareSpellScript(spell_monk_transcandence_transfert_SpellScript);
 
-        void Hit()
+        void Cast()
 		{
-			  if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))
+			if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()) && (GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->isAlive())
 			  {
 					float petX, petY, petZ, casterX, casterY, casterZ;
 					uint32 petMapId;
 					(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->GetPosition(petX, petY, petZ);
 					petMapId = (GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->GetMapId();
 					GetCaster()->GetPosition(casterX, casterY, casterZ);
-
+				
 					(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->SetPosition(casterX, casterY, casterZ, 0.0f);
 				
 					if(GetCaster()->ToPlayer())
@@ -139,7 +139,7 @@ public:
 
         void Register()
         {
-            OnHit += SpellHitFn(spell_monk_transcandence_transfert_SpellScript::Hit);
+            OnCast += SpellCastFn(spell_monk_transcandence_transfert_SpellScript::Cast);
         }
     };
 
@@ -160,10 +160,13 @@ public:
     {
         PrepareSpellScript(spell_monk_transcandence_SpellScript);
 		
-        void Hit()
+        void Cast()
         {
 			if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))
+			{
 				GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->DespawnOrUnsummon();
+				GetCaster()->ToPlayer()->SetTranscendenceSpirit(NULL);
+			}
             float x, y, z;
 			uint32 displayIdCaster;
 			GetCaster()->GetPosition(x,y,z);
@@ -175,7 +178,7 @@ public:
 		
         void Register()
         {
-            OnHit += SpellHitFn(spell_monk_transcandence_SpellScript::Hit);
+            OnCast += SpellCastFn(spell_monk_transcandence_SpellScript::Cast);
         }
     };
 
