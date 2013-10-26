@@ -3447,7 +3447,7 @@ void Guild::SendBankList(WorldSession* session, uint8 tabId, bool withContent, b
 					data << uint32(tabItem->GetEntry());
 					data << uint32(0);
 					data << uint32(0);
-					data << uint32(30);
+					data << uint32(0);
 					data << uint32(tabItem->GetCount());
 					data << uint32(10);
 
