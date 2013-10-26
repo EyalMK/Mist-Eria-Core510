@@ -872,8 +872,8 @@ void WorldSession::HandleQuestPOIQuery(WorldPacket& recvData)
 
                     for (std::vector<QuestPOIPoint>::const_iterator itr2 = itr->points.begin(); itr2 != itr->points.end(); ++itr2)
                     {
-                        data << int32(itr2->x); // POI point x
-                        data << int32(itr2->y); // POI point y
+                        data << int32(itr2->y); // POI point x
+                        data << int32(itr2->x); // POI point y
                     }
                 }
             }
