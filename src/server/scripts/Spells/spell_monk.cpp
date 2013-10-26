@@ -123,12 +123,12 @@ public:
 		{
 			if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))
 			  {
-					if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->isSummon() && GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->isAlive())
-					{
 						float petX, petY, petZ, casterX, casterY, casterZ;
 						uint32 petMapId;
-						uint32 displayIdCaster;
+						uint32 displayIdCaster;						
 						(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->GetPosition(petX, petY, petZ);
+						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->DespawnOrUnsummon();
+						GetCaster()->ToPlayer()->SetTranscendenceSpirit(GetCaster()->SummonCreature(54569, petX, petY, petZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 900*IN_MILLISECONDS));
 						petMapId = (GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->GetMapId();
 						GetCaster()->GetPosition(casterX, casterY, casterZ);
 				
@@ -138,11 +138,10 @@ public:
 						    GetCaster()->ToPlayer()->TeleportTo(petMapId, petX, petY, petZ, 0.0f);
 
 						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->DespawnOrUnsummon();
-						GetCaster()->ToPlayer()->SetTranscendenceSpirit(GetCaster()->SummonCreature(54569, casterX, casterY, casterZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS));
+						GetCaster()->ToPlayer()->SetTranscendenceSpirit(GetCaster()->SummonCreature(54569, casterX, casterY, casterZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 900*IN_MILLISECONDS));
 						displayIdCaster = GetCaster()->GetDisplayId();
 						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->SetDisplayId(displayIdCaster);
-
-					}
+						
 			  }
 			
 		}
@@ -180,7 +179,7 @@ public:
             float x, y, z;
 			uint32 displayIdCaster;
 			GetCaster()->GetPosition(x,y,z);
-			GetCaster()->ToPlayer()->SetTranscendenceSpirit(GetCaster()->SummonCreature(54569, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS));
+			GetCaster()->ToPlayer()->SetTranscendenceSpirit(GetCaster()->SummonCreature(54569, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 900*IN_MILLISECONDS));
 			displayIdCaster = GetCaster()->GetDisplayId();
 			GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->SetDisplayId(displayIdCaster);
 			GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 1784);
