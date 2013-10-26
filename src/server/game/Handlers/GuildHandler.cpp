@@ -524,6 +524,7 @@ void WorldSession::HandleGuildBankSwapItems(WorldPacket& recvPacket)
     uint8 tabId;
     uint8 slotId;
     uint32 itemGuid;
+	uint32 itemEntry;
     uint32 splitedAmount = 0;
 	uint8 unk;
 
