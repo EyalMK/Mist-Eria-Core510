@@ -450,7 +450,7 @@ void WorldSession::HandleGuildBankerActivate(WorldPacket& recvPacket)
     }
 
 	guild->SendBankList(this, 0, true, true);
-    guild->SendBankList(this, 1, true, true);
+	guild->_GetPurchasedTabsSize()
 }
 
 // Called when opening guild bank tab only (first one)

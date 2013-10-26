@@ -3350,6 +3350,12 @@ void Guild::_BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* par
         sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_EVENT [Broadcast] Event: %s (%u)", _GetGuildEventString(guildEvent).c_str(), guildEvent);
 }
 
+void Guild::SendBankListAll(WorldSession* session, bool withContent, bool withTabInfo) const
+{
+	for(int i=0; i<_GetPurchasedTabsSize(); ++i)
+		SendBankList(session, i, withContent, withTabInfo);
+}
+
 void Guild::SendBankList(WorldSession* session, uint8 tabId, bool withContent, bool withTabInfo) const
 {
     Member const* member = GetMember(session->GetPlayer()->GetGUID());
