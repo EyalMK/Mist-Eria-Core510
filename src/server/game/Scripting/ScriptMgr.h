@@ -432,7 +432,7 @@ class CreatureScript : public UnitScript, public UpdatableScript<Creature>
 
         // Called when a player accepts a quest from the creature.
         virtual bool OnQuestAccept(Player* /*player*/, Creature* /*creature*/, Quest const* /*quest*/) { return false; }
-
+		
         // Called when a player selects a quest in the creature's quest menu.
         virtual bool OnQuestSelect(Player* /*player*/, Creature* /*creature*/, Quest const* /*quest*/) { return false; }
 
@@ -983,7 +983,7 @@ class ScriptMgr
         void OnRemovePassenger(Vehicle* veh, Unit* passenger);
 
     public: /* DynamicObjectScript */
-
+		
         void OnDynamicObjectUpdate(DynamicObject* dynobj, uint32 diff);
 
     public: /* TransportScript */
@@ -995,7 +995,7 @@ class ScriptMgr
         void OnRelocate(Transport* transport, uint32 waypointId, uint32 mapId, float x, float y, float z);
 
     public: /* AchievementCriteriaScript */
-
+		
         bool OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target);
 
     public: /* PlayerScript */

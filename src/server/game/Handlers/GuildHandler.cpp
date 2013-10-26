@@ -410,9 +410,14 @@ void WorldSession::HandleGuildBankSetTabInfo(WorldPacket& recvData)
 
 	uint32 textLength = 0;
 	std::string info;
+	uint32 tabId;
 
+	recvData >> tabId;
 	textLength = recvData.ReadBits(14);
     info = recvData.ReadString(textLength);
+
+	if (Guild* guild = GetPlayer()->GetGuild())
+        guild->SetBankTabText(tabId, info);
 }
 
 void WorldSession::HandleGuildPermissions(WorldPacket& /* recvPacket */)
@@ -444,7 +449,7 @@ void WorldSession::HandleGuildBankerActivate(WorldPacket& recvPacket)
         return;
     }
 
-    guild->SendBankList(this, 0, true, true);
+	guild->SendBankListAll(this, true, true);
 }
 
 // Called when opening guild bank tab only (first one)
@@ -520,6 +525,7 @@ void WorldSession::HandleGuildBankSwapItems(WorldPacket& recvPacket)
     uint8 slotId;
     uint32 itemEntry;
     uint32 splitedAmount = 0;
+	uint8 unk;
 
     if (bankToBank)
     {
@@ -536,7 +542,9 @@ void WorldSession::HandleGuildBankSwapItems(WorldPacket& recvPacket)
 		recvPacket >> itemEntry;
         recvPacket >> slotId; 
 		recvPacket >> splitedAmount;
-        recvPacket.read_skip<uint8>();                       // Always 0
+        recvPacket >> unk;                       // Always 0
+
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "%u, %u, %u, %u, %u, %u, %u, %u", destTabId, destSlotId, destItemEntry, tabId, itemEntry, slotId, splitedAmount, unk);
 
         guild->SwapItems(GetPlayer(), tabId, slotId, destTabId, destSlotId, splitedAmount);
     }
@@ -619,10 +627,16 @@ void WorldSession::HandleGuildBankLogQuery(WorldPacket& recvPacket)
 
 void WorldSession::HandleQueryGuildBankTabText(WorldPacket &recvPacket)
 {
+	uint64 unk;
+	uint8 unk2;
     uint8 tabId;
-    recvPacket >> tabId;
 
-    sLog->outDebug(LOG_FILTER_GUILD, "MSG_QUERY_GUILD_BANK_TEXT [%s]: TabId: %u", GetPlayerInfo().c_str(), tabId);
+	recvPacket >> unk;
+    recvPacket >> tabId;
+	recvPacket >> unk2;
+
+    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_QUERY_TEXT [%s]: TabId: %u, unk: %lu, unk2: %u", GetPlayerInfo().c_str(), tabId, unk, unk2);
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_GUILD_BANK_QUERY_TEXT [%s]: TabId: %u, unk: %lu, unk2: %u", GetPlayerInfo().c_str(), tabId, unk, unk2);
 
     if (Guild* guild = GetPlayer()->GetGuild())
         guild->SendBankTabText(this, tabId);
@@ -690,7 +704,7 @@ void WorldSession::HandleGuildSetRankPermissionsOpcode(WorldPacket& recvPacket)
 
     recvPacket >> oldRankId;
     recvPacket >> oldRights;
-    recvPacket >> newRights;
+	recvPacket >> newRankId;
 
     GuildBankRightsAndSlotsVec rightsAndSlots(GUILD_BANK_MAX_TABS);
     for (uint8 tabId = 0; tabId < GUILD_BANK_MAX_TABS; ++tabId)
@@ -704,10 +718,13 @@ void WorldSession::HandleGuildSetRankPermissionsOpcode(WorldPacket& recvPacket)
         rightsAndSlots[tabId] = GuildBankRightsAndSlots(tabId, uint8(bankRights), slots);
     }
 
+	recvPacket >> newRights;
     recvPacket >> moneyPerDay;
-    recvPacket >> newRankId;
+
     uint32 nameLength = recvPacket.ReadBits(7);
     std::string rankName = recvPacket.ReadString(nameLength);
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "1: %u ; 2: %u ; 3: %u ; 4: %u ; 5: %u", oldRankId, oldRights, newRights, moneyPerDay, newRankId);
 
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_SET_RANK_PERMISSIONS [%s]: Rank: %s (%u)", GetPlayerInfo().c_str(), rankName.c_str(), newRankId);
 

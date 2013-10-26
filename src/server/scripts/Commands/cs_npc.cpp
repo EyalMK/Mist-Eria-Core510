@@ -448,6 +448,7 @@ public:
             return false;
         }
 
+
         // Delete the creature
         unit->CombatStop();
         unit->DeleteFromDB();

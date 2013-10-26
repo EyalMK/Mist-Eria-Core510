@@ -680,7 +680,7 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this)
 #ifdef _MSC_VER
 #pragma warning(default:4355)
 #endif
-
+	
     m_speakTime = 0;
     m_speakCount = 0;
 
@@ -893,6 +893,7 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this)
 
     m_achievementMgr = new AchievementMgr<Player>(this);
     m_reputationMgr = new ReputationMgr(this);
+	transcendence_spirit = NULL;
 }
 
 Player::~Player()

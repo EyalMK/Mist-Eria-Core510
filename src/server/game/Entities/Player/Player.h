@@ -2526,7 +2526,7 @@ class Player : public Unit, public GridObject<Player>
         void SetClientControl(Unit* target, uint8 allowMove);
 
         void SetMover(Unit* target);
-
+		
         void SetSeer(WorldObject* target) { m_seer = target; }
         void SetViewpoint(WorldObject* target, bool apply);
         WorldObject* GetViewpoint() const;
@@ -2782,6 +2782,8 @@ class Player : public Unit, public GridObject<Player>
         bool SwapVoidStorageItem(uint8 oldSlot, uint8 newSlot);
         VoidStorageItem* GetVoidStorageItem(uint8 slot) const;
         VoidStorageItem* GetVoidStorageItem(uint64 id, uint8& slot) const;
+		Creature* GetTranscendenceSpirit(Unit* unit){ if(unit->getClass() == CLASS_MONK) return transcendence_spirit; else return NULL; }
+		void SetTranscendenceSpirit(Creature* creature){transcendence_spirit = creature;}
 
     protected:
         // Gamemaster whisper whitelist
@@ -3072,7 +3074,7 @@ class Player : public Unit, public GridObject<Player>
         InventoryResult CanStoreItem_InInventorySlots(uint8 slot_begin, uint8 slot_end, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const;
         Item* _StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool update);
         Item* _LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, Field* fields);
-
+		Creature *transcendence_spirit;
         std::set<uint32> m_refundableItems;
         void SendRefundInfo(Item* item);
         void RefundItem(Item* item);
