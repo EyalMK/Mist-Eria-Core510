@@ -3314,7 +3314,7 @@ void Guild::_SendBankContentUpdate(uint8 tabId, SlotIds slots) const
 
 			data << uint32(0);
             data << uint32(0);
-            data << uint32(tabItem ? tabItem->GetBagSlot() : 0);
+            data << uint32(*itr);
 
 			if(tabItem)
 			{

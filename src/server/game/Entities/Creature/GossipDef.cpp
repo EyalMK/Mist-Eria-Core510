@@ -357,7 +357,12 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, uint64 npcGUID, 
     data << uint32(quest->GetSuggestedPlayers());
     data << uint8(0);                                       // IsFinished? value is sent back to server in quest accept packet
     data << uint8(0);                                       // 4.x FIXME: Starts at AreaTrigger
-    data << uint32(quest->GetRequiredSpell());              // 4.x
+
+    if (quest->GetRequiredSpell()) {
+        data << uint32(1);
+        data << uint32(quest->GetRequiredSpell());              // 4.x
+    } else
+        data << uint32(0);
 
     quest->BuildExtraQuestInfo(data, _session->GetPlayer());
 
@@ -579,32 +584,34 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
             type = QUEST_REQUIREMENT_GAMEOBJECT;
             id *= -1;
         }
-        requirementCount++;
 
-        data << uint32(0);
+        data << uint32(requirementCount);
         data << uint8(type);
         data << uint32(id);
         data << uint32(quest->RequiredNpcOrGoCount[i]);
         data << uint32(0);
         data << questObjectiveText[i];
         data << uint8(0);           // unknown
-        data << uint8(0);           // unknown
+        data << uint8(0);           // additionnal data
+
+        requirementCount++;
     }
 
     for(int i = 0 ; i < QUEST_ITEM_OBJECTIVES_COUNT ; i++)
     {
         uint32 id = quest->RequiredItemId[i];
         uint32 count = quest->RequiredItemCount[i];
-        requirementCount++;
 
-        data << uint32(0);
+        data << uint32(requirementCount);
         data << uint8(QUEST_REQUIREMENT_ITEM);
         data << uint32(id);
         data << uint32(count);
         data << uint32(0);
         data << uint8(0);
         data << uint8(0);           // unknown
-        data << uint8(0);           // unknown
+        data << uint8(0);           // additionnal data
+
+        requirementCount++;
     }
 
     //Others to implement

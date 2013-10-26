@@ -449,12 +449,15 @@ public:
         }
 
 		if(unit->GetEntry() == 54569)
-			unit->Kill(unit); //Mise du pointeur Transcendence Spirt a NULL
+		{
+			return false;	
+		}
 
         // Delete the creature
         unit->CombatStop();
         unit->DeleteFromDB();
         unit->AddObjectToRemoveList();
+		
 
         handler->SendSysMessage(LANG_COMMAND_DELCREATMESSAGE);
 
