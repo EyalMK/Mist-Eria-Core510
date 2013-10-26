@@ -129,7 +129,7 @@ public:
 					petMapId = (GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->GetMapId();
 					GetCaster()->GetPosition(casterX, casterY, casterZ);
 				
-					(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->SetPosition(casterX, casterY, casterZ, 0.0f);
+					(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->FarTeleportTo(GetCaster()->GetMap(), casterX, casterY, casterZ, 0.0f);
 				
 					if(GetCaster()->ToPlayer())
 			           GetCaster()->ToPlayer()->TeleportTo(petMapId, petX, petY, petZ, 0.0f);
