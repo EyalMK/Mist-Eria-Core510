@@ -449,7 +449,8 @@ void WorldSession::HandleGuildBankerActivate(WorldPacket& recvPacket)
         return;
     }
 
-    guild->SendBankList(this, 0, true, true);
+	guild->SendBankList(this, 0, true, true);
+    guild->SendBankList(this, 1, true, true);
 }
 
 // Called when opening guild bank tab only (first one)
