@@ -448,8 +448,6 @@ public:
             return false;
         }
 
-		if(unit->GetEntry() == 54569)
-			unit->GetOwner()->ToPlayer()->SetTranscendenceSpirit(NULL); //Mise du pointeur Transcendence Spirit a NULL
 
         // Delete the creature
         unit->CombatStop();
