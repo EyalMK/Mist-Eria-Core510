@@ -3444,7 +3444,7 @@ void Guild::SendBankList(WorldSession* session, uint8 tabId, bool withContent, b
 
 					data << uint32(0); // GetDataInSitu with this size
 
-					data << uint32(1);
+					data << uint32(slotId);
 					data << uint32(2);
 					data << uint32(3);
 					data << uint32(4);
