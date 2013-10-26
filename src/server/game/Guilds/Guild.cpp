@@ -3262,6 +3262,8 @@ void Guild::_SendBankContentUpdate(MoveItemData* pSrc, MoveItemData* pDest) cons
 
 void Guild::_SendBankContentUpdate(uint8 tabId, SlotIds slots) const
 {
+	WorldPacket data(SMSG_GUILD_BANK_LIST, 1200);
+
 	data << int32(tabId);
 	data << int64(m_bankMoney);
 
