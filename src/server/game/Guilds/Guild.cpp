@@ -1400,7 +1400,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
 		data.WriteBits(offNoteLength, 8);
 
 		data.WriteBit(guid[3]);
-
+		
 
 
 
