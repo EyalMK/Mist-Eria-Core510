@@ -109,11 +109,11 @@ public:
     }
 };
 
-// 119996 - transcandence_transfert
+// 119996 - transcendence_transfert
 class spell_monk_transcandence_transfert : public SpellScriptLoader
 {
 public:
-    spell_monk_transcandence_transfert() : SpellScriptLoader("spell_monk_transcandence_transfert") { }
+    spell_monk_transcandence_transfert() : SpellScriptLoader("spell_monk_transcendence_transfert") { }
 	
     class spell_monk_transcandence_transfert_SpellScript : public SpellScript
     {
@@ -149,11 +149,11 @@ public:
     }
 };
 
-// 101643 -- transcandence
+// 101643 -- transcendence
 class spell_monk_transcandence : public SpellScriptLoader
 {
 public:
-    spell_monk_transcandence() : SpellScriptLoader("spell_monk_transcandence") { }
+    spell_monk_transcandence() : SpellScriptLoader("spell_monk_transcendence") { }
 
 	
     class spell_monk_transcandence_SpellScript : public SpellScript
