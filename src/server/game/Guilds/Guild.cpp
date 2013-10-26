@@ -3340,7 +3340,7 @@ void Guild::_SendBankContentUpdate(uint8 tabId, SlotIds slots) const
             
         }
         
-    }
+    
 
 	/*
     if (BankTab const* tab = GetBankTab(tabId))
