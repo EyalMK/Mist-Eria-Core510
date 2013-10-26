@@ -137,7 +137,7 @@ public:
 						    GetCaster()->ToPlayer()->TeleportTo(petMapId, petX, petY, petZ, 0.0f);
 
 						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->DespawnOrUnsummon();
-						GetCaster()->ToPlayer()->SetTranscendenceSpirit(GetCaster()->SummonCreature(54569, casterX, casterY, casterZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 900*IN_MILLISECONDS));
+						GetCaster()->ToPlayer()->SetTranscendenceSpirit(GetCaster()->SummonCreature(54570, casterX, casterY, casterZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 900*IN_MILLISECONDS));
 						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->SetVisible(true);
 						
 
