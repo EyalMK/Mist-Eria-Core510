@@ -127,6 +127,7 @@ public:
 					{
 						float petX, petY, petZ, casterX, casterY, casterZ;
 						uint32 petMapId;
+						uint32 displayIdCaster;
 						(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->GetPosition(petX, petY, petZ);
 						petMapId = (GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->GetMapId();
 						GetCaster()->GetPosition(casterX, casterY, casterZ);
@@ -137,9 +138,9 @@ public:
 						    GetCaster()->ToPlayer()->TeleportTo(petMapId, petX, petY, petZ, 0.0f);
 
 						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->DespawnOrUnsummon();
-						GetCaster()->ToPlayer()->SetTranscendenceSpirit(GetCaster()->SummonCreature(54570, casterX, casterY, casterZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 900*IN_MILLISECONDS));
-						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->SetVisible(true);
-						
+						GetCaster()->ToPlayer()->SetTranscendenceSpirit(GetCaster()->SummonCreature(54569, casterX, casterY, casterZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 900*IN_MILLISECONDS));
+						displayIdCaster = GetCaster()->GetDisplayId();
+						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->SetDisplayId(displayIdCaster);
 
 					}
 			  }
