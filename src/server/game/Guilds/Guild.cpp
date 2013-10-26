@@ -3270,7 +3270,7 @@ void Guild::_SendBankContentUpdate(uint8 tabId, SlotIds slots) const
 	size_t rempos = data.wpos();
 	data << int32(0);
 
-	data.WriteBits(slots.size, 20);
+	data.WriteBits(slots.size(), 20);
 
 
     if (BankTab const* tab = GetBankTab(tabId))
@@ -3301,7 +3301,7 @@ void Guild::_SendBankContentUpdate(uint8 tabId, SlotIds slots) const
 
 
 
-	data.WriteBits(0);
+	data.WriteBits(0, 22);
 	data.WriteBit(0);
 
     data.FlushBits();
