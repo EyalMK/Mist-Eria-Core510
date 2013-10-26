@@ -448,11 +448,18 @@ public:
             return false;
         }
 
-
+		if(unit->GetEntry() == 54569)
+		{
+			unit->GetOwner->ToPlayer()->GetTranscendenceSpirit(unit->GetOwner())->DespawnOrUnsummon();
+			unit->GetOwner()->ToPlayer()->SetTranscendenceSpirit(NULL);
+		}
+		else
+		{			
         // Delete the creature
         unit->CombatStop();
         unit->DeleteFromDB();
         unit->AddObjectToRemoveList();
+		}
 
         handler->SendSysMessage(LANG_COMMAND_DELCREATMESSAGE);
 
