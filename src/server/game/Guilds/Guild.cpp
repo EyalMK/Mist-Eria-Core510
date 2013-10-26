@@ -3429,9 +3429,9 @@ void Guild::SendBankList(WorldSession* session, uint8 tabId, bool withContent, b
             {
                 if (Item* tabItem = tab->GetItem(slotId))
                 {
-					data << uint32(10);
-                    data << uint32(20);
-                    data << uint32(30);
+					data << uint32(1000);
+                    data << uint32(2000);
+                    data << uint32(slotId);
 
 					for (uint32 ench = 0; ench < MAX_ENCHANTMENT_SLOT; ++ench)
                     {
@@ -3444,12 +3444,12 @@ void Guild::SendBankList(WorldSession* session, uint8 tabId, bool withContent, b
 
 					data << uint32(0); // GetDataInSitu with this size
 
-					data << uint32(6);
-					data << uint32(5);
-					data << uint32(4);
-					data << uint32(3);
-					data << uint32(2);
-					data << uint32(1);
+					data << uint32(60);
+					data << uint32(50);
+					data << uint32(40);
+					data << uint32(30);
+					data << uint32(20);
+					data << uint32(10);
 
 					/*
                     tabData << uint32(tabItem->GetCount());                 // ITEM_FIELD_STACK_COUNT
