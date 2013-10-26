@@ -450,7 +450,7 @@ public:
 
 		if(unit->GetEntry() == 54569)
 		{
-			unit->GetOwner->ToPlayer()->GetTranscendenceSpirit(unit->GetOwner())->DespawnOrUnsummon();
+			unit->GetOwner()->ToPlayer()->GetTranscendenceSpirit(unit->GetOwner())->DespawnOrUnsummon();
 			unit->GetOwner()->ToPlayer()->SetTranscendenceSpirit(NULL);
 		}
 		else
