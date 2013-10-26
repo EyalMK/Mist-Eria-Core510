@@ -153,7 +153,7 @@ public:
 class spell_monk_transcandence : public SpellScriptLoader
 {
 public:
-    spell_monk_transcandence() : SpellScriptLoader("spell_monk_transcandence_test") { }
+    spell_monk_transcandence() : SpellScriptLoader("spell_monk_transcandence") { }
 
 	
     class spell_monk_transcandence_SpellScript : public SpellScript
