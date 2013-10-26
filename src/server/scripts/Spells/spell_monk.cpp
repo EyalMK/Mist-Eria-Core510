@@ -121,7 +121,7 @@ public:
 
         void Cast()
 		{
-			if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()) && (GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->isAlive())
+			if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()) && GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->isSummon())
 			  {
 					float petX, petY, petZ, casterX, casterY, casterZ;
 					uint32 petMapId;
@@ -174,7 +174,9 @@ public:
 			displayIdCaster = GetCaster()->GetDisplayId();
 			GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->SetDisplayId(displayIdCaster);
 			GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 1784);
+
         }
+		
 		
         void Register()
         {
