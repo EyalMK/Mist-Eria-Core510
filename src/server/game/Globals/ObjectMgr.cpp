@@ -1605,6 +1605,12 @@ void ObjectMgr::LoadCreatures()
 void ObjectMgr::AddCreatureToGrid(uint32 guid, CreatureData const* data)
 {
     uint8 mask = data->spawnMask;
+
+    //NOBODIE
+    if (guid == 15116769) {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE addcretogrid map %u mask %u ", data->mapid, mask);
+    }
+
     for (uint8 i = 0; mask != 0; i++, mask >>= 1)
     {
         if (mask & 1)
