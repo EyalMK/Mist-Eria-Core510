@@ -249,7 +249,7 @@ public:
 			me->GetOwner()->ToPlayer()->SetTranscendenceSpirit(NULL);
 		}
 
-		void CorpseRemoved()
+		void CorpseRemoved(uint32& /*respawnDelay*/)
 		{
 			me->GetOwner()->ToPlayer()->SetTranscendenceSpirit(NULL);
 		}
