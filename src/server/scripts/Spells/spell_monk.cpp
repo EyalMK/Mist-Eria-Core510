@@ -123,7 +123,7 @@ public:
 		{
 				if (GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()) == NULL)
 					return SPELL_FAILED_NO_PET;
-				if(GetCaster()->ToPlayer()->GetExactDist2d(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionX(), GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionY()) <= 40.0f)
+				if(GetCaster()->ToPlayer()->GetExactDist2d(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionX(), GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionY()) > 40.0f)
 					return SPELL_FAILED_OUT_OF_RANGE;
 
 				return SPELL_CAST_OK;
