@@ -499,6 +499,10 @@ class spell_pri_power_word_shield : public SpellScriptLoader
                     return false;
                 if (!sSpellMgr->GetSpellInfo(SPELL_PRIEST_REFLECTIVE_SHIELD_R1))
                     return false;
+
+				if (GetTarget()->HasAura(6788)) // Weakened Soul
+					return false;
+
                 return true;
             }
 
@@ -553,10 +557,30 @@ class spell_pri_power_word_shield : public SpellScriptLoader
             }
         };
 
+		class spell_pri_power_word_shield_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pri_power_word_shield_SpellScript);
+
+			void HandleOnHit(SpellEffIndex /*effIndex*/)
+			{
+				GetCaster()->CastSpell(GetHitUnit(), 6788, true);
+			}
+
+			void Register()
+			{
+				OnEffectHit += SpellEffectFn(spell_pri_power_word_shield_SpellScript::HandleOnHit, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+			}
+		};
+
         AuraScript* GetAuraScript() const
         {
             return new spell_pri_power_word_shield_AuraScript();
         }
+
+		SpellScript* GetSpellScript() const
+		{
+			return new spell_pri_power_word_shield_SpellScript();
+		}
 };
 
 // 33110 - Prayer of Mending Heal
@@ -794,6 +818,7 @@ class spell_pri_vampiric_touch : public SpellScriptLoader
             return new spell_pri_vampiric_touch_AuraScript();
         }
 };
+
 
 void AddSC_priest_spell_scripts()
 {
