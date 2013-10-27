@@ -142,8 +142,8 @@ void WorldSession::HandleRealmCache(WorldPacket& recvData)
 	}
 
 	data << rev_realmid;
-	data << uint8(0);
-	data << uint8(realmID); //realmid ?? not test
+    data << uint8(_player->getRace());
+    data << uint8(_player->getClass()); //realmid ?? not test
 	data << realmName;
 	data << realmName;
 	SendPacket(&data);
@@ -863,10 +863,10 @@ void WorldSession::HandleQuestPOIQuery(WorldPacket& recvData)
                     data << uint32(0);
                     data << uint32(itr->MapId);             // mapid
                     data << uint32(itr->AreaId);            // areaid
+                    data << uint32(0);
                     data << uint32(itr->Unk2);              // unknown
                     data << uint32(itr->Unk3);              // unknown
                     data << uint32(itr->Unk4);              // unknown
-                    data << uint32(0);
                     data << uint32(0);
                     data << uint32(itr->points.size());     // POI points count
 
