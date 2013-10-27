@@ -2163,15 +2163,15 @@ void WorldSession::HandleSaveCUFProfiles(WorldPacket& recvPacket)
     {
         recvPacket >> profiles[i]->Unk146;
 		recvPacket >> profiles[i]->HealthText;
-        recvPacket >> profiles[i]->Unk152;
+        recvPacket >> profiles[i]->FrameWidth;
 		profiles[i]->ProfileName = recvPacket.ReadString(strlens[i]);
 		recvPacket >> profiles[i]->Unk147;
         recvPacket >> profiles[i]->SortBy;
-		recvPacket >> profiles[i]->FrameHeight;
+		recvPacket >> profiles[i]->Unk154;
 		recvPacket >> profiles[i]->Unk148;
-        recvPacket >> profiles[i]->FrameWidth;
+        recvPacket >> profiles[i]->Unk152;
         recvPacket >> profiles[i]->Unk150;
-        recvPacket >> profiles[i]->Unk154;
+		recvPacket >> profiles[i]->FrameHeight;
         
 
         GetPlayer()->SaveCUFProfile(i, profiles[i]);
@@ -2225,16 +2225,16 @@ void WorldSession::SendLoadCUFProfiles()
         data.WriteBit(profile->BoolOptions[CUF_AUTO_ACTIVATE_PVP]);
 
         byteBuffer << uint8(profile->Unk147);
-		byteBuffer << uint16(profile->Unk154);
+		byteBuffer << uint16(profile->FrameHeight);
 		byteBuffer << uint8(profile->Unk146);
         byteBuffer << uint8(profile->HealthText);
         byteBuffer << uint8(profile->SortBy);
 		byteBuffer.WriteString(profile->ProfileName);
-		byteBuffer << uint16(profile->FrameHeight);
+		byteBuffer << uint16(profile->Unk154);
 		byteBuffer << uint8(profile->Unk148); 
-		byteBuffer << uint16(profile->Unk152);
+		byteBuffer << uint16(profile->FrameWidth);
         byteBuffer << uint16(profile->Unk150);
-        byteBuffer << uint16(profile->FrameWidth);
+		byteBuffer << uint16(profile->Unk152);
     }
 
     data.FlushBits();

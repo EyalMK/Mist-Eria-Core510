@@ -165,8 +165,8 @@ enum GuildEvents
     GE_BANK_TAB_PURCHASED               = 19,
     GE_BANK_TAB_UPDATED                 = 20,
     GE_BANK_MONEY_SET                   = 21,
-    GE_BANK_MONEY_CHANGED               = 22,
-    GE_BANK_TEXT_CHANGED                = 23,
+    GE_BANK_MONEY_CHANGED               = 23,
+    GE_BANK_TEXT_CHANGED                = 22,
     // 24 - error 795
     GE_SIGNED_ON_MOBILE                 = 25,
     GE_SIGNED_Off_MOBILE                = 26,
@@ -559,7 +559,7 @@ private:
         // Adds new event to collection and saves it to DB
         void AddEvent(SQLTransaction& trans, LogEntry* entry);
         // Writes information about all events to packet
-        void WritePacket(WorldPacket& data) const;
+        void WritePacket(WorldPacket& data, ByteBuffer& buffer) const;
         uint32 GetNextGUID();
         GuildLog* GetGuildLog() { return &m_log; } // Hack needed for news as WritePacket can't be used
 

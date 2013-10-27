@@ -119,6 +119,21 @@ public:
     {
         PrepareSpellScript(spell_monk_transcendence_transfert_SpellScript);
 
+		SpellCastResult CheckCast()
+		{
+			 if(GetCaster() && GetCaster()->ToPlayer())
+			 {
+					if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()) != NULL && GetCaster()->ToPlayer()->GetExactDist2d(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionX(), GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionY()) <= 40.0f)
+						return SPELL_CAST_OK;
+					else if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()) == NULL)
+						return SPELL_FAILED_NO_PET;
+					else if(GetCaster()->ToPlayer()->GetExactDist2d(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionX(), GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionY()) <= 40.0f)
+						return SPELL_FAILED_NO_PET;
+						//return SPELL_FAILED_OUT_OF_RANGE;
+
+			 }
+		}
+	
         void Cast()
 		{
 			if(GetCaster() && GetCaster()->ToPlayer())
@@ -141,7 +156,8 @@ public:
 						GetCaster()->ToPlayer()->SetTranscendenceSpirit(GetCaster()->SummonCreature(54569, casterX, casterY, casterZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 900*IN_MILLISECONDS));
 						displayIdCaster = GetCaster()->GetDisplayId();
 						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->SetDisplayId(displayIdCaster);
-						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 1784);
+						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 124416);
+						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 119053);
 						
 				 }
 			}
@@ -185,7 +201,8 @@ public:
 			GetCaster()->ToPlayer()->SetTranscendenceSpirit(GetCaster()->SummonCreature(54569, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 900*IN_MILLISECONDS));
 			displayIdCaster = GetCaster()->GetDisplayId();
 			GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->SetDisplayId(displayIdCaster);
-			GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 1784);
+			GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 124416);
+			GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 119053);
         }
 		
 		
@@ -232,7 +249,7 @@ public:
 			me->GetOwner()->ToPlayer()->SetTranscendenceSpirit(NULL);
 		}
 
-		void CorpseRemoved()
+		void CorpseRemoved(uint32& /*respawnDelay*/)
 		{
 			me->GetOwner()->ToPlayer()->SetTranscendenceSpirit(NULL);
 		}

@@ -523,7 +523,7 @@ void WorldSession::HandleGuildBankSwapItems(WorldPacket& recvPacket)
 
     uint8 tabId;
     uint8 slotId;
-    uint32 itemEntry;
+	uint32 itemEntry;
     uint32 splitedAmount = 0;
 	uint8 unk;
 
@@ -539,12 +539,10 @@ void WorldSession::HandleGuildBankSwapItems(WorldPacket& recvPacket)
         recvPacket >> destItemEntry;
 
         recvPacket >> tabId;
+		recvPacket >> slotId; 
 		recvPacket >> itemEntry;
-        recvPacket >> slotId; 
+        recvPacket >> unk; //Always 0
 		recvPacket >> splitedAmount;
-        recvPacket >> unk;                       // Always 0
-
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "%u, %u, %u, %u, %u, %u, %u, %u", destTabId, destSlotId, destItemEntry, tabId, itemEntry, slotId, splitedAmount, unk);
 
         guild->SwapItems(GetPlayer(), tabId, slotId, destTabId, destSlotId, splitedAmount);
     }
@@ -821,19 +819,39 @@ void WorldSession::HandleGuildRewardsQueryOpcode(WorldPacket& recvPacket)
         std::vector<GuildReward> const& rewards = sGuildMgr->GetGuildRewards();
 
         WorldPacket data(SMSG_GUILD_REWARDS_LIST, 3 + rewards.size() * (4 + 4 + 4 + 8 + 4 + 4));
+
+		data << uint32(time(NULL));
+
         data.WriteBits(rewards.size(), 21);
-        data.FlushBits();
+        
+
+		for (uint32 i = 0; i < rewards.size(); i++)
+        {
+			data.WriteBits(0, 24); // unk
+		}
+
+
+		data.FlushBits();
 
         for (uint32 i = 0; i < rewards.size(); i++)
         {
+			data << uint32(0);
+
+			data << uint32(100);
+			data << uint32(200);
+			data << uint32(300);
+
+			/*
+			data << uint32(rewards[i].AchievementId);
+
             data << uint32(rewards[i].Standing);
             data << int32(rewards[i].Racemask);
             data << uint32(rewards[i].Entry);
-            data << uint64(rewards[i].Price);
-            data << uint32(0); // Unused
-            data << uint32(rewards[i].AchievementId);
+			*/
+
+            data << uint64(rewards[i].Price); 
         }
-        data << uint32(time(NULL));
+        
         SendPacket(&data);
     }
 }
