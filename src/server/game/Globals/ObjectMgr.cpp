@@ -1482,6 +1482,9 @@ void ObjectMgr::LoadCreatures()
         }
     }
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spawnMask for sw prison : %u", spawnMasks[34]);
+
+
     _creatureDataStore.rehash(result->GetRowCount());
     uint32 count = 0;
     do
