@@ -1564,11 +1564,11 @@ void Guild::SendGuildRankInfo(WorldSession* session) const
             data << uint32(rankInfo->GetBankTabRights(j));
         }
 
-		data << uint32(i);
+		data << uint32(rankInfo->GetBankMoneyPerDay());
 
 		data << uint32(rankInfo->GetRights());
 
-        data << uint32(rankInfo->GetBankMoneyPerDay());
+        data << uint32(i);
     }
 
     session->SendPacket(&data);
