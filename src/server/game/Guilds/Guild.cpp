@@ -578,8 +578,12 @@ void Guild::BankTab::SetText(std::string const& text)
 uint8 Guild::BankTab::GetSlotByGUID(uint32 guidLow)
 {
 	for(int i = 0; i<GUILD_BANK_MAX_SLOTS; ++i)
+	{
 		if(m_items[i] != NULL && m_items[i]->GetGUIDLow() == guidLow)
 			return i;
+		if(m_items[i])
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "BANK #### Item guid low : %u , %u", m_items[i]->GetGUIDLow(), guidLow);
+	}
 	return -1;
 }
 
