@@ -559,7 +559,7 @@ private:
         // Adds new event to collection and saves it to DB
         void AddEvent(SQLTransaction& trans, LogEntry* entry);
         // Writes information about all events to packet
-        void WritePacket(WorldPacket& data) const;
+        void WritePacket(WorldPacket& data, ByteBuffer& buffer) const;
         uint32 GetNextGUID();
         GuildLog* GetGuildLog() { return &m_log; } // Hack needed for news as WritePacket can't be used
 

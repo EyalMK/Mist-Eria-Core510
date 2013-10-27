@@ -154,15 +154,11 @@ inline void Guild::LogHolder::AddEvent(SQLTransaction& trans, LogEntry* entry)
 }
 
 // Writes information about all events into packet.
-inline void Guild::LogHolder::WritePacket(WorldPacket& data) const
+inline void Guild::LogHolder::WritePacket(WorldPacket& data, ByteBuffer& buffer) const
 {
-    ByteBuffer buffer;
     data.WriteBits(m_log.size(), 23);
     for (GuildLog::const_iterator itr = m_log.begin(); itr != m_log.end(); ++itr)
         (*itr)->WritePacket(data, buffer);
-
-    data.FlushBits();
-    data.append(buffer);
 }
 
 inline uint32 Guild::LogHolder::GetNextGUID()
@@ -285,40 +281,46 @@ void Guild::BankEventLogEntry::WritePacket(WorldPacket& data, ByteBuffer& conten
     bool hasStack = (hasItem && m_itemStackCount > 1) || itemMoved;
 
     data.WriteBit(IsMoneyEvent());
-    data.WriteBit(logGuid[4]);
-    data.WriteBit(logGuid[1]);
-    data.WriteBit(hasItem);
-    data.WriteBit(hasStack);
-    data.WriteBit(logGuid[2]);
     data.WriteBit(logGuid[5]);
-    data.WriteBit(logGuid[3]);
-    data.WriteBit(logGuid[6]);
+    data.WriteBit(logGuid[1]);
+	data.WriteBit(logGuid[2]);
+	data.WriteBit(logGuid[3]);
+	data.WriteBit(itemMoved);
+	data.WriteBit(logGuid[6]);
+	data.WriteBit(logGuid[7]);
+	data.WriteBit(logGuid[4]);
     data.WriteBit(logGuid[0]);
-    data.WriteBit(itemMoved);
-    data.WriteBit(logGuid[7]);
+    data.WriteBit(hasStack);
+	data.WriteBit(hasItem);
 
+	content.WriteByteSeq(logGuid[2]);
+	content.WriteByteSeq(logGuid[1]);
     content.WriteByteSeq(logGuid[6]);
-    content.WriteByteSeq(logGuid[1]);
-    content.WriteByteSeq(logGuid[5]);
-    if (hasStack)
-        content << uint32(m_itemStackCount);
 
-    content << uint8(m_eventType);
-    content.WriteByteSeq(logGuid[2]);
-    content.WriteByteSeq(logGuid[4]);
-    content.WriteByteSeq(logGuid[0]);
-    content.WriteByteSeq(logGuid[7]);
-    content.WriteByteSeq(logGuid[3]);
-    if (hasItem)
+	if (hasItem)
         content << uint32(m_itemOrMoney);
 
-    content << uint32(time(NULL) - m_timestamp);
+	content << uint8(m_eventType);
 
-    if (IsMoneyEvent())
+	if (hasStack)
+        content << uint32(m_itemStackCount);
+
+    content.WriteByteSeq(logGuid[7]);
+
+	if (IsMoneyEvent())
         content << uint64(m_itemOrMoney);
 
-    if (itemMoved)
+	content.WriteByteSeq(logGuid[3]);
+
+	if (itemMoved)
         content << uint8(m_destTabId);
+    
+    content.WriteByteSeq(logGuid[4]);
+	content.WriteByteSeq(logGuid[5]);
+    content.WriteByteSeq(logGuid[0]);
+    
+    content << uint32(time(NULL) - m_timestamp);
+
 }
 
 void Guild::NewsLogEntry::SaveToDB(SQLTransaction& trans) const
@@ -2222,12 +2224,23 @@ void Guild::SendBankLog(WorldSession* session, uint8 tabId) const
     if (tabId < _GetPurchasedTabsSize() || tabId == GUILD_BANK_MAX_TABS)
     {
         LogHolder const* log = m_bankEventLog[tabId];
+		ByteBuffer buffer;
         WorldPacket data(SMSG_GUILD_BANK_LOG_QUERY_RESULT, log->GetSize() * (4 * 4 + 1) + 1 + 1);
-        data.WriteBit(GetLevel() >= 5 && tabId == GUILD_BANK_MAX_TABS);     // has Cash Flow perk
-        log->WritePacket(data);
+
+        
+        log->WritePacket(data, buffer);
+
+		//data.WriteBit(GetLevel() >= 5 && tabId == GUILD_BANK_MAX_TABS);     // has Cash Flow perk
+		data.WriteBit(0);
+
+		data.FlushBits();
+
+		data.append(buffer),		
+
         data << uint32(tabId);
         //if (tabId == GUILD_BANK_MAX_TABS && hasCashFlow)
         //    data << uint64(cashFlowContribution);
+
         session->SendPacket(&data);
         sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_BANK_LOG_QUERY_RESULT [%s] TabId: %u", session->GetPlayerInfo().c_str(), tabId);
     }
