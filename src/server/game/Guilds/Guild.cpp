@@ -290,20 +290,21 @@ void Guild::BankEventLogEntry::WritePacket(WorldPacket& data, ByteBuffer& conten
 	data.WriteBit(logGuid[7]);
 	data.WriteBit(logGuid[4]);
     data.WriteBit(logGuid[0]);
-    data.WriteBit(hasStack);
 	data.WriteBit(hasItem);
+    data.WriteBit(hasStack);
+	
 
 	content.WriteByteSeq(logGuid[2]);
 	content.WriteByteSeq(logGuid[1]);
     content.WriteByteSeq(logGuid[6]);
 
-	if (hasItem)
-        content << uint32(m_itemOrMoney);
+	if (hasStack)
+        content << uint32(m_itemStackCount);
 
 	content << uint8(m_eventType);
 
-	if (hasStack)
-        content << uint32(m_itemStackCount);
+	if (hasItem)
+        content << uint32(m_itemOrMoney);
 
     content.WriteByteSeq(logGuid[7]);
 
