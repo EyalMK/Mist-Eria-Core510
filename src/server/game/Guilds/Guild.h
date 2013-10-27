@@ -166,7 +166,7 @@ enum GuildEvents
     GE_BANK_TAB_UPDATED                 = 20,
     GE_BANK_MONEY_SET                   = 21,
     GE_BANK_MONEY_CHANGED               = 23,
-    GE_BANK_TEXT_CHANGED                = 23,
+    GE_BANK_TEXT_CHANGED                = 22,
     // 24 - error 795
     GE_SIGNED_ON_MOBILE                 = 25,
     GE_SIGNED_Off_MOBILE                = 26,
