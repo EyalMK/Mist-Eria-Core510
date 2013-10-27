@@ -2157,8 +2157,11 @@ void Guild::HandleGuildPartyRequest(WorldSession* session)
 
 void Guild::SendEventLog(WorldSession* session) const
 {
+	ByteBuffer buffer;
     WorldPacket data(SMSG_GUILD_EVENT_LOG_QUERY_RESULT, 1 + m_eventLog->GetSize() * (1 + 8 + 4));
-    m_eventLog->WritePacket(data);
+    m_eventLog->WritePacket(data, buffer);
+	data.FlushBits();
+	data.append(buffer);
     session->SendPacket(&data);
     sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_EVENT_LOG_QUERY_RESULT [%s]", session->GetPlayerInfo().c_str());
 }
