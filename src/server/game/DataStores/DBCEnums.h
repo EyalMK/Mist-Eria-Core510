@@ -351,7 +351,7 @@ enum Difficulty
 
 #define MAX_DUNGEON_DIFFICULTY     2 // Seems to be 2?
 #define MAX_RAID_DIFFICULTY        9 // Seems like 40Man got a difficulty...
-#define MAX_DIFFICULTY             9
+#define MAX_DIFFICULTY             10
 
 enum SpawnMask
 {
