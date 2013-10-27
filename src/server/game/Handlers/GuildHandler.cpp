@@ -523,7 +523,6 @@ void WorldSession::HandleGuildBankSwapItems(WorldPacket& recvPacket)
 
     uint8 tabId;
     uint8 slotId;
-    uint32 itemGuid;
 	uint32 itemEntry;
     uint32 splitedAmount = 0;
 	uint8 unk;
@@ -540,12 +539,12 @@ void WorldSession::HandleGuildBankSwapItems(WorldPacket& recvPacket)
         recvPacket >> destItemEntry;
 
         recvPacket >> tabId;
-		recvPacket >> itemGuid;
-        recvPacket >> slotId; 
+		recvPacket >> slotId; 
+		recvPacket >> itemEntry;
+        recvPacket >> unk; //Always 0
 		recvPacket >> splitedAmount;
-        recvPacket >> unk;                       // Always 0
 
-        guild->SwapItems(GetPlayer(), tabId, itemGuid, destTabId, destSlotId, splitedAmount);
+        guild->SwapItems(GetPlayer(), tabId, itemEntry, destTabId, destSlotId, splitedAmount);
     }
     else
     {

@@ -645,7 +645,6 @@ private:
         std::string const& GetText() const { return m_text; }
 
         inline Item* GetItem(uint8 slotId) const { return slotId < GUILD_BANK_MAX_SLOTS ?  m_items[slotId] : NULL; }
-		uint8 GetSlotByGUID(uint32 guidLow);
         bool SetItem(SQLTransaction& trans, uint8 slotId, Item* item);
 
     private:
@@ -849,7 +848,7 @@ public:
     uint32 GetMembersCount() { return m_members.size(); }
 
     // Bank
-    void SwapItems(Player* player, uint8 tabId, uint32 itemGuid, uint8 destTabId, uint8 destSlotId, uint32 splitedAmount);
+    void SwapItems(Player* player, uint8 tabId, uint8 slotId, uint8 destTabId, uint8 destSlotId, uint32 splitedAmount);
     void SwapItemsWithInventory(Player* player, bool toChar, uint8 tabId, uint8 slotId, uint8 playerBag, uint8 playerSlotId, uint32 splitedAmount);
 
     // Bank tabs

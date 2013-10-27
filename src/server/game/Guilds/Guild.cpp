@@ -575,18 +575,6 @@ void Guild::BankTab::SetText(std::string const& text)
     CharacterDatabase.Execute(stmt);
 }
 
-uint8 Guild::BankTab::GetSlotByGUID(uint32 guidLow)
-{
-	for(int i = 0; i<GUILD_BANK_MAX_SLOTS; ++i)
-	{
-		if(m_items[i] != NULL && m_items[i]->GetGUIDLow() == guidLow)
-			return i;
-		if(m_items[i])
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "BANK #### Item guid low : %u , %u", m_items[i]->GetGUIDLow(), guidLow);
-	}
-	return -1;
-}
-
 // Sets/removes contents of specified slot.
 // If pItem == NULL contents are removed.
 bool Guild::BankTab::SetItem(SQLTransaction& trans, uint8 slotId, Item* item)
@@ -2808,15 +2796,10 @@ bool Guild::IsMember(uint64 guid) const
 }
 
 // Bank (items move)
-void Guild::SwapItems(Player* player, uint8 tabId, uint32 itemGuid, uint8 destTabId, uint8 destSlotId, uint32 splitedAmount)
+void Guild::SwapItems(Player* player, uint8 tabId, uint8 slotId, uint8 destTabId, uint8 destSlotId, uint32 splitedAmount)
 {
-    if (tabId >= _GetPurchasedTabsSize() || destTabId >= _GetPurchasedTabsSize() || destSlotId >= GUILD_BANK_MAX_SLOTS)
+    if (tabId >= _GetPurchasedTabsSize() || destTabId >= _GetPurchasedTabsSize() || slotId >= GUILD_BANK_MAX_SLOTS || destSlotId >= GUILD_BANK_MAX_SLOTS)
         return;
-
-	uint8 slotId = GetBankTab(tabId)->GetSlotByGUID(itemGuid);
-
-	if (slotId < 0)
-		return;
 
     if (tabId == destTabId && slotId == destSlotId)
         return;
