@@ -1397,8 +1397,8 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
 		data.WriteBit(guid[2]);
 		data.WriteBit(guid[0]);
 
-		data.WriteBit(0); // bit361
-		data.WriteBit(0); // bit360
+		data.WriteBit(1); // bit361
+		data.WriteBit(1); // bit360
 
 		data.WriteBits(offNoteLength, 8);
 
@@ -1413,7 +1413,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         memberData.WriteByteSeq(guid[1]);
 
         memberData << uint8(member->GetLevel());
-        memberData << uint32(0);
+        memberData << uint32(100);
         memberData << uint32(member->GetZoneId());
 
 		if (pubNoteLength)
@@ -1457,7 +1457,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
 
         memberData.WriteByteSeq(guid[6]);
 
-        memberData << uint8(0);
+        memberData << uint8(200);
         memberData << uint8(member->GetClass()); // unk
         memberData << uint32(member->GetAchievementPoints());
         memberData << uint64(member->GetTotalActivity());
