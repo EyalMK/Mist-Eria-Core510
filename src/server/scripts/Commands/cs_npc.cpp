@@ -201,7 +201,7 @@ public:
             return true;
         }
 
-        creature->SaveToDB(map->GetId(), (1 << (map->GetSpawnMode()-1)), chr->GetPhaseMgr().GetPhaseMaskForSpawn());
+        creature->SaveToDB(map->GetId(), (1 << (map->GetSpawnMode())), chr->GetPhaseMgr().GetPhaseMaskForSpawn());
 
         uint32 db_guid = creature->GetDBTableGUIDLow();
 
