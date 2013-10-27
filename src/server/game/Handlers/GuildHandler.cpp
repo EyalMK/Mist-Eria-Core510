@@ -827,7 +827,7 @@ void WorldSession::HandleGuildRewardsQueryOpcode(WorldPacket& recvPacket)
 
 		for (uint32 i = 0; i < rewards.size(); i++)
         {
-			data.WriteBits(0, 24); // unk
+			data.WriteBits(1, 24); // unk
 		}
 
 
@@ -835,11 +835,12 @@ void WorldSession::HandleGuildRewardsQueryOpcode(WorldPacket& recvPacket)
 
         for (uint32 i = 0; i < rewards.size(); i++)
         {
-			data << uint32(0);
+			data << uint32(1);
+			data << uint32(4000);
 
-			data << uint32(100);
-			data << uint32(200);
-			data << uint32(300);
+			data << uint32(1000);
+			data << uint32(2000);
+			data << uint32(3000);
 
 			/*
 			data << uint32(rewards[i].AchievementId);
