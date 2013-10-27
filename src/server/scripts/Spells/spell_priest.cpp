@@ -552,6 +552,7 @@ class spell_pri_power_word_shield : public SpellScriptLoader
 
 			void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
 			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "On passe par la !!!!!!!!");
 				GetCaster()->CastSpell(GetTarget(), 6788, true);
 			}
 
