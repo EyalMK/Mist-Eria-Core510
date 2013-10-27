@@ -119,6 +119,16 @@ public:
     {
         PrepareSpellScript(spell_monk_transcendence_transfert_SpellScript);
 
+		SpellCastResult CheckCast()
+		{
+				if (GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()) == NULL)
+					return SPELL_FAILED_NO_PET;
+				if(GetCaster()->ToPlayer()->GetExactDist2d(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionX(), GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionY()) <= 40.0f)
+					return SPELL_FAILED_OUT_OF_RANGE;
+
+				return SPELL_CAST_OK;
+		}
+	
         void Cast()
 		{
 			if(GetCaster() && GetCaster()->ToPlayer())
@@ -142,7 +152,7 @@ public:
 						displayIdCaster = GetCaster()->GetDisplayId();
 						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->SetDisplayId(displayIdCaster);
 						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 124416);
-			GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 119053);
+						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 119053);
 						
 				 }
 			}
