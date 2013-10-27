@@ -1516,7 +1516,7 @@ void ObjectMgr::LoadCreatures()
         data.curhealth      = fields[12].GetUInt32();
         data.curmana        = fields[13].GetUInt32();
         data.movementType   = fields[14].GetUInt8();
-        data.spawnMask      = fields[15].GetUInt8();
+        data.spawnMask      = fields[15].GetUInt32();
         data.phaseMask      = fields[16].GetUInt16();
         int16 gameEvent     = fields[17].GetInt8();
         uint32 PoolId       = fields[18].GetUInt32();
@@ -1611,7 +1611,7 @@ void ObjectMgr::AddCreatureToGrid(uint32 guid, CreatureData const* data)
         sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE addcretogrid map %u mask %u ", data->mapid, mask);
     }
 
-    for (uint8 i = 0; mask != 0; i++, mask >>= 1)
+    for (uint16 i = 0; mask != 0; i++, mask >>= 1)
     {
         if (mask & 1)
         {
@@ -1625,7 +1625,7 @@ void ObjectMgr::AddCreatureToGrid(uint32 guid, CreatureData const* data)
 void ObjectMgr::RemoveCreatureFromGrid(uint32 guid, CreatureData const* data)
 {
     uint8 mask = data->spawnMask;
-    for (uint8 i = 0; mask != 0; i++, mask >>= 1)
+    for (uint16 i = 0; mask != 0; i++, mask >>= 1)
     {
         if (mask & 1)
         {
