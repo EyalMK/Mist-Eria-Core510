@@ -550,9 +550,8 @@ class spell_pri_power_word_shield : public SpellScriptLoader
                     }
             }
 
-			void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+			void ApplyDebuff(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
 			{
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "On passe par la !!!!!!!!");
 				GetCaster()->CastSpell(GetTarget(), 6788, true);
 			}
 
@@ -560,7 +559,7 @@ class spell_pri_power_word_shield : public SpellScriptLoader
             {
                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_power_word_shield_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
                 AfterEffectAbsorb += AuraEffectAbsorbFn(spell_pri_power_word_shield_AuraScript::ReflectDamage, EFFECT_0);
-				OnEffectApply += AuraEffectApplyFn(spell_pri_power_word_shield_AuraScript::OnApply, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
+				OnEffectApply += AuraEffectApplyFn(spell_pri_power_word_shield_AuraScript::ApplyDebuff, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
