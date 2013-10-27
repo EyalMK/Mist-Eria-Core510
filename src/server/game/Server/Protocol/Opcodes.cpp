@@ -51,7 +51,7 @@ void OpcodeTable::Initialize()
 #define DEFINE_OPCODE_HANDLER(opcode, status, processing, handler)                                      \
     ValidateAndSetOpcode<(opcode < NUM_OPCODE_HANDLERS)>(opcode, #opcode, status, processing, handler);
 	
-	DEFINE_OPCODE_HANDLER(CMSG_REALM_CACHE,                             STATUS_AUTHED,    PROCESS_THREADUNSAFE, &WorldSession::HandleRealmCache );
+    DEFINE_OPCODE_HANDLER(CMSG_REALM_CACHE,                             STATUS_LOGGEDIN,    PROCESS_THREADUNSAFE, &WorldSession::HandleRealmCache );
 	DEFINE_OPCODE_HANDLER(SMSG_REALM_CACHE,                             STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_ServerSide );
     DEFINE_OPCODE_HANDLER(CMSG_ACCEPT_LEVEL_GRANT,                      STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleAcceptGrantLevel          );
     DEFINE_OPCODE_HANDLER(CMSG_ACCEPT_TRADE,                            STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleAcceptTradeOpcode         );
