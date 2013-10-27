@@ -201,6 +201,9 @@ public:
             return true;
         }
 
+
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE npcadd mapSpawnMode %u", map->GetSpawnMode());
+
         creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMgr().GetPhaseMaskForSpawn());
 
         uint32 db_guid = creature->GetDBTableGUIDLow();
