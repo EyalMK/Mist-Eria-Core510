@@ -7720,7 +7720,7 @@ void Player::SetInGuild(uint32 guildId)
     else
         SetUInt64Value(OBJECT_FIELD_DATA, 0);
 
-    ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_GUILD_LEVEL_ENABLED, guildId != 0 && sWorld->getBoolConfig(CONFIG_GUILD_LEVELING_ENABLED));
+    ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_GUILD_LEVEL_ENABLED, guildId != 0/* && sWorld->getBoolConfig(CONFIG_GUILD_LEVELING_ENABLED)*/);
     SetUInt16Value(OBJECT_FIELD_TYPE, 1, guildId != 0);
 }
 
