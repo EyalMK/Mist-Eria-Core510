@@ -685,60 +685,6 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     break;
             }
             break;
-		case SPELLFAMILY_MAGE:
-			switch (m_spellInfo->Id)
-            {
-                // Cold Snap - Mage ( remove cooldowns )
-			case 11958:                                 
-                {
-                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
-                        return;
-
-                    const SpellCooldowns& cm = m_caster->ToPlayer()->GetSpellCooldownMap();
-                    for (SpellCooldowns::const_iterator itr = cm.begin(); itr != cm.end();)
-                    {
-                        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_MAGE &&
-                            (m_spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) &&
-                            m_spellInfo->Id != 11958 && m_spellInfo->CategoryRecoveryTime > 0)
-                        {
-                            m_caster->ToPlayer()->RemoveSpellCooldown((itr++)->first, true);
-                        }
-                        else
-                            ++itr;
-                    }
-                    return;
-                }
-                default:
-                    break;
-            }
-            break;
-		case SPELLFAMILY_ROGUE:
-			switch (m_spellInfo->Id)
-            {
-			// Preparation - Rogue ( remove cooldowns )
-			case 14185:
-			{
-				if (unitTarget->ToPlayer()->HasSpellCooldown(2983))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(2983); // sprint
-
-				if (unitTarget->ToPlayer()->HasSpellCooldown(5277))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(5277); // evasion
-
-				if (unitTarget->ToPlayer()->HasSpellCooldown(51722))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(51722); // dismantle
-
-				if (unitTarget->ToPlayer()->HasSpellCooldown(31224))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(31224); // cloak of shadows
-
-				if (unitTarget->ToPlayer()->HasSpellCooldown(1856))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(1856); // vanish
-
-				break;
-			}
-                default:
-                    break;
-            }
-            break;
         case SPELLFAMILY_DEATHKNIGHT:
             switch (m_spellInfo->Id)
             {
