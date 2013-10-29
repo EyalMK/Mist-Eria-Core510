@@ -697,11 +697,9 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     const SpellCooldowns& cm = m_caster->ToPlayer()->GetSpellCooldownMap();
                     for (SpellCooldowns::const_iterator itr = cm.begin(); itr != cm.end();)
                     {
-                        SpellEntry const *spellInfo = sSpellStore.LookupEntry(itr->first);
-
-                        if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE &&
-                            (GetSpellSchoolMask(spellInfo) & SPELL_SCHOOL_MASK_FROST) &&
-                            spellInfo->Id != 11958 && GetSpellRecoveryTime(spellInfo) > 0)
+                        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_MAGE &&
+                            (m_spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) &&
+                            m_spellInfo->Id != 11958 && m_spellInfo->CategoryRecoveryTime > 0)
                         {
                             m_caster->ToPlayer()->RemoveSpellCooldown((itr++)->first, true);
                         }
