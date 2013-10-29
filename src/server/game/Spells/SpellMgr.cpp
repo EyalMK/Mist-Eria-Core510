@@ -3754,6 +3754,8 @@ void SpellMgr::LoadSpellInfoCorrections()
             case 128829:
                 spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(28); //5sec
                 break;
+			case 114556:
+				spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(27); //3sec
             default:
                 break;
         }

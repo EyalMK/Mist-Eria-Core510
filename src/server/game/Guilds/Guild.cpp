@@ -2335,8 +2335,8 @@ void Guild::SendLoginInfo(WorldSession* session)
     data.Initialize(SMSG_GUILD_MEMBER_DAILY_RESET, 0);  // tells the client to request bank withdrawal limit
     session->SendPacket(&data);
 
-    if (!sWorld->getBoolConfig(CONFIG_GUILD_LEVELING_ENABLED))
-        return;
+    /*if (!sWorld->getBoolConfig(CONFIG_GUILD_LEVELING_ENABLED))
+        return;*/
 
     for (uint32 i = 0; i < sGuildPerkSpellsStore.GetNumRows(); ++i)
         if (GuildPerkSpellsEntry const* entry = sGuildPerkSpellsStore.LookupEntry(i))
