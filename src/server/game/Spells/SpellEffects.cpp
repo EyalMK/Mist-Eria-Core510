@@ -909,6 +909,26 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
 
 				return;
 			}
+			// Preparation - Rogue ( remove cooldowns )
+			case 14185:
+			{
+				if (unitTarget->ToPlayer()->HasSpellCooldown(2983))
+                    unitTarget->ToPlayer()->RemoveSpellCooldown(2983); // sprint
+
+				if (unitTarget->ToPlayer()->HasSpellCooldown(5277))
+                    unitTarget->ToPlayer()->RemoveSpellCooldown(5277); // evasion
+
+				if (unitTarget->ToPlayer()->HasSpellCooldown(51722))
+                    unitTarget->ToPlayer()->RemoveSpellCooldown(51722); // dismantle
+
+				if (unitTarget->ToPlayer()->HasSpellCooldown(31224))
+                    unitTarget->ToPlayer()->RemoveSpellCooldown(31224); // cloak of shadows
+
+				if (unitTarget->ToPlayer()->HasSpellCooldown(1856))
+                    unitTarget->ToPlayer()->RemoveSpellCooldown(1856); // vanish
+
+				return;
+			}
             // Demonic Empowerment -- succubus
             case 54437:
             {
