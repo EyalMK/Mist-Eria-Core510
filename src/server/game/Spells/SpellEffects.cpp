@@ -689,19 +689,27 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
 			switch (m_spellInfo->Id)
             {
                 // Cold Snap - Mage ( remove cooldowns )
-			case 11958:
-			{
-				if (unitTarget->ToPlayer()->HasSpellCooldown(45438))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(45438); // ice block
+			case 11958:                                 
+                {
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
 
-				if (unitTarget->ToPlayer()->HasSpellCooldown(122))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(122); // frost nova
+                    const SpellCooldowns& cm = m_caster->ToPlayer()->GetSpellCooldownMap();
+                    for (SpellCooldowns::const_iterator itr = cm.begin(); itr != cm.end();)
+                    {
+                        SpellEntry const *spellInfo = sSpellStore.LookupEntry(itr->first);
 
-				if (unitTarget->ToPlayer()->HasSpellCooldown(120))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(120); // cone of cold
-
-				break;
-			}
+                        if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE &&
+                            (GetSpellSchoolMask(spellInfo) & SPELL_SCHOOL_MASK_FROST) &&
+                            spellInfo->Id != 11958 && GetSpellRecoveryTime(spellInfo) > 0)
+                        {
+                            m_caster->ToPlayer()->RemoveSpellCooldown((itr++)->first, true);
+                        }
+                        else
+                            ++itr;
+                    }
+                    return;
+                }
                 default:
                     break;
             }
