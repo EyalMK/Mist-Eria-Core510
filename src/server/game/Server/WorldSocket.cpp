@@ -169,7 +169,18 @@ int WorldSocket::SendPacket(WorldPacket const& pct)
     if (sPacketLog->CanLogPacket())
         sPacketLog->LogPacket(pct, SERVER_TO_CLIENT);
 
-    WorldPacket const* pkt = &pct;
+    WorldPacket *pkt = &(WorldPacket&)pct;
+
+    uint16 opcodeRealValue = OpcodeInternalEnumToRealValue(pkt->GetOpcode());
+    if(opcodeRealValue == 0)
+    {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "Preventing sending a not valued opcode (%s)", GetOpcodeNameForLogging(pkt->GetOpcode()).c_str());
+        return 0;
+    }
+
+    printf("Opcode 0x%04X\n", opcodeRealValue);
+
+    pkt->SetOpcode((Opcodes)opcodeRealValue);
 
     // Empty buffer used in case packet should be compressed
     //WorldPacket buff;
@@ -788,7 +799,9 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     // manage memory ;)
     ACE_Auto_Ptr<WorldPacket> aptr(new_pct);
 
-    Opcodes opcode = PacketFilter::DropHighBytes(new_pct->GetOpcode());
+    Opcodes opcode = OpcodeRealValueToInternalEnum(PacketFilter::DropHighBytes(new_pct->GetOpcode()));
+
+    new_pct->SetOpcode(opcode);
 
     if (closing_)
         return -1;
