@@ -895,6 +895,20 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                 unitTarget->CastSpell(unitTarget, 1784, true);
                 return;
             }
+			// Cold Snap - Mage ( remove cooldowns )
+			case 11958:
+			{
+				if (unitTarget->ToPlayer()->HasSpellCooldown(45438))
+                    unitTarget->ToPlayer()->RemoveSpellCooldown(45438); // ice block
+
+				if (unitTarget->ToPlayer()->HasSpellCooldown(122))
+                    unitTarget->ToPlayer()->RemoveSpellCooldown(122); // frost nova
+
+				if (unitTarget->ToPlayer()->HasSpellCooldown(120))
+                    unitTarget->ToPlayer()->RemoveSpellCooldown(120); // cone of cold
+
+				return;
+			}
             // Demonic Empowerment -- succubus
             case 54437:
             {
