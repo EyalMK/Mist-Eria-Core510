@@ -685,6 +685,54 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     break;
             }
             break;
+		case SPELLFAMILY_MAGE:
+			switch (m_spellInfo->Id)
+            {
+                // Cold Snap - Mage ( remove cooldowns )
+			case 11958:
+			{
+				if (unitTarget->ToPlayer()->HasSpellCooldown(45438))
+                    unitTarget->ToPlayer()->RemoveSpellCooldown(45438); // ice block
+
+				if (unitTarget->ToPlayer()->HasSpellCooldown(122))
+                    unitTarget->ToPlayer()->RemoveSpellCooldown(122); // frost nova
+
+				if (unitTarget->ToPlayer()->HasSpellCooldown(120))
+                    unitTarget->ToPlayer()->RemoveSpellCooldown(120); // cone of cold
+
+				break;
+			}
+                default:
+                    break;
+            }
+            break;
+		case SPELLFAMILY_ROGUE:
+			switch (m_spellInfo->Id)
+            {
+			// Preparation - Rogue ( remove cooldowns )
+			case 14185:
+			{
+				if (unitTarget->ToPlayer()->HasSpellCooldown(2983))
+                    unitTarget->ToPlayer()->RemoveSpellCooldown(2983); // sprint
+
+				if (unitTarget->ToPlayer()->HasSpellCooldown(5277))
+                    unitTarget->ToPlayer()->RemoveSpellCooldown(5277); // evasion
+
+				if (unitTarget->ToPlayer()->HasSpellCooldown(51722))
+                    unitTarget->ToPlayer()->RemoveSpellCooldown(51722); // dismantle
+
+				if (unitTarget->ToPlayer()->HasSpellCooldown(31224))
+                    unitTarget->ToPlayer()->RemoveSpellCooldown(31224); // cloak of shadows
+
+				if (unitTarget->ToPlayer()->HasSpellCooldown(1856))
+                    unitTarget->ToPlayer()->RemoveSpellCooldown(1856); // vanish
+
+				break;
+			}
+                default:
+                    break;
+            }
+            break;
         case SPELLFAMILY_DEATHKNIGHT:
             switch (m_spellInfo->Id)
             {
@@ -895,40 +943,6 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                 unitTarget->CastSpell(unitTarget, 1784, true);
                 return;
             }
-			// Cold Snap - Mage ( remove cooldowns )
-			case 11958:
-			{
-				if (unitTarget->ToPlayer()->HasSpellCooldown(45438))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(45438); // ice block
-
-				if (unitTarget->ToPlayer()->HasSpellCooldown(122))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(122); // frost nova
-
-				if (unitTarget->ToPlayer()->HasSpellCooldown(120))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(120); // cone of cold
-
-				return;
-			}
-			// Preparation - Rogue ( remove cooldowns )
-			case 14185:
-			{
-				if (unitTarget->ToPlayer()->HasSpellCooldown(2983))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(2983); // sprint
-
-				if (unitTarget->ToPlayer()->HasSpellCooldown(5277))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(5277); // evasion
-
-				if (unitTarget->ToPlayer()->HasSpellCooldown(51722))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(51722); // dismantle
-
-				if (unitTarget->ToPlayer()->HasSpellCooldown(31224))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(31224); // cloak of shadows
-
-				if (unitTarget->ToPlayer()->HasSpellCooldown(1856))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(1856); // vanish
-
-				return;
-			}
             // Demonic Empowerment -- succubus
             case 54437:
             {
