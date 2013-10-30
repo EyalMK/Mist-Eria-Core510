@@ -166,6 +166,7 @@ public:
         void Register()
         {
             OnCast += SpellCastFn(spell_monk_transcendence_transfert_SpellScript::Cast);
+			OnCheckCast += SpellCheckCastFn(spell_monk_transcendence_transfert_SpellScript::CheckCast);
         }
     };
 
