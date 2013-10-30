@@ -1589,7 +1589,7 @@ class spell_q31682 : public SpellScriptLoader
 						else
 							return SPELL_FAILED_SUCCESS;
 					 }
-					 return SPELL_FAILED_SUCCESS
+					 return SPELL_FAILED_SUCCESS;
 				 }
 			}
 		
