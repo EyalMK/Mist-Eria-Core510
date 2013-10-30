@@ -1576,7 +1576,7 @@ class spell_q31682 : public SpellScriptLoader
         {
             PrepareSpellScript(spell_q31682_SpellScript);
 
-            void HandleDummy(SpellEffIndex /* effIndex */)
+            void Cast()
             {
 					if(GetCaster())
 					if(GetCaster()->hasQuest(31682) && GetHitUnit()->GetEntry() == NPC_QUEST_31682)
@@ -1585,7 +1585,7 @@ class spell_q31682 : public SpellScriptLoader
 
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_q31682_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+                OnCast += SpellCastFn(spell_q31682_SpellScript::Cast);
             }
         };
 
