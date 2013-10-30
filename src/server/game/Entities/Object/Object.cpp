@@ -384,7 +384,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         data->WriteBit(guid[5]);
         data->WriteBits(0, 24);
         data->WriteBit(!hasSplineElevation);       // Has spline elevation
-        data->WriteBit(1); //not ?
+        data->WriteBit(0); //not ?
         data->WriteBit(0);
         data->WriteBit(guid[0]);
         data->WriteBit(guid[6]);
@@ -585,7 +585,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
             *data << float(self->m_movementInfo.pitch);
 
         data->WriteByteSeq(guid[5]);
-        //*data << uint32(0);
+        *data << uint32(0);
         *data << self->GetSpeed(MOVE_PITCH_RATE);
         data->WriteByteSeq(guid[2]);
         *data << self->GetSpeed(MOVE_RUN);
