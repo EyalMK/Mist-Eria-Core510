@@ -1582,23 +1582,28 @@ class spell_q31682 : public SpellScriptLoader
 				 if(GetCaster() && GetCaster()->ToPlayer())
 				 {
 					
+					 if(GetHitCreature())
+					 {
 						if(GetCaster()->hasQuest(31682) && GetHitCreature()->GetEntry() == NPC_QUEST_31682)
 							return SPELL_CAST_OK;
 						else
 							return SPELL_FAILED_SUCCESS;
+					 }
+					 return SPELL_FAILED_SUCCESS
 				 }
 			}
-
-			void Cast()
+		
+			void HandleScriptEffect(SpellEffIndex /* effIndex */)
 			{
-				GetHitCreature()->CastSpell(GetHitCreature(), SPELL_QUEST_31682);
+				if(GetHitCreature())
+					GetHitCreature()->CastSpell(GetHitCreature(), SPELL_QUEST_31682);
 			}
 
 			
             void Register()
             {
                 OnCheckCast += SpellCheckCastFn(spell_q31682_SpellScript::CheckCast);
-				OnCast += SpellCastFn(spell_q31682_SpellScript::Cast);
+				OnEffectHitTarget += SpellEffectFn(spell_q31682_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
