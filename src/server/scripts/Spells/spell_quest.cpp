@@ -1575,17 +1575,29 @@ class spell_q31682 : public SpellScriptLoader
         class spell_q31682_SpellScript : public SpellScript
         {
             PrepareSpellScript(spell_q31682_SpellScript);
+			
 
-            void Cast()
-            {
-					if(GetCaster())
-					if(GetCaster()->hasQuest(31682) && GetHitUnit()->GetEntry() == NPC_QUEST_31682)
-						GetCaster()->ToPlayer()->KilledMonsterCredit(NPC_QUEST_31682, 0);
-            }
+			SpellCastResult CheckCast()
+			{
+				 if(GetCaster() && GetCaster()->ToPlayer())
+				 {
+						if(GetCaster()->hasQuest(31682) && GetHitUnit()->GetEntry() == NPC_QUEST_31682)
+							return SPELL_CAST_OK;
+						else
+							return SPELL_FAILED_SUCCESS;
+				 }
+			}
 
+			void Cast()
+			{
+				GetHitUnit()->CastSpell(GetHitUnit(), SPELL_QUEST_31682);
+			}
+
+			
             void Register()
             {
-                OnCast += SpellCastFn(spell_q31682_SpellScript::Cast);
+                OnCheckCast += SpellCheckCastFn(spell_q31682_SpellScript::CheckCast);
+				OnCast += SpellCastFn(spell_q31682_SpellScript::Cast);
             }
         };
 
