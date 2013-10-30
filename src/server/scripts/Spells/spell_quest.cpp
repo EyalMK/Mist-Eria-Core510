@@ -1548,7 +1548,7 @@ class spell_q12527_zuldrak_rat : public SpellScriptLoader
                         basilisk->DespawnOrUnsummon();
                 }
             }
-
+	
             void Register()
             {
                 OnEffectHitTarget += SpellEffectFn(spell_q12527_zuldrak_rat_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
@@ -1560,6 +1560,48 @@ class spell_q12527_zuldrak_rat : public SpellScriptLoader
             return new spell_q12527_zuldrak_rat_SpellScript();
         }
 };
+
+enum Quest_31682_Data
+{
+	NPC_QUEST_31682 = 62851,
+	SPELL_QUEST_31682 = 122779
+};
+
+class spell_q31682 : public SpellScriptLoader
+{
+    public:
+        spell_q31682() : SpellScriptLoader("spell_q31682") { }
+
+        class spell_q31682_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_q31682_SpellScript);
+
+            bool Validate(SpellInfo const* /*spell*/)
+            {
+                if (GetHitUnit()->GetEntry() != NPC_QUEST_31682)
+                    return false;
+                return true;
+            }
+
+            void HandleDummy(SpellEffIndex /* effIndex */)
+            {
+					if(GetCaster())
+					if(GetCaster()->hasQuest(31682) && GetHitUnit()->GetEntry() == NPC_QUEST_31682)
+						GetCaster()->ToPlayer()->KilledMonsterCredit(NPC_QUEST_31682, 0);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_q31682_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_q31682_SpellScript();
+        }
+};
+
 
 void AddSC_quest_spell_scripts()
 {
@@ -1599,4 +1641,5 @@ void AddSC_quest_spell_scripts()
     new spell_q11010_q11102_q11023_q11008_check_fly_mount();
     new spell_q12372_azure_on_death_force_whisper();
     new spell_q12527_zuldrak_rat();
+	new spell_q31682();
 }
