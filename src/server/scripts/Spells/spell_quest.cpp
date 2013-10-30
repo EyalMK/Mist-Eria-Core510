@@ -1576,13 +1576,6 @@ class spell_q31682 : public SpellScriptLoader
         {
             PrepareSpellScript(spell_q31682_SpellScript);
 
-            bool Validate(SpellInfo const* /*spell*/)
-            {
-                if (GetHitUnit()->GetEntry() != NPC_QUEST_31682)
-                    return false;
-                return true;
-            }
-
             void HandleDummy(SpellEffIndex /* effIndex */)
             {
 					if(GetCaster())
