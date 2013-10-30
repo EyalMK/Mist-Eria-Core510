@@ -1576,12 +1576,13 @@ class spell_q31682 : public SpellScriptLoader
         {
             PrepareSpellScript(spell_q31682_SpellScript);
 			
-
+			
 			SpellCastResult CheckCast()
 			{
 				 if(GetCaster() && GetCaster()->ToPlayer())
 				 {
-						if(GetCaster()->hasQuest(31682) && GetHitUnit()->GetEntry() == NPC_QUEST_31682)
+					
+						if(GetCaster()->hasQuest(31682) && GetHitCreature()->GetEntry() == NPC_QUEST_31682)
 							return SPELL_CAST_OK;
 						else
 							return SPELL_FAILED_SUCCESS;
@@ -1590,7 +1591,7 @@ class spell_q31682 : public SpellScriptLoader
 
 			void Cast()
 			{
-				GetHitUnit()->CastSpell(GetHitUnit(), SPELL_QUEST_31682);
+				GetHitCreature()->CastSpell(GetHitCreature(), SPELL_QUEST_31682);
 			}
 
 			
