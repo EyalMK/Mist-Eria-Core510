@@ -1561,59 +1561,6 @@ class spell_q12527_zuldrak_rat : public SpellScriptLoader
         }
 };
 
-enum Quest_31682_Data
-{
-	NPC_QUEST_31682 = 62851,
-	SPELL_QUEST_31682 = 122779
-};
-
-class spell_q31682 : public SpellScriptLoader
-{
-    public:
-        spell_q31682() : SpellScriptLoader("spell_q31682") { }
-
-        class spell_q31682_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_q31682_SpellScript);
-			
-			
-			SpellCastResult CheckCast()
-			{
-				 if(GetCaster() && GetCaster()->ToPlayer())
-				 {
-					
-					 if(GetHitCreature())
-					 {
-						if(GetCaster()->hasQuest(31682) && GetHitCreature()->GetEntry() == NPC_QUEST_31682)
-							return SPELL_CAST_OK;
-						else
-							return SPELL_FAILED_SUCCESS;
-					 }
-					 return SPELL_FAILED_SUCCESS;
-				 }
-			}
-		
-			void HandleScriptEffect(SpellEffIndex /* effIndex */)
-			{
-				if(GetHitCreature())
-					GetHitCreature()->CastSpell(GetHitCreature(), SPELL_QUEST_31682);
-			}
-
-			
-            void Register()
-            {
-                OnCheckCast += SpellCheckCastFn(spell_q31682_SpellScript::CheckCast);
-				OnEffectHitTarget += SpellEffectFn(spell_q31682_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_q31682_SpellScript();
-        }
-};
-
-
 void AddSC_quest_spell_scripts()
 {
     new spell_q55_sacred_cleansing();
@@ -1652,5 +1599,4 @@ void AddSC_quest_spell_scripts()
     new spell_q11010_q11102_q11023_q11008_check_fly_mount();
     new spell_q12372_azure_on_death_force_whisper();
     new spell_q12527_zuldrak_rat();
-	new spell_q31682();
 }
