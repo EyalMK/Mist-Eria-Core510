@@ -561,14 +561,14 @@ class spell_pri_power_word_shield : public SpellScriptLoader
         {
             PrepareSpellScript(spell_pri_power_word_shield_SpellScript);
 
-			void HandleOnHit(SpellEffIndex /*effIndex*/)
+			void HandleOnHit()
 			{
 				GetCaster()->CastSpell(GetHitUnit(), 6788, true);
 			}
 
 			void Register()
 			{
-				OnEffectHit += SpellEffectFn(spell_pri_power_word_shield_SpellScript::HandleOnHit, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+				OnHit += SpellHitFn(spell_pri_power_word_shield_SpellScript::HandleOnHit);
 			}
 		};
 

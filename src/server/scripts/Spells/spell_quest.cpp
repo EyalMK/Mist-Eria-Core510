@@ -1548,7 +1548,7 @@ class spell_q12527_zuldrak_rat : public SpellScriptLoader
                         basilisk->DespawnOrUnsummon();
                 }
             }
-
+	
             void Register()
             {
                 OnEffectHitTarget += SpellEffectFn(spell_q12527_zuldrak_rat_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);

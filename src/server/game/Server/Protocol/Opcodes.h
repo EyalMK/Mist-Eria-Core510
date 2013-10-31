@@ -1520,6 +1520,11 @@ extern OpcodeTable opcodeTable;
 
 void InitOpcodes();
 
+extern std::map<Opcodes, uint16> _opcodeConversionMap;
+
+uint16 OpcodeInternalEnumToRealValue(Opcodes opcd);
+Opcodes OpcodeRealValueToInternalEnum(uint16 value);
+
 /// Lookup opcode name for human understandable logging
 inline std::string GetOpcodeNameForLogging(Opcodes id)
 {
@@ -1541,15 +1546,9 @@ inline std::string GetOpcodeNameForLogging(Opcodes id)
     else
         ss << "INVALID OPCODE";
 
-    ss << " 0x" << std::hex << std::uppercase << opcode << std::nouppercase << " (" << std::dec << opcode << ")]";
+    ss << " 0x" << std::hex << std::uppercase << OpcodeInternalEnumToRealValue((Opcodes)opcode) << std::nouppercase << " (" << std::dec << opcode << ")]";
     return ss.str();
 }
-
-extern std::map<Opcodes, uint16> _opcodeConversionMap;
-
-uint16 OpcodeInternalEnumToRealValue(Opcodes opcd);
-Opcodes OpcodeRealValueToInternalEnum(uint16 value);
-
 
 void InitConversionArray();
 
