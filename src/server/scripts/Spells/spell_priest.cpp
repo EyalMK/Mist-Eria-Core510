@@ -563,7 +563,7 @@ class spell_pri_power_word_shield : public SpellScriptLoader
 
 			void HandleOnHit()
 			{
-				GetCaster()->CastSpell(GetHitUnit(), 6788, true);
+				GetCaster()->CastSpell(GetHitPlayer(), 6788, true);
 			}
 
 			void Register()
