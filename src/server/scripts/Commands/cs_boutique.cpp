@@ -39,7 +39,7 @@ public:
     {
         const char* reqcount = "SELECT count(*), bsa.id FROM boutique_service_achat bsa INNER JOIN boutique_service bs ON bsa.type = bs.type WHERE bs.realmMask & %u !=0 AND bsa.accountId='%u' AND bsa.type=0 AND bsa.recup=0 LIMIT 1";
 
-        sLog->outString(reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
+        sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
         Field* fieldscount = resultcount->Fetch();
         if (fieldscount[0].GetInt32()==0) {
@@ -58,8 +58,8 @@ public:
             handler->PSendSysMessage(11017);
             target->SetAtLoginFlag(AT_LOGIN_RENAME);
 
-            const char* requpdate = "UPDATE boutique_service_achat SET realmId = '%u', recup='%u' WHERE id='%u'";
-            LoginDatabase.PExecute(requpdate, realmId, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), id);
+            const char* requpdate = "UPDATE boutique_service_achat SET realmID = '%u', recup='%u' WHERE id='%u'";
+            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), id);
         }
 
         return true;
@@ -68,7 +68,7 @@ public:
     static bool HandleBoutiqueLevelCommand(ChatHandler *handler, const char *args) {
         const char* reqcount = "SELECT count(*), bsa.id FROM boutique_service_achat bsa INNER JOIN boutique_service bs ON bsa.type = bs.type WHERE bs.realmMask & %u !=0 AND bsa.accountId='%u' AND bsa.type=1 AND bsa.recup=0 LIMIT 1";
 
-        sLog->outString(reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
+        sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
         Field* fieldscount = resultcount->Fetch();
         if (fieldscount[0].GetInt32()==0) {
@@ -123,8 +123,8 @@ public:
 
             target->SaveToDB();
 
-            const char* requpdate = "UPDATE boutique_service_achat SET realmId = '%u', recup='%u' WHERE id='%u'";
-            LoginDatabase.PExecute(requpdate, realmId, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), id);
+            const char* requpdate = "UPDATE boutique_service_achat SET realmID = '%u', recup='%u' WHERE id='%u'";
+            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), id);
         }
 
         return true;
@@ -139,7 +139,7 @@ public:
 
         const char* reqcount = "SELECT count(*), ba.nom, ba.itemId, ba.recup, ba.quantite FROM boutique_achat ba INNER JOIN boutique_produit bp ON ba.itemId = bp.itemId WHERE bp.realmMask & '%u' !=0 AND ba.accountId = '%u' AND ba.id='%u'";
 
-        QueryResult resultcount = LoginDatabase.PQuery(reqcount, realmId, handler->GetSession()->GetAccountId(), achatId);
+        QueryResult resultcount = LoginDatabase.PQuery(reqcount, realmID, handler->GetSession()->GetAccountId(), achatId);
         Field* fieldscount = resultcount->Fetch();
         if (fieldscount[0].GetInt32()==0) {
             //Cet achat n'existe pas, ne vous est pas attribue ou n'est pas disponible sur ce serveur.
@@ -201,8 +201,8 @@ public:
         if (count > 0 && item)
         {
             plTarget->SendNewItem(item,count,true,false);
-            const char* requpdate = "UPDATE boutique_achat SET realmId = '%u', recup='%u' WHERE id='%u'";
-            LoginDatabase.PExecute(requpdate, realmId, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), achatId);
+            const char* requpdate = "UPDATE boutique_achat SET realmID = '%u', recup='%u' WHERE id='%u'";
+            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), achatId);
 
             handler->PSendSysMessage(11013, fieldscount[1].GetCString());
         }
@@ -218,7 +218,7 @@ public:
     static bool HandleBoutiquePOCommand(ChatHandler *handler, const char *args) {
         const char* reqcount = "SELECT count(*), bsa.id FROM boutique_service_achat bsa INNER JOIN boutique_service bs ON bsa.type = bs.type WHERE bs.realmMask & %u !=0 AND bsa.accountId='%u' AND bsa.type=2 AND bsa.recup=0 LIMIT 1";
 
-        sLog->outString(reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
+        sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
         Field* fieldscount = resultcount->Fetch();
         if (fieldscount[0].GetInt32()==0) {
@@ -234,8 +234,8 @@ public:
             target->SetMoney(target->GetMoney()+(2000*100*100));
 
             target->SaveToDB();
-            const char* requpdate = "UPDATE boutique_service_achat SET realmId = '%u', recup='%u' WHERE id='%u'";
-            LoginDatabase.PExecute(requpdate, realmId, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), id);
+            const char* requpdate = "UPDATE boutique_service_achat SET realmID = '%u', recup='%u' WHERE id='%u'";
+            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), id);
         }
 
         return true;
@@ -622,7 +622,7 @@ public:
 
         uint32 guidLow = pPlayer->GetGUIDLow();
 
-	//sLog->outString("NOBODIE test1");
+	//sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE test1");
 
         QueryResult result = LoginDatabase.PQuery("SELECT id, level, stuff_wanted FROM recuperation WHERE idPerso=%u AND state=3", guidLow);
         if(!result)
@@ -631,7 +631,7 @@ public:
             return true;
         }
 
-	//sLog->outString("NOBODIE test2");
+	//sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE test2");
 
         Field *recup = result->Fetch();
 
@@ -657,7 +657,7 @@ public:
             moneyToAdd = 10000 * GOLD;
         }
 
-	//sLog->outString("NOBODIE test3");
+	//sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE test3");
 
         pPlayer->ModifyMoney(moneyToAdd);
 
@@ -676,7 +676,7 @@ public:
 
         }
 
-	//sLog->outString("NOBODIE test4");
+	//sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE test4");
 
 
         for(uint32 i = INVENTORY_SLOT_ITEM_START ; i < INVENTORY_SLOT_ITEM_END ; i++)
@@ -685,7 +685,7 @@ public:
                 pPlayer->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
         }
 
-	//sLog->outString("NOBODIE test5");
+	//sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE test5");
 
 
         for(uint32 i = 0 ; i < 4 ; i++)
@@ -693,7 +693,7 @@ public:
             pPlayer->EquipNewItem(INVENTORY_SLOT_BAG_START+i, sacId, true);
         }
 
-	//sLog->outString("NOBODIE test6");
+	//sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE test6");
 
         pPlayer->GiveLevel(level);
         pPlayer->InitTalentForLevel();
@@ -710,7 +710,7 @@ public:
             while(stuff->NextRow());
         }
 
-	//sLog->outString("NOBODIE test7");
+	//sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE test7");
 
         if(reput)
         {
@@ -730,7 +730,7 @@ public:
             while(reput->NextRow());
         }
 
-	//sLog->outString("NOBODIE test8");
+	//sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE test8");
 
         if(metier)
         {
@@ -757,12 +757,12 @@ public:
             while(metier->NextRow());
         }
 
-	//sLog->outString("NOBODIE test9");
+	//sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE test9");
 
 
         LoginDatabase.PQuery("UPDATE recuperation SET state=5 WHERE id=%u", id);
 
-	//sLog->outString("NOBODIE test10");
+	//sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE test10");
 
         if (pPlayer->getRace() == RACE_GOBLIN)
             pPlayer->TeleportTo(1, 1569, -4398, 18, 0);
@@ -771,7 +771,7 @@ public:
 
         pPlayer->SaveToDB();
 
-	//sLog->outString("NOBODIE test11");
+	//sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE test11");
 
 
         return true;
@@ -783,7 +783,7 @@ public:
 
         const char* reqcount = "SELECT count(*), bsa.id FROM boutique_service_achat bsa INNER JOIN boutique_service bs ON bsa.type = bs.type WHERE bs.realmMask & %u !=0 AND bsa.accountId='%u' AND bsa.type=3 AND bsa.recup=0 LIMIT 1";
 
-        sLog->outString(reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
+        sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
         Field* fieldscount = resultcount->Fetch();
         if (fieldscount[0].GetInt32()==0) {
@@ -800,8 +800,8 @@ public:
             CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '128' WHERE guid = %u", target->GetGUIDLow());
 
             target->SaveToDB();
-            const char* requpdate = "UPDATE boutique_service_achat SET realmId = '%u', recup='%u' WHERE id='%u'";
-            LoginDatabase.PExecute(requpdate, realmId, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), id);
+            const char* requpdate = "UPDATE boutique_service_achat SET realmID = '%u', recup='%u' WHERE id='%u'";
+            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), id);
         }
 
         return true;
@@ -812,7 +812,7 @@ public:
 
         const char* reqcount = "SELECT count(*), bsa.id FROM boutique_service_achat bsa INNER JOIN boutique_service bs ON bsa.type = bs.type WHERE bs.realmMask & %u !=0 AND bsa.accountId='%u' AND bsa.type=4 AND bsa.recup=0 LIMIT 1";
 
-        sLog->outString(reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
+        sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, (1<<(realmid-1)), handler->GetSession()->GetAccountId());
         Field* fieldscount = resultcount->Fetch();
         if (fieldscount[0].GetInt32()==0) {
@@ -821,7 +821,7 @@ public:
             return true;
         }
         const char* reqallowed = "SELECT value FROM data WHERE RealmID = %u AND identifier = 'lowestFaction';";
-        sLog->outString(reqallowed, realmID);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, reqallowed, realmID);
         QueryResult resultallowed = LoginDatabase.PQuery(reqallowed, realmID);
         Field* fieldsallowed = resultallowed->Fetch();
         if (fieldsallowed[0].GetInt32()==target->GetTeamId()) {
@@ -838,8 +838,8 @@ public:
             CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '64' WHERE guid = '%u'", target->GetGUIDLow());
 
             target->SaveToDB();
-            const char* requpdate = "UPDATE boutique_service_achat SET realmId = '%u', recup='%u' WHERE id='%u'";
-            LoginDatabase.PExecute(requpdate, realmId, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), id);
+            const char* requpdate = "UPDATE boutique_service_achat SET realmID = '%u', recup='%u' WHERE id='%u'";
+            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), id);
         }
 
         return true;
