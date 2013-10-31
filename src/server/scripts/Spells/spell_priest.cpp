@@ -561,14 +561,14 @@ class spell_pri_power_word_shield : public SpellScriptLoader
         {
             PrepareSpellScript(spell_pri_power_word_shield_SpellScript);
 
-			void HandleOnHit()
+			void HandleAfterCast()
 			{
-				GetCaster()->CastSpell(GetHitPlayer(), 6788, true);
+				GetCaster()->CastSpell(GetExplTargetUnit(), 6788, true);
 			}
 
 			void Register()
 			{
-				OnHit += SpellHitFn(spell_pri_power_word_shield_SpellScript::HandleOnHit);
+				AfterCast += SpellCastFn(spell_pri_power_word_shield_SpellScript::HandleAfterCast);
 			}
 		};
 
