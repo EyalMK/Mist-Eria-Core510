@@ -3647,6 +3647,43 @@ class spell_gen_darkflight : public SpellScriptLoader
         }
 };
 
+class spell_gen_sylvanas_musix_box : public SpellScriptLoader
+{
+    public:
+        spell_gen_sylvanas_musix_box() : SpellScriptLoader("spell_gen_sylvanas_musix_box") { }
+
+        class spell_gen_sylvanas_musix_box_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_gen_sylvanas_musix_box_SpellScript);
+
+            void HandleOnCast()
+            {
+                Map::PlayerList const &PlayerList = GetCaster()->GetMap()->GetPlayers();
+				if (!PlayerList.isEmpty())
+				{
+					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+					{
+						Player *p = i->getSource();
+						if (p && p->GetDistance2d(GetCaster()) < 30)
+						{
+							p->PlayDirectSound(10896);
+						}
+					}
+				}
+            }
+
+            void Register()
+            {
+                OnCast += SpellCastFn(spell_gen_sylvanas_musix_box_SpellScript::HandleOnCast);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_gen_sylvanas_musix_box_SpellScript();
+        }
+};
+
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_absorb0_hitlimit1();
@@ -3735,4 +3772,5 @@ void AddSC_generic_spell_scripts()
     new spell_gen_running_wild();
     new spell_gen_two_forms();
     new spell_gen_darkflight();
+	new spell_gen_sylvanas_musix_box();
 }
