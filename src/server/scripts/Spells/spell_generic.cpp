@@ -3656,7 +3656,7 @@ class spell_gen_sylvanas_musix_box : public SpellScriptLoader
         {
             PrepareSpellScript(spell_gen_sylvanas_musix_box_SpellScript);
 
-            void HandleOnCast()
+            void Cast()
             {
                 Map::PlayerList const &PlayerList = GetCaster()->GetMap()->GetPlayers();
 				if (!PlayerList.isEmpty())
@@ -3674,7 +3674,7 @@ class spell_gen_sylvanas_musix_box : public SpellScriptLoader
 
             void Register()
             {
-                OnCast += SpellCastFn(spell_gen_sylvanas_musix_box_SpellScript::HandleOnCast);
+                OnCast += SpellCastFn(spell_gen_sylvanas_musix_box_SpellScript::Cast);
             }
         };
 
