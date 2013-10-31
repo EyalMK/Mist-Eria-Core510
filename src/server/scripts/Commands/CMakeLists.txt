@@ -14,6 +14,7 @@ set(sources
   Commands/cs_achievement.cpp
   Commands/cs_ban.cpp
   Commands/cs_bf.cpp
+  Commands/cs_boutique.cpp
   Commands/cs_cast.cpp
   Commands/cs_character.cpp
   Commands/cs_cheat.cpp
