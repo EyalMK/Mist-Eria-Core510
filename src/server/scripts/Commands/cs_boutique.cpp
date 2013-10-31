@@ -108,11 +108,11 @@ public:
                 if (handler->needReportToTarget(target))
                 {
                     if (oldlevel == newlevel)
-                        ChatHandler(target).PSendSysMessage(LANG_YOURS_LEVEL_PROGRESS_RESET,handler->GetNameLink().c_str());
+                        handler->PSendSysMessage(LANG_YOURS_LEVEL_PROGRESS_RESET,handler->GetNameLink().c_str());
                     else if (oldlevel < newlevel)
-                        ChatHandler(target).PSendSysMessage(LANG_YOURS_LEVEL_UP,handler->GetNameLink().c_str(),newlevel);
+                        handler->PSendSysMessage(LANG_YOURS_LEVEL_UP,handler->GetNameLink().c_str(),newlevel);
                     else // if (oldlevel > newlevel)
-                        ChatHandler(target).PSendSysMessage(LANG_YOURS_LEVEL_DOWN,handler->GetNameLink().c_str(),newlevel);
+                        handler->PSendSysMessage(LANG_YOURS_LEVEL_DOWN,handler->GetNameLink().c_str(),newlevel);
                 }
             }
             else
@@ -615,6 +615,9 @@ public:
             player->SaveToDB();
         }*/
 
+		return false;
+		
+		/*
         Player *pPlayer = handler->GetSession()->GetPlayer();
 
         if(!pPlayer)
@@ -774,7 +777,7 @@ public:
 	//sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE test11");
 
 
-        return true;
+        return true;*/
     }
 
 
@@ -801,7 +804,7 @@ public:
 
             target->SaveToDB();
             const char* requpdate = "UPDATE boutique_service_achat SET realmID = '%u', recup='%u' WHERE id='%u'";
-            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), id);
+            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), fieldscount[1].GetInt32());
         }
 
         return true;
@@ -813,7 +816,7 @@ public:
         const char* reqcount = "SELECT count(*), bsa.id FROM boutique_service_achat bsa INNER JOIN boutique_service bs ON bsa.type = bs.type WHERE bs.realmMask & %u !=0 AND bsa.accountId='%u' AND bsa.type=4 AND bsa.recup=0 LIMIT 1";
 
         sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
-        QueryResult resultcount = LoginDatabase.PQuery(reqcount, (1<<(realmid-1)), handler->GetSession()->GetAccountId());
+        QueryResult resultcount = LoginDatabase.PQuery(reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
         Field* fieldscount = resultcount->Fetch();
         if (fieldscount[0].GetInt32()==0) {
             //Vous ne disposez actuellement d'aucun service de ce type. Vous pouvez acheter ce service sur la boutique
@@ -839,7 +842,7 @@ public:
 
             target->SaveToDB();
             const char* requpdate = "UPDATE boutique_service_achat SET realmID = '%u', recup='%u' WHERE id='%u'";
-            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), id);
+            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), fieldscount[1].GetInt32());
         }
 
         return true;
