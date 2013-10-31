@@ -564,10 +564,12 @@ class spell_pri_power_word_shield : public SpellScriptLoader
 			void HandleAfterHit()
 			{
 				//GetCaster()->CastSpell(GetExplTargetUnit(), 6788, true);
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH Creature : %u", GetHitCreature());
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH Unit : %u", GetHitUnit());
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH Player : %u", GetHitPlayer());
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH Target : %u", GetExplTargetUnit());
+				std::stringstream ss;
+				ss << "DEBUG TERAH Creature : " << GetHitCreature();
+				ss << "\nDEBUG TERAH Unit : " << GetHitUnit();
+				ss << "\nDEBUG TERAH Player : " << GetHitPlayer();
+				ss << "\nDEBUG TERAH Target : " << GetExplTargetUnit();
+				GetCaster()->ToPlayer()->Whisper(ss.str(), 0, GetCaster()->ToPlayer()->GetGUID());
 			}
 
 			void Register()
