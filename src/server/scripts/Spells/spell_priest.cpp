@@ -550,7 +550,7 @@ class spell_pri_power_word_shield : public SpellScriptLoader
                     }
             }
 
-			void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes mode)
+			void HandleAfterEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes mode)
 			{
 				GetTarget()->CastSpell(GetTarget(), 6788, true);
 			}
@@ -559,7 +559,7 @@ class spell_pri_power_word_shield : public SpellScriptLoader
             {
                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_power_word_shield_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
                 AfterEffectAbsorb += AuraEffectAbsorbFn(spell_pri_power_word_shield_AuraScript::ReflectDamage, EFFECT_0);
-				OnEffectApply += AuraEffectApplyFn(spell_pri_power_word_shield_AuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
+				AfterEffectApply += AuraEffectApplyFn(spell_pri_power_word_shield_AuraScript::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
