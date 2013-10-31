@@ -564,13 +564,11 @@ class spell_pri_power_word_shield : public SpellScriptLoader
 			void HandleOnHit(SpellEffIndex /*effIndex*/)
 			{
 				GetCaster()->CastSpell(GetHitUnit(), 6788, true);
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "TERAH DEBUG 1");
 			}
 
 			void Register()
 			{
-				OnEffectHit += SpellEffectFn(spell_pri_power_word_shield_SpellScript::HandleOnHit, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "TERAH DEBUG 2");
+				OnHit += SpellHitFn(spell_pri_power_word_shield_SpellScript::HandleOnHit);
 			}
 		};
 
@@ -582,7 +580,6 @@ class spell_pri_power_word_shield : public SpellScriptLoader
 		SpellScript* GetSpellScript() const
 		{
 			return new spell_pri_power_word_shield_SpellScript();
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "TERAH DEBUG 3");
 		}
 };
 
