@@ -561,7 +561,7 @@ class spell_pri_power_word_shield : public SpellScriptLoader
         {
             PrepareSpellScript(spell_pri_power_word_shield_SpellScript);
 
-			void HandleOnHit(SpellEffIndex /*effIndex*/)
+			void HandleOnHit()
 			{
 				GetCaster()->CastSpell(GetHitUnit(), 6788, true);
 			}
