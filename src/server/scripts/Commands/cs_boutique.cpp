@@ -108,11 +108,11 @@ public:
                 if (handler->needReportToTarget(target))
                 {
                     if (oldlevel == newlevel)
-                        handler->PSendSysMessage(LANG_YOURS_LEVEL_PROGRESS_RESET,handler->GetNameLink().c_str());
+                        handler->PSendSysMessage(559,handler->GetNameLink().c_str());
                     else if (oldlevel < newlevel)
-                        handler->PSendSysMessage(LANG_YOURS_LEVEL_UP,handler->GetNameLink().c_str(),newlevel);
+                        handler->PSendSysMessage(557,handler->GetNameLink().c_str(),newlevel);
                     else // if (oldlevel > newlevel)
-                        handler->PSendSysMessage(LANG_YOURS_LEVEL_DOWN,handler->GetNameLink().c_str(),newlevel);
+                        handler->PSendSysMessage(558,handler->GetNameLink().c_str(),newlevel);
                 }
             }
             else
