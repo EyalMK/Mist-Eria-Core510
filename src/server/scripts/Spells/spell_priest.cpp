@@ -561,14 +561,18 @@ class spell_pri_power_word_shield : public SpellScriptLoader
         {
             PrepareSpellScript(spell_pri_power_word_shield_SpellScript);
 
-			void HandleAfterCast()
+			void HandleAfterHit()
 			{
-				GetCaster()->CastSpell(GetExplTargetUnit(), 6788, true);
+				//GetCaster()->CastSpell(GetExplTargetUnit(), 6788, true);
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH Creature : %u", GetHitCreature());
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH Unit : %u", GetHitUnit());
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH Player : %u", GetHitPlayer());
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH Target : %u", GetExplTargetUnit());
 			}
 
 			void Register()
 			{
-				AfterCast += SpellCastFn(spell_pri_power_word_shield_SpellScript::HandleAfterCast);
+				AfterHit += SpellHitFn(spell_pri_power_word_shield_SpellScript::HandleAfterHit);
 			}
 		};
 
