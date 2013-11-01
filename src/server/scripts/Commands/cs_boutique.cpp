@@ -164,51 +164,40 @@ public:
             return false;
         }
 
-        const char* reqcount = "SELECT count(*), nom, itemId, recup, quantite FROM boutique_achat WHERE accountId = '%u' AND id='%u'";
+        const char* reqcount = "SELECT nom, itemId, recup, quantite FROM boutique_achat WHERE accountId = '%u' AND id='%u'";
 
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, handler->GetSession()->GetAccountId(), achatId);
-        Field* fieldscount = resultcount->Fetch();
-        if (fieldscount[0].GetInt32()==0) {
+
+        if (!resultcount) {
             //Cet achat n'existe pas, ne vous est pas attribue ou n'est pas disponible sur ce serveur.
             handler->PSendSysMessage(11008);
             return true;
         }
+
+        Field* fieldscount = resultcount->Fetch();
 		
 
         //Vous avez dÃ©jÃ  attribuÃ© cet achat Ã  un de vos personnages
-        if (fieldscount[3].GetInt32()!=0) {
+        if (fieldscount[2].GetInt32()!=0) {
             const char* reqperso = "SELECT count(*), name FROM characters WHERE guid='%u'";
             QueryResult resultperso = CharacterDatabase.PQuery(reqperso, fieldscount[3].GetInt32());
             Field* fieldperso = resultperso->Fetch();
-            if (fieldperso[0].GetInt32()!=0) {
-                handler->PSendSysMessage(11014, fieldperso[1].GetCString());
-                return true;
-            } else {
-                handler->PSendSysMessage(11010);
-                return true;
-            }
+            handler->PSendSysMessage(11014, fieldperso[1].GetCString());
         }
 
-        uint32 itemId = fieldscount[2].GetInt32();
+        uint32 itemId = fieldscount[1].GetInt32();
 		
-						const char* qmask = "SELECT count(*) FROM boutique_achat WHERE realmMask & '%u' != 0 and itemId = '%u'";
+        const char* qmask = "SELECT 1 FROM boutique_achat WHERE realmMask & '%u' != 0 and itemId = '%u'";
         QueryResult reqmask = LoginDatabase.PQuery(qmask, (1<<(realmID-1)), itemId);
-        Field* fieldsmask = reqmask->Fetch();
-        if (fieldsmask[0].GetInt32()==0) {
+        if (!reqmask) {
             //Ce produit ou service n'est pas disponible pour ce royaume.
             handler->PSendSysMessage(11018);
             return true;
         }
 
-		
-		
-		
-		
-        const char* reqobj = "SELECT count(*) FROM item_template WHERE entry='%u'";
-        QueryResult resultobj = WorldDatabase.PQuery(reqobj, itemId);
-        Field* fieldobj = resultobj->Fetch();
+        ItemTemplate const *tmp = sObjectMgr->GetItemTemplate(itemId);
 
-        if (fieldobj[0].GetInt32()==0) {
+        if (!tmp) {
             handler->PSendSysMessage(11011); //Cet objet n'existe pas. Veuillez contacter un MJ et lui dÃ?Â©crire le problÃ?Â¨me
             return false;
         }
@@ -218,7 +207,7 @@ public:
 
         Player* plTarget = handler->GetSession()->GetPlayer();
         Player* pl = plTarget;
-        uint32 count = fieldscount[4].GetInt32();
+        uint32 count = fieldscount[3].GetInt32();
 
         // check space and find places
         ItemPosCountVec dest;
@@ -244,9 +233,9 @@ public:
         {
             plTarget->SendNewItem(item,count,true,false);
             const char* requpdate = "UPDATE boutique_achat SET realmID = '%u', recup='%u' WHERE id='%u'";
-            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), achatId);
+            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUIDLow(), achatId);
 
-            handler->PSendSysMessage(11013, fieldscount[1].GetCString());
+            handler->PSendSysMessage(11013, fieldscount[0].GetCString());
         }
 
         if (noSpaceForCount > 0)
