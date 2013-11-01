@@ -81,30 +81,28 @@ public:
     }
 
     static bool HandleBoutiqueLevelCommand(ChatHandler *handler, const char *args) {
-        const char* reqcount = "SELECT count(*), id FROM boutique_service_achat WHERE accountId='%u' AND type=1 AND recup=0 LIMIT 1";
+        const char* reqcount = "SELECT id FROM boutique_service_achat WHERE accountId='%u' AND type=1 AND recup=0 LIMIT 1";
 
         sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, handler->GetSession()->GetAccountId());
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, handler->GetSession()->GetAccountId());
-        Field* fieldscount = resultcount->Fetch();
-        if (fieldscount[0].GetInt32()==0) {
+
+        if (!resultcount) {
             //Vous ne disposez actuellement d'aucun service de ce type. Vous pouvez acheter ce service sur la boutique
             handler->PSendSysMessage(11016);
             return true;
         }
 		
+        Field* fieldscount = resultcount->Fetch();
 		
-				const char* qmask = "SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0 and type = 1";
+        const char* qmask = "SELECT 1 FROM boutique_service WHERE realmMask & '%u' != 0 and type = 1";
         QueryResult reqmask = LoginDatabase.PQuery(qmask, (1<<(realmID-1)));
-        Field* fieldsmask = reqmask->Fetch();
-        if (fieldsmask[0].GetInt32()==0) {
+        if (!reqmask) {
             //Ce produit ou service n'est pas disponible pour ce royaume.
             handler->PSendSysMessage(11018);
             return true;
         }
 
-		
-
-        int id = fieldscount[1].GetInt32();
+        int id = fieldscount[0].GetInt32();
 
         Player* target = handler->GetSession()->GetPlayer();
         if (target) {
