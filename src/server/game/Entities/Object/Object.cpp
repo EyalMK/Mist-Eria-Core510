@@ -418,10 +418,11 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         if (hasFallData)
             data->WriteBit(hasFallDirection);
 
+        data->WriteBit(self->IsSplineEnabled();
         if (movementFlags)
             data->WriteBits(movementFlags, 30);
 
-        if(data->WriteBit(self->IsSplineEnabled()))                              // Has spline data
+        if(self->IsSplineEnabled())                              // Has spline data
             Movement::PacketBuilder::WriteCreateBits(*self->movespline, *data);
     }
 
@@ -441,7 +442,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 
 	/*
     if (bit654)
-        data.WriteBits(0,8);
+        data.WriteBits(0,9);
     if (bit520)
     {
         data.WriteBit(bit540);
