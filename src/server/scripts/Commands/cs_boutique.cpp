@@ -37,7 +37,7 @@ public:
 
     static bool HandleBoutiqueRenameCommand(ChatHandler *handler, const char *args)
     {
-        const char* reqcount = "SELECT count(*), bsa.id FROM boutique_service_achat bsa INNER JOIN boutique_service bs ON bsa.type = bs.type WHERE bs.realmMask & %u !=0 AND bsa.accountId='%u' AND bsa.type=0 AND bsa.recup=0 LIMIT 1";
+        const char* reqcount = "SELECT count(*), bsa.id FROM boutique_service_achat bsa INNER JOIN boutique_service bs ON bsa.type = bs.type WHERE bs.realmMask & '%u' !=0 AND bsa.accountId='%u' AND bsa.type=0 AND bsa.recup=0 LIMIT 1";
 
         sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
@@ -48,6 +48,10 @@ public:
             return true;
         }
 
+		
+		//SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0
+		
+		
         int id = fieldscount[1].GetInt32();
 
         Player* target = handler->GetSession()->GetPlayer();
@@ -66,7 +70,7 @@ public:
     }
 
     static bool HandleBoutiqueLevelCommand(ChatHandler *handler, const char *args) {
-        const char* reqcount = "SELECT count(*), bsa.id FROM boutique_service_achat bsa INNER JOIN boutique_service bs ON bsa.type = bs.type WHERE bs.realmMask & %u !=0 AND bsa.accountId='%u' AND bsa.type=1 AND bsa.recup=0 LIMIT 1";
+        const char* reqcount = "SELECT count(*), bsa.id FROM boutique_service_achat bsa INNER JOIN boutique_service bs ON bsa.type = bs.type WHERE bs.realmMask & '%u' !=0 AND bsa.accountId='%u' AND bsa.type=1 AND bsa.recup=0 LIMIT 1";
 
         sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
@@ -216,7 +220,7 @@ public:
 
 
     static bool HandleBoutiquePOCommand(ChatHandler *handler, const char *args) {
-        const char* reqcount = "SELECT count(*), bsa.id FROM boutique_service_achat bsa INNER JOIN boutique_service bs ON bsa.type = bs.type WHERE bs.realmMask & %u !=0 AND bsa.accountId='%u' AND bsa.type=2 AND bsa.recup=0 LIMIT 1";
+        const char* reqcount = "SELECT count(*), bsa.id FROM boutique_service_achat bsa INNER JOIN boutique_service bs ON bsa.type = bs.type WHERE bs.realmMask & '%u' !=0 AND bsa.accountId='%u' AND bsa.type=2 AND bsa.recup=0 LIMIT 1";
 
         sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
@@ -784,7 +788,7 @@ public:
     static bool HandleBoutiqueRaceCommand(ChatHandler *handler, const char *args) {
         Player* target = handler->GetSession()->GetPlayer();
 
-        const char* reqcount = "SELECT count(*), bsa.id FROM boutique_service_achat bsa INNER JOIN boutique_service bs ON bsa.type = bs.type WHERE bs.realmMask & %u !=0 AND bsa.accountId='%u' AND bsa.type=3 AND bsa.recup=0 LIMIT 1";
+        const char* reqcount = "SELECT count(*), bsa.id FROM boutique_service_achat bsa INNER JOIN boutique_service bs ON bsa.type = bs.type WHERE bs.realmMask & '%u' !=0 AND bsa.accountId='%u' AND bsa.type=3 AND bsa.recup=0 LIMIT 1";
 
         sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
@@ -813,7 +817,7 @@ public:
     static bool HandleBoutiqueFactionCommand(ChatHandler *handler, const char *args) {
         Player* target = handler->GetSession()->GetPlayer();
 
-        const char* reqcount = "SELECT count(*), bsa.id FROM boutique_service_achat bsa INNER JOIN boutique_service bs ON bsa.type = bs.type WHERE bs.realmMask & %u !=0 AND bsa.accountId='%u' AND bsa.type=4 AND bsa.recup=0 LIMIT 1";
+        const char* reqcount = "SELECT count(*), bsa.id FROM boutique_service_achat bsa INNER JOIN boutique_service bs ON bsa.type = bs.type WHERE bs.realmMask & '%u' !=0 AND bsa.accountId='%u' AND bsa.type=4 AND bsa.recup=0 LIMIT 1";
 
         sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, (1<<(realmID-1)), handler->GetSession()->GetAccountId());
