@@ -1660,6 +1660,38 @@ class spell_druid_wild_mushroom_detonate : public SpellScriptLoader
 };
 */
 
+class spell_dru_displacer_beast : public SpellScriptLoader
+{
+    public:
+        spell_dru_displacer_beast() : SpellScriptLoader("spell_dru_displacer_beast") { }
+
+        class spell_dru_displacer_beast_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dru_displacer_beast_SpellScript);
+
+            bool Load()
+            {
+                return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+            }
+
+			void HandleCatForm(SpellEffIndex /*effIndex*/)
+            {
+                GetCaster()->CastSpell(GetCaster(), 768, true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_dru_displacer_beast_SpellScript::HandleCatForm, EFFECT_0, SPELL_EFFECT_LEAP);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dru_displacer_beast_SpellScript();
+        }
+};
+
+
 void AddSC_druid_spell_scripts()
 {
     new spell_dru_bear_cat();
@@ -1694,4 +1726,5 @@ void AddSC_druid_spell_scripts()
     new spell_dru_t10_restoration_4p_bonus();
     /*new spell_druid_wild_mushroom();
     new spell_druid_wild_mushroom_detonate();*/
+	new spell_dru_displacer_beast();
 }
