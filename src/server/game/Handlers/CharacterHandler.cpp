@@ -1934,7 +1934,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
             trans->Append(stmt);
         }
 
-        if (OpcodeRealValueToInternalEnum(PacketFilter::DropHighBytes(new_pct->GetOpcode())) == CMSG_CHAR_FACTION_CHANGE)
+        if (OpcodeRealValueToInternalEnum(PacketFilter::DropHighBytes(recvData->GetOpcode())) == CMSG_CHAR_FACTION_CHANGE)
         {
             // Delete all Flypaths
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_TAXI_PATH);
