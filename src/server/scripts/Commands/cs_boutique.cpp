@@ -175,14 +175,14 @@ public:
         //Vous avez dÃ©jÃ  attribuÃ© cet achat Ã  un de vos personnages
         if (fieldscount[2].GetInt32()!=0) {
             const char* reqperso = "SELECT count(*), name FROM characters WHERE guid='%u'";
-            QueryResult resultperso = CharacterDatabase.PQuery(reqperso, fieldscount[3].GetInt32());
+            QueryResult resultperso = CharacterDatabase.PQuery(reqperso, fieldscount[2].GetInt32());
             Field* fieldperso = resultperso->Fetch();
             handler->PSendSysMessage(11014, fieldperso[1].GetCString());
         }
 
         uint32 itemId = fieldscount[1].GetInt32();
 		
-        const char* qmask = "SELECT 1 FROM boutique_achat WHERE realmMask & '%u' != 0 and itemId = '%u'";
+        const char* qmask = "SELECT 1 FROM boutique_produit WHERE realmMask & '%u' != 0 and itemId = '%u'";
         QueryResult reqmask = LoginDatabase.PQuery(qmask, (1<<(realmID-1)), itemId);
         if (!reqmask) {
             //Ce produit ou service n'est pas disponible pour ce royaume.
