@@ -261,6 +261,8 @@ public:
         sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, handler->GetSession()->GetAccountId());
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, handler->GetSession()->GetAccountId());
         Field* fieldscount = resultcount->Fetch();
+		
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE boutique po %u %u", fieldscount[0].GetInt32(), fieldscount[0].GetInt16());
         if (fieldscount[0].GetInt32()==0) {
             //Vous ne disposez actuellement d'aucun service de ce type. Vous pouvez acheter ce service sur la boutique
             handler->PSendSysMessage(11016);
