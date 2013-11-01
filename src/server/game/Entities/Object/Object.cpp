@@ -418,7 +418,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         if (hasFallData)
             data->WriteBit(hasFallDirection);
 
-        data->WriteBit(self->IsSplineEnabled();
+        data->WriteBit(self->IsSplineEnabled());
         if (movementFlags)
             data->WriteBits(movementFlags, 30);
 
