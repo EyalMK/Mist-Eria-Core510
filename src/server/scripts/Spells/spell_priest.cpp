@@ -483,7 +483,7 @@ class spell_pri_penance : public SpellScriptLoader
         }
 };
 
-// -17 - Power Word: Shield
+// 17 - Power Word: Shield
 class spell_pri_power_word_shield : public SpellScriptLoader
 {
     public:
@@ -550,37 +550,23 @@ class spell_pri_power_word_shield : public SpellScriptLoader
                     }
             }
 
+			void HandleAfterEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes mode)
+			{
+				GetTarget()->CastSpell(GetTarget(), 6788, true);
+			}
+
             void Register()
             {
                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_power_word_shield_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
                 AfterEffectAbsorb += AuraEffectAbsorbFn(spell_pri_power_word_shield_AuraScript::ReflectDamage, EFFECT_0);
+				AfterEffectApply += AuraEffectApplyFn(spell_pri_power_word_shield_AuraScript::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
             }
         };
-
-		class spell_pri_power_word_shield_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_pri_power_word_shield_SpellScript);
-
-			void HandleOnHit()
-			{
-				GetCaster()->CastSpell(GetHitPlayer(), 6788, true);
-			}
-
-			void Register()
-			{
-				OnHit += SpellHitFn(spell_pri_power_word_shield_SpellScript::HandleOnHit);
-			}
-		};
 
         AuraScript* GetAuraScript() const
         {
             return new spell_pri_power_word_shield_AuraScript();
         }
-
-		SpellScript* GetSpellScript() const
-		{
-			return new spell_pri_power_word_shield_SpellScript();
-		}
 };
 
 // 33110 - Prayer of Mending Heal
