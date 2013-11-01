@@ -58,6 +58,7 @@ public:
             return true;
         }
 		
+        Field *fieldscount = resultcount->Fetch();
         int id = fieldscount[0].GetInt32();
 
         Player* target = handler->GetSession()->GetPlayer();
