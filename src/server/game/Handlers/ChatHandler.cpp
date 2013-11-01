@@ -47,7 +47,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE chat test : %u", recvData.GetOpcode());
 
-    switch ((uint32)recvData.GetOpcode())
+
+
+    switch (OpcodeRealValueToInternalEnum(PacketFilter::DropHighBytes(new_pct->GetOpcode())))
     {
     case CMSG_MESSAGECHAT_SAY:
         type = CHAT_MSG_SAY;
@@ -529,10 +531,8 @@ void WorldSession::HandleAddonMessagechatOpcode(WorldPacket& recvData)
     Player* sender = GetPlayer();
     ChatMsg type;
 
-
-
     sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE chat test : %u", recvData.GetOpcode());
-    switch (recvData.GetOpcode())
+    switch (OpcodeRealValueToInternalEnum(PacketFilter::DropHighBytes(new_pct->GetOpcode())))
     {
     /*case CMSG_MESSAGECHAT_ADDON_BATTLEGROUND:
         type = CHAT_MSG_BATTLEGROUND;
