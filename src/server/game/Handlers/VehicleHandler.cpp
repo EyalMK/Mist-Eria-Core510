@@ -63,7 +63,7 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
         return;
     }
 
-    switch (OpcodeRealValueToInternalEnum(PacketFilter::DropHighBytes(recvData->GetOpcode())))
+    switch (OpcodeRealValueToInternalEnum(PacketFilter::DropHighBytes(recvData.GetOpcode())))
     {
         case CMSG_REQUEST_VEHICLE_PREV_SEAT:
             GetPlayer()->ChangeSeat(-1, false);
