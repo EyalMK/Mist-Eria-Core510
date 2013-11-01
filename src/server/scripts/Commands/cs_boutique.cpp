@@ -3,6 +3,8 @@
 #include "Channel.h"
 #include "ObjectMgr.h"
 #include "Config.h"
+#include "Player.h"
+#include "ReputationMgr.h"
 #include <cctype>
 
 
@@ -158,7 +160,7 @@ public:
     static bool HandleBoutiqueItemCommand(ChatHandler *handler, const char *args) {
         uint32 achatId = (uint32)atol(args);
         if (!achatId) {
-            handler->PSendSysMessage(11007, handler->GetSession()->GetPlayerName());
+            handler->PSendSysMessage(11007, handler->GetSession()->GetPlayerName().c_str());
             return false;
         }
 
@@ -256,30 +258,30 @@ public:
 
 
     static bool HandleBoutiquePOCommand(ChatHandler *handler, const char *args) {
-        const char* reqcount = "SELECT count(*), id FROM boutique_service_achat WHERE accountId='%u' AND type=2 AND recup=0 LIMIT 1";
+        const char* reqcount = "SELECT id FROM boutique_service_achat WHERE accountId='%u' AND type=2 AND recup=0 LIMIT 1";
 
         sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, handler->GetSession()->GetAccountId());
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, handler->GetSession()->GetAccountId());
-        Field* fieldscount = resultcount->Fetch();
-		
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE boutique po %u %u", fieldscount[0].GetInt32(), fieldscount[0].GetInt16());
-        if (fieldscount[0].GetInt32()==0) {
+
+        if (!resultcount) {
             //Vous ne disposez actuellement d'aucun service de ce type. Vous pouvez acheter ce service sur la boutique
             handler->PSendSysMessage(11016);
             return true;
-        }
+        }        
+
 		
-						const char* qmask = "SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0 and type = 2";
+        const char* qmask = "SELECT 1 FROM boutique_service WHERE realmMask & '%u' != 0 and type = 2";
         QueryResult reqmask = LoginDatabase.PQuery(qmask, (1<<(realmID-1)));
-        Field* fieldsmask = reqmask->Fetch();
-        if (fieldsmask[0].GetInt32()==0) {
+        if (!reqmask) {
             //Ce produit ou service n'est pas disponible pour ce royaume.
             handler->PSendSysMessage(11018);
             return true;
         }
 		
+        Field *fieldscount = resultcount->Fetch();
+        int id = fieldscount[0].GetInt32();
 
-        int id = fieldscount[1].GetInt32();
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE boutique po %u", fieldscount[0].GetInt32());
 
         Player* target = handler->GetSession()->GetPlayer();
         if (target) {
@@ -287,7 +289,7 @@ public:
 
             target->SaveToDB();
             const char* requpdate = "UPDATE boutique_service_achat SET realmID = '%u', recup='%u' WHERE id='%u'";
-            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), id);
+            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUIDLow(), id);
         }
 
         return true;
@@ -660,14 +662,9 @@ public:
                     }
                 }
             }
-            if (player->getRace() == RACE_GOBLIN)
-                player->TeleportTo(1, 1569, -4398, 18, 0);
-            else if (player->getRace() == RACE_WORGEN)
-                player->TeleportTo(0, -8830, 626, 96, 0);
-            player->SaveToDB();
+
         }*/
 
-		return false;
 		
 		/*
         Player *pPlayer = handler->GetSession()->GetPlayer();
@@ -830,6 +827,141 @@ public:
 
 
         return true;*/
+
+        Player *pPlayer = handler->GetSession()->GetPlayer();
+
+        if(!pPlayer)
+            return false;
+
+        uint32 guidLow = pPlayer->GetGUIDLow();
+
+        QueryResult result = LoginDatabase.PQuery("SELECT id, level, stuff_wanted FROM recuperation WHERE idPerso=%u AND state=3 AND destination_realm=%u", guidLow, realmID);
+        if(result->GetRowCount() == 0)
+        {
+            handler->PSendSysMessage("Vous ne disposez pas de recuperation pour ce personnage, ou elle n'a pas encore été validee par un maitre du jeu");
+            return true;
+        }
+
+        Field *recup = result->Fetch();
+
+        uint32 id = recup[0].GetUInt32();
+        uint32 stuffId = recup[2].GetUInt32();
+        uint8 level = recup[1].GetUInt8();
+
+        QueryResult metier = LoginDatabase.PQuery("SELECT skill, value, max FROM recuperation_metier WHERE idRecup = %u", id);
+        QueryResult reput = LoginDatabase.PQuery("SELECT reputId, value FROM recuperation_reput WHERE idRecup = %u", id);
+        QueryResult stuff = LoginDatabase.PQuery("SELECT itemId FROM recuperation_stuff WHERE spe = %u", stuffId);
+
+
+        uint32 sacId = 0;
+        uint32 moneyToAdd = 0;
+        if(level == 85)
+        {
+            sacId = 21841;
+            moneyToAdd = 12000 * GOLD;
+        }
+        else
+        {
+            sacId = 30744;
+            moneyToAdd = 10000 * GOLD;
+        }
+
+        pPlayer->ModifyMoney(moneyToAdd);
+
+        for(uint32 i = INVENTORY_SLOT_BAG_START ; i < INVENTORY_SLOT_BAG_END ; i++)
+        {
+            if(Bag *pBag = (Bag*)pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            {
+                for(uint32 j = 0 ; j < pBag->GetBagSize(); j++)
+                {
+                    if(Item *pItem = pBag->GetItemByPos(j))
+                        pPlayer->DestroyItem(INVENTORY_SLOT_BAG_0, j, false);
+                }
+
+                pPlayer->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+            }
+
+        }
+
+        for(uint32 i = INVENTORY_SLOT_ITEM_START ; i < INVENTORY_SLOT_ITEM_END ; i++)
+        {
+            if(pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                pPlayer->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+        }
+
+        for(uint32 i = 0 ; i < 4 ; i++)
+        {
+            pPlayer->EquipNewItem(INVENTORY_SLOT_BAG_START+i, sacId, true);
+        }
+
+        pPlayer->GiveLevel(level);
+        pPlayer->InitTalentForLevel();
+        pPlayer->SetUInt32Value(PLAYER_XP,0);
+
+        if(stuff->GetRowCount() > 0)
+        {
+            do
+            {
+                Field * piece = stuff->Fetch();
+                uint32 item = piece[0].GetUInt32();
+                pPlayer->AddItem(item, 1);
+            }
+            while(stuff->NextRow());
+        }
+
+        if(reput->GetRowCount() > 0)
+        {
+            do
+            {
+                Field *rep = reput->Fetch();
+                uint32 reputId = rep[0].GetUInt32();
+                uint32 rank = rep[1].GetUInt32();
+
+                FactionEntry const *fac = sFactionStore.LookupEntry(reputId);
+
+                if(rank == 42000)
+                    rank += 1000;
+
+                pPlayer->GetReputationMgr().SetReputation(fac, rank);
+            }
+            while(reput->NextRow());
+        }
+
+        if(metier->GetRowCount() > 0)
+        {
+            do
+            {
+                Field *prof = metier->Fetch();
+
+                uint32 skill = prof[0].GetUInt32();
+                uint32 value = prof[1].GetUInt32();
+                uint32 max = prof[2].GetUInt32();
+
+                QueryResult profSpellQ = LoginDatabase.PQuery("SELECT competence FROM recuperation_metier_spell WHERE id = %u AND niveau = %u", skill, max);
+                if(profSpellQ->GetRowCount() == 0)
+                    continue;
+
+                Field *profSpell = profSpellQ->Fetch();
+                uint32 spell = profSpell->GetUInt32();
+
+                if(!pPlayer->HasSpell(spell))
+                    pPlayer->learnSpell(spell, true);
+
+                pPlayer->SetSkill(skill, pPlayer->GetSkillStep(skill), value, max);
+            }
+            while(metier->NextRow());
+        }
+
+        LoginDatabase.PQuery("UPDATE recuperation SET state=5 WHERE id=%u", id);
+
+        if (pPlayer->getRace() == RACE_GOBLIN)
+            pPlayer->TeleportTo(1, 1569, -4398, 18, 0);
+        else if (pPlayer->getRace() == RACE_WORGEN)
+            pPlayer->TeleportTo(0, -8830, 626, 96, 0);
+
+        pPlayer->SaveToDB();
+
+        return true;
     }
 
 

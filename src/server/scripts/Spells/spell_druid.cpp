@@ -1660,6 +1660,72 @@ class spell_druid_wild_mushroom_detonate : public SpellScriptLoader
 };
 */
 
+// 102280 - Displacer Beast
+class spell_dru_displacer_beast : public SpellScriptLoader
+{
+    public:
+        spell_dru_displacer_beast() : SpellScriptLoader("spell_dru_displacer_beast") { }
+
+        class spell_dru_displacer_beast_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dru_displacer_beast_SpellScript);
+
+            bool Load()
+            {
+                return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+            }
+
+			void HandleCatForm(SpellEffIndex /*effIndex*/)
+            {
+                GetCaster()->CastSpell(GetCaster(), 768, true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_dru_displacer_beast_SpellScript::HandleCatForm, EFFECT_0, SPELL_EFFECT_LEAP);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dru_displacer_beast_SpellScript();
+        }
+};
+
+// 106737 Force of Nature
+class spell_dru_force_of_nature : public SpellScriptLoader
+{
+    public:
+        spell_dru_force_of_nature() : SpellScriptLoader("spell_dru_force_of_nature") { }
+
+        class spell_dru_force_of_nature_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dru_force_of_nature_SpellScript);
+
+            void Cast()
+            {
+				Position pos;
+				GetExplTargetDest()->GetPosition(&pos);
+				if(Player* player = GetCaster()->ToPlayer())
+				{
+					for(uint8 i=0; i<3; ++i)
+					player->SummonCreature(54983, pos, TEMPSUMMON_TIMED_DESPAWN, 15000); 
+				}
+            }
+
+            void Register()
+            {
+                OnCast += SpellCastFn(spell_dru_force_of_nature_SpellScript::Cast);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dru_force_of_nature_SpellScript();
+        }
+};
+
+
 void AddSC_druid_spell_scripts()
 {
     new spell_dru_bear_cat();
@@ -1694,4 +1760,6 @@ void AddSC_druid_spell_scripts()
     new spell_dru_t10_restoration_4p_bonus();
     /*new spell_druid_wild_mushroom();
     new spell_druid_wild_mushroom_detonate();*/
+	new spell_dru_displacer_beast();
+	new spell_dru_force_of_nature();
 }
