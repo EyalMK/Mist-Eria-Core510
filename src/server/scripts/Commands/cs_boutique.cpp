@@ -175,7 +175,7 @@ public:
         //Vous avez dÃ©jÃ  attribuÃ© cet achat Ã  un de vos personnages
         if (fieldscount[2].GetInt32()!=0) {
             const char* reqperso = "SELECT count(*), name FROM characters WHERE guid='%u'";
-            QueryResult resultperso = CharacterDatabase.PQuery(reqperso, fieldscount[3].GetInt32());
+            QueryResult resultperso = CharacterDatabase.PQuery(reqperso, fieldscount[2].GetInt32());
             Field* fieldperso = resultperso->Fetch();
             handler->PSendSysMessage(11014, fieldperso[1].GetCString());
         }
