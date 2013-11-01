@@ -49,7 +49,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
 
 
-    switch (OpcodeRealValueToInternalEnum(PacketFilter::DropHighBytes(recvData.GetOpcode())))
+    switch (recvData.GetOpcode())
     {
     case CMSG_MESSAGECHAT_SAY:
         type = CHAT_MSG_SAY;
@@ -532,7 +532,7 @@ void WorldSession::HandleAddonMessagechatOpcode(WorldPacket& recvData)
     ChatMsg type;
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE chat test : %u", recvData.GetOpcode());
-    switch (OpcodeRealValueToInternalEnum(PacketFilter::DropHighBytes(recvData.GetOpcode())))
+    switch (recvData.GetOpcode())
     {
     /*case CMSG_MESSAGECHAT_ADDON_BATTLEGROUND:
         type = CHAT_MSG_BATTLEGROUND;
