@@ -472,7 +472,7 @@ uint32 SpellMgr::GetOverrideSpell(Player* player, uint32 id) const
 	case 853: // Hammer of Justice
 		return player->HasSpell(105593) ? 105593 : 853; // Fist of Justice
 	case 770: // Faerie Fire
-		return player->HasSpell(106707) ? 106707 : 770; // Faerie Swarm
+		return player->HasSpell(102355) ? 102355 : 770; // Faerie Swarm
 	case 66: // Invisibility
 		return player->HasSpell(110959) ? 110959 : 66; // Greater Invisibility
 	case 34428: // Impending Victory
