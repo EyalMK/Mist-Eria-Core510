@@ -39,31 +39,27 @@ public:
 
     static bool HandleBoutiqueRenameCommand(ChatHandler *handler, const char *args)
     {
-        const char* reqcount = "SELECT count(*), id FROM boutique_service_achat WHERE accountId='%u' AND type=0 AND recup=0 LIMIT 1";
+        const char* reqcount = "SELECT id FROM boutique_service_achat WHERE accountId='%u' AND type=0 AND recup=0 LIMIT 1";
 
         sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, handler->GetSession()->GetAccountId());
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, handler->GetSession()->GetAccountId());
-        Field* fieldscount = resultcount->Fetch();
-        if (fieldscount[0].GetInt32()==0) {
+        if (!resultcount) {
             //Vous ne disposez actuellement d'aucun service de ce type. Vous pouvez acheter ce service sur la boutique
             handler->PSendSysMessage(11016);
             return true;
         }
 		
 		
-		const char* qmask = "SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0 and type = 0";
+        const char* qmask = "SELECT 1 FROM boutique_service WHERE realmMask & '%u' != 0 and type = 0";
         QueryResult reqmask = LoginDatabase.PQuery(qmask, (1<<(realmID-1)));
-        Field* fieldsmask = reqmask->Fetch();
-        if (fieldsmask[0].GetInt32()==0) {
+        if (!reqmask) {
             //Ce produit ou service n'est pas disponible pour ce royaume.
             handler->PSendSysMessage(11018);
             return true;
         }
-
-
 		
-		
-        int id = fieldscount[1].GetInt32();
+        Field *fieldscount = resultcount->Fetch();
+        int id = fieldscount[0].GetInt32();
 
         Player* target = handler->GetSession()->GetPlayer();
         if (target) {
@@ -81,30 +77,28 @@ public:
     }
 
     static bool HandleBoutiqueLevelCommand(ChatHandler *handler, const char *args) {
-        const char* reqcount = "SELECT count(*), id FROM boutique_service_achat WHERE accountId='%u' AND type=1 AND recup=0 LIMIT 1";
+        const char* reqcount = "SELECT id FROM boutique_service_achat WHERE accountId='%u' AND type=1 AND recup=0 LIMIT 1";
 
         sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, handler->GetSession()->GetAccountId());
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, handler->GetSession()->GetAccountId());
-        Field* fieldscount = resultcount->Fetch();
-        if (fieldscount[0].GetInt32()==0) {
+
+        if (!resultcount) {
             //Vous ne disposez actuellement d'aucun service de ce type. Vous pouvez acheter ce service sur la boutique
             handler->PSendSysMessage(11016);
             return true;
         }
 		
+        Field* fieldscount = resultcount->Fetch();
 		
-				const char* qmask = "SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0 and type = 1";
+        const char* qmask = "SELECT 1 FROM boutique_service WHERE realmMask & '%u' != 0 and type = 1";
         QueryResult reqmask = LoginDatabase.PQuery(qmask, (1<<(realmID-1)));
-        Field* fieldsmask = reqmask->Fetch();
-        if (fieldsmask[0].GetInt32()==0) {
+        if (!reqmask) {
             //Ce produit ou service n'est pas disponible pour ce royaume.
             handler->PSendSysMessage(11018);
             return true;
         }
 
-		
-
-        int id = fieldscount[1].GetInt32();
+        int id = fieldscount[0].GetInt32();
 
         Player* target = handler->GetSession()->GetPlayer();
         if (target) {
@@ -112,13 +106,14 @@ public:
             int level = target->getLevel();
 
             if (level<40) levelToAdd = 8;
-            else if (level<50) levelToAdd = 7;
-            else if (level<60) levelToAdd = 6;
-            else if (level<70) levelToAdd = 5;
-            else if (level<75) levelToAdd = 4;
-            else if (level<80) levelToAdd = 3;
-            else if (level<83) levelToAdd = 2;
-            else if (level<85) levelToAdd = 1;
+            else if (level<50) levelToAdd = 8;
+            else if (level<60) levelToAdd = 7;
+            else if (level<70) levelToAdd = 6;
+            else if (level<75) levelToAdd = 5;
+            else if (level<80) levelToAdd = 4;
+            else if (level<83) levelToAdd = 3;
+            else if (level<86) levelToAdd = 2;
+            else if (level<90) levelToAdd = 1;
             else {
                 return false;
             }
@@ -164,51 +159,40 @@ public:
             return false;
         }
 
-        const char* reqcount = "SELECT count(*), nom, itemId, recup, quantite FROM boutique_achat WHERE accountId = '%u' AND id='%u'";
+        const char* reqcount = "SELECT nom, itemId, recup, quantite FROM boutique_achat WHERE accountId = '%u' AND id='%u'";
 
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, handler->GetSession()->GetAccountId(), achatId);
-        Field* fieldscount = resultcount->Fetch();
-        if (fieldscount[0].GetInt32()==0) {
+
+        if (!resultcount) {
             //Cet achat n'existe pas, ne vous est pas attribue ou n'est pas disponible sur ce serveur.
             handler->PSendSysMessage(11008);
             return true;
         }
+
+        Field* fieldscount = resultcount->Fetch();
 		
 
         //Vous avez dÃ©jÃ  attribuÃ© cet achat Ã  un de vos personnages
-        if (fieldscount[3].GetInt32()!=0) {
+        if (fieldscount[2].GetInt32()!=0) {
             const char* reqperso = "SELECT count(*), name FROM characters WHERE guid='%u'";
             QueryResult resultperso = CharacterDatabase.PQuery(reqperso, fieldscount[3].GetInt32());
             Field* fieldperso = resultperso->Fetch();
-            if (fieldperso[0].GetInt32()!=0) {
-                handler->PSendSysMessage(11014, fieldperso[1].GetCString());
-                return true;
-            } else {
-                handler->PSendSysMessage(11010);
-                return true;
-            }
+            handler->PSendSysMessage(11014, fieldperso[1].GetCString());
         }
 
-        uint32 itemId = fieldscount[2].GetInt32();
+        uint32 itemId = fieldscount[1].GetInt32();
 		
-						const char* qmask = "SELECT count(*) FROM boutique_achat WHERE realmMask & '%u' != 0 and itemId = '%u'";
+        const char* qmask = "SELECT 1 FROM boutique_achat WHERE realmMask & '%u' != 0 and itemId = '%u'";
         QueryResult reqmask = LoginDatabase.PQuery(qmask, (1<<(realmID-1)), itemId);
-        Field* fieldsmask = reqmask->Fetch();
-        if (fieldsmask[0].GetInt32()==0) {
+        if (!reqmask) {
             //Ce produit ou service n'est pas disponible pour ce royaume.
             handler->PSendSysMessage(11018);
             return true;
         }
 
-		
-		
-		
-		
-        const char* reqobj = "SELECT count(*) FROM item_template WHERE entry='%u'";
-        QueryResult resultobj = WorldDatabase.PQuery(reqobj, itemId);
-        Field* fieldobj = resultobj->Fetch();
+        ItemTemplate const *tmp = sObjectMgr->GetItemTemplate(itemId);
 
-        if (fieldobj[0].GetInt32()==0) {
+        if (!tmp) {
             handler->PSendSysMessage(11011); //Cet objet n'existe pas. Veuillez contacter un MJ et lui dÃ?Â©crire le problÃ?Â¨me
             return false;
         }
@@ -218,7 +202,7 @@ public:
 
         Player* plTarget = handler->GetSession()->GetPlayer();
         Player* pl = plTarget;
-        uint32 count = fieldscount[4].GetInt32();
+        uint32 count = fieldscount[3].GetInt32();
 
         // check space and find places
         ItemPosCountVec dest;
@@ -244,9 +228,9 @@ public:
         {
             plTarget->SendNewItem(item,count,true,false);
             const char* requpdate = "UPDATE boutique_achat SET realmID = '%u', recup='%u' WHERE id='%u'";
-            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), achatId);
+            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUIDLow(), achatId);
 
-            handler->PSendSysMessage(11013, fieldscount[1].GetCString());
+            handler->PSendSysMessage(11013, fieldscount[0].GetCString());
         }
 
         if (noSpaceForCount > 0)
@@ -968,21 +952,22 @@ public:
     static bool HandleBoutiqueRaceCommand(ChatHandler *handler, const char *args) {
         Player* target = handler->GetSession()->GetPlayer();
 
-        const char* reqcount = "SELECT count(*), id FROM boutique_service_achat WHERE accountId='%u' AND type=3 AND recup=0 LIMIT 1";
+        const char* reqcount = "SELECT id FROM boutique_service_achat WHERE accountId='%u' AND type=3 AND recup=0 LIMIT 1";
 
         sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, handler->GetSession()->GetAccountId());
         QueryResult resultcount = LoginDatabase.PQuery(reqcount, handler->GetSession()->GetAccountId());
-        Field* fieldscount = resultcount->Fetch();
-        if (fieldscount[0].GetInt32()==0) {
+
+        if (!resultcount) {
             //Vous ne disposez actuellement d'aucun service de ce type. Vous pouvez acheter ce service sur la boutique
             handler->PSendSysMessage(11016);
             return true;
         }
 
-						const char* qmask = "SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0 and type = 3";
+        Field* fieldscount = resultcount->Fetch();
+
+        const char* qmask = "SELECT 1 FROM boutique_service WHERE realmMask & '%u' != 0 and type = 3";
         QueryResult reqmask = LoginDatabase.PQuery(qmask, (1<<(realmID-1)));
-        Field* fieldsmask = reqmask->Fetch();
-        if (fieldsmask[0].GetInt32()==0) {
+        if (!reqmask) {
             //Ce produit ou service n'est pas disponible pour ce royaume.
             handler->PSendSysMessage(11018);
             return true;
@@ -998,7 +983,7 @@ public:
 
             target->SaveToDB();
             const char* requpdate = "UPDATE boutique_service_achat SET realmID = '%u', recup='%u' WHERE id='%u'";
-            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), fieldscount[1].GetInt32());
+            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), fieldscount[0].GetInt32());
         }
 
         return true;
@@ -1007,21 +992,21 @@ public:
     static bool HandleBoutiqueFactionCommand(ChatHandler *handler, const char *args) {
         Player* target = handler->GetSession()->GetPlayer();
 
-        const char* reqcount = "SELECT count(*), id FROM boutique_service_achat WHERE accountId='%u' AND type=4 AND recup=0 LIMIT 1";
+        const char* reqcount = "SELECT id FROM boutique_service_achat WHERE accountId='%u' AND type=4 AND recup=0 LIMIT 1";
 
         sLog->outDebug(LOG_FILTER_NETWORKIO, reqcount, handler->GetSession()->GetAccountId());
-        QueryResult resultcount = LoginDatabase.PQuery(reqcount, handler->GetSession()->GetAccountId());
-        Field* fieldscount = resultcount->Fetch();
-        if (fieldscount[0].GetInt32()==0) {
+        QueryResult resultcount = LoginDatabase.PQuery(reqcount, handler->GetSession()->GetAccountId());        
+        if (!resultcount) {
             //Vous ne disposez actuellement d'aucun service de ce type. Vous pouvez acheter ce service sur la boutique
             handler->PSendSysMessage(11016);
             return true;
         }
+
+        Field* fieldscount = resultcount->Fetch();
 		
-						const char* qmask = "SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0 and type = 4";
-        QueryResult reqmask = LoginDatabase.PQuery(qmask, (1<<(realmID-1)));
-        Field* fieldsmask = reqmask->Fetch();
-        if (fieldsmask[0].GetInt32()==0) {
+        const char* qmask = "SELECT 1 FROM boutique_service WHERE realmMask & '%u' != 0 and type = 4";
+        QueryResult reqmask = LoginDatabase.PQuery(qmask, (1<<(realmID-1)));        
+        if (!reqmask) {
             //Ce produit ou service n'est pas disponible pour ce royaume.
             handler->PSendSysMessage(11018);
             return true;
@@ -1046,7 +1031,7 @@ public:
 
             target->SaveToDB();
             const char* requpdate = "UPDATE boutique_service_achat SET realmID = '%u', recup='%u' WHERE id='%u'";
-            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), fieldscount[1].GetInt32());
+            LoginDatabase.PExecute(requpdate, realmID, (uint32)handler->GetSession()->GetPlayer()->GetGUID(), fieldscount[0].GetInt32());
         }
 
         return true;
