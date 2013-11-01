@@ -1528,7 +1528,7 @@ Opcodes OpcodeRealValueToInternalEnum(uint16 value);
 /// Lookup opcode name for human understandable logging
 inline std::string GetOpcodeNameForLogging(Opcodes id)
 {
-    uint32 opcode = uint32(id);
+    uint32 opcode = OpcodeInternalEnumToRealValue(id);
     std::ostringstream ss;
     ss << '[';
 
@@ -1546,7 +1546,7 @@ inline std::string GetOpcodeNameForLogging(Opcodes id)
     else
         ss << "INVALID OPCODE";
 
-    ss << " 0x" << std::hex << std::uppercase << OpcodeInternalEnumToRealValue((Opcodes)opcode) << std::nouppercase << " (" << std::dec << opcode << ")]";
+    ss << " 0x" << std::hex << std::uppercase << opcode << std::nouppercase << " (" << std::dec << opcode << ")]";
     return ss.str();
 }
 
