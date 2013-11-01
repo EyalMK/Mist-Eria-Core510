@@ -112,7 +112,7 @@ void WorldSession::HandleNameQueryOpcode(WorldPacket& recvData)
     uint64 guid;
     recvData >> guid;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE name query", GUID_LOPART(guid));
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE name query %u", GUID_LOPART(guid));
 
     // This is disable by default to prevent lots of console spam
     // sLog->outInfo(LOG_FILTER_NETWORKIO, "HandleNameQueryOpcode %u", guid);
