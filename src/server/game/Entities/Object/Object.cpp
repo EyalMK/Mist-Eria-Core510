@@ -418,11 +418,11 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         if (hasFallData)
             data->WriteBit(hasFallDirection);
 
-        data->WriteBit(self->IsSplineEnabled());
+        data->WriteBit(0); //self->IsSplineEnabled()
         if (movementFlags)
             data->WriteBits(movementFlags, 30);
 
-        if(self->IsSplineEnabled())                              // Has spline data
+        if(false) //self->IsSplineEnabled()                             // Has spline data
             Movement::PacketBuilder::WriteCreateBits(*self->movespline, *data);
     }
 
@@ -517,7 +517,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 
         *data << self->GetSpeed(MOVE_FLIGHT_BACK);
 
-        if (self->IsSplineEnabled())
+        if (false) //self->IsSplineEnabled()
             Movement::PacketBuilder::WriteCreateData(*self->movespline, *data);
 
         *data << self->GetSpeed(MOVE_SWIM);
