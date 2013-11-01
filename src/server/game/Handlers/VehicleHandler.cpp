@@ -65,10 +65,10 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
 
     switch (recvData.GetOpcode())
     {
-        case 0x1430:
+        case _opcodeConversionMap[CMSG_REQUEST_VEHICLE_PREV_SEAT]:
             GetPlayer()->ChangeSeat(-1, false);
             break;
-        case 0x1429:
+        case _opcodeConversionMap[CMSG_REQUEST_VEHICLE_NEXT_SEAT]:
             GetPlayer()->ChangeSeat(-1, true);
             break;
         /*case CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE:
@@ -99,7 +99,7 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
             }
             break;
         }*/
-        case 0x1431:
+        case _opcodeConversionMap[CMSG_REQUEST_VEHICLE_SWITCH_SEAT]:
         {
             uint64 guid;        // current vehicle guid
             recvData.readPackGUID(guid);

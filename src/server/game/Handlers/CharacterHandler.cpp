@@ -1768,7 +1768,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
     Field* fields = result->Fetch();
     uint32 at_loginFlags = fields[0].GetUInt16();
     char const* knownTitlesStr = fields[1].GetCString();
-    uint32 used_loginFlag = ((recvData.GetOpcode() == 0x0C4C) ? AT_LOGIN_CHANGE_RACE : AT_LOGIN_CHANGE_FACTION);
+    uint32 used_loginFlag = ((recvData.GetOpcode() == _opcodeConversionMap[CMSG_CHAR_RACE_CHANGE]) ? AT_LOGIN_CHANGE_RACE : AT_LOGIN_CHANGE_FACTION);
 
     if (!sObjectMgr->GetPlayerInfo(race, playerClass))
     {
@@ -1934,7 +1934,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
             trans->Append(stmt);
         }
 
-        if (recvData.GetOpcode() == 0x00E5)
+        if (recvData.GetOpcode() == _opcodeConversionMap[CMSG_CHAR_FACTION_CHANGE])
         {
             // Delete all Flypaths
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_TAXI_PATH);

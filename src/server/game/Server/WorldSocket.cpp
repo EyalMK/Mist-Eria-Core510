@@ -193,11 +193,11 @@ int WorldSocket::SendPacket(WorldPacket const& pct)
 	//switch to make console stop spams opcodes
 	switch(pkt->GetOpcode())
 	{
-        case 0x02A5: //MONSERT_MOVE
-        case 0x0120: //UPDATE OBJECT
-        case 0x34C:  //DESTROY OBJECT
-        case 0x410: //SMSG_TIME_SYNC_REQ
-        case 0x294: //SMSG_PLAYER_MOVE
+        case (int)(_opcodeConversionMap[SMSG_MONSTER_MOVE]):
+        case _opcodeConversionMap[SMSG_UPDATE_OBJECT]:
+        case _opcodeConversionMap[SMSG_DESTROY_OBJECT]:
+        case _opcodeConversionMap[SMSG_TIME_SYNC_REQ]:
+        case _opcodeConversionMap[SMSG_PLAYER_MOVE]:
 			break;
 		default:
 		{

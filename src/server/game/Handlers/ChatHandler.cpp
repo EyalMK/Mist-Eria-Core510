@@ -47,43 +47,43 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     switch (recvData.GetOpcode())
     {
-    case 0x67A:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_SAY]:
         type = CHAT_MSG_SAY;
         break;
-    case 0xF7F:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_YELL]:
         type = CHAT_MSG_YELL;
         break;
-    case 0x067E:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_CHANNEL]:
         type = CHAT_MSG_CHANNEL;
         break;
-    case 0x306:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_WHISPER]:
         type = CHAT_MSG_WHISPER;
         break;
-    case 0x057E:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_GUILD]:
         type = CHAT_MSG_GUILD;
         break;
-    case 0x030A:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_OFFICER]:
         type = CHAT_MSG_OFFICER;
         break;
-    case 0x0267:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_AFK]:
         type = CHAT_MSG_AFK;
         break;
-    case 0x0FFB:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_DND]:
         type = CHAT_MSG_DND;
         break;
-    case 0x02CE:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_EMOTE]:
         type = CHAT_MSG_EMOTE;
         break;
-    case 0x02AB:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_PARTY]:
         type = CHAT_MSG_PARTY;
         break;
-    case 0x0246:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_RAID]:
         type = CHAT_MSG_RAID;
         break;
     /*case CMSG_MESSAGECHAT_BATTLEGROUND:
         type = CHAT_MSG_BATTLEGROUND;
         break;*/
-    case 0x0CDE:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_RAID_WARNING]:
         type = CHAT_MSG_RAID_WARNING;
         break;
     default:
@@ -532,19 +532,19 @@ void WorldSession::HandleAddonMessagechatOpcode(WorldPacket& recvData)
     /*case CMSG_MESSAGECHAT_ADDON_BATTLEGROUND:
         type = CHAT_MSG_BATTLEGROUND;
         break;*/
-    case 0x02AA:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_ADDON_GUILD]:
         type = CHAT_MSG_GUILD;
         break;
-    case 0x0327:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_ADDON_OFFICER]:
         type = CHAT_MSG_OFFICER;
         break;
-    case 0x04FB:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_ADDON_PARTY]:
         type = CHAT_MSG_PARTY;
         break;
-    case 0x0282:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_ADDON_RAID]:
         type = CHAT_MSG_RAID;
         break;
-    case 0x0D77:
+    case _opcodeConversionMap[CMSG_MESSAGECHAT_ADDON_WHISPER]:
         type = CHAT_MSG_WHISPER;
         break;
     default:
