@@ -106,13 +106,14 @@ public:
             int level = target->getLevel();
 
             if (level<40) levelToAdd = 8;
-            else if (level<50) levelToAdd = 7;
-            else if (level<60) levelToAdd = 6;
-            else if (level<70) levelToAdd = 5;
-            else if (level<75) levelToAdd = 4;
-            else if (level<80) levelToAdd = 3;
-            else if (level<83) levelToAdd = 2;
-            else if (level<85) levelToAdd = 1;
+            else if (level<50) levelToAdd = 8;
+            else if (level<60) levelToAdd = 7;
+            else if (level<70) levelToAdd = 6;
+            else if (level<75) levelToAdd = 5;
+            else if (level<80) levelToAdd = 4;
+            else if (level<83) levelToAdd = 3;
+            else if (level<86) levelToAdd = 2;
+            else if (level<90) levelToAdd = 1;
             else {
                 return false;
             }
