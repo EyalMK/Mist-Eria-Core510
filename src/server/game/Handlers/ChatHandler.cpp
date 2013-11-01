@@ -45,7 +45,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     uint32 type = 0;
     uint32 lang;
 
-    switch (recvData.GetOpcode())
+    switch ((uint32)recvData.GetOpcode())
     {
     case 0x67A:
         type = CHAT_MSG_SAY;
@@ -527,7 +527,7 @@ void WorldSession::HandleAddonMessagechatOpcode(WorldPacket& recvData)
     Player* sender = GetPlayer();
     ChatMsg type;
 
-    switch (recvData.GetOpcode())
+    switch ((uint32)recvData.GetOpcode())
     {
     /*case CMSG_MESSAGECHAT_ADDON_BATTLEGROUND:
         type = CHAT_MSG_BATTLEGROUND;
