@@ -49,8 +49,8 @@ public:
         }
 		
 		
-		const char* reqmask = "SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0 and type = 0";
-        QueryResult reqmask = LoginDatabase.PQuery(reqcount, (1<<(realmID-1)));
+		const char* qmask = "SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0 and type = 0";
+        QueryResult reqmask = LoginDatabase.PQuery(qmask, (1<<(realmID-1)));
         Field* fieldsmask = reqmask->Fetch();
         if (fieldsmask[0].GetInt32()==0) {
             //Ce produit ou service n'est pas disponible pour ce royaume.
@@ -91,8 +91,8 @@ public:
         }
 		
 		
-				const char* reqmask = "SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0 and type = 1";
-        QueryResult reqmask = LoginDatabase.PQuery(reqcount, (1<<(realmID-1)));
+				const char* qmask = "SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0 and type = 1";
+        QueryResult reqmask = LoginDatabase.PQuery(qmask, (1<<(realmID-1)));
         Field* fieldsmask = reqmask->Fetch();
         if (fieldsmask[0].GetInt32()==0) {
             //Ce produit ou service n'est pas disponible pour ce royaume.
@@ -189,8 +189,8 @@ public:
 
         uint32 itemId = fieldscount[2].GetInt32();
 		
-						const char* reqmask = "SELECT count(*) FROM boutique_achat WHERE realmMask & '%u' != 0 and itemId = '%u'";
-        QueryResult reqmask = LoginDatabase.PQuery(reqcount, (1<<(realmID-1)), itemId);
+						const char* qmask = "SELECT count(*) FROM boutique_achat WHERE realmMask & '%u' != 0 and itemId = '%u'";
+        QueryResult reqmask = LoginDatabase.PQuery(qmask, (1<<(realmID-1)), itemId);
         Field* fieldsmask = reqmask->Fetch();
         if (fieldsmask[0].GetInt32()==0) {
             //Ce produit ou service n'est pas disponible pour ce royaume.
@@ -267,8 +267,8 @@ public:
             return true;
         }
 		
-						const char* reqmask = "SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0 and type = 2";
-        QueryResult reqmask = LoginDatabase.PQuery(reqcount, (1<<(realmID-1)));
+						const char* qmask = "SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0 and type = 2";
+        QueryResult reqmask = LoginDatabase.PQuery(qmask, (1<<(realmID-1)));
         Field* fieldsmask = reqmask->Fetch();
         if (fieldsmask[0].GetInt32()==0) {
             //Ce produit ou service n'est pas disponible pour ce royaume.
@@ -845,8 +845,8 @@ public:
             return true;
         }
 
-						const char* reqmask = "SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0 and type = 3";
-        QueryResult reqmask = LoginDatabase.PQuery(reqcount, (1<<(realmID-1)));
+						const char* qmask = "SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0 and type = 3";
+        QueryResult reqmask = LoginDatabase.PQuery(qmask, (1<<(realmID-1)));
         Field* fieldsmask = reqmask->Fetch();
         if (fieldsmask[0].GetInt32()==0) {
             //Ce produit ou service n'est pas disponible pour ce royaume.
@@ -884,8 +884,8 @@ public:
             return true;
         }
 		
-						const char* reqmask = "SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0 and type = 4";
-        QueryResult reqmask = LoginDatabase.PQuery(reqcount, (1<<(realmID-1)));
+						const char* qmask = "SELECT count(*) FROM boutique_service WHERE realmMask & '%u' != 0 and type = 4";
+        QueryResult reqmask = LoginDatabase.PQuery(qmask, (1<<(realmID-1)));
         Field* fieldsmask = reqmask->Fetch();
         if (fieldsmask[0].GetInt32()==0) {
             //Ce produit ou service n'est pas disponible pour ce royaume.
