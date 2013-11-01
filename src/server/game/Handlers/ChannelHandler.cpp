@@ -103,7 +103,7 @@ void WorldSession::HandleChannelList(WorldPacket& recvPacket)
     std::string channelName = recvPacket.ReadString(length);
 
     sLog->outDebug(LOG_FILTER_CHATSYS, "%s %s Channel: %s",
-        OpcodeRealValueToInternalEnum(PacketFilter::DropHighBytes(recvData.GetOpcode())) == CMSG_CHANNEL_DISPLAY_LIST ? "CMSG_CHANNEL_DISPLAY_LIST" : "CMSG_CHANNEL_LIST",
+        OpcodeRealValueToInternalEnum(PacketFilter::DropHighBytes(recvPacket.GetOpcode())) == CMSG_CHANNEL_DISPLAY_LIST ? "CMSG_CHANNEL_DISPLAY_LIST" : "CMSG_CHANNEL_LIST",
         GetPlayerInfo().c_str(), channelName.c_str());
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeam()))
