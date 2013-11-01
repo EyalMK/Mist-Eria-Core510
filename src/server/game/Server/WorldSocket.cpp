@@ -193,11 +193,11 @@ int WorldSocket::SendPacket(WorldPacket const& pct)
 	//switch to make console stop spams opcodes
 	switch(pkt->GetOpcode())
 	{
-        case OpcodeInternalEnumToRealValue(SMSG_MONSTER_MOVE):
-        case OpcodeInternalEnumToRealValue(SMSG_UPDATE_OBJECT):
-        case OpcodeInternalEnumToRealValue(SMSG_DESTROY_OBJECT):
-        case OpcodeInternalEnumToRealValue(SMSG_TIME_SYNC_REQ):
-        case OpcodeInternalEnumToRealValue(SMSG_PLAYER_MOVE):
+        case SMSG_MONSTER_MOVE:
+        case SMSG_UPDATE_OBJECT:
+        case SMSG_DESTROY_OBJECT:
+        case SMSG_TIME_SYNC_REQ:
+        case SMSG_PLAYER_MOVE:
 			break;
 		default:
 		{

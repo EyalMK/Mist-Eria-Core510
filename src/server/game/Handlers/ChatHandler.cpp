@@ -527,6 +527,9 @@ void WorldSession::HandleAddonMessagechatOpcode(WorldPacket& recvData)
     Player* sender = GetPlayer();
     ChatMsg type;
 
+
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE chat test : %u", recvData.GetOpcode());
     switch (recvData.GetOpcode())
     {
     /*case CMSG_MESSAGECHAT_ADDON_BATTLEGROUND:
