@@ -47,43 +47,43 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     switch (recvData.GetOpcode())
     {
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_SAY]:
+    case CMSG_MESSAGECHAT_SAY:
         type = CHAT_MSG_SAY;
         break;
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_YELL]:
+    case CMSG_MESSAGECHAT_YELL:
         type = CHAT_MSG_YELL;
         break;
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_CHANNEL]:
+    case CMSG_MESSAGECHAT_CHANNEL:
         type = CHAT_MSG_CHANNEL;
         break;
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_WHISPER]:
+    case CMSG_MESSAGECHAT_WHISPER:
         type = CHAT_MSG_WHISPER;
         break;
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_GUILD]:
+    case CMSG_MESSAGECHAT_GUILD:
         type = CHAT_MSG_GUILD;
         break;
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_OFFICER]:
+    case CMSG_MESSAGECHAT_OFFICER:
         type = CHAT_MSG_OFFICER;
         break;
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_AFK]:
+    case CMSG_MESSAGECHAT_AFK:
         type = CHAT_MSG_AFK;
         break;
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_DND]:
+    case CMSG_MESSAGECHAT_DND:
         type = CHAT_MSG_DND;
         break;
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_EMOTE]:
+    case CMSG_MESSAGECHAT_EMOTE:
         type = CHAT_MSG_EMOTE;
         break;
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_PARTY]:
+    case CMSG_MESSAGECHAT_PARTY:
         type = CHAT_MSG_PARTY;
         break;
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_RAID]:
+    case CMSG_MESSAGECHAT_RAID:
         type = CHAT_MSG_RAID;
         break;
     /*case CMSG_MESSAGECHAT_BATTLEGROUND:
         type = CHAT_MSG_BATTLEGROUND;
         break;*/
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_RAID_WARNING]:
+    case CMSG_MESSAGECHAT_RAID_WARNING:
         type = CHAT_MSG_RAID_WARNING;
         break;
     default:
@@ -532,19 +532,19 @@ void WorldSession::HandleAddonMessagechatOpcode(WorldPacket& recvData)
     /*case CMSG_MESSAGECHAT_ADDON_BATTLEGROUND:
         type = CHAT_MSG_BATTLEGROUND;
         break;*/
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_ADDON_GUILD]:
+    case CMSG_MESSAGECHAT_ADDON_GUILD:
         type = CHAT_MSG_GUILD;
         break;
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_ADDON_OFFICER]:
+    case CMSG_MESSAGECHAT_ADDON_OFFICER:
         type = CHAT_MSG_OFFICER;
         break;
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_ADDON_PARTY]:
+    case CMSG_MESSAGECHAT_ADDON_PARTY:
         type = CHAT_MSG_PARTY;
         break;
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_ADDON_RAID]:
+    case CMSG_MESSAGECHAT_ADDON_RAID:
         type = CHAT_MSG_RAID;
         break;
-    case _opcodeConversionMap[CMSG_MESSAGECHAT_ADDON_WHISPER]:
+    case CMSG_MESSAGECHAT_ADDON_WHISPER:
         type = CHAT_MSG_WHISPER;
         break;
     default:
