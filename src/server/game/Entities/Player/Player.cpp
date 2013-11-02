@@ -7876,7 +7876,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
         if (GetSession() && group->isLFGGroup() && sLFGMgr->IsTeleported(GetGUID()))
             for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
                 if (Player* member = itr->getSource())
-                    GetSession()->SendNameQueryOpcode(member->GetGUID());
+                    GetSession()->SendNameQueryOpcode(member->GetGUID(), realmID);
     }
 
     m_zoneUpdateId    = newZone;
