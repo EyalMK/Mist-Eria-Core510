@@ -27,6 +27,8 @@
 #include "SpellAuraEffects.h"
 #include "Containers.h"
 #include "WorldSession.h"
+#include "MapManager.h"
+#include "ScriptedCreature.h"
 
 enum DruidSpells
 {
