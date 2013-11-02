@@ -74,7 +74,7 @@ enum DBQueryType
     SpellReagents              = 0xAB66C99F*/
 };
 
-void WorldSession::SendNameQueryOpcode(uint64 guid, uint32 realmid)
+void WorldSession::SendNameQueryOpcode(uint64 guid)
 {
     Player* player = ObjectAccessor::FindPlayer(guid);
     CharacterNameData const* nameData = sWorld->GetCharacterNameData(GUID_LOPART(guid));
@@ -83,14 +83,14 @@ void WorldSession::SendNameQueryOpcode(uint64 guid, uint32 realmid)
     data.appendPackGUID(guid);
     if (!nameData)
     {
-        data << uint8(3);                           // name unknown
+        data << uint8(1);                           // name unknown
         SendPacket(&data);
         return;
     }
 
     data << uint8(0);                               // name known
     data << nameData->m_name;                       // played name
-    data << uint32(realmid);                               // realm name - only set for cross realm interaction (such as Battlegrounds)
+    data << uint8(0);                               // realm name - only set for cross realm interaction (such as Battlegrounds)
     data << uint8(nameData->m_race);
     data << uint8(nameData->m_gender);
     data << uint8(nameData->m_class);
@@ -103,15 +103,14 @@ void WorldSession::SendNameQueryOpcode(uint64 guid, uint32 realmid)
 void WorldSession::HandleNameQueryOpcode(WorldPacket& recvData)
 {
     uint64 guid;
-    uint32 realmid;
-    recvData >> guid >> realmid;
+    recvData >> guid;
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE name query %u", GUID_LOPART(guid));
 
     // This is disable by default to prevent lots of console spam
     // sLog->outInfo(LOG_FILTER_NETWORKIO, "HandleNameQueryOpcode %u", guid);
 
-    SendNameQueryOpcode(guid, realmid);
+    SendNameQueryOpcode(guid);
 }
 
 void WorldSession::HandleRealmCache(WorldPacket& recvData)
