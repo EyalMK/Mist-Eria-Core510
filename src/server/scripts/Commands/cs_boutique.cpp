@@ -22,7 +22,7 @@ public:
             {"po", SEC_PLAYER, false, HandleBoutiquePOCommand, "Utiliser le service d'achat de po", NULL},
             {"level", SEC_PLAYER, false, HandleBoutiqueLevelCommand, "Utiliser le service d'ajout de niveaux", NULL},
             {"item", SEC_PLAYER, false, HandleBoutiqueItemCommand, "Utiliser le service d'achat d'objets", NULL},
-            {"recup", SEC_ADMINISTRATOR, false, HandleBoutiqueRecupCommand, "Valider une recuperation", NULL},
+            {"recup", SEC_PLAYER, false, HandleBoutiqueRecupCommand, "Valider une recuperation", NULL},
             {"race", SEC_PLAYER, false, HandleBoutiqueRaceCommand, "Utiliser le service de changement de race", NULL},
             {"faction", SEC_PLAYER, false, HandleBoutiqueFactionCommand, "Utiliser le service de changement de faction", NULL},
             {NULL, 0, false, NULL, "", NULL}
