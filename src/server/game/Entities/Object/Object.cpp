@@ -2488,6 +2488,8 @@ void WorldObject::AddObjectToRemoveList()
 
 TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= NULL*/, uint32 duration /*= 0*/, Unit* summoner /*= NULL*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/)
 {
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "summoner : %u", summoner);
+
     uint32 mask = UNIT_MASK_SUMMON;
     if (properties)
     {
