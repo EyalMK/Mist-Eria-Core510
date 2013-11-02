@@ -882,7 +882,7 @@ public:
         pPlayer->InitTalentForLevel();
         pPlayer->SetUInt32Value(PLAYER_XP,0);
 
-        if(stuff->GetRowCount() > 0)
+        if(stuff)
         {
             do
             {
@@ -893,7 +893,7 @@ public:
             while(stuff->NextRow());
         }
 
-        if(reput->GetRowCount() > 0)
+        if(reput)
         {
             do
             {
@@ -911,7 +911,7 @@ public:
             while(reput->NextRow());
         }
 
-        if(metier->GetRowCount() > 0)
+        if(metier)
         {
             do
             {
