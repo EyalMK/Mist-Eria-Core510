@@ -47,7 +47,7 @@ public:
                         ss << "|Hplayer:" << player->GetName() << "|h[" << player->GetName()<< "]|h : " << msg;
 
                         notify << ss.str().c_str();
-                        itr->second->SendPacket(&notify);
+                        ChatHandler(plr->GetSession()).PSendSysMessage(ss.str().c_str());
 
                         continue;
                     }
@@ -63,7 +63,7 @@ public:
                         ss << "|Hplayer:" << player->GetName() << "|h[" << player->GetName()<< "]|h : " << msg;
 
                         notify << ss.str().c_str();
-                        itr->second->SendPacket(&notify);
+                        ChatHandler(plr->GetSession()).PSendSysMessage(ss.str().c_str());
 
                         continue;
                     }
@@ -101,10 +101,7 @@ public:
                         else
                             ss << "|cffffffff|Hplayer:" << player->GetName() << "|h[" << player->GetName()<< "]|h dit : " << msg;
 
-                        WorldPacket data(SMSG_SERVER_MESSAGE);
-                        data << uint32(SERVER_MSG_STRING);
-                        data << ss.str().c_str();
-                        itr->second->SendPacket(&data);
+                        ChatHandler(plr->GetSession()).PSendSysMessage(ss.str().c_str());
                     }
                 }
             }
@@ -143,10 +140,7 @@ public:
                     {
                         std::stringstream ss;
                         ss << "|cff4bb5ff[Groupe] |Hplayer:" << player->GetName() << "|h[" << player->GetName()<< "]|h " << msg;
-                        WorldPacket data(SMSG_SERVER_MESSAGE);
-                        data << uint32(SERVER_MSG_STRING);
-                        data << ss.str().c_str();
-                        itr->second->SendPacket(&data);
+                        ChatHandler(plr->GetSession()).PSendSysMessage(ss.str().c_str());
                         return;
                     }
                 }
@@ -179,10 +173,7 @@ public:
 
                     if(!ss.str().empty())
                     {
-                        WorldPacket data(SMSG_SERVER_MESSAGE);
-                        data << uint32(SERVER_MSG_STRING);
-                        data << ss.str().c_str();
-                        itr->second->SendPacket(&data);
+                        ChatHandler(plr->GetSession()).PSendSysMessage(ss.str().c_str());
                     }
                 }
             }
@@ -210,10 +201,7 @@ public:
                     if(plr->GetSpyMgr().IsGuildSpied(guild->GetId()) || plr->GetSpyMgr().IsPlayerSpied(player->GetGUIDLow()))
                     {
                         ss << "|cff00c821[Guild] |Hplayer:" << player->GetName() << "|h[" << player->GetName()<< "]|h " << msg;
-                        WorldPacket data(SMSG_SERVER_MESSAGE);
-                        data << uint32(SERVER_MSG_STRING);
-                        data << ss.str().c_str();
-                        itr->second->SendPacket(&data);
+                        ChatHandler(plr->GetSession()).PSendSysMessage(ss.str().c_str());
                     }
                 }
             }
@@ -493,7 +481,7 @@ public:
         std::stringstream ss;
         ss << "Le mot \"" << word << "\" a été ajouté à la blacklist";
 
-        handler->PSendSysMessage(ss.str().c_str());
+        handler->SendGlobalGMSysMessage(ss.str().c_str());
 
         return true;
     }
@@ -528,7 +516,7 @@ public:
         std::stringstream ss;
         ss << "Le mot \"" << word << "\" a été retiré de la blacklist";
 
-        handler->PSendSysMessage(ss.str().c_str());
+        handler->SendGlobalGMSysMessage(ss.str().c_str());
 
         return true;
     }
