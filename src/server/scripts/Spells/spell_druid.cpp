@@ -1710,8 +1710,7 @@ class spell_dru_force_of_nature : public SpellScriptLoader
 				GetExplTargetDest()->GetPosition(&pos);
 				for(uint8 i=0; i<3; ++i)
 				{
-					TempSummon* summon = GetCaster()->SummonCreature(54983, pos, TEMPSUMMON_TIMED_DESPAWN, 15000); 
-					summon->SetOwnerGUID(GetCaster()->ToPlayer()->GetGUID());
+					TempSummon* summon = GetCaster()->SummonCreature(54983, pos, TEMPSUMMON_TIMED_DESPAWN, 15000);
 				}
 
             }
@@ -1776,8 +1775,8 @@ public:
 
 		void Reset()
 		{
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "owner : %u", me->GetOwnerGUID());
-			Player* owner = ObjectAccessor::GetPlayer(*me, me->GetOwnerGUID());;
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "owner : %u", ((TempSummon*)me)->GetSummoner());
+			Player* owner = ((TempSummon*)me)->GetSummoner();;
 			me->SetMaxHealth(owner->GetMaxHealth()/10);
 			me->SetHealth(owner->GetMaxHealth()/10);
 			hasVictim = true;
