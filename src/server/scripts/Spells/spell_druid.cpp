@@ -1709,7 +1709,7 @@ class spell_dru_force_of_nature : public SpellScriptLoader
 				Position pos;
 				GetExplTargetDest()->GetPosition(&pos);
 				for(uint8 i=0; i<3; ++i)
-					GetCaster()->SummonCreature(54983, pos, TEMPSUMMON_TIMED_DESPAWN, 15000); 
+					GetCaster()->SummonCreature(54983, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 15000); 
 
             }
 
