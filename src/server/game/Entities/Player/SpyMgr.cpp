@@ -167,7 +167,7 @@ void SpyMgrGlobal::AddBlackListedWord(std::string word)
 
     m_blackListedWords.push_back(word);
 
-    WorldDatabase.PQuery("INSERT INTO word_blacklist(word) VALUE ('%s')", word.c_str());
+    LoginDatabase.PQuery("INSERT INTO word_blacklist(word) VALUE ('%s')", word.c_str());
 }
 
 void SpyMgrGlobal::DelBlackListedWord(std::string word)
@@ -177,7 +177,7 @@ void SpyMgrGlobal::DelBlackListedWord(std::string word)
         if(*i == word)
         {
             m_blackListedWords.erase(i);
-            WorldDatabase.PQuery("DELETE FROM word_blacklist WHERE word = '%s'", word.c_str());
+            LoginDatabase.PQuery("DELETE FROM word_blacklist WHERE word = '%s'", word.c_str());
             return;
         }
     }
@@ -190,7 +190,7 @@ std::vector<std::string> SpyMgrGlobal::GetBlacklistedWordList()
 
 void SpyMgrGlobal::LoadBlackListedWords()
 {
-    QueryResult result = WorldDatabase.Query("SELECT word FROM word_blacklist");
+    QueryResult result = LoginDatabase.Query("SELECT word FROM word_blacklist");
 
     if(result)
     {
