@@ -84,6 +84,7 @@
 #include "BlackMarket/BlackMarketMgr.h"
 #include "SpellLearn.h"
 #include "MasteryMgr.h"
+#include "SpyMgr.h"
 
 ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
@@ -1860,6 +1861,9 @@ void World::SetInitialWorldSettings()
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Calculate next currency reset time...");
     InitCurrencyResetTime();
+
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Initializing PRISM...");
+    sSpyMgr->LoadBlackListedWords();
 
     LoadCharacterNameData();
 

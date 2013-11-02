@@ -29,6 +29,7 @@
 #include "QuestDef.h"
 #include "SpellMgr.h"
 #include "Unit.h"
+#include "SpyMgr.h"
 
 #include <string>
 #include <vector>
@@ -2785,6 +2786,8 @@ class Player : public Unit, public GridObject<Player>
 		Creature* GetTranscendenceSpirit(Unit* unit){ if(unit->getClass() == CLASS_MONK) return transcendence_spirit; else return NULL; }
 		void SetTranscendenceSpirit(Creature* creature){transcendence_spirit = creature;}
 
+        SpyMgr &GetSpyMgr() {return m_spyMgr;}
+
     protected:
         // Gamemaster whisper whitelist
         WhisperListContainer WhisperList;
@@ -3145,6 +3148,8 @@ class Player : public Unit, public GridObject<Player>
         uint32 _maxPersonalArenaRate;
 
         PhaseMgr phaseMgr;
+
+        SpyMgr m_spyMgr;
 };
 
 void AddItemsSetItem(Player*player, Item* item);
