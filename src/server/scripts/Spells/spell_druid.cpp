@@ -1774,7 +1774,7 @@ public:
 
 		void Reset()
 		{
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "owner : %u, player : %u", me->GetOwner(), me->GetOwner()->ToPlayer());
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "owner : %u", me->GetOwner());
 			owner = me->GetOwner()->ToPlayer();
 			me->SetMaxHealth(owner->GetMaxHealth()/10);
 			me->SetHealth(owner->GetMaxHealth()/10);
@@ -1811,6 +1811,8 @@ public:
 					events.ScheduleEvent(EVENT_ROOT, urand(1500, 3000));
 					break;
 				}
+			default:
+				break;
 			}
 		}
 
