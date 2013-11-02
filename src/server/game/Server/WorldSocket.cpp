@@ -178,9 +178,7 @@ int WorldSocket::SendPacket(WorldPacket const& pct)
         return 0;
     }
 
-    printf("Opcode 0x%04X\n", opcodeRealValue);
-
-    pkt->SetOpcode((Opcodes)opcodeRealValue);
+    printf("Opcode 0x%04X\n", opcodeRealValue);    
 
     // Empty buffer used in case packet should be compressed
     //WorldPacket buff;
@@ -208,6 +206,8 @@ int WorldSocket::SendPacket(WorldPacket const& pct)
 			break;
 		}
 	}
+
+    pkt->SetOpcode((Opcodes)opcodeRealValue);
     sScriptMgr->OnPacketSend(this, *pkt);
 
     ServerPktHeader header(pkt->size()+2, pkt->GetOpcode());
