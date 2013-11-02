@@ -816,6 +816,8 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (81208, 'spel
 
 */
 
+#define PRIEST_SPELL_RENEW 139
+
 class spell_pri_chakra_serenity_proc : public SpellScriptLoader
 {
 public:
