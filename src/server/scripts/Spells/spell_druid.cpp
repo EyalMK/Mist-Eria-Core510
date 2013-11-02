@@ -1709,7 +1709,7 @@ class spell_dru_force_of_nature : public SpellScriptLoader
 				Position pos;
 				GetExplTargetDest()->GetPosition(&pos);
 				for(uint8 i=0; i<3; ++i)
-					GetCaster()->SummonCreature(54983, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 15000); 
+					GetCaster()->SummonCreature(54983, pos, TEMPSUMMON_TIMED_DESPAWN, 15000);
 
             }
 
@@ -1772,10 +1772,14 @@ public:
 			SPELL_BASH = 113801
 		};
 
+		void IsSummonedBy(Unit* summoner)
+		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "summoner : %u", summoner);
+			owner = summoner->ToPlayer();
+		}
+		
 		void Reset()
 		{
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "owner : %u", me->GetOwnerGUID());
-			owner = me->GetOwner()->ToPlayer();
 			me->SetMaxHealth(owner->GetMaxHealth()/10);
 			me->SetHealth(owner->GetMaxHealth()/10);
 			hasVictim = true;
