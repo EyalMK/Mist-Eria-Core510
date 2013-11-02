@@ -1708,11 +1708,9 @@ class spell_dru_force_of_nature : public SpellScriptLoader
             {
 				Position pos;
 				GetExplTargetDest()->GetPosition(&pos);
-				if(Player* player = GetCaster()->ToPlayer())
-				{
-					for(uint8 i=0; i<3; ++i)
-						player->SummonCreature(54983, pos, TEMPSUMMON_TIMED_DESPAWN, 15000); 
-				}
+				for(uint8 i=0; i<3; ++i)
+					GetCaster()->SummonCreature(54983, pos, TEMPSUMMON_TIMED_DESPAWN, 15000); 
+
             }
 
             void Register()
@@ -1776,8 +1774,10 @@ public:
 
 		void Reset()
 		{
-			me->SetMaxHealth(me->GetOwner()->GetMaxHealth()/10);
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "owner : %u, player : %u", me->GetOwner(), me->GetOwner()->ToPlayer());
 			owner = me->GetOwner()->ToPlayer();
+			me->SetMaxHealth(owner->GetMaxHealth()/10);
+			me->SetHealth(owner->GetMaxHealth()/10);
 			hasVictim = true;
 
 			switch(owner->GetPrimaryTalentTree(owner->GetActiveSpec()))
