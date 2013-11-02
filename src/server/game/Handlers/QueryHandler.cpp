@@ -95,14 +95,7 @@ void WorldSession::SendNameQueryOpcode(uint64 guid, uint32 realmid)
     data << uint8(nameData->m_gender);
     data << uint8(nameData->m_class);
 
-    if (DeclinedName const* names = (player ? player->GetDeclinedNames() : NULL))
-    {
-        data << uint8(1);                           // Name is declined
-        for (uint8 i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
-            data << names->name[i];
-    }
-    else
-        data << uint8(0);                           // Name is not declined
+    data << uint8(0);                           // Name is not declined
 
     SendPacket(&data);
 }
