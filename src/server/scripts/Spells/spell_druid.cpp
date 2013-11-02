@@ -1774,7 +1774,7 @@ public:
 
 		void Reset()
 		{
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "owner : %u", me->GetOwner());
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "owner : %u", me->GetOwnerGUID());
 			owner = me->GetOwner()->ToPlayer();
 			me->SetMaxHealth(owner->GetMaxHealth()/10);
 			me->SetHealth(owner->GetMaxHealth()/10);
