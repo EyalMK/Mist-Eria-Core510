@@ -1745,7 +1745,7 @@ public:
 		}
 
 		EventMap events;
-		bool hasVictim;
+		bool needVictim;
 
 		enum Events
 		{
@@ -1778,7 +1778,7 @@ public:
 			Player* owner = ((TempSummon*)me)->GetSummoner()->ToPlayer();
 			me->SetMaxHealth(owner->GetMaxHealth()/10);
 			me->SetHealth(owner->GetMaxHealth()/10);
-			hasVictim = true;
+			needVictim = true;
 
 			switch(owner->GetPrimaryTalentTree(owner->GetActiveSpec()))
 			{
@@ -1788,7 +1788,7 @@ public:
 					me->SetDisplayId(DISPLAY_HEAL);
 					events.ScheduleEvent(EVENT_HEAL, urand(500, 1500));
 					events.ScheduleEvent(EVENT_ROOT, urand(1500, 3000));
-					hasVictim = false;
+					needVictim = false;
 					break;
 				}
 			case TALENT_TREE_DRUID_FERAL:
@@ -1815,12 +1815,14 @@ public:
 				break;
 			}
 
+			me->setFaction(owner->getFaction());
+			me->SetReactState(REACT_AGGRESSIVE);
 			DoZoneInCombat();
 		}
 
 		void UpdateAI(uint32 diff)
 		{	
-			if(hasVictim && !UpdateVictim())
+			if(needVictim && !UpdateVictim())
 				return;
 
 			events.Update(diff);
