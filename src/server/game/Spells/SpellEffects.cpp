@@ -725,6 +725,11 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         case SPELLFAMILY_MONK:
             switch(m_spellInfo->Id)
             {
+				case 116841:						// tiger's lust
+				{
+					m_caster->RemoveMovementImpairingAuras();
+					break;
+				}
                 case 109132:                        //roulade
                 {
                     if(m_caster->HasUnitMovementFlag(MOVEMENTFLAG_BACKWARD))
