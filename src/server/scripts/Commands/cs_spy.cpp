@@ -77,6 +77,9 @@ public:
         if(CheckMessage(player, msg, type, 0, 0, 0, 0))
             return;
 
+        if(type == CHAT_MSG_ADDON)
+            return;
+
         if(player)
         {
             SessionMap sessionmap = sWorld->GetAllSessions();
