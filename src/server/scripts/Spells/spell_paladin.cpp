@@ -1058,28 +1058,10 @@ public:
             SetHitHeal(totalheal);
         }
 
-		void HandleAfterCast()
-		{
-			// Eternal Glory
-			if (Unit* caster = GetCaster())
-				if (AuraEffect const* pAurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 2944, 0))
-					if (roll_chance_i(pAurEff->GetAmount()))
-						caster->CastCustomSpell(caster,88676, &holyStack, NULL,NULL,true);
-		}
-
-		void HandlePeriodic()
-        {
-            // Glyph of Long Word
-            if (!GetCaster()->HasAura(93466))
-                PreventHitAura();
-        }
-
         void Register()
         {
 			BeforeCast += SpellCastFn(spell_pal_word_of_glory_heal_SpellScript::HandleBeforeCast);
             OnEffectHitTarget += SpellEffectFn(spell_pal_word_of_glory_heal_SpellScript::ChangeHeal, EFFECT_0, SPELL_EFFECT_HEAL);
-			AfterHit += SpellHitFn(spell_pal_word_of_glory_heal_SpellScript::HandlePeriodic);
-			AfterCast += SpellCastFn(spell_pal_word_of_glory_heal_SpellScript::HandleAfterCast);
         }
     };
 
