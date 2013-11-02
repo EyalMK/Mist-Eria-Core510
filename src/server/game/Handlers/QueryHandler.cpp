@@ -138,8 +138,8 @@ void WorldSession::HandleRealmCache(WorldPacket& recvData)
 	}
 
 	data << rev_realmid;
-    data << uint8(_player->getRace());
-    data << uint8(_player->getClass()); //realmid ?? not test
+    data << uint8(0);
+    data << uint8(1); //realmid ?? not test
 	data << realmName;
 	data << realmName;
 	SendPacket(&data);
