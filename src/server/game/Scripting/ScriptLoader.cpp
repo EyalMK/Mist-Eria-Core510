@@ -103,7 +103,7 @@ void AddSC_ticket_commandscript();
 void AddSC_titles_commandscript();
 void AddSC_wp_commandscript();
 void AddSc_boutique();
-
+void AddSc_spy();
 
 #ifdef SCRIPTS
 //world
@@ -742,7 +742,7 @@ void AddCommandScripts()
     AddSC_titles_commandscript();
     AddSC_wp_commandscript();
     AddSc_boutique();
-
+    AddSc_spy();
 }
 
 void AddWorldScripts()
