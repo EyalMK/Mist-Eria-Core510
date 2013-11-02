@@ -27,6 +27,8 @@
 #include "SpellAuraEffects.h"
 #include "Containers.h"
 #include "WorldSession.h"
+#include "MapManager.h"
+#include "ScriptedCreature.h"
 
 enum DruidSpells
 {
@@ -1706,11 +1708,9 @@ class spell_dru_force_of_nature : public SpellScriptLoader
             {
 				Position pos;
 				GetExplTargetDest()->GetPosition(&pos);
-				if(Player* player = GetCaster()->ToPlayer())
-				{
-					for(uint8 i=0; i<3; ++i)
-					player->SummonCreature(54983, pos, TEMPSUMMON_TIMED_DESPAWN, 15000); 
-				}
+				for(uint8 i=0; i<3; ++i)
+					GetCaster()->SummonCreature(54983, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 15000); 
+
             }
 
             void Register()
@@ -1725,6 +1725,159 @@ class spell_dru_force_of_nature : public SpellScriptLoader
         }
 };
 
+// 54983 -- treant - Force of Nature
+class npc_treant : public CreatureScript 
+{
+public:
+	npc_treant() : CreatureScript("npc_treant") { }
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_treantAI(creature);
+	}
+
+	struct npc_treantAI : public ScriptedAI
+	{
+		npc_treantAI(Creature *creature) : ScriptedAI(creature)
+		{
+		}
+
+		EventMap events;
+		Player* owner;
+		bool hasVictim;
+
+		enum Events
+		{
+			EVENT_HEAL = 0,
+			EVENT_BASH,
+			EVENT_WRATH,
+			EVENT_TAUNT,
+			EVENT_ROOT
+		};
+
+		enum DisplayIDs
+		{
+			DISPLAY_HEAL = 18922,
+			DISPLAY_FERAL = 40690,
+			DISPLAY_CAST = 40688,
+			DISPLAY_TANK = 40692
+		};
+
+		enum Spells
+		{
+			SPELL_HEAL = 113828,
+			SPELL_TAUNT = 122719,
+			SPELL_ROOT = 113770,
+			SPELL_WRATH = 113769,
+			SPELL_BASH = 113801
+		};
+
+		void Reset()
+		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "owner : %u", me->GetOwnerGUID());
+			owner = me->GetOwner()->ToPlayer();
+			me->SetMaxHealth(owner->GetMaxHealth()/10);
+			me->SetHealth(owner->GetMaxHealth()/10);
+			hasVictim = true;
+
+			switch(owner->GetPrimaryTalentTree(owner->GetActiveSpec()))
+			{
+			case TALENT_TREE_DRUID_RESTORATION:
+				{
+					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+					me->SetDisplayId(DISPLAY_HEAL);
+					events.ScheduleEvent(EVENT_HEAL, urand(500, 1500));
+					events.ScheduleEvent(EVENT_ROOT, urand(1500, 3000));
+					hasVictim = false;
+					break;
+				}
+			case TALENT_TREE_DRUID_FERAL:
+				{
+					me->SetDisplayId(DISPLAY_FERAL);
+					events.ScheduleEvent(EVENT_BASH, urand(4000, 6000));
+					break;
+				}
+			case TALENT_TREE_DRUID_GUARDIAN:
+				{
+					me->SetDisplayId(DISPLAY_TANK);
+					events.ScheduleEvent(EVENT_TAUNT, urand(1000, 2000));
+					break;
+				}
+			case TALENT_TREE_DRUID_BALANCE:
+				{
+					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+					me->SetDisplayId(DISPLAY_CAST);
+					events.ScheduleEvent(EVENT_WRATH, urand(500, 1500));
+					events.ScheduleEvent(EVENT_ROOT, urand(1500, 3000));
+					break;
+				}
+			default:
+				break;
+			}
+		}
+
+		void UpdateAI(uint32 diff)
+		{	
+			if(hasVictim && !UpdateVictim())
+				return;
+
+			events.Update(diff);
+			
+			while(uint32 event = events.ExecuteEvent())
+			{
+				switch(event)
+				{
+					case EVENT_BASH:
+					{
+						DoCast(SPELL_BASH);
+						events.ScheduleEvent(EVENT_BASH, urand(8500, 10000));
+						break;
+					}
+					case EVENT_TAUNT:
+					{
+						DoCast(SPELL_TAUNT);
+						events.ScheduleEvent(EVENT_TAUNT, urand(8500, 10000));
+						break;
+					}
+					case EVENT_WRATH:
+					{
+						DoCast(SPELL_WRATH);
+						events.ScheduleEvent(EVENT_WRATH, 2000);
+						break;
+					}
+					case EVENT_ROOT:
+					{
+						if(UpdateVictim()) // Need to check for heal spec
+							DoCast(SPELL_ROOT);
+						events.ScheduleEvent(EVENT_ROOT, urand(8500, 10000));
+						break;
+					}
+					case EVENT_HEAL:
+					{
+						Player* lowest;
+						Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
+						if (!PlayerList.isEmpty())
+						{
+							for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+							{
+								if(Player *p = i->getSource())
+								{
+									if(p->GetHealth() < lowest->GetHealth())
+										lowest = p;
+								}
+							}
+						}
+						me->CastSpell(lowest, SPELL_HEAL, false);
+
+						events.ScheduleEvent(EVENT_HEAL, 2000);
+						break;
+					}
+				}
+			}
+
+		}
+	};
+};
 
 void AddSC_druid_spell_scripts()
 {
@@ -1762,4 +1915,5 @@ void AddSC_druid_spell_scripts()
     new spell_druid_wild_mushroom_detonate();*/
 	new spell_dru_displacer_beast();
 	new spell_dru_force_of_nature();
+	new npc_treant();
 }

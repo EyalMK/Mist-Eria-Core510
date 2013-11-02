@@ -957,6 +957,150 @@ class spell_pal_seal_of_righteousness : public SpellScriptLoader
         }
 };
 
+// Long Arm of The law
+// 20271 - judgment
+
+/* MUST APPLY IN DATABASE :
+
+DELETE FROM `spell_proc_event` WHERE `entry` IN (87172); 
+INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES (87172, 0, 10, 8388608, 0, 0, 272, 0, 0, 100, 0);
+
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (20271, 'spell_pal_long_arm_of_the_law'); 
+
+*/
+class spell_pal_long_arm_of_the_law : public SpellScriptLoader
+{
+    public:
+        spell_pal_long_arm_of_the_law() : SpellScriptLoader("spell_pal_long_arm_of_the_law") { }
+
+        class spell_pal_long_arm_of_the_law_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pal_long_arm_of_the_law_SpellScript);
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                Unit* caster = GetCaster();
+
+                if (Unit* target = GetHitUnit())
+                {
+                    if (caster->HasAura(87172))
+                       if (caster->GetDistance(target) > 15.0f || !caster->IsWithinDistInMap(target, 15.0f))
+                           caster->CastSpell(target, 87173, true);
+                }
+
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_pal_long_arm_of_the_law_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pal_long_arm_of_the_law_SpellScript();
+        }
+};
+
+// Word of Glory ; id = 85673
+// 4.3.4
+
+/*
+
+MUST APPLY THIS TO DATABASE :
+
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (85673, 'spell_pal_word_of_glory');
+
+*/
+
+class spell_pal_word_of_glory : public SpellScriptLoader
+{
+public:
+    spell_pal_word_of_glory() : SpellScriptLoader("spell_pal_word_of_glory") { }
+
+    class spell_pal_word_of_glory_heal_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pal_word_of_glory_heal_SpellScript)
+
+        int32 totalheal;
+		int32 holyStack;
+
+        bool Load()
+        {
+            if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+
+			holyStack = 0;
+
+            return true;
+        }
+
+        void HandleBeforeCast()
+        {
+			if (Unit* caster = GetCaster())
+				holyStack = caster->GetPower(POWER_HOLY_POWER);
+        }
+
+        void ChangeHeal(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            Unit* target = GetHitUnit();
+
+			int32 ap = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.198;
+			int32 sp = caster->ToPlayer()->GetBaseSpellPowerBonus() * 0.209;
+			int32 stack = caster->HasAura(SPELL_PALADIN_DIVINE_PURPOSE_PROC) ? 3 : caster->GetPower(POWER_HOLY_POWER);
+
+            if (!target)
+                return;
+
+			totalheal = (GetHitHeal() + ap + sp) * stack;
+
+            SetHitHeal(totalheal);
+        }
+
+        void Register()
+        {
+			BeforeCast += SpellCastFn(spell_pal_word_of_glory_heal_SpellScript::HandleBeforeCast);
+            OnEffectHitTarget += SpellEffectFn(spell_pal_word_of_glory_heal_SpellScript::ChangeHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+        }
+    };
+
+    class spell_pal_word_of_glory_heal_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_pal_word_of_glory_heal_AuraScript)
+
+        bool Load()
+        {
+            if (!GetCaster() || GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            return true;
+        }
+
+        void CalculateOvertime(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
+        {
+            if (AuraEffect const* longWord = GetCaster()->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 4127, 1))
+            {
+                canBeRecalculated = true;
+                amount = ((GetSpellInfo()->Effects[EFFECT_0].CalcValue() * longWord->GetAmount()) / 100) / 3;
+            }
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_word_of_glory_heal_AuraScript::CalculateOvertime, EFFECT_1, SPELL_AURA_PERIODIC_HEAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_pal_word_of_glory_heal_AuraScript();
+    }
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_pal_word_of_glory_heal_SpellScript();
+    }
+};
 
 void AddSC_paladin_spell_scripts()
 {
@@ -978,4 +1122,6 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_sacred_shield();
     new spell_pal_templar_s_verdict();
     new spell_pal_seal_of_righteousness();
+	new spell_pal_long_arm_of_the_law();
+	new spell_pal_word_of_glory();
 }

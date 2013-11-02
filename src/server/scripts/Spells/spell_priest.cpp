@@ -50,6 +50,7 @@ enum PriestSpells
     SPELL_PRIEST_SHADOW_WORD_DEATH                  = 32409,
     SPELL_PRIEST_T9_HEALING_2P                      = 67201,
     SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL              = 64085,
+	SPELL_PRIEST_RENEW                              = 139,
 };
 
 enum PriestSpellIcons
@@ -805,6 +806,49 @@ class spell_pri_vampiric_touch : public SpellScriptLoader
         }
 };
 
+// 81208 Chakra: Serenity
+
+/* 
+
+MUST ADD TO DATABASE : 
+
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (81208, 'spell_pri_chakra_serenity_proc');
+
+*/
+
+#define PRIEST_SPELL_RENEW 139
+
+class spell_pri_chakra_serenity_proc : public SpellScriptLoader
+{
+public:
+    spell_pri_chakra_serenity_proc() : SpellScriptLoader("spell_pri_chakra_serenity_proc") { }
+
+    class spell_pri_chakra_serenity_proc_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pri_chakra_serenity_proc_SpellScript);
+
+        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+        {
+            Unit* target = GetHitUnit();
+
+            if (!target)
+                return;
+
+            if (Aura* renew = target->GetAura(PRIEST_SPELL_RENEW, GetCaster()->GetGUID()))
+                renew->RefreshDuration();
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_pri_chakra_serenity_proc_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_pri_chakra_serenity_proc_SpellScript();
+    }
+};
 
 void AddSC_priest_spell_scripts()
 {
@@ -825,4 +869,5 @@ void AddSC_priest_spell_scripts()
     new spell_pri_shadow_word_death();
     new spell_pri_shadowform();
     new spell_pri_vampiric_touch();
+	new spell_pri_chakra_serenity_proc();
 }

@@ -674,13 +674,6 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     // now let next effect cast spell at each target.
                     return;
                 }
-                case 85673:                            // World of Glory
-                {
-                    //DieSide will reduce it by one (seek int32 SpellEffectInfo::CalcBaseValue(int32 value) const )    FIX IT : PEXIRN
-                    int32 holy = m_caster->GetPower(POWER_HOLY_POWER) + 1;
-                    m_caster->CastCustomSpell(unitTarget, 130551, &holy, NULL, NULL, true);
-                    return;
-                }
                 default:
                     break;
             }
@@ -732,6 +725,11 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         case SPELLFAMILY_MONK:
             switch(m_spellInfo->Id)
             {
+				case 116841:						// tiger's lust
+				{
+					m_caster->RemoveMovementImpairingAuras();
+					break;
+				}
                 case 109132:                        //roulade
                 {
                     if(m_caster->HasUnitMovementFlag(MOVEMENTFLAG_BACKWARD))
@@ -1514,10 +1512,6 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
             if (Player* player = m_caster->ToPlayer())
                 if (player->HasSkill(SKILL_ENGINEERING))
                     AddPct(addhealth, 25);
-        }
-        else if(m_spellInfo->Id == 130551)  //World of glory
-        {
-            addhealth = m_spellValue->EffectBasePoints[effIndex] * CalculateDamage(effIndex, unitTarget) / m_caster->GetMaxPower(POWER_HOLY_POWER);
         }
         else if(m_spellInfo->Id == 89653) //drain life
         {
