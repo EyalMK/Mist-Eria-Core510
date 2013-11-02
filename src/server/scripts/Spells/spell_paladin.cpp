@@ -957,6 +957,50 @@ class spell_pal_seal_of_righteousness : public SpellScriptLoader
         }
 };
 
+// Long Arm of The law
+// 20271 - judgment
+
+/* MUST APPLY IN DATABASE :
+
+DELETE FROM `spell_proc_event` WHERE `entry` IN (87172); 
+INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES (87172, 0, 10, 8388608, 0, 0, 272, 0, 0, 100, 0);
+
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (20271, 'spell_pal_long_arm_of_the_law'); 
+
+*/
+class spell_pal_long_arm_of_the_law : public SpellScriptLoader
+{
+    public:
+        spell_pal_long_arm_of_the_law() : SpellScriptLoader("spell_pal_long_arm_of_the_law") { }
+
+        class spell_pal_long_arm_of_the_law_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pal_long_arm_of_the_law_SpellScript);
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                Unit* caster = GetCaster();
+
+                if (Unit* target = GetHitUnit())
+                {
+                    if (caster->HasAura(87172))
+                       if (caster->GetDistance(target) > 15.0f || !caster->IsWithinDistInMap(target, 15.0f))
+                           caster->CastSpell(target, 87173, true);
+                }
+
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_pal_long_arm_of_the_law_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pal_long_arm_of_the_law_SpellScript();
+        }
+};
 
 void AddSC_paladin_spell_scripts()
 {
@@ -978,4 +1022,5 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_sacred_shield();
     new spell_pal_templar_s_verdict();
     new spell_pal_seal_of_righteousness();
+	new spell_pal_long_arm_of_the_law();
 }
