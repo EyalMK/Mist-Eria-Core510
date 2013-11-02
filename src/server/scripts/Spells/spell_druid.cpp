@@ -1776,7 +1776,7 @@ public:
 		void Reset()
 		{
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "owner : %u", ((TempSummon*)me)->GetSummoner());
-			Player* owner = ((TempSummon*)me)->GetSummoner();;
+			Player* owner = ((TempSummon*)me)->GetSummoner()->ToPlayer();
 			me->SetMaxHealth(owner->GetMaxHealth()/10);
 			me->SetHealth(owner->GetMaxHealth()/10);
 			hasVictim = true;
