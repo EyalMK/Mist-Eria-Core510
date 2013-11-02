@@ -820,7 +820,7 @@ public:
         uint32 guidLow = pPlayer->GetGUIDLow();
 
         QueryResult result = LoginDatabase.PQuery("SELECT id, level, stuff_wanted FROM recuperation WHERE idPerso=%u AND state=3 AND destination_realm=%u", guidLow, realmID);
-        if(result->GetRowCount() == 0)
+        if(!result)
         {
             handler->PSendSysMessage("Vous ne disposez pas de recuperation pour ce personnage, ou elle n'a pas encore été validee par un maitre du jeu");
             return true;
