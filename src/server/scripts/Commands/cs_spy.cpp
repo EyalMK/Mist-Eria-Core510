@@ -129,10 +129,7 @@ public:
                     {
                         std::stringstream ss;
                         ss << "|cff4bb5ff[Groupe de " << name << "] |Hplayer:" << player->GetName() << "|h[" << player->GetName()<< "]|h " << msg;
-                        WorldPacket data(SMSG_SERVER_MESSAGE);
-                        data << uint32(SERVER_MSG_STRING);
-                        data << ss.str().c_str();
-                        itr->second->SendPacket(&data);
+                        ChatHandler(plr->GetSession()).PSendSysMessage(ss.str().c_str());
                         return;
                     }
 
@@ -223,7 +220,7 @@ public:
                     message[i] = m_normal_char[j];
             }
 
-            for(int j = 0 ; j < m_accent_char.size() ; j++)
+            for(int j = 0 ; j < m_separator.size() ; j++)
             {
                 if(message[i] == m_separator[j])
                     message[i] = ' ';
