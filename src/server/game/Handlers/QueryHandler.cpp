@@ -90,7 +90,7 @@ void WorldSession::SendNameQueryOpcode(uint64 guid)
 
     data << uint8(0);                               // name known
     data << nameData->m_name;                       // played name
-    data << uint32(0);                              // realm name - only set for cross realm interaction (such as Battlegrounds)
+    data << uint32(realmID);                              // realm name - only set for cross realm interaction (such as Battlegrounds)
     data << uint8(nameData->m_race);
     data << uint8(nameData->m_gender);
     data << uint8(nameData->m_class);
@@ -137,8 +137,8 @@ void WorldSession::HandleRealmCache(WorldPacket& recvData)
 	}
 
 	data << rev_realmid;
-    data << uint8(_player->getRace());
-    data << uint8(_player->getClass()); //realmid ?? not test
+    data << uint8(0);
+    data << uint8(1); //realmid ?? not test
 	data << realmName;
 	data << realmName;
 	SendPacket(&data);

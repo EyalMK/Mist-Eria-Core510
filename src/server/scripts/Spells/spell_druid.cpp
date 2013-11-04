@@ -1709,7 +1709,9 @@ class spell_dru_force_of_nature : public SpellScriptLoader
 				Position pos;
 				GetExplTargetDest()->GetPosition(&pos);
 				for(uint8 i=0; i<3; ++i)
-					GetCaster()->SummonCreature(54983, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 15000); 
+				{
+					TempSummon* summon = GetCaster()->SummonCreature(54983, pos, TEMPSUMMON_TIMED_DESPAWN, 15000);
+				}
 
             }
 
@@ -1743,8 +1745,7 @@ public:
 		}
 
 		EventMap events;
-		Player* owner;
-		bool hasVictim;
+		bool needVictim;
 
 		enum Events
 		{
@@ -1774,11 +1775,10 @@ public:
 
 		void Reset()
 		{
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "owner : %u", me->GetOwnerGUID());
-			owner = me->GetOwner()->ToPlayer();
+			Player* owner = ((TempSummon*)me)->GetSummoner()->ToPlayer();
 			me->SetMaxHealth(owner->GetMaxHealth()/10);
 			me->SetHealth(owner->GetMaxHealth()/10);
-			hasVictim = true;
+			needVictim = true;
 
 			switch(owner->GetPrimaryTalentTree(owner->GetActiveSpec()))
 			{
@@ -1788,7 +1788,7 @@ public:
 					me->SetDisplayId(DISPLAY_HEAL);
 					events.ScheduleEvent(EVENT_HEAL, urand(500, 1500));
 					events.ScheduleEvent(EVENT_ROOT, urand(1500, 3000));
-					hasVictim = false;
+					needVictim = false;
 					break;
 				}
 			case TALENT_TREE_DRUID_FERAL:
@@ -1814,11 +1814,15 @@ public:
 			default:
 				break;
 			}
+
+			me->setFaction(owner->getFaction());
+			me->SetReactState(REACT_AGGRESSIVE);
+			DoZoneInCombat();
 		}
 
 		void UpdateAI(uint32 diff)
 		{	
-			if(hasVictim && !UpdateVictim())
+			if(needVictim && !UpdateVictim())
 				return;
 
 			events.Update(diff);
