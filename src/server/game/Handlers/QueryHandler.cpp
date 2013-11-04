@@ -35,19 +35,19 @@
 
 enum DBQueryType
 {
-    /*BattlePetAbility           = 0xCBA43BD7,
-    BattlePetAbilityEffect     = 0xDD8B690E,
-    BattlePetAbilityState      = 0x3C556E43,
-    BattlePetAbilityTurn       = 0xECD8ECDC,
-    BattlePetBreedQuality      = 0x1B5A4EA6,
-    BattlePetBreedState        = 0x6AFB3206,
-    BattlePetEffectProperties  = 0x63B4C4BA,
-    BattlePetNPCTeamMember     = 0xF2059DFA,
-    BattlePetSpecies           = 0x6C93F9B1,
-    BattlePetSpeciesState      = 0x15D87DD0,
-    BattlePetSpeciesXAbility   = 0x44237314,
-    BattlePetState             = 0x8F447330,
-    BattlePetVisual            = 0xC3ADEB43,*/
+    //BattlePetAbility           = 0xCBA43BD7,
+    //BattlePetAbilityEffect     = 0xDD8B690E,
+    //BattlePetAbilityState      = 0x3C556E43,
+    //BattlePetAbilityTurn       = 0xECD8ECDC,
+    //BattlePetBreedQuality      = 0x1B5A4EA6,
+    //BattlePetBreedState        = 0x6AFB3206,
+    DB_QUERY_BattlePetEffectProperties  = 0x63B4C4BA,
+    //BattlePetNPCTeamMember     = 0xF2059DFA,
+    //BattlePetSpecies           = 0x6C93F9B1,
+    //BattlePetSpeciesState      = 0x15D87DD0,
+    //BattlePetSpeciesXAbility   = 0x44237314,
+    //BattlePetState             = 0x8F447330,
+    //BattlePetVisual            = 0xC3ADEB43,
     DB_QUERY_NPC_TEXT          = 0x021826BB,
     /*Creature                   = 0xC9D6B6B3,
     GameObjects                = 0x13C403A5,*/
@@ -708,26 +708,38 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
 
         switch (l_QueryType)
         {
-            case DB_QUERY_NPC_TEXT:
-            {
-                SendNpcTextDBQueryResponse(this, l_Data, l_requestedEntries[l_I]);
-                break;
-            }
-            case DB_QUERY_ITEM_SPARSE:
-            {
-                if(!SendItemSparseDBQueryResponse(this, l_Data, l_requestedEntries[l_I])) continue; //dont send if no item
-                break; //to disable the sent of the opcode
-            }
-            case DB_QUERY_ITEM:
-            {
-                if(!SendItemDBQueryResponse(this, l_Data, l_requestedEntries[l_I])) continue; //dont send if no item
-                break; //to disable the sent of the opcode
-            }
-            default:
-            {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "Received non handled db query type 0x%08.8X", l_QueryType);
-                continue; //to disable the sent of the opcode
-            }
+        case DB_QUERY_NPC_TEXT:
+        {
+            SendNpcTextDBQueryResponse(this, l_Data, l_requestedEntries[l_I]);
+            break;
+        }
+        case DB_QUERY_ITEM_SPARSE:
+        {
+            if(!SendItemSparseDBQueryResponse(this, l_Data, l_requestedEntries[l_I])) continue; //dont send if no item
+            break; //to disable the sent of the opcode
+        }
+        case DB_QUERY_ITEM:
+        {
+            if(!SendItemDBQueryResponse(this, l_Data, l_requestedEntries[l_I])) continue; //dont send if no item
+            break; //to disable the sent of the opcode
+        }
+        case DB_QUERY_BattlePetEffectProperties:
+        {
+            l_Data << uint32(l_requestedEntries[l_I]);
+            l_Data << uint32(0);
+            l_Data << "";
+            l_Data << "";
+            l_Data << uint32(0);
+            l_Data << uint32(0);
+            l_Data << uint32(0);
+            l_Data << uint32(0);
+            break; //to disable the sent of the opcode
+        }
+        default:
+        {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "Received non handled db query type 0x%08.8X", l_QueryType);
+            continue; //to disable the sent of the opcode
+        }
         }
 
         l_Data << uint32(sObjectMgr->GetHotfixDate(l_requestedEntries[l_I], l_QueryType));
