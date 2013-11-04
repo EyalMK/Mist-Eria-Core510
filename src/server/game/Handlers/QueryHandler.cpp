@@ -726,10 +726,10 @@ void WorldSession::HandleDbQueryOpcode(WorldPacket& p_ReceivedPacket)
         case DB_QUERY_BattlePetEffectProperties:
         {
             l_Data << uint32(l_requestedEntries[l_I]);
-            l_Data << uint32(0);
-            l_Data << "";
-            l_Data << "";
-            l_Data << uint32(0);
+            l_Data << uint32(38);
+            l_Data << "Points";
+            l_Data << "Accuracy";
+            l_Data << uint32(43);
             l_Data << uint32(0);
             l_Data << uint32(0);
             l_Data << uint32(0);
