@@ -74,8 +74,6 @@ public:
 
     void OnChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg)
     {
-        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Message received (hook)");
-
         if(CheckMessage(player, msg, type, 0, 0, 0, 0))
             return;
 
