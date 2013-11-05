@@ -17,7 +17,7 @@ public:
         m_separator = L"&#\'[|-_\\)]=}+\"!/;.,?<>*({`%§";
     }
 
-    void OnChat(Player *player, uint32 /*type*/, uint32 /*lang*/, std::string msg, Channel* channel)
+    void OnChat(Player *player, uint32 /*type*/, uint32 /*lang*/, std::string& msg, Channel* channel)
     {
         if(CheckMessage(player, msg, 0, 0, channel, 0, 0))
             return;
@@ -72,7 +72,7 @@ public:
         }
     }
 
-    void OnChat(Player* player, uint32 type, uint32 /*lang*/, std::string msg)
+    void OnChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg)
     {
         sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Message received (hook)");
 
@@ -110,7 +110,7 @@ public:
         }
     }
 
-    void OnChat(Player* player, uint32 /*type*/, uint32 /*lang*/, std::string msg, Group* group)
+    void OnChat(Player* player, uint32 /*type*/, uint32 /*lang*/, std::string& msg, Group* group)
     {
         if(CheckMessage(player, msg, 0, 0, 0, 0, group))
             return;
@@ -147,7 +147,7 @@ public:
         }
     }
 
-    void OnChat(Player* player, uint32 type, uint32 lang, std::string msg, Player* receiver)
+    void OnChat(Player* player, uint32 type, uint32 lang, std::string& msg, Player* receiver)
     {
         if(CheckMessage(player, msg, 0, receiver, 0, 0, 0))
             return;
@@ -179,7 +179,7 @@ public:
         }
     }
 
-    void OnChat(Player* player, uint32 /*type*/, uint32 /*lang*/, std::string msg, Guild* guild)
+    void OnChat(Player* player, uint32 /*type*/, uint32 /*lang*/, std::string& msg, Guild* guild)
     {
         if(CheckMessage(player, msg, 0, 0, 0, guild, 0))
             return;
