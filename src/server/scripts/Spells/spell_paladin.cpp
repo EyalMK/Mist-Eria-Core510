@@ -70,6 +70,32 @@ enum PaladinSpells
 };
 
 //24275 -- SPELL_HAMMER_OF_WRATH
+class spell_pal_hammer_of_wrath : public SpellScriptLoader
+{
+    public:
+        spell_pal_hammer_of_wrath() : SpellScriptLoader("spell_pal_hammer_of_wrath") { }
+
+        class spell_pal_hammer_of_wrath_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pal_hammer_of_wrath_SpellScript);
+			
+            void HandleEffect(SpellEffIndex /*effIndex*/)
+            {
+				int32 baseDamage = GetCaster()->ToPlayer()->GetSpellDamage(urand(133,147), 38, urand(1748,1930), 90, 0.0f, 161.0f, false, BASE_ATTACK, SPELL_SCHOOL_MASK_HOLY);
+				SetHitDamage(baseDamage);
+            }
+			
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_pal_hammer_of_wrath_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+			}
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pal_hammer_of_wrath_SpellScript();
+        }
+};
 
 //879 -- SPELL_EXORCISM 
 class spell_pal_exorcism : public SpellScriptLoader
