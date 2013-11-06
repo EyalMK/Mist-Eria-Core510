@@ -877,7 +877,7 @@ class spell_pal_templar_s_verdict : public SpellScriptLoader
             {                
                 Unit* caster = GetCaster();
 				uint8 level = caster->getLevel();
-				int32 damage = int32((level*(19 - 0.134f*(level-1))) + caster->GetTotalAttackPowerValue(BASE_ATTACK) * (275.0f /100.0f) / 100.0f);
+				int32 damage = int32((level*(19 - 0.134f*(level-1))) + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * (275.0f /100.0f) / 60.0f));
                 SetHitDamage(damage);
             }
 
