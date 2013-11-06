@@ -65,8 +65,11 @@ enum PaladinSpells
 
     SPELL_GENERIC_ARENA_DAMPENING                = 74410,
     SPELL_GENERIC_BATTLEGROUND_DAMPENING         = 74411,
-	SPELL_EXORCISM								 = 879
+	SPELL_EXORCISM								 = 879,
+	SPELL_HAMMER_OF_WRATH						 = 24275
 };
+
+//24275 -- SPELL_HAMMER_OF_WRATH
 
 //879 -- SPELL_EXORCISM 
 class spell_pal_exorcism : public SpellScriptLoader
