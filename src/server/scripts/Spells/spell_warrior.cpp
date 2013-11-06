@@ -35,7 +35,7 @@ enum WarriorSpells
     SPELL_WARRIOR_DEEP_WOUNDS_RANK_2                = 12850,
     SPELL_WARRIOR_DEEP_WOUNDS_RANK_3                = 12868,
     SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC         = 12721,
-    SPELL_WARRIOR_EXECUTE                           = 20647,
+    SPELL_WARRIOR_EXECUTE                           = 5308,
     SPELL_WARRIOR_GLYPH_OF_EXECUTION                = 58367,
     SPELL_WARRIOR_GLYPH_OF_VIGILANCE                = 63326,
     SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_BUFF        = 65156,
@@ -272,7 +272,7 @@ class spell_warr_execute : public SpellScriptLoader
                     SpellInfo const* spellInfo = GetSpellInfo();
                     int32 rageUsed = std::min<int32>(200 - spellInfo->CalcPowerCost(caster, SpellSchoolMask(spellInfo->SchoolMask)), caster->GetPower(POWER_RAGE));
                     int32 newRage = std::max<int32>(0, caster->GetPower(POWER_RAGE) - rageUsed);
-
+					uint8 level = caster->getLevel();
                     // Sudden Death rage save
                     if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_GENERIC, WARRIOR_ICON_ID_SUDDEN_DEATH, EFFECT_0))
                     {
@@ -283,7 +283,7 @@ class spell_warr_execute : public SpellScriptLoader
                     caster->SetPower(POWER_RAGE, uint32(newRage));
 
                     /// Formula taken from the DBC: "${10+$AP*0.437*$m1/100}"
-                    int32 baseDamage = int32(10 + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.437f * GetEffectValue() / 100.0f);
+                    int32 baseDamage = int32((level*(21 + 0.817*(level-7))) + caster->GetTotalAttackPowerValue(BASE_ATTACK) * (255.0f /100.0f) * GetEffectValue() / 100.0f);
                     /// Formula taken from the DBC: "${$ap*0.874*$m1/100-1} = 20 rage"
                     int32 moreDamage = int32(rageUsed * (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.874f * GetEffectValue() / 100.0f - 1) / 200);
                     SetHitDamage(baseDamage + moreDamage);
