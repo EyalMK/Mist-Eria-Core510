@@ -1884,7 +1884,7 @@ public:
 						bp0 = owner->GetSpellDamage(1, urand(48, 56), 90, urand(3201, 3779), 0.f, 32.3f);
 						me->CastCustomSpell(lowest, SPELL_HEAL, &bp0, NULL, NULL, false);
 
-						events.ScheduleEvent(EVENT_HEAL, 2000);
+						events.ScheduleEvent(EVENT_HEAL, 2500);
 						break;
 					}
 				}
