@@ -1195,4 +1195,5 @@ void AddSC_paladin_spell_scripts()
 	new spell_pal_word_of_glory();
 	new spell_pal_judgment();
 	new spell_pal_exorcism();
+	new spell_pal_hammer_of_wrath();
 }
