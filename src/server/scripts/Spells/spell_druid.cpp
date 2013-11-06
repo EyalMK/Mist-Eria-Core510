@@ -1746,7 +1746,7 @@ public:
 
 		EventMap events;
 		bool needVictim;
-		Player* owner;
+		
 
 		enum Events
 		{
@@ -1776,7 +1776,7 @@ public:
 
 		void Reset()
 		{
-			owner = ((TempSummon*)me)->GetSummoner()->ToPlayer();
+			Player* owner = ((TempSummon*)me)->GetSummoner()->ToPlayer();
 			me->SetMaxHealth(owner->GetMaxHealth()/10);
 			me->SetHealth(owner->GetMaxHealth()/10);
 					
@@ -1831,6 +1831,8 @@ public:
 				return;
 
 			events.Update(diff);
+
+
 			
 			while(uint32 event = events.ExecuteEvent())
 			{
@@ -1851,8 +1853,11 @@ public:
 					}
 					case EVENT_WRATH:
 					{
-						bp0 = owner->GetSpellDamage(1, urand(30, 32), 90, urand(1930, 2176), 0.f, 37.5f);
-						me->CastCustomSpell(me->getVictim(), SPELL_WRATH, &bp0, NULL, NULL, false);
+						if(Player* owner = ((TempSummon*)me)->GetSummoner()->ToPlayer())
+						{
+							bp0 = owner->GetSpellDamage(1, urand(30, 32), 90, urand(1930, 2176), 0.f, 37.5f);
+							me->CastCustomSpell(me->getVictim(), SPELL_WRATH, &bp0, NULL, NULL, false);
+						}
 						events.ScheduleEvent(EVENT_WRATH, 2000);
 						break;
 					}
@@ -1865,22 +1870,34 @@ public:
 					}
 					case EVENT_HEAL:
 					{
-						Player* lowest;
-						Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
-						if (!PlayerList.isEmpty())
+						if(Player* owner = ((TempSummon*)me)->GetSummoner()->ToPlayer())
 						{
-							for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+							Player* lowest = NULL;
+							Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
+							if (!PlayerList.isEmpty())
 							{
-								if(Player *p = i->getSource())
+								for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 								{
-									if(p->GetHealth() < lowest->GetHealth())
-										lowest = p;
+									if(Player *p = i->getSource())
+									{
+										if(me->GetDistance(p) < 35.f)
+										{
+											if(lowest)
+											{
+												if(p->GetHealth() < lowest->GetHealth())
+													lowest = p;
+											}
+											else
+												lowest = p;
+										}
+									}
 								}
 							}
+
+							bp0 = owner->GetSpellDamage(1, urand(48, 56), 90, urand(3201, 3779), 0.f, 32.3f, true);
+							if(lowest)
+								me->CastCustomSpell(lowest, SPELL_HEAL, &bp0, NULL, NULL, false);
 						}
-						
-						bp0 = owner->GetSpellDamage(1, urand(48, 56), 90, urand(3201, 3779), 0.f, 32.3f);
-						me->CastCustomSpell(lowest, SPELL_HEAL, &bp0, NULL, NULL, false);
 
 						events.ScheduleEvent(EVENT_HEAL, 2500);
 						break;
@@ -1888,9 +1905,12 @@ public:
 				}
 			}
 
-			if (owner->GetPrimaryTalentTree(owner->GetActiveSpec()) == TALENT_TREE_DRUID_FERAL
-				||(owner->GetPrimaryTalentTree(owner->GetActiveSpec())) == TALENT_TREE_DRUID_GUARDIAN)
-				DoMeleeAttackIfReady();
+			if(Player* owner = ((TempSummon*)me)->GetSummoner()->ToPlayer())
+			{
+				if (owner->GetPrimaryTalentTree(owner->GetActiveSpec()) == TALENT_TREE_DRUID_FERAL
+					||(owner->GetPrimaryTalentTree(owner->GetActiveSpec())) == TALENT_TREE_DRUID_GUARDIAN)
+					DoMeleeAttackIfReady();
+			}
 
 		}
 	};
