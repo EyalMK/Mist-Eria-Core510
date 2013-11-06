@@ -939,6 +939,16 @@ class spell_pal_seal_of_righteousness : public SpellScriptLoader
         }
 };
 
+/* MUST APPLY IN DATABASE :
+
+DELETE FROM `spell_proc_event` WHERE `entry` IN (87172); 
+INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES (87172, 0, 10, 8388608, 0, 0, 272, 0, 0, 100, 0);
+
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (20271, 'spell_pal_long_arm_of_the_law'); 
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (20271, 'spell_pal_judgment'); 
+
+*/
+
 // 20271 - judgment
 class spell_pal_judgment : public SpellScriptLoader
 {
@@ -986,16 +996,6 @@ class spell_pal_judgment : public SpellScriptLoader
             return new spell_pal_judgment_SpellScript();
         }
 };
-
-/* MUST APPLY IN DATABASE :
-
-DELETE FROM `spell_proc_event` WHERE `entry` IN (87172); 
-INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES (87172, 0, 10, 8388608, 0, 0, 272, 0, 0, 100, 0);
-
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (20271, 'spell_pal_long_arm_of_the_law'); 
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (20271, 'spell_pal_judgment'); 
-
-*/
 
 // Long Arm of The law
 class spell_pal_long_arm_of_the_law : public SpellScriptLoader
@@ -1154,4 +1154,5 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_seal_of_righteousness();
 	new spell_pal_long_arm_of_the_law();
 	new spell_pal_word_of_glory();
+	new spell_pal_judgment();
 }
