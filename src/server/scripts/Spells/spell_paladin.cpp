@@ -939,8 +939,53 @@ class spell_pal_seal_of_righteousness : public SpellScriptLoader
         }
 };
 
-// Long Arm of The law
 // 20271 - judgment
+class spell_pal_judgment : public SpellScriptLoader
+{
+    public:
+        spell_pal_judgment() : SpellScriptLoader("spell_pal_judgment") { }
+
+        class spell_pal_judgment_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pal_judgment_SpellScript);
+
+			SpellCastResult CheckCast()
+			{
+				if(Unit* caster = GetCaster())
+				    if (Unit* target = GetHitUnit())
+					{
+						 if(caster->GetDistance(target) > 30.0f)
+							return SPELL_FAILED_OUT_OF_RANGE; 
+						else 
+							return SPELL_CAST_OK;
+					}
+			}
+
+            void ChangeDamage(SpellEffIndex /*effIndex*/)
+            {
+                Unit* caster = GetCaster();
+
+                if (Unit* target = GetHitUnit())
+                {
+					 uint8 level = caster->getLevel();
+					 int32 baseDamage = int32((level*(20 + 0.034*(level-5))) + caster->GetTotalAttackPowerValue(BASE_ATTACK) * (32.8f /100.0f) + caster->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false) * (54.6f / 100.0f));
+					 SetHitDamage(baseDamage);
+                }
+
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_pal_judgment_SpellScript::ChangeDamage, EFFECT_0, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
+				OnCheckCast += SpellCheckCastFn(spell_pal_judgment_SpellScript::CheckCast);
+			}
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pal_judgment_SpellScript();
+        }
+};
 
 /* MUST APPLY IN DATABASE :
 
@@ -948,8 +993,11 @@ DELETE FROM `spell_proc_event` WHERE `entry` IN (87172);
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES (87172, 0, 10, 8388608, 0, 0, 272, 0, 0, 100, 0);
 
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (20271, 'spell_pal_long_arm_of_the_law'); 
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (20271, 'spell_pal_judgment'); 
 
 */
+
+// Long Arm of The law
 class spell_pal_long_arm_of_the_law : public SpellScriptLoader
 {
     public:
@@ -966,8 +1014,8 @@ class spell_pal_long_arm_of_the_law : public SpellScriptLoader
                 if (Unit* target = GetHitUnit())
                 {
                     if (caster->HasAura(87172))
-                       if (caster->GetDistance(target) > 15.0f || !caster->IsWithinDistInMap(target, 15.0f))
-                           caster->CastSpell(target, 87173, true);
+                     //  if (caster->GetDistance(target) > 15.0f || !caster->IsWithinDistInMap(target, 15.0f))
+                           caster->CastSpell(/*target*/caster, 87173, true);
                 }
 
             }
