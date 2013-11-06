@@ -844,7 +844,7 @@ class spell_pal_sacred_shield : public SpellScriptLoader
 };
 
 // 85256 - Templar's Verdict
-/// Updated 4.3.4
+/// Updated 5.1.0
 class spell_pal_templar_s_verdict : public SpellScriptLoader
 {
     public:
@@ -876,26 +876,10 @@ class spell_pal_templar_s_verdict : public SpellScriptLoader
             void ChangeDamage(SpellEffIndex /*effIndex*/)
             {                
                 Unit* caster = GetCaster();
-                int32 damage = GetHitDamage();
-
-                if (caster->HasAura(SPELL_PALADIN_DIVINE_PURPOSE_PROC))
-                    damage *= 7.5;  // 7.5*30% = 225%
-                else
-                {
-                    switch (caster->GetPower(POWER_HOLY_POWER))
-                    {
-                        case 0: // 1 Holy Power
-                            damage = damage;
-                            break;
-                        case 1: // 2 Holy Power
-                            damage *= 3;    // 3*30 = 90%
-                            break;
-                        case 2: // 3 Holy Power
-                            damage *= 7.5;  // 7.5*30% = 225%
-                            break;
-                    }
-                }
-
+				int32 attackPower = caster->GetTotalAttackPowerValue(BASE_ATTACK);
+				uint8 level = caster->getLevel();
+                int32 damage;
+				damage = (level*(19 + -0.134*level) + attackPower*(275.0f /100.0f));
                 SetHitDamage(damage);
             }
 
