@@ -254,7 +254,7 @@ class spell_warr_deep_wounds : public SpellScriptLoader
         }
 };
 
-/// Updated 4.3.4
+/// Updated 5.1.0
 class spell_warr_execute : public SpellScriptLoader
 {
     public:
@@ -282,11 +282,8 @@ class spell_warr_execute : public SpellScriptLoader
 
                     caster->SetPower(POWER_RAGE, uint32(newRage));
 
-                    /// Formula taken from the DBC: "${10+$AP*0.437*$m1/100}"
-                    int32 baseDamage = int32((level*(21 + 0.817*(level-7))) + caster->GetTotalAttackPowerValue(BASE_ATTACK) * (255.0f /100.0f)/* * GetEffectValue() / 100.0f*/);
-                    /// Formula taken from the DBC: "${$ap*0.874*$m1/100-1} = 20 rage"
-                    //int32 moreDamage = int32(rageUsed * (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.874f * GetEffectValue() / 100.0f - 1) / 200);
-                    SetHitDamage(baseDamage/* + moreDamage*/);
+                    int32 baseDamage = int32((level*(21 + 0.817*(level-7))) + caster->GetTotalAttackPowerValue(BASE_ATTACK) * (255.0f /100.0f));
+                    SetHitDamage(baseDamage);
                 }
             }
 
