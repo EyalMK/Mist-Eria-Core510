@@ -958,7 +958,7 @@ class spell_pal_judgment : public SpellScriptLoader
         class spell_pal_judgment_SpellScript : public SpellScript
         {
             PrepareSpellScript(spell_pal_judgment_SpellScript);
-
+	
 			SpellCastResult CheckCast()
 			{
 				if(Unit* caster = GetCaster())
@@ -969,6 +969,7 @@ class spell_pal_judgment : public SpellScriptLoader
 						else 
 							return SPELL_CAST_OK;
 					}
+				return SPELL_CAST_OK;
 			}
 
             void ChangeDamage(SpellEffIndex /*effIndex*/)
