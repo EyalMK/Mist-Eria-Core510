@@ -1779,11 +1779,7 @@ public:
 			owner = ((TempSummon*)me)->GetSummoner()->ToPlayer();
 			me->SetMaxHealth(owner->GetMaxHealth()/10);
 			me->SetHealth(owner->GetMaxHealth()/10);
-			me->setFaction(owner->getFaction());
-			me->SetReactState(REACT_AGGRESSIVE);
-			DoZoneInCombat();
-
-			
+					
 			
 			needVictim = true;
 
@@ -1824,7 +1820,9 @@ public:
 				break;
 			}
 
-			
+			me->setFaction(owner->getFaction());
+			me->SetReactState(REACT_AGGRESSIVE);
+			DoZoneInCombat();			
 		}
 
 		void UpdateAI(uint32 diff)
@@ -1889,6 +1887,10 @@ public:
 					}
 				}
 			}
+
+			if (owner->GetPrimaryTalentTree(owner->GetActiveSpec()) == TALENT_TREE_DRUID_FERAL
+				||(owner->GetPrimaryTalentTree(owner->GetActiveSpec())) == TALENT_TREE_DRUID_GUARDIAN)
+				DoMeleeAttackIfReady();
 
 		}
 	};
