@@ -966,7 +966,7 @@ class spell_pal_judgment : public SpellScriptLoader
 					{
 						 if(caster->GetDistance(target) > 30.0f)
 							return SPELL_FAILED_OUT_OF_RANGE; 
-						else 
+						else
 							return SPELL_CAST_OK;
 					}
 				return SPELL_CAST_OK;
@@ -976,7 +976,7 @@ class spell_pal_judgment : public SpellScriptLoader
             {
                 Unit* caster = GetCaster();
 			    uint8 level = caster->getLevel();
-			    int32 baseDamage = int32((level*(20 + 0.034*(level-5))) + caster->GetTotalAttackPowerValue(BASE_ATTACK)* (255.0f /100.0f));
+			    int32 baseDamage = int32((level*(20 + 0.034*(level-5))) + caster->GetTotalAttackPowerValue(BASE_ATTACK));
 				SetHitDamage(baseDamage);
             }
 			
