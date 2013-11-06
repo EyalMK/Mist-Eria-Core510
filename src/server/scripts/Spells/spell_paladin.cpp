@@ -64,8 +64,40 @@ enum PaladinSpells
     SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS          = 25742,
 
     SPELL_GENERIC_ARENA_DAMPENING                = 74410,
-    SPELL_GENERIC_BATTLEGROUND_DAMPENING         = 74411
+    SPELL_GENERIC_BATTLEGROUND_DAMPENING         = 74411,
+	SPELL_EXORCISM								 = 879
 };
+
+//879 -- SPELL_EXORCISM 
+class spell_pal_exorcism : public SpellScriptLoader
+{
+    public:
+        spell_pal_exorcism() : SpellScriptLoader("spell_pal_exorcism") { }
+
+        class spell_pal_exorcism_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pal_exorcism_SpellScript);
+
+            void HandleEffect(SpellEffIndex /*effIndex*/)
+            {
+                Unit* caster = GetCaster();
+			    uint8 level = caster->getLevel();
+				int32 baseDamage = int32((level*(urand(200,222) + -1.56f*(level-1))) + (caster->GetTotalAttackPowerValue(BASE_ATTACK)*(67.7f/100.0f)));
+				SetHitDamage(baseDamage);
+            }
+			
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_pal_exorcism_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+			}
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pal_exorcism_SpellScript();
+        }
+};
+
 
 // 31850 - Ardent Defender
 /*class spell_pal_ardent_defender : public SpellScriptLoader
@@ -1153,4 +1185,5 @@ void AddSC_paladin_spell_scripts()
 	new spell_pal_long_arm_of_the_law();
 	new spell_pal_word_of_glory();
 	new spell_pal_judgment();
+	new spell_pal_exorcism();
 }
