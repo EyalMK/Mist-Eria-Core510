@@ -979,12 +979,12 @@ class spell_pal_judgment : public SpellScriptLoader
                 if (Unit* target = GetHitUnit())
                 {
 					 uint8 level = caster->getLevel();
-					 int32 baseDamage = int32((level*(20 + 0.034*(level-5))) + caster->GetTotalAttackPowerValue(BASE_ATTACK) * (32.8f /100.0f) + caster->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false) * (54.6f / 100.0f));
+					 int32 baseDamage = int32((level*(20 + 0.034*(level-5))) + caster->GetTotalAttackPowerValue(BASE_ATTACK) * (32.8f /100.0f)/* + caster->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false) * (54.6f / 100.0f)*/);
 					 SetHitDamage(baseDamage);
                 }
 
             }
-
+			
             void Register()
             {
                 OnEffectHitTarget += SpellEffectFn(spell_pal_judgment_SpellScript::ChangeDamage, EFFECT_0, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
