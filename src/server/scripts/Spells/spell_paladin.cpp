@@ -972,22 +972,17 @@ class spell_pal_judgment : public SpellScriptLoader
 				return SPELL_CAST_OK;
 			}
 
-            void ChangeDamage(SpellEffIndex /*effIndex*/)
+            void HandleEffect(SpellEffIndex /*effIndex*/)
             {
                 Unit* caster = GetCaster();
-
-                if (Unit* target = GetHitUnit())
-                {
-					 uint8 level = caster->getLevel();
-					 int32 baseDamage = int32((level*(20 + 0.034*(level-5))) + caster->GetTotalAttackPowerValue(BASE_ATTACK));
-					 SetHitDamage(baseDamage);
-                }
-
+			    uint8 level = caster->getLevel();
+			    int32 baseDamage = int32((level*(20 + 0.034*(level-5))) + caster->GetTotalAttackPowerValue(BASE_ATTACK)* (255.0f /100.0f));
+				SetHitDamage(baseDamage);
             }
 			
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_pal_judgment_SpellScript::ChangeDamage, EFFECT_0, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
+                OnEffectHitTarget += SpellEffectFn(spell_pal_judgment_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
 				OnCheckCast += SpellCheckCastFn(spell_pal_judgment_SpellScript::CheckCast);
 			}
         };
