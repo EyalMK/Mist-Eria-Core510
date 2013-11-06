@@ -978,6 +978,8 @@ class spell_pal_judgment : public SpellScriptLoader
 			    uint8 level = caster->getLevel();
 				int32 baseDamage = int32((level*(20 + 0.034*(level-5))) + (caster->GetTotalAttackPowerValue(BASE_ATTACK)*(38.0f/100.0f)) + (caster->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false)*(54.6f/100.0f)));
 				SetHitDamage(baseDamage);
+				caster->CastSpell(caster, 111528, true);
+				caster->CastSpell(GetHitUnit(), 81326, true);
             }
 			
             void Register()
