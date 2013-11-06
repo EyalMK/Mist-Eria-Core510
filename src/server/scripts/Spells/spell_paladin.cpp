@@ -1010,8 +1010,23 @@ class spell_pal_judgment : public SpellScriptLoader
 			    uint8 level = caster->getLevel();
 				int32 baseDamage = int32((level*(20 + 0.034*(level-5))) + (caster->GetTotalAttackPowerValue(BASE_ATTACK)*(38.0f/100.0f)) + (caster->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false)*(54.6f/100.0f)));
 				SetHitDamage(baseDamage);
-				caster->CastSpell(caster, 111528, true);
-				caster->CastSpell(GetHitUnit(), 81326, true);
+
+				//Judgment of the Bold
+				if (caster->HasAura(111529))
+				{
+					caster->CastSpell(caster, 111528, true);
+					caster->CastSpell(GetHitUnit(), 81326, true);
+				}
+
+				//Long arm of the law
+				if (caster->HasAura(87172))
+					caster->CastSpell(caster, 87173, true);
+
+				//Judgment of the Wise
+				if (caster->HasAura(105424))
+				{
+					caster->CastSpell(caster, 105427, true);
+				}
             }
 			
             void Register()
@@ -1027,40 +1042,6 @@ class spell_pal_judgment : public SpellScriptLoader
         }
 };
 
-// Long Arm of The law
-class spell_pal_long_arm_of_the_law : public SpellScriptLoader
-{
-    public:
-        spell_pal_long_arm_of_the_law() : SpellScriptLoader("spell_pal_long_arm_of_the_law") { }
-
-        class spell_pal_long_arm_of_the_law_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_pal_long_arm_of_the_law_SpellScript);
-
-            void HandleDummy(SpellEffIndex /*effIndex*/)
-            {
-                Unit* caster = GetCaster();
-
-                if (Unit* target = GetHitUnit())
-                {
-                    if (caster->HasAura(87172))
-                     //  if (caster->GetDistance(target) > 15.0f || !caster->IsWithinDistInMap(target, 15.0f))
-                           caster->CastSpell(/*target*/caster, 87173, true);
-                }
-
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_pal_long_arm_of_the_law_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_pal_long_arm_of_the_law_SpellScript();
-        }
-};
 
 // Word of Glory ; id = 85673
 // 4.3.4
@@ -1182,7 +1163,6 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_sacred_shield();
     new spell_pal_templar_s_verdict();
     new spell_pal_seal_of_righteousness();
-	new spell_pal_long_arm_of_the_law();
 	new spell_pal_word_of_glory();
 	new spell_pal_judgment();
 	new spell_pal_exorcism();
