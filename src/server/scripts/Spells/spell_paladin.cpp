@@ -976,7 +976,7 @@ class spell_pal_judgment : public SpellScriptLoader
             {
                 Unit* caster = GetCaster();
 			    uint8 level = caster->getLevel();
-			    int32 baseDamage = int32((level*(20 + 0.034*(level-5))) + caster->GetTotalAttackPowerValue(BASE_ATTACK));
+				int32 baseDamage = int32((level*(20 + 0.034*(level-5))) + (caster->GetTotalAttackPowerValue(BASE_ATTACK)*(32.8f/100.0f)) + (caster->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false)*(54.6f/100.0f)));
 				SetHitDamage(baseDamage);
             }
 			
