@@ -938,6 +938,15 @@ Player::~Player()
     sWorld->DecreasePlayerCount();
 }
 
+int32 Player::GetSpellDamage(uint8 minLevel, uint8 minAttack, uint8 maxLevel, uint8 maxAttack, float attackCoef, float spellCoef, bool heal, WeaponAttackType attackType, SpellSchoolMask schoolMask)
+{
+	int32 damage;
+	uint8 level = getLevel();
+	float coef = float(((maxAttack/maxLevel)-(minAttack/minLevel))/(maxLevel-minLevel));
+	damage = int32((level*(minAttack + coef*(level-minLevel))) + (GetTotalAttackPowerValue(attackType)*(attackCoef/100.0f)) + (GetTotalSpellPowerValue(schoolMask, heal)*(spellCoef/100.0f)));
+	return damage;
+}
+
 void Player::CleanupsBeforeDelete(bool finalCleanup)
 {
     TradeCancel(false);
