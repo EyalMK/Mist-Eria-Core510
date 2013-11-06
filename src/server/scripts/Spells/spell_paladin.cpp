@@ -876,10 +876,8 @@ class spell_pal_templar_s_verdict : public SpellScriptLoader
             void ChangeDamage(SpellEffIndex /*effIndex*/)
             {                
                 Unit* caster = GetCaster();
-				int32 attackPower = caster->GetTotalAttackPowerValue(BASE_ATTACK);
 				uint8 level = caster->getLevel();
-                int32 damage;
-				damage = (level*(19 + -0.134*level) + attackPower*(275.0f /100.0f));
+				int32 damage = int32((level*(19 - 0.134f*(level-1))) + caster->GetTotalAttackPowerValue(BASE_ATTACK) * (275.0f /100.0f));
                 SetHitDamage(damage);
             }
 
