@@ -1240,7 +1240,7 @@ class Player : public Unit, public GridObject<Player>
         void CleanupsBeforeDelete(bool finalCleanup = true);
 		
 		//spell damage
-		const int32 GetSpellDamage(uint8 minLevel, uint8 minAttack, uint8 maxLevel, uint8 maxAttack, float attackCoef, float spellCoef, bool heal = false, WeaponAttackType attackType = BASE_ATTACK, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL);
+		int32 GetSpellDamage(uint8 minLevel, uint8 minAttack, uint8 maxLevel, uint8 maxAttack, float attackCoef, float spellCoef, bool heal = false, WeaponAttackType attackType = BASE_ATTACK, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL);
 		
         void AddToWorld();
         void RemoveFromWorld();
