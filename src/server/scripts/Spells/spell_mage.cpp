@@ -588,6 +588,16 @@ class spell_mage_living_bomb : public SpellScriptLoader
                 return true;
             }
 			
+			void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
+            {
+                canBeRecalculated = false;
+                if (Unit* caster = GetCaster())
+                {
+                    amount = 0;
+                    amount += int32(1072 + (caster->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false)*(80.4f/100.0f)));
+                }
+            }
+
             void AfterRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
                 AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
@@ -601,7 +611,8 @@ class spell_mage_living_bomb : public SpellScriptLoader
             void Register()
             {
                 AfterEffectRemove += AuraEffectRemoveFn(spell_mage_living_bomb_AuraScript::AfterRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
+				DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_living_bomb_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+			}
         };
 
         AuraScript* GetAuraScript() const
@@ -627,7 +638,7 @@ class spell_mage_ice_barrier : public SpellScriptLoader
                 if (Unit* caster = GetCaster())
                 {
 					amount = 0;
-					amount += 4580 + (caster->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_FROST, false)*3.3f);
+					amount += int32(4580 + (caster->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_FROST, false)*3.3f));
 				}
             }
 
