@@ -4479,7 +4479,10 @@ bool Player::ResetTalents(bool no_cost)
     if (specSpells)
         for (std::list<uint32>::const_iterator itr = specSpells->begin(); itr != specSpells->end(); ++itr)
             if (ChrSpecializationSpellsEntry const* specSpell = sChrSpecializationSpellsStore.LookupEntry(*itr))
+			{
                 removeSpell(specSpell->SpellId, false, false);
+				RemoveAurasDueToSpell(specSpell->SpellId);
+			}
 
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
         if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(i))
@@ -4498,6 +4501,7 @@ bool Player::ResetTalents(bool no_cost)
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     _SaveTalents(trans);
     _SaveSpells(trans);
+	_SaveAuras(trans);
     CharacterDatabase.CommitTransaction(trans);
 
     if (!no_cost)
