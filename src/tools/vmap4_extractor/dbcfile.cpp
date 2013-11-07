@@ -20,62 +20,77 @@
 
 #include "dbcfile.h"
 
-DBCFile::DBCFile(HANDLE mpq, const char* filename) :
-    _mpq(mpq), _filename(filename), _file(NULL), _data(NULL), _stringTable(NULL)
+DBCFile::DBCFile(HANDLE file) :
+    _file(file), _data(NULL), _stringTable(NULL)
 {
 }
 
 bool DBCFile::open()
 {
-    if (!SFileOpenFileEx(_mpq, _filename, SFILE_OPEN_PATCHED_FILE, &_file))
-        return false;
-
     char header[4];
     unsigned int na, nb, es, ss;
 
     DWORD readBytes = 0;
     SFileReadFile(_file, header, 4, &readBytes, NULL);
-    if (readBytes != 4)                                         // Number of records
+    if (readBytes != 4)
+	{                                         // Number of records
         return false;
+		printf("Error at 1", _file);
+	}
 
     if (header[0] != 'W' || header[1] != 'D' || header[2] != 'B' || header[3] != 'C')
+	{
         return false;
-
-    readBytes = 0;
+		printf("Error at 2", _file);
+	}
     SFileReadFile(_file, &na, 4, &readBytes, NULL);
-    if (readBytes != 4)                                         // Number of records
+    if (readBytes != 4)
+	{                                         // Number of records
         return false;
+		printf("Error at 3", _file);
+	}
 
-    readBytes = 0;
     SFileReadFile(_file, &nb, 4, &readBytes, NULL);
-    if (readBytes != 4)                                         // Number of fields
+    if (readBytes != 4)
+	{                                         // Number of records
         return false;
+		printf("Error at 4", _file);
+	}
 
-    readBytes = 0;
     SFileReadFile(_file, &es, 4, &readBytes, NULL);
-    if (readBytes != 4)                                         // Size of a record
+    if (readBytes != 4)
+	{                                         // Number of records
         return false;
+		printf("Error at 5", _file);
+	}
 
-    readBytes = 0;
     SFileReadFile(_file, &ss, 4, &readBytes, NULL);
-    if (readBytes != 4)                                         // String size
+    if (readBytes != 4)
+	{                                         // Number of records
         return false;
+		printf("Error at 6", _file);
+	}
 
     _recordSize = es;
     _recordCount = na;
     _fieldCount = nb;
     _stringSize = ss;
     if (_fieldCount * 4 != _recordSize)
+    {                                         // Number of records
         return false;
+		printf("Error at 7", _file);
+	}
 
     _data = new unsigned char[_recordSize * _recordCount + _stringSize];
     _stringTable = _data + _recordSize*_recordCount;
 
     size_t data_size = _recordSize * _recordCount + _stringSize;
-    readBytes = 0;
     SFileReadFile(_file, _data, data_size, &readBytes, NULL);
     if (readBytes != data_size)
+	{                                         // Number of records
         return false;
+		printf("Error at 8");
+	}
 
     return true;
 }
@@ -83,8 +98,6 @@ bool DBCFile::open()
 DBCFile::~DBCFile()
 {
     delete [] _data;
-    if (_file != NULL)
-        SFileCloseFile(_file);
 }
 
 DBCFile::Record DBCFile::getRecord(size_t id)
