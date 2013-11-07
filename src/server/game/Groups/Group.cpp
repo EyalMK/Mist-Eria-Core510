@@ -2602,6 +2602,8 @@ InstanceGroupBind* Group::GetBoundInstance(Difficulty difficulty, uint32 mapId)
     // some instances only have one difficulty
     GetDownscaledMapDifficultyData(mapId, difficulty);
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "map %u diff %u", mapId, difficulty);
+
     BoundInstancesMap::iterator itr = m_boundInstances[difficulty].find(mapId);
     if (itr != m_boundInstances[difficulty].end())
         return &itr->second;
