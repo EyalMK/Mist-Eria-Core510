@@ -390,6 +390,7 @@ bool SpellEffectInfo::IsAPSPModified() const
 			case SPELL_AURA_MOD_INCREASE_SPEED:
 			case SPELL_AURA_MOD_DECREASE_SPEED:
 			case SPELL_AURA_MOD_INCREASE_ENERGY_PERCENT:
+			case SPELL_AURA_MOD_STAT:
                 return false;
             default:
                 break;
