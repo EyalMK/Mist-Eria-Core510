@@ -3,8 +3,13 @@
 #include "adtfile.h"
 #include "vmapexport.h"
 
+
 #include <algorithm>
 #include <stdio.h>
+#include <iostream>
+#include <fstream>
+
+using namespace std;
 
 char output_path1[128]=".";
 char input_path1[1024]=".";
@@ -41,27 +46,39 @@ extern HANDLE LocaleMpq;
 
 void ExtractGameobjectModels()
 {
+	ofstream fichier ("ExtractGameobjectModels.txt", ios::out | ios::trunc);
+
 	printf("Extracting GameObject models...");
     char localMPQ[512];
 
-    sprintf(localMPQ, "%s/Data/model.MPQ", input_path1); // not sure for model.mpq
+	fichier << "Extracting GameObject models..." << endl;
+
+    sprintf(localMPQ, "%smodel.MPQ", input_path1); // not sure for model.mpq %s/Data/model.MPQ
+
+	fichier << "sprinf of %smodel.MPQ" << endl;
+
     if (FileExists(localMPQ)==false)
     {   // Use model.mpq
+		fichier << "FileExists false" << endl;
         printf(localMPQ, "%s/Data/%s/locale-%s.MPQ", input_path1);
     }
 
     if (!SFileOpenArchive(localMPQ, 0, MPQ_OPEN_READ_ONLY, &LocaleMpq))
     {
+		fichier << "SFileOpenArchive" << endl;
+		fichier.close();
         exit(1);
     }
 
-
+	
     HANDLE dbcFile;
     if (!SFileOpenFileEx(LocaleMpq, "DBFilesClient\\GameObjectDisplayInfo.dbc", SFILE_OPEN_PATCHED_FILE, &dbcFile))
     {
         if (!SFileOpenFileEx(LocaleMpq, "DBFilesClient\\GameObjectDisplayInfo.dbc", SFILE_OPEN_PATCHED_FILE, &dbcFile))
         {
             printf("Fatal error: Cannot find GameObjectDisplayInfo.dbc in archive!\n");
+			fichier << "Fatal error: Cannot find GameObjectDisplayInfo.dbc in archive!" << endl;
+			fichier.close();
             exit(1);
         }
     }
@@ -72,14 +89,18 @@ void ExtractGameobjectModels()
     if(!dbc.open())
     {
         printf("Fatal error: Invalid GameObjectDisplayInfo.dbc file format!\n");
+		fichier << "Fatal error: Invalid GameObjectDisplayInfo.dbc file format!" << endl;
+		fichier.close();
         exit(1);
     }
 
     std::string basepath = szWorkDirWmo;
     basepath += "/";
     std::string path;
-
+	
     FILE * model_list = fopen((basepath + "temp_gameobject_models").c_str(), "wb");
+
+	fichier << "fopen OK" << endl;
 
     for (DBCFile::Iterator it = dbc.begin(); it != dbc.end(); ++it)
     {
@@ -117,6 +138,9 @@ void ExtractGameobjectModels()
     }
 
     fclose(model_list);
+
+	fichier << "Done!" << endl;
+	fichier.close();
 
     printf("Done!\n");
 }
