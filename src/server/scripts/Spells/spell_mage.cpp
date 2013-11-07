@@ -587,6 +587,7 @@ class spell_mage_living_bomb : public SpellScriptLoader
                 if (!sSpellMgr->GetSpellInfo(44461))
                     return false;
                 return true;
+				 sLog->outDebug(LOG_FILTER_NETWORKIO, "valeur : %d", sSpellMgr->GetSpellInfo(44461));
             }
 			
 			void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
