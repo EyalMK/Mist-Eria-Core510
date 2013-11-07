@@ -571,7 +571,7 @@ class spell_mage_frostbolt : public SpellScriptLoader
        }
 };
 
-// -44457 - Living Bomb
+// 44457 - Living Bomb
 class spell_mage_living_bomb : public SpellScriptLoader
 {
     public:
@@ -583,11 +583,11 @@ class spell_mage_living_bomb : public SpellScriptLoader
 
             bool Validate(SpellInfo const* spellInfo)
             {
-                if (!sSpellMgr->GetSpellInfo(uint32(spellInfo->Effects[EFFECT_1].CalcValue())))
+                if (!sSpellMgr->GetSpellInfo(44461))
                     return false;
                 return true;
             }
-
+			
             void AfterRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
                 AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
@@ -597,7 +597,7 @@ class spell_mage_living_bomb : public SpellScriptLoader
                 if (Unit* caster = GetCaster())
                     caster->CastSpell(GetTarget(), uint32(aurEff->GetAmount()), true, NULL, aurEff);
             }
-
+			
             void Register()
             {
                 AfterEffectRemove += AuraEffectRemoveFn(spell_mage_living_bomb_AuraScript::AfterRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
@@ -620,6 +620,16 @@ class spell_mage_ice_barrier : public SpellScriptLoader
        class spell_mage_ice_barrier_AuraScript : public AuraScript
        {
            PrepareAuraScript(spell_mage_ice_barrier_AuraScript);
+			
+		   void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
+            {
+				canBeRecalculated = false;
+                if (Unit* caster = GetCaster())
+                {
+					amount = 0;
+					amount += 4580 + (caster->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_FROST, false)*3.3f);
+				}
+            }
 
            void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
            {
@@ -631,10 +641,11 @@ class spell_mage_ice_barrier : public SpellScriptLoader
                else if (GetTarget()->HasAura(SPELL_MAGE_SHATTERED_BARRIER_R2))
                    GetTarget()->CastSpell(GetTarget(), SPELL_MAGE_SHATTERED_BARRIER_FREEZE_R2, true);
            }
-
+		   
            void Register()
            {
                 AfterEffectRemove += AuraEffectRemoveFn(spell_mage_ice_barrier_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
+				DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_ice_barrier_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
            }
        };
 
@@ -794,7 +805,7 @@ class spell_mage_master_of_elements : public SpellScriptLoader
                 if (mana > 0)
                     GetTarget()->CastCustomSpell(SPELL_MAGE_MASTER_OF_ELEMENTS_ENERGIZE, SPELLVALUE_BASE_POINT0, mana, GetTarget(), true, NULL, aurEff);
             }
-
+			
             void Register()
             {
                 DoCheckProc += AuraCheckProcFn(spell_mage_master_of_elements_AuraScript::CheckProc);
