@@ -582,12 +582,17 @@ class spell_mage_living_bomb : public SpellScriptLoader
         {
             PrepareAuraScript(spell_mage_living_bomb_AuraScript);
 
-            bool Validate(SpellInfo const* spellInfo)
+            bool Load()
             {
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "valeur : %d", sSpellMgr->GetSpellInfo(44461));
-                //if (!sSpellMgr->GetSpellInfo(44461))
-                //    return false;
+                if (!sSpellMgr->GetSpellInfo(44461))
+                    return false;
                 return true;
+            }
+
+			void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+            {
+                PreventDefaultAction();
+                GetTarget()->CastSpell(GetTarget(), 44457, true);
             }
 			
 			void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
@@ -614,6 +619,7 @@ class spell_mage_living_bomb : public SpellScriptLoader
             {
                 AfterEffectRemove += AuraEffectRemoveFn(spell_mage_living_bomb_AuraScript::AfterRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
 				DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_living_bomb_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+				OnEffectProc += AuraEffectProcFn(spell_mage_living_bomb_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
 			}
         };
 
