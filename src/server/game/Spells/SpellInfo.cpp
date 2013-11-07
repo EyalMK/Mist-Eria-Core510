@@ -387,6 +387,14 @@ bool SpellEffectInfo::IsAPSPModified() const
             case SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED:
             case SPELL_AURA_MOD_INCREASE_SWIM_SPEED:
             case SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED:
+			case SPELL_AURA_MOD_INCREASE_SPEED:
+			case SPELL_AURA_MOD_DECREASE_SPEED:
+			case SPELL_AURA_MOD_INCREASE_ENERGY_PERCENT:
+			case SPELL_AURA_MOD_STAT:
+			case SPELL_AURA_MOD_ATTACKSPEED:
+			case SPELL_AURA_MOD_RANGED_HASTE:
+			case SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK:
+			case SPELL_AURA_MOD_MELEE_RANGED_HASTE:
                 return false;
             default:
                 break;

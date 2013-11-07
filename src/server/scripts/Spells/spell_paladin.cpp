@@ -64,8 +64,69 @@ enum PaladinSpells
     SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS          = 25742,
 
     SPELL_GENERIC_ARENA_DAMPENING                = 74410,
-    SPELL_GENERIC_BATTLEGROUND_DAMPENING         = 74411
+    SPELL_GENERIC_BATTLEGROUND_DAMPENING         = 74411,
+	SPELL_EXORCISM								 = 879,
+	SPELL_HAMMER_OF_WRATH						 = 24275
 };
+
+//24275 -- SPELL_HAMMER_OF_WRATH
+class spell_pal_hammer_of_wrath : public SpellScriptLoader
+{
+    public:
+        spell_pal_hammer_of_wrath() : SpellScriptLoader("spell_pal_hammer_of_wrath") { }
+
+        class spell_pal_hammer_of_wrath_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pal_hammer_of_wrath_SpellScript);
+			
+            void HandleEffect(SpellEffIndex /*effIndex*/)
+            {
+				int32 baseDamage = GetCaster()->ToPlayer()->GetSpellDamage(urand(133,147), 38, urand(1748,1930), 90, 0.0f, 161.0f, false, BASE_ATTACK, SPELL_SCHOOL_MASK_HOLY);
+				SetHitDamage(baseDamage);
+            }
+			
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_pal_hammer_of_wrath_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+			}
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pal_hammer_of_wrath_SpellScript();
+        }
+};
+
+//879 -- SPELL_EXORCISM 
+class spell_pal_exorcism : public SpellScriptLoader
+{
+    public:
+        spell_pal_exorcism() : SpellScriptLoader("spell_pal_exorcism") { }
+
+        class spell_pal_exorcism_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pal_exorcism_SpellScript);
+
+            void HandleEffect(SpellEffIndex /*effIndex*/)
+            {
+                Unit* caster = GetCaster();
+			    uint8 level = caster->getLevel();
+				int32 baseDamage = int32((level*(urand(200,222) + -1.56f*(level-1))) + (caster->GetTotalAttackPowerValue(BASE_ATTACK)*(67.7f/100.0f)));
+				SetHitDamage(baseDamage);
+            }
+			
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_pal_exorcism_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+			}
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pal_exorcism_SpellScript();
+        }
+};
+
 
 // 31850 - Ardent Defender
 /*class spell_pal_ardent_defender : public SpellScriptLoader
@@ -844,7 +905,7 @@ class spell_pal_sacred_shield : public SpellScriptLoader
 };
 
 // 85256 - Templar's Verdict
-/// Updated 4.3.4
+/// Updated 5.1.0
 class spell_pal_templar_s_verdict : public SpellScriptLoader
 {
     public:
@@ -876,26 +937,8 @@ class spell_pal_templar_s_verdict : public SpellScriptLoader
             void ChangeDamage(SpellEffIndex /*effIndex*/)
             {                
                 Unit* caster = GetCaster();
-                int32 damage = GetHitDamage();
-
-                if (caster->HasAura(SPELL_PALADIN_DIVINE_PURPOSE_PROC))
-                    damage *= 7.5;  // 7.5*30% = 225%
-                else
-                {
-                    switch (caster->GetPower(POWER_HOLY_POWER))
-                    {
-                        case 0: // 1 Holy Power
-                            damage = damage;
-                            break;
-                        case 1: // 2 Holy Power
-                            damage *= 3;    // 3*30 = 90%
-                            break;
-                        case 2: // 3 Holy Power
-                            damage *= 7.5;  // 7.5*30% = 225%
-                            break;
-                    }
-                }
-
+				uint8 level = caster->getLevel();
+				int32 damage = int32((level*(19 - 0.134f*(level-1))) + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * (275.0f /100.0f)));
                 SetHitDamage(damage);
             }
 
@@ -957,50 +1000,77 @@ class spell_pal_seal_of_righteousness : public SpellScriptLoader
         }
 };
 
-// Long Arm of The law
-// 20271 - judgment
-
 /* MUST APPLY IN DATABASE :
 
 DELETE FROM `spell_proc_event` WHERE `entry` IN (87172); 
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES (87172, 0, 10, 8388608, 0, 0, 272, 0, 0, 100, 0);
 
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (20271, 'spell_pal_long_arm_of_the_law'); 
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (20271, 'spell_pal_judgment'); 
 
 */
-class spell_pal_long_arm_of_the_law : public SpellScriptLoader
+
+// 20271 - judgment
+class spell_pal_judgment : public SpellScriptLoader
 {
     public:
-        spell_pal_long_arm_of_the_law() : SpellScriptLoader("spell_pal_long_arm_of_the_law") { }
+        spell_pal_judgment() : SpellScriptLoader("spell_pal_judgment") { }
 
-        class spell_pal_long_arm_of_the_law_SpellScript : public SpellScript
+        class spell_pal_judgment_SpellScript : public SpellScript
         {
-            PrepareSpellScript(spell_pal_long_arm_of_the_law_SpellScript);
+            PrepareSpellScript(spell_pal_judgment_SpellScript);
+	
+			SpellCastResult CheckCast()
+			{
+				if(Unit* caster = GetCaster())
+				    if (Unit* target = GetHitUnit())
+					{
+						 if(caster->GetDistance(target) > 30.0f)
+							return SPELL_FAILED_OUT_OF_RANGE; 
+						else
+							return SPELL_CAST_OK;
+					}
+				return SPELL_CAST_OK;
+			}
 
-            void HandleDummy(SpellEffIndex /*effIndex*/)
+            void HandleEffect(SpellEffIndex /*effIndex*/)
             {
                 Unit* caster = GetCaster();
+			    uint8 level = caster->getLevel();
+				int32 baseDamage = int32((level*(20 + 0.034*(level-5))) + (caster->GetTotalAttackPowerValue(BASE_ATTACK)*(38.0f/100.0f)) + (caster->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false)*(54.6f/100.0f)));
+				SetHitDamage(baseDamage);
 
-                if (Unit* target = GetHitUnit())
-                {
-                    if (caster->HasAura(87172))
-                       if (caster->GetDistance(target) > 15.0f || !caster->IsWithinDistInMap(target, 15.0f))
-                           caster->CastSpell(target, 87173, true);
-                }
+				//Judgment of the Bold
+				if (caster->HasAura(111529))
+				{
+					caster->CastSpell(caster, 111528, true);
+					caster->CastSpell(GetHitUnit(), 81326, true);
+				}
 
+				//Long arm of the law
+				if (caster->HasAura(87172))
+					caster->CastSpell(caster, 87173, true);
+
+				//Judgment of the Wise
+				if (caster->HasAura(105424))
+				{
+					caster->CastSpell(caster, 105427, true);
+				}
             }
-
+			
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_pal_long_arm_of_the_law_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
+                OnEffectHitTarget += SpellEffectFn(spell_pal_judgment_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+				OnCheckCast += SpellCheckCastFn(spell_pal_judgment_SpellScript::CheckCast);
+			}
         };
 
         SpellScript* GetSpellScript() const
         {
-            return new spell_pal_long_arm_of_the_law_SpellScript();
+            return new spell_pal_judgment_SpellScript();
         }
 };
+
 
 // Word of Glory ; id = 85673
 // 4.3.4
@@ -1122,6 +1192,8 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_sacred_shield();
     new spell_pal_templar_s_verdict();
     new spell_pal_seal_of_righteousness();
-	new spell_pal_long_arm_of_the_law();
 	new spell_pal_word_of_glory();
+	new spell_pal_judgment();
+	new spell_pal_exorcism();
+	new spell_pal_hammer_of_wrath();
 }

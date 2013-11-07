@@ -1238,7 +1238,10 @@ class Player : public Unit, public GridObject<Player>
         ~Player();
 
         void CleanupsBeforeDelete(bool finalCleanup = true);
-
+		
+		//spell damage
+		int32 GetSpellDamage(uint8 minLevel, uint8 minAttack, uint8 maxLevel, uint8 maxAttack, float attackCoef, float spellCoef, bool heal = false, WeaponAttackType attackType = BASE_ATTACK, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL);
+		
         void AddToWorld();
         void RemoveFromWorld();
 
@@ -2228,7 +2231,7 @@ class Player : public Unit, public GridObject<Player>
         uint16 GetSkillStep(uint16 skill) const;            // 0...6
         bool HasSkill(uint32 skill) const;
         void learnSkillRewardedSpells(uint32 id, uint32 value);
-
+		
         WorldLocation& GetTeleportDest() { return m_teleport_dest; }
         bool IsBeingTeleported() const { return mSemaphoreTeleport_Near || mSemaphoreTeleport_Far; }
         bool IsBeingTeleportedNear() const { return mSemaphoreTeleport_Near; }

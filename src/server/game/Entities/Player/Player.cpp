@@ -938,6 +938,15 @@ Player::~Player()
     sWorld->DecreasePlayerCount();
 }
 
+int32 Player::GetSpellDamage(uint8 minLevel, uint8 minAttack, uint8 maxLevel, uint8 maxAttack, float attackCoef, float spellCoef, bool heal, WeaponAttackType attackType, SpellSchoolMask schoolMask)
+{
+	int32 damage;
+	uint8 level = getLevel();
+	float coef = float(((maxAttack/maxLevel)-(minAttack/minLevel))/(maxLevel-minLevel));
+	damage = int32((level*(minAttack + coef*(level-minLevel))) + (GetTotalAttackPowerValue(attackType)*(attackCoef/100.0f)) + (GetTotalSpellPowerValue(schoolMask, heal)*(spellCoef/100.0f)));
+	return damage;
+}
+
 void Player::CleanupsBeforeDelete(bool finalCleanup)
 {
     TradeCancel(false);
@@ -4470,7 +4479,10 @@ bool Player::ResetTalents(bool no_cost)
     if (specSpells)
         for (std::list<uint32>::const_iterator itr = specSpells->begin(); itr != specSpells->end(); ++itr)
             if (ChrSpecializationSpellsEntry const* specSpell = sChrSpecializationSpellsStore.LookupEntry(*itr))
+			{
                 removeSpell(specSpell->SpellId, false, false);
+				RemoveAurasDueToSpell(specSpell->SpellId);
+			}
 
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
         if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(i))
@@ -4489,6 +4501,7 @@ bool Player::ResetTalents(bool no_cost)
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     _SaveTalents(trans);
     _SaveSpells(trans);
+	_SaveAuras(trans);
     CharacterDatabase.CommitTransaction(trans);
 
     if (!no_cost)
@@ -26578,7 +26591,7 @@ void Player::SendMovementSetCanFly(bool apply)
         data.Initialize(SMSG_MOVE_SET_CAN_FLY, 1 + 8 + 4);
         data << uint32(0);          //! movement counter
         data.WriteBit(guid[4]);
-        data.WriteBit(guid[5]);
+		data.WriteBit(guid[5]);
         data.WriteBit(guid[0]);
         data.WriteBit(guid[6]);
         data.WriteBit(guid[2]);
@@ -26639,44 +26652,44 @@ void Player::SendMovementSetHover(bool apply)
         data.Initialize(SMSG_MOVE_SET_HOVER, 12);
         data.WriteBit(guid[1]);
         data.WriteBit(guid[4]);
-        data.WriteBit(guid[2]);
         data.WriteBit(guid[3]);
-        data.WriteBit(guid[0]);
         data.WriteBit(guid[5]);
-        data.WriteBit(guid[6]);
         data.WriteBit(guid[7]);
+        data.WriteBit(guid[6]);
+        data.WriteBit(guid[0]);
+        data.WriteBit(guid[2]);
 
-        data.WriteByteSeq(guid[5]);
-        data.WriteByteSeq(guid[4]);
-        data.WriteByteSeq(guid[1]);
-        data.WriteByteSeq(guid[2]);
-        data.WriteByteSeq(guid[3]);
-        data.WriteByteSeq(guid[6]);
         data.WriteByteSeq(guid[0]);
+        data.WriteByteSeq(guid[6]);
         data.WriteByteSeq(guid[7]);
-        data << uint32(0);          // movement counter
+		data << uint32(0);          // movement counter
+        data.WriteByteSeq(guid[5]);
+        data.WriteByteSeq(guid[1]);
+        data.WriteByteSeq(guid[4]);
+        data.WriteByteSeq(guid[3]);
+        data.WriteByteSeq(guid[2]);
     }
     else
     {
         data.Initialize(SMSG_MOVE_UNSET_HOVER, 12);
-        data.WriteBit(guid[4]);
-        data.WriteBit(guid[6]);
-        data.WriteBit(guid[3]);
-        data.WriteBit(guid[1]);
-        data.WriteBit(guid[2]);
-        data.WriteBit(guid[7]);
         data.WriteBit(guid[5]);
         data.WriteBit(guid[0]);
+        data.WriteBit(guid[2]);
+        data.WriteBit(guid[7]);
+        data.WriteBit(guid[1]);
+        data.WriteBit(guid[6]);
+        data.WriteBit(guid[3]);
+        data.WriteBit(guid[4]);
 
-        data.WriteByteSeq(guid[4]);
-        data.WriteByteSeq(guid[5]);
-        data.WriteByteSeq(guid[3]);
         data.WriteByteSeq(guid[6]);
-        data.WriteByteSeq(guid[7]);
+        data.WriteByteSeq(guid[0]);
+		data << uint32(0);          // movement counter
+        data.WriteByteSeq(guid[3]);
+        data.WriteByteSeq(guid[5]);
         data.WriteByteSeq(guid[1]);
         data.WriteByteSeq(guid[2]);
-        data.WriteByteSeq(guid[0]);
-        data << uint32(0);          // movement counter
+        data.WriteByteSeq(guid[4]);
+        data.WriteByteSeq(guid[7]);
     }
 
     SendDirectMessage(&data);
@@ -26689,46 +26702,46 @@ void Player::SendMovementSetWaterWalking(bool apply)
     if (apply)
     {
         data.Initialize(SMSG_MOVE_WATER_WALK, 1 + 4 + 8);
-        data.WriteBit(guid[4]);
-        data.WriteBit(guid[7]);
-        data.WriteBit(guid[6]);
-        data.WriteBit(guid[0]);
-        data.WriteBit(guid[1]);
+        data.WriteBit(guid[2]);
         data.WriteBit(guid[3]);
         data.WriteBit(guid[5]);
-        data.WriteBit(guid[2]);
+        data.WriteBit(guid[0]);
+        data.WriteBit(guid[6]);
+        data.WriteBit(guid[7]);
+        data.WriteBit(guid[1]);
+        data.WriteBit(guid[4]);
 
-        data.WriteByteSeq(guid[0]);
-        data.WriteByteSeq(guid[5]);
-        data.WriteByteSeq(guid[2]);
-        data << uint32(0);          //! movement counter
         data.WriteByteSeq(guid[7]);
-        data.WriteByteSeq(guid[3]);
-        data.WriteByteSeq(guid[4]);
         data.WriteByteSeq(guid[1]);
+        data.WriteByteSeq(guid[3]);
+        data << uint32(0);          //! movement counter
+        data.WriteByteSeq(guid[2]);
+        data.WriteByteSeq(guid[0]);
         data.WriteByteSeq(guid[6]);
+        data.WriteByteSeq(guid[4]);
+        data.WriteByteSeq(guid[5]);
     }
     else
     {
         data.Initialize(SMSG_MOVE_LAND_WALK, 1 + 4 + 8);
-        data.WriteBit(guid[5]);
-        data.WriteBit(guid[1]);
-        data.WriteBit(guid[6]);
-        data.WriteBit(guid[2]);
-        data.WriteBit(guid[3]);
-        data.WriteBit(guid[4]);
         data.WriteBit(guid[0]);
         data.WriteBit(guid[7]);
+        data.WriteBit(guid[5]);
+        data.WriteBit(guid[3]);
+        data.WriteBit(guid[1]);
+        data.WriteBit(guid[6]);
+        data.WriteBit(guid[4]);
+        data.WriteBit(guid[2]);
 
-        data.WriteByteSeq(guid[6]);
-        data.WriteByteSeq(guid[1]);
+        data.WriteByteSeq(guid[2]);
         data.WriteByteSeq(guid[7]);
+		data << uint32(0);          //! movement counter
+        data.WriteByteSeq(guid[3]);
+        data.WriteByteSeq(guid[1]);
+        data.WriteByteSeq(guid[0]);
+        data.WriteByteSeq(guid[6]);
         data.WriteByteSeq(guid[5]);
         data.WriteByteSeq(guid[4]);
-        data.WriteByteSeq(guid[0]);
-        data.WriteByteSeq(guid[3]);
-        data.WriteByteSeq(guid[2]);
-        data << uint32(0);          //! movement counter
     }
     SendDirectMessage(&data);
 }
@@ -26767,9 +26780,9 @@ void Player::SendMovementSetFeatherFall(bool apply)
         data.WriteBit(guid[6]);
         data.WriteBit(guid[5]);
         data.WriteBit(guid[3]);
-        data.WriteBit(guid[1]);
         data.WriteBit(guid[0]);
         data.WriteBit(guid[7]);
+        data.WriteBit(guid[1]);
         data.WriteBit(guid[2]);
         data.WriteBit(guid[4]);
 
@@ -26791,27 +26804,27 @@ void Player::SendMovementSetCollisionHeight(float height)
 {
     ObjectGuid guid = GetGUID();
     WorldPacket data(SMSG_MOVE_SET_COLLISION_HEIGHT, 2 + 8 + 4 + 4);
-    data.WriteBits(0, 2);
     data.WriteBit(guid[6]);
-    data.WriteBit(guid[1]);
-    data.WriteBit(guid[4]);
-    data.WriteBit(guid[7]);
-    data.WriteBit(guid[5]);
-    data.WriteBit(guid[2]);
-    data.WriteBit(guid[0]);
     data.WriteBit(guid[3]);
+    data.WriteBit(guid[7]);
+    data.WriteBit(guid[0]);
+	data.WriteBits(0, 2);
+    data.WriteBit(guid[5]);
+    data.WriteBit(guid[4]);
+    data.WriteBit(guid[2]);
+    data.WriteBit(guid[1]);
     data.FlushBits();
 
-    data.WriteByteSeq(guid[6]);
     data.WriteByteSeq(guid[0]);
     data.WriteByteSeq(guid[4]);
+    data.WriteByteSeq(guid[6]);
+	data << uint32(sWorld->GetGameTime());   // Packet counter
+    data.WriteByteSeq(guid[2]);
     data.WriteByteSeq(guid[3]);
     data.WriteByteSeq(guid[5]);
-    data << uint32(sWorld->GetGameTime());   // Packet counter
-    data.WriteByteSeq(guid[1]);
-    data.WriteByteSeq(guid[2]);
+	data << float(height);
     data.WriteByteSeq(guid[7]);
-    data << float(height);
+    data.WriteByteSeq(guid[1]);
 
     SendDirectMessage(&data);
 }
