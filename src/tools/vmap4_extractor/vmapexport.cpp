@@ -653,7 +653,7 @@ int main(int argc, char ** argv)
             printf("Map - %s\n",map_ids[x].name);
         }
 		fichier << "Avant ParsMapFile" << endl;
-        ParsMapFiles(); //crash ici
+        //ParsMapFiles(); //OK
 		fichier << "ParsMapFiles OK" << endl;
         delete [] map_ids;
         //nError = ERROR_SUCCESS;
