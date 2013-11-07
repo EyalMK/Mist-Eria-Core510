@@ -52,10 +52,9 @@ void ExtractGameobjectModels()
     char localMPQ[512];
 
 	fichier << "Extracting GameObject models..." << endl;
-
-    sprintf(localMPQ, "%smodel.MPQ", input_path1); // not sure for model.mpq %s/Data/model.MPQ
-
-	fichier << "sprinf of %smodel.MPQ" << endl;
+	
+    sprintf(localMPQ, "%s/Data/misc.MPQ", input_path1); // not sure for model.mpq %s/Data/misc.MPQ
+	fichier << "sprinf of %smisc.MPQ" << endl;
 
     if (FileExists(localMPQ)==false)
     {   // Use model.mpq
@@ -69,7 +68,7 @@ void ExtractGameobjectModels()
 		fichier.close();
         exit(1);
     }
-
+	
 	
     HANDLE dbcFile;
     if (!SFileOpenFileEx(LocaleMpq, "DBFilesClient\\GameObjectDisplayInfo.dbc", SFILE_OPEN_PATCHED_FILE, &dbcFile))
