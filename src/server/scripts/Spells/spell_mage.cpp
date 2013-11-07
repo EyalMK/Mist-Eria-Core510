@@ -572,6 +572,7 @@ class spell_mage_frostbolt : public SpellScriptLoader
 };
 
 // 44457 - Living Bomb
+/// Updated 5.1.0
 class spell_mage_living_bomb : public SpellScriptLoader
 {
     public:
@@ -622,7 +623,7 @@ class spell_mage_living_bomb : public SpellScriptLoader
 };
 
 // 11426 - Ice Barrier
-/// Updated 4.3.4
+/// Updated 5.1.0
 class spell_mage_ice_barrier : public SpellScriptLoader
 {
    public:
@@ -638,7 +639,7 @@ class spell_mage_ice_barrier : public SpellScriptLoader
                 if (Unit* caster = GetCaster())
                 {
 					amount = 0;
-					amount += int32(4580 + (caster->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_FROST, false)*3.3f));
+					amount += int32(4580 + (caster->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false)*3.3f));
 				}
             }
 
