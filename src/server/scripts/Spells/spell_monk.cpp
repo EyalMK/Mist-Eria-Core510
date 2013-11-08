@@ -18,14 +18,14 @@ public:
     {
         PrepareAuraScript(spell_monk_renewing_mist_AuraScript);
 
-		void ChangeProc(ProcEventInfo& eventInfo)
+		void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
 		{
 			GetCaster()->CastSpell(GetCaster(), 123757); //aura for spell elevation
 		}
 
         void Register()
         {
-            OnProc += AuraProcFn(spell_monk_renewing_mist_AuraScript::ChangeProc);
+			OnEffectProc += AuraEffectProcFn(spell_mon_renewing_mist_AuraScript::HandleProc, EFFECT_1, SPELL_AURA_PERIODIC_HEAL);
         }
     };
 
