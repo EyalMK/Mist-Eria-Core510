@@ -1,0 +1,28 @@
+UPDATE creature_template SET ScriptName = 'boss_lorewalker_stonestep' WHERE entry = 56843;
+UDAPTE creature_template SET ScriptName = 'npc_zao_sunseeker' WHERE entry = 58826;
+UDAPTE creature_template SET ScriptName = 'npc_sun' WHERE entry = 56915;
+UDAPTE creature_template SET ScriptName = 'npc_hauting_sha' WHERE entry = 59555;
+UDAPTE creature_template SET ScriptName = 'npc_haunting_sha_transition' WHERE entry = ?????;
+UDAPTE creature_template SET ScriptName = 'npc_lorewalker_intro_trigger' WHERE entry = 57080;
+UDAPTE creature_template SET ScriptName = 'npc_lorewalker_intro_trigger_2' WHERE entry = ?????;
+UDAPTE creature_template SET ScriptName = 'npc_lorewalker_intro_trigger_3' WHERE entry = ?????;
+UDAPTE creature_template SET ScriptName = 'npc_lorewalker_intro_trigger_4' WHERE entry = ?????;
+UDAPTE creature_template SET ScriptName = 'npc_lorewalker_intro_trigger_5' WHERE entry = ?????;
+
+INSERT INTO creature_text (entry, groupid, id, text, type, language, probability, emote, duration, sound, comment) VALUES
+(56843, 0, 0, "Vous, là ! Sur la galerie ! Ma bibliothèque sacrée est possédée par les sha !", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - Intro"),
+(56843, 1, 0, "Regardez-les se répandre par chacune des lettres de ces parchemins sacrés… ils les corrompent ! Ils les souillent !", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - Intro2"),
+(56843, 2, 0, "Je vous en conjure, étrangers. Purifiez cet endroit de leur présence impure ! Nos écrits doivent trouver le repos !", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - Intro3"),
+(56843, 3, 0, "Vous devez détruire la source de la corruption ! Vite, avant que l'histoire qui nous est chère ne soit effacée à tout jamais !", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - Intro4"),
+(56843, 4, 0, "Ça, alors. Si je ne me trompe pas, le conte de Zao Cherche Soleil prend vie sous nos yeux.", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - Intro5"),
+(56843, 5, 0, "Selon la légende, il y a bien longtemps, cinq soleils brillaient dans le ciel. Lorsque le vent soufflait, la chaleur intense qu’ils généraient provoquait de grands feux de forêt.", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - Intro6"),
+(56843, 6, 0, "Les récoltes se flétrissaient, les villages brûlaient, et les familles erraient sans cesse à la recherche d’un abri contre les flammes…", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - Intro7"),
+(56843, 7, 0, "Le feu... La bibliothèque va brûler ! Je vous en prie, héros ! Purgez ce mal avant que le temple ne soit réduit en cendres !", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - AfterBeginCombat"),
+(56843, 8, 0, "Zao aussi est corrompu ! S’il vous plaît, combattez-le dignement…", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - Phase2"),
+(56843, 9, 0, "Je vous remercie, héros. Vous avez apporté la paix à ce temple sacré.", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - DeathZao");
+(56843, 10, 0, "Maintenant, partez ! J’ai besoin de méditer avant d’entamer le rituel de restauration.", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - AfetrDeathZao");
+
+
+INSERT INTO creature_text (entry, groupid, id, text, type, language, probability, emote, duration, sound, comment) VALUES
+(58826, 0, 0, "Je ne le permettrai plus !", 14, 0, 100, 0, 0, ??????, "ZaoSunseeker - IntroDebutSun");
+(58826, 1, 0, "Cette chaleur torride a dû émousser mes sens… Vous n’êtes tous que des mirages !", 14, 0, 100, 0, 0, ??????, "ZaoSunseeker - Phase2");

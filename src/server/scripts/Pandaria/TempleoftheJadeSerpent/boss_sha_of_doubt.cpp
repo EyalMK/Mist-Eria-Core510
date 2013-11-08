@@ -2,17 +2,7 @@
 
 /* Notes : Tester -- voir spells -- SoundID
 
-Sha of Doubt : Script 95% (terminé -- voir spells)
-
-UPDATE creature_template SET ScriptName = 'boss_sha_of_doubt' WHERE entry = 56439;
-
-INSERT INTO creature_text (entry, groupid, id, text, type, language, probability, emote, duration, sound, comment) VALUES
-(56439, 0, 0, "Rendez-vous ou mourez. Vous ne pouvez me vaincre.", 14, 0, 100, 0, 0, ???????, "ShaOfDoubt - combat"),
-(56439, 1, 0, "Vous vous étiolez si facilement.", 14, 0, 100, 0, 0, ???????, "ShaOfDoubt - boundsOfReality"),
-(56439, 2, 0, "Vous ne pouvez pas m’échapper. Je suis… dans… chaque… souffle.", 14, 0, 100, 0, 0, ???????, "ShaOfDoubt - Death"),
-(56439, 3, 0, "Succombez à la noirceur dans votre âme.", 14, 0, 100, 0, 0, ???????, "ShaOfDoubt - Slay1"),
-(56439, 4, 0, "Abandonnez toute espérance.", 14, 0, 100, 0, 0, ???????, "ShaOfDoubt - Slay2");
-
+Sha of Doubt : Script 95% (termine -- voir spells)
 */
 
 #include "ScriptPCH.h"
@@ -66,7 +56,7 @@ class boss_sha_of_doubt : public CreatureScript
 public:
 	boss_sha_of_doubt() : CreatureScript("boss_sha_of_doubt") { }
 
-	CreatureAI* GetAI(Creature* creature) const
+	CreatureAI* GetAI(Creature* creature) const 
 	{
 		return new boss_sha_of_doubtAI(creature);
 	}
@@ -87,12 +77,12 @@ public:
 		std::list<Creature*> listFigment;
 		
 
-		void Reset()
+		void Reset() 
 		{
 			checkBounds1 = false;
 			checkBounds2 = false;
 			checkShaOfDoubtAlive = true;
-			checkShaOfDoubtAlive = me->isAlive();
+			checkShaOfDoubtAlive = me->IsAlive();
 						
 			events.Reset();
 
@@ -104,7 +94,7 @@ public:
 			
 		}
 		
-		void DoAction(int32 action)
+		void DoAction(int32 action) 
         {
             switch (action)
             {
@@ -117,7 +107,7 @@ public:
 			}
         }
 
-		void JustDied(Unit *pWho)
+		void JustDied(Unit *pWho) 
 		{
 			Talk(SAY_DEATH);
 
@@ -132,18 +122,18 @@ public:
 			
 		}
 
-		void KilledUnit(Unit *pWho)
+		void KilledUnit(Unit *pWho) 
 		{
 			Talk(urand(SAY_SLAY_1, SAY_SLAY_2));
 		}
 		
-		void EnterEvadeMode()
+		void EnterEvadeMode() 
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, FAIL);	
 		}
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) 
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, IN_PROGRESS);
@@ -153,14 +143,14 @@ public:
 			events.ScheduleEvent(EVENT_WITHER_WILL, 6*IN_MILLISECONDS, 0, PHASE_COMBAT);
 		}
 		
-		void Verification()
+		void Verification() 
 		{
 			GetCreatureListWithEntryInGrid(listFigment, me, FIGMENT_OF_DOUBT, 50000.0f);
 			if(!listFigment.empty())
 			{
 				for(std::list<Creature*>::const_iterator i = listFigment.begin() ; i != listFigment.end() ; ++i)
 				{
-					if((*i)->isAlive())
+					if((*i)->IsAlive())
 					{
 						DoCast(*i, SPELL_GATHERING_DOUBT);
 						(*i)->DespawnOrUnsummon();	
@@ -183,7 +173,7 @@ public:
 
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(uint32 diff) 
 		{
 			if(!UpdateVictim())
 				return;
@@ -233,10 +223,12 @@ public:
 			{
 				Talk(SAY_BOUNDS_OF_REALITY);
 				DoCast(me, SPELL_BOUNDS_OF_REALITY);
-				me->SummonCreature(FIGMENT_OF_DOUBT, (me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 600*IN_MILLISECONDS);
-				me->SummonCreature(FIGMENT_OF_DOUBT, (me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 600*IN_MILLISECONDS);
-				me->SummonCreature(FIGMENT_OF_DOUBT, (me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 600*IN_MILLISECONDS);
-				me->SummonCreature(FIGMENT_OF_DOUBT, (me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 600*IN_MILLISECONDS);
+				float x,y,z;
+				me->GetPosition(x,y,z);
+				me->SummonCreature(FIGMENT_OF_DOUBT, (x, y, z), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 600*IN_MILLISECONDS);
+				me->SummonCreature(FIGMENT_OF_DOUBT, (x, y, z), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 600*IN_MILLISECONDS);
+				me->SummonCreature(FIGMENT_OF_DOUBT, (x, y, z), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 600*IN_MILLISECONDS);
+				me->SummonCreature(FIGMENT_OF_DOUBT, (x, y, z), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 600*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_VERIFICATION, 30*IN_MILLISECONDS, 0, PHASE_COMBAT);
 				checkBounds1 = true;
 			}

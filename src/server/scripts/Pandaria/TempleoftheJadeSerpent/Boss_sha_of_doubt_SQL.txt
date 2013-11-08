@@ -1,0 +1,8 @@
+UPDATE creature_template SET ScriptName = 'boss_sha_of_doubt' WHERE entry = 56439;
+
+INSERT INTO creature_text (entry, groupid, id, text, type, language, probability, emote, duration, sound, comment) VALUES
+(56439, 0, 0, "Rendez-vous ou mourez. Vous ne pouvez me vaincre.", 14, 0, 100, 0, 0, ???????, "ShaOfDoubt - combat"),
+(56439, 1, 0, "Vous vous etiolez si facilement.", 14, 0, 100, 0, 0, ???????, "ShaOfDoubt - boundsOfReality"),
+(56439, 2, 0, "Vous ne pouvez pas m’echapper. Je suis… dans… chaque… souffle.", 14, 0, 100, 0, 0, ???????, "ShaOfDoubt - Death"),
+(56439, 3, 0, "Succombez à la noirceur dans votre âme.", 14, 0, 100, 0, 0, ???????, "ShaOfDoubt - Slay1"),
+(56439, 4, 0, "Abandonnez toute esperance.", 14, 0, 100, 0, 0, ???????, "ShaOfDoubt - Slay2");
