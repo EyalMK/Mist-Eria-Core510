@@ -21,11 +21,12 @@ public:
 		void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
 		{
 			GetCaster()->CastSpell(GetCaster(), 123757); //aura for spell elevation
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleProc 123757 !!!!!!!!!!!!!");
 		}
-
+		
         void Register()
         {
-			OnEffectProc += AuraEffectProcFn(spell_monk_renewing_mist_AuraScript::HandleProc, EFFECT_1, SPELL_AURA_PERIODIC_HEAL);
+			OnEffectProc += AuraEffectProcFn(spell_monk_renewing_mist_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
         }
     };
 
