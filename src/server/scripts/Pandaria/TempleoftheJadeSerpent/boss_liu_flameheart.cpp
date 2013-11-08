@@ -82,7 +82,7 @@ class boss_liu_flameheart: public CreatureScript
 public:
 	boss_liu_flameheart() : CreatureScript("boss_liu_flameheart") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new boss_liu_flameheartAI(creature);
 	}
@@ -102,7 +102,7 @@ public:
 		std::list<Creature*> listMinion;
 		Position position;
 		
-		void Reset() OVERRIDE
+		void Reset() 
 		{
 			me->GetPosition(&position);
 			counterMinionDeath = 0;
@@ -130,7 +130,7 @@ public:
 			
 		}
 
-		void DoAction(int32 action) OVERRIDE
+		void DoAction(int32 action) 
         {
             switch (action)
             {
@@ -150,7 +150,7 @@ public:
 			}
         }
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho)
 		{
 			if (instance)
 			{
@@ -163,18 +163,18 @@ public:
 			
 		}
 
-		void KilledUnit(Unit *pWho) OVERRIDE
+		void KilledUnit(Unit *pWho) 
 		{	
 			Talk(urand(SAY_SLAY_1, SAY_SLAY_2));
 		}
 		
-		void EnterEvadeMode() OVERRIDE
+		void EnterEvadeMode()
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, FAIL);			
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/) 
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, IN_PROGRESS);
@@ -188,7 +188,7 @@ public:
 			events.ScheduleEvent(EVENT_SERPENT_WAVE, 5*IN_MILLISECONDS, 0, PHASE_COMBAT);
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff) 
 		{
 			if(!UpdateVictim())
 				return;
@@ -306,7 +306,7 @@ class npc_minion_of_doubt: public CreatureScript
 public:
 	npc_minion_of_doubt() : CreatureScript("npc_minion_of_doubt") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const
 	{
 		return new npc_minion_of_doubtAI(creature);
 	}
@@ -321,7 +321,7 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 		
-		void Reset() OVERRIDE
+		void Reset() 
 		{
 			if(instance)
 				if (Creature* liu = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LIU_FLAMEHEART)))
@@ -331,11 +331,11 @@ public:
 					}
 		}
 
-		void DoAction(int32 action) OVERRIDE
+		void DoAction(int32 action) 
         {
         }
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho) 
 		{	
 			if(instance)
 				if (Creature* liu = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LIU_FLAMEHEART)))
@@ -345,20 +345,20 @@ public:
 					}
 		}
 
-		void KilledUnit(Unit *pWho) OVERRIDE
+		void KilledUnit(Unit *pWho)
 		{	
 		}
 		
-		void EnterEvadeMode() OVERRIDE
+		void EnterEvadeMode()
 		{	
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/) 
 		{
 			me->SetInCombatWithZone();
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff) 
 		{
 			if(!UpdateVictim())
 				return;
@@ -378,7 +378,7 @@ class npc_yulon : public CreatureScript
 public:
 	npc_yulon() : CreatureScript("npc_yulon") { }
 
-	CreatureAI* GetAI(Creature* creature) const OVERRIDE
+	CreatureAI* GetAI(Creature* creature) const 
 	{
 		return new npc_yulonAI(creature);
 	}
@@ -395,7 +395,7 @@ public:
 		
 		int health;
 
-		void Reset() OVERRIDE
+		void Reset() 
 		{
 			events.Reset();
 
@@ -404,7 +404,7 @@ public:
 			me->SetHealth(health);
 		}
 
-		void JustSummoned(Creature* creature) OVERRIDE
+		void JustSummoned(Creature* creature) 
 		{
 			events.Reset();
 
@@ -413,11 +413,11 @@ public:
 			me->SetHealth(health);
 		}
 
-		void DoAction(int32 action) OVERRIDE
+		void DoAction(int32 action) 
 		{
 		}
 
-		void JustDied(Unit *pWho) OVERRIDE
+		void JustDied(Unit *pWho) 
 		{
 			events.SetPhase(PHASE_END);
 			if(instance)
@@ -426,14 +426,14 @@ public:
 						lorewalker->AI()->DoAction(ACTION_END);
 		}
 
-		void EnterCombat(Unit* /*who*/) OVERRIDE
+		void EnterCombat(Unit* /*who*/) 
 		{
 			me->SetInCombatWithZone();
 			events.SetPhase(PHASE_3);
 			events.ScheduleEvent(EVENT_JADE_FIRE, 6*IN_MILLISECONDS, 0, PHASE_3);
 		}
 
-		void EnterEvadeMode() OVERRIDE
+		void EnterEvadeMode()
 		{
 			me->DespawnOrUnsummon();
 			if (Creature* lorewalker = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LOREWALKER_STONESTEP)))
@@ -441,7 +441,7 @@ public:
 					lorewalker->AI()->Reset();
 		}
 
-		void UpdateAI(uint32 diff) OVERRIDE
+		void UpdateAI(uint32 diff) 
 		{	
 			if(!UpdateVictim())
 				return;

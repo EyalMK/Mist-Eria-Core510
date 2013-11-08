@@ -82,7 +82,7 @@ public:
 			checkBounds1 = false;
 			checkBounds2 = false;
 			checkShaOfDoubtAlive = true;
-			checkShaOfDoubtAlive = me->IsAlive();
+			checkShaOfDoubtAlive = me->isAlive();
 						
 			events.Reset();
 
@@ -150,7 +150,7 @@ public:
 			{
 				for(std::list<Creature*>::const_iterator i = listFigment.begin() ; i != listFigment.end() ; ++i)
 				{
-					if((*i)->IsAlive())
+					if((*i)->isAlive())
 					{
 						DoCast(*i, SPELL_GATHERING_DOUBT);
 						(*i)->DespawnOrUnsummon();	
