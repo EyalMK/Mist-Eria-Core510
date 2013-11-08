@@ -115,7 +115,7 @@ public:
 			checkSaySpawn4 = false;
 			counterLivingWater = 0;
 			checkWiseMariAlive = true;
-			checkWiseMariAlive = me->IsAlive();
+			checkWiseMariAlive = me->isAlive();
 			
 			events.Reset();
 
@@ -357,7 +357,7 @@ public:
 				{
 					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 					{
-						if (me->GetExactDist2d(i->GetSource()->GetPositionX(),i->GetSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
+						if (me->GetExactDist2d(i->getSource()->GetPositionX(),i->getSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
 						{
 							if (instance)
 								if (Creature* wise = me->GetCreature(*me, instance->GetData64(DATA_BOSS_WISE_MARI)))
