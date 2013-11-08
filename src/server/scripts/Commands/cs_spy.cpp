@@ -370,7 +370,7 @@ public:
 
         normalizePlayerName(plr);
 
-        Player *player = sObjectAccessor->GetPlayer(*(handler->GetSession()->GetPlayer()), sObjectMgr->GetPlayerGUIDByName(plr.c_str()));
+        Player *player = sObjectAccessor->FindPlayerByName(plr);
         if(player)
         {
             Player *mj = handler->GetSession()->GetPlayer();
@@ -401,7 +401,7 @@ public:
 
         normalizePlayerName(plr);
 
-        Player *player = sObjectAccessor->GetPlayer(*(handler->GetSession()->GetPlayer()), sObjectMgr->GetPlayerGUIDByName(plr.c_str()));
+        Player *player = sObjectAccessor->FindPlayerByName(plr);
         if(player)
         {
             Player *mj = handler->GetSession()->GetPlayer();
@@ -597,7 +597,7 @@ public:
 
         normalizePlayerName(plr);
 
-        Player *player = sObjectAccessor->GetPlayer(*(handler->GetSession()->GetPlayer()), sObjectMgr->GetPlayerGUIDByName(plr.c_str()));
+        Player *player = sObjectAccessor->FindPlayerByName(plr);
         if(player)
         {
             Player *mj = handler->GetSession()->GetPlayer();
@@ -623,7 +623,7 @@ public:
 
         normalizePlayerName(plr);
 
-        Player *player = sObjectAccessor->GetPlayer(*(handler->GetSession()->GetPlayer()), sObjectMgr->GetPlayerGUIDByName(plr.c_str()));
+        Player *player = sObjectAccessor->FindPlayerByName(plr);
         if(player)
         {
             Player *mj = handler->GetSession()->GetPlayer();
