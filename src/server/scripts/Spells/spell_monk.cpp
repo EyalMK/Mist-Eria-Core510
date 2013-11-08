@@ -7,6 +7,34 @@
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
 
+//115151 - Renewing mist
+class spell_monk_renewing_mist : public SpellScriptLoader
+{
+public:
+    spell_monk_renewing_mist() : SpellScriptLoader("spell_monk_renewing_mist") { }
+
+
+    class spell_monk_renewing_mist_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_monk_renewing_mist_AuraScript);
+
+		void ChangeProc(ProcEventInfo& eventInfo)
+		{
+			GetCaster()->CastSpell(GetCaster(), 123757); //aura for spell elevation
+		}
+
+        void Register()
+        {
+            OnProc += AuraProcFn(spell_monk_renewing_mist_AuraScript::ChangeProc);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_monk_renewing_mist_AuraScript();
+    }
+};
+
 // 116095 - Disable
 class spell_monk_disable : public SpellScriptLoader
 {
@@ -280,4 +308,5 @@ void AddSC_monk_spell_scripts()
     new spell_monk_transcendence_transfert();
 	new spell_monk_transcendence();
 	new npc_transcendence_spirit();
+	new spell_monk_renewing_mist();
 }
