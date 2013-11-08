@@ -16666,6 +16666,7 @@ void Unit::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
         in conjunction with any of the moving movement flags such as MOVEMENTFLAG_FORWARD.
         It will freeze clients that receive this player's movement info.
     */
+   //With this, we can't detect cheaters
     REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_ROOT),
         MOVEMENTFLAG_ROOT);
 
@@ -16691,26 +16692,11 @@ void Unit::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
 
     //! Cannot move forwards and backwards at the same time
     REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_FORWARD) && mi->HasMovementFlag(MOVEMENTFLAG_BACKWARD),
-        MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD);
-
-    //! Cannot walk on water without SPELL_AURA_WATER_WALK
-    REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_WATERWALKING) && !HasAuraType(SPELL_AURA_WATER_WALK),
-        MOVEMENTFLAG_WATERWALKING);
+        MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD);    
 
     //! Cannot feather fall without SPELL_AURA_FEATHER_FALL
     REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_FALLING_SLOW) && !HasAuraType(SPELL_AURA_FEATHER_FALL),
-        MOVEMENTFLAG_FALLING_SLOW);
-
-    /*! Cannot fly if no fly auras present. Exception is being a GM.
-        Note that we check for account level instead of Player::IsGameMaster() because in some
-        situations it may be feasable to use .gm fly on as a GM without having .gm on,
-        e.g. aerial combat.
-    */
-
-    REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY) && ToPlayer()->GetSession()->GetSecurity() == SEC_PLAYER &&
-        !ToPlayer()->m_mover->HasAuraType(SPELL_AURA_FLY) &&
-        !ToPlayer()->m_mover->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED),
-        MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY);
+        MOVEMENTFLAG_FALLING_SLOW);    
 
     #undef REMOVE_VIOLATING_FLAGS
 }
