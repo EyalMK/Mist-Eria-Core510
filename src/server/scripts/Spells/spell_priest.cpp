@@ -506,7 +506,7 @@ class spell_pri_power_word_shield : public SpellScriptLoader
 
                 return true;
             }
-
+			
             void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
             {
                 canBeRecalculated = false;

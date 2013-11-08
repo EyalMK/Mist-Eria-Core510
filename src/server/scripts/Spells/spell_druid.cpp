@@ -1746,6 +1746,7 @@ public:
 
 		EventMap events;
 		bool needVictim;
+		
 
 		enum Events
 		{
@@ -1778,6 +1779,8 @@ public:
 			Player* owner = ((TempSummon*)me)->GetSummoner()->ToPlayer();
 			me->SetMaxHealth(owner->GetMaxHealth()/10);
 			me->SetHealth(owner->GetMaxHealth()/10);
+					
+			
 			needVictim = true;
 
 			switch(owner->GetPrimaryTalentTree(owner->GetActiveSpec()))
@@ -1794,12 +1797,14 @@ public:
 			case TALENT_TREE_DRUID_FERAL:
 				{
 					me->SetDisplayId(DISPLAY_FERAL);
+					me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER, (1 + (owner->GetTotalAttackPowerValue(BASE_ATTACK) / 14) * 2 * 0.75f + 1));
 					events.ScheduleEvent(EVENT_BASH, urand(4000, 6000));
 					break;
 				}
 			case TALENT_TREE_DRUID_GUARDIAN:
 				{
 					me->SetDisplayId(DISPLAY_TANK);
+					me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER, ((1 + (owner->GetTotalAttackPowerValue(BASE_ATTACK) / 14) * 2 * 0.75f) * 0.2f + 1));
 					events.ScheduleEvent(EVENT_TAUNT, urand(1000, 2000));
 					break;
 				}
@@ -1817,7 +1822,7 @@ public:
 
 			me->setFaction(owner->getFaction());
 			me->SetReactState(REACT_AGGRESSIVE);
-			DoZoneInCombat();
+			DoZoneInCombat();			
 		}
 
 		void UpdateAI(uint32 diff)
@@ -1826,9 +1831,12 @@ public:
 				return;
 
 			events.Update(diff);
+
+
 			
 			while(uint32 event = events.ExecuteEvent())
 			{
+				int32 bp0;
 				switch(event)
 				{
 					case EVENT_BASH:
@@ -1845,7 +1853,11 @@ public:
 					}
 					case EVENT_WRATH:
 					{
-						DoCast(SPELL_WRATH);
+						if(Player* owner = ((TempSummon*)me)->GetSummoner()->ToPlayer())
+						{
+							bp0 = owner->GetSpellDamage(1, urand(30, 32), 90, urand(1930, 2176), 0.f, 37.5f);
+							me->CastCustomSpell(me->getVictim(), SPELL_WRATH, &bp0, NULL, NULL, false);
+						}
 						events.ScheduleEvent(EVENT_WRATH, 2000);
 						break;
 					}
@@ -1858,25 +1870,46 @@ public:
 					}
 					case EVENT_HEAL:
 					{
-						Player* lowest;
-						Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
-						if (!PlayerList.isEmpty())
+						if(Player* owner = ((TempSummon*)me)->GetSummoner()->ToPlayer())
 						{
-							for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+							Player* lowest = NULL;
+							Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
+							if (!PlayerList.isEmpty())
 							{
-								if(Player *p = i->getSource())
+								for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 								{
-									if(p->GetHealth() < lowest->GetHealth())
-										lowest = p;
+									if(Player *p = i->getSource())
+									{
+										if(me->GetDistance(p) < 35.f)
+										{
+											if(lowest)
+											{
+												if(p->GetHealth() < lowest->GetHealth())
+													lowest = p;
+											}
+											else
+												lowest = p;
+										}
+									}
 								}
 							}
-						}
-						me->CastSpell(lowest, SPELL_HEAL, false);
 
-						events.ScheduleEvent(EVENT_HEAL, 2000);
+							bp0 = owner->GetSpellDamage(1, urand(48, 56), 90, urand(3201, 3779), 0.f, 32.3f, true);
+							if(lowest)
+								me->CastCustomSpell(lowest, SPELL_HEAL, &bp0, NULL, NULL, false);
+						}
+
+						events.ScheduleEvent(EVENT_HEAL, 2500);
 						break;
 					}
 				}
+			}
+
+			if(Player* owner = ((TempSummon*)me)->GetSummoner()->ToPlayer())
+			{
+				if (owner->GetPrimaryTalentTree(owner->GetActiveSpec()) == TALENT_TREE_DRUID_FERAL
+					||(owner->GetPrimaryTalentTree(owner->GetActiveSpec())) == TALENT_TREE_DRUID_GUARDIAN)
+					DoMeleeAttackIfReady();
 			}
 
 		}

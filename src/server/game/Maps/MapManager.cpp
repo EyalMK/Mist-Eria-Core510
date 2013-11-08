@@ -216,6 +216,8 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
         }
     }
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 8");
+
     if (!player->isAlive())
     {
         if (Corpse* corpse = player->GetCorpse())
@@ -249,11 +251,19 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
     //Get instance where player's group is bound & its map
     if (group)
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 9");
+
         InstanceGroupBind* boundInstance = group->GetBoundInstance(entry);
-        if (boundInstance && boundInstance->save)
-            if (Map* boundMap = sMapMgr->FindMap(mapid, boundInstance->save->GetInstanceId()))
-                if (!loginCheck && !boundMap->CanEnter(player))
+        if (boundInstance && boundInstance->save) {
+            if (Map* boundMap = sMapMgr->FindMap(mapid, boundInstance->save->GetInstanceId())) {
+                if (!loginCheck && !boundMap->CanEnter(player)) {
                     return false;
+                }
+            }
+        }
+
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 10");
+
             /*
                 This check has to be moved to InstanceMap::CanEnter()
                 // Player permanently bounded to different instance than groups one
@@ -269,6 +279,9 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
     // players are only allowed to enter 5 instances per hour
     if (entry->IsDungeon() && (!player->GetGroup() || (player->GetGroup() && !player->GetGroup()->isLFGGroup())))
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 11");
+
+
         uint32 instaceIdToCheck = 0;
         if (InstanceSave* save = player->GetInstanceSave(mapid, entry->IsRaid()))
             instaceIdToCheck = save->GetInstanceId();
@@ -276,10 +289,15 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
         // instanceId can never be 0 - will not be found
         if (!player->CheckInstanceCount(instaceIdToCheck) && !player->isDead())
         {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 12");
+
             player->SendTransferAborted(mapid, TRANSFER_ABORT_TOO_MANY_INSTANCES);
             return false;
         }
     }
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 13");
+
 
     //Other requirements
     return player->Satisfy(sObjectMgr->GetAccessRequirement(mapid, targetDifficulty), mapid, true);
