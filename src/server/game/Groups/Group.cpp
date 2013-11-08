@@ -2604,8 +2604,8 @@ InstanceGroupBind* Group::GetBoundInstance(Difficulty difficulty, uint32 mapId)
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "map %u diff %u", mapId, difficulty);
 
-    difficulty = std::max((int)difficulty, 0);
-    difficulty = std::min((int)difficulty, MAX_DIFFICULTY-1);
+    difficulty = (Difficulty)std::max((int)difficulty, 0);
+    difficulty = (Difficulty)std::min((int)difficulty, MAX_DIFFICULTY-1);
 
 
     BoundInstancesMap::iterator itr = m_boundInstances[difficulty].find(mapId);
