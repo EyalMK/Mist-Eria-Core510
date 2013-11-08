@@ -680,6 +680,15 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this)
 #ifdef _MSC_VER
 #pragma warning(default:4355)
 #endif
+
+    m_antiHackLastTime = getMSTime();
+    m_speedHackNbPositif = 0;
+    m_speedHackTimer = 0;
+    m_flyHackNbPositif = 0;
+    m_flyHackTimer = 0;
+    m_wwHackNbPositif = 0;
+    m_wwHackTimer = 0;
+    m_antihackLastPos.Relocate(0, 0, 0, 0);
 	
     m_speakTime = 0;
     m_speakCount = 0;
@@ -1536,6 +1545,10 @@ void Player::Update(uint32 p_time)
 {
     if (!IsInWorld())
         return;
+
+    m_speedHackTimer += p_time;
+    m_flyHackTimer += p_time;
+    m_wwHackTimer += p_time;
 
     // undelivered mail
     if (m_nextMailDelivereTime && m_nextMailDelivereTime <= time(NULL))
@@ -26937,4 +26950,54 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     //ObjectAccessor::UpdateObjectVisibility(pet);
 
     return pet;
+}
+
+void Player::ReportSpeedHack(float vitesse)
+{
+    m_speedHackNbPositif++;
+
+    if(m_speedHackNbPositif > 5)
+    {
+        if(m_speedHackTimer > 5000)
+        {
+            float pourcent = vitesse / GetSpeed(MOVE_RUN) * 100;
+            std::stringstream ss;
+            ss << "[Anti-hack] Speed hack pour " << GetName() << " (" << pourcent << "%)";
+            ChatHandler(NULL).SendGlobalGMSysMessage(ss.str().c_str());
+            ResetSpeedHackReport();
+        }
+    }
+}
+
+void Player::ReportFlyHack()
+{
+    std::cout << "Report fly hack" << std::endl;
+    m_flyHackNbPositif++;
+
+    if(m_flyHackNbPositif > 5)
+    {
+        if(m_flyHackTimer > 5000)
+        {
+            std::stringstream ss;
+            ss<< "[Anti-hack] Fly hack pour " << GetName();
+            ChatHandler(NULL).SendGlobalGMSysMessage(ss.str().c_str());
+            ResetFlyHackReport();
+        }
+    }
+}
+
+void Player::ReportWWHack()
+{
+    m_wwHackNbPositif++;
+
+    if(m_wwHackNbPositif > 5)
+    {
+        if(m_wwHackTimer > 5000)
+        {
+            std::stringstream ss;
+            ss << "[Anti-hack] Water walk hack pour " << GetName();
+            ChatHandler(NULL).SendGlobalGMSysMessage(ss.str().c_str());
+            ResetWWHackReport();
+        }
+    }
 }

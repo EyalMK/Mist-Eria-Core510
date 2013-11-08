@@ -304,6 +304,82 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
     MovementInfo movementInfo;
     GetPlayer()->ReadMovementInfo(recvPacket, &movementInfo);
 
+    if(plrMover && !plrMover->isGameMaster() && plrMover->GetAntiHackLastPos().IsPositionValid() && movementInfo.t_guid == 0 && !(movementInfo.flags & MOVEMENTFLAG_FALLING))
+    {
+        Position lPos = plrMover->GetAntiHackLastPos();
+        float dist = movementInfo.pos.GetExactDist(&lPos);
+        uint32 dt = GetMSTimeDiffToNow(plrMover->GetAntiHackLastTime());
+        if(dt != 0 && dist != 0)
+        {
+            UnitMoveType mType;
+
+            if(movementInfo.flags & MOVEMENTFLAG_WALKING && !(movementInfo.flags & MOVEMENTFLAG_FLYING))
+            {
+                mType = MOVE_WALK;
+            }
+            else if(movementInfo.flags & MOVEMENTFLAG_SWIMMING)
+            {
+                if(movementInfo.flags & MOVEMENTFLAG_BACKWARD)
+                    mType = MOVE_SWIM_BACK;
+                else
+                    mType = MOVE_SWIM;
+            }
+            else if(movementInfo.flags & MOVEMENTFLAG_FLYING)
+            {
+                if(movementInfo.flags & MOVEMENTFLAG_BACKWARD)
+                    mType = MOVE_FLIGHT_BACK;
+                else
+                    mType = MOVE_FLIGHT;
+            }
+            else
+            {
+                if(movementInfo.flags & MOVEMENTFLAG_BACKWARD)
+                    mType = MOVE_RUN_BACK;
+                else
+                    mType = MOVE_RUN;
+            }
+
+            float vitesse = dist / (float)(dt / float(IN_MILLISECONDS)), vsimu = plrMover->GetSpeed(mType);
+            int ecart_relatif = floor(((vitesse - vsimu) / vsimu) * 100);
+
+            if(ecart_relatif > 100)
+                plrMover->ReportSpeedHack(vitesse);
+            else
+                plrMover->ResetSpeedHackReport();
+
+            if(movementInfo.flags & MOVEMENTFLAG_FLYING)
+            {
+                if(!plrMover->HasAuraType(SPELL_AURA_FLY) && !plrMover->HasAuraType(SPELL_AURA_MOUNTED) &&
+                        !plrMover->m_mover->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+                {
+                    plrMover->ReportFlyHack();
+                }
+                else
+                    plrMover->ResetFlyHackReport();
+            }
+
+            if(movementInfo.flags & MOVEMENTFLAG_WATERWALKING)
+            {
+                if(!plrMover->HasAuraType(SPELL_AURA_WATER_WALK) && !plrMover->HasAuraType(SPELL_AURA_GHOST))
+                {
+                    plrMover->ReportWWHack();
+                }
+                else
+                    plrMover->ResetWWHackReport();
+            }
+
+            /*if(movementInfo.flags & MOVEMENTFLAG_JUMPING)
+            {
+                ss << " jumping (vitesse  Z :" << movementInfo.j_zspeed << " XY : " << movementInfo.j_xyspeed << ")";
+            }*/
+        }
+    }
+    if(plrMover)
+    {
+        plrMover->SetAntiHackLastPos(movementInfo.pos);
+        plrMover->SetAntiHackLastTime(getMSTime());
+    }
+
     // prevent tampered movement data
     if (movementInfo.guid != mover->GetGUID())
     {

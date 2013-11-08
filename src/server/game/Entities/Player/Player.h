@@ -2510,6 +2510,38 @@ class Player : public Unit, public GridObject<Player>
         void ChangeSpeakTime(int utime);
 
         /*********************************************************/
+        /***                 ANTI-HACK SYSTEM                  ***/
+        /*********************************************************/
+
+        void ReportSpeedHack(float vitesse);
+        void ReportFlyHack();
+        void ReportWWHack();
+
+        inline void ResetSpeedHackReport() {m_speedHackNbPositif = 0;}
+        inline void ResetFlyHackReport() {m_flyHackNbPositif = 0;}
+        inline void ResetWWHackReport() {m_wwHackNbPositif = 0;}
+
+        inline void SetAntiHackLastPos(Position pos) { m_antihackLastPos = pos;}
+        inline Position GetAntiHackLastPos() { return m_antihackLastPos; }
+
+        inline uint32 GetAntiHackLastTime() { return m_antiHackLastTime; }
+        inline void SetAntiHackLastTime(uint32 lastTime) { m_antiHackLastTime = lastTime; }
+
+private:
+        uint32 m_speedHackNbPositif;
+        uint32 m_flyHackNbPositif;
+        uint32 m_wwHackNbPositif;
+
+        //Minimum time between two reports
+        uint32 m_speedHackTimer;
+        uint32 m_flyHackTimer;
+        uint32 m_wwHackTimer;
+
+        Position m_antihackLastPos;
+        uint32 m_antiHackLastTime;
+public:
+
+        /*********************************************************/
         /***                 VARIOUS SYSTEMS                   ***/
         /*********************************************************/
         void UpdateFallInformationIfNeed(MovementInfo const& minfo, uint16 opcode);
