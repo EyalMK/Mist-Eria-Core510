@@ -25,7 +25,7 @@ public:
 
         void Register()
         {
-			OnEffectProc += AuraEffectProcFn(spell_mon_renewing_mist_AuraScript::HandleProc, EFFECT_1, SPELL_AURA_PERIODIC_HEAL);
+			OnEffectProc += AuraEffectProcFn(spell_monk_renewing_mist_AuraScript::HandleProc, EFFECT_1, SPELL_AURA_PERIODIC_HEAL);
         }
     };
 
