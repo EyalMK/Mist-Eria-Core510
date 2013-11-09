@@ -727,39 +727,38 @@ class spell_warr_rallying_cry : public SpellScriptLoader
     public:
         spell_warr_rallying_cry() : SpellScriptLoader("spell_warr_rallying_cry") { }
 
-        class spell_warr_rallying_cry_AuraScript : public AuraScript
+        class spell_warr_rallying_cry_SpellScript : public SpellScript
         {
-            PrepareAuraScript(spell_warr_rallying_cry_AuraScript);
+            PrepareSpellScript(spell_warr_rallying_cry_SpellScript);
 
-            bool Validate(SpellInfo const* /*spell*/)
+            bool Validate(SpellInfo const* /*spellInfo*/)
             {
                 if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_RALLYING_CRY))
                     return false;
                 return true;
             }
 
-            void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            bool Load()
             {
-                Unit* target = GetTarget();
-                int32 bp0 = target->CountPctFromMaxHealth(aurEff->GetAmount());
-                target->CastCustomSpell(target, SPELL_WARRIOR_RALLYING_CRY, &bp0, NULL, NULL, true);
+                return GetCaster()->GetTypeId() ==  TYPEID_PLAYER;
             }
 
-            void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            void HandleScript(SpellEffIndex /*effIndex*/)
             {
-                GetTarget()->RemoveAurasDueToSpell(SPELL_WARRIOR_RALLYING_CRY);
+                int32 basePoints0 = int32(GetHitUnit()->CountPctFromMaxHealth(GetEffectValue()));
+
+                GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_WARRIOR_RALLYING_CRY, &basePoints0, NULL, NULL, true);
             }
 
             void Register()
             {
-                AfterEffectApply += AuraEffectApplyFn(spell_warr_rallying_cry_AuraScript::AfterApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK);
-                AfterEffectRemove += AuraEffectRemoveFn(spell_warr_rallying_cry_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK);
+                OnEffectHitTarget += SpellEffectFn(spell_warr_rallying_cry_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        SpellScript* GetSpellScript() const
         {
-            return new spell_warr_rallying_cry_AuraScript();
+            return new spell_warr_rallying_cry_SpellScript();
         }
 };
 
