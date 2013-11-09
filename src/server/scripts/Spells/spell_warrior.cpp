@@ -745,7 +745,7 @@ class spell_warr_rallying_cry : public SpellScriptLoader
 
             void HandleScript(SpellEffIndex /*effIndex*/)
             {
-                int32 basePoints0 = int32(GetHitUnit()->CountPctFromMaxHealth(GetEffectValue()));
+                int32 basePoints0 = int32(GetHitUnit()->CountPctFromMaxHealth(20));
 
                 GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_WARRIOR_RALLYING_CRY_TRIGGERED, &basePoints0, NULL, NULL, true);
             }
