@@ -27,7 +27,7 @@ public:
 		
         void Register()
         {
-			OnEffectPeriodic += AuraEffectPeriodicFn(spell_monk_renewing_mist::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+			OnEffectPeriodic += AuraEffectPeriodicFn(spell_monk_renewing_mist_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
         }
     };
 
