@@ -733,8 +733,8 @@ public:
 
         void EffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
-            int32 amount = aurEff->GetAmount() * GetTarget()->GetMaxHealth() / 100;
-            GetTarget()->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float(aurEff->GetAmount()), true);
+            int32 amount = 20 * GetTarget()->GetMaxHealth() / 100;
+            GetTarget()->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float(20), true);
             GetTarget()->ModifyHealth(amount);
 
             PreventDefaultAction();
@@ -742,7 +742,7 @@ public:
 
         void EffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
-            int32 amount = aurEff->GetAmount() * GetTarget()->GetMaxHealth() / 100;
+            int32 amount = 20 * GetTarget()->GetMaxHealth() / 100;
             
             
             if (int32(GetTarget()->GetHealth()) > amount)
@@ -750,7 +750,7 @@ public:
             else
                 GetTarget()->SetHealth(1);
 
-            GetTarget()->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float( aurEff->GetAmount() ), false);
+            GetTarget()->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float(20), false);
 
             PreventDefaultAction();
         }
