@@ -50,7 +50,7 @@ enum WarriorSpells
     SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_2     = 64850,
     SPELL_WARRIOR_VIGILANCE_PROC                    = 50725,
     SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665,
-	SPELL_WARRIOR_RALLYING_CRY                      = 97462,
+	SPELL_WARRIOR_RALLYING_CRY_TRIGGERED            = 97463,
     SPELL_PALADIN_BLESSING_OF_SANCTUARY             = 20911,
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
     SPELL_PRIEST_RENEWED_HOPE                       = 63944,
@@ -733,7 +733,7 @@ class spell_warr_rallying_cry : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spellInfo*/)
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_RALLYING_CRY))
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_RALLYING_CRY_TRIGGERED))
                     return false;
                 return true;
             }
@@ -747,7 +747,7 @@ class spell_warr_rallying_cry : public SpellScriptLoader
             {
                 int32 basePoints0 = int32(GetHitUnit()->CountPctFromMaxHealth(GetEffectValue()));
 
-                GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_WARRIOR_RALLYING_CRY, &basePoints0, NULL, NULL, true);
+                GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_WARRIOR_RALLYING_CRY_TRIGGERED, &basePoints0, NULL, NULL, true);
             }
 
             void Register()
