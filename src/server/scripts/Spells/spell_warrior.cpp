@@ -740,18 +740,19 @@ class spell_warr_rallying_cry : public SpellScriptLoader
 
             bool Load()
             {
-                return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+                return GetCaster()->GetTypeId() ==  TYPEID_PLAYER;
             }
 
-            void OnHit()
+            void HandleScript(SpellEffIndex /*effIndex*/)
             {
-				if (AuraEffect const* aurEff = GetHitUnit()->GetAuraEffect(SPELL_WARRIOR_RALLYING_CRY_TRIGGERED, EFFECT_0))
-                    GetHitUnit()->CastCustomSpell(SPELL_WARRIOR_RALLYING_CRY_TRIGGERED, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetHitUnit(), true);
+                int32 basePoints0 = int32(GetHitUnit()->CountPctFromMaxHealth(GetEffectValue()));
+
+                GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_WARRIOR_RALLYING_CRY_TRIGGERED, &basePoints0, NULL, NULL, true);
             }
 
             void Register()
             {
-                AfterHit += SpellHitFn(spell_warr_rallying_cry_SpellScript::OnHit);
+                OnEffectHitTarget += SpellEffectFn(spell_warr_rallying_cry_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
         };
 
