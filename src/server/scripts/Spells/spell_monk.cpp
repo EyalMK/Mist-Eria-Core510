@@ -316,7 +316,10 @@ public:
         void HandleEffect(SpellEffIndex /*effIndex*/)
         {
 			if(Player* p = GetCaster()->ToPlayer())
+			{
+				SetHitDamage(p->GetSpellDamage(1, urand(108, 124), 90, urand(7210, 8379), 0.f, 68.f));
 				SetHitHeal(p->GetSpellDamage(1, urand(108, 124), 90, urand(7210, 8379), 0.f, 68.f));
+			}
         }
 		
         void Register()
