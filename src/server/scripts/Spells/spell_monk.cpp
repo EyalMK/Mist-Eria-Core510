@@ -22,7 +22,6 @@ public:
 		void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
 		{
 			GetCaster()->CastSpell(GetCaster(), 123757); //aura for spell elevation
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleProc 123757 !!!!!!!!!!!!!");
 		}
 		
         void Register()
