@@ -6,8 +6,9 @@
 #include "ScriptedCreature.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
+#include "SpellAuras.h"
 
-//115151 - Renewing mist
+//119611 - Renewing mist
 class spell_monk_renewing_mist : public SpellScriptLoader
 {
 public:
@@ -18,7 +19,7 @@ public:
     {
         PrepareAuraScript(spell_monk_renewing_mist_AuraScript);
 
-		void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+		void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
 		{
 			GetCaster()->CastSpell(GetCaster(), 123757); //aura for spell elevation
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleProc 123757 !!!!!!!!!!!!!");
@@ -26,7 +27,7 @@ public:
 		
         void Register()
         {
-			OnEffectProc += AuraEffectProcFn(spell_monk_renewing_mist_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+			OnEffectPeriodic += AuraEffectPeriodicFn(spell_monk_renewing_mist::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
         }
     };
 
