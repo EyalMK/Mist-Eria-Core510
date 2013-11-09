@@ -743,7 +743,7 @@ class spell_warr_rallying_cry : public SpellScriptLoader
                 return GetCaster()->GetTypeId() ==  TYPEID_PLAYER;
             }
 
-            void HandleScript(SpellEffIndex /*effIndex*/)
+            void HandleScript()
             {
                 int32 basePoints0 = int32(GetHitUnit()->CountPctFromMaxHealth(20));
 
@@ -752,7 +752,7 @@ class spell_warr_rallying_cry : public SpellScriptLoader
 
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_warr_rallying_cry_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
+                AfterCast += SpellCastFn(spell_warr_rallying_cry_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
         };
 
