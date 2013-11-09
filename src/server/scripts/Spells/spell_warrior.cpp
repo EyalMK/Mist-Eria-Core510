@@ -50,7 +50,7 @@ enum WarriorSpells
     SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_2     = 64850,
     SPELL_WARRIOR_VIGILANCE_PROC                    = 50725,
     SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665,
-	SPELL_WARRIOR_RALLYING_CRY                      = 97463,
+	SPELL_WARRIOR_RALLYING_CRY                      = 97462,
     SPELL_PALADIN_BLESSING_OF_SANCTUARY             = 20911,
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
     SPELL_PRIEST_RENEWED_HOPE                       = 63944,
@@ -724,48 +724,42 @@ class spell_warr_vigilance_trigger : public SpellScriptLoader
 // 97462 - Rallying Cry
 class spell_warr_rallying_cry : public SpellScriptLoader
 {
-public:
-    spell_warr_rallying_cry() : SpellScriptLoader("spell_warr_rallying_cry") { }
+    public:
+        spell_warr_rallying_cry() : SpellScriptLoader("spell_warr_rallying_cry") { }
 
-    class spell_warr_rallying_cry_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_warr_rallying_cry_AuraScript);
-
-        void EffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        class spell_warr_rallying_cry_SpellScript : public SpellScript
         {
-            int32 amount = 20 * GetTarget()->GetMaxHealth() / 100;
-            GetTarget()->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float(20), true);
-            GetTarget()->ModifyHealth(amount);
+            PrepareSpellScript(spell_warr_rallying_cry_SpellScript);
 
-            PreventDefaultAction();
-        }
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_RALLYING_CRY))
+                    return false;
+                return true;
+            }
 
-        void EffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            bool Load()
+            {
+                return GetCaster()->GetTypeId() ==  TYPEID_PLAYER;
+            }
+
+            void HandleScript(SpellEffIndex /*effIndex*/)
+            {
+                int32 basePoints0 = int32(GetHitUnit()->CountPctFromMaxHealth(GetEffectValue()));
+
+                GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_WARRIOR_RALLYING_CRY, &basePoints0, NULL, NULL, true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_warr_rallying_cry_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
         {
-            int32 amount = 20 * GetTarget()->GetMaxHealth() / 100;
-            
-            
-            if (int32(GetTarget()->GetHealth()) > amount)
-                GetTarget()->ModifyHealth(-amount);
-            else
-                GetTarget()->SetHealth(1);
-
-            GetTarget()->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float(20), false);
-
-            PreventDefaultAction();
+            return new spell_warr_rallying_cry_SpellScript();
         }
-
-        void Register()
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_warr_rallying_cry_AuraScript::EffectApply, EFFECT_0, SPELL_AURA_MOD_INCREASE_HEALTH_2, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_warr_rallying_cry_AuraScript::EffectRemove, EFFECT_0, SPELL_AURA_MOD_INCREASE_HEALTH_2, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const
-    {
-        return new spell_warr_rallying_cry_AuraScript;
-    }
 };
 
 // Heroic leap 6544
