@@ -1953,6 +1953,9 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
     int i = 0;
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
+        if(citr->group != slot->group)
+            continue;
+
         if(citr->guid == slot->guid)
         {
             memberPos = i;
@@ -1967,12 +1970,10 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
     uint8 isLFG = 0;
     uint8 byte74 = m_groupType; //Checked
     uint8 byte1C = /*slot->roles*/ slot->roles;
-    uint8 byte40 = slot->flags;
+    uint8 byte40 = slot->group;
     int32 dword38 = memberPos;
-    uint32 dword3C = slot->group;
+    uint32 dword3C = slot->flags;
     m_counter++;
-
-    std::cout << dword38 << std::endl;
 
     data.WriteBit(groupGuid[2]);
     data.WriteBit(byte10);
@@ -2066,7 +2067,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
         std::cout << "Member : " << citr->name << std::endl;
 
         ObjectGuid memberGuid = citr->guid;
-        uint8 byte39 = citr->flags, byte3A = citr->group, byte38 = onlineState, byte3B = citr->roles;
+        uint8 byte39 = citr->group, byte3A = citr->flags, byte38 = onlineState, byte3B = citr->roles;
 
         data.WriteByteSeq(memberGuid[0]);
         data.WriteByteSeq(memberGuid[7]);
@@ -2090,7 +2091,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
     data.WriteByteSeq(leaderGuid[0]);
     data.WriteByteSeq(groupGuid[7]);
 
-    if(GetMembersCount()-1)
+    if(byte10)
     {
         data << uint32(m_raidDifficulty);
         data << uint32(m_dungeonDifficulty);
@@ -2125,8 +2126,8 @@ void Group::UpdatePlayerOutOfRange(Player* player)
     for (GroupReference* itr = GetFirstMember(); itr != NULL; itr = itr->next())
     {
         member = itr->getSource();
-        if (member && !member->IsWithinDist(player, member->GetSightRange(), false))
-            member->GetSession()->SendPacket(&data);
+        /*if (member && !member->IsWithinDist(player, member->GetSightRange(), false))
+            member->GetSession()->SendPacket(&data);*/
     }
 }
 
