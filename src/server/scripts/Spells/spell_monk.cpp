@@ -20,14 +20,14 @@ public:
     {
         PrepareAuraScript(spell_monk_renewing_mist_AuraScript);
 
-		void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
-		{
-			GetCaster()->CastSpell(GetCaster(), 123757); //aura for spell elevation
-		}
-		
+        void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+        {
+            GetCaster()->CastSpell(GetCaster(), 123757); //aura for spell elevation
+        }
+
         void Register()
         {
-			OnEffectPeriodic += AuraEffectPeriodicFn(spell_monk_renewing_mist_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_monk_renewing_mist_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
         }
     };
 
@@ -101,7 +101,7 @@ public:
             OnCast += SpellCastFn(spell_monk_disable_SpellScript::Cast);
         }
     };
-	
+
     SpellScript* GetSpellScript() const
     {
         return new spell_monk_disable_SpellScript();
@@ -144,59 +144,59 @@ class spell_monk_transcendence_transfert : public SpellScriptLoader
 {
 public:
     spell_monk_transcendence_transfert() : SpellScriptLoader("spell_monk_transcendence_transfert") { }
-	
+
     class spell_monk_transcendence_transfert_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_monk_transcendence_transfert_SpellScript);
 
-		SpellCastResult CheckCast()
-		{
-			 if(GetCaster() && GetCaster()->ToPlayer())
-			 {
-					if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()) != NULL && GetCaster()->ToPlayer()->GetExactDist2d(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionX(), GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionY()) <= 40.0f)
-						return SPELL_CAST_OK;
-					else if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()) == NULL)
-						return SPELL_FAILED_NO_PET;
-					else if(GetCaster()->ToPlayer()->GetExactDist2d(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionX(), GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionY()) <= 40.0f)
-						return SPELL_FAILED_OUT_OF_RANGE;
+        SpellCastResult CheckCast()
+        {
+            if(GetCaster() && GetCaster()->ToPlayer())
+            {
+                if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()) != NULL && GetCaster()->ToPlayer()->GetExactDist2d(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionX(), GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionY()) <= 40.0f)
+                    return SPELL_CAST_OK;
+                else if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()) == NULL)
+                    return SPELL_FAILED_NO_PET;
+                else if(GetCaster()->ToPlayer()->GetExactDist2d(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionX(), GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionY()) <= 40.0f)
+                    return SPELL_FAILED_OUT_OF_RANGE;
 
-			 }
-		}
-	
+            }
+        }
+
         void Cast()
-		{
-			if(GetCaster() && GetCaster()->ToPlayer())
-			{
-				if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()) != NULL && GetCaster()->ToPlayer()->GetExactDist2d(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionX(), GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionY()) <= 40.0f)
-				 {
-						float petX, petY, petZ, casterX, casterY, casterZ;
-						uint32 petMapId;
-						uint32 displayIdCaster;
-						(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->GetPosition(petX, petY, petZ);
-						petMapId = (GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->GetMapId();
-						GetCaster()->GetPosition(casterX, casterY, casterZ);
-						
-						(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->FarTeleportTo(GetCaster()->GetMap(), casterX, casterY, casterZ, 0.0f);
-				
-						if(GetCaster()->ToPlayer())
-						    GetCaster()->ToPlayer()->TeleportTo(petMapId, petX, petY, petZ, 0.0f);
+        {
+            if(GetCaster() && GetCaster()->ToPlayer())
+            {
+                if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()) != NULL && GetCaster()->ToPlayer()->GetExactDist2d(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionX(), GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->GetPositionY()) <= 40.0f)
+                {
+                    float petX, petY, petZ, casterX, casterY, casterZ;
+                    uint32 petMapId;
+                    uint32 displayIdCaster;
+                    (GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->GetPosition(petX, petY, petZ);
+                    petMapId = (GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->GetMapId();
+                    GetCaster()->GetPosition(casterX, casterY, casterZ);
 
-						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->DespawnOrUnsummon();
-						GetCaster()->ToPlayer()->SetTranscendenceSpirit(GetCaster()->SummonCreature(54569, casterX, casterY, casterZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 900*IN_MILLISECONDS));
-						displayIdCaster = GetCaster()->GetDisplayId();
-						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->SetDisplayId(displayIdCaster);
-						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 124416);
-						GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 119053);
-						
-				 }
-			}
-			
-		}
+                    (GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))->FarTeleportTo(GetCaster()->GetMap(), casterX, casterY, casterZ, 0.0f);
+
+                    if(GetCaster()->ToPlayer())
+                        GetCaster()->ToPlayer()->TeleportTo(petMapId, petX, petY, petZ, 0.0f);
+
+                    GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->DespawnOrUnsummon();
+                    GetCaster()->ToPlayer()->SetTranscendenceSpirit(GetCaster()->SummonCreature(54569, casterX, casterY, casterZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 900*IN_MILLISECONDS));
+                    displayIdCaster = GetCaster()->GetDisplayId();
+                    GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->SetDisplayId(displayIdCaster);
+                    GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 124416);
+                    GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 119053);
+
+                }
+            }
+
+        }
 
         void Register()
         {
             OnCast += SpellCastFn(spell_monk_transcendence_transfert_SpellScript::Cast);
-			OnCheckCast += SpellCheckCastFn(spell_monk_transcendence_transfert_SpellScript::CheckCast);
+            OnCheckCast += SpellCheckCastFn(spell_monk_transcendence_transfert_SpellScript::CheckCast);
         }
     };
 
@@ -212,30 +212,30 @@ class spell_monk_transcendence : public SpellScriptLoader
 public:
     spell_monk_transcendence() : SpellScriptLoader("spell_monk_transcendence") { }
 
-	
+
     class spell_monk_transcendence_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_monk_transcendence_SpellScript);
-		
+
         void Cast()
         {
-			if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))
-			{
-				GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->DespawnOrUnsummon();
-				GetCaster()->ToPlayer()->SetTranscendenceSpirit(NULL);
-			}
-			
+            if(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()))
+            {
+                GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->DespawnOrUnsummon();
+                GetCaster()->ToPlayer()->SetTranscendenceSpirit(NULL);
+            }
+
             float x, y, z;
-			uint32 displayIdCaster;
-			GetCaster()->GetPosition(x,y,z);
-			GetCaster()->ToPlayer()->SetTranscendenceSpirit(GetCaster()->SummonCreature(54569, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 900*IN_MILLISECONDS));
-			displayIdCaster = GetCaster()->GetDisplayId();
-			GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->SetDisplayId(displayIdCaster);
-			GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 124416);
-			GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 119053);
+            uint32 displayIdCaster;
+            GetCaster()->GetPosition(x,y,z);
+            GetCaster()->ToPlayer()->SetTranscendenceSpirit(GetCaster()->SummonCreature(54569, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 900*IN_MILLISECONDS));
+            displayIdCaster = GetCaster()->GetDisplayId();
+            GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->SetDisplayId(displayIdCaster);
+            GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 124416);
+            GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster())->CastSpell(GetCaster()->ToPlayer()->GetTranscendenceSpirit(GetCaster()), 119053);
         }
-		
-		
+
+
         void Register()
         {
             OnCast += SpellCastFn(spell_monk_transcendence_SpellScript::Cast);
@@ -253,53 +253,53 @@ public:
 class npc_transcendence_spirit : public CreatureScript 
 {
 public:
-	npc_transcendence_spirit() : CreatureScript("npc_transcendence_spirit") { }
+    npc_transcendence_spirit() : CreatureScript("npc_transcendence_spirit") { }
 
-	CreatureAI* GetAI(Creature* creature) const
-	{
-		return new npc_transcendence_spiritAI(creature);
-	}
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_transcendence_spiritAI(creature);
+    }
 
-	struct npc_transcendence_spiritAI : public ScriptedAI
-	{
-		npc_transcendence_spiritAI(Creature *creature) : ScriptedAI(creature)
-		{
-		}
+    struct npc_transcendence_spiritAI : public ScriptedAI
+    {
+        npc_transcendence_spiritAI(Creature *creature) : ScriptedAI(creature)
+        {
+        }
 
-		EventMap events;
-		uint32 secondTimer;
+        EventMap events;
+        uint32 secondTimer;
 
-		void Reset()
-		{
-			secondTimer = 900000;
-		}
-		
-		void JustDied(Unit *pWho)
-		{
-			me->GetOwner()->ToPlayer()->SetTranscendenceSpirit(NULL);
-		}
+        void Reset()
+        {
+            secondTimer = 900000;
+        }
 
-		void CorpseRemoved(uint32& /*respawnDelay*/)
-		{
-			me->GetOwner()->ToPlayer()->SetTranscendenceSpirit(NULL);
-		}
+        void JustDied(Unit *pWho)
+        {
+            me->GetOwner()->ToPlayer()->SetTranscendenceSpirit(NULL);
+        }
 
-		void EnterCombat(Unit* /*who*/)
-		{
+        void CorpseRemoved(uint32& /*respawnDelay*/)
+        {
+            me->GetOwner()->ToPlayer()->SetTranscendenceSpirit(NULL);
+        }
 
-		}
+        void EnterCombat(Unit* /*who*/)
+        {
 
-		void UpdateAI(uint32 diff)
-		{	
-			events.Update(diff);
-			
-			if(secondTimer <= diff)
-			{
-				me->GetOwner()->ToPlayer()->SetTranscendenceSpirit(NULL);
-				me->DespawnOrUnsummon();
-			} else secondTimer -= diff;
-		}
-	};
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            events.Update(diff);
+
+            if(secondTimer <= diff)
+            {
+                me->GetOwner()->ToPlayer()->SetTranscendenceSpirit(NULL);
+                me->DespawnOrUnsummon();
+            } else secondTimer -= diff;
+        }
+    };
 };
 
 // 116670 -- Elevation
@@ -308,20 +308,20 @@ class spell_monk_elevation : public SpellScriptLoader
 public:
     spell_monk_elevation() : SpellScriptLoader("spell_monk_elevation") { }
 
-	
+
     class spell_monk_elevation_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_monk_elevation_SpellScript);
-		
+
         void HandleEffect(SpellEffIndex /*effIndex*/)
         {
-			if(Player* p = GetCaster()->ToPlayer())
-			{
-				SetHitDamage(p->GetSpellDamage(1, urand(108, 124), 90, urand(7210, 8379), 0.f, 68.f));
-				SetHitHeal(p->GetSpellDamage(1, urand(108, 124), 90, urand(7210, 8379), 0.f, 68.f));
-			}
+            if(Player* p = GetCaster()->ToPlayer())
+            {
+                SetHitDamage(p->GetSpellDamage(1, urand(108, 124), 90, urand(7210, 8379), 0.f, 68.f));
+                SetHitHeal(p->GetSpellDamage(1, urand(108, 124), 90, urand(7210, 8379), 0.f, 68.f));
+            }
         }
-		
+
         void Register()
         {
             OnEffectHitTarget += SpellEffectFn(spell_monk_elevation_SpellScript::HandleEffect, EFFECT_1, SPELL_EFFECT_HEAL);
@@ -335,14 +335,70 @@ public:
     }
 };
 
+enum spell_monk
+{
+    SPELL_MONK_TOUCH_DEATH = 115080,
+};
+
+class spell_monk_touch_death : public SpellScriptLoader
+{
+public:
+    spell_monk_touch_death() : SpellScriptLoader("spell_monk_touch_death") { }
+
+    class spell_monk_touch_deathSpellSCript : public SpellScript
+    {
+        PrepareSpellScript(spell_monk_touch_deathSpellSCript);
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            if(Unit* caster = GetCaster())
+            {
+                if(Player* casterPlayer = caster->ToPlayer())
+                {
+                    if(casterPlayer->HasAura(124490)) // if caster has spe to use this spell on player
+                        if(Unit* target = casterPlayer->getVictim())
+                        {
+                            if(Player* victim = target->ToPlayer())
+                            {
+                                if(victim->HealthBelowPct(10))
+                                    casterPlayer->DealDamage(victim, victim->GetMaxHealth() * 0.1 + 1);
+                            } else if(Creature* victim = target->ToCreature())
+                            {
+                                if(victim->GetHealth() <= casterPlayer->GetHealth())
+                                    casterPlayer->DealDamage(victim, victim->GetMaxHealth() + 1);
+                            }
+                        }
+                } else if(Unit* target = casterPlayer->getVictim())
+                {
+                    if(Creature* victim = target->ToCreature())
+                    {
+                        if(victim->GetHealth() <= casterPlayer->GetHealth())
+                            casterPlayer->DealDamage(victim, victim->GetMaxHealth() + 1);
+                    }
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_monk_touch_deathSpellSCript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_monk_touch_deathSpellSCript();
+    }
+};
 
 void AddSC_monk_spell_scripts()
 {
     new spell_monk_disable();
     new spell_monk_paralysis();
     new spell_monk_transcendence_transfert();
-	new spell_monk_transcendence();
-	new npc_transcendence_spirit();
-	new spell_monk_renewing_mist();
-	new spell_monk_elevation();
+    new spell_monk_transcendence();
+    new npc_transcendence_spirit();
+    new spell_monk_renewing_mist();
+    new spell_monk_elevation();
+    new spell_monk_touch_death();
 }
