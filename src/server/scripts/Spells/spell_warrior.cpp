@@ -841,22 +841,18 @@ class spell_warr_colossus_smash : public SpellScriptLoader
 
             void HandleEffect(SpellEffIndex /*effIndex*/)
             {
-                Unit* caster = GetCaster();
-				Unit* victim = GetHitUnit();
-				int32 baseDamage = 3882;
-				int32 attackPowerDamage = 0;
-				int32 damage = baseDamage + attackPowerDamage;
+				if (Unit* caster = GetCaster())
+				{
+					SetHitDamage((GetEffectValue()/100) * caster->GetTotalAttackPowerValue(BASE_ATTACK));
 
-				if (Unit* target = GetHitUnit())
-					int32 damage = 1.75f * caster->GetTotalAttackPowerValue(BASE_ATTACK);
-					
-				SetHitDamage(damage);
-				caster->CastSpell(victim, SPELL_WARRIOR_PHYSICAL_VULNERABILITY, true);
+					int32 basePoints0 = GetEffectValue();
+					caster->CastCustomSpell(GetHitUnit(), SPELL_WARRIOR_PHYSICAL_VULNERABILITY, &basePoints0, NULL, NULL, true);
+				}
             }
 
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_warr_colossus_smash_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+                OnEffectHitTarget += SpellEffectFn(spell_warr_colossus_smash_SpellScript::HandleEffect, EFFECT_2, SPELL_EFFECT_SCHOOL_DAMAGE);
             }
         };
 
