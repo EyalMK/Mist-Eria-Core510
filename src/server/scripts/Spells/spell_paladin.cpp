@@ -84,15 +84,23 @@ class spell_pal_hammer_of_wrath : public SpellScriptLoader
 				Player* caster = GetCaster()->ToPlayer();
 
 				int32 baseDamage = urand(1747, 1930);
-				int32 damage = 0;
 
 				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_PALADIN_HOLY)
+				{
 					int32 damage = baseDamage + 1.61f * GetCaster()->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false);
+					SetHitDamage(damage);
+				}
 
 				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_PALADIN_PROTECTION || caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_PALADIN_RETRIBUTION)
+				{
 					int32 damage = baseDamage + 1.61f * GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK);
+					SetHitDamage(damage);
+				}
 
-				SetHitDamage(baseDamage + damage);
+				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_PALADIN_HOLY &&
+					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_PALADIN_PROTECTION &&
+					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_PALADIN_RETRIBUTION)
+					SetHitDamage(baseDamage);
             }
 			
             void Register()
