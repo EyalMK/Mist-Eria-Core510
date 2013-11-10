@@ -152,15 +152,9 @@ class spell_warr_charge : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-                int32 chargeBasePoints0 = GetEffectValue();
+                int32 chargeBasePoints0 = GetEffectValue()*10;
                 Unit* caster = GetCaster();
                 caster->CastCustomSpell(caster, SPELL_WARRIOR_CHARGE, &chargeBasePoints0, NULL, NULL, true);
-				caster->ModifyPower(POWER_RAGE, 20);
-
-				if (!caster->HasAura(SPELL_WARRIOR_CHARGE_TALENT_PASSIVE))
-					caster->CastSpell(GetHitUnit(), SPELL_WARRIOR_CHARGE, true);
-				if (caster->HasAura(SPELL_WARRIOR_CHARGE_TALENT_PASSIVE))
-					caster->CastSpell(GetHitUnit(), SPELL_WARRIOR_CHARGE_TALENT, true);
             }
 
             void Register()
