@@ -6,6 +6,36 @@
 #include "ScriptedCreature.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
+#include "SpellAuras.h"
+#include "Spell.h"
+
+//119611 - Renewing mist
+class spell_monk_renewing_mist : public SpellScriptLoader
+{
+public:
+    spell_monk_renewing_mist() : SpellScriptLoader("spell_monk_renewing_mist") { }
+
+
+    class spell_monk_renewing_mist_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_monk_renewing_mist_AuraScript);
+
+		void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+		{
+			GetCaster()->CastSpell(GetCaster(), 123757); //aura for spell elevation
+		}
+		
+        void Register()
+        {
+			OnEffectPeriodic += AuraEffectPeriodicFn(spell_monk_renewing_mist_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_monk_renewing_mist_AuraScript();
+    }
+};
 
 // 116095 - Disable
 class spell_monk_disable : public SpellScriptLoader
@@ -272,6 +302,39 @@ public:
 	};
 };
 
+// 116670 -- Elevation
+class spell_monk_elevation : public SpellScriptLoader
+{
+public:
+    spell_monk_elevation() : SpellScriptLoader("spell_monk_elevation") { }
+
+	
+    class spell_monk_elevation_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_monk_elevation_SpellScript);
+		
+        void HandleEffect(SpellEffIndex /*effIndex*/)
+        {
+			if(Player* p = GetCaster()->ToPlayer())
+			{
+				SetHitDamage(p->GetSpellDamage(1, urand(108, 124), 90, urand(7210, 8379), 0.f, 68.f));
+				SetHitHeal(p->GetSpellDamage(1, urand(108, 124), 90, urand(7210, 8379), 0.f, 68.f));
+			}
+        }
+		
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_monk_elevation_SpellScript::HandleEffect, EFFECT_1, SPELL_EFFECT_HEAL);
+        }
+
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_monk_elevation_SpellScript();
+    }
+};
+
 
 void AddSC_monk_spell_scripts()
 {
@@ -280,4 +343,6 @@ void AddSC_monk_spell_scripts()
     new spell_monk_transcendence_transfert();
 	new spell_monk_transcendence();
 	new npc_transcendence_spirit();
+	new spell_monk_renewing_mist();
+	new spell_monk_elevation();
 }

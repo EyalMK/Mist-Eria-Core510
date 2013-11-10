@@ -50,11 +50,12 @@ enum WarriorSpells
     SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_2     = 64850,
     SPELL_WARRIOR_VIGILANCE_PROC                    = 50725,
     SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665,
-	SPELL_WARRIOR_RALLYING_CRY                      = 97463,
+	SPELL_WARRIOR_RALLYING_CRY_TRIGGERED            = 97463,
     SPELL_PALADIN_BLESSING_OF_SANCTUARY             = 20911,
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
     SPELL_PRIEST_RENEWED_HOPE                       = 63944,
     SPELL_GEN_DAMAGE_REDUCTION_AURA                 = 68066,
+	SPELL_WARRIOR_PHYSICAL_VULNERABILITY			= 81326,
 };
 
 enum WarriorSpellIcons
@@ -733,7 +734,7 @@ class spell_warr_rallying_cry : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spellInfo*/)
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_RALLYING_CRY))
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_RALLYING_CRY_TRIGGERED))
                     return false;
                 return true;
             }
@@ -747,7 +748,7 @@ class spell_warr_rallying_cry : public SpellScriptLoader
             {
                 int32 basePoints0 = int32(GetHitUnit()->CountPctFromMaxHealth(GetEffectValue()));
 
-                GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_WARRIOR_RALLYING_CRY, &basePoints0, NULL, NULL, true);
+                GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_WARRIOR_RALLYING_CRY_TRIGGERED, &basePoints0, NULL, NULL, true);
             }
 
             void Register()
@@ -828,6 +829,43 @@ public:
     }
 };
 
+/// Updated 5.1.0 : 86346 - Colossus Smash
+class spell_warr_colossus_smash : public SpellScriptLoader
+{
+    public:
+        spell_warr_colossus_smash() : SpellScriptLoader("spell_warr_colossus_smash") { }
+
+        class spell_warr_colossus_smash_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_colossus_smash_SpellScript);
+
+            void HandleEffect(SpellEffIndex /*effIndex*/)
+            {
+                Unit* caster = GetCaster();
+				Unit* victim = GetHitUnit();
+				int32 baseDamage = 3882;
+				int32 attackPowerDamage = 0;
+				int32 damage = baseDamage + attackPowerDamage;
+
+				if (Unit* target = GetHitUnit())
+					int32 damage = 1.75f * caster->GetTotalAttackPowerValue(BASE_ATTACK);
+					
+				SetHitDamage(damage);
+				caster->CastSpell(victim, SPELL_WARRIOR_PHYSICAL_VULNERABILITY, true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_warr_colossus_smash_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_colossus_smash_SpellScript();
+        }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_bloodthirst();
@@ -849,4 +887,5 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_rallying_cry();
 	new spell_warr_heroic_leap();
 	new spell_warr_heroic_leap_dummy();
+	new spell_warr_colossus_smash();
 }

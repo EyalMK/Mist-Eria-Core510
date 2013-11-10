@@ -81,8 +81,26 @@ class spell_pal_hammer_of_wrath : public SpellScriptLoader
 			
             void HandleEffect(SpellEffIndex /*effIndex*/)
             {
-				int32 baseDamage = GetCaster()->ToPlayer()->GetSpellDamage(urand(133,147), 38, urand(1748,1930), 90, 0.0f, 161.0f, false, BASE_ATTACK, SPELL_SCHOOL_MASK_HOLY);
-				SetHitDamage(baseDamage);
+				Player* caster = GetCaster()->ToPlayer();
+
+				int32 baseDamage = urand(1747, 1930);
+
+				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_PALADIN_HOLY)
+				{
+					int32 damage = baseDamage + 1.61f * GetCaster()->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false);
+					SetHitDamage(damage);
+				}
+
+				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_PALADIN_PROTECTION || caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_PALADIN_RETRIBUTION)
+				{
+					int32 damage = baseDamage + 1.61f * GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK);
+					SetHitDamage(damage);
+				}
+
+				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_PALADIN_HOLY &&
+					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_PALADIN_PROTECTION &&
+					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_PALADIN_RETRIBUTION)
+					SetHitDamage(baseDamage);
             }
 			
             void Register()

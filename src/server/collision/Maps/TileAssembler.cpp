@@ -115,7 +115,7 @@ namespace VMAP
                 printf("Cannot open %s\n", mapfilename.str().c_str());
                 break;
             }
-
+			
             //general info
             if (success && fwrite(VMAP_MAGIC, 1, 8, mapfile) != 8) success = false;
             uint32 globalTileID = StaticMapTree::packTileID(65, 65);

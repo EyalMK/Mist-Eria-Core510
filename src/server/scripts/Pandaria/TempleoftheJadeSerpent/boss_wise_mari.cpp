@@ -1,38 +1,11 @@
 /* # Script de Tydrheal : Wise Mari # */
 
-/* Notes : Tester -- vérifier les spells -- SoundID
+/* Notes : Tester -- verifier les spells -- SoundID
 Ajouter l'ID du NPC_TRIGGER
 
-Wise Mari : Script 95% vérifier spells
+Wise Mari : Script 95% verifier spells
 Wise Mari Trigger : Script 100%	
-Corrupt Living Water : Script 95% vérifier spells	
-
-
-UPDATE creature_template SET ScriptName = 'boss_wise_mari' WHERE entry = 56448;
-UDAPTE creature_template SET ScriptName = 'npc_wise_intro_trigger' WHERE entry = ????;
-UDAPTE creature_template SET ScriptName = 'npc_corrupt_living_water' WHERE entry = 59873;
-
-INSERT INTO creature_text (entry, groupid, id, text, type, language, probability, emote, duration, sound, comment) VALUES
-(56448, 0, 0, "Les eaux murmurent à mes oreilles… des ennemis approchent.", 12, 0, 100, 0, 0, ???????, "WiseMari - INTRO_1"),
-(56448, 1, 0, "Vous osez déranger ces eaux ? Vous serez submergés !", 12, 0, 100, 0, 0, ???????, "WiseMari - COMBAT"),
-(56448, 2, 0, "Montez !", 12, 0, 100, 0, 0, ???????, "WiseMari - CorruptLivingWater"),
-(56448, 3, 0, "Eaux vivantes, donnez-leur la mort !", 12, 0, 100, 0, 0, ???????, "WiseMari - Spawn2"),
-(56448, 4, 0, "Que la mort vous submerge !", 12, 0, 100, 0, 0, ???????, "WiseMari - Spawn3"),
-(56448, 5, 0, "Contemplez la puissance des torrents !", 12, 0, 100, 0, 0, ???????, "WiseMari - Spawn4"),
-(56448, 6, 0, "Ne fuyez pas, ça ne fait que retarder l'inévitable !", 12, 0, 100, 0, 0, ???????, "WiseMari - AfterPhase2"),
-(56448, 7, 0, "Plongez, elle est bonne !", 12, 0, 100, 0, 0, ???????, "WiseMari - MiddleLife"),
-(56448, 8, 0, "J'observe les eaux et mon reflet est vide…", 12, 0, 100, 0, 0, ???????, "WiseMari - Death1"),
-(56448, 9, 0, "Les eaux… m'emportent…", 12, 0, 100, 0, 0, ???????, "WiseMari - Death2"),
-(56448, 10, 0, "Que la mort vous submerge !", 12, 0, 100, 0, 0, ???????, "WiseMari - Slay1"),
-(56448, 11, 0, "Votre cause est perdue.", 14, 0, 100, 0, 0, ???????, "WiseMari - Slay2"),
-(56448, 12, 0, "Comme les eaux l'avaient prédit.", 14, 0, 100, 0, 0, ???????, "WiseMari - Evade");
-
-
-
-
-
-
-
+Corrupt Living Water : Script 95% verifier spells	
 */
 
 #include "ScriptPCH.h"
@@ -94,7 +67,7 @@ enum spawnIds
 {
 	CORRUPT_LIVING_WATER = 59873,
 	CORRUPT_DROPLET = 62360,
-	NPC_TRIGGER = 0000
+	NPC_TRIGGER = 56449
 };
 
 enum Phases
@@ -110,7 +83,7 @@ class boss_wise_mari : public CreatureScript
 public:
 	boss_wise_mari() : CreatureScript("boss_wise_mari") { }
 
-	CreatureAI* GetAI(Creature* creature) const
+	CreatureAI* GetAI(Creature* creature) const 
 	{
 		return new boss_wise_mariAI(creature);
 	}
@@ -133,7 +106,7 @@ public:
 		bool checkHealthBelow21;
 		int counterLivingWater;
 		
-		void Reset()
+		void Reset() 
 		{
 			checkHealthBelow21 = false;
 			checkMiddleLife = false;
@@ -157,7 +130,7 @@ public:
 			
 		}
 
-		void DoAction(int32 action)
+		void DoAction(int32 action) 
         {
             switch (action)
             {
@@ -174,7 +147,7 @@ public:
 			}
         }
 
-		void JustDied(Unit *pWho)
+		void JustDied(Unit *pWho) 
 		{
 			if (instance)
 			{
@@ -187,12 +160,12 @@ public:
 		
 		}
 
-		void KilledUnit(Unit *pWho)
+		void KilledUnit(Unit *pWho) 
 		{	
 			Talk(urand(SAY_SLAY_1, SAY_SLAY_2));
 		}
 		
-		void EnterEvadeMode()
+		void EnterEvadeMode() 
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_WISE_MARI, FAIL);	
@@ -200,7 +173,7 @@ public:
 			Talk(SAY_EVADE);
 		}
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) 
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_WISE_MARI, IN_PROGRESS);
@@ -213,7 +186,7 @@ public:
 			events.ScheduleEvent(EVENT_CALL_WATER, 15*IN_MILLISECONDS, 0, PHASE_1);
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(uint32 diff) 
 		{
 			if(!UpdateVictim())
 				return;
@@ -270,7 +243,9 @@ public:
 							if(counterLivingWater < 2)
 								Talk(SAY_SPAWN);
 							counterLivingWater++;
-							me->SummonCreature(CORRUPT_LIVING_WATER, (me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60*IN_MILLISECONDS);
+							float x,y,z;
+							me->GetPosition(x,y,z);
+							me->SummonCreature(CORRUPT_LIVING_WATER, (x, y, z), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60*IN_MILLISECONDS);
 							events.ScheduleEvent(EVENT_CORRUPTED_WATERS, 25*IN_MILLISECONDS, 0, PHASE_1);
 							break;
 
@@ -336,7 +311,7 @@ class npc_wise_intro_trigger : public CreatureScript
 public:
 	npc_wise_intro_trigger() : CreatureScript("npc_wise_intro_trigger") { }
 
-	CreatureAI* GetAI(Creature* creature) const
+	CreatureAI* GetAI(Creature* creature) const 
 	{
 		return new npc_wise_intro_triggerAI(creature);
 	}
@@ -353,27 +328,27 @@ public:
 		
 		bool checkTrigger; 
 
-		void Reset()
+		void Reset() 
 		{
 			checkTrigger = true;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE); 
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); 
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED); 
-			//ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilité du PNJ par les joueurs.
+			//ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilite du PNJ par les joueurs.
 		}
 
-		void JustDied(Unit *pWho)
+		void JustDied(Unit *pWho) 
 		{
 
 		}
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) 
 		{
 
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(uint32 diff) 
 		{	
 			if(checkTrigger)
 			{
@@ -404,7 +379,7 @@ class npc_corrupt_living_water : public CreatureScript
 public:
 	npc_corrupt_living_water() : CreatureScript("npc_corrupt_living_water") { }
 
-	CreatureAI* GetAI(Creature* creature) const
+	CreatureAI* GetAI(Creature* creature) const 
 	{
 		return new npc_corrupt_living_waterAI(creature);
 	}
@@ -419,25 +394,26 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 
-		void Reset()
+		void Reset() 
 		{
 		
 		}
 
-		void JustDied(Unit *pWho)
+		void JustDied(Unit *pWho) 
 		{
 			DoCast(me, SPELL_SHA_RESIDUE);
-			me->SummonCreature(CORRUPT_DROPLET, (me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60*IN_MILLISECONDS);
-			me->SummonCreature(CORRUPT_DROPLET, (me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60*IN_MILLISECONDS);
-			me->SummonCreature(CORRUPT_DROPLET, (me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60*IN_MILLISECONDS);
+			float x,y,z;
+			me->SummonCreature(CORRUPT_DROPLET, (x, y, z), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60*IN_MILLISECONDS);
+			me->SummonCreature(CORRUPT_DROPLET, (x, y, z), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60*IN_MILLISECONDS);
+			me->SummonCreature(CORRUPT_DROPLET, (x, y, z), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60*IN_MILLISECONDS);
 		}
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) 
 		{
 
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(uint32 diff) 
 		{	
 			
 		}
@@ -451,3 +427,4 @@ void AddSC_boss_wise_mari()
 	new npc_wise_intro_trigger();
 	new npc_corrupt_living_water();
 }
+

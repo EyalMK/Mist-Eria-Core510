@@ -14,36 +14,6 @@ Lorewalker Stonestep trigger 3 : Script 99% A test -- ajouter le flag invisibili
 Lorewalker Stonestep trigger 4 : Script 99% A test -- ajouter le flag invisibilité dans la DB
 Corrupted Scroll : Script 100% A test
 
-
-UPDATE creature_template SET ScriptName = 'boss_lorewalker_stonestep' WHERE entry = 56843;
-UDAPTE creature_template SET ScriptName = 'npc_zao_sunseeker' WHERE entry = 58826;
-UDAPTE creature_template SET ScriptName = 'npc_sun' WHERE entry = 56915;
-UDAPTE creature_template SET ScriptName = 'npc_hauting_sha' WHERE entry = 59555;
-UDAPTE creature_template SET ScriptName = 'npc_haunting_sha_transition' WHERE entry = ?????;
-UDAPTE creature_template SET ScriptName = 'npc_lorewalker_intro_trigger' WHERE entry = 57080;
-UDAPTE creature_template SET ScriptName = 'npc_lorewalker_intro_trigger_2' WHERE entry = ?????;
-UDAPTE creature_template SET ScriptName = 'npc_lorewalker_intro_trigger_3' WHERE entry = ?????;
-UDAPTE creature_template SET ScriptName = 'npc_lorewalker_intro_trigger_4' WHERE entry = ?????;
-UDAPTE creature_template SET ScriptName = 'npc_lorewalker_intro_trigger_5' WHERE entry = ?????;
-
-INSERT INTO creature_text (entry, groupid, id, text, type, language, probability, emote, duration, sound, comment) VALUES
-(56843, 0, 0, "Vous, là ! Sur la galerie ! Ma bibliothèque sacrée est possédée par les sha !", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - Intro"),
-(56843, 1, 0, "Regardez-les se répandre par chacune des lettres de ces parchemins sacrés… ils les corrompent ! Ils les souillent !", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - Intro2"),
-(56843, 2, 0, "Je vous en conjure, étrangers. Purifiez cet endroit de leur présence impure ! Nos écrits doivent trouver le repos !", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - Intro3"),
-(56843, 3, 0, "Vous devez détruire la source de la corruption ! Vite, avant que l'histoire qui nous est chère ne soit effacée à tout jamais !", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - Intro4"),
-(56843, 4, 0, "Ça, alors. Si je ne me trompe pas, le conte de Zao Cherche Soleil prend vie sous nos yeux.", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - Intro5"),
-(56843, 5, 0, "Selon la légende, il y a bien longtemps, cinq soleils brillaient dans le ciel. Lorsque le vent soufflait, la chaleur intense qu’ils généraient provoquait de grands feux de forêt.", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - Intro6"),
-(56843, 6, 0, "Les récoltes se flétrissaient, les villages brûlaient, et les familles erraient sans cesse à la recherche d’un abri contre les flammes…", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - Intro7"),
-(56843, 7, 0, "Le feu... La bibliothèque va brûler ! Je vous en prie, héros ! Purgez ce mal avant que le temple ne soit réduit en cendres !", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - AfterBeginCombat"),
-(56843, 8, 0, "Zao aussi est corrompu ! S’il vous plaît, combattez-le dignement…", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - Phase2"),
-(56843, 9, 0, "Je vous remercie, héros. Vous avez apporté la paix à ce temple sacré.", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - DeathZao");
-(56843, 10, 0, "Maintenant, partez ! J’ai besoin de méditer avant d’entamer le rituel de restauration.", 14, 0, 100, 0, 0, ??????, "LorewalkerStonestep - AfetrDeathZao");
-
-
-INSERT INTO creature_text (entry, groupid, id, text, type, language, probability, emote, duration, sound, comment) VALUES
-(58826, 0, 0, "Je ne le permettrai plus !", 14, 0, 100, 0, 0, ??????, "ZaoSunseeker - IntroDebutSun");
-(58826, 1, 0, "Cette chaleur torride a dû émousser mes sens… Vous n’êtes tous que des mirages !", 14, 0, 100, 0, 0, ??????, "ZaoSunseeker - Phase2");
-
 */
 
 #include "ScriptPCH.h"
@@ -293,23 +263,23 @@ public:
 			}
         }
 
-		void JustDied(Unit *pWho)
+		void JustDied(Unit *pWho) 
 		{
 			
 		}
 
-		void KilledUnit(Unit *pWho)
+		void KilledUnit(Unit *pWho) 
 		{
 
 		}
 		
-		void EnterEvadeMode()
+		void EnterEvadeMode() 
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, FAIL);	
 		}
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) 
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, IN_PROGRESS);
@@ -317,7 +287,7 @@ public:
 			me->SetInCombatWithZone();
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(uint32 diff) 
 		{
 			if(!UpdateVictim())
 				return;
@@ -385,7 +355,7 @@ class npc_zao_sunseeker : public CreatureScript
 public:
 	npc_zao_sunseeker() : CreatureScript("npc_zao_sunseeker") { }
 
-	CreatureAI* GetAI(Creature* creature) const
+	CreatureAI* GetAI(Creature* creature) const 
 	{
 		return new npc_zao_sunseekerAI(creature);
 	}
@@ -406,7 +376,7 @@ public:
 		int checkEvadeMode;
 		bool checkTransition;
 
-		void Reset()
+		void Reset() 
 		{
 			checkTransition = true;
 			counterHauntingShaDeath = 0;
@@ -437,7 +407,7 @@ public:
 
 		}
 
-		void DoAction(int32 action)
+		void DoAction(int32 action) 
 		{
 			switch (action)
             {
@@ -462,7 +432,7 @@ public:
 			}
 		}
 
-		void JustDied(Unit *pWho)
+		void JustDied(Unit *pWho) 
 		{
 			DoCastToAllHostilePlayers(SPELL_LOREWALKERS_ALACRITY);
 			if (instance)
@@ -480,17 +450,17 @@ public:
 			}
 		}
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) 
 		{
 			me->SetInCombatWithZone();
 		}
 
-		void EnterEvadeMode()
+		void EnterEvadeMode() 
 		{
 			checkEvadeMode = 1;
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(uint32 diff) 
 		{	
 			if(!UpdateVictim())
 				return;
@@ -592,7 +562,7 @@ class npc_sun : public CreatureScript
 public:
 	npc_sun() : CreatureScript("npc_sun") { }
 
-	CreatureAI* GetAI(Creature* creature) const
+	CreatureAI* GetAI(Creature* creature) const 
 	{
 		return new npc_sunAI(creature);
 	}
@@ -610,7 +580,7 @@ public:
 		bool checkSunAlive;
 		int checkEvadeMode;
 
-		void Reset()
+		void Reset() 
 		{
 			checkSunAlive = true;
 			checkSunAlive = me->isAlive();
@@ -638,7 +608,7 @@ public:
 			}
 		}
 
-		void DoAction(int32 action)
+		void DoAction(int32 action) 
 		{
 			switch (action)
             {
@@ -659,23 +629,25 @@ public:
 
 		void JustDied(Unit *pWho)
 		{
-			me->SummonCreature(HAUNTING_SHA, (me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 80*IN_MILLISECONDS);
+			float x,y,z;
+			me->GetPosition(x,y,z);
+			me->SummonCreature(HAUNTING_SHA, (x, y, z), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 80*IN_MILLISECONDS);
 			me->AI()->DoAction(ACTION_NPC_SUN_DIED);
 		}
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) 
 		{
 			me->SetInCombatWithZone();
 			events.SetPhase(PHASE_COMBAT);
 			events.ScheduleEvent(EVENT_SUNFIRE_RAYS, 0, 0, PHASE_COMBAT);
 		}
 
-		void EnterEvadeMode()
+		void EnterEvadeMode() 
 		{
 			checkEvadeMode = 1;
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(uint32 diff) 
 		{	
 			if(!UpdateVictim())
 				return;
@@ -715,7 +687,7 @@ class npc_haunting_sha : public CreatureScript
 public:
 	npc_haunting_sha() : CreatureScript("npc_haunting_sha") { }
 
-	CreatureAI* GetAI(Creature* creature) const
+	CreatureAI* GetAI(Creature* creature) const 
 	{
 		return new npc_haunting_shaAI(creature);
 	}
@@ -732,7 +704,7 @@ public:
 
 		int checkEvadeMode;
 
-		void Reset()
+		void Reset() 
 		{
 			events.Reset();
 			if(checkEvadeMode == 1)
@@ -747,7 +719,7 @@ public:
 				}
 		}
 
-		void JustSummoned(Creature* creature)
+		void JustSummoned(Creature* creature) 
 		{
 			events.Reset();
 			if(checkEvadeMode == 1)
@@ -775,18 +747,18 @@ public:
 
 		}
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) 
 		{
 			me->SetInCombatWithZone();
 			events.ScheduleEvent(EVENT_HAUNTING_GAZE, 6*IN_MILLISECONDS);
 		}
 
-		void EnterEvadeMode()
+		void EnterEvadeMode() 
 		{
 			checkEvadeMode = 1;
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(uint32 diff) 
 		{	
 			if(!UpdateVictim())
 				return;
@@ -827,7 +799,7 @@ class npc_haunting_sha_transition : public CreatureScript
 public:
 	npc_haunting_sha_transition() : CreatureScript("npc_haunting_sha_transition") { }
 
-	CreatureAI* GetAI(Creature* creature) const
+	CreatureAI* GetAI(Creature* creature) const 
 	{
 		return new npc_haunting_sha_transitionAI(creature);
 	}
@@ -842,7 +814,7 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 
-		void Reset()
+		void Reset() 
 		{
 			events.Reset();
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -852,11 +824,13 @@ public:
 			if(Creature* zao = me->GetCreature(*me, instance->GetData64(DATA_NPC_ZAO_SUNSEEKER)))
 				if (zao->AI())
 				{
-					me->GetMotionMaster()->MovePoint(0, zao->GetPositionX(), zao->GetPositionY(), zao->GetPositionZ());
+					float x,y,z;
+					zao->GetPosition(x,y,z);
+					me->GetMotionMaster()->MovePoint(0, x, y, z);
 				}
 		}
 
-		void JustSummoned(Creature* creature)
+		void JustSummoned(Creature* creature) 
 		{
 			events.Reset();
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -866,24 +840,26 @@ public:
 			if(Creature* zao = me->GetCreature(*me, instance->GetData64(DATA_NPC_ZAO_SUNSEEKER)))
 				if (zao->AI())
 				{
-					me->GetMotionMaster()->MovePoint(0, zao->GetPositionX(), zao->GetPositionY(), zao->GetPositionZ());
+					float x,y,z;
+					zao->GetPosition(x,y,z);
+					me->GetMotionMaster()->MovePoint(0, x, y, z);
 				}
 		}
 
-		void JustDied(Unit *pWho)
+		void JustDied(Unit *pWho) 
 		{
 
 		}
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) 
 		{
 		}
 
-		void EnterEvadeMode()
+		void EnterEvadeMode() 
 		{
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(uint32 diff) 
 		{	
 			if(!UpdateVictim())
 				return;
@@ -912,7 +888,7 @@ class npc_lorewalker_intro_trigger : public CreatureScript
 public:
 	npc_lorewalker_intro_trigger() : CreatureScript("npc_lorewalker_intro_trigger") { }
 
-	CreatureAI* GetAI(Creature* creature) const
+	CreatureAI* GetAI(Creature* creature) const 
 	{
 		return new npc_lorewalker_intro_triggerAI(creature);
 	}
@@ -929,7 +905,7 @@ public:
 		
 		bool checkTrigger; 
 
-		void Reset()
+		void Reset() 
 		{
 			checkTrigger = true;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
@@ -939,17 +915,17 @@ public:
 			//ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilité du PNJ par les joueurs.
 		}
 
-		void JustDied(Unit *pWho)
+		void JustDied(Unit *pWho) 
 		{
 
 		}
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) 
 		{
 
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(uint32 diff) 
 		{	
 			if(checkTrigger)
 			{
@@ -980,7 +956,7 @@ class npc_lorewalker_intro_trigger_2 : public CreatureScript
 public:
 	npc_lorewalker_intro_trigger_2() : CreatureScript("npc_lorewalker_intro_trigger_2") { }
 
-	CreatureAI* GetAI(Creature* creature) const
+	CreatureAI* GetAI(Creature* creature) const 
 	{
 		return new npc_lorewalker_intro_trigger_2AI(creature);
 	}
@@ -997,7 +973,7 @@ public:
 		
 		bool checkTrigger; 
 
-		void Reset()
+		void Reset() 
 		{
 			checkTrigger = true;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
@@ -1007,17 +983,17 @@ public:
 			//ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilité du PNJ par les joueurs.
 		}
 
-		void JustDied(Unit *pWho)
+		void JustDied(Unit *pWho) 
 		{
 
 		}
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) 
 		{
 
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(uint32 diff) 
 		{	
 			if(checkTrigger)
 			{
@@ -1048,7 +1024,7 @@ class npc_lorewalker_intro_trigger_3 : public CreatureScript
 public:
 	npc_lorewalker_intro_trigger_3() : CreatureScript("npc_lorewalker_intro_trigger_3") { }
 
-	CreatureAI* GetAI(Creature* creature) const
+	CreatureAI* GetAI(Creature* creature) const 
 	{
 		return new npc_lorewalker_intro_trigger_3AI(creature);
 	}
@@ -1065,7 +1041,7 @@ public:
 		
 		bool checkTrigger; 
 
-		void Reset()
+		void Reset() 
 		{
 			checkTrigger = true;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
@@ -1075,17 +1051,17 @@ public:
 			//ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilité du PNJ par les joueurs.
 		}
 
-		void JustDied(Unit *pWho)
+		void JustDied(Unit *pWho) 
 		{
 
 		}
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) 
 		{
 
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(uint32 diff) 
 		{	
 			if(checkTrigger)
 			{
@@ -1116,7 +1092,7 @@ class npc_lorewalker_intro_trigger_4 : public CreatureScript
 public:
 	npc_lorewalker_intro_trigger_4() : CreatureScript("npc_lorewalker_intro_trigger_4") { }
 
-	CreatureAI* GetAI(Creature* creature) const
+	CreatureAI* GetAI(Creature* creature) const 
 	{
 		return new npc_lorewalker_intro_trigger_4AI(creature);
 	}
@@ -1133,7 +1109,7 @@ public:
 		
 		bool checkTrigger; 
 
-		void Reset()
+		void Reset() 
 		{
 			checkTrigger = true;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
@@ -1184,7 +1160,7 @@ class npc_corrupted_scroll : public CreatureScript
 public:
 	npc_corrupted_scroll() : CreatureScript("npc_corrupted_scroll") { }
 
-	CreatureAI* GetAI(Creature* creature) const
+	CreatureAI* GetAI(Creature* creature) const 
 	{
 		return new npc_corrupted_scrollAI(creature);
 	}
@@ -1200,12 +1176,12 @@ public:
 		EventMap events;
 		
 
-		void Reset()
+		void Reset() 
 		{
 
 		}
 
-		void JustDied(Unit *pWho)
+		void JustDied(Unit *pWho) 
 		{
 			if (instance)
 				if (Creature* lorewalker = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LOREWALKER_STONESTEP)))
@@ -1215,12 +1191,12 @@ public:
 					}
 		}
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) 
 		{
 
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(uint32 diff) 
 		{	
 			
 		}

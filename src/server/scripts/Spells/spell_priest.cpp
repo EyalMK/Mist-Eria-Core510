@@ -534,6 +534,9 @@ class spell_pri_power_word_shield : public SpellScriptLoader
 
                     // Focused Power
                     amount *= caster->GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
+
+
+					GetTarget()->CastSpell(GetTarget(), 6788, true);
                 }
             }
 

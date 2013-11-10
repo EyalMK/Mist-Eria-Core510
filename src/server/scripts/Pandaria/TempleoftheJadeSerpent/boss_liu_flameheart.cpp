@@ -4,23 +4,6 @@
 Liu Flameheart : Script 95% (terminé -- voir spells)	
 Minon of doubt : Script 100%
 Yulon : Script 95% (voir spells)
-
-UPDATE creature_template SET ScriptName = 'boss_liu_flameheart' WHERE entry = 56732;
-UDAPTE creature_template SET ScriptName = 'npc_minion_of_doubt' WHERE entry = 57109;
-UDAPTE creature_template SET ScriptName = 'npc_yulon' WHERE entry = 56762;
-
-INSERT INTO creature_text (entry, groupid, id, text, type, language, probability, emote, duration, sound, comment) VALUES
-(56732, 0, 0, "Vos forces sont insignifiantes.", 14, 0, 100, 0, 0, ???????, "LiuFlameheart- Beginning"),
-(56732, 1, 0, "Le cœur du grand Serpent ne tombera pas entre vos mains !", 14, 0, 100, 0, 0, ???????, "LiuFlameheart- EnterCombat"),
-(56732, 2, 0, "Quittez ce lieu.", 14, 0, 100, 0, 0, ???????, "LiuFlameheart- QuitterCeLieu"),
-(56732, 3, 0, "Serpent de jade, donne-moi la force !", 14, 0, 100, 0, 0, ???????, "LiuFlameheart- Phase2"),
-(56732, 4, 0, "Le cœur est à MOI !", 14, 0, 100, 0, 0, ???????, "LiuFlameheart- AfterPhase2"),
-(56732, 5, 0, "Le cycle doit se perpétuer, le Serpent de jade doit renaître !", 14, 0, 100, 0, 0, ???????, "LiuFlameheart- Phase3"),
-(56732, 5, 0, "Le voile sur mes yeux s’est levé… Pardonnez-moi d’avoir douté de vous…", 14, 0, 100, 0, 0, ???????, "LiuFlameheart- Death"),
-(56732, 6, 0, "La voie du chevaucheur de serpents est inondée de sang et de larmes. Votre périple ne fait que commencer !", 14, 0, 100, 0, 0, ???????, "LiuFlameheart- Slay1"),
-(56732, 7, 0, "Les chevaucheurs de serpents ne doivent pas craindre la douleur.", 14, 0, 100, 0, 0, ???????, "LiuFlameheart- Slay2");
-
-
 */
 
 #include "ScriptPCH.h"
@@ -119,7 +102,7 @@ public:
 		std::list<Creature*> listMinion;
 		Position position;
 		
-		void Reset()
+		void Reset() 
 		{
 			me->GetPosition(&position);
 			counterMinionDeath = 0;
@@ -147,7 +130,7 @@ public:
 			
 		}
 
-		void DoAction(int32 action)
+		void DoAction(int32 action) 
         {
             switch (action)
             {
@@ -180,7 +163,7 @@ public:
 			
 		}
 
-		void KilledUnit(Unit *pWho)
+		void KilledUnit(Unit *pWho) 
 		{	
 			Talk(urand(SAY_SLAY_1, SAY_SLAY_2));
 		}
@@ -191,7 +174,7 @@ public:
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, FAIL);			
 		}
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) 
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, IN_PROGRESS);
@@ -205,7 +188,7 @@ public:
 			events.ScheduleEvent(EVENT_SERPENT_WAVE, 5*IN_MILLISECONDS, 0, PHASE_COMBAT);
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(uint32 diff) 
 		{
 			if(!UpdateVictim())
 				return;
@@ -338,7 +321,7 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 		
-		void Reset()
+		void Reset() 
 		{
 			if(instance)
 				if (Creature* liu = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LIU_FLAMEHEART)))
@@ -348,11 +331,11 @@ public:
 					}
 		}
 
-		void DoAction(int32 action)
+		void DoAction(int32 action) 
         {
         }
 
-		void JustDied(Unit *pWho)
+		void JustDied(Unit *pWho) 
 		{	
 			if(instance)
 				if (Creature* liu = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LIU_FLAMEHEART)))
@@ -370,12 +353,12 @@ public:
 		{	
 		}
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) 
 		{
 			me->SetInCombatWithZone();
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(uint32 diff) 
 		{
 			if(!UpdateVictim())
 				return;
@@ -395,7 +378,7 @@ class npc_yulon : public CreatureScript
 public:
 	npc_yulon() : CreatureScript("npc_yulon") { }
 
-	CreatureAI* GetAI(Creature* creature) const
+	CreatureAI* GetAI(Creature* creature) const 
 	{
 		return new npc_yulonAI(creature);
 	}
@@ -412,7 +395,7 @@ public:
 		
 		int health;
 
-		void Reset()
+		void Reset() 
 		{
 			events.Reset();
 
@@ -421,7 +404,7 @@ public:
 			me->SetHealth(health);
 		}
 
-		void JustSummoned(Creature* creature)
+		void JustSummoned(Creature* creature) 
 		{
 			events.Reset();
 
@@ -430,11 +413,11 @@ public:
 			me->SetHealth(health);
 		}
 
-		void DoAction(int32 action)
+		void DoAction(int32 action) 
 		{
 		}
 
-		void JustDied(Unit *pWho)
+		void JustDied(Unit *pWho) 
 		{
 			events.SetPhase(PHASE_END);
 			if(instance)
@@ -443,7 +426,7 @@ public:
 						lorewalker->AI()->DoAction(ACTION_END);
 		}
 
-		void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/) 
 		{
 			me->SetInCombatWithZone();
 			events.SetPhase(PHASE_3);
@@ -458,7 +441,7 @@ public:
 					lorewalker->AI()->Reset();
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(uint32 diff) 
 		{	
 			if(!UpdateVictim())
 				return;

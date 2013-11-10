@@ -1,4 +1,12 @@
-/* # Script de Tydrheal : Temple du serpent de jade. # */
+/* # Script de Tydrheal : Wise Mari # */
+
+/* Notes : Tester -- verifier les spells -- SoundID
+Ajouter l'ID du NPC_TRIGGER
+
+Wise Mari : Script 95% verifier spells
+Wise Mari Trigger : Script 100%	
+Corrupt Living Water : Script 95% verifier spells	
+*//* # Script de Tydrheal : Temple du serpent de jade. # */
 
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
@@ -12,6 +20,7 @@ Wise Mari : Script 95% (termine -- voir spells)
 Lorewalker Stonestep : Script 95% (termine -- voir spells)
 Liu Flameheart : Script 95% (termine -- voir spells)
 Sha of Doubt : Script 95% (termine -- voir spells)
+
 */
 
 
@@ -95,21 +104,21 @@ class instance_temple_of_the_jade_serpent : public InstanceMapScript
 				}
 			}
 			
-			void OnGameObjectCreate(GameObject* go)
+			void OnGameObjectCreate(GameObject* go) 
             {
                 switch (go->GetEntry())
                 {
 				}
 			}
 			
-			void OnGameObjectRemove(GameObject* go)
+			void OnGameObjectRemove(GameObject* go) 
             {
                 switch (go->GetEntry())
                 {
 				}
 			}
 
-			uint64 GetData64(uint32 id) const
+			uint64 GetData64(uint32 id) const 
 			{
 				switch (id)
 				{
@@ -168,7 +177,7 @@ class instance_temple_of_the_jade_serpent : public InstanceMapScript
 
 		};
 
-		InstanceScript* GetInstanceScript(InstanceMap* map) const
+		InstanceScript* GetInstanceScript(InstanceMap* map) const 
 		{
 			return new instance_temple_of_the_jade_serpent_InstanceMapScript(map);
 		}
@@ -179,3 +188,4 @@ void AddSC_instance_temple_of_the_jade_serpent()
 {
    new instance_temple_of_the_jade_serpent();
 }
+
