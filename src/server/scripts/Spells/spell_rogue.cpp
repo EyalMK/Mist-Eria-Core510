@@ -35,6 +35,12 @@ enum RogueSpells
     SPELL_ROGUE_SHIV_TRIGGERED                   = 5940,
     SPELL_ROGUE_TRICKS_OF_THE_TRADE_DMG_BOOST    = 57933,
     SPELL_ROGUE_TRICKS_OF_THE_TRADE_PROC         = 59628,
+    SPELL_ROGUE_POISON_DEADLY                    = 2823,
+    SPELL_ROGUE_POISON_WOUND                     = 8679,
+    SPELL_ROGUE_POISON_CRIPPLING                 = 3408,
+    SPELL_ROGUE_POISON_LEECHING                  = 108211,
+    SPELL_ROGUE_POISON_MIND                      = 5761,
+    SPELL_ROGUE_POISON_PARALYTIC                 = 108215,
 };
 
 enum RogueSpellIcons
@@ -625,13 +631,6 @@ public:
     }
 };
 
-// A ajouter dans les enums :
-SPELL_ROGUE_POISON_DEADLY                    = 2823,
-SPELL_ROGUE_POISON_WOUND                     = 8679,
-SPELL_ROGUE_POISON_CRIPPLING                 = 3408,
-SPELL_ROGUE_POISON_LEECHING                  = 108211,
-SPELL_ROGUE_POISON_MIND                      = 5761,
-SPELL_ROGUE_POISON_PARALYTIC                 = 108215,
 
 // Plus bas
 // 2818 - Deadly Poison
