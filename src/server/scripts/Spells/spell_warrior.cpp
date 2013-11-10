@@ -55,7 +55,6 @@ enum WarriorSpells
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
     SPELL_PRIEST_RENEWED_HOPE                       = 63944,
     SPELL_GEN_DAMAGE_REDUCTION_AURA                 = 68066,
-	SPELL_WARRIOR_PHYSICAL_VULNERABILITY			= 81326,
 };
 
 enum WarriorSpellIcons
@@ -844,8 +843,6 @@ class spell_warr_colossus_smash : public SpellScriptLoader
 				if (Unit* caster = GetCaster())
 				{
 					SetHitDamage((GetEffectValue()/100) * caster->GetTotalAttackPowerValue(BASE_ATTACK));
-
-					caster->CastSpell(GetHitUnit(), SPELL_WARRIOR_PHYSICAL_VULNERABILITY, true);
 				}
             }
 
