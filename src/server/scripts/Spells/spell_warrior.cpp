@@ -133,7 +133,7 @@ class spell_warr_bloodthirst_heal : public SpellScriptLoader
         }
 };
 
-/// Updated 4.3.4
+/// Updated 5.1.0
 class spell_warr_charge : public SpellScriptLoader
 {
     public:
