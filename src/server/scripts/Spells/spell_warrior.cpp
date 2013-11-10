@@ -51,6 +51,7 @@ enum WarriorSpells
     SPELL_WARRIOR_VIGILANCE_PROC                    = 50725,
     SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665,
 	SPELL_WARRIOR_RALLYING_CRY_TRIGGERED            = 97463,
+	SPELL_WARRIOR_PHYSICAL_VULNERABILITY			= 81326,
     SPELL_PALADIN_BLESSING_OF_SANCTUARY             = 20911,
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
     SPELL_PRIEST_RENEWED_HOPE                       = 63944,
@@ -818,7 +819,7 @@ public:
 
         void Register()
         {
-            OnEffectHitTarget += SpellEffectFn(spell_warr_heroic_leap_dummy::spell_warr_heroic_leap_dummy_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            OnEffectHitTarget += SpellEffectFn(spell_warr_heroic_leap_dummy::spell_warr_heroic_leap_dummy_SpellScript::CalculateDamage, EFFECT_3, SPELL_EFFECT_SCHOOL_DAMAGE);
         }
     };
 
@@ -840,15 +841,12 @@ class spell_warr_colossus_smash : public SpellScriptLoader
 
             void HandleEffect(SpellEffIndex /*effIndex*/)
             {
-				if (Unit* caster = GetCaster())
-				{
-					SetHitDamage((GetEffectValue()/100) * caster->GetTotalAttackPowerValue(BASE_ATTACK));
-				}
+				GetCaster()->CastSpell(GetHitUnit(), SPELL_WARRIOR_PHYSICAL_VULNERABILITY, true);
             }
 
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_warr_colossus_smash_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+                OnEffectHitTarget += SpellEffectFn(spell_warr_colossus_smash_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_NORMALIZED_WEAPON_DMG);
             }
         };
 
