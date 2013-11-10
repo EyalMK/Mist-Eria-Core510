@@ -800,7 +800,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         {
             switch(m_spellInfo->Id)
             {
-                case 97462:
+                /*case 97462:
                 {
                     m_caster->CastSpell(unitTarget, 122507, true);
                     break;
@@ -809,7 +809,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 {
                     m_caster->CastSpell(unitTarget, 97463, true);
                     break;
-                }
+                }*/
                 default:
                     break;
             }
