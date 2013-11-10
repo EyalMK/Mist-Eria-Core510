@@ -845,14 +845,13 @@ class spell_warr_colossus_smash : public SpellScriptLoader
 				{
 					SetHitDamage((GetEffectValue()/100) * caster->GetTotalAttackPowerValue(BASE_ATTACK));
 
-					int32 basePoints0 = GetEffectValue();
-					caster->CastCustomSpell(GetHitUnit(), SPELL_WARRIOR_PHYSICAL_VULNERABILITY, &basePoints0, NULL, NULL, true);
+					caster->CastSpell(GetHitUnit(), SPELL_WARRIOR_PHYSICAL_VULNERABILITY, true);
 				}
             }
 
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_warr_colossus_smash_SpellScript::HandleEffect, EFFECT_2, SPELL_EFFECT_SCHOOL_DAMAGE);
+                OnEffectHitTarget += SpellEffectFn(spell_warr_colossus_smash_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
             }
         };
 
