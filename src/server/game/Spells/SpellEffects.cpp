@@ -409,6 +409,33 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             }
             case SPELLFAMILY_WARRIOR:
             {
+				switch (m_spellInfo->Id)
+				{
+					case 103840: // Impending victory
+						int32 baseDamageArms = 1558;
+						int32 baseDamage = 1246;
+						
+						if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_WARRIOR_ARMS)
+						{
+							int32 talentDamage = baseDamageArms + 0.7f * m_caster->ToPlayer()->GetTotalAttackPowerValue(BASE_ATTACK);
+							damage = talentDamage;
+						}
+
+						if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY ||
+							m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_WARRIOR_PROTECTION)
+						{
+							int32 talentDamage = baseDamage + 0.56f * m_caster->ToPlayer()->GetTotalAttackPowerValue(BASE_ATTACK);
+							damage = talentDamage;
+						}
+
+						if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) != TALENT_TREE_WARRIOR_ARMS &&
+							m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) != TALENT_TREE_WARRIOR_FURY &&
+							m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) != TALENT_TREE_WARRIOR_PROTECTION)
+							damage = baseDamage;
+
+						m_caster->CastSpell(m_caster, 118340, true);
+					break;
+				}
                 // Victory Rush
                 if (m_spellInfo->Id == 34428 && m_caster->HasAura(32216))
                 {

@@ -887,7 +887,7 @@ class spell_warr_impending_victory : public SpellScriptLoader
 					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_WARRIOR_PROTECTION)
 					SetHitDamage(baseDamage);
 
-				caster->CastSpell(caster, SPELL_WARRIOR_IMPENDING_VICTORY, true);
+				caster->CastSpell(caster, SPELL_WARRIOR_IMPENDING_VICTORY);
             }
 
             void Register()
