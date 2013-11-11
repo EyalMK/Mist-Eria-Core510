@@ -1329,7 +1329,7 @@ void Spell::EffectApplyAura(SpellEffIndex effIndex)
         return;
     ASSERT(unitTarget == m_spellAura->GetOwner());
 
-    switch(m_spellInfo->SpellFamilyFlags)
+    switch(m_spellInfo->SpellFamilyName)
     {
     case SPELLFAMILY_WARRIOR:
         switch(m_spellInfo->Id)
