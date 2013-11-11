@@ -5855,7 +5855,7 @@ float Player::GetRatingBonusValue(CombatRating cr) const
     float baseResult = float(GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + cr)) * GetRatingMultiplier(cr);
     if (cr != CR_RESILIENCE_PLAYER_DAMAGE_TAKEN)
         return baseResult;
-    return float(1.0f - pow(0.99f, baseResult)) * 100.0f;
+    return 40.f + float(1.0f - pow(0.99f, baseResult)) * 100.0f;
 }
 
 float Player::GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const
