@@ -30,7 +30,9 @@ enum WarriorSpells
 {
     SPELL_WARRIOR_BLOODTHIRST                       = 23885,
     SPELL_WARRIOR_BLOODTHIRST_DAMAGE                = 23881,
-    SPELL_WARRIOR_CHARGE                            = 34846,
+    SPELL_WARRIOR_CHARGE                            = 7922,
+	SPELL_WARRIOR_CHARGE_TALENT						= 105771,
+	SPELL_WARRIOR_CHARGE_TALENT_PASSIVE				= 103828,
     SPELL_WARRIOR_DEEP_WOUNDS_RANK_1                = 12162,
     SPELL_WARRIOR_DEEP_WOUNDS_RANK_2                = 12850,
     SPELL_WARRIOR_DEEP_WOUNDS_RANK_3                = 12868,
@@ -38,8 +40,6 @@ enum WarriorSpells
     SPELL_WARRIOR_EXECUTE                           = 5308,
     SPELL_WARRIOR_GLYPH_OF_EXECUTION                = 58367,
     SPELL_WARRIOR_GLYPH_OF_VIGILANCE                = 63326,
-    SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_BUFF        = 65156,
-    SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_TALENT      = 64976,
     SPELL_WARRIOR_LAST_STAND_TRIGGERED              = 12976,
     SPELL_WARRIOR_SLAM                              = 50782,
     SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK     = 26654,
@@ -51,6 +51,7 @@ enum WarriorSpells
     SPELL_WARRIOR_VIGILANCE_PROC                    = 50725,
     SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665,
 	SPELL_WARRIOR_RALLYING_CRY_TRIGGERED            = 97463,
+	SPELL_WARRIOR_PHYSICAL_VULNERABILITY			= 81326,
     SPELL_PALADIN_BLESSING_OF_SANCTUARY             = 20911,
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
     SPELL_PRIEST_RENEWED_HOPE                       = 63944,
@@ -132,7 +133,7 @@ class spell_warr_bloodthirst_heal : public SpellScriptLoader
         }
 };
 
-/// Updated 4.3.4
+/// Updated 5.1.0
 class spell_warr_charge : public SpellScriptLoader
 {
     public:
@@ -144,20 +145,16 @@ class spell_warr_charge : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spellInfo*/)
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_TALENT) || !sSpellMgr->GetSpellInfo(SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_BUFF) || !sSpellMgr->GetSpellInfo(SPELL_WARRIOR_CHARGE))
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_CHARGE))
                     return false;
                 return true;
             }
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-                int32 chargeBasePoints0 = GetEffectValue();
+                int32 chargeBasePoints0 = GetEffectValue()*10;
                 Unit* caster = GetCaster();
                 caster->CastCustomSpell(caster, SPELL_WARRIOR_CHARGE, &chargeBasePoints0, NULL, NULL, true);
-
-                // Juggernaut crit bonus
-                if (caster->HasAura(SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_TALENT))
-                    caster->CastSpell(caster, SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_BUFF, true);
             }
 
             void Register()
@@ -818,7 +815,7 @@ public:
 
         void Register()
         {
-            OnEffectHitTarget += SpellEffectFn(spell_warr_heroic_leap_dummy::spell_warr_heroic_leap_dummy_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            OnEffectHitTarget += SpellEffectFn(spell_warr_heroic_leap_dummy::spell_warr_heroic_leap_dummy_SpellScript::CalculateDamage, EFFECT_3, SPELL_EFFECT_SCHOOL_DAMAGE);
         }
     };
 
@@ -840,15 +837,12 @@ class spell_warr_colossus_smash : public SpellScriptLoader
 
             void HandleEffect(SpellEffIndex /*effIndex*/)
             {
-				if (Unit* caster = GetCaster())
-				{
-					SetHitDamage((GetEffectValue()/100) * caster->GetTotalAttackPowerValue(BASE_ATTACK));
-				}
+				GetCaster()->CastSpell(GetHitUnit(), SPELL_WARRIOR_PHYSICAL_VULNERABILITY, true);
             }
 
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_warr_colossus_smash_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+                OnEffectHitTarget += SpellEffectFn(spell_warr_colossus_smash_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_NORMALIZED_WEAPON_DMG);
             }
         };
 
