@@ -395,6 +395,9 @@ bool SpellEffectInfo::IsAPSPModified() const
 			case SPELL_AURA_MOD_RANGED_HASTE:
 			case SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK:
 			case SPELL_AURA_MOD_MELEE_RANGED_HASTE:
+			case SPELL_AURA_ADD_FLAT_MODIFIER:
+			case SPELL_AURA_ADD_PCT_MODIFIER:
+			case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE:
                 return false;
             default:
                 break;

@@ -1329,6 +1329,19 @@ void Spell::EffectApplyAura(SpellEffIndex effIndex)
         return;
     ASSERT(unitTarget == m_spellAura->GetOwner());
 
+    switch(m_spellInfo->SpellFamilyName)
+    {
+    case SPELLFAMILY_WARRIOR:
+        switch(m_spellInfo->Id)
+        {
+        case 29838:
+            if(m_caster->HealthBelowPct(35))
+                m_caster->CastSpell(m_caster, 16491, true);
+            break;
+        }
+        break;
+    }
+
     m_spellAura->_ApplyEffectForTargets(effIndex);
 }
 
