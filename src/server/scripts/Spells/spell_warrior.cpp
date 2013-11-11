@@ -52,6 +52,7 @@ enum WarriorSpells
     SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665,
 	SPELL_WARRIOR_RALLYING_CRY_TRIGGERED            = 97463,
 	SPELL_WARRIOR_PHYSICAL_VULNERABILITY			= 81326,
+	SPELL_WARRIOR_IMPENDING_VICTORY					= 118340,
 	SPELL_WARRIOR_HEROIC_THROW						= 57755,
     SPELL_PALADIN_BLESSING_OF_SANCTUARY             = 20911,
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
@@ -970,4 +971,5 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_heroic_leap();
 	new spell_warr_heroic_leap_dummy();
 	new spell_warr_colossus_smash();
+	new spell_warr_heroic_throw();
 }
