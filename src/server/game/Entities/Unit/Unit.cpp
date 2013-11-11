@@ -6964,7 +6964,7 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 /*damage*/, Aura* triggeredByAura
                 case 29838:
                 {
                     if(HealthBelowPct(35))
-                        CastSpell(m_caster, 16491, true);
+                        CastSpell(this, 16491, true);
                     break;
                 }
                 default:
