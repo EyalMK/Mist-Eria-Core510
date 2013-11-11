@@ -54,6 +54,7 @@ enum WarriorSpells
 	SPELL_WARRIOR_PHYSICAL_VULNERABILITY			= 81326,
 	SPELL_WARRIOR_IMPENDING_VICTORY					= 118340,
 	SPELL_WARRIOR_HEROIC_THROW						= 57755,
+	SPELL_WARRIOR_WILD_STRIKE						= 100130,
     SPELL_PALADIN_BLESSING_OF_SANCTUARY             = 20911,
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
     SPELL_PRIEST_RENEWED_HOPE                       = 63944,
@@ -949,6 +950,52 @@ class spell_warr_heroic_throw : public SpellScriptLoader
         }
 };
 
+/// Updated 5.1.0 : 100130 - Wild strike
+class spell_warr_wild_strike : public SpellScriptLoader
+{
+    public:
+        spell_warr_wild_strike() : SpellScriptLoader("spell_warr_wild_strike") { }
+
+        class spell_warr_wild_strike_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_wild_strike_SpellScript);
+
+            bool Validate (SpellInfo const* /*spellEntry*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_WILD_STRIKE))
+                    return false;
+
+                return true;
+            }
+
+            bool Load()
+            {
+                if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                    return false;
+
+                return true;
+            }
+
+            void HandleDamage(SpellEffIndex /*effIndex*/)
+            {                
+                Unit* caster = GetCaster();
+
+				int32 damage = 1003 + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 2.3f;
+                SetHitDamage(damage);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_warr_wild_strike_SpellScript::HandleDamage, EFFECT_2, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_wild_strike_SpellScript();
+        }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_bloodthirst();
@@ -972,4 +1019,5 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_heroic_leap_dummy();
 	new spell_warr_colossus_smash();
 	new spell_warr_heroic_throw();
+	new spell_warr_wild_strike();
 }
