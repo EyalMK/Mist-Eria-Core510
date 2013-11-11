@@ -52,6 +52,7 @@ enum WarriorSpells
     SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665,
 	SPELL_WARRIOR_RALLYING_CRY_TRIGGERED            = 97463,
 	SPELL_WARRIOR_PHYSICAL_VULNERABILITY			= 81326,
+	SPELL_WARRIOR_IMPENDING_VICTORY					= 118340,
     SPELL_PALADIN_BLESSING_OF_SANCTUARY             = 20911,
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
     SPELL_PRIEST_RENEWED_HOPE                       = 63944,
@@ -849,6 +850,55 @@ class spell_warr_colossus_smash : public SpellScriptLoader
         SpellScript* GetSpellScript() const
         {
             return new spell_warr_colossus_smash_SpellScript();
+        }
+};
+
+/// Updated 5.1.0 : 103840 - Impending victory
+class spell_warr_impending_victory : public SpellScriptLoader
+{
+    public:
+        spell_warr_impending_victory() : SpellScriptLoader("spell_warr_impending_victory") { }
+
+        class spell_warr_impending_victory_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_impending_victory_SpellScript);
+
+            void HandleDamage(SpellEffIndex /*effIndex*/)
+            {
+				Player* caster = GetCaster()->ToPlayer();
+				int32 baseDamageArms = 1558;
+				int32 baseDamage = 1246;
+
+				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_ARMS)
+				{
+					int32 damage = baseDamageArms + 0.7f * GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK);
+					SetHitDamage(damage);
+				}
+
+				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY ||
+					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_PROTECTION)
+				{
+					int32 damage = baseDamage + 0.56f * GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK);
+					SetHitDamage(damage);
+				}
+
+				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_WARRIOR_ARMS &&
+					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_WARRIOR_FURY &&
+					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_WARRIOR_PROTECTION)
+					SetHitDamage(baseDamage);
+
+				caster->CastSpell(caster, SPELL_WARRIOR_IMPENDING_VICTORY, true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_warr_impending_victory_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_impending_victory_SpellScript();
         }
 };
 
