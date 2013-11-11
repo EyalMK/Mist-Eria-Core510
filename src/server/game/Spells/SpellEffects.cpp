@@ -800,12 +800,6 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         {
             switch(m_spellInfo->Id)
             {
-				case 100:
-					if (!m_caster->HasAura(103828))
-						m_caster->CastSpell(unitTarget, 7922, true);
-					if (m_caster->HasAura(103828))
-						m_caster->CastSpell(unitTarget, 105771, true);
-					break;
                 default:
                     break;
             }
@@ -4893,6 +4887,11 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         // not all charge effects used in negative spells
         if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER)
             m_caster->Attack(unitTarget, true);
+
+		if (!m_caster->HasAura(103828) && m_caster->GetTypeId() == TYPEID_PLAYER)
+			m_caster->CastSpell(unitTarget, 7922, true);
+		if (m_caster->HasAura(103828) && m_caster->GetTypeId() == TYPEID_PLAYER)
+			m_caster->CastSpell(unitTarget, 105771, true);
     }
 }
 
