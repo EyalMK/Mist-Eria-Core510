@@ -66,7 +66,7 @@ enum WarriorSpellIcons
     WARRIOR_ICON_ID_SUDDEN_DEATH                    = 1989,
 };
 
-/// Updated 4.3.4
+/// Waiting for debug
 class spell_warr_bloodthirst : public SpellScriptLoader
 {
     public:
