@@ -209,8 +209,8 @@ void WorldSession::HandleBlackMarketBid(WorldPacket& recvData)
 	if(auction->bid >= price && price != auction->bm_template->startBid) // Trying to cheat
 		return;
 
-	if (GetPlayer()->GetMoney() < price) // Trying to cheat
-		return;
+	if(!GetPlayer()->ModifyMoney(-price))
+		return; // trying to cheat
 
 
 	sBlackMarketMgr->UpdateAuction(auction, price, GetPlayer());
