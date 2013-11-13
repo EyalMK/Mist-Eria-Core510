@@ -618,16 +618,33 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         break;
 					case 124335: // Swift Reflexes
 						{
-						int32 baseDamage = 2;
-						if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_BREWMASTER)
-							damage = irand(0.809f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 0.404f * m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + 0.205f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 0.809f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.404f * m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + 0.205f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
-							/* [ 80.9% of Mainhand Min DPS + 40.4% of Offhand Min DPS + 20.5% of AP - 2 ] to [ 80.9% of Mainhand Max DPS + 40.4% of Offhand Max DPS + 20.5% of AP + 2 ]*/
-						if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_WINDWALKER)
-							damage = irand(2.022f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 1.011f * m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + 0.161f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 2.022f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 1.011f * m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + 0.161f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
-							/*[ 202.2% of Mainhand Min DPS + 101.1% of Offhand Min DPS + 16.1% of AP - 2 ] to [ 202.2% of Mainhand Max DPS + 101.1% of Offhand Max DPS + 16.1% of AP + 2 ]*/
-						if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_MISTWEAVER)
-							damage = irand(3.034f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 0.161f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 3.034f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.161f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
-							/*[ 303.4% of Mainhand Min DPS + 16.1% of AP - 2 ] to [ 303.4% of Mainhand Max DPS + 16.1% of AP + 2 ]*/
+							int32 baseDamage = 2;
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_BREWMASTER)
+								damage = irand(0.809f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 0.404f * m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + 0.205f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 0.809f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.404f * m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + 0.205f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+								/* [ 80.9% of Mainhand Min DPS + 40.4% of Offhand Min DPS + 20.5% of AP - 2 ] to [ 80.9% of Mainhand Max DPS + 40.4% of Offhand Max DPS + 20.5% of AP + 2 ]*/
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_WINDWALKER)
+								damage = irand(2.022f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 1.011f * m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + 0.161f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 2.022f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 1.011f * m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + 0.161f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+								/*[ 202.2% of Mainhand Min DPS + 101.1% of Offhand Min DPS + 16.1% of AP - 2 ] to [ 202.2% of Mainhand Max DPS + 101.1% of Offhand Max DPS + 16.1% of AP + 2 ]*/
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_MISTWEAVER)
+								damage = irand(3.034f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 0.161f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 3.034f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.161f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+								/*[ 303.4% of Mainhand Min DPS + 16.1% of AP - 2 ] to [ 303.4% of Mainhand Max DPS + 16.1% of AP + 2 ]*/
+						}
+						break;
+					case 107270: // Spinning crane kick
+						{
+							m_caster->SetSpeed(MOVE_WALK, 0.7f, true);
+							m_caster->SetSpeed(MOVE_RUN, 0.7f, true);
+							
+							int32 baseDamage = 2;
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_BREWMASTER)
+								damage = irand(0.629f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 0.315f * m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + 0.159f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 0.629f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.315f * m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + 0.159f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+								 /* [ 62.9% of Mainhand Min DPS + 31.5% of Offhand Min DPS + 15.9% of AP - 2 ] to [ 62.9% of Mainhand Max DPS + 31.5% of Offhand Max DPS + 15.9% of AP + 2 ] */
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_WINDWALKER)
+								damage = irand(1.573f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 0.787f * m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + 0.125f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 1.573f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.787f * m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + 0.125f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+								/* [ 157.3% of Mainhand Min DPS + 78.7% of Offhand Min DPS + 12.5% of AP - 2 ] to [ 157.3% of Mainhand Max DPS + 78.7% of Offhand Max DPS + 12.5% of AP + 2 ]*/
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_MISTWEAVER)
+								damage = irand(2.36f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 0.125f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 2.36f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.125f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+								/*[ 236% of Mainhand Min DPS + 12.5% of AP - 2 ] to [ 236% of Mainhand Max DPS + 12.5% of AP + 2 ]*/
 						}
 						break;
                     default:
