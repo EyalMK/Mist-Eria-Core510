@@ -9,6 +9,11 @@
 #include "SpellAuras.h"
 #include "Spell.h"
 
+enum MonkSpells
+{
+    SPELL_MONK_TOUCH_DEATH = 115080,
+};
+
 //119611 - Renewing mist
 class spell_monk_renewing_mist : public SpellScriptLoader
 {
@@ -335,11 +340,6 @@ public:
     }
 };
 
-enum spell_monk
-{
-    SPELL_MONK_TOUCH_DEATH = 115080,
-};
-
 class spell_monk_touch_death : public SpellScriptLoader
 {
 public:
@@ -391,51 +391,6 @@ public:
     }
 };
 
-class spell_monk_spinning_crane_kick : public SpellScriptLoader
-{
-    public:
-        spell_monk_spinning_crane_kick() : SpellScriptLoader("spell_monk_spinning_crane_kick") { }
-
-        class spell_monk_spinning_crane_kick_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_monk_spinning_crane_kick_SpellScript);
-
-            bool Validate (SpellInfo const* /*spellEntry*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(107270))
-                    return false;
-
-                return true;
-            }
-
-            bool Load()
-            {
-                if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
-                    return false;
-
-                return true;
-            }
-
-            void HandleDamage(SpellEffIndex /*effIndex*/)
-            {                
-                Unit* caster = GetCaster();
-
-				int32 damage = 1003 + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 2.3f; // Mauvais calcul => A CHANGER !
-                SetHitDamage(0);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_monk_spinning_crane_kick_SpellScript::HandleDamage, EFFECT_2, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_monk_spinning_crane_kick_SpellScript();
-        }
-};
-
 void AddSC_monk_spell_scripts()
 {
     new spell_monk_disable();
@@ -446,5 +401,4 @@ void AddSC_monk_spell_scripts()
     new spell_monk_renewing_mist();
     new spell_monk_elevation();
     new spell_monk_touch_death();
-	new spell_monk_spinning_crane_kick();
 }
