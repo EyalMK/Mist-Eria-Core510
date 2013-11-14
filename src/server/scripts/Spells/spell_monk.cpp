@@ -11,7 +11,10 @@
 
 enum MonkSpells
 {
-    SPELL_MONK_TOUCH_DEATH = 115080,
+    SPELL_MONK_TOUCH_DEATH					= 115080,
+	SPELL_MONK_LEGACY_OF_THE_EMPEROR		= 117666,
+	SPELL_MONK_LEGACY_OF_THE_WHITE_TIGER	= 116781,
+	SPELL_MONK_TOUCH_OF_DEATH				= 115080,
 };
 
 //119611 - Renewing mist
@@ -144,7 +147,7 @@ public:
     }
 };
 
-// 119996 - transcendence_transfert
+// 119996 - Transcendence Transfert
 class spell_monk_transcendence_transfert : public SpellScriptLoader
 {
 public:
@@ -211,7 +214,7 @@ public:
     }
 };
 
-// 101643 -- transcendence
+// 101643 Transcendence
 class spell_monk_transcendence : public SpellScriptLoader
 {
 public:
@@ -254,7 +257,7 @@ public:
     }
 };
 
-// 54569 -- trasncendence_spirit
+// 54569 - Trasncendence Spirit
 class npc_transcendence_spirit : public CreatureScript 
 {
 public:
@@ -307,7 +310,7 @@ public:
     };
 };
 
-// 116670 -- Elevation
+// 116670 - Elevation
 class spell_monk_elevation : public SpellScriptLoader
 {
 public:
@@ -340,55 +343,99 @@ public:
     }
 };
 
-class spell_monk_touch_death : public SpellScriptLoader
+// Touch of death : 115080
+class spell_monk_touch_of_death : public SpellScriptLoader
 {
-public:
-    spell_monk_touch_death() : SpellScriptLoader("spell_monk_touch_death") { }
+    public:
+        spell_monk_touch_of_death() : SpellScriptLoader("spell_monk_touch_of_death") { }
 
-    class spell_monk_touch_deathSpellSCript : public SpellScript
-    {
-        PrepareSpellScript(spell_monk_touch_deathSpellSCript);
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
+        class spell_monk_touch_of_death_SpellScript : public SpellScript
         {
-            if(Unit* caster = GetCaster())
+            PrepareSpellScript(spell_monk_touch_of_death_SpellScript);
+
+            bool Validate(SpellInfo const* /*spellEntry*/)
             {
-                if(Player* casterPlayer = caster->ToPlayer())
-                {
-                    if(casterPlayer->HasAura(124490)) // if caster has spe to use this spell on player
-                        if(Unit* target = casterPlayer->getVictim())
-                        {
-                            if(Player* victim = target->ToPlayer())
-                            {
-                                if(victim->HealthBelowPct(10))
-                                    casterPlayer->DealDamage(victim, victim->GetMaxHealth() * 0.1 + 1);
-                            } else if(Creature* victim = target->ToCreature())
-                            {
-                                if(victim->GetHealth() <= casterPlayer->GetHealth())
-                                    casterPlayer->DealDamage(victim, victim->GetMaxHealth() + 1);
-                            }
-                        }
-                } else if(Unit* target = casterPlayer->getVictim())
-                {
-                    if(Creature* victim = target->ToCreature())
-                    {
-                        if(victim->GetHealth() <= casterPlayer->GetHealth())
-                            casterPlayer->DealDamage(victim, victim->GetMaxHealth() + 1);
-                    }
-                }
+                if (!sSpellMgr->GetSpellInfo(SPELL_MONK_TOUCH_OF_DEATH))
+                    return false;
+                return true;
             }
-        }
 
-        void Register()
+			SpellCastResult CheckCast()
+            {
+				if (GetHitUnit()->GetTypeId() == TYPEID_PLAYER)
+				{
+					if (GetHitUnit()->GetHealth() > GetHitUnit()->GetMaxHealth()*0.10f)
+						return SPELL_FAILED_ERROR;
+				}
+
+				if (GetHitUnit()->GetTypeId() != TYPEID_PLAYER && GetCaster()->GetHealth() < GetHitUnit()->GetHealth())
+					return SPELL_FAILED_ERROR;
+
+				if (GetCaster() == GetHitUnit())
+					return SPELL_FAILED_NO_VALID_TARGETS;
+
+				return SPELL_CAST_OK;
+            }
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+				Unit* caster = GetCaster();
+				Unit* target = GetHitUnit();
+				uint32 damage = 0;
+
+				if (caster->GetTypeId() == TYPEID_PLAYER && target->GetHealth() <= target->GetMaxHealth()*0.10f)
+				{
+					damage = GetHitUnit()->GetHealth();
+					SetHitDamage(damage);
+				}
+
+				if (target->GetTypeId() != TYPEID_PLAYER && caster->GetHealth() >= target->GetHealth())
+				{
+					damage = GetHitUnit()->GetHealth();
+					SetHitDamage(damage);
+				}
+			}
+
+            void Register()
+            {
+                OnEffectHit += SpellEffectFn(spell_monk_touch_of_death_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+				OnCheckCast += SpellCheckCastFn(spell_monk_touch_of_death_SpellScript::CheckCast);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
         {
-            OnEffectHitTarget += SpellEffectFn(spell_monk_touch_deathSpellSCript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+            return new spell_monk_touch_of_death_SpellScript();
         }
-    };
+};
 
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_monk_touch_deathSpellSCript();
-    }
+class spell_monk_legacy_of_the_white_tiger : public SpellScriptLoader
+{
+    public:
+        spell_monk_legacy_of_the_white_tiger() : SpellScriptLoader("spell_monk_legacy_of_the_white_tiger") { }
+
+        class spell_monk_legacy_of_the_white_tiger_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_monk_legacy_of_the_white_tiger_SpellScript);
+
+            void Cast()
+            {
+                Unit* caster = GetCaster()->ToPlayer();
+
+				if (caster->HasAura(SPELL_MONK_LEGACY_OF_THE_EMPEROR))
+					caster->RemoveAura(SPELL_MONK_LEGACY_OF_THE_EMPEROR);
+            }
+
+            void Register()
+            {
+                OnCast += SpellCastFn(spell_monk_legacy_of_the_white_tiger_SpellScript::Cast);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_monk_legacy_of_the_white_tiger_SpellScript();
+        }
 };
 
 void AddSC_monk_spell_scripts()
@@ -400,5 +447,6 @@ void AddSC_monk_spell_scripts()
     new npc_transcendence_spirit();
     new spell_monk_renewing_mist();
     new spell_monk_elevation();
-    new spell_monk_touch_death();
+    new spell_monk_touch_of_death();
+	new spell_monk_legacy_of_the_white_tiger();
 }
