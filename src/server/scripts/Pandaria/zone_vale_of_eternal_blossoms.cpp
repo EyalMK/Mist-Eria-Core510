@@ -29,13 +29,13 @@ public:
 
 		EventMap events;
 
-        void Reset() OVERRIDE
+        void Reset()
 		{
 			events.Reset();
 			events.ScheduleEvent(EVENT_SPINNING_CRANE_KICK, 1*IN_MILLISECONDS);
 		}
 
-        void MoveInLineOfSight(Unit* who) OVERRIDE
+        void MoveInLineOfSight(Unit* who)
         {
             if (!me->IsWithinDistInMap(who, 40.0f))
                 return;
@@ -47,7 +47,7 @@ public:
                     who->CastSpell(who, SPELL_CYCLONIC_INSPIRATION);
         }
 
-        void UpdateAI(uint32 diff) OVERRIDE
+        void UpdateAI(uint32 diff)
 		{
 			events.Update(diff);
 
@@ -70,7 +70,7 @@ public:
 		}
     };
 
-    CreatureAI* GetAI(Creature* creature) const OVERRIDE
+    CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_jinho_and_taijingAI(creature);
     }
