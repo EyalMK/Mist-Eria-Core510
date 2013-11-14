@@ -706,6 +706,18 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
     else
         *data << uint64(target_guid);
 
+    switch (type) {
+    case CHAT_MSG_PARTY:
+    case CHAT_MSG_PARTY_LEADER:
+    case CHAT_MSG_RAID:
+    case CHAT_MSG_RAID_LEADER:
+    case CHAT_MSG_RAID_WARNING:
+        *data << uint64(target_guid);
+        break;
+    default:
+        break;
+    }
+
     *data << uint32(messageLength);
     *data << message;
     if (session != 0 && type != CHAT_MSG_WHISPER_INFORM && type != CHAT_MSG_DND && type != CHAT_MSG_AFK)
