@@ -9,6 +9,11 @@
 #include "SpellAuras.h"
 #include "Spell.h"
 
+enum MonkSpells
+{
+    SPELL_MONK_TOUCH_DEATH = 115080,
+};
+
 //119611 - Renewing mist
 class spell_monk_renewing_mist : public SpellScriptLoader
 {
@@ -333,11 +338,6 @@ public:
     {
         return new spell_monk_elevation_SpellScript();
     }
-};
-
-enum spell_monk
-{
-    SPELL_MONK_TOUCH_DEATH = 115080,
 };
 
 class spell_monk_touch_death : public SpellScriptLoader

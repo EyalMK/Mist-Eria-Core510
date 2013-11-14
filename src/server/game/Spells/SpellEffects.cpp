@@ -409,6 +409,33 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             }
             case SPELLFAMILY_WARRIOR:
             {
+				switch (m_spellInfo->Id)
+				{
+					case 103840: // Impending victory
+						int32 baseDamageArms = 1558;
+						int32 baseDamage = 1246;
+						
+						if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_WARRIOR_ARMS)
+						{
+							int32 talentDamage = baseDamageArms + 0.7f * m_caster->ToPlayer()->GetTotalAttackPowerValue(BASE_ATTACK);
+							damage = talentDamage;
+						}
+
+						if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY ||
+							m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_WARRIOR_PROTECTION)
+						{
+							int32 talentDamage = baseDamage + 0.56f * m_caster->ToPlayer()->GetTotalAttackPowerValue(BASE_ATTACK);
+							damage = talentDamage;
+						}
+
+						if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) != TALENT_TREE_WARRIOR_ARMS &&
+							m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) != TALENT_TREE_WARRIOR_FURY &&
+							m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) != TALENT_TREE_WARRIOR_PROTECTION)
+							damage = baseDamage;
+
+						m_caster->CastSpell(m_caster, 118340, true);
+					break;
+				}
                 // Victory Rush
                 if (m_spellInfo->Id == 34428 && m_caster->HasAura(32216))
                 {
@@ -582,13 +609,89 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             {
                 switch(m_spellInfo->Id)
                 {
-                    case 100784:
-                    {
-                        int32 mindamage = int32(7.12f * ((0.898882f * (unitTarget->GetFloatValue(UNIT_FIELD_MINDAMAGE) * 3/2) + (unitTarget->GetTotalAttackPowerValue(BASE_ATTACK) / 14) - 1.f)));
-                        int32 maxdamage = int32(7.12f * ((0.898882f * (unitTarget->GetFloatValue(UNIT_FIELD_MAXDAMAGE) * 3/2) + (unitTarget->GetTotalAttackPowerValue(BASE_ATTACK) / 14) + 1.f)));
-                        damage = irand(mindamage, maxdamage);
+                    case 100784: // Blackout Kick
+						{
+							int32 baseDamage = 7;
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_BREWMASTER)
+								damage = irand(6.4f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 3.2f * m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + 0.509f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 6.4f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.320f * m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + 0.509f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+												/*[ 640% of Mainhand Min DPS + 320% of Offhand Min DPS + 50.9% of AP - 7 ]								to [ 640% of Mainhand Max DPS + 320% of Offhand Max DPS + 50.9% of AP + 7 ]*/
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_WINDWALKER)
+								damage = irand(6.4f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 3.2f * m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + 0.509f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 6.4f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.320f * m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + 0.509f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+												/*[ 640% of Mainhand Min DPS + 320% of Offhand Min DPS + 50.9% of AP - 7 ]								to [ 640% of Mainhand Max DPS + 320% of Offhand Max DPS + 50.9% of AP + 7 ]*/
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_MISTWEAVER)
+								damage = irand(9.6f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 0.509f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 9.6f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.509f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+												/* [ 960% of Mainhand Min DPS + 50.9% of AP - 7 ] 														to [ 960% of Mainhand Max DPS + 50.9% of AP + 7 ]*/
+						}
                         break;
-                    }
+					case 124335: // Swift Reflexes
+						{
+							int32 baseDamage = 2;
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_BREWMASTER)
+								damage = irand(0.809f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 0.404f * m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + 0.205f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 0.809f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.404f * m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + 0.205f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+												/*[ 80.9% of Mainhand Min DPS + 40.4% of Offhand Min DPS + 20.5% of AP - 2 ]							to [ 80.9% of Mainhand Max DPS + 40.4% of Offhand Max DPS + 20.5% of AP + 2 ]*/
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_WINDWALKER)
+								damage = irand(2.022f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 1.011f * m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + 0.161f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 2.022f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 1.011f * m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + 0.161f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+												/*[ 202.2% of Mainhand Min DPS + 101.1% of Offhand Min DPS + 16.1% of AP - 2 ]							to [ 202.2% of Mainhand Max DPS + 101.1% of Offhand Max DPS + 16.1% of AP + 2 ]*/
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_MISTWEAVER)
+								damage = irand(3.034f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 0.161f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 3.034f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.161f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+												/*[ 303.4% of Mainhand Min DPS + 16.1% of AP - 2 ]														to [ 303.4% of Mainhand Max DPS + 16.1% of AP + 2 ]*/
+						}
+						break;
+					case 107270: // Spinning Crane Kick
+						{
+							m_caster->SetSpeed(MOVE_WALK, 0.7f, true);
+							m_caster->SetSpeed(MOVE_RUN, 0.7f, true);
+							
+							int32 baseDamage = 2;
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_BREWMASTER)
+								damage = irand(0.629f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 0.315f * m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + 0.159f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 0.629f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.315f * m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + 0.159f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+												/*[ 62.9% of Mainhand Min DPS + 31.5% of Offhand Min DPS + 15.9% of AP - 2 ]							to [ 62.9% of Mainhand Max DPS + 31.5% of Offhand Max DPS + 15.9% of AP + 2 ] */
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_WINDWALKER)
+								damage = irand(1.573f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 0.787f * m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + 0.125f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 1.573f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.787f * m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + 0.125f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+												/*[ 157.3% of Mainhand Min DPS + 78.7% of Offhand Min DPS + 12.5% of AP - 2 ]							to [ 157.3% of Mainhand Max DPS + 78.7% of Offhand Max DPS + 12.5% of AP + 2 ]*/
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_MISTWEAVER)
+								damage = irand(2.36f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 0.125f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 2.36f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.125f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+												/*[ 236% of Mainhand Min DPS + 12.5% of AP - 2 ]														to [ 236% of Mainhand Max DPS + 12.5% of AP + 2 ]*/
+						}
+						break;
+					case 100787: // Tiger Palm
+						{
+							int32 baseDamage = 3;
+
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_BREWMASTER || m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_WINDWALKER)
+								damage = irand(2.697f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 1.348f * m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + 0.214f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 2.697f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 1.348f * m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + 0.214f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+												/*[ 269.7% of Mainhand Min DPS + 134.8% of Offhand Min DPS + 21.4% of AP - 3 ]							to [ 269.7% of Mainhand Max DPS + 134.8% of Offhand Max DPS + 21.4% of AP + 3 ]*/
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_MISTWEAVER)
+								damage = irand(8.09f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 0.429f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - (2 * baseDamage), 8.09f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.429f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + (2 * baseDamage));
+												/*[ 809% of Mainhand Min DPS + 42.9% of AP - 6 ]														to [ 809% of Mainhand Max DPS + 42.9% of AP + 6 ]*/
+						}
+						break;
+					case 100780: // Jab
+						{
+							int32 baseDamage = 2;
+
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_BREWMASTER || m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_WINDWALKER)
+								damage = irand(1.348f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 67.4f * m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + 0.107f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 1.348f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.674f * m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + 0.107f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+												/*[ 134.8% of Mainhand Min DPS + 67.4% of Offhand Min DPS + 10.7% of AP - 2 ]							to [ 134.8% of Mainhand Max DPS + 67.4% of Offhand Max DPS + 10.7% of AP + 2 ]*/
+							if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_MONK_MISTWEAVER)
+								damage = irand(2.02f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 0.107f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 2.022f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 0.107f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+												/*[ 202.2% of Mainhand Min DPS + 10.7% of AP - 2 ]														to [ 202.2% of Mainhand Max DPS + 10.7% of AP + 2 ]*/
+						}
+						break;
+					case 117418: // Fists of Fury
+						{
+							int32 baseDamage = 7;
+							damage = irand(6.0f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 3.0f * m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + 0.477f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 6.0f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 3.0f * m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + 0.477f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+							/* [ 600% of Mainhand Min DPS + 300% of Offhand Min DPS + 47.7% of AP - 7 ]													to [ 600% of Mainhand Max DPS + 300% of Offhand Max DPS + 47.7% of AP + 7 ] */
+						}
+						break;
+					case 107428: // Rising Sun Kick
+						{
+							int32 baseDamage = 13;
+							damage = irand(11.52f * m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE) + 5.76f * m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + 0.915f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) - baseDamage, 11.52f * m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + 5.76f * m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + 0.915f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + baseDamage);
+							/*[ 1,152% of Mainhand Min DPS + 576% of Offhand Min DPS + 91.5% of AP - 13 ]												to [ 1,152% of Mainhand Max DPS + 576% of Offhand Max DPS + 91.5% of AP + 13 ]*/		
+						}
+						break;
                     default:
                         break;
                 }
@@ -725,29 +828,27 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         case SPELLFAMILY_MONK:
             switch(m_spellInfo->Id)
             {
-				case 116841:						// tiger's lust
-				{
+				case 116841:						// Tiger's lust
 					m_caster->RemoveMovementImpairingAuras();
 					break;
-				}
-                case 109132:                        //roulade
+                case 109132:                        // Roll
                 {
                     if(m_caster->HasUnitMovementFlag(MOVEMENTFLAG_BACKWARD))
 					{
-                        m_caster->CastSpell(m_caster, 109131, true); // cast roll
+                        m_caster->CastSpell(m_caster, 109131, true); // Casts roll
 
-						if(m_caster->HasAura(115174)) // if monk have "Momentum" talent
+						if(m_caster->HasAura(115174)) // If monk have "Momentum" talent
 						{
-							m_caster->CastSpell(m_caster, 119085, true); // cast spell for speed
+							m_caster->CastSpell(m_caster, 119085, true); // Casts spell for the speed
 						}
 					}
                     else
 					{
-                        m_caster->CastSpell(m_caster, 107427, true); // cast roll
+                        m_caster->CastSpell(m_caster, 107427, true); // Casts roll
 
-						if(m_caster->HasAura(115174)) // if monk have "Momentum" talent
+						if(m_caster->HasAura(115174)) // If monk have "Momentum" talent
 						{
-							m_caster->CastSpell(m_caster, 119085, true); // cast spell for speed
+							m_caster->CastSpell(m_caster, 119085, true); // Casts spell for the speed
 						}
 					}
                     return;
@@ -756,20 +857,24 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 {
                     m_caster->CastSpell(unitTarget, 116189, true);
                     m_caster->CastSpell(unitTarget, 130793, true);
-                    break;
                 }
+				break;
                 case 115921:
                 {
                     Player* caster = m_caster->ToPlayer();
                     Player* target = unitTarget->ToPlayer();
+
                     if (caster && target && caster->IsInSameGroupWith(target))
                     {
                         caster->CastSpell(target, 117666, true);
                     }
                     else
                         m_caster->CastSpell(unitTarget, 117667, true);
-                    break;
+
+					if (caster->HasAura(116781)) // Legacy of the White Tiger
+						caster->RemoveAura(116781);
                 }
+				break;
                 case 115203:
                 {
                     m_caster->CastSpell(unitTarget, 126456, true);
@@ -782,6 +887,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
 						m_caster->CastSpell(m_caster, 119085, true); // cast spell for speed
 					}
 				}
+				break;
                 default:
                     break;
             }
@@ -4880,6 +4986,8 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         }
         else
             m_caster->GetMotionMaster()->MoveCharge(m_preGeneratedPath);
+
+		m_caster->ModifyPower(POWER_RAGE, 20);
     }
 
     if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET)

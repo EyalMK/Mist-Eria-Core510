@@ -3759,6 +3759,10 @@ void SpellMgr::LoadSpellInfoCorrections()
                 break;
 			case 114556:
 				spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(27); //3sec
+				break;
+			case 118253:
+				spellInfo->Effects[EFFECT_1].Effect = 0; // This effect is completely fucked up
+				break;
             default:
                 break;
         }
