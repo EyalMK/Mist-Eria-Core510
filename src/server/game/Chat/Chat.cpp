@@ -690,7 +690,7 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
     }
 
     *data << uint64(target_guid);                           // there 0 for BG messages
-    *data << uint32(CHAT_MSG_PARTY || CHAT_MSG_PARTY_LEADER || CHAT_MSG_RAID);                                     // can be chat msg group or something
+    *data << uint32(CHAT_MSG_PARTY || CHAT_MSG_RAID);                                     // can be chat msg group or something
 
     if (type == CHAT_MSG_CHANNEL)
     {
