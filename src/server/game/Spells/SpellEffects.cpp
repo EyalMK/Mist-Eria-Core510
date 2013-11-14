@@ -439,7 +439,9 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 						}
 
 						m_caster->CastSpell(m_caster, 118340, true); // Healing spell
-					break;
+						break;
+					default:
+						break;
 				}
                 // Victory Rush
                 if (m_spellInfo->Id == 34428 && m_caster->HasAura(32216))
@@ -722,6 +724,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 								default:
 									break;
 							}
+						}
 						break;
 					case 117418: // Fists of Fury
 						{
