@@ -629,20 +629,20 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 						{
 							case TALENT_TREE_MONK_BREWMASTER:
 							{
-								damage = irand(6.4f*minMainHandDmg + 3.2f*minOffHandDmg + 0.509f*attackPower - baseDamage, 6.4f*maxMainHandDmg + 0.32f*maxOffHandDmg + 0.509f*attackPower + baseDamage);
-											/*[ 640% of Mainhand Min DPS + 320% of Offhand Min DPS + 50.9% of AP - 7 ]		to [ 640% of Mainhand Max DPS + 320% of Offhand Max DPS + 50.9% of AP + 7 ]*/
+								damage = irand(6.4f*minMainHandDmg + 3.2f*minOffHandDmg + 0.509f*attackPower - baseDamage, 6.4f*maxMainHandDmg + 3.2f*maxOffHandDmg + 0.509f*attackPower + baseDamage);
+											//[ 640% of Mainhand Min DPS + 320% of Offhand Min DPS + 50.9% of AP - 7 ]		to [ 640% of Mainhand Max DPS + 320% of Offhand Max DPS + 50.9% of AP + 7 ]
 								break;
 							}
 							case TALENT_TREE_MONK_WINDWALKER:
 							{
-								damage = irand(6.4f*minMainHandDmg + 3.2f*minOffHandDmg + 0.509f*attackPower - baseDamage, 6.4f*maxMainHandDmg + 0.32f*maxOffHandDmg + 0.509f*attackPower + baseDamage);
-												/*[ 640% of Mainhand Min DPS + 320% of Offhand Min DPS + 50.9% of AP - 7 ]		to [ 640% of Mainhand Max DPS + 320% of Offhand Max DPS + 50.9% of AP + 7 ]*/
+								damage = irand(6.4f*minMainHandDmg + 3.2f*minOffHandDmg + 0.509f*attackPower - baseDamage, 6.4f*maxMainHandDmg + 3.2f*maxOffHandDmg + 0.509f*attackPower + baseDamage);
+											//[ 640% of Mainhand Min DPS + 320% of Offhand Min DPS + 50.9% of AP - 7 ]		to [ 640% of Mainhand Max DPS + 320% of Offhand Max DPS + 50.9% of AP + 7 ]
 								break;
 							}
 							case TALENT_TREE_MONK_MISTWEAVER:
 							{
 								damage = irand(9.6f*minMainHandDmg + 0.509f*attackPower - baseDamage, 9.6f*maxMainHandDmg + 0.509f*attackPower + baseDamage);
-											/*[ 960% of Mainhand Min DPS + 50.9% of AP - 7 ] 			to [ 960% of Mainhand Max DPS + 50.9% of AP + 7 ]*/
+											//[ 960% of Mainhand Min DPS + 50.9% of AP - 7 ] 			to [ 960% of Mainhand Max DPS + 50.9% of AP + 7 ]
 								break;
 							}
 							default:
@@ -659,15 +659,15 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     {
                     case TALENT_TREE_MONK_BREWMASTER:
                         damage = irand(0.809f*minMainHandDmg + 0.404f*minOffHandDmg + 0.205f*attackPower - baseDamage, 0.809f*maxMainHandDmg + 0.404f*maxOffHandDmg + 0.205f*attackPower + baseDamage);
-                        /*[ 80.9% of Mainhand Min DPS + 40.4% of Offhand Min DPS + 20.5% of AP - 2 ]		to [ 80.9% of Mainhand Max DPS + 40.4% of Offhand Max DPS + 20.5% of AP + 2 ]*/
+                        //[ 80.9% of Mainhand Min DPS + 40.4% of Offhand Min DPS + 20.5% of AP - 2 ]		to [ 80.9% of Mainhand Max DPS + 40.4% of Offhand Max DPS + 20.5% of AP + 2 ]
                         break;
                     case TALENT_TREE_MONK_WINDWALKER:
                         damage = irand(2.022f*minMainHandDmg + 1.011f*minOffHandDmg + 0.161f*attackPower - baseDamage, 2.022f*maxMainHandDmg + 1.011f*maxOffHandDmg + 0.161f*attackPower + baseDamage);
-                        /*[ 202.2% of Mainhand Min DPS + 101.1% of Offhand Min DPS + 16.1% of AP - 2 ]	to [ 202.2% of Mainhand Max DPS + 101.1% of Offhand Max DPS + 16.1% of AP + 2 ]*/
+                        //[ 202.2% of Mainhand Min DPS + 101.1% of Offhand Min DPS + 16.1% of AP - 2 ]	to [ 202.2% of Mainhand Max DPS + 101.1% of Offhand Max DPS + 16.1% of AP + 2 ]
                         break;
                     case TALENT_TREE_MONK_MISTWEAVER:
                         damage = irand(3.034f*minMainHandDmg + 0.161f*attackPower - baseDamage, 3.034f*maxMainHandDmg + 0.161f*attackPower + baseDamage);
-                        /*[ 303.4% of Mainhand Min DPS + 16.1% of AP - 2 ]			to [ 303.4% of Mainhand Max DPS + 16.1% of AP + 2 ]*/
+                        //[ 303.4% of Mainhand Min DPS + 16.1% of AP - 2 ]			to [ 303.4% of Mainhand Max DPS + 16.1% of AP + 2 ]
                         break;
                     default:
                         break;
@@ -753,7 +753,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     {
                     case TALENT_TREE_MONK_BREWMASTER:
                     case TALENT_TREE_MONK_WINDWALKER:
-                        minDMG = (uint32)(1.348f*minMainHandDmg + 67.4f*minOffHandDmg + 0.107f*attackPower - baseDamage);
+                        minDMG = (uint32)(1.348f*minMainHandDmg + 0.674f*minOffHandDmg + 0.107f*attackPower - baseDamage);
                         maxDMG = (uint32)(1.348f*maxMainHandDmg + 0.674f*maxOffHandDmg + 0.107f*attackPower + baseDamage);
                         //[ 134.8% of Mainhand Min DPS + 67.4% of Offhand Min DPS + 10.7% of AP - 2 ]		to [ 134.8% of Mainhand Max DPS + 67.4% of Offhand Max DPS + 10.7% of AP + 2 ]
                         break;
