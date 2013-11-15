@@ -285,9 +285,9 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote eEmote, const std::string& Title
             data << uint32(questID);
             data << uint32(qmi.QuestIcon);
             data << int32(quest->GetQuestLevel());
-            data << uint32(0);             // 3.3.3 quest flags
+            data << uint32(quest->GetFlags());             // 3.3.3 quest flags
 			data << uint32(quest->GetFlags());							 // quest->GetFlags2()
-            data << uint8(0);                              // 3.3.3 changes icon: blue question or yellow exclamation
+            data << uint8(1);                              // 3.3.3 changes icon: blue question or yellow exclamation
             data << title;
         }
     }
