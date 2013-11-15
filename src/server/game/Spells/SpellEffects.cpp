@@ -669,7 +669,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     int32 minDMG, maxDMG;
 
                     switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
-
+                    {
                     case TALENT_TREE_MONK_BREWMASTER:
                         minDMG = (uint32)(0.629f*minMainHandDmg + 0.315f*minOffHandDmg + 0.159f*attackPower - baseDamage);
                         maxDMG = (uint32)(0.629f*maxMainHandDmg + 0.315f*maxOffHandDmg + 0.159f*attackPower + baseDamage);
