@@ -648,6 +648,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 							default:
 								break;
 						}
+<<<<<<< HEAD
 						break;
 					}
 					case 124335: // Swift Reflexes
@@ -777,6 +778,150 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     default:
                         break;
 				}
+=======
+                        break;*/
+                case 124335: // Swift Reflexes
+                {
+                    int32 baseDamage = 2;
+
+                    switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
+                    {
+                    case TALENT_TREE_MONK_BREWMASTER:
+                        damage = irand(0.809f*minMainHandDmg + 0.404f*minOffHandDmg + 0.205f*attackPower - baseDamage, 0.809f*maxMainHandDmg + 0.404f*maxOffHandDmg + 0.205f*attackPower + baseDamage);
+                        /*[ 80.9% of Mainhand Min DPS + 40.4% of Offhand Min DPS + 20.5% of AP - 2 ]		to [ 80.9% of Mainhand Max DPS + 40.4% of Offhand Max DPS + 20.5% of AP + 2 ]*/
+                        break;
+                    case TALENT_TREE_MONK_WINDWALKER:
+                        damage = irand(2.022f*minMainHandDmg + 1.011f*minOffHandDmg + 0.161f*attackPower - baseDamage, 2.022f*maxMainHandDmg + 1.011f*maxOffHandDmg + 0.161f*attackPower + baseDamage);
+                        /*[ 202.2% of Mainhand Min DPS + 101.1% of Offhand Min DPS + 16.1% of AP - 2 ]	to [ 202.2% of Mainhand Max DPS + 101.1% of Offhand Max DPS + 16.1% of AP + 2 ]*/
+                        break;
+                    case TALENT_TREE_MONK_MISTWEAVER:
+                        damage = irand(3.034f*minMainHandDmg + 0.161f*attackPower - baseDamage, 3.034f*maxMainHandDmg + 0.161f*attackPower + baseDamage);
+                        /*[ 303.4% of Mainhand Min DPS + 16.1% of AP - 2 ]			to [ 303.4% of Mainhand Max DPS + 16.1% of AP + 2 ]*/
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                    break;
+                case 107270: // Spinning Crane Kick
+                {
+                    m_caster->SetSpeed(MOVE_WALK, 0.7f, true);
+                    m_caster->SetSpeed(MOVE_RUN, 0.7f, true);
+                    int32 baseDamage = 2;
+                    int32 minDMG, maxDMG;
+
+                    switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
+                    {
+                    case TALENT_TREE_MONK_BREWMASTER:
+                        minDMG = (uint32)(0.629f*minMainHandDmg + 0.315f*minOffHandDmg + 0.159f*attackPower - baseDamage);
+                        maxDMG = (uint32)(0.629f*maxMainHandDmg + 0.315f*maxOffHandDmg + 0.159f*attackPower + baseDamage);
+                        //[ 62.9% of Mainhand Min DPS + 31.5% of Offhand Min DPS + 15.9% of AP - 2 ]		to [ 62.9% of Mainhand Max DPS + 31.5% of Offhand Max DPS + 15.9% of AP + 2 ]
+                        break;
+                    case TALENT_TREE_MONK_WINDWALKER:
+                        minDMG = (uint32)(1.573f*minMainHandDmg + 0.787f*minOffHandDmg + 0.125f*attackPower - baseDamage);
+                        maxDMG = (uint32)(1.573f*maxMainHandDmg + 0.787f*maxOffHandDmg + 0.125f*attackPower + baseDamage);
+                        //[ 157.3% of Mainhand Min DPS + 78.7% of Offhand Min DPS + 12.5% of AP - 2 ]		to [ 157.3% of Mainhand Max DPS + 78.7% of Offhand Max DPS + 12.5% of AP + 2 ]
+                        break;
+                    case TALENT_TREE_MONK_MISTWEAVER:
+                        minDMG = (uint32)(2.36f*minMainHandDmg + 0.125f*attackPower - baseDamage);
+                        maxDMG = (uint32)(2.36f*maxMainHandDmg + 0.125f*attackPower + baseDamage);
+                        //[ 236% of Mainhand Min DPS + 12.5% of AP - 2 ]			to [ 236% of Mainhand Max DPS + 12.5% of AP + 2 ]
+                        break;
+                    default:
+                        break;
+                    }
+
+                    if (minDMG > maxDMG) {
+                        uint32 tmp = minDMG;
+                        minDMG = maxDMG;
+                        maxDMG = tmp;
+                    }
+                    damage = irand(minDMG, maxDMG);
+
+                }
+                break;
+                case 100787: // Tiger Palm
+                {
+                    int32 baseDamage = 3;
+
+                    int32 minDMG, maxDMG;
+
+                    switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
+                    {
+                    case TALENT_TREE_MONK_BREWMASTER:
+                    case TALENT_TREE_MONK_WINDWALKER:
+                        minDMG = (uint32)(2.697f*minMainHandDmg + 1.348f*minOffHandDmg + 0.214f*attackPower - baseDamage);
+                        maxDMG = (uint32)(2.697f*maxMainHandDmg + 1.348f*maxOffHandDmg + 0.214f*attackPower + baseDamage);
+
+                        //[ 269.7% of Mainhand Min DPS + 134.8% of Offhand Min DPS + 21.4% of AP - 3 ]		to [ 269.7% of Mainhand Max DPS + 134.8% of Offhand Max DPS + 21.4% of AP + 3 ]
+                        break;
+                    case TALENT_TREE_MONK_MISTWEAVER:
+                        minDMG = (uint32)(8.09f*minMainHandDmg + 0.429f*attackPower - (2*baseDamage));
+                        maxDMG = (uint32)(8.09f*maxMainHandDmg + 0.429f*attackPower + (2*baseDamage));
+
+                        //[ 809% of Mainhand Min DPS + 42.9% of AP - 6 ]				to [ 809% of Mainhand Max DPS + 42.9% of AP + 6 ]
+                        break;
+                    default:
+                        break;
+                    }
+
+                    if (minDMG > maxDMG) {
+                        uint32 tmp = minDMG;
+                        minDMG = maxDMG;
+                        maxDMG = tmp;
+                    }
+                    damage = irand(minDMG, maxDMG);
+                }
+                break;
+                case 100780: // Jab
+                {
+                    int32 baseDamage = 2;
+
+                    int32 minDMG, maxDMG;
+
+                    switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
+                    {
+                    case TALENT_TREE_MONK_BREWMASTER:
+                    case TALENT_TREE_MONK_WINDWALKER:
+                        minDMG = (uint32)(1.348f*minMainHandDmg + 67.4f*minOffHandDmg + 0.107f*attackPower - baseDamage);
+                        maxDMG = (uint32)(1.348f*maxMainHandDmg + 0.674f*maxOffHandDmg + 0.107f*attackPower + baseDamage);
+                        //[ 134.8% of Mainhand Min DPS + 67.4% of Offhand Min DPS + 10.7% of AP - 2 ]		to [ 134.8% of Mainhand Max DPS + 67.4% of Offhand Max DPS + 10.7% of AP + 2 ]
+                        break;
+                    case TALENT_TREE_MONK_MISTWEAVER:
+                        minDMG = (uint32)(2.02f*minMainHandDmg + 0.107f*attackPower - baseDamage);
+                        maxDMG = (uint32)(2.022f*maxMainHandDmg + 0.107f*attackPower + baseDamage);
+                        //[ 202.2% of Mainhand Min DPS + 10.7% of AP - 2 ]					to [ 202.2% of Mainhand Max DPS + 10.7% of AP + 2 ]
+                        break;
+                    default:
+                        break;
+                    }
+                    if (minDMG > maxDMG) {
+                        uint32 tmp = minDMG;
+                        minDMG = maxDMG;
+                        maxDMG = tmp;
+                    }
+                    damage = irand(minDMG, maxDMG);
+                }
+                break;
+                case 117418: // Fists of Fury
+                {
+                    int32 baseDamage = 7;
+                    damage = irand(6.0f*minMainHandDmg + 3.0f*minOffHandDmg + 0.477f*attackPower - baseDamage, 6.0f*maxMainHandDmg + 3.0f*maxOffHandDmg + 0.477f*attackPower + baseDamage);
+                    /* [ 600% of Mainhand Min DPS + 300% of Offhand Min DPS + 47.7% of AP - 7 ]					to [ 600% of Mainhand Max DPS + 300% of Offhand Max DPS + 47.7% of AP + 7 ] */
+                }
+                break;
+                case 107428: // Rising Sun Kick
+                {
+                    int32 baseDamage = 13;
+
+                    damage = irand(11.52f*minMainHandDmg + 5.76f*minOffHandDmg + 0.915f*attackPower - baseDamage, 11.52f*maxMainHandDmg + 5.76f*maxOffHandDmg + 0.915f*attackPower + baseDamage);
+                    /*[ 1,152% of Mainhand Min DPS + 576% of Offhand Min DPS + 91.5% of AP - 13 ]					to [ 1,152% of Mainhand Max DPS + 576% of Offhand Max DPS + 91.5% of AP + 13 ]*/
+                }
+                break;
+                default:
+                    break;
+                }
+>>>>>>> 3e37685097e4d4f9feb6046b9ec760cadfa0af63
                 break;
             }
             default:
