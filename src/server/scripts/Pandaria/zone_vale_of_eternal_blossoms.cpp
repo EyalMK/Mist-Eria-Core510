@@ -40,7 +40,7 @@ public:
             if (!me->IsWithinDistInMap(who, 40.0f))
                 return;
 
-			if (!who || !who->IsInWorld() || who->GetZoneId() != 5840)
+			if (!who || !who->IsInWorld() || who->GetZoneId() != 6553 || who->GetZoneId() != 6541)
                 return;
 
 			if (who && who->GetTypeId() == TYPEID_PLAYER && !who->HasAura(SPELL_CYCLONIC_INSPIRATION) && !me->IsValidAttackTarget(who) && me->HasAura(SPELL_SPINNING_CRANE_KICK))
