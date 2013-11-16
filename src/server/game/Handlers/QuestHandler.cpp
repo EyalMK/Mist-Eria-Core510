@@ -677,7 +677,9 @@ uint32 WorldSession::getDialogStatus(Player* player, Object* questgiver, uint32 
         {
             if (quest->IsAutoComplete() && quest->IsRepeatable())
                 result2 = DIALOG_STATUS_REWARD_REP;
-            else
+            else if (quest->HasFlag(QUEST_FLAGS_DAILY) || quest->HasFlag(QUEST_FLAGS_WEEKLY))
+				result2 = DIALOG_STATUS_REWARD_REP;
+			else
                 result2 = DIALOG_STATUS_REWARD;
         }
         else if (status == QUEST_STATUS_INCOMPLETE)
@@ -716,7 +718,12 @@ uint32 WorldSession::getDialogStatus(Player* player, Object* questgiver, uint32 
                             result2 = DIALOG_STATUS_AVAILABLE;
                     }
                     else
-                        result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE;
+					{
+						if (quest->HasFlag(QUEST_FLAGS_DAILY) || quest->HasFlag(QUEST_FLAGS_WEEKLY))
+							result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE_REP;
+						else
+							result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE;
+					}
                 }
                 else
                     result2 = DIALOG_STATUS_UNAVAILABLE;
