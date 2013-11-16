@@ -286,8 +286,8 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote eEmote, const std::string& Title
             data << uint32(qmi.QuestIcon);
             data << int32(quest->GetQuestLevel());
             data << uint32(quest->GetFlags());             // 3.3.3 quest flags
-			data << uint32(quest->GetFlags());							 // quest->GetFlags2()
-            data << uint8(0xFF);                              // 3.3.3 changes icon: blue question or yellow exclamation
+			data << uint32(0);							 // quest->GetFlags2()
+            data << uint8(0);                              // 3.3.3 changes icon: blue question or yellow exclamation
             data << title;
         }
     }
@@ -301,7 +301,7 @@ void PlayerMenu::SendQuestGiverStatus(uint32 questStatus, uint64 npcGUID) const
 {
     WorldPacket data(SMSG_QUESTGIVER_STATUS, 8 + 4);
     data << uint64(npcGUID);
-    data << uint32(0xFFFFFFFF);
+    data << uint32(questStatus);
 
     _session->SendPacket(&data);
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_QUESTGIVER_STATUS NPC Guid=%u, status=%u", GUID_LOPART(npcGUID), questStatus);

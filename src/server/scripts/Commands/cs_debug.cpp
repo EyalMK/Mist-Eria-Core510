@@ -92,6 +92,7 @@ public:
             { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "", NULL },
             { "phase",          SEC_MODERATOR,      false, &HandleDebugPhaseCommand,           "", NULL },
 			{ "chat",			SEC_MODERATOR,      false, &HandleDebugChatCommand,			   "", NULL },
+			{ "questgiver",		SEC_MODERATOR,      false, &HandleDebugQuestGiverCommand,	   "", NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
         };
         static ChatCommand debugSetCommandTable[] = 
@@ -1531,6 +1532,37 @@ public:
 
 		WorldPacket data;
 		ChatHandler::FillMessageData(&data, handler->GetSession(), uint8(type), LANG_UNIVERSAL, NULL, 0, text.c_str(), NULL);
+		handler->GetSession()->SendPacket(&data);
+
+        return true;
+    }
+
+	static bool HandleDebugQuestGiverCommand(ChatHandler* handler, char const* args)
+    {
+		if (!args)
+			return false;
+
+		uint32 status;
+
+		char* statusStr = strtok((char*)args, " ");
+
+		if (!statusStr)
+			return false;
+
+		status = atoi(statusStr);
+
+		Creature * c = handler->getSelectedCreature();
+
+		if(!c)
+		{
+			handler->SendSysMessage("Vous devez selectionner une Creature");
+			return false;
+		}
+
+		WorldPacket data(SMSG_QUESTGIVER_STATUS, 8 + 4);
+		data << uint64(c->GetGUID());
+		data << uint32(status);
+
 		handler->GetSession()->SendPacket(&data);
 
         return true;
