@@ -15920,7 +15920,7 @@ bool Player::SatisfyQuestDay(Quest const* qInfo, bool msg)
         return true;
     }
 
-    bool have_slot = false;
+    bool have_slot = true;
     for (uint32 quest_daily_idx = 0; quest_daily_idx < PLAYER_MAX_DAILY_QUESTS; ++quest_daily_idx)
     {
         //For MOP,unknow about PLAYER_FIELD_DAILY_QUESTS_1 fileds
