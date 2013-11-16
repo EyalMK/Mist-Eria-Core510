@@ -56,8 +56,11 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
             if (!cr_questgiver->IsHostileTo(_player))       // do not show quest status to enemies
             {
                 questStatus = sScriptMgr->GetDialogStatus(_player, cr_questgiver);
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NoboDie questStatus 1 %u", questStatus);
                 if (questStatus > 6)
                     questStatus = getDialogStatus(_player, cr_questgiver, defstatus);
+
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NoboDie questStatus 2 %u", questStatus);
             }
             break;
         }
