@@ -15920,25 +15920,6 @@ bool Player::SatisfyQuestDay(Quest const* qInfo, bool msg)
         return true;
     }
 
-    bool have_slot = true;
-    for (uint32 quest_daily_idx = 0; quest_daily_idx < PLAYER_MAX_DAILY_QUESTS; ++quest_daily_idx)
-    {
-        //For MOP,unknow about PLAYER_FIELD_DAILY_QUESTS_1 fileds
-        //uint32 id = GetUInt32Value(PLAYER_FIELD_DAILY_QUESTS_1+quest_daily_idx);
-        //if (qInfo->GetQuestId() == id)
-            //return false;
-
-        //if (!id)
-            //have_slot = true;
-    }
-
-    if (!have_slot)
-    {
-        if (msg)
-            SendCanTakeQuestResponse(INVALIDREASON_DAILY_QUESTS_REMAINING);
-        return false;
-    }
-
     return true;
 }
 
