@@ -343,6 +343,7 @@ public:
 									DoCast(SPELL_HYDROLANCE);
 								}
 
+								hydrolanceCount + 1;
 								events.ScheduleEvent(EVENT_HYDROLANCE, 4*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
 								break;
 							}
@@ -360,7 +361,7 @@ public:
 									}
 								}
 
-								hydrolanceCount = 1;
+								hydrolanceWaterCount = 1;
 								events.CancelEvent(EVENT_HYDROLANCE_FRONT);
 								break;
 							}
@@ -378,7 +379,7 @@ public:
 									}
 								}
 							
-								hydrolanceCount = 2;
+								hydrolanceWaterCount = 2;
 								events.CancelEvent(EVENT_HYDROLANCE_LEFT);
 								break;
 							}
@@ -396,8 +397,8 @@ public:
 									}
 								}
 
+								hydrolanceWaterCount = 0;
 								events.CancelEvent(EVENT_HYDROLANCE_RIGHT);
-								hydrolanceCount = 0;
 								break;
 							}
 
