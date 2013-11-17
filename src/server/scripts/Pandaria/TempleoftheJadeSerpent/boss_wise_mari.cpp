@@ -95,7 +95,6 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
-		SummonList Summons;
 		int32 corruptWaterCount;
 		bool firstCorruptWater;
 		bool secondCorruptWater;
@@ -111,7 +110,6 @@ public:
 				instance->SetBossState(DATA_BOSS_WISE_MARI, NOT_STARTED);
 				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				events.SetPhase(PHASE_NULL);
-				Summons.DespawnAll();
 
 				corruptWaterCount = 0;
 				firstCorruptWater = false;
