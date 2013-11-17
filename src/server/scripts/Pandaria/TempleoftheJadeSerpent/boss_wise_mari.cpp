@@ -155,7 +155,7 @@ public:
 				Talk(SAY_AGGRO);
 
 				events.SetPhase(PHASE_CORRUPT_LIVING_WATERS);
-				events.ScheduleEvent(EVENT_HYDROLANCE, 500, 0, PHASE_CORRUPT_LIVING_WATERS);
+				events.ScheduleEvent(EVENT_HYDROLANCE, 0, 0, PHASE_CORRUPT_LIVING_WATERS);
 				events.ScheduleEvent(EVENT_CALL_FIRST_WATER, 8*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
 			}
 		}
@@ -170,13 +170,13 @@ public:
 
 			events.Update(diff);
 
-			Unit* firstTrigger = me->FindNearestCreature(NPC_FIRST_TRIGGER_WATER, 500, true);
-			Unit* secondTrigger = me->FindNearestCreature(NPC_SECOND_TRIGGER_WATER, 500, true);
-			Unit* thirdTrigger = me->FindNearestCreature(NPC_THIRD_TRIGGER_WATER, 500, true);
-			Unit* fourthTrigger = me->FindNearestCreature(NPC_FOURTH_TRIGGER_WATER, 500, true);
-
 			if (instance)
 			{
+				Unit* firstTrigger = me->FindNearestCreature(NPC_FIRST_TRIGGER_WATER, 500, true);
+				Unit* secondTrigger = me->FindNearestCreature(NPC_SECOND_TRIGGER_WATER, 500, true);
+				Unit* thirdTrigger = me->FindNearestCreature(NPC_THIRD_TRIGGER_WATER, 500, true);
+				Unit* fourthTrigger = me->FindNearestCreature(NPC_FOURTH_TRIGGER_WATER, 500, true);
+
 				if (Unit* corruptWater = me->FindNearestCreature(NPC_CORRUPT_LIVING_WATER, 500))
 				{
 					if (!corruptWater->isAlive() && !firstCorruptWater)
