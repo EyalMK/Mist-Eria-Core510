@@ -20,34 +20,42 @@ enum Spells
 	SPELL_PURIFIED_WATER				= 118714,
 	SPELL_WATER_BUBBLE					= 106062,
 	SPELL_HYDROLANCE_PRECAST			= 115220,
-	
+	SPELL_HYDROLANCE_PULSE_BIG			= 106267,
+	SPELL_HYDROLANCE_PULSE_SMALL		= 106319,
+
 	/* Corrupt Living Water */
 	SPELL_SHA_RESIDUE					= 106653
 };
 
 enum Npcs
 {
-	NPC_CORRUPT_LIVING_WATER	= 56511,
-	NPC_FIRST_TRIGGER_WATER		= 400430,
-	NPC_SECOND_TRIGGER_WATER	= 400431,
-	NPC_THIRD_TRIGGER_WATER		= 400432,
-	NPC_FOURTH_TRIGGER_WATER	= 400433,
-	NPC_CORRUPT_DROPLET			= 56658,
+	NPC_CORRUPT_LIVING_WATER		= 56511,
+	NPC_FIRST_TRIGGER_WATER			= 400430,
+	NPC_SECOND_TRIGGER_WATER		= 400431,
+	NPC_THIRD_TRIGGER_WATER			= 400432,
+	NPC_FOURTH_TRIGGER_WATER		= 400433,
+	NPC_CORRUPT_DROPLET				= 56658,
+	NPC_HYDROLANCE_TRIGGER_FRONT	= 400434,
+	NPC_HYDROLANCE_TRIGGER_LEFT		= 400435,
+	NPC_HYDROLANCE_TRIGGER_RIGHT	= 400436,
 };
 
 enum Events
 {
 	EVENT_HYDROLANCE				= 1,
-	EVENT_CALL_FIRST_WATER			= 2,
-	EVENT_CALL_SECOND_WATER			= 3,
-	EVENT_CALL_THIRD_WATER			= 4,
-	EVENT_CALL_FOURTH_WATER			= 5,
-	EVENT_BUBBLE_BURST				= 6,
-	EVENT_HYDROBLAST				= 7,
-	EVENT_FIRST_TRIGGER_WATER_AURA	= 8,
-	EVENT_SECOND_TRIGGER_WATER_AURA	= 9,
-	EVENT_THIRD_TRIGGER_WATER_AURA	= 10,
-	EVENT_FOURTH_TRIGGER_WATER_AURA	= 11
+	EVENT_HYDROLANCE_FRONT			= 2,
+	EVENT_HYDROLANCE_LEFT			= 3,
+	EVENT_HYDROLANCE_RIGHT			= 4,
+	EVENT_CALL_FIRST_WATER			= 5,
+	EVENT_CALL_SECOND_WATER			= 6,
+	EVENT_CALL_THIRD_WATER			= 7,
+	EVENT_CALL_FOURTH_WATER			= 8,
+	EVENT_BUBBLE_BURST				= 9,
+	EVENT_HYDROBLAST				= 10,
+	EVENT_FIRST_TRIGGER_WATER_AURA	= 11,
+	EVENT_SECOND_TRIGGER_WATER_AURA	= 12,
+	EVENT_THIRD_TRIGGER_WATER_AURA	= 13,
+	EVENT_FOURTH_TRIGGER_WATER_AURA	= 14
 };
 
 enum Texts
@@ -97,6 +105,8 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
+		int32 hydrolanceCount;
+		int32 hydrolanceWaterCount;
 		bool firstCorruptWater;
 		bool secondCorruptWater;
 		bool thirdCorruptWater;
@@ -113,6 +123,8 @@ public:
 				me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE);
 				events.SetPhase(PHASE_NULL);
 
+				hydrolanceCount = 0;
+				hydrolanceWaterCount = 0;
 				firstCorruptWater = false;
 				secondCorruptWater = false;
 				thirdCorruptWater = false;
@@ -177,36 +189,33 @@ public:
 				Creature* thirdTrigger = me->FindNearestCreature(NPC_THIRD_TRIGGER_WATER, 500, true);
 				Creature* fourthTrigger = me->FindNearestCreature(NPC_FOURTH_TRIGGER_WATER, 500, true);
 
-				if (Creature* corruptWater = me->FindNearestCreature(NPC_CORRUPT_LIVING_WATER, 500))
+				if (hydrolanceCount == 5 && !firstCorruptWater)
 				{
-					if (!corruptWater->isAlive() && !firstCorruptWater)
-					{
-						events.ScheduleEvent(EVENT_CALL_SECOND_WATER, 5*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
-						firstCorruptWater = true;
-						corruptWater->RemoveCorpse();
-					}
+					events.ScheduleEvent(EVENT_CALL_SECOND_WATER, 2*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+					firstCorruptWater = true;
+					hydrolanceCount = 0;
+				}
 						
-					if (!corruptWater->isAlive() && !secondCorruptWater)
-					{
-						events.ScheduleEvent(EVENT_CALL_THIRD_WATER, 5*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
-						secondCorruptWater = true;
-						corruptWater->RemoveCorpse();
-					}
+				if (hydrolanceCount == 5 && !secondCorruptWater)
+				{
+					events.ScheduleEvent(EVENT_CALL_THIRD_WATER, 2*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+					secondCorruptWater = true;
+					hydrolanceCount = 0;
+				}
 
-					if (!corruptWater->isAlive() && !thirdCorruptWater)
-					{
-						events.ScheduleEvent(EVENT_CALL_FOURTH_WATER, 5*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
-						thirdCorruptWater = true;
-						corruptWater->RemoveCorpse();
-					}
+				if (hydrolanceCount == 5 && !thirdCorruptWater)
+				{
+					events.ScheduleEvent(EVENT_CALL_FOURTH_WATER, 2*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+					thirdCorruptWater = true;
+					hydrolanceCount = 0;
+				}
 
-					if (!corruptWater->isAlive() && !fourthCorruptWater)
-					{
-						events.SetPhase(PHASE_HYDROBLAST);
-						events.ScheduleEvent(EVENT_BUBBLE_BURST, 5*IN_MILLISECONDS, 0, PHASE_HYDROBLAST);
-						fourthCorruptWater = true;
-						corruptWater->RemoveCorpse();
-					}
+				if (hydrolanceCount == 5 && !fourthCorruptWater)
+				{
+					events.SetPhase(PHASE_HYDROBLAST);
+					events.ScheduleEvent(EVENT_BUBBLE_BURST, 2*IN_MILLISECONDS, 0, PHASE_HYDROBLAST);
+					fourthCorruptWater = true;
+					hydrolanceCount = 0;
 				}
 			
 				while(uint32 eventId = events.ExecuteEvent())
@@ -276,10 +285,123 @@ public:
 								break;
 
 							case EVENT_HYDROLANCE:
-								DoCast(SPELL_HYDROLANCE);
+							{
+								if (hydrolanceWaterCount == 0) // Front
+								{
+									me->SetOrientation(1.250952f);
+									
+									std::list<Creature*> hydrolanceTriggers;
+						            me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_FRONT, 500.0f);
+							        if (!hydrolanceTriggers.empty())
+								    {
+									    for (std::list<Creature*>::iterator itr = hydrolanceTriggers.begin(); itr != hydrolanceTriggers.end(); ++itr)
+										{
+											if ((*itr)->isAlive())
+												me->CastSpell((*itr), SPELL_HYDROLANCE_PRECAST);
+										}
+									}
+
+									events.ScheduleEvent(EVENT_HYDROLANCE_FRONT, 6*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+									DoCast(SPELL_HYDROLANCE);
+								}
+
+								if (hydrolanceWaterCount == 1) // Left
+								{
+									me->SetOrientation(5.240993f);
+									
+									std::list<Creature*> hydrolanceTriggers;
+						            me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_LEFT, 500.0f);
+							        if (!hydrolanceTriggers.empty())
+								    {
+									    for (std::list<Creature*>::iterator itr = hydrolanceTriggers.begin(); itr != hydrolanceTriggers.end(); ++itr)
+										{
+											if ((*itr)->isAlive())
+												me->CastSpell((*itr), SPELL_HYDROLANCE_PRECAST);
+										}
+									}
+
+									events.ScheduleEvent(EVENT_HYDROLANCE_LEFT, 6*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+									DoCast(SPELL_HYDROLANCE);
+								}
+
+								if (hydrolanceWaterCount == 2) // Right
+								{
+									me->SetOrientation(3.504827f);
+									
+									std::list<Creature*> hydrolanceTriggers;
+						            me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_RIGHT, 500.0f);
+							        if (!hydrolanceTriggers.empty())
+								    {
+									    for (std::list<Creature*>::iterator itr = hydrolanceTriggers.begin(); itr != hydrolanceTriggers.end(); ++itr)
+										{
+											if ((*itr)->isAlive())
+												me->CastSpell((*itr), SPELL_HYDROLANCE_PRECAST);
+										}
+									}
+
+									events.ScheduleEvent(EVENT_HYDROLANCE_RIGHT, 6*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+									DoCast(SPELL_HYDROLANCE);
+								}
 
 								events.ScheduleEvent(EVENT_HYDROLANCE, 4*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
 								break;
+							}
+
+							case EVENT_HYDROLANCE_FRONT:
+							{
+								std::list<Creature*> hydrolanceTriggers;
+								me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_FRONT, 500.0f);
+								if (!hydrolanceTriggers.empty())
+								{
+									for (std::list<Creature*>::iterator itr = hydrolanceTriggers.begin(); itr != hydrolanceTriggers.end(); ++itr)
+									{
+										if ((*itr)->isAlive())
+										{
+											me->CastSpell((*itr), SPELL_HYDROLANCE_PULSE_BIG);
+										}
+									}
+								}
+
+								hydrolanceCount = 1;
+								break;
+							}
+
+							case EVENT_HYDROLANCE_LEFT:
+							{
+								std::list<Creature*> hydrolanceTriggers;
+								me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_LEFT, 500.0f);
+								if (!hydrolanceTriggers.empty())
+								{
+									for (std::list<Creature*>::iterator itr = hydrolanceTriggers.begin(); itr != hydrolanceTriggers.end(); ++itr)
+									{
+										if ((*itr)->isAlive())
+										{
+											me->CastSpell((*itr), SPELL_HYDROLANCE_PULSE_BIG);
+										}
+									}
+								}
+							
+								hydrolanceCount = 2;
+								break;
+							}
+
+							case EVENT_HYDROLANCE_RIGHT:
+							{
+								std::list<Creature*> hydrolanceTriggers;
+								me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_RIGHT, 500.0f);
+								if (!hydrolanceTriggers.empty())
+								{
+									for (std::list<Creature*>::iterator itr = hydrolanceTriggers.begin(); itr != hydrolanceTriggers.end(); ++itr)
+									{
+										if ((*itr)->isAlive())
+										{
+											me->CastSpell((*itr), SPELL_HYDROLANCE_PULSE_BIG);
+										}
+									}
+								}
+								hydrolanceCount = 0;
+								break;
+							}
 
 							case EVENT_BUBBLE_BURST:
 								DoCast(SPELL_BUBBLE_BURST);
