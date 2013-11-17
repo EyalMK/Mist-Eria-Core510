@@ -165,6 +165,9 @@ public:
 			if(!UpdateVictim())
 				return;
 
+			if (me->HasUnitState(UNIT_STATE_CASTING))
+				return;
+
 			events.Update(diff);
 
 			Unit* firstTrigger = me->FindNearestCreature(NPC_FIRST_TRIGGER_WATER, 500, true);
