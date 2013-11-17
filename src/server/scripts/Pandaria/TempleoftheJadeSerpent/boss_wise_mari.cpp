@@ -13,7 +13,6 @@ enum Spells
 	SPELL_BLESSING_OF_THE_WATERSPEAKER	= 121483,
 	SPELL_BUBBLE_BURST					= 106612,
 	SPELL_CALL_WATER					= 106526,
-	SPELL_CALL_WATER_TRIGGERED			= 106462,
 	SPELL_HYDROLANCE					= 106055,
 	SPELL_PURIFIED_WATER				= 118714,
 	SPELL_WATER_BUBBLE					= 106062,
@@ -109,6 +108,7 @@ public:
 			{
 				instance->SetBossState(DATA_BOSS_WISE_MARI, NOT_STARTED);
 				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+				me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE);
 				events.SetPhase(PHASE_NULL);
 
 				corruptWaterCount = 0;
@@ -124,10 +124,7 @@ public:
             switch (action)
             {
 				case ACTION_WATER_COUNT:
-					corruptWaterCount++;
-					break;
-
-				default:
+					corruptWaterCount + 1;
 					break;
 			}
         }

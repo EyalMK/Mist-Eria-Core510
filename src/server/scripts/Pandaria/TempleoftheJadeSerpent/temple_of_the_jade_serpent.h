@@ -31,11 +31,11 @@ enum CreaturesIds
 
 enum CreaturesGUID
 {
-	NPC_SUN_1			= 000000,
-	NPC_SUN_2			= 000001,
-	NPC_SUN_3			= 000002,
-	NPC_SUN_4			= 000003,
-	NPC_SUN_5			= 000004,
+	NPC_SUN_1			= 0,
+	NPC_SUN_2			= 0,
+	NPC_SUN_3			= 0,
+	NPC_SUN_4			= 0,
+	NPC_SUN_5			= 0,
 };
 
 
