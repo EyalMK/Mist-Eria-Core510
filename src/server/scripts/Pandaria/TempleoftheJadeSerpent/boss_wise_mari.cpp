@@ -177,7 +177,7 @@ public:
 
 			if (instance)
 			{
-				if (Unit* corruptWater = me->FindNearestCreature(NPC_CORRUPT_LIVING_WATER, 500, true))
+				if (Unit* corruptWater = me->FindNearestCreature(NPC_CORRUPT_LIVING_WATER, 500))
 				{
 					if (!corruptWater->isAlive() && !firstCorruptWater)
 					{
@@ -228,7 +228,7 @@ public:
 						case EVENT_FIRST_TRIGGER_WATER_AURA:
 							firstTrigger->CastSpell(firstTrigger, SPELL_HYDROLANCE_PRECAST);
 
-							events.ScheduleEvent(EVENT_FIRST_TRIGGER_WATER_AURA, 6*IN_MILLISECONDS);
+							events.ScheduleEvent(EVENT_FIRST_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
 							break;
 
 						case EVENT_CALL_SECOND_WATER:
@@ -243,7 +243,7 @@ public:
 						case EVENT_SECOND_TRIGGER_WATER_AURA:
 							secondTrigger->CastSpell(secondTrigger, SPELL_HYDROLANCE_PRECAST);
 
-							events.ScheduleEvent(EVENT_SECOND_TRIGGER_WATER_AURA, 6*IN_MILLISECONDS);
+							events.ScheduleEvent(EVENT_SECOND_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
 							break;
 
 						case EVENT_CALL_THIRD_WATER:
@@ -258,7 +258,7 @@ public:
 						case EVENT_THIRD_TRIGGER_WATER_AURA:
 							thirdTrigger->CastSpell(thirdTrigger, SPELL_HYDROLANCE_PRECAST);
 
-							events.ScheduleEvent(EVENT_THIRD_TRIGGER_WATER_AURA, 6*IN_MILLISECONDS);
+							events.ScheduleEvent(EVENT_THIRD_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
 							break;
 
 						case EVENT_CALL_FOURTH_WATER:
@@ -273,7 +273,7 @@ public:
 						case EVENT_FOURTH_TRIGGER_WATER_AURA:
 							fourthTrigger->CastSpell(fourthTrigger, SPELL_HYDROLANCE_PRECAST);
 
-							events.ScheduleEvent(EVENT_FOURTH_TRIGGER_WATER_AURA, 6*IN_MILLISECONDS);
+							events.ScheduleEvent(EVENT_FOURTH_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
 							break;
 
 						case EVENT_HYDROLANCE:
