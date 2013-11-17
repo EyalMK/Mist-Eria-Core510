@@ -172,6 +172,11 @@ public:
 
 			if (instance)
 			{
+				Creature* firstTrigger = me->FindNearestCreature(NPC_FIRST_TRIGGER_WATER, 500, true);
+				Creature* secondTrigger = me->FindNearestCreature(NPC_SECOND_TRIGGER_WATER, 500, true);
+				Creature* thirdTrigger = me->FindNearestCreature(NPC_THIRD_TRIGGER_WATER, 500, true);
+				Creature* fourthTrigger = me->FindNearestCreature(NPC_FOURTH_TRIGGER_WATER, 500, true);
+
 				if (Creature* corruptWater = me->FindNearestCreature(NPC_CORRUPT_LIVING_WATER, 500))
 				{
 					if (!corruptWater->isAlive() && !firstCorruptWater)
@@ -203,102 +208,98 @@ public:
 						corruptWater->RemoveCorpse();
 					}
 				}
-			}
-
-			while(uint32 eventId = events.ExecuteEvent())
-			{
-				switch(eventId)
+			
+				while(uint32 eventId = events.ExecuteEvent())
 				{
-					if (instance)
+					switch(eventId)
 					{
-						Creature* firstTrigger = me->FindNearestCreature(NPC_FIRST_TRIGGER_WATER, 500, true);
-						Creature* secondTrigger = me->FindNearestCreature(NPC_SECOND_TRIGGER_WATER, 500, true);
-						Creature* thirdTrigger = me->FindNearestCreature(NPC_THIRD_TRIGGER_WATER, 500, true);
-						Creature* fourthTrigger = me->FindNearestCreature(NPC_FOURTH_TRIGGER_WATER, 500, true);
-
-						case EVENT_CALL_FIRST_WATER:
-							me->InterruptSpell(CURRENT_GENERIC_SPELL);
-							me->CastSpell(firstTrigger, SPELL_CALL_WATER);
-							Talk(SAY_CALL_FIRST_WATER);
+						if (instance)
+						{
+							case EVENT_CALL_FIRST_WATER:
+								me->InterruptSpell(CURRENT_GENERIC_SPELL);
+								me->CastSpell(firstTrigger, SPELL_CALL_WATER);
+								Talk(SAY_CALL_FIRST_WATER);
 							
-							events.ScheduleEvent(EVENT_FIRST_TRIGGER_WATER_AURA, 0);
-							events.CancelEvent(EVENT_CALL_FIRST_WATER);
-							break;
+								events.ScheduleEvent(EVENT_FIRST_TRIGGER_WATER_AURA, 0);
+								events.CancelEvent(EVENT_CALL_FIRST_WATER);
+								break;
+									
+							case EVENT_FIRST_TRIGGER_WATER_AURA:
+								firstTrigger->CastSpell(firstTrigger, SPELL_HYDROLANCE_PRECAST);
+									
+								events.ScheduleEvent(EVENT_FIRST_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
+								break;
 
-						case EVENT_FIRST_TRIGGER_WATER_AURA:
-							firstTrigger->CastSpell(firstTrigger, SPELL_HYDROLANCE_PRECAST);
+							case EVENT_CALL_SECOND_WATER:
+								me->InterruptSpell(CURRENT_GENERIC_SPELL);
+								me->CastSpell(secondTrigger, SPELL_CALL_WATER);
+								Talk(SAY_CALL_SECOND_WATER);
 
-							events.ScheduleEvent(EVENT_FIRST_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
-							break;
+								events.ScheduleEvent(EVENT_SECOND_TRIGGER_WATER_AURA, 0);
+								events.CancelEvent(EVENT_CALL_SECOND_WATER);
+								break;
 
-						case EVENT_CALL_SECOND_WATER:
-							me->InterruptSpell(CURRENT_GENERIC_SPELL);
-							me->CastSpell(secondTrigger, SPELL_CALL_WATER);
-							Talk(SAY_CALL_SECOND_WATER);
+							case EVENT_SECOND_TRIGGER_WATER_AURA:
+								secondTrigger->CastSpell(secondTrigger, SPELL_HYDROLANCE_PRECAST);
 
-							events.ScheduleEvent(EVENT_SECOND_TRIGGER_WATER_AURA, 0);
-							events.CancelEvent(EVENT_CALL_SECOND_WATER);
-							break;
+								events.ScheduleEvent(EVENT_SECOND_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
+								break;
 
-						case EVENT_SECOND_TRIGGER_WATER_AURA:
-							secondTrigger->CastSpell(secondTrigger, SPELL_HYDROLANCE_PRECAST);
+							case EVENT_CALL_THIRD_WATER:
+								me->InterruptSpell(CURRENT_GENERIC_SPELL);
+								me->CastSpell(thirdTrigger, SPELL_CALL_WATER);
+								Talk(SAY_CALL_THIRD_WATER);
 
-							events.ScheduleEvent(EVENT_SECOND_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
-							break;
+								events.ScheduleEvent(EVENT_THIRD_TRIGGER_WATER_AURA, 0);
+								events.CancelEvent(EVENT_CALL_THIRD_WATER);
+								break;
 
-						case EVENT_CALL_THIRD_WATER:
-							me->InterruptSpell(CURRENT_GENERIC_SPELL);
-							me->CastSpell(thirdTrigger, SPELL_CALL_WATER);
-							Talk(SAY_CALL_THIRD_WATER);
+							case EVENT_THIRD_TRIGGER_WATER_AURA:
+								thirdTrigger->CastSpell(thirdTrigger, SPELL_HYDROLANCE_PRECAST);
+								
+								events.ScheduleEvent(EVENT_THIRD_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
+								break;
 
-							events.ScheduleEvent(EVENT_THIRD_TRIGGER_WATER_AURA, 0);
-							events.CancelEvent(EVENT_CALL_THIRD_WATER);
-							break;
+							case EVENT_CALL_FOURTH_WATER:
+								me->InterruptSpell(CURRENT_GENERIC_SPELL);
+								me->CastSpell(fourthTrigger, SPELL_CALL_WATER);
+								Talk(SAY_CALL_FOURTH_WATER);
+	
+								events.ScheduleEvent(EVENT_FOURTH_TRIGGER_WATER_AURA, 0);
+								events.CancelEvent(EVENT_CALL_FOURTH_WATER);
+								break;
+	
+							case EVENT_FOURTH_TRIGGER_WATER_AURA:
+								fourthTrigger->CastSpell(fourthTrigger, SPELL_HYDROLANCE_PRECAST);
 
-						case EVENT_THIRD_TRIGGER_WATER_AURA:
-							thirdTrigger->CastSpell(thirdTrigger, SPELL_HYDROLANCE_PRECAST);
+								events.ScheduleEvent(EVENT_FOURTH_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
+								break;
 
-							events.ScheduleEvent(EVENT_THIRD_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
-							break;
+							case EVENT_HYDROLANCE:
+								DoCast(SPELL_HYDROLANCE);
 
-						case EVENT_CALL_FOURTH_WATER:
-							me->InterruptSpell(CURRENT_GENERIC_SPELL);
-							me->CastSpell(fourthTrigger, SPELL_CALL_WATER);
-							Talk(SAY_CALL_FOURTH_WATER);
+								events.ScheduleEvent(EVENT_HYDROLANCE, 4*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+								break;
 
-							events.ScheduleEvent(EVENT_FOURTH_TRIGGER_WATER_AURA, 0);
-							events.CancelEvent(EVENT_CALL_FOURTH_WATER);
-							break;
+							case EVENT_BUBBLE_BURST:
+								DoCast(SPELL_BUBBLE_BURST);
+								Talk(SAY_PHASE_HYDROBLAST);
 
-						case EVENT_FOURTH_TRIGGER_WATER_AURA:
-							fourthTrigger->CastSpell(fourthTrigger, SPELL_HYDROLANCE_PRECAST);
+								events.ScheduleEvent(EVENT_HYDROBLAST, 4*IN_MILLISECONDS, 0, PHASE_HYDROBLAST);
+								events.CancelEvent(EVENT_BUBBLE_BURST);
+								break;
+	
+							case EVENT_HYDROBLAST:
+								me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE, me->GetGUID());
+								// Cast hydroblast spell
 
-							events.ScheduleEvent(EVENT_FOURTH_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
-							break;
-
-						case EVENT_HYDROLANCE:
-							DoCast(SPELL_HYDROLANCE);
-
-							events.ScheduleEvent(EVENT_HYDROLANCE, 4*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
-							break;
-
-						case EVENT_BUBBLE_BURST:
-							DoCast(SPELL_BUBBLE_BURST);
-							Talk(SAY_PHASE_HYDROBLAST);
-
-							events.ScheduleEvent(EVENT_HYDROBLAST, 4*IN_MILLISECONDS, 0, PHASE_HYDROBLAST);
-							events.CancelEvent(EVENT_BUBBLE_BURST);
-							break;
-
-						case EVENT_HYDROBLAST:
-							me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE, me->GetGUID());
-							// Cast hydroblast spell
-
-							events.CancelEvent(EVENT_HYDROBLAST);
-							break;
+								events.CancelEvent(EVENT_HYDROBLAST);
+								break;
+						
+						}
 
 						default:
-							break;
+								break;
 					}
 				}
 			}
