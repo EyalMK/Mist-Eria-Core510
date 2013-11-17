@@ -1,7 +1,10 @@
 /* # Script de Tydrheal & Sungis : Wise Mari # */
 
 /*
-	Notes : Pending
+	Notes :
+	What is missing ? :	- Hydroblast
+						- Hydrolance triggers system
+						- Water damage
 */
 
 #include "ScriptPCH.h"
@@ -16,6 +19,7 @@ enum Spells
 	SPELL_HYDROLANCE					= 106055,
 	SPELL_PURIFIED_WATER				= 118714,
 	SPELL_WATER_BUBBLE					= 106062,
+	SPELL_HYDROLANCE_PRECAST			= 115220,
 	
 	/* Corrupt Living Water */
 	SPELL_SHA_RESIDUE					= 106653
@@ -33,18 +37,17 @@ enum Npcs
 
 enum Events
 {
-	EVENT_HYDROLANCE		= 1,
-	EVENT_CALL_FIRST_WATER	= 2,
-	EVENT_CALL_SECOND_WATER	= 3,
-	EVENT_CALL_THIRD_WATER	= 4,
-	EVENT_CALL_FOURTH_WATER	= 5,
-	EVENT_BUBBLE_BURST		= 6,
-	EVENT_HYDROBLAST		= 7,
-};
-
-enum Actions
-{
-	ACTION_WATER_COUNT
+	EVENT_HYDROLANCE				= 1,
+	EVENT_CALL_FIRST_WATER			= 2,
+	EVENT_CALL_SECOND_WATER			= 3,
+	EVENT_CALL_THIRD_WATER			= 4,
+	EVENT_CALL_FOURTH_WATER			= 5,
+	EVENT_BUBBLE_BURST				= 6,
+	EVENT_HYDROBLAST				= 7,
+	EVENT_FIRST_TRIGGER_WATER_AURA	= 8,
+	EVENT_SECOND_TRIGGER_WATER_AURA	= 9,
+	EVENT_THIRD_TRIGGER_WATER_AURA	= 10,
+	EVENT_FOURTH_TRIGGER_WATER_AURA	= 11
 };
 
 enum Texts
@@ -94,7 +97,6 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
-		int32 corruptWaterCount;
 		bool firstCorruptWater;
 		bool secondCorruptWater;
 		bool thirdCorruptWater;
@@ -111,7 +113,6 @@ public:
 				me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE);
 				events.SetPhase(PHASE_NULL);
 
-				corruptWaterCount = 0;
 				firstCorruptWater = false;
 				secondCorruptWater = false;
 				thirdCorruptWater = false;
@@ -119,20 +120,13 @@ public:
 			}
 		}
 
-		void DoAction(int32 action)
-        {
-            switch (action)
-            {
-				case ACTION_WATER_COUNT:
-					corruptWaterCount + 1;
-					break;
-			}
-        }
-
 		void JustDied(Unit *pWho)
 		{
 			if (instance)
+			{
 				Talk(irand(SAY_DEATH_1, SAY_DEATH_3));
+				instance->DoCastSpellOnPlayers(SPELL_BLESSING_OF_THE_WATERSPEAKER);
+			}
 		}
 
 		void KilledUnit(Unit *pWho) 
@@ -171,9 +165,6 @@ public:
 			if(!UpdateVictim())
 				return;
 
-			if(me->HasUnitState(UNIT_STATE_CASTING))
-				return;
-
 			events.Update(diff);
 
 			Unit* firstTrigger = me->FindNearestCreature(NPC_FIRST_TRIGGER_WATER, 500, true);
@@ -181,29 +172,39 @@ public:
 			Unit* thirdTrigger = me->FindNearestCreature(NPC_THIRD_TRIGGER_WATER, 500, true);
 			Unit* fourthTrigger = me->FindNearestCreature(NPC_FOURTH_TRIGGER_WATER, 500, true);
 
-			if (corruptWaterCount == 1 && !firstCorruptWater)
+			if (instance)
 			{
-				events.ScheduleEvent(EVENT_CALL_SECOND_WATER, 5*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
-				firstCorruptWater = true;
-			}
+				if (Unit* corruptWater = me->FindNearestCreature(NPC_CORRUPT_LIVING_WATER, 500, true))
+				{
+					if (!corruptWater->isAlive() && !firstCorruptWater)
+					{
+						events.ScheduleEvent(EVENT_CALL_SECOND_WATER, 5*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+						firstCorruptWater = true;
+						corruptWater->ToCreature()->DespawnOrUnsummon();
+					}
+						
+					if (!corruptWater->isAlive() && !secondCorruptWater)
+					{
+						events.ScheduleEvent(EVENT_CALL_THIRD_WATER, 5*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+						secondCorruptWater = true;
+						corruptWater->ToCreature()->DespawnOrUnsummon();
+					}
 
-			if (corruptWaterCount == 2 && !secondCorruptWater)
-			{
-				events.ScheduleEvent(EVENT_CALL_THIRD_WATER, 5*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
-				secondCorruptWater = true;
-			}
+					if (!corruptWater->isAlive() && !thirdCorruptWater)
+					{
+						events.ScheduleEvent(EVENT_CALL_FOURTH_WATER, 5*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+						thirdCorruptWater = true;
+						corruptWater->ToCreature()->DespawnOrUnsummon();
+					}
 
-			if (corruptWaterCount == 3 && !thirdCorruptWater)
-			{
-				events.ScheduleEvent(EVENT_CALL_FOURTH_WATER, 5*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
-				thirdCorruptWater = true;
-			}
-
-			if (corruptWaterCount == 4 && !fourthCorruptWater)
-			{
-				events.SetPhase(PHASE_HYDROBLAST);
-				events.ScheduleEvent(EVENT_BUBBLE_BURST, 5*IN_MILLISECONDS, 0, PHASE_HYDROBLAST);
-				fourthCorruptWater = true;
+					if (!corruptWater->isAlive() && !fourthCorruptWater)
+					{
+						events.SetPhase(PHASE_HYDROBLAST);
+						events.ScheduleEvent(EVENT_BUBBLE_BURST, 5*IN_MILLISECONDS, 0, PHASE_HYDROBLAST);
+						fourthCorruptWater = true;
+						corruptWater->ToCreature()->DespawnOrUnsummon();
+					}
+				}
 			}
 
 			while(uint32 eventId = events.ExecuteEvent())
@@ -217,7 +218,14 @@ public:
 							me->CastSpell(firstTrigger, SPELL_CALL_WATER);
 							Talk(SAY_CALL_FIRST_WATER);
 
+							events.ScheduleEvent(EVENT_FIRST_TRIGGER_WATER_AURA, 0);
 							events.CancelEvent(EVENT_CALL_FIRST_WATER);
+							break;
+
+						case EVENT_FIRST_TRIGGER_WATER_AURA:
+							firstTrigger->CastSpell(firstTrigger, SPELL_HYDROLANCE_PRECAST);
+
+							events.ScheduleEvent(EVENT_FIRST_TRIGGER_WATER_AURA, 6*IN_MILLISECONDS);
 							break;
 
 						case EVENT_CALL_SECOND_WATER:
@@ -225,7 +233,14 @@ public:
 							me->CastSpell(secondTrigger, SPELL_CALL_WATER);
 							Talk(SAY_CALL_SECOND_WATER);
 
+							events.ScheduleEvent(EVENT_SECOND_TRIGGER_WATER_AURA, 0);
 							events.CancelEvent(EVENT_CALL_SECOND_WATER);
+							break;
+
+						case EVENT_SECOND_TRIGGER_WATER_AURA:
+							secondTrigger->CastSpell(secondTrigger, SPELL_HYDROLANCE_PRECAST);
+
+							events.ScheduleEvent(EVENT_SECOND_TRIGGER_WATER_AURA, 6*IN_MILLISECONDS);
 							break;
 
 						case EVENT_CALL_THIRD_WATER:
@@ -233,7 +248,14 @@ public:
 							me->CastSpell(thirdTrigger, SPELL_CALL_WATER);
 							Talk(SAY_CALL_THIRD_WATER);
 
+							events.ScheduleEvent(EVENT_THIRD_TRIGGER_WATER_AURA, 0);
 							events.CancelEvent(EVENT_CALL_THIRD_WATER);
+							break;
+
+						case EVENT_THIRD_TRIGGER_WATER_AURA:
+							thirdTrigger->CastSpell(thirdTrigger, SPELL_HYDROLANCE_PRECAST);
+
+							events.ScheduleEvent(EVENT_THIRD_TRIGGER_WATER_AURA, 6*IN_MILLISECONDS);
 							break;
 
 						case EVENT_CALL_FOURTH_WATER:
@@ -241,7 +263,14 @@ public:
 							me->CastSpell(fourthTrigger, SPELL_CALL_WATER);
 							Talk(SAY_CALL_FOURTH_WATER);
 
+							events.ScheduleEvent(EVENT_FOURTH_TRIGGER_WATER_AURA, 0);
 							events.CancelEvent(EVENT_CALL_FOURTH_WATER);
+							break;
+
+						case EVENT_FOURTH_TRIGGER_WATER_AURA:
+							fourthTrigger->CastSpell(fourthTrigger, SPELL_HYDROLANCE_PRECAST);
+
+							events.ScheduleEvent(EVENT_FOURTH_TRIGGER_WATER_AURA, 6*IN_MILLISECONDS);
 							break;
 
 						case EVENT_HYDROLANCE:
@@ -254,14 +283,17 @@ public:
 							DoCast(SPELL_BUBBLE_BURST);
 							Talk(SAY_PHASE_HYDROBLAST);
 
-							events.ScheduleEvent(EVENT_HYDROBLAST, 6*IN_MILLISECONDS, 0, PHASE_HYDROBLAST);
+							events.ScheduleEvent(EVENT_HYDROBLAST, 4*IN_MILLISECONDS, 0, PHASE_HYDROBLAST);
+							events.CancelEvent(EVENT_BUBBLE_BURST);
 							break;
 
 						case EVENT_HYDROBLAST:
-							me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE);
+							me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE, me->GetGUID());
+							// Cast hydroblast spell
 
 							events.CancelEvent(EVENT_HYDROBLAST);
 							break;
+
 						default:
 							break;
 					}
@@ -308,11 +340,6 @@ public:
 			me->SummonCreature(NPC_CORRUPT_DROPLET, (x + 2.0f), y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60*IN_MILLISECONDS);
 			me->SummonCreature(NPC_CORRUPT_DROPLET, (x - 2.0f), y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60*IN_MILLISECONDS);
 			me->SummonCreature(NPC_CORRUPT_DROPLET, x, (y - 2.0f), z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60*IN_MILLISECONDS);
-
-			if (instance)
-				if (Creature* wiseMari = me->GetCreature(*me, instance->GetData64(DATA_BOSS_WISE_MARI)))
-					if (wiseMari->AI())
-					    wiseMari->AI()->DoAction(ACTION_WATER_COUNT);
 		}
 
 		void UpdateAI(uint32 diff) 
