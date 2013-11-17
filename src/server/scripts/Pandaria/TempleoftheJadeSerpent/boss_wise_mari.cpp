@@ -356,13 +356,12 @@ public:
 									for (std::list<Creature*>::iterator itr = hydrolanceTriggers.begin(); itr != hydrolanceTriggers.end(); ++itr)
 									{
 										if ((*itr)->isAlive())
-										{
-											me->CastSpell((*itr), SPELL_HYDROLANCE_PULSE_BIG);
-										}
+											(*itr)->CastSpell((*itr), SPELL_HYDROLANCE_PULSE_BIG);
 									}
 								}
 
 								hydrolanceCount = 1;
+								events.CancelEvent(EVENT_HYDROLANCE_FRONT);
 								break;
 							}
 
@@ -375,13 +374,12 @@ public:
 									for (std::list<Creature*>::iterator itr = hydrolanceTriggers.begin(); itr != hydrolanceTriggers.end(); ++itr)
 									{
 										if ((*itr)->isAlive())
-										{
-											me->CastSpell((*itr), SPELL_HYDROLANCE_PULSE_BIG);
-										}
+											(*itr)->CastSpell((*itr), SPELL_HYDROLANCE_PULSE_BIG);
 									}
 								}
 							
 								hydrolanceCount = 2;
+								events.CancelEvent(EVENT_HYDROLANCE_LEFT);
 								break;
 							}
 
@@ -394,11 +392,11 @@ public:
 									for (std::list<Creature*>::iterator itr = hydrolanceTriggers.begin(); itr != hydrolanceTriggers.end(); ++itr)
 									{
 										if ((*itr)->isAlive())
-										{
-											me->CastSpell((*itr), SPELL_HYDROLANCE_PULSE_BIG);
-										}
+											(*itr)->CastSpell((*itr), SPELL_HYDROLANCE_PULSE_BIG);
 									}
 								}
+
+								events.CancelEvent(EVENT_HYDROLANCE_RIGHT);
 								hydrolanceCount = 0;
 								break;
 							}
