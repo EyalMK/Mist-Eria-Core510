@@ -1,11 +1,7 @@
-/* # Script de Tydrheal : Wise Mari # */
+/* # Script de Tydrheal & Sungis : Wise Mari # */
 
-/* Notes : Tester -- verifier les spells -- SoundID
-Ajouter l'ID du NPC_TRIGGER
-
-Wise Mari : Script 95% verifier spells
-Wise Mari Trigger : Script 100%	
-Corrupt Living Water : Script 95% verifier spells	
+/*
+	Notes : Pending
 */
 
 #include "ScriptPCH.h"
@@ -15,65 +11,68 @@ enum Spells
 {
 	/* Wise Mari */
 	SPELL_BLESSING_OF_THE_WATERSPEAKER	= 121483,
-	SPELL_CORRUPTED_WATERS				= 115167,
-	SPELL_WATER_BUBBLE					= 106062,
-	SPELL_CALL_WATER					= 106462,
 	SPELL_BUBBLE_BURST					= 106612,
-	SPELL_WASH_AWAY						= 106334,
+	SPELL_CALL_WATER					= 106526,
+	SPELL_CALL_WATER_TRIGGERED			= 106462,
+	SPELL_HYDROLANCE					= 106055,
+	SPELL_PURIFIED_WATER				= 118714,
+	SPELL_WATER_BUBBLE					= 106062,
 	
 	/* Corrupt Living Water */
-	SPELL_SHA_RESIDUE = 106653
+	SPELL_SHA_RESIDUE					= 106653
+};
+
+enum Npcs
+{
+	NPC_CORRUPT_LIVING_WATER	= 56511,
+	NPC_FIRST_TRIGGER_WATER		= 400430,
+	NPC_SECOND_TRIGGER_WATER	= 400431,
+	NPC_THIRD_TRIGGER_WATER		= 400432,
+	NPC_FOURTH_TRIGGER_WATER	= 400433,
+	NPC_CORRUPT_DROPLET			= 56658,
 };
 
 enum Events
 {
-	EVENT_WATER_BUBBLE,
-	EVENT_PHASE_2,
-	EVENT_CORRUPTED_WATERS,
-	EVENT_CALL_WATER,
-	EVENT_AFTER_PHASE_2,
-	EVENT_SAY_DEATH_1,
-	EVENT_SAY_DEATH_2,
-	EVENT_DEATH
+	EVENT_HYDROLANCE		= 1,
+	EVENT_CALL_FIRST_WATER	= 2,
+	EVENT_CALL_SECOND_WATER	= 3,
+	EVENT_CALL_THIRD_WATER	= 4,
+	EVENT_CALL_FOURTH_WATER	= 5,
+	EVENT_BUBBLE_BURST		= 6,
+	EVENT_HYDROBLAST		= 7,
 };
 
 enum Actions
 {
-	ACTION_BOSS_WISE_MARI_RESET,
-	ACTION_BOSS_WISE_MARI_DIED,
-	ACTION_WISE_MARI_INTRO
+	ACTION_WATER_COUNT
 };
 
 enum Texts
 {
-	SAY_INTRO_1 = 0,
-	SAY_COMBAT = 1,
-	SAY_SPAWN = 2,
-	SAY_SPAWN_2 = 3,
-	SAY_SPAWN_3 = 4,
-	SAY_SPAWN_4 = 5,
-	SAY_AFTER_PHASE_2 = 6,
-	SAY_MIDDLE_LIFE = 7,
-	SAY_21_PER_CENT = 4,
-	SAY_DEATH_1 = 8,
-	SAY_DEATH_2 = 9,
-	SAY_SLAY_1 = 10,
-	SAY_SLAY_2 = 11,
-	SAY_EVADE = 12
-};
+	SAY_AGGRO				= 0,
+	SAY_CALL_FIRST_WATER	= 1,
+	SAY_CALL_SECOND_WATER	= 2,
+	SAY_CALL_THIRD_WATER	= 3,
+	SAY_CALL_FOURTH_WATER	= 4,
+	SAY_DEATH_1				= 5,
+	SAY_DEATH_2				= 6,
+	SAY_DEATH_3				= 7,
+	SAY_INTRO				= 8,
+	SAY_PHASE_HYDROBLAST	= 9,
+	SAY_SLAY_1				= 10,
+	SAY_SLAY_2				= 11,
+	SAY_TAUNT_1				= 12,
+	SAY_TAUNT_2				= 13,
+	SAY_TAUNT_3				= 14
 
-enum spawnIds
-{
-	CORRUPT_LIVING_WATER = 59873,
-	CORRUPT_DROPLET = 62360,
-	NPC_TRIGGER = 56449
 };
 
 enum Phases
 {
-	PHASE_1,
-	PHASE_2,
-	PHASE_DEATH
+	PHASE_NULL,
+	PHASE_CORRUPT_LIVING_WATERS,
+	PHASE_HYDROBLAST,
 };
 
 
@@ -96,93 +95,80 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
-		
-		bool checkWiseMariAlive;
-		bool checkSaySpawn2;
-		bool checkSaySpawn3;
-		bool checkSaySpawn4;
-		bool checkMiddleLife;
-		bool checkHealthBelow21;
-		int counterLivingWater;
-		
-		void Reset() 
+		SummonList Summons;
+		int32 corruptWaterCount;
+		bool firstCorruptWater;
+		bool secondCorruptWater;
+		bool thirdCorruptWater;
+		bool fourthCorruptWater;
+
+		void Reset()
 		{
-			checkHealthBelow21 = false;
-			checkMiddleLife = false;
-			checkSaySpawn2 = false;
-			checkSaySpawn3 = false;
-			checkSaySpawn4 = false;
-			counterLivingWater = 0;
-			checkWiseMariAlive = true;
-			checkWiseMariAlive = me->isAlive();
-			
 			events.Reset();
 
 			if (instance)
 			{
-				if(Creature *triggers = me->FindNearestCreature(NPC_TRIGGER, 50000.0f))
-					if(triggers->AI())
-					   triggers->AI()->Reset();
 				instance->SetBossState(DATA_BOSS_WISE_MARI, NOT_STARTED);
-				me->AI()->DoAction(ACTION_BOSS_WISE_MARI_RESET);
+				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+				events.SetPhase(PHASE_NULL);
+				Summons.DespawnAll();
+
+				corruptWaterCount = 0;
+				firstCorruptWater = false;
+				secondCorruptWater = false;
+				thirdCorruptWater = false;
+				fourthCorruptWater = false;
 			}
-			
 		}
 
-		void DoAction(int32 action) 
+		void DoAction(int32 action)
         {
             switch (action)
             {
-				case ACTION_BOSS_WISE_MARI_RESET:
-					checkWiseMariAlive = true;
+				case ACTION_WATER_COUNT:
+					corruptWaterCount++;
 					break;
-				case ACTION_BOSS_WISE_MARI_DIED:
-					checkWiseMariAlive = false;
+
+				default:
 					break;
-				case ACTION_WISE_MARI_INTRO:
-					Talk(SAY_INTRO_1);
-					break;
-				
 			}
         }
 
-		void JustDied(Unit *pWho) 
+		void JustDied(Unit *pWho)
 		{
 			if (instance)
-			{
-				me->AI()->DoAction(ACTION_BOSS_WISE_MARI_DIED);
-
-				if (!checkWiseMariAlive)
-					instance->SetBossState(DATA_BOSS_WISE_MARI, DONE);
-
-			}
-		
+				Talk(irand(SAY_DEATH_1, SAY_DEATH_3));
 		}
 
 		void KilledUnit(Unit *pWho) 
-		{	
-			Talk(urand(SAY_SLAY_1, SAY_SLAY_2));
+		{
+			if (instance)
+				Talk(irand(SAY_SLAY_1, SAY_SLAY_2));
 		}
 		
 		void EnterEvadeMode() 
 		{
 			if (instance)
-				instance->SetBossState(DATA_BOSS_WISE_MARI, FAIL);	
-			
-			Talk(SAY_EVADE);
+			{
+				instance->SetBossState(DATA_BOSS_WISE_MARI, FAIL);
+				me->CombatStop();
+				me->DeleteThreatList();
+			}
 		}
 
 		void EnterCombat(Unit* /*who*/) 
 		{
 			if (instance)
+			{
 				instance->SetBossState(DATA_BOSS_WISE_MARI, IN_PROGRESS);
+				me->SetInCombatWithZone();
+				DoCast(SPELL_WATER_BUBBLE);
+				Talk(SAY_AGGRO);
 
-			me->SetInCombatWithZone();
-			Talk(SAY_COMBAT);
-			events.SetPhase(PHASE_1);
-			events.ScheduleEvent(EVENT_WATER_BUBBLE, 0, 0, PHASE_1);
-			events.ScheduleEvent(EVENT_CORRUPTED_WATERS, 0, 0, PHASE_1);
-			events.ScheduleEvent(EVENT_CALL_WATER, 15*IN_MILLISECONDS, 0, PHASE_1);
+				events.SetPhase(PHASE_CORRUPT_LIVING_WATERS);
+				events.ScheduleEvent(EVENT_HYDROLANCE, 500, 0, PHASE_CORRUPT_LIVING_WATERS);
+				events.ScheduleEvent(EVENT_CALL_FIRST_WATER, 8*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+			}
 		}
 
 		void UpdateAI(uint32 diff) 
@@ -190,10 +176,40 @@ public:
 			if(!UpdateVictim())
 				return;
 
+			if(me->HasUnitState(UNIT_STATE_CASTING))
+				return;
+
 			events.Update(diff);
 
-			if (me->HasUnitState(UNIT_STATE_CASTING))
-				return;
+			Unit* firstTrigger = me->FindNearestCreature(NPC_FIRST_TRIGGER_WATER, 500, true);
+			Unit* secondTrigger = me->FindNearestCreature(NPC_SECOND_TRIGGER_WATER, 500, true);
+			Unit* thirdTrigger = me->FindNearestCreature(NPC_THIRD_TRIGGER_WATER, 500, true);
+			Unit* fourthTrigger = me->FindNearestCreature(NPC_FOURTH_TRIGGER_WATER, 500, true);
+
+			if (corruptWaterCount == 1 && !firstCorruptWater)
+			{
+				events.ScheduleEvent(EVENT_CALL_SECOND_WATER, 5*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+				firstCorruptWater = true;
+			}
+
+			if (corruptWaterCount == 2 && !secondCorruptWater)
+			{
+				events.ScheduleEvent(EVENT_CALL_THIRD_WATER, 5*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+				secondCorruptWater = true;
+			}
+
+			if (corruptWaterCount == 3 && !thirdCorruptWater)
+			{
+				events.ScheduleEvent(EVENT_CALL_FOURTH_WATER, 5*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+				thirdCorruptWater = true;
+			}
+
+			if (corruptWaterCount == 4 && !fourthCorruptWater)
+			{
+				events.SetPhase(PHASE_HYDROBLAST);
+				events.ScheduleEvent(EVENT_BUBBLE_BURST, 5*IN_MILLISECONDS, 0, PHASE_HYDROBLAST);
+				fourthCorruptWater = true;
+			}
 
 			while(uint32 eventId = events.ExecuteEvent())
 			{
@@ -201,171 +217,58 @@ public:
 				{
 					if (instance)
 					{
-						case EVENT_DEATH:
-							me->Kill(me);
-							events.CancelEvent(EVENT_DEATH);
+						case EVENT_CALL_FIRST_WATER:
+							me->InterruptSpell(CURRENT_GENERIC_SPELL);
+							me->CastSpell(firstTrigger, SPELL_CALL_WATER);
+							Talk(SAY_CALL_FIRST_WATER);
+
+							events.CancelEvent(EVENT_CALL_FIRST_WATER);
 							break;
 
-						case EVENT_SAY_DEATH_1:
-							me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
-							me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-							Talk(SAY_DEATH_1);
-							events.ScheduleEvent(EVENT_SAY_DEATH_2, 8*IN_MILLISECONDS, 0, PHASE_DEATH);
-							events.CancelEvent(EVENT_SAY_DEATH_1);
+						case EVENT_CALL_SECOND_WATER:
+							me->InterruptSpell(CURRENT_GENERIC_SPELL);
+							me->CastSpell(secondTrigger, SPELL_CALL_WATER);
+							Talk(SAY_CALL_SECOND_WATER);
+
+							events.CancelEvent(EVENT_CALL_SECOND_WATER);
 							break;
 
-						case EVENT_SAY_DEATH_2:
-							Talk(SAY_DEATH_2);
-							events.ScheduleEvent(EVENT_DEATH, 3*IN_MILLISECONDS, 0, PHASE_DEATH);
-							DoCastToAllHostilePlayers(SPELL_BLESSING_OF_THE_WATERSPEAKER);
-							events.CancelEvent(EVENT_SAY_DEATH_2);
+						case EVENT_CALL_THIRD_WATER:
+							me->InterruptSpell(CURRENT_GENERIC_SPELL);
+							me->CastSpell(thirdTrigger, SPELL_CALL_WATER);
+							Talk(SAY_CALL_THIRD_WATER);
+
+							events.CancelEvent(EVENT_CALL_THIRD_WATER);
 							break;
 
-						case EVENT_WATER_BUBBLE:
-							DoCast(me, SPELL_WATER_BUBBLE);
-							events.CancelEvent(EVENT_WATER_BUBBLE);
-							break;
-							
-						case EVENT_PHASE_2:
-							DoCast(me, SPELL_BUBBLE_BURST);
-							DoCast(me, SPELL_WASH_AWAY);
-							events.ScheduleEvent(EVENT_AFTER_PHASE_2, 10*IN_MILLISECONDS, 0, PHASE_2);
-							events.CancelEvent(EVENT_PHASE_2);
+						case EVENT_CALL_FOURTH_WATER:
+							me->InterruptSpell(CURRENT_GENERIC_SPELL);
+							me->CastSpell(fourthTrigger, SPELL_CALL_WATER);
+							Talk(SAY_CALL_FOURTH_WATER);
+
+							events.CancelEvent(EVENT_CALL_FOURTH_WATER);
 							break;
 
-						case EVENT_CORRUPTED_WATERS:
-							DoCast(me, SPELL_CORRUPTED_WATERS); //voir il faudra surement modifier ce sort pour qu'il change de fontaine
-							events.ScheduleEvent(EVENT_CORRUPTED_WATERS, 8*IN_MILLISECONDS, 0, PHASE_1);
+						case EVENT_HYDROLANCE:
+							DoCast(SPELL_HYDROLANCE);
+
+							events.ScheduleEvent(EVENT_HYDROLANCE, 4*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
 							break;
 
-						case EVENT_CALL_WATER:
-							if(counterLivingWater < 2)
-								Talk(SAY_SPAWN);
-							counterLivingWater++;
-							float x,y,z;
-							me->GetPosition(x,y,z);
-							me->SummonCreature(CORRUPT_LIVING_WATER, (x, y, z), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60*IN_MILLISECONDS);
-							events.ScheduleEvent(EVENT_CORRUPTED_WATERS, 25*IN_MILLISECONDS, 0, PHASE_1);
+						case EVENT_BUBBLE_BURST:
+							DoCast(SPELL_BUBBLE_BURST);
+							Talk(SAY_PHASE_HYDROBLAST);
+
+							events.ScheduleEvent(EVENT_HYDROBLAST, 6*IN_MILLISECONDS, 0, PHASE_HYDROBLAST);
 							break;
 
-						case EVENT_AFTER_PHASE_2:
-							Talk(SAY_AFTER_PHASE_2);
-							events.CancelEvent(EVENT_AFTER_PHASE_2);
+						case EVENT_HYDROBLAST:
+							me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE);
+
+							events.CancelEvent(EVENT_HYDROBLAST);
 							break;
-							
 						default:
 							break;
-					}
-				}
-			}
-
-			if(counterLivingWater == 2 && !checkSaySpawn2)
-			{
-				Talk(SAY_SPAWN_2);
-				checkSaySpawn2 = true;
-			}
-
-			if(counterLivingWater == 3 && !checkSaySpawn3)
-			{
-				Talk(SAY_SPAWN_3);
-				checkSaySpawn3 = true;
-			}
-
-			if(counterLivingWater == 4 && !checkSaySpawn4)
-			{
-				Talk(SAY_SPAWN_4);
-				events.SetPhase(PHASE_2);
-				events.ScheduleEvent(EVENT_PHASE_2, 5*IN_MILLISECONDS, 0, PHASE_2);
-				checkSaySpawn4 = true;
-			}
-
-			if(me->HealthBelowPct(50) && !checkMiddleLife)
-			{
-				Talk(SAY_MIDDLE_LIFE);
-				checkMiddleLife = true;
-			}
-
-			if(me->HealthBelowPct(21) && !checkHealthBelow21)
-			{
-				Talk(SAY_21_PER_CENT);
-				checkHealthBelow21 = true;
-			}
-
-			if(me->HealthBelowPct(3) && events.IsInPhase(PHASE_2))
-			{
-				events.ScheduleEvent(EVENT_SAY_DEATH_1, 0, 0, PHASE_DEATH);
-				events.SetPhase(PHASE_DEATH);
-			}
-
-			if(!events.IsInPhase(PHASE_DEATH))
-			{
-				DoMeleeAttackIfReady();
-			}
-		}
-	};
-};
-
-class npc_wise_intro_trigger : public CreatureScript 
-{
-public:
-	npc_wise_intro_trigger() : CreatureScript("npc_wise_intro_trigger") { }
-
-	CreatureAI* GetAI(Creature* creature) const 
-	{
-		return new npc_wise_intro_triggerAI(creature);
-	}
-
-	struct npc_wise_intro_triggerAI : public ScriptedAI
-	{
-		npc_wise_intro_triggerAI(Creature *creature) : ScriptedAI(creature)
-		{
-			instance = creature->GetInstanceScript();
-		}
-
-		InstanceScript* instance;
-		EventMap events;
-		
-		bool checkTrigger; 
-
-		void Reset() 
-		{
-			checkTrigger = true;
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE); 
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); 
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED); 
-			//ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilite du PNJ par les joueurs.
-		}
-
-		void JustDied(Unit *pWho) 
-		{
-
-		}
-
-		void EnterCombat(Unit* /*who*/) 
-		{
-
-		}
-
-		void UpdateAI(uint32 diff) 
-		{	
-			if(checkTrigger)
-			{
-				Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
-				if (!PlayerList.isEmpty())
-				{
-					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-					{
-						if (me->GetExactDist2d(i->getSource()->GetPositionX(),i->getSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
-						{
-							if (instance)
-								if (Creature* wise = me->GetCreature(*me, instance->GetData64(DATA_BOSS_WISE_MARI)))
-									if (wise->AI())
-									{
-										wise->AI()->DoAction(ACTION_WISE_MARI_INTRO);
-										checkTrigger = false;
-									}
-						}
 					}
 				}
 			}
@@ -395,26 +298,34 @@ public:
 
 		void Reset() 
 		{
-		
+			me->SetInCombatWithZone();
 		}
 
 		void JustDied(Unit *pWho) 
 		{
-			DoCast(me, SPELL_SHA_RESIDUE);
-			float x,y,z;
-			me->SummonCreature(CORRUPT_DROPLET, (x, y, z), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60*IN_MILLISECONDS);
-			me->SummonCreature(CORRUPT_DROPLET, (x, y, z), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60*IN_MILLISECONDS);
-			me->SummonCreature(CORRUPT_DROPLET, (x, y, z), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60*IN_MILLISECONDS);
-		}
+			DoCast(SPELL_SHA_RESIDUE);
 
-		void EnterCombat(Unit* /*who*/) 
-		{
+			float x = me->GetPositionX();
+			float y = me->GetPositionY();
+			float z = me->GetPositionZ();
+			float o = me->GetOrientation();
 
+			me->SummonCreature(NPC_CORRUPT_DROPLET, (x + 2.0f), y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60*IN_MILLISECONDS);
+			me->SummonCreature(NPC_CORRUPT_DROPLET, (x - 2.0f), y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60*IN_MILLISECONDS);
+			me->SummonCreature(NPC_CORRUPT_DROPLET, x, (y - 2.0f), z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60*IN_MILLISECONDS);
+
+			if (instance)
+				if (Creature* wiseMari = me->GetCreature(*me, instance->GetData64(DATA_BOSS_WISE_MARI)))
+					if (wiseMari->AI())
+					    wiseMari->AI()->DoAction(ACTION_WATER_COUNT);
 		}
 
 		void UpdateAI(uint32 diff) 
-		{	
-			
+		{
+			if(!UpdateVictim())
+				return;
+
+			DoMeleeAttackIfReady();
 		}
 	};
 };
@@ -423,7 +334,6 @@ public:
 void AddSC_boss_wise_mari()
 {
 	new boss_wise_mari();
-	new npc_wise_intro_trigger();
 	new npc_corrupt_living_water();
 }
 
