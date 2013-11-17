@@ -172,32 +172,27 @@ public:
 
 			if (instance)
 			{
-				Unit* firstTrigger = me->FindNearestCreature(NPC_FIRST_TRIGGER_WATER, 500, true);
-				Unit* secondTrigger = me->FindNearestCreature(NPC_SECOND_TRIGGER_WATER, 500, true);
-				Unit* thirdTrigger = me->FindNearestCreature(NPC_THIRD_TRIGGER_WATER, 500, true);
-				Unit* fourthTrigger = me->FindNearestCreature(NPC_FOURTH_TRIGGER_WATER, 500, true);
-
-				if (Unit* corruptWater = me->FindNearestCreature(NPC_CORRUPT_LIVING_WATER, 500))
+				if (Creature* corruptWater = me->FindNearestCreature(NPC_CORRUPT_LIVING_WATER, 500))
 				{
 					if (!corruptWater->isAlive() && !firstCorruptWater)
 					{
 						events.ScheduleEvent(EVENT_CALL_SECOND_WATER, 5*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
 						firstCorruptWater = true;
-						corruptWater->ToCreature()->DespawnOrUnsummon();
+						corruptWater->RemoveCorpse();
 					}
 						
 					if (!corruptWater->isAlive() && !secondCorruptWater)
 					{
 						events.ScheduleEvent(EVENT_CALL_THIRD_WATER, 5*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
 						secondCorruptWater = true;
-						corruptWater->ToCreature()->DespawnOrUnsummon();
+						corruptWater->RemoveCorpse();
 					}
 
 					if (!corruptWater->isAlive() && !thirdCorruptWater)
 					{
 						events.ScheduleEvent(EVENT_CALL_FOURTH_WATER, 5*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
 						thirdCorruptWater = true;
-						corruptWater->ToCreature()->DespawnOrUnsummon();
+						corruptWater->RemoveCorpse();
 					}
 
 					if (!corruptWater->isAlive() && !fourthCorruptWater)
@@ -205,7 +200,7 @@ public:
 						events.SetPhase(PHASE_HYDROBLAST);
 						events.ScheduleEvent(EVENT_BUBBLE_BURST, 5*IN_MILLISECONDS, 0, PHASE_HYDROBLAST);
 						fourthCorruptWater = true;
-						corruptWater->ToCreature()->DespawnOrUnsummon();
+						corruptWater->RemoveCorpse();
 					}
 				}
 			}
@@ -216,11 +211,16 @@ public:
 				{
 					if (instance)
 					{
+						Creature* firstTrigger = me->FindNearestCreature(NPC_FIRST_TRIGGER_WATER, 500, true);
+						Creature* secondTrigger = me->FindNearestCreature(NPC_SECOND_TRIGGER_WATER, 500, true);
+						Creature* thirdTrigger = me->FindNearestCreature(NPC_THIRD_TRIGGER_WATER, 500, true);
+						Creature* fourthTrigger = me->FindNearestCreature(NPC_FOURTH_TRIGGER_WATER, 500, true);
+
 						case EVENT_CALL_FIRST_WATER:
 							me->InterruptSpell(CURRENT_GENERIC_SPELL);
 							me->CastSpell(firstTrigger, SPELL_CALL_WATER);
 							Talk(SAY_CALL_FIRST_WATER);
-
+							
 							events.ScheduleEvent(EVENT_FIRST_TRIGGER_WATER_AURA, 0);
 							events.CancelEvent(EVENT_CALL_FIRST_WATER);
 							break;
