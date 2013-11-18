@@ -1592,7 +1592,7 @@ public:
         uint32 opcode = (uint32)atoi(x);
         uint32 val = (uint32)atoi(y);
 
-        WorldPacket data(opcode, 4);
+        WorldPacket data(Opcodes(opcode), 4);
         data << uint32(val);
 
         handler->PSendSysMessage("sent opcode %u(0x%x) with value : %u", opcode, opcode, val);
