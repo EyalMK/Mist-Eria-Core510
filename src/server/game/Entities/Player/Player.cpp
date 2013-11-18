@@ -829,6 +829,9 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this)
     m_dungeonDifficulty = DUNGEON_DIFFICULTY_NORMAL;
     m_raidDifficulty = RAID_DIFFICULTY_10MAN_NORMAL;
 
+
+    m_NoboDifficulty = REGULAR_DIFFICULTY;
+
     m_lastPotionId = 0;
     _talentMgr = new PlayerTalentInfo();
 
@@ -20304,15 +20307,40 @@ void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
 void Player::SendDungeonDifficulty(bool IsInGroup)
 {
     uint8 val = 0x00000001;
-    WorldPacket data(MSG_SET_DUNGEON_DIFFICULTY, 4);
+    WorldPacket data(SMSG_SET_DUNGEON_DIFFICULTY, 4);
     data << (uint32)GetDungeonDifficulty();
     GetSession()->SendPacket(&data);
+}
+
+void Player::noboSendDifficulty() {
+    Opcodes o;
+
+    switch (noboGetDifficulty()) {
+    case DUNGEON_DIFFICULTY_NORMAL:
+    case DUNGEON_DIFFICULTY_HEROIC:
+        o = SMSG_SET_DUNGEON_DIFFICULTY;
+        break;
+    case RAID_DIFFICULTY_10MAN_NORMAL:
+    case RAID_DIFFICULTY_25MAN_NORMAL:
+    case RAID_DIFFICULTY_10MAN_HEROIC:
+    case RAID_DIFFICULTY_25MAN_HEROIC:
+        o = SMSG_SET_RAID_DIFFICULTY;
+        break;
+    default:
+        return;
+    }
+
+    WorldPacket data(o, 4);
+    data << (uint32)noboGetDifficulty();
+    GetSession()->SendPacket(&data);
+
+
 }
 
 void Player::SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty)
 {
     uint8 val = 0x00000001;
-    WorldPacket data(MSG_SET_RAID_DIFFICULTY, 4);
+    WorldPacket data(SMSG_SET_RAID_DIFFICULTY, 4);
     data << uint32(GetRaidDifficulty());
     GetSession()->SendPacket(&data);
 }

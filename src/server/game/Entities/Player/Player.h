@@ -2080,6 +2080,10 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetArenaTeamIdInvited() { return m_ArenaTeamIdInvited; }
         uint32 GetRBGPersonalRating() const { return 0; }
 
+
+        Difficulty noboGetDifficulty() const { return m_NoboDifficulty;}
+        void noboSetDifficulty(Difficulty diff) { m_NoboDifficulty = diff;}
+
         Difficulty GetDifficulty(bool isRaid) const { return isRaid ? m_raidDifficulty : m_dungeonDifficulty; }
         Difficulty GetDungeonDifficulty() const { return m_dungeonDifficulty; }
         Difficulty GetRaidDifficulty() const { return m_raidDifficulty; }
@@ -2172,6 +2176,8 @@ class Player : public Unit, public GridObject<Player>
 
         void SendDungeonDifficulty(bool IsInGroup);
         void SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty = -1);
+        void noboSendDifficulty();
+
         void ResetInstances(uint8 method, bool isRaid);
         void SendResetInstanceSuccess(uint32 MapId);
         void SendResetInstanceFailed(uint32 reason, uint32 MapId);
@@ -2949,6 +2955,7 @@ public:
         Difficulty m_dungeonDifficulty;
         Difficulty m_raidDifficulty;
         Difficulty m_raidMapDifficulty;
+        Difficulty m_NoboDifficulty;
 
         uint32 m_atLoginFlags;
 
