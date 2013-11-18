@@ -672,10 +672,10 @@ enum Opcodes
     MSG_RAID_READY_CHECK_FINISHED                     = 0x017C,//16357
     MSG_RAID_TARGET_UPDATE                            = 0x0512,//16357
     MSG_SAVE_GUILD_EMBLEM                             = 0x04CD,//16357
-    CMSG_SET_DUNGEON_DIFFICULTY                        = 0x0E0C,//16357
-    SMSG_SET_DUNGEON_DIFFICULTY                        = 0x0E00,//16357
-    CMSG_SET_RAID_DIFFICULTY                           = 0x0E00,//16357
-    SMSG_SET_RAID_DIFFICULTY                           = 0x0E0C,//16357
+    CMSG_SET_DUNGEON_DIFFICULTY                       = 0x0E0C,//16357
+    SMSG_SET_DUNGEON_DIFFICULTY                       = 0x0E0C,//16357
+    CMSG_SET_RAID_DIFFICULTY                          = 0x0E00,//16357
+    SMSG_SET_RAID_DIFFICULTY                          = 0x0E00,//16357
     MSG_START_MOVE_FORWARD                            = 0x1609,
     MSG_TABARDVENDOR_ACTIVATE                         = 0x0729,//16357
     CMSG_RESPEC_WIPE_CONFIRM                          = 0x052A,//16357
