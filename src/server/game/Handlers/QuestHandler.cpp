@@ -664,24 +664,15 @@ uint32 WorldSession::getDialogStatus(Player* player, Object* questgiver, uint32 
         uint32 result2 = 0;
         uint32 quest_id = i->second;
 
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NoboDie dialogstatus 1 %u", quest_id);
-
         Quest const* quest = sObjectMgr->GetQuestTemplate(quest_id);
         if (!quest)
             continue;
-
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NoboDie dialogstatus 2 %u", quest_id);
-
 
         ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK, quest->GetQuestId());
         if (!sConditionMgr->IsObjectMeetToConditions(player, conditions))
             continue;
 
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NoboDie dialogstatus 3 %u", quest_id);
-
         QuestStatus status = player->GetQuestStatus(quest_id);
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NoboDie dialogstatus 4 %u", status);
-
 
         if ((status == QUEST_STATUS_COMPLETE && !player->GetQuestRewardStatus(quest_id)) ||
             (quest->IsAutoComplete() && player->CanTakeQuest(quest, false)))
@@ -693,9 +684,6 @@ uint32 WorldSession::getDialogStatus(Player* player, Object* questgiver, uint32 
 			else
                 result2 = DIALOG_STATUS_REWARD;
 
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "NoboDie dialogstatus 5 %u", result2);
-
-
         }
         else if (status == QUEST_STATUS_INCOMPLETE)
             result2 = DIALOG_STATUS_INCOMPLETE;
@@ -703,7 +691,6 @@ uint32 WorldSession::getDialogStatus(Player* player, Object* questgiver, uint32 
         if (result2 > result)
             result = result2;
 
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NoboDie dialogstatus 6 %u %u", result, result2);
     }
 
     for (QuestRelations::const_iterator i = qr.first; i != qr.second; ++i)
@@ -714,30 +701,17 @@ uint32 WorldSession::getDialogStatus(Player* player, Object* questgiver, uint32 
         if (!quest)
             continue;
 
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NoboDie dialogstatus 7 %u", quest_id);
-
-
         ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK, quest->GetQuestId());
         if (!sConditionMgr->IsObjectMeetToConditions(player, conditions))
             continue;
 
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NoboDie dialogstatus 8 %u", quest_id);
-
-
         QuestStatus status = player->GetQuestStatus(quest_id);
         if (status == QUEST_STATUS_NONE)
         {
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "NoboDie dialogstatus 9 %u", status);
-
-
             if (player->CanSeeStartQuest(quest))
             {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "NoboDie dialogstatus 10 %u", quest_id);
-
                 if (player->SatisfyQuestLevel(quest, false))
                 {
-                    sLog->outDebug(LOG_FILTER_NETWORKIO, "NoboDie dialogstatus 11 %u", quest_id);
-
                     if (quest->IsAutoComplete() || (quest->IsRepeatable() && player->IsQuestRewarded(quest_id)))
                         result2 = DIALOG_STATUS_REWARD_REP;
                     else if (player->getLevel() <= ((player->GetQuestLevel(quest) == -1) ? player->getLevel() : player->GetQuestLevel(quest) + sWorld->getIntConfig(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF)))
@@ -757,8 +731,6 @@ uint32 WorldSession::getDialogStatus(Player* player, Object* questgiver, uint32 
                 }
                 else
                     result2 = DIALOG_STATUS_UNAVAILABLE;
-
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "NoboDie dialogstatus 12 %u", result2);
 
             }
         }

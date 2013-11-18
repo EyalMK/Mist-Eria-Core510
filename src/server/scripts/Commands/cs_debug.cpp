@@ -93,6 +93,7 @@ public:
             { "phase",          SEC_MODERATOR,      false, &HandleDebugPhaseCommand,           "", NULL },
 			{ "chat",			SEC_MODERATOR,      false, &HandleDebugChatCommand,			   "", NULL },
 			{ "questgiver",		SEC_MODERATOR,      false, &HandleDebugQuestGiverCommand,	   "", NULL },
+            { "difficulty",		SEC_MODERATOR,      false, &HandleDebugDifficultyCommand,	   "", NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
         };
         static ChatCommand debugSetCommandTable[] = 
@@ -1565,6 +1566,13 @@ public:
 
 		handler->GetSession()->SendPacket(&data);
 
+        return true;
+    }
+
+    static bool HandleDebugDifficultyCommand(ChatHandler* handler, char const* args)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        handler->PSendSysMessage("Current difficulty mode : %u", player->noboGetDifficulty());
         return true;
     }
 };
