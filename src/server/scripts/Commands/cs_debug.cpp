@@ -94,6 +94,7 @@ public:
 			{ "chat",			SEC_MODERATOR,      false, &HandleDebugChatCommand,			   "", NULL },
 			{ "questgiver",		SEC_MODERATOR,      false, &HandleDebugQuestGiverCommand,	   "", NULL },
             { "difficulty",		SEC_MODERATOR,      false, &HandleDebugDifficultyCommand,	   "", NULL },
+            { "op32",		    SEC_MODERATOR,      false, &HandleDebugSendOpcodeUint32Command,"", NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
         };
         static ChatCommand debugSetCommandTable[] = 
@@ -1575,6 +1576,34 @@ public:
         handler->PSendSysMessage("Current difficulty mode : %u", player->noboGetDifficulty());
         return true;
     }
+
+
+    static bool HandleDebugSendOpcodeUint32Command(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* x = strtok((char*)args, " ");
+        char* y = strtok(NULL, " ");
+
+        if (!x || !y)
+            return false;
+
+        uint32 opcode = (uint32)atoi(x);
+        uint32 val = (uint32)atoi(y);
+
+        WorldPacket data(opcode, 4);
+        data << uint32(val);
+
+        handler->PSendSysMessage("sent opcode %u(0x%x) with value : %u", opcode, opcode, val);
+
+        handler->GetSession()->SendPacket(&data);
+
+        return true;
+    }
+
+
+
 };
 
 void AddSC_debug_commandscript()
