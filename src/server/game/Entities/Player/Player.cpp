@@ -7570,29 +7570,28 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
         oldWeekCount = itr->second.weekCount;
     }
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### TERAH VALOR REWARD 0 ##### count : %d", count);
 
     // count can't be more then weekCap if used (weekCap > 0)
     uint32 weekCap = GetCurrencyWeekCap(currency);
     if (weekCap && count > int32(weekCap))
         count = weekCap;
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### TERAH VALOR REWARD 1 ##### count : %d", count);
-
     // count can't be more then totalCap if used (totalCap > 0)
     uint32 totalCap = GetCurrencyTotalCap(currency);
     if (totalCap && count > int32(totalCap))
         count = totalCap;
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### TERAH VALOR REWARD 2 ##### count : %d", count);
-
     int32 newTotalCount = int32(oldTotalCount) + count;
     if (newTotalCount < 0)
         newTotalCount = 0;
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### TERAH VALOR REWARD 0 ##### totalcount : %d", newTotalCount);
+
     int32 newWeekCount = int32(oldWeekCount) + (count > 0 ? count : 0);
     if (newWeekCount < 0)
         newWeekCount = 0;
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### TERAH VALOR REWARD 1 ##### totalcount : %d", newTotalCount);
 
     // if we get more then weekCap just set to limit
     if (weekCap && int32(weekCap) < newWeekCount)
@@ -7602,12 +7601,16 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
         newTotalCount = oldTotalCount + (weekCap - oldWeekCount);
     }
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### TERAH VALOR REWARD 2 ##### totalcount : %d", newTotalCount);
+
     // if we get more then totalCap set to maximum;
     if (totalCap && int32(totalCap) < newTotalCount)
     {
         newTotalCount = int32(totalCap);
         newWeekCount = weekCap;
     }
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "##### TERAH VALOR REWARD 3 ##### totalcount : %d", newTotalCount);
 
     if (uint32(newTotalCount) != oldTotalCount)
     {
