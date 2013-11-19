@@ -2677,7 +2677,7 @@ void SpellMgr::LoadSpellInfoStore()
             continue;
 
         //if(effect->EffectSpellId == 62388 && effect->EffectIndex == 0) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN 62388 correct load");
-        effectsBySpell[effect->EffectSpellId].effects[(effect->EffectIndex) * (effect->difficultyMode)] = effect;
+        effectsBySpell[effect->EffectSpellId].effects[(effect->EffectIndex) + (effect->difficultyMode*MAX_DIFFICULTY)] = effect;
     }
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
