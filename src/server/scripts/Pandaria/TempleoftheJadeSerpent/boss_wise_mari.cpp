@@ -3,7 +3,7 @@
 /*
 	Notes :
 	What is missing ? :	- Hydroblast
-						- Hydrolance triggers system (Trying to fix it)
+						- Hydrolance triggers system : missing 6 triggers (two first pulses)
 						- Water damage
 */
 
@@ -38,6 +38,12 @@ enum Npcs
 	NPC_HYDROLANCE_TRIGGER_FRONT	= 400434,
 	NPC_HYDROLANCE_TRIGGER_LEFT		= 400435,
 	NPC_HYDROLANCE_TRIGGER_RIGHT	= 400436,
+	NPC_HYDROTRIGGER_ONE_FRONT		= 400438,
+	NPC_HYDROTRIGGER_TWO_FRONT		= 400439,
+	NPC_HYDROTRIGGER_ONE_LEFT		= 400440,
+	NPC_HYDROTRIGGER_TWO_LEFT		= 400441,
+	NPC_HYDROTRIGGER_ONE_RIGHT		= 400442,
+	NPC_HYDROTRIGGER_TWO_RIGHT		= 400443
 };
 
 enum Events
@@ -55,7 +61,13 @@ enum Events
 	EVENT_FIRST_TRIGGER_WATER_AURA	= 11,
 	EVENT_SECOND_TRIGGER_WATER_AURA	= 12,
 	EVENT_THIRD_TRIGGER_WATER_AURA	= 13,
-	EVENT_FOURTH_TRIGGER_WATER_AURA	= 14
+	EVENT_FOURTH_TRIGGER_WATER_AURA	= 14,
+	EVENT_HYDROTRIGGER_ONE_FRONT	= 15,
+	EVENT_HYDROTRIGGER_TWO_FRONT	= 16,
+	EVENT_HYDROTRIGGER_ONE_LEFT		= 17,
+	EVENT_HYDROTRIGGER_TWO_LEFT		= 18,
+	EVENT_HYDROTRIGGER_ONE_RIGHT	= 19,
+	EVENT_HYDROTRIGGER_TWO_RIGHT	= 20
 };
 
 enum Texts
@@ -132,6 +144,7 @@ public:
 			{
 				Talk(irand(SAY_DEATH_1, SAY_DEATH_3));
 				instance->DoCastSpellOnPlayers(SPELL_BLESSING_OF_THE_WATERSPEAKER);
+				instance->DoUseDoorOrButton(GO_WISE_MARI_DOOR);
 			}
 		}
 
@@ -178,11 +191,6 @@ public:
 
 			if (instance)
 			{
-				Creature* firstTrigger = me->FindNearestCreature(NPC_FIRST_TRIGGER_WATER, 500, true);
-				Creature* secondTrigger = me->FindNearestCreature(NPC_SECOND_TRIGGER_WATER, 500, true);
-				Creature* thirdTrigger = me->FindNearestCreature(NPC_THIRD_TRIGGER_WATER, 500, true);
-				Creature* fourthTrigger = me->FindNearestCreature(NPC_FOURTH_TRIGGER_WATER, 500, true);
-
 				if (hydrolanceWaterCount == 5 && corruptWaterCount == 0) // First corrupt living water
 				{
 					events.ScheduleEvent(EVENT_CALL_SECOND_WATER, 2*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
@@ -216,7 +224,9 @@ public:
 						{
 							case EVENT_CALL_FIRST_WATER:
 								me->InterruptSpell(CURRENT_GENERIC_SPELL);
-								me->CastSpell(firstTrigger, SPELL_CALL_WATER);
+								if (Creature* firstTrigger = me->FindNearestCreature(NPC_FIRST_TRIGGER_WATER, 500, true))
+									me->CastSpell(firstTrigger, SPELL_CALL_WATER);
+
 								Talk(SAY_CALL_FIRST_WATER);
 
 								events.ScheduleEvent(EVENT_FIRST_TRIGGER_WATER_AURA, 0);
@@ -224,14 +234,17 @@ public:
 								break;
 									
 							case EVENT_FIRST_TRIGGER_WATER_AURA:
-								firstTrigger->CastSpell(firstTrigger, SPELL_HYDROLANCE_PRECAST);
+								if (Creature* firstTrigger = me->FindNearestCreature(NPC_FIRST_TRIGGER_WATER, 500, true))
+									firstTrigger->CastSpell(firstTrigger, SPELL_HYDROLANCE_PRECAST);
 									
 								events.ScheduleEvent(EVENT_FIRST_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
 								break;
 
 							case EVENT_CALL_SECOND_WATER:
 								me->InterruptSpell(CURRENT_GENERIC_SPELL);
-								me->CastSpell(secondTrigger, SPELL_CALL_WATER);
+								if (Creature* secondTrigger = me->FindNearestCreature(NPC_SECOND_TRIGGER_WATER, 500, true))
+									me->CastSpell(secondTrigger, SPELL_CALL_WATER);
+
 								Talk(SAY_CALL_SECOND_WATER);
 								corruptWaterCount = 1;
 
@@ -240,14 +253,17 @@ public:
 								break;
 
 							case EVENT_SECOND_TRIGGER_WATER_AURA:
-								secondTrigger->CastSpell(secondTrigger, SPELL_HYDROLANCE_PRECAST);
+								if (Creature* secondTrigger = me->FindNearestCreature(NPC_SECOND_TRIGGER_WATER, 500, true))
+									secondTrigger->CastSpell(secondTrigger, SPELL_HYDROLANCE_PRECAST);
 
 								events.ScheduleEvent(EVENT_SECOND_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
 								break;
 
 							case EVENT_CALL_THIRD_WATER:
 								me->InterruptSpell(CURRENT_GENERIC_SPELL);
-								me->CastSpell(thirdTrigger, SPELL_CALL_WATER);
+								if (Creature* thirdTrigger = me->FindNearestCreature(NPC_THIRD_TRIGGER_WATER, 500, true))
+									me->CastSpell(thirdTrigger, SPELL_CALL_WATER);
+
 								Talk(SAY_CALL_THIRD_WATER);
 								corruptWaterCount = 2;
 
@@ -256,14 +272,17 @@ public:
 								break;
 
 							case EVENT_THIRD_TRIGGER_WATER_AURA:
-								thirdTrigger->CastSpell(thirdTrigger, SPELL_HYDROLANCE_PRECAST);
+								if (Creature* thirdTrigger = me->FindNearestCreature(NPC_THIRD_TRIGGER_WATER, 500, true))
+									thirdTrigger->CastSpell(thirdTrigger, SPELL_HYDROLANCE_PRECAST);
 								
 								events.ScheduleEvent(EVENT_THIRD_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
 								break;
 
 							case EVENT_CALL_FOURTH_WATER:
 								me->InterruptSpell(CURRENT_GENERIC_SPELL);
-								me->CastSpell(fourthTrigger, SPELL_CALL_WATER);
+								if (Creature* fourthTrigger = me->FindNearestCreature(NPC_FOURTH_TRIGGER_WATER, 500, true))
+									me->CastSpell(fourthTrigger, SPELL_CALL_WATER);
+
 								Talk(SAY_CALL_FOURTH_WATER);
 								corruptWaterCount = 3;
 
@@ -272,7 +291,8 @@ public:
 								break;
 	
 							case EVENT_FOURTH_TRIGGER_WATER_AURA:
-								fourthTrigger->CastSpell(fourthTrigger, SPELL_HYDROLANCE_PRECAST);
+								if (Creature* fourthTrigger = me->FindNearestCreature(NPC_FOURTH_TRIGGER_WATER, 500, true))
+									fourthTrigger->CastSpell(fourthTrigger, SPELL_HYDROLANCE_PRECAST);
 
 								events.ScheduleEvent(EVENT_FOURTH_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
 								break;
@@ -281,8 +301,8 @@ public:
 							{
 								if (hydrolanceCount == 0) // Front
 								{
-									me->SetOrientation(1.250952f);
-									
+									me->SetFacingTo(1.250952f);
+
 									std::list<Creature*> hydrolanceTriggers;
 						            me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_FRONT, 500.0f);
 							        if (!hydrolanceTriggers.empty())
@@ -294,13 +314,15 @@ public:
 										}
 									}
 
+									events.ScheduleEvent(EVENT_HYDROTRIGGER_ONE_FRONT, 1*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+									events.ScheduleEvent(EVENT_HYDROTRIGGER_TWO_FRONT, 1500, 0, PHASE_CORRUPT_LIVING_WATERS);
 									events.ScheduleEvent(EVENT_HYDROLANCE_FRONT, 2*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
 									DoCast(SPELL_HYDROLANCE);
 								}
 
 								if (hydrolanceCount == 1) // Left
 								{
-									me->SetOrientation(5.240993f);
+									me->SetFacingTo(5.240993f);
 									
 									std::list<Creature*> hydrolanceTriggers;
 						            me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_LEFT, 500.0f);
@@ -313,13 +335,15 @@ public:
 										}
 									}
 
+									events.ScheduleEvent(EVENT_HYDROTRIGGER_ONE_LEFT, 1*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+									events.ScheduleEvent(EVENT_HYDROTRIGGER_TWO_LEFT, 1500, 0, PHASE_CORRUPT_LIVING_WATERS);
 									events.ScheduleEvent(EVENT_HYDROLANCE_LEFT, 2*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
 									DoCast(SPELL_HYDROLANCE);
 								}
 
 								if (hydrolanceCount == 2) // Right
 								{
-									me->SetOrientation(3.504827f);
+									me->SetFacingTo(3.504827f);
 									
 									std::list<Creature*> hydrolanceTriggers;
 						            me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_RIGHT, 500.0f);
@@ -332,6 +356,8 @@ public:
 										}
 									}
 
+									events.ScheduleEvent(EVENT_HYDROTRIGGER_ONE_RIGHT, 1*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+									events.ScheduleEvent(EVENT_HYDROTRIGGER_TWO_RIGHT, 1500, 0, PHASE_CORRUPT_LIVING_WATERS);
 									events.ScheduleEvent(EVENT_HYDROLANCE_RIGHT, 2*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
 									DoCast(SPELL_HYDROLANCE);
 								}
@@ -340,6 +366,48 @@ public:
 								events.ScheduleEvent(EVENT_HYDROLANCE, 4*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
 								break;
 							}
+
+							case EVENT_HYDROTRIGGER_ONE_FRONT:
+								if (Creature* hydroTriggerOneFront = me->FindNearestCreature(NPC_HYDROTRIGGER_ONE_FRONT, 500, true))
+									hydroTriggerOneFront->CastSpell(hydroTriggerOneFront, SPELL_HYDROLANCE_PULSE_SMALL);
+
+								events.CancelEvent(EVENT_HYDROTRIGGER_ONE_FRONT);
+								break;
+
+							case EVENT_HYDROTRIGGER_TWO_FRONT:
+								if (Creature* hydroTriggerTwoFront = me->FindNearestCreature(NPC_HYDROTRIGGER_TWO_FRONT, 500, true))
+									hydroTriggerTwoFront->CastSpell(hydroTriggerTwoFront, SPELL_HYDROLANCE_PULSE_SMALL);
+
+								events.CancelEvent(EVENT_HYDROTRIGGER_TWO_FRONT);
+								break;
+
+							case EVENT_HYDROTRIGGER_ONE_LEFT:
+								if (Creature* hydroTriggerOneLeft = me->FindNearestCreature(NPC_HYDROTRIGGER_ONE_LEFT, 500, true))
+									hydroTriggerOneLeft->CastSpell(hydroTriggerOneLeft, SPELL_HYDROLANCE_PULSE_SMALL);
+
+								events.CancelEvent(EVENT_HYDROTRIGGER_ONE_LEFT);
+								break;
+								
+							case EVENT_HYDROTRIGGER_TWO_LEFT:
+								if (Creature* hydroTriggerTwoLeft = me->FindNearestCreature(NPC_HYDROTRIGGER_TWO_LEFT, 500, true))
+									hydroTriggerTwoLeft->CastSpell(hydroTriggerTwoLeft, SPELL_HYDROLANCE_PULSE_SMALL);
+
+								events.CancelEvent(EVENT_HYDROTRIGGER_TWO_LEFT);
+								break;
+
+							case EVENT_HYDROTRIGGER_ONE_RIGHT:
+								if (Creature* hydroTriggerOneRight = me->FindNearestCreature(NPC_HYDROTRIGGER_ONE_RIGHT, 500, true))
+									hydroTriggerOneRight->CastSpell(hydroTriggerOneRight, SPELL_HYDROLANCE_PULSE_SMALL);
+
+								events.CancelEvent(EVENT_HYDROTRIGGER_ONE_RIGHT);
+								break;
+
+							case EVENT_HYDROTRIGGER_TWO_RIGHT:
+								if (Creature* hydroTriggerTwoRight = me->FindNearestCreature(NPC_HYDROTRIGGER_TWO_RIGHT, 500, true))
+									hydroTriggerTwoRight->CastSpell(hydroTriggerTwoRight, SPELL_HYDROLANCE_PULSE_SMALL);
+
+								events.CancelEvent(EVENT_HYDROTRIGGER_TWO_RIGHT);
+								break;
 
 							case EVENT_HYDROLANCE_FRONT:
 							{
@@ -399,7 +467,7 @@ public:
 								DoCast(SPELL_BUBBLE_BURST);
 								Talk(SAY_PHASE_HYDROBLAST);
 
-								events.ScheduleEvent(EVENT_HYDROBLAST, 4*IN_MILLISECONDS, 0, PHASE_HYDROBLAST);
+								events.ScheduleEvent(EVENT_HYDROBLAST, 0, 0, PHASE_HYDROBLAST);
 								events.CancelEvent(EVENT_BUBBLE_BURST);
 								break;
 	

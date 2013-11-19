@@ -38,6 +38,10 @@ enum CreaturesGUID
 	NPC_SUN_5			= 4,
 };
 
+enum GameObjectsGUID
+{
+	GO_WISE_MARI_DOOR	= 428968,
+};
 
 #endif
 
