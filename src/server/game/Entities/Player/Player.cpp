@@ -7155,6 +7155,17 @@ void Player::RewardReputation(Quest const* quest)
     }
 }
 
+void Player::RewardCurrency(Quest const* quest)
+{
+	for (uint8 i = 0; i < QUEST_REWARD_CURRENCY_COUNT; ++i)
+    {
+        if (!quest->RewardCurrencyId[i])
+            continue;
+
+		ModifyCurrency(quest->RewardCurrencyId[i], quest->RewardCurrencyCount[i]);
+	}		
+}
+
 void Player::UpdateHonorFields()
 {
     /// called when rewarding honor and at each save
@@ -15436,6 +15447,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     }
 
     RewardReputation(quest);
+	RewardCurrency(quest);
 
     uint16 log_slot = FindQuestSlot(quest_id);
     if (log_slot < MAX_QUEST_LOG_SIZE)
