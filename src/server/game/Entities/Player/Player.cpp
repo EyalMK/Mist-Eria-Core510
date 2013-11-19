@@ -20258,7 +20258,7 @@ void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
 void Player::SendDungeonDifficulty(bool IsInGroup)
 {
     uint8 val = 0x00000001;
-    WorldPacket data(MSG_SET_DUNGEON_DIFFICULTY, 4);
+    WorldPacket data(SMSG_SET_DUNGEON_DIFFICULTY, 4);
     data << (uint32)GetDungeonDifficulty();
     GetSession()->SendPacket(&data);
 }
@@ -20266,7 +20266,7 @@ void Player::SendDungeonDifficulty(bool IsInGroup)
 void Player::SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty)
 {
     uint8 val = 0x00000001;
-    WorldPacket data(MSG_SET_RAID_DIFFICULTY, 4);
+    WorldPacket data(SMSG_SET_RAID_DIFFICULTY, 4);
     data << uint32(GetRaidDifficulty());
     GetSession()->SendPacket(&data);
 }
