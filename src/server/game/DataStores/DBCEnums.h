@@ -347,6 +347,8 @@ enum Difficulty
     RAID_FINDER_DIFFICULTY       = 7,
     DUNGEON_DIFFICULTY_CHALLENGE = 8,
     RAID_DIFFICULTY_40MAN_NORMAL = 9,
+
+	MAX_DIFFICULTY				 = 10
 };
 
 #define MAX_DUNGEON_DIFFICULTY     2 // Seems to be 2?
