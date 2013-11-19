@@ -7430,9 +7430,9 @@ void Player::SendNewCurrency(uint32 id) const
     uint32 weekCap = GetCurrencyWeekCap(entry) / precision;
 
 	packet.WriteBits(0, 5); // some flags
-    packet.WriteBit(weekCap);
-    packet.WriteBit(0);     // season total earned
+	packet.WriteBit(0);     // season total earned
     packet.WriteBit(weekCount);
+	packet.WriteBit(weekCap);
    
 	currencyData << uint32(entry->ID);
     currencyData << uint32(itr->second.totalCount / precision);
@@ -7440,11 +7440,11 @@ void Player::SendNewCurrency(uint32 id) const
     if (weekCap)
         currencyData << uint32(weekCap);
 
-    //if (seasonTotal)
-    //    currencyData << uint32(seasonTotal / precision);
-
     if (weekCount)
         currencyData << uint32(weekCount);
+
+	//if (seasonTotal)
+    //    currencyData << uint32(seasonTotal / precision);
 
     packet.FlushBits();
     packet.append(currencyData);
@@ -7471,9 +7471,9 @@ void Player::SendCurrencies() const
         uint32 weekCap = GetCurrencyWeekCap(entry) / precision;
 
         packet.WriteBits(0, 5); // some flags
-        packet.WriteBit(weekCap);
         packet.WriteBit(0);     // season total earned
         packet.WriteBit(weekCount);
+		packet.WriteBit(weekCap);
 
         currencyData << uint32(entry->ID);
         currencyData << uint32(itr->second.totalCount / precision);
@@ -7481,11 +7481,11 @@ void Player::SendCurrencies() const
         if (weekCap)
             currencyData << uint32(weekCap);
 
-        //if (seasonTotal)
-        //    currencyData << uint32(seasonTotal / precision);
-
         if (weekCount)
             currencyData << uint32(weekCount);
+
+		//if (seasonTotal)
+        //    currencyData << uint32(seasonTotal / precision);
 
         ++count;
     }
@@ -7627,8 +7627,9 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
 		packet << uint32(newTotalCount / precision);
 
         packet.WriteBit(weekCap != 0);
+		packet.WriteBit(!printLog); // print in log
         packet.WriteBit(0); // hasSeasonCount
-        packet.WriteBit(!printLog); // print in log
+        
 
         //if (hasSeasonCount)
         //    packet << uint32(0);
