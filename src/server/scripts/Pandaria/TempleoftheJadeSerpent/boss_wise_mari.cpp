@@ -3,7 +3,7 @@
 /*
 	Notes :
 	What is missing ? :	- Hydroblast
-						- Hydrolance triggers system
+						- Hydrolance triggers system (Trying to fix it)
 						- Water damage
 */
 
@@ -107,10 +107,7 @@ public:
 		EventMap events;
 		int32 hydrolanceCount;
 		int32 hydrolanceWaterCount;
-		bool firstCorruptWater;
-		bool secondCorruptWater;
-		bool thirdCorruptWater;
-		bool fourthCorruptWater;
+		int32 corruptWaterCount;
 
 		void Reset()
 		{
@@ -123,12 +120,9 @@ public:
 				me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE);
 				events.SetPhase(PHASE_NULL);
 
-				hydrolanceCount = 0;
-				hydrolanceWaterCount = 0;
-				firstCorruptWater = false;
-				secondCorruptWater = false;
-				thirdCorruptWater = false;
-				fourthCorruptWater = false;
+				hydrolanceCount = 0; // 0 = front | 1 = left | 2 = right
+				hydrolanceWaterCount = 0; // Number of hydrolances casted before the new Corrupt living water appears (5)
+				corruptWaterCount = 0; // 0 = first corrupt living water | 1 = second | 2 = third | 3 = fourth | 4 = phase 2
 			}
 		}
 
@@ -189,33 +183,29 @@ public:
 				Creature* thirdTrigger = me->FindNearestCreature(NPC_THIRD_TRIGGER_WATER, 500, true);
 				Creature* fourthTrigger = me->FindNearestCreature(NPC_FOURTH_TRIGGER_WATER, 500, true);
 
-				if (hydrolanceCount == 5 && !firstCorruptWater)
+				if (hydrolanceWaterCount == 5 && corruptWaterCount == 0) // First corrupt living water
 				{
 					events.ScheduleEvent(EVENT_CALL_SECOND_WATER, 2*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
-					firstCorruptWater = true;
-					hydrolanceCount = 0;
+					hydrolanceWaterCount = 0;
 				}
 						
-				if (hydrolanceCount == 5 && !secondCorruptWater)
+				if (hydrolanceWaterCount == 5 && corruptWaterCount == 1) // Second corrupt living water
 				{
 					events.ScheduleEvent(EVENT_CALL_THIRD_WATER, 2*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
-					secondCorruptWater = true;
-					hydrolanceCount = 0;
+					hydrolanceWaterCount = 0;
 				}
 
-				if (hydrolanceCount == 5 && !thirdCorruptWater)
+				if (hydrolanceWaterCount == 5 && corruptWaterCount == 2) // Third corrupt living water
 				{
 					events.ScheduleEvent(EVENT_CALL_FOURTH_WATER, 2*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
-					thirdCorruptWater = true;
-					hydrolanceCount = 0;
+					hydrolanceWaterCount = 0;
 				}
 
-				if (hydrolanceCount == 5 && !fourthCorruptWater)
+				if (hydrolanceWaterCount == 5 && corruptWaterCount == 3) // Fourth corrupt living water
 				{
 					events.SetPhase(PHASE_HYDROBLAST);
 					events.ScheduleEvent(EVENT_BUBBLE_BURST, 2*IN_MILLISECONDS, 0, PHASE_HYDROBLAST);
-					fourthCorruptWater = true;
-					hydrolanceCount = 0;
+					hydrolanceWaterCount = 0;
 				}
 			
 				while(uint32 eventId = events.ExecuteEvent())
@@ -228,7 +218,7 @@ public:
 								me->InterruptSpell(CURRENT_GENERIC_SPELL);
 								me->CastSpell(firstTrigger, SPELL_CALL_WATER);
 								Talk(SAY_CALL_FIRST_WATER);
-							
+
 								events.ScheduleEvent(EVENT_FIRST_TRIGGER_WATER_AURA, 0);
 								events.CancelEvent(EVENT_CALL_FIRST_WATER);
 								break;
@@ -243,6 +233,7 @@ public:
 								me->InterruptSpell(CURRENT_GENERIC_SPELL);
 								me->CastSpell(secondTrigger, SPELL_CALL_WATER);
 								Talk(SAY_CALL_SECOND_WATER);
+								corruptWaterCount = 1;
 
 								events.ScheduleEvent(EVENT_SECOND_TRIGGER_WATER_AURA, 0);
 								events.CancelEvent(EVENT_CALL_SECOND_WATER);
@@ -258,6 +249,7 @@ public:
 								me->InterruptSpell(CURRENT_GENERIC_SPELL);
 								me->CastSpell(thirdTrigger, SPELL_CALL_WATER);
 								Talk(SAY_CALL_THIRD_WATER);
+								corruptWaterCount = 2;
 
 								events.ScheduleEvent(EVENT_THIRD_TRIGGER_WATER_AURA, 0);
 								events.CancelEvent(EVENT_CALL_THIRD_WATER);
@@ -273,7 +265,8 @@ public:
 								me->InterruptSpell(CURRENT_GENERIC_SPELL);
 								me->CastSpell(fourthTrigger, SPELL_CALL_WATER);
 								Talk(SAY_CALL_FOURTH_WATER);
-	
+								corruptWaterCount = 3;
+
 								events.ScheduleEvent(EVENT_FOURTH_TRIGGER_WATER_AURA, 0);
 								events.CancelEvent(EVENT_CALL_FOURTH_WATER);
 								break;
@@ -286,7 +279,7 @@ public:
 
 							case EVENT_HYDROLANCE:
 							{
-								if (hydrolanceWaterCount == 0) // Front
+								if (hydrolanceCount == 0) // Front
 								{
 									me->SetOrientation(1.250952f);
 									
@@ -301,11 +294,11 @@ public:
 										}
 									}
 
-									events.ScheduleEvent(EVENT_HYDROLANCE_FRONT, 6*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+									events.ScheduleEvent(EVENT_HYDROLANCE_FRONT, 2*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
 									DoCast(SPELL_HYDROLANCE);
 								}
 
-								if (hydrolanceWaterCount == 1) // Left
+								if (hydrolanceCount == 1) // Left
 								{
 									me->SetOrientation(5.240993f);
 									
@@ -320,11 +313,11 @@ public:
 										}
 									}
 
-									events.ScheduleEvent(EVENT_HYDROLANCE_LEFT, 6*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+									events.ScheduleEvent(EVENT_HYDROLANCE_LEFT, 2*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
 									DoCast(SPELL_HYDROLANCE);
 								}
 
-								if (hydrolanceWaterCount == 2) // Right
+								if (hydrolanceCount == 2) // Right
 								{
 									me->SetOrientation(3.504827f);
 									
@@ -339,11 +332,11 @@ public:
 										}
 									}
 
-									events.ScheduleEvent(EVENT_HYDROLANCE_RIGHT, 6*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
+									events.ScheduleEvent(EVENT_HYDROLANCE_RIGHT, 2*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
 									DoCast(SPELL_HYDROLANCE);
 								}
 
-								hydrolanceCount + 1;
+								hydrolanceWaterCount++;
 								events.ScheduleEvent(EVENT_HYDROLANCE, 4*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
 								break;
 							}
@@ -361,7 +354,7 @@ public:
 									}
 								}
 
-								hydrolanceWaterCount = 1;
+								hydrolanceCount = 1; // Next => left
 								events.CancelEvent(EVENT_HYDROLANCE_FRONT);
 								break;
 							}
@@ -379,7 +372,7 @@ public:
 									}
 								}
 							
-								hydrolanceWaterCount = 2;
+								hydrolanceCount = 2; // Next => right
 								events.CancelEvent(EVENT_HYDROLANCE_LEFT);
 								break;
 							}
@@ -397,7 +390,7 @@ public:
 									}
 								}
 
-								hydrolanceWaterCount = 0;
+								hydrolanceCount = 0; // Next => front
 								events.CancelEvent(EVENT_HYDROLANCE_RIGHT);
 								break;
 							}
