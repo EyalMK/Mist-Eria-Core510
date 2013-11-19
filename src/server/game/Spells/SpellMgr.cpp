@@ -2654,7 +2654,7 @@ struct SpellEffectArray
 {
     SpellEffectArray()
     {
-        for (uint8 i = 0; i < MAX_SPELL_EFFECTS_DIFFICULTY; ++i)
+        for (uint32 i = 0; i < MAX_SPELL_EFFECTS_DIFFICULTY; ++i)
             effects[i] = NULL;
     }
 
