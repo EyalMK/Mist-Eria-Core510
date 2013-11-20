@@ -906,8 +906,8 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effe
     APMultiplier = spellEntry->APMultiplier;
 
     // SpellDifficultyEntry
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS_DIFFICULTY; ++i)
-        Effects[i] = SpellEffectInfo(spellEntry, this, i, effects[i]);
+    for (uint32 i = 0; i < MAX_SPELL_EFFECTS_DIFFICULTY; ++i)
+        Effects[i] = SpellEffectInfo(spellEntry, this, i%MAX_SPELL_EFFECTS, effects[i]);
 
     // SpellScalingEntry
     SpellScalingEntry const* _scaling = GetSpellScaling();
