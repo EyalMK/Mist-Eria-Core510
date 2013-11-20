@@ -2415,6 +2415,17 @@ bool SpellInfo::IsHighRankOf(SpellInfo const* spellInfo) const
     return false;
 }
 
+void SpellInfo::SetDifficulty(uint32 difficulty)
+{
+	if(!difficulty)
+		return;
+
+	for(uint32 i=0; i<MAX_SPELL_EFFECTS; ++i)
+		if(Effects[i].IsEffect())
+			if(Effects[i+(difficulty*MAX_SPELL_EFFECTS)].IsEffect())
+				Effects[i] = Effects[i+(difficulty*MAX_SPELL_EFFECTS)];
+}
+
 uint32 SpellInfo::_GetExplicitTargetMask() const
 {
     bool srcSet = false;

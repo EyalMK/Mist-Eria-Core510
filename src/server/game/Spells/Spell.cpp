@@ -613,6 +613,7 @@ Spell::~Spell()
         ASSERT(m_caster->ToPlayer()->m_spellModTakingSpell != this);
 
     delete m_spellValue;
+	delete m_spellInfo;
 
     CheckEffectExecuteData();
 }

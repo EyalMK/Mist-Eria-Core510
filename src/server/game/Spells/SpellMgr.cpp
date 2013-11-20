@@ -554,6 +554,28 @@ SpellInfo const* SpellMgr::GetSpellForDifficultyFromSpell(SpellInfo const* spell
     return newSpell;
 }*/
 
+SpellInfo const* SpellMgr::GetSpellInfo(uint32 spellId, Unit* caster) const
+{
+	const SpellInfo *spellInfo = GetSpellInfo(spellId);
+
+	if(!spellInfo)
+		return NULL;
+
+	// ## Difficulty system :
+
+	//Making a temp copy
+	SpellInfo spellInfoCopy(*spellInfo);
+
+	if(caster)
+		if (caster->GetMap())
+			spellInfoCopy.SetDifficulty(caster->GetMap()->GetDifficulty());
+
+	// Will be freed in Spell Destructor
+	const SpellInfo* result = new SpellInfo(spellInfoCopy);
+
+	return result;
+}
+
 
 SpellChainNode const* SpellMgr::GetSpellChainNode(uint32 spell_id) const
 {
@@ -2676,7 +2698,6 @@ void SpellMgr::LoadSpellInfoStore()
         if (!effect)
             continue;
 
-        //if(effect->EffectSpellId == 62388 && effect->EffectIndex == 0) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN 62388 correct load");
         effectsBySpell[effect->EffectSpellId].effects[(effect->EffectIndex) + (effect->difficultyMode*MAX_SPELL_EFFECTS)] = effect;
     }
 
