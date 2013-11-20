@@ -506,13 +506,14 @@ public:
 							case EVENT_WASH_AWAY:
 								me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE, me->GetGUID());
 								DoCast(SPELL_WASH_AWAY_VISUAL);
+								sLog->outDebug(LOG_FILTER_UNITS, "###### ICI FONCTIONNE ######");
 
-								if (Creature* washAwayTrigger = me->FindNearestCreature(NPC_WASH_AWAY_TRIGGER, 500, true))
+								if (Creature* washAwayTrigger = ObjectAccessor::GetCreature(*me, 15207990))
 								{
 									me->SetInCombatWith(washAwayTrigger);
 									me->AddThreat(washAwayTrigger, 999999);
 									DoCast(washAwayTrigger, SPELL_WASH_AWAY);
-									sLog->outDebug(LOG_FILTER_UNITS, "###### FONCTIONNE ######");
+									sLog->outDebug(LOG_FILTER_UNITS, "###### ET LA FONCTIONNE ######");
 								}
 
 								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
