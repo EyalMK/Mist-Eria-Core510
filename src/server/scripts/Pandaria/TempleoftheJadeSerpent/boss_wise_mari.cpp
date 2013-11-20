@@ -47,7 +47,8 @@ enum Npcs
 	NPC_HYDROTRIGGER_ONE_LEFT		= 400440,
 	NPC_HYDROTRIGGER_TWO_LEFT		= 400441,
 	NPC_HYDROTRIGGER_ONE_RIGHT		= 400442,
-	NPC_HYDROTRIGGER_TWO_RIGHT		= 400443
+	NPC_HYDROTRIGGER_TWO_RIGHT		= 400443,
+	NPC_WASH_AWAY_TRIGGER			= 400444
 };
 
 enum Events
@@ -166,6 +167,10 @@ public:
 			{
 				if (me->HasAura(SPELL_WATER_BUBBLE))
 					me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE);
+				if (me->HasAura(SPELL_WASH_AWAY))
+					me->RemoveAurasDueToSpell(SPELL_WASH_AWAY);
+				if (me->HasAura(SPELL_WASH_AWAY_VISUAL))
+					me->RemoveAurasDueToSpell(SPELL_WASH_AWAY_VISUAL);
 
 				me->HandleEmoteCommand(0); // Remove emote
 				me->SetFacingTo(1.250952f);
@@ -503,9 +508,9 @@ public:
 							case EVENT_WASH_AWAY:
 								me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE, me->GetGUID());
 								me->SetFacingTo(4.393149f);
-								me->CombatStop(true);
 								DoCast(SPELL_WASH_AWAY_VISUAL);
-								DoCast(SPELL_WASH_AWAY);
+								if (Creature* washAwayTrigger = me->FindNearestCreature(NPC_WASH_AWAY_TRIGGER, 500, true))
+									DoCast(washAwayTrigger, SPELL_WASH_AWAY, true);
 
 								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
 								events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 0, 0, PHASE_WASH_AWAY);
@@ -519,7 +524,8 @@ public:
 								break;
 
 							case EVENT_WASH_AWAY_TURN:
-								me->SetFacingTo(me->GetOrientation() + 0.000500f);
+								if (Creature* washAwayTrigger = me->FindNearestCreature(NPC_WASH_AWAY_TRIGGER, 500, true))
+									me->SetFacingToObject(washAwayTrigger);
 
 								events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 1, 0, PHASE_WASH_AWAY);
 								break;
