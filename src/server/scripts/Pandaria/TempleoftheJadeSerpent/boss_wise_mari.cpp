@@ -173,7 +173,6 @@ public:
 
 				me->HandleEmoteCommand(0); // Remove emote
 				me->SetFacingTo(1.250952f);
-				me->GetMotionMaster()->MoveIdle();
 				me->CombatStop();
 				me->DeleteThreatList();
 				instance->SetBossState(DATA_BOSS_WISE_MARI, FAIL);
@@ -506,11 +505,14 @@ public:
 	
 							case EVENT_WASH_AWAY:
 								me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE, me->GetGUID());
-								if (Creature* washAwayTrigger = me->FindNearestCreature(NPC_WASH_AWAY_TRIGGER, 500, true))
-									me->AddThreat(washAwayTrigger, 999999.0f);
-
 								DoCast(SPELL_WASH_AWAY_VISUAL);
-								DoCast(SPELL_WASH_AWAY);
+
+								if (Creature* washAwayTrigger = me->FindNearestCreature(NPC_WASH_AWAY_TRIGGER, 500, true))
+								{
+									me->SetInCombatWith(washAwayTrigger);
+									me->AddThreat(washAwayTrigger, 999999);
+									DoCast(washAwayTrigger, SPELL_WASH_AWAY);
+								}
 
 								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
 								//events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 0, 0, PHASE_WASH_AWAY);
