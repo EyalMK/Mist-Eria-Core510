@@ -2,7 +2,7 @@
 
 /*
 	Notes :
-	What is missing ? :	- Wash away (need a test)
+	What is missing ? :	- Wash away (Need to be fixed)
 						- Doors (need a test)
 						- Water damage (Does not work)
 */
@@ -23,7 +23,7 @@ enum Spells
 	SPELL_HYDROLANCE_PULSE_BIG			= 106267,
 	SPELL_HYDROLANCE_PULSE_SMALL		= 106319,
 	SPELL_CORRUPTED_WATERS				= 115165,
-	SPELL_WASH_AWAY						= 106331,
+	SPELL_WASH_AWAY						= 106329,
 	SPELL_WASH_AWAY_VISUAL				= 115575,
 	
 
@@ -134,14 +134,12 @@ public:
 			{
 				instance->SetBossState(DATA_BOSS_WISE_MARI, NOT_STARTED);
 				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-				me->HandleEmoteCommand(0); // Remove emote
-				me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE);
-				me->SetFacingTo(1.250952f);
-				events.SetPhase(PHASE_NULL);
 
 				hydrolanceCount = 0; // 0 = front | 1 = left | 2 = right
 				hydrolanceWaterCount = 0; // Number of hydrolances casted before the new Corrupt living Water appears (5)
 				corruptWaterCount = 0; // 0 = first corrupt living water | 1 = second | 2 = third | 3 = fourth & phase 2
+
+				events.SetPhase(PHASE_NULL);
 			}
 		}
 
@@ -166,9 +164,15 @@ public:
 		{
 			if (instance)
 			{
-				instance->SetBossState(DATA_BOSS_WISE_MARI, FAIL);
+				if (me->HasAura(SPELL_WATER_BUBBLE))
+					me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE);
+
+				me->HandleEmoteCommand(0); // Remove emote
+				me->SetFacingTo(1.250952f);
+				me->GetMotionMaster()->MoveIdle();
 				me->CombatStop();
 				me->DeleteThreatList();
+				instance->SetBossState(DATA_BOSS_WISE_MARI, FAIL);
 			}
 		}
 
@@ -499,25 +503,26 @@ public:
 							case EVENT_WASH_AWAY:
 								me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE, me->GetGUID());
 								me->SetFacingTo(4.393149f);
+								me->GetMotionMaster()->MoveRotate(99999999, ROTATE_DIRECTION_RIGHT);
 								DoCast(SPELL_WASH_AWAY_VISUAL);
 								DoCast(SPELL_WASH_AWAY);
 
 								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
-								events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 0, 0, PHASE_WASH_AWAY);
+								//events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 0, 0, PHASE_WASH_AWAY);
 								events.CancelEvent(EVENT_WASH_AWAY);
 								break;
 
 							case EVENT_SAY_TAUNT:
-								Talk(urand(SAY_TAUNT_1, SAY_TAUNT_3));
+								Talk(irand(SAY_TAUNT_1, SAY_TAUNT_3));
 
 								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
 								break;
 
-							case EVENT_WASH_AWAY_TURN:
+							/*case EVENT_WASH_AWAY_TURN:
 								me->SetFacingTo(me->GetOrientation() + 0.000500f);
 
 								events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 1, 0, PHASE_WASH_AWAY);
-								break;
+								break;*/
 						}
 
 						default:
