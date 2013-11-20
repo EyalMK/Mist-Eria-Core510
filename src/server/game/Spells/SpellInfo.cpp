@@ -1013,6 +1013,8 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effe
 
     ExplicitTargetMask = _GetExplicitTargetMask();
     ChainEntry = NULL;
+
+	m_difficulty = 0;
 }
 
 SpellInfo::~SpellInfo()
@@ -2419,6 +2421,8 @@ void SpellInfo::SetDifficulty(uint32 difficulty)
 {
 	if(!difficulty)
 		return;
+
+	m_difficulty = difficulty;
 
 	for(uint32 i=0; i<MAX_SPELL_EFFECTS; ++i)
 		if(Effects[i].IsEffect())

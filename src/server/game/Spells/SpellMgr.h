@@ -690,7 +690,7 @@ class SpellMgr
         SpellAreaForAreaMapBounds GetSpellAreaForAreaMapBounds(uint32 area_id) const;
 
         // SpellInfo object management
-        SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  new SpellInfo(*(mSpellInfoMap[spellId])) : NULL; }
+        SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : NULL; }
 		SpellInfo const* GetSpellInfo(uint32 spellId, Unit* caster) const;
         uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap.size(); }
 
