@@ -512,6 +512,7 @@ public:
 									me->SetInCombatWith(washAwayTrigger);
 									me->AddThreat(washAwayTrigger, 999999);
 									DoCast(washAwayTrigger, SPELL_WASH_AWAY);
+									sLog->outDebug(LOG_FILTER_UNITS, "###### FONCTIONNE ######");
 								}
 
 								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
