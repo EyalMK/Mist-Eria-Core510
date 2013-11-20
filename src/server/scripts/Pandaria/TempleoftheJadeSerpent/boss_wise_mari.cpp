@@ -23,7 +23,7 @@ enum Spells
 	SPELL_HYDROLANCE_PULSE_BIG			= 106267,
 	SPELL_HYDROLANCE_PULSE_SMALL		= 106319,
 	SPELL_CORRUPTED_WATERS				= 115165,
-	SPELL_WASH_AWAY						= 106329,
+	SPELL_WASH_AWAY						= 106331,
 	SPELL_WASH_AWAY_VISUAL				= 115575,
 	
 
@@ -557,6 +557,11 @@ public:
 		void Reset() 
 		{
 			me->SetInCombatWithZone();
+		}
+
+		void EnterEvadeMode() 
+		{
+			me->DespawnOrUnsummon();
 		}
 
 		void JustDied(Unit *pWho) 
