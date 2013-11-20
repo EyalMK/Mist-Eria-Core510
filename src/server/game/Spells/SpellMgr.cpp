@@ -3765,6 +3765,18 @@ void SpellMgr::LoadSpellInfoCorrections()
 			case 118253:
 				spellInfo->Effects[EFFECT_1].Effect = 0; // This effect is completely fucked up
 				break;
+			/*case 106331: // Wash away
+				spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_TARGET_ENEMY);
+                spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
+				break;*/
+			case 106334: // Wash away triggered
+				spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_TARGET_ENEMY);
+                spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
+				spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_DEST_TARGET_ENEMY);
+                spellInfo->Effects[EFFECT_1].TargetB = SpellImplicitTargetInfo();
+				spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_DEST_TARGET_ENEMY);
+                spellInfo->Effects[EFFECT_2].TargetB = SpellImplicitTargetInfo();
+				break;
             default:
                 break;
         }

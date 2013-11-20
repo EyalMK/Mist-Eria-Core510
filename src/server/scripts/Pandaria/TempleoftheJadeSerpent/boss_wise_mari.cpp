@@ -2,9 +2,9 @@
 
 /*
 	Notes :
-	What is missing ? :	- Hydroblast
-						- Hydrolance triggers system : missing 6 triggers (two first pulses)
-						- Water damage
+	What is missing ? :	- Wash away (need a test)
+						- Doors (need a test)
+						- Water damage (need a test)
 */
 
 #include "ScriptPCH.h"
@@ -22,8 +22,12 @@ enum Spells
 	SPELL_HYDROLANCE_PRECAST			= 115220,
 	SPELL_HYDROLANCE_PULSE_BIG			= 106267,
 	SPELL_HYDROLANCE_PULSE_SMALL		= 106319,
+	SPELL_CORRUPTED_WATERS				= 115165,
+	SPELL_WASH_AWAY						= 106331,
+	SPELL_WASH_AWAY_VISUAL				= 115575,
+	
 
-	/* Corrupt Living Water */
+	/* Corrupt living Water */
 	SPELL_SHA_RESIDUE					= 106653
 };
 
@@ -57,7 +61,7 @@ enum Events
 	EVENT_CALL_THIRD_WATER			= 7,
 	EVENT_CALL_FOURTH_WATER			= 8,
 	EVENT_BUBBLE_BURST				= 9,
-	EVENT_HYDROBLAST				= 10,
+	EVENT_WASH_AWAY					= 10,
 	EVENT_FIRST_TRIGGER_WATER_AURA	= 11,
 	EVENT_SECOND_TRIGGER_WATER_AURA	= 12,
 	EVENT_THIRD_TRIGGER_WATER_AURA	= 13,
@@ -67,7 +71,9 @@ enum Events
 	EVENT_HYDROTRIGGER_ONE_LEFT		= 17,
 	EVENT_HYDROTRIGGER_TWO_LEFT		= 18,
 	EVENT_HYDROTRIGGER_ONE_RIGHT	= 19,
-	EVENT_HYDROTRIGGER_TWO_RIGHT	= 20
+	EVENT_HYDROTRIGGER_TWO_RIGHT	= 20,
+	EVENT_SAY_TAUNT					= 21,
+	EVENT_WASH_AWAY_TURN			= 22
 };
 
 enum Texts
@@ -81,7 +87,7 @@ enum Texts
 	SAY_DEATH_2				= 6,
 	SAY_DEATH_3				= 7,
 	SAY_INTRO				= 8,
-	SAY_PHASE_HYDROBLAST	= 9,
+	SAY_PHASE_WASH_AWAY		= 9,
 	SAY_SLAY_1				= 10,
 	SAY_SLAY_2				= 11,
 	SAY_TAUNT_1				= 12,
@@ -94,7 +100,7 @@ enum Phases
 {
 	PHASE_NULL,
 	PHASE_CORRUPT_LIVING_WATERS,
-	PHASE_HYDROBLAST,
+	PHASE_WASH_AWAY,
 };
 
 
@@ -130,6 +136,8 @@ public:
 				instance->SetBossState(DATA_BOSS_WISE_MARI, NOT_STARTED);
 				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE);
+				me->SetFacingTo(1.250952f);
+				me->HandleEmoteCommand(EMOTE_ONESHOT_CUSTOM_SPELL_01);
 				events.SetPhase(PHASE_NULL);
 
 				hydrolanceCount = 0; // 0 = front | 1 = left | 2 = right
@@ -144,7 +152,7 @@ public:
 			{
 				Talk(irand(SAY_DEATH_1, SAY_DEATH_3));
 				instance->DoCastSpellOnPlayers(SPELL_BLESSING_OF_THE_WATERSPEAKER);
-				instance->DoUseDoorOrButton(GO_WISE_MARI_DOOR);
+				instance->HandleGameObject(GO_WISE_MARI_DOOR, true); // need a test
 			}
 		}
 
@@ -184,10 +192,26 @@ public:
 			if(!UpdateVictim())
 				return;
 
-			if (me->HasUnitState(UNIT_STATE_CASTING))
+			if (me->HasUnitState(UNIT_STATE_CASTING) && !events.IsInPhase(PHASE_WASH_AWAY))
 				return;
 
 			events.Update(diff);
+
+			Map* map = me->GetMap();
+			if (map && map->IsDungeon())
+			{
+				Map::PlayerList const &PlayerList = map->GetPlayers();
+
+				if (!PlayerList.isEmpty())
+					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+					{
+						if (i->getSource()->isAlive() && i->getSource()->IsInWater() && !i->getSource()->HasAura(SPELL_CORRUPTED_WATERS))
+							i->getSource()->CastSpell(i->getSource(), SPELL_CORRUPTED_WATERS);
+
+						if (i->getSource()->isAlive() && !i->getSource()->IsInWater() && i->getSource()->HasAura(SPELL_CORRUPTED_WATERS))
+							i->getSource()->RemoveAurasDueToSpell(SPELL_CORRUPTED_WATERS);
+					}
+			}
 
 			if (instance)
 			{
@@ -211,11 +235,11 @@ public:
 
 				if (hydrolanceWaterCount == 5 && corruptWaterCount == 3) // Fourth corrupt living water
 				{
-					events.SetPhase(PHASE_HYDROBLAST);
-					events.ScheduleEvent(EVENT_BUBBLE_BURST, 2*IN_MILLISECONDS, 0, PHASE_HYDROBLAST);
+					events.SetPhase(PHASE_WASH_AWAY);
+					events.ScheduleEvent(EVENT_BUBBLE_BURST, 2*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
 					hydrolanceWaterCount = 0;
 				}
-			
+
 				while(uint32 eventId = events.ExecuteEvent())
 				{
 					switch(eventId)
@@ -465,19 +489,34 @@ public:
 
 							case EVENT_BUBBLE_BURST:
 								DoCast(SPELL_BUBBLE_BURST);
-								Talk(SAY_PHASE_HYDROBLAST);
+								Talk(SAY_PHASE_WASH_AWAY);
 
-								events.ScheduleEvent(EVENT_HYDROBLAST, 0, 0, PHASE_HYDROBLAST);
+								events.ScheduleEvent(EVENT_WASH_AWAY, 4*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
 								events.CancelEvent(EVENT_BUBBLE_BURST);
 								break;
 	
-							case EVENT_HYDROBLAST:
+							case EVENT_WASH_AWAY:
 								me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE, me->GetGUID());
-								// Cast hydroblast spell
+								me->SetFacingTo(4.393149f);
+								DoCast(SPELL_WASH_AWAY_VISUAL);
+								DoCast(SPELL_WASH_AWAY);
 
-								events.CancelEvent(EVENT_HYDROBLAST);
+								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
+								events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 0, 0, PHASE_WASH_AWAY);
+								events.CancelEvent(EVENT_WASH_AWAY);
 								break;
-						
+
+							case EVENT_SAY_TAUNT:
+								Talk(urand(SAY_TAUNT_1, SAY_TAUNT_3));
+
+								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
+								break;
+
+							case EVENT_WASH_AWAY_TURN:
+								me->SetFacingTo(me->GetOrientation() + 0.000500f);
+
+								events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 1, 0, PHASE_WASH_AWAY);
+								break;
 						}
 
 						default:
