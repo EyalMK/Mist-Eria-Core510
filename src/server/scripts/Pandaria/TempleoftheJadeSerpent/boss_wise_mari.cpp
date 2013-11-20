@@ -25,7 +25,6 @@ enum Spells
 	SPELL_CORRUPTED_WATERS				= 115165,
 	SPELL_WASH_AWAY						= 106331,
 	SPELL_WASH_AWAY_VISUAL				= 115575,
-	
 
 	/* Corrupt living Water */
 	SPELL_SHA_RESIDUE					= 106653
@@ -48,7 +47,7 @@ enum Npcs
 	NPC_HYDROTRIGGER_TWO_LEFT		= 400441,
 	NPC_HYDROTRIGGER_ONE_RIGHT		= 400442,
 	NPC_HYDROTRIGGER_TWO_RIGHT		= 400443,
-	NPC_WASH_AWAY_TRIGGER			= 400444
+	//NPC_WASH_AWAY_TRIGGER			= 400444
 };
 
 enum Events
@@ -507,13 +506,14 @@ public:
 	
 							case EVENT_WASH_AWAY:
 								me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE, me->GetGUID());
-								me->SetFacingTo(4.393149f);
-								DoCast(SPELL_WASH_AWAY_VISUAL);
 								if (Creature* washAwayTrigger = me->FindNearestCreature(NPC_WASH_AWAY_TRIGGER, 500, true))
-									DoCast(washAwayTrigger, SPELL_WASH_AWAY, true);
+									me->AddThreat(washAwayTrigger, 999999.0f);
+
+								DoCast(SPELL_WASH_AWAY_VISUAL);
+								DoCast(SPELL_WASH_AWAY);
 
 								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
-								events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 0, 0, PHASE_WASH_AWAY);
+								//events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 0, 0, PHASE_WASH_AWAY);
 								events.CancelEvent(EVENT_WASH_AWAY);
 								break;
 
@@ -523,12 +523,11 @@ public:
 								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
 								break;
 
-							case EVENT_WASH_AWAY_TURN:
-								if (Creature* washAwayTrigger = me->FindNearestCreature(NPC_WASH_AWAY_TRIGGER, 500, true))
-									me->SetFacingToObject(washAwayTrigger);
+							/*case EVENT_WASH_AWAY_TURN:
+								
 
 								events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 1, 0, PHASE_WASH_AWAY);
-								break;
+								break;*/
 						}
 
 						default:
