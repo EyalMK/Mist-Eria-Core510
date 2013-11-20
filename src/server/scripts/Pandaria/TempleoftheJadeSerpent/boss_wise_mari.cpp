@@ -503,6 +503,7 @@ public:
 							case EVENT_WASH_AWAY:
 								me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE, me->GetGUID());
 								me->SetFacingTo(4.393149f);
+								me->CombatStop(true);
 								DoCast(SPELL_WASH_AWAY_VISUAL);
 								DoCast(SPELL_WASH_AWAY);
 
@@ -518,9 +519,7 @@ public:
 								break;
 
 							case EVENT_WASH_AWAY_TURN:
-								me->SetControlled(false, UNIT_STATE_STUNNED);
 								me->SetFacingTo(me->GetOrientation() + 0.000500f);
-								me->SetControlled(true, UNIT_STATE_STUNNED);
 
 								events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 1, 0, PHASE_WASH_AWAY);
 								break;
