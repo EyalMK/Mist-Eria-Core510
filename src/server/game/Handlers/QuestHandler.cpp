@@ -56,8 +56,11 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
             if (!cr_questgiver->IsHostileTo(_player))       // do not show quest status to enemies
             {
                 questStatus = sScriptMgr->GetDialogStatus(_player, cr_questgiver);
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NoboDie questStatus 1 %u", questStatus);
                 if (questStatus > 6)
                     questStatus = getDialogStatus(_player, cr_questgiver, defstatus);
+
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NoboDie questStatus 2 %u", questStatus);
             }
             break;
         }
@@ -660,6 +663,7 @@ uint32 WorldSession::getDialogStatus(Player* player, Object* questgiver, uint32 
     {
         uint32 result2 = 0;
         uint32 quest_id = i->second;
+
         Quest const* quest = sObjectMgr->GetQuestTemplate(quest_id);
         if (!quest)
             continue;
@@ -669,19 +673,24 @@ uint32 WorldSession::getDialogStatus(Player* player, Object* questgiver, uint32 
             continue;
 
         QuestStatus status = player->GetQuestStatus(quest_id);
+
         if ((status == QUEST_STATUS_COMPLETE && !player->GetQuestRewardStatus(quest_id)) ||
             (quest->IsAutoComplete() && player->CanTakeQuest(quest, false)))
         {
             if (quest->IsAutoComplete() && quest->IsRepeatable())
                 result2 = DIALOG_STATUS_REWARD_REP;
-            else
+            else if (quest->HasFlag(QUEST_FLAGS_DAILY) || quest->HasFlag(QUEST_FLAGS_WEEKLY))
+				result2 = DIALOG_STATUS_REWARD_REP;
+			else
                 result2 = DIALOG_STATUS_REWARD;
+
         }
         else if (status == QUEST_STATUS_INCOMPLETE)
             result2 = DIALOG_STATUS_INCOMPLETE;
 
         if (result2 > result)
             result = result2;
+
     }
 
     for (QuestRelations::const_iterator i = qr.first; i != qr.second; ++i)
@@ -713,10 +722,16 @@ uint32 WorldSession::getDialogStatus(Player* player, Object* questgiver, uint32 
                             result2 = DIALOG_STATUS_AVAILABLE;
                     }
                     else
-                        result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE;
+					{
+						if (quest->HasFlag(QUEST_FLAGS_DAILY) || quest->HasFlag(QUEST_FLAGS_WEEKLY))
+							result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE_REP;
+						else
+							result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE;
+					}
                 }
                 else
                     result2 = DIALOG_STATUS_UNAVAILABLE;
+
             }
         }
 

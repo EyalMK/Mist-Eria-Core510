@@ -31,13 +31,17 @@ enum CreaturesIds
 
 enum CreaturesGUID
 {
-	NPC_SUN_1			= 000000,
-	NPC_SUN_2			= 000001,
-	NPC_SUN_3			= 000002,
-	NPC_SUN_4			= 000003,
-	NPC_SUN_5			= 000004,
+	NPC_SUN_1			= 0,
+	NPC_SUN_2			= 1,
+	NPC_SUN_3			= 2,
+	NPC_SUN_4			= 3,
+	NPC_SUN_5			= 4,
 };
 
+enum GameObjectsGUID
+{
+	GO_WISE_MARI_DOOR	= 428968,
+};
 
 #endif
 

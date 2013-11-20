@@ -395,7 +395,7 @@ public:
     int32  ScalingClass;
     float  CoefBase;
     int32  CoefLevelBase;
-    SpellEffectInfo Effects[MAX_SPELL_EFFECTS];
+    SpellEffectInfo Effects[MAX_SPELL_EFFECTS_DIFFICULTY];
     uint32 ExplicitTargetMask;
     SpellChainNode const* ChainEntry;
 

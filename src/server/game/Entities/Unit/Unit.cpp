@@ -6961,9 +6961,19 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 /*damage*/, Aura* triggeredByAura
                     *handled = true;
                     break;
                 }
+                case 29838:
+                {
+                    if(HealthBelowPct(35))
+                        CastSpell(this, 16491, true);
+                    break;
+                }
                 default:
                     break;
             }
+
+
+
+
             break;
         }
     }

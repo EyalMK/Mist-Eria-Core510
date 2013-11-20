@@ -2080,12 +2080,16 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetArenaTeamIdInvited() { return m_ArenaTeamIdInvited; }
         uint32 GetRBGPersonalRating() const { return 0; }
 
+
+        Difficulty noboGetDifficulty() const { return m_NoboDifficulty;}
+        void noboSetDifficulty(Difficulty diff) { m_NoboDifficulty = diff;}
+
         Difficulty GetDifficulty(bool isRaid) const { return isRaid ? m_raidDifficulty : m_dungeonDifficulty; }
         Difficulty GetDungeonDifficulty() const { return m_dungeonDifficulty; }
         Difficulty GetRaidDifficulty() const { return m_raidDifficulty; }
         Difficulty GetStoredRaidDifficulty() const { return m_raidMapDifficulty; } // only for use in difficulty packet after exiting to raid map
-        void SetDungeonDifficulty(Difficulty dungeon_difficulty) { m_dungeonDifficulty = dungeon_difficulty; }
-        void SetRaidDifficulty(Difficulty raid_difficulty) { m_raidDifficulty = raid_difficulty; }
+        void SetDungeonDifficulty(Difficulty dungeon_difficulty) { noboSetDifficulty(dungeon_difficulty); m_dungeonDifficulty = dungeon_difficulty; }
+        void SetRaidDifficulty(Difficulty raid_difficulty) { noboSetDifficulty(raid_difficulty); m_raidDifficulty = raid_difficulty; }
         void StoreRaidMapDifficulty() { m_raidMapDifficulty = GetMap()->GetDifficulty(); }
 
         bool UpdateSkill(uint32 skill_id, uint32 step);
@@ -2172,6 +2176,8 @@ class Player : public Unit, public GridObject<Player>
 
         void SendDungeonDifficulty(bool IsInGroup);
         void SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty = -1);
+        void noboSendDifficulty();
+
         void ResetInstances(uint8 method, bool isRaid);
         void SendResetInstanceSuccess(uint32 MapId);
         void SendResetInstanceFailed(uint32 reason, uint32 MapId);
@@ -2265,6 +2271,7 @@ class Player : public Unit, public GridObject<Player>
         ReputationRank GetReputationRank(uint32 faction_id) const;
         void RewardReputation(Unit* victim, float rate);
         void RewardReputation(Quest const* quest);
+		void RewardCurrency(Quest const* quest);
 
         int32 CalculateReputationGain(ReputationSource source, uint32 creatureOrQuestLevel, int32 rep, int32 faction, bool noQuestBonus = false);
 
@@ -2621,9 +2628,6 @@ public:
         bool isUsingLfg();
         bool inRandomLfgDungeon();
 
-        typedef std::set<uint32> DFQuestsDoneList;
-        DFQuestsDoneList m_DFQuests;
-
         // Temporarily removed pet cache
         uint32 GetTemporaryUnsummonedPetNumber() const { return m_temporaryUnsummonedPetNumber; }
         void SetTemporaryUnsummonedPetNumber(uint32 petnumber) { m_temporaryUnsummonedPetNumber = petnumber; }
@@ -2858,6 +2862,7 @@ public:
         typedef std::set<uint32> SeasonalQuestSet;
         typedef UNORDERED_MAP<uint32, SeasonalQuestSet> SeasonalEventQuestMap;
         QuestSet m_timedquests;
+		QuestSet m_dailyquests;
         QuestSet m_weeklyquests;
         QuestSet m_monthlyquests;
         SeasonalEventQuestMap m_seasonalquests;
@@ -2949,6 +2954,7 @@ public:
         Difficulty m_dungeonDifficulty;
         Difficulty m_raidDifficulty;
         Difficulty m_raidMapDifficulty;
+        Difficulty m_NoboDifficulty;
 
         uint32 m_atLoginFlags;
 

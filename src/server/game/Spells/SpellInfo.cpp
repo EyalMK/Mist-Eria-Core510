@@ -395,6 +395,10 @@ bool SpellEffectInfo::IsAPSPModified() const
 			case SPELL_AURA_MOD_RANGED_HASTE:
 			case SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK:
 			case SPELL_AURA_MOD_MELEE_RANGED_HASTE:
+			case SPELL_AURA_ADD_FLAT_MODIFIER:
+			case SPELL_AURA_ADD_PCT_MODIFIER:
+			case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE:
+			case SPELL_AURA_MOD_DAMAGE_FROM_CASTER:
                 return false;
             default:
                 break;
@@ -902,8 +906,8 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effe
     APMultiplier = spellEntry->APMultiplier;
 
     // SpellDifficultyEntry
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-        Effects[i] = SpellEffectInfo(spellEntry, this, i, effects[i]);
+    for (uint32 i = 0; i < MAX_SPELL_EFFECTS_DIFFICULTY; ++i)
+        Effects[i] = SpellEffectInfo(spellEntry, this, i%MAX_SPELL_EFFECTS, effects[i]);
 
     // SpellScalingEntry
     SpellScalingEntry const* _scaling = GetSpellScaling();

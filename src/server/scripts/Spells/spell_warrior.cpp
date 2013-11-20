@@ -30,7 +30,9 @@ enum WarriorSpells
 {
     SPELL_WARRIOR_BLOODTHIRST                       = 23885,
     SPELL_WARRIOR_BLOODTHIRST_DAMAGE                = 23881,
-    SPELL_WARRIOR_CHARGE                            = 34846,
+    SPELL_WARRIOR_CHARGE                            = 7922,
+	SPELL_WARRIOR_CHARGE_TALENT						= 105771,
+	SPELL_WARRIOR_CHARGE_TALENT_PASSIVE				= 103828,
     SPELL_WARRIOR_DEEP_WOUNDS_RANK_1                = 12162,
     SPELL_WARRIOR_DEEP_WOUNDS_RANK_2                = 12850,
     SPELL_WARRIOR_DEEP_WOUNDS_RANK_3                = 12868,
@@ -38,8 +40,6 @@ enum WarriorSpells
     SPELL_WARRIOR_EXECUTE                           = 5308,
     SPELL_WARRIOR_GLYPH_OF_EXECUTION                = 58367,
     SPELL_WARRIOR_GLYPH_OF_VIGILANCE                = 63326,
-    SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_BUFF        = 65156,
-    SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_TALENT      = 64976,
     SPELL_WARRIOR_LAST_STAND_TRIGGERED              = 12976,
     SPELL_WARRIOR_SLAM                              = 50782,
     SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK     = 26654,
@@ -51,11 +51,14 @@ enum WarriorSpells
     SPELL_WARRIOR_VIGILANCE_PROC                    = 50725,
     SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665,
 	SPELL_WARRIOR_RALLYING_CRY_TRIGGERED            = 97463,
+	SPELL_WARRIOR_PHYSICAL_VULNERABILITY			= 81326,
+	SPELL_WARRIOR_IMPENDING_VICTORY					= 118340,
+	SPELL_WARRIOR_HEROIC_THROW						= 57755,
+	SPELL_WARRIOR_WILD_STRIKE						= 100130,
     SPELL_PALADIN_BLESSING_OF_SANCTUARY             = 20911,
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
     SPELL_PRIEST_RENEWED_HOPE                       = 63944,
     SPELL_GEN_DAMAGE_REDUCTION_AURA                 = 68066,
-	SPELL_WARRIOR_PHYSICAL_VULNERABILITY			= 81326,
 };
 
 enum WarriorSpellIcons
@@ -63,7 +66,7 @@ enum WarriorSpellIcons
     WARRIOR_ICON_ID_SUDDEN_DEATH                    = 1989,
 };
 
-/// Updated 4.3.4
+/// Waiting for debug
 class spell_warr_bloodthirst : public SpellScriptLoader
 {
     public:
@@ -133,7 +136,7 @@ class spell_warr_bloodthirst_heal : public SpellScriptLoader
         }
 };
 
-/// Updated 4.3.4
+/// Updated 5.1.0
 class spell_warr_charge : public SpellScriptLoader
 {
     public:
@@ -145,20 +148,16 @@ class spell_warr_charge : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spellInfo*/)
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_TALENT) || !sSpellMgr->GetSpellInfo(SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_BUFF) || !sSpellMgr->GetSpellInfo(SPELL_WARRIOR_CHARGE))
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_CHARGE))
                     return false;
                 return true;
             }
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-                int32 chargeBasePoints0 = GetEffectValue();
+                int32 chargeBasePoints0 = GetEffectValue()*10;
                 Unit* caster = GetCaster();
                 caster->CastCustomSpell(caster, SPELL_WARRIOR_CHARGE, &chargeBasePoints0, NULL, NULL, true);
-
-                // Juggernaut crit bonus
-                if (caster->HasAura(SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_TALENT))
-                    caster->CastSpell(caster, SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_BUFF, true);
             }
 
             void Register()
@@ -819,7 +818,7 @@ public:
 
         void Register()
         {
-            OnEffectHitTarget += SpellEffectFn(spell_warr_heroic_leap_dummy::spell_warr_heroic_leap_dummy_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            OnEffectHitTarget += SpellEffectFn(spell_warr_heroic_leap_dummy::spell_warr_heroic_leap_dummy_SpellScript::CalculateDamage, EFFECT_3, SPELL_EFFECT_SCHOOL_DAMAGE);
         }
     };
 
@@ -841,28 +840,159 @@ class spell_warr_colossus_smash : public SpellScriptLoader
 
             void HandleEffect(SpellEffIndex /*effIndex*/)
             {
-                Unit* caster = GetCaster();
-				Unit* victim = GetHitUnit();
-				int32 baseDamage = 3882;
-				int32 attackPowerDamage = 0;
-				int32 damage = baseDamage + attackPowerDamage;
-
-				if (Unit* target = GetHitUnit())
-					int32 damage = 1.75f * caster->GetTotalAttackPowerValue(BASE_ATTACK);
-					
-				SetHitDamage(damage);
-				caster->CastSpell(victim, SPELL_WARRIOR_PHYSICAL_VULNERABILITY, true);
+				GetCaster()->CastSpell(GetHitUnit(), SPELL_WARRIOR_PHYSICAL_VULNERABILITY, true);
             }
 
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_warr_colossus_smash_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+                OnEffectHitTarget += SpellEffectFn(spell_warr_colossus_smash_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_NORMALIZED_WEAPON_DMG);
             }
         };
 
         SpellScript* GetSpellScript() const
         {
             return new spell_warr_colossus_smash_SpellScript();
+        }
+};
+
+/// Updated 5.1.0 : 103840 - Impending victory
+class spell_warr_impending_victory : public SpellScriptLoader
+{
+    public:
+        spell_warr_impending_victory() : SpellScriptLoader("spell_warr_impending_victory") { }
+
+        class spell_warr_impending_victory_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_impending_victory_SpellScript);
+
+            void HandleDamage(SpellEffIndex /*effIndex*/)
+            {
+				Player* caster = GetCaster()->ToPlayer();
+				int32 baseDamageArms = 1558;
+				int32 baseDamage = 1246;
+
+				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_ARMS)
+				{
+					int32 damage = baseDamageArms + 0.7f * GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK);
+					SetHitDamage(damage);
+				}
+
+				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY ||
+					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_PROTECTION)
+				{
+					int32 damage = baseDamage + 0.56f * GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK);
+					SetHitDamage(damage);
+				}
+
+				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_WARRIOR_ARMS &&
+					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_WARRIOR_FURY &&
+					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_WARRIOR_PROTECTION)
+					SetHitDamage(baseDamage);
+
+				caster->CastSpell(caster, SPELL_WARRIOR_IMPENDING_VICTORY);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_warr_impending_victory_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_impending_victory_SpellScript();
+        }
+};
+
+/// Updated 5.1.0 : 57755 - Heroic Throw
+class spell_warr_heroic_throw : public SpellScriptLoader
+{
+    public:
+        spell_warr_heroic_throw() : SpellScriptLoader("spell_warr_heroic_throw") { }
+
+        class spell_warr_heroic_throw_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_heroic_throw_SpellScript);
+
+            bool Validate (SpellInfo const* /*spellEntry*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_HEROIC_THROW))
+                    return false;
+
+                return true;
+            }
+
+            bool Load()
+            {
+                if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                    return false;
+
+                return true;
+            }
+
+            void HandleDamage(SpellEffIndex /*effIndex*/)
+            {                
+                Unit* caster = GetCaster();
+
+				int32 damage = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f;
+                SetHitDamage(damage);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_warr_heroic_throw_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_heroic_throw_SpellScript();
+        }
+};
+
+/// Updated 5.1.0 : 100130 - Wild strike
+class spell_warr_wild_strike : public SpellScriptLoader
+{
+    public:
+        spell_warr_wild_strike() : SpellScriptLoader("spell_warr_wild_strike") { }
+
+        class spell_warr_wild_strike_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_wild_strike_SpellScript);
+
+            bool Validate (SpellInfo const* /*spellEntry*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_WILD_STRIKE))
+                    return false;
+
+                return true;
+            }
+
+            bool Load()
+            {
+                if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                    return false;
+
+                return true;
+            }
+
+            void HandleDamage(SpellEffIndex /*effIndex*/)
+            {                
+                Unit* caster = GetCaster();
+
+				int32 damage = 1003 + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 2.3f;
+                SetHitDamage(damage);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_warr_wild_strike_SpellScript::HandleDamage, EFFECT_2, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_wild_strike_SpellScript();
         }
 };
 
@@ -888,4 +1018,6 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_heroic_leap();
 	new spell_warr_heroic_leap_dummy();
 	new spell_warr_colossus_smash();
+	new spell_warr_heroic_throw();
+	new spell_warr_wild_strike();
 }

@@ -1626,7 +1626,7 @@ void WorldSession::HandleResetInstancesOpcode(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket& recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_SET_DUNGEON_DIFFICULTY");
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_SET_DUNGEON_DIFFICULTY");
 
     uint32 mode;
     recvData >> mode;
@@ -1693,7 +1693,7 @@ void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_SET_RAID_DIFFICULTY");
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_SET_RAID_DIFFICULTY");
 
     uint32 mode;
     recvData >> mode;

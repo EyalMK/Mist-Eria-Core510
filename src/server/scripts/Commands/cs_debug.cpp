@@ -92,6 +92,9 @@ public:
             { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "", NULL },
             { "phase",          SEC_MODERATOR,      false, &HandleDebugPhaseCommand,           "", NULL },
 			{ "chat",			SEC_MODERATOR,      false, &HandleDebugChatCommand,			   "", NULL },
+			{ "questgiver",		SEC_MODERATOR,      false, &HandleDebugQuestGiverCommand,	   "", NULL },
+            { "difficulty",		SEC_MODERATOR,      false, &HandleDebugDifficultyCommand,	   "", NULL },
+            { "op32",		    SEC_MODERATOR,      false, &HandleDebugSendOpcodeUint32Command,"", NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
         };
         static ChatCommand debugSetCommandTable[] = 
@@ -1535,6 +1538,72 @@ public:
 
         return true;
     }
+
+	static bool HandleDebugQuestGiverCommand(ChatHandler* handler, char const* args)
+    {
+		if (!args)
+			return false;
+
+		uint32 status;
+
+		char* statusStr = strtok((char*)args, " ");
+
+		if (!statusStr)
+			return false;
+
+		status = atoi(statusStr);
+
+		Creature * c = handler->getSelectedCreature();
+
+		if(!c)
+		{
+			handler->SendSysMessage("Vous devez selectionner une Creature");
+			return false;
+		}
+
+		WorldPacket data(SMSG_QUESTGIVER_STATUS, 8 + 4);
+		data << uint64(c->GetGUID());
+		data << uint32(status);
+
+		handler->GetSession()->SendPacket(&data);
+
+        return true;
+    }
+
+    static bool HandleDebugDifficultyCommand(ChatHandler* handler, char const* args)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        handler->PSendSysMessage("Current difficulty mode : %u", player->noboGetDifficulty());
+        return true;
+    }
+
+
+    static bool HandleDebugSendOpcodeUint32Command(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* x = strtok((char*)args, " ");
+        char* y = strtok(NULL, " ");
+
+        if (!x || !y)
+            return false;
+
+        uint32 opcode = (uint32)atoi(x);
+        uint32 val = (uint32)atoi(y);
+
+        WorldPacket data(Opcodes(opcode), 4);
+        data << uint32(val);
+
+        handler->PSendSysMessage("sent opcode %u(0x%x) with value : %u", opcode, opcode, val);
+
+        handler->GetSession()->SendPacket(&data);
+
+        return true;
+    }
+
+
+
 };
 
 void AddSC_debug_commandscript()

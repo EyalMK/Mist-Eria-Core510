@@ -17,11 +17,13 @@
 
 #include "ScriptLoader.h"
 
-
 void AddSC_boss_gekkan();
 void AddSC_instance_mogushan_palace();
 
-//Monastere des pandashan
+// Pandaria zones
+void AddSC_vale_of_eternal_blossoms();
+
+// Shado-Pan Monastery
 void AddSC_boss_gu_cloudstrike();
 void AddSC_boss_master_snowdrift();
 void AddSC_boss_sha_of_violence();
@@ -33,21 +35,21 @@ void AddSC_boss_hoptallus();
 void AddSC_boss_ook_ook();
 void AddSC_boss_yan_zhu();
 
-//Temple du serpent de jade
+// Temple du serpent de jade
 void AddSC_boss_wise_mari();
 void AddSC_boss_lorewalker_stonestep();
 void AddSC_boss_liu_flameheart();
 void AddSC_boss_sha_of_doubt();
 void AddSC_instance_temple_of_the_jade_serpent();
 
-//examples
+// Examples
 void AddSC_example_creature();
 void AddSC_example_escort();
 void AddSC_example_gossip_codebox();
 void AddSC_example_misc();
 void AddSC_example_commandscript();
 
-// spells
+// Spells
 void AddSC_deathknight_spell_scripts();
 void AddSC_druid_spell_scripts();
 void AddSC_generic_spell_scripts();
@@ -68,7 +70,7 @@ void AddSC_monk_spell_scripts();
 
 void AddSC_SmartSCripts();
 
-//Commands
+// Commands
 void AddSC_account_commandscript();
 void AddSC_achievement_commandscript();
 void AddSC_ban_commandscript();
@@ -106,7 +108,7 @@ void AddSc_boutique();
 void AddSc_spy();
 
 #ifdef SCRIPTS
-//world
+// World
 void AddSC_areatrigger_scripts();
 void AddSC_emerald_dragons();
 void AddSC_generic_creature();
@@ -119,7 +121,7 @@ void AddSC_npcs_special();
 void AddSC_npc_taxi();
 void AddSC_achievement_scripts();
 
-//eastern kingdoms
+// Eastern kingdoms
 void AddSC_alterac_valley();                 //Alterac Valley
 void AddSC_boss_balinda();
 void AddSC_boss_drekthar();
@@ -1307,7 +1309,9 @@ void AddPandariaScripts()
     AddSC_boss_gekkan();
     AddSC_instance_mogushan_palace();
 
-    AddSC_boss_gu_cloudstrike();			//Monastère des Pandashan
+	AddSC_vale_of_eternal_blossoms();
+
+    AddSC_boss_gu_cloudstrike();			//Shado-Pan Monastery
     AddSC_boss_master_snowdrift();
     AddSC_boss_sha_of_violence();
     AddSC_boss_taran_zhu();
@@ -1319,7 +1323,7 @@ void AddPandariaScripts()
     AddSC_boss_yan_zhu();
 
 
-    AddSC_boss_wise_mari();                 //Temple du serpent de jade
+    AddSC_boss_wise_mari();                 //Temple of the Jade Serpent
     AddSC_boss_lorewalker_stonestep();
     AddSC_boss_liu_flameheart();
     AddSC_boss_sha_of_doubt();

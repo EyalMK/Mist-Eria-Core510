@@ -12,6 +12,7 @@ set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
   Pandaria/boss_sha_of_anger.cpp
   Pandaria/zone_wandering_isle.cpp
+  Pandaria/zone_vale_of_eternal_blossoms.cpp
   Pandaria/MoguShanPalace/boss_gekkan.cpp
   Pandaria/MoguShanPalace/boss_xin_the_weaponmaster.cpp
   Pandaria/MoguShanPalace/instance_mogushan_palace.cpp
