@@ -3766,10 +3766,7 @@ void SpellMgr::LoadSpellInfoCorrections()
 				spellInfo->Effects[EFFECT_1].Effect = 0; // This effect is completely fucked up
 				break;
 			case 106331: // Wash away
-				spellInfo->Effects[0].Amplitude = 2500;
-				break;
-			case 106334: // Wash away damage
-				spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_8_YARDS);
+				spellInfo->Effects[0].Amplitude = 3500;
 				break;
 			case 106267: // Hydrolance pulse big
 				spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_4_YARDS);

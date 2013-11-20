@@ -505,7 +505,6 @@ public:
 								me->SetFacingTo(4.393149f);
 								DoCast(SPELL_WASH_AWAY_VISUAL);
 								DoCast(SPELL_WASH_AWAY);
-								me->SetControlled(true, UNIT_STATE_STUNNED);
 
 								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
 								events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 0, 0, PHASE_WASH_AWAY);
@@ -519,7 +518,9 @@ public:
 								break;
 
 							case EVENT_WASH_AWAY_TURN:
+								me->SetControlled(false, UNIT_STATE_STUNNED);
 								me->SetFacingTo(me->GetOrientation() + 0.000500f);
+								me->SetControlled(true, UNIT_STATE_STUNNED);
 
 								events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 1, 0, PHASE_WASH_AWAY);
 								break;
