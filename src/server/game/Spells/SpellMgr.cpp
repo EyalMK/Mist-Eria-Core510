@@ -3795,6 +3795,9 @@ void SpellMgr::LoadSpellInfoCorrections()
 			case 106319: // Hydrolance pulse small
 				spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_3_YARDS);
 				break;
+			case 106062:
+				spellInfo->Effects[0].Amplitude = 1500;
+				break;
             default:
                 break;
         }
