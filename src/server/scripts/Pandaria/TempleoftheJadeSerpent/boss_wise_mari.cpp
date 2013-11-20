@@ -4,7 +4,7 @@
 	Notes :
 	What is missing ? :	- Wash away (need a test)
 						- Doors (need a test)
-						- Water damage (need a test)
+						- Water damage (Does not work)
 */
 
 #include "ScriptPCH.h"
@@ -93,7 +93,6 @@ enum Texts
 	SAY_TAUNT_1				= 12,
 	SAY_TAUNT_2				= 13,
 	SAY_TAUNT_3				= 14
-
 };
 
 enum Phases
@@ -135,14 +134,14 @@ public:
 			{
 				instance->SetBossState(DATA_BOSS_WISE_MARI, NOT_STARTED);
 				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+				me->HandleEmoteCommand(0); // Remove emote
 				me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE);
 				me->SetFacingTo(1.250952f);
-				me->HandleEmoteCommand(EMOTE_ONESHOT_CUSTOM_SPELL_01);
 				events.SetPhase(PHASE_NULL);
 
 				hydrolanceCount = 0; // 0 = front | 1 = left | 2 = right
-				hydrolanceWaterCount = 0; // Number of hydrolances casted before the new Corrupt living water appears (5)
-				corruptWaterCount = 0; // 0 = first corrupt living water | 1 = second | 2 = third | 3 = fourth | 4 = phase 2
+				hydrolanceWaterCount = 0; // Number of hydrolances casted before the new Corrupt living Water appears (5)
+				corruptWaterCount = 0; // 0 = first corrupt living water | 1 = second | 2 = third | 3 = fourth & phase 2
 			}
 		}
 
@@ -152,7 +151,8 @@ public:
 			{
 				Talk(irand(SAY_DEATH_1, SAY_DEATH_3));
 				instance->DoCastSpellOnPlayers(SPELL_BLESSING_OF_THE_WATERSPEAKER);
-				instance->HandleGameObject(GO_WISE_MARI_DOOR, true); // need a test
+				if (GameObject* go = GameObject::GetGameObject(*me, instance->GetData64(DATA_WISE_MARI_GATE)))
+                        instance->HandleGameObject(go->GetGUID(), false);
 			}
 		}
 
@@ -178,6 +178,7 @@ public:
 			{
 				instance->SetBossState(DATA_BOSS_WISE_MARI, IN_PROGRESS);
 				me->SetInCombatWithZone();
+				me->HandleEmoteCommand(EMOTE_ONESHOT_CUSTOM_SPELL_01);
 				DoCast(SPELL_WATER_BUBBLE);
 				Talk(SAY_AGGRO);
 
@@ -236,13 +237,13 @@ public:
 				if (hydrolanceWaterCount == 5 && corruptWaterCount == 3) // Fourth corrupt living water
 				{
 					events.SetPhase(PHASE_WASH_AWAY);
-					events.ScheduleEvent(EVENT_BUBBLE_BURST, 2*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
+					events.ScheduleEvent(EVENT_BUBBLE_BURST, 3*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
 					hydrolanceWaterCount = 0;
 				}
 
-				while(uint32 eventId = events.ExecuteEvent())
+				while (uint32 eventId = events.ExecuteEvent())
 				{
-					switch(eventId)
+					switch (eventId)
 					{
 						if (instance)
 						{
