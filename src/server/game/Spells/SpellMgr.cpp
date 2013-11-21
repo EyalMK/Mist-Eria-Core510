@@ -554,6 +554,29 @@ SpellInfo const* SpellMgr::GetSpellForDifficultyFromSpell(SpellInfo const* spell
     return newSpell;
 }*/
 
+SpellInfo const* SpellMgr::GetSpellInfo(uint32 spellId, Unit* caster) const
+{
+	const SpellInfo *spellInfo = GetSpellInfo(spellId);
+
+	if(!spellInfo)
+		return NULL;
+
+	// ## Difficulty system :
+
+	//Making a temp copy
+	SpellInfo spellInfoCopy(*spellInfo);
+
+	if(caster)
+		if (caster->GetMap())
+			spellInfoCopy.SetDifficulty(caster->GetMap()->GetDifficulty());
+
+	// Will be freed in Spell Destructor
+	const SpellInfo* result = new SpellInfo(spellInfoCopy);
+
+	return result;
+}
+
+
 SpellChainNode const* SpellMgr::GetSpellChainNode(uint32 spell_id) const
 {
     SpellChainMap::const_iterator itr = mSpellChains.find(spell_id);
@@ -2653,11 +2676,11 @@ struct SpellEffectArray
 {
     SpellEffectArray()
     {
-        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        for (uint32 i = 0; i < MAX_SPELL_EFFECTS_DIFFICULTY; ++i)
             effects[i] = NULL;
     }
 
-    SpellEffectEntry const* effects[MAX_SPELL_EFFECTS];
+    SpellEffectEntry const* effects[MAX_SPELL_EFFECTS_DIFFICULTY];
 };
 
 void SpellMgr::LoadSpellInfoStore()
@@ -2675,8 +2698,7 @@ void SpellMgr::LoadSpellInfoStore()
         if (!effect)
             continue;
 
-        //if(effect->EffectSpellId == 62388 && effect->EffectIndex == 0) sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN 62388 correct load");
-        effectsBySpell[effect->EffectSpellId].effects[effect->EffectIndex] = effect;
+        effectsBySpell[effect->EffectSpellId].effects[(effect->EffectIndex) + (effect->difficultyMode*MAX_SPELL_EFFECTS)] = effect;
     }
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
@@ -3735,6 +3757,7 @@ void SpellMgr::LoadSpellInfoCorrections()
 			case 132621:
 			case 132627:
 			case 53141:
+			case 44089:
 				spellInfo->Effects[0].Effect = SPELL_EFFECT_TELEPORT_UNITS;
 				spellInfo->Effects[0].TargetA = TARGET_DEST_DB;
 				break;
@@ -3762,6 +3785,18 @@ void SpellMgr::LoadSpellInfoCorrections()
 				break;
 			case 118253:
 				spellInfo->Effects[EFFECT_1].Effect = 0; // This effect is completely fucked up
+				break;
+			case 106331: // Wash away
+				spellInfo->Effects[0].Amplitude = 2000;
+				break;
+			case 106267: // Hydrolance pulse big
+				spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_3_YARDS);
+				break;
+			case 106319: // Hydrolance pulse small
+				spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_2_YARDS);
+				break;
+			case 106062: // Water bubble
+				spellInfo->Effects[0].Amplitude = 1200;
 				break;
             default:
                 break;

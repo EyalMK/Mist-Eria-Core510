@@ -12,15 +12,7 @@ Corrupt Living Water : Script 95% verifier spells
 #include "InstanceScript.h"
 #include "temple_of_the_jade_serpent.h"
 
-/* Notes :
-Mettre les GUID dans le header pour les Npc Sun (1 a 5)
-
-Instance : Script 95% 
-Wise Mari : Script 95% (termine -- voir spells)
-Lorewalker Stonestep : Script 95% (termine -- voir spells)
-Liu Flameheart : Script 95% (termine -- voir spells)
-Sha of Doubt : Script 95% (termine -- voir spells)
-
+/* Notes : What is missing ? : - ...
 */
 
 
@@ -33,17 +25,18 @@ class instance_temple_of_the_jade_serpent : public InstanceMapScript
 		{
 			instance_temple_of_the_jade_serpent_InstanceMapScript(Map* map) : InstanceScript(map)
 			{
-				BossWiseMariGUID	= 0;
-				BossLorewalkerStonestepGUID = 0;
-				NpcZaoSunseekerGUID = 0;
-				NpcCorruptedScrollGUID = 0;
-				NpcSun1GUID = 0;
-				NpcSun2GUID = 0;
-				NpcSun3GUID = 0;
-				NpcSun4GUID = 0;
-				NpcSun5GUID = 0;
-				BossLiuFlameheartGUID = 0;
-				BossShaOfDoubtGUID = 0;
+				BossWiseMariGUID			= 0;
+				WiseMariGateGUID			= 0;
+				BossLorewalkerStonestepGUID	= 0;
+				NpcZaoSunseekerGUID			= 0;
+				NpcCorruptedScrollGUID		= 0;
+				NpcSun1GUID					= 0;
+				NpcSun2GUID					= 0;
+				NpcSun3GUID					= 0;
+				NpcSun4GUID					= 0;
+				NpcSun5GUID					= 0;
+				BossLiuFlameheartGUID		= 0;
+				BossShaOfDoubtGUID			= 0;
 			}
 
 			void OnCreatureCreate(Creature* creature)
@@ -108,6 +101,9 @@ class instance_temple_of_the_jade_serpent : public InstanceMapScript
             {
                 switch (go->GetEntry())
                 {
+					case GO_WISE_MARI_GATE:
+						WiseMariGateGUID = go->GetGUID();
+						break;
 				}
 			}
 			
@@ -125,6 +121,9 @@ class instance_temple_of_the_jade_serpent : public InstanceMapScript
 					case DATA_BOSS_WISE_MARI:
 						return BossWiseMariGUID;
 					
+					case DATA_WISE_MARI_GATE:
+						return WiseMariGateGUID;
+
 					case DATA_BOSS_LOREWALKER_STONESTEP:
 						return BossLorewalkerStonestepGUID;
 
@@ -164,6 +163,7 @@ class instance_temple_of_the_jade_serpent : public InstanceMapScript
 
 			protected:
 				uint64 BossWiseMariGUID;
+				uint64 WiseMariGateGUID;
 				uint64 BossLorewalkerStonestepGUID;
 				uint64 NpcZaoSunseekerGUID;
 				uint64 NpcCorruptedScrollGUID;

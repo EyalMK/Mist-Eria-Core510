@@ -2271,6 +2271,7 @@ class Player : public Unit, public GridObject<Player>
         ReputationRank GetReputationRank(uint32 faction_id) const;
         void RewardReputation(Unit* victim, float rate);
         void RewardReputation(Quest const* quest);
+		void RewardCurrency(Quest const* quest);
 
         int32 CalculateReputationGain(ReputationSource source, uint32 creatureOrQuestLevel, int32 rep, int32 faction, bool noQuestBonus = false);
 
@@ -2627,9 +2628,6 @@ public:
         bool isUsingLfg();
         bool inRandomLfgDungeon();
 
-        typedef std::set<uint32> DFQuestsDoneList;
-        DFQuestsDoneList m_DFQuests;
-
         // Temporarily removed pet cache
         uint32 GetTemporaryUnsummonedPetNumber() const { return m_temporaryUnsummonedPetNumber; }
         void SetTemporaryUnsummonedPetNumber(uint32 petnumber) { m_temporaryUnsummonedPetNumber = petnumber; }
@@ -2864,6 +2862,7 @@ public:
         typedef std::set<uint32> SeasonalQuestSet;
         typedef UNORDERED_MAP<uint32, SeasonalQuestSet> SeasonalEventQuestMap;
         QuestSet m_timedquests;
+		QuestSet m_dailyquests;
         QuestSet m_weeklyquests;
         QuestSet m_monthlyquests;
         SeasonalEventQuestMap m_seasonalquests;

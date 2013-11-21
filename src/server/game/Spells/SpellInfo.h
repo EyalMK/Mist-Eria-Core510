@@ -395,9 +395,10 @@ public:
     int32  ScalingClass;
     float  CoefBase;
     int32  CoefLevelBase;
-    SpellEffectInfo Effects[MAX_SPELL_EFFECTS];
+    SpellEffectInfo Effects[MAX_SPELL_EFFECTS_DIFFICULTY];
     uint32 ExplicitTargetMask;
     SpellChainNode const* ChainEntry;
+	uint32 m_difficulty;
 
     // struct access functions
     SpellMiscEntry const* GetSpellMiscs() const;
@@ -516,6 +517,9 @@ public:
     bool IsRankOf(SpellInfo const* spellInfo) const;
     bool IsDifferentRankOf(SpellInfo const* spellInfo) const;
     bool IsHighRankOf(SpellInfo const* spellInfo) const;
+
+	void SetDifficulty(uint32 difficulty);
+	uint32 GetDifficulty() const {return m_difficulty; };
 
     // loading helpers
     uint32 _GetExplicitTargetMask() const;
