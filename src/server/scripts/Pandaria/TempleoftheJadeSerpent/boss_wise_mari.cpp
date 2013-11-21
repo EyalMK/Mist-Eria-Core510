@@ -232,7 +232,7 @@ public:
 			if (instance)
 				if (washAway)
 					if (Creature* washAwayTrigger = me->FindNearestCreature(NPC_WASH_AWAY_TRIGGER, 500, true))
-									DoCast(washAwayTrigger, SPELL_TRACK_ROTATE);
+						DoCast(washAwayTrigger, SPELL_TRACK_ROTATE);
 
 			if (instance)
 			{
@@ -519,6 +519,7 @@ public:
 							case EVENT_WASH_AWAY:
 								me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE, me->GetGUID());
 								DoCast(SPELL_WASH_AWAY_VISUAL);
+								DoCast(SPELL_WASH_AWAY);
 								
 								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
 								//events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 0, 0, PHASE_WASH_AWAY);
