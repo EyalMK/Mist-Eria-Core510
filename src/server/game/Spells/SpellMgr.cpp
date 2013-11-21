@@ -3790,12 +3790,12 @@ void SpellMgr::LoadSpellInfoCorrections()
 				spellInfo->Effects[0].Amplitude = 3500;
 				break;
 			case 106267: // Hydrolance pulse big
-				spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_4_YARDS);
-				break;
-			case 106319: // Hydrolance pulse small
 				spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_3_YARDS);
 				break;
-			case 106062:
+			case 106319: // Hydrolance pulse small
+				spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_2_YARDS);
+				break;
+			case 106062: // Water bubble
 				spellInfo->Effects[0].Amplitude = 1200;
 				break;
             default:

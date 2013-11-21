@@ -213,7 +213,7 @@ public:
 
 			events.Update(diff);
 
-			Map* map = me->GetMap();
+			/*Map* map = me->GetMap();
 			if (map && map->IsDungeon())
 			{
 				Map::PlayerList const &PlayerList = map->GetPlayers();
@@ -227,12 +227,15 @@ public:
 						if (i->getSource()->isAlive() && !i->getSource()->IsInWater() && i->getSource()->HasAura(SPELL_CORRUPTED_WATERS))
 							i->getSource()->RemoveAurasDueToSpell(SPELL_CORRUPTED_WATERS);
 					}
-			}
+			}*/
 
 			if (instance)
 				if (washAway)
 					if (Creature* washAwayTrigger = me->FindNearestCreature(NPC_WASH_AWAY_TRIGGER, 500, true))
+					{
 						DoCast(washAwayTrigger, SPELL_TRACK_ROTATE);
+						me->SetFacingToObject(washAwayTrigger);
+					}
 
 			if (instance)
 			{
