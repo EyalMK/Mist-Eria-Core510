@@ -82,9 +82,9 @@ enum GroupMemberAssignment
 
 enum GroupType
 {
-    GROUPTYPE_NORMAL = 0x00,
+    GROUPTYPE_NORMAL = 0x02,
     GROUPTYPE_BG     = 0x01,
-    GROUPTYPE_RAID   = 0x02,
+    GROUPTYPE_RAID   = 0x00,
     GROUPTYPE_BGRAID = GROUPTYPE_BG | GROUPTYPE_RAID,       // mask
     GROUPTYPE_UNK1   = 0x04,
     GROUPTYPE_LFG    = 0x08
