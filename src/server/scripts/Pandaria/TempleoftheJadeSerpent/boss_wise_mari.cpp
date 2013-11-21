@@ -25,6 +25,7 @@ enum Spells
 	SPELL_CORRUPTED_WATERS				= 115165,
 	SPELL_WASH_AWAY						= 106331,
 	SPELL_WASH_AWAY_VISUAL				= 115575,
+	SPELL_TRACK_ROTATE					= 74758, // For the Wash away
 
 	/* Corrupt living Water */
 	SPELL_SHA_RESIDUE					= 106653
@@ -125,6 +126,7 @@ public:
 		int32 hydrolanceCount;
 		int32 hydrolanceWaterCount;
 		int32 corruptWaterCount;
+		bool washAway;
 
 		void Reset()
 		{
@@ -138,6 +140,7 @@ public:
 				hydrolanceCount = 0; // 0 = front | 1 = left | 2 = right
 				hydrolanceWaterCount = 0; // Number of hydrolances casted before the new Corrupt living Water appears (5)
 				corruptWaterCount = 0; // 0 = first corrupt living water | 1 = second | 2 = third | 3 = fourth & phase 2
+				washAway = false;
 
 				events.SetPhase(PHASE_NULL);
 			}
@@ -176,6 +179,11 @@ public:
 				me->CombatStop();
 				me->DeleteThreatList();
 				instance->SetBossState(DATA_BOSS_WISE_MARI, FAIL);
+
+				hydrolanceCount = 0; // 0 = front | 1 = left | 2 = right
+				hydrolanceWaterCount = 0; // Number of hydrolances casted before the new Corrupt living Water appears (5)
+				corruptWaterCount = 0; // 0 = first corrupt living water | 1 = second | 2 = third | 3 = fourth & phase 2
+				washAway = false;
 			}
 		}
 
@@ -220,6 +228,11 @@ public:
 							i->getSource()->RemoveAurasDueToSpell(SPELL_CORRUPTED_WATERS);
 					}
 			}
+
+			if (instance)
+				if (washAway)
+					if (Creature* washAwayTrigger = me->FindNearestCreature(NPC_WASH_AWAY_TRIGGER, 500, true))
+									DoCast(washAwayTrigger, SPELL_TRACK_ROTATE);
 
 			if (instance)
 			{
@@ -506,18 +519,11 @@ public:
 							case EVENT_WASH_AWAY:
 								me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE, me->GetGUID());
 								DoCast(SPELL_WASH_AWAY_VISUAL);
-								sLog->outDebug(LOG_FILTER_UNITS, "###### ICI FONCTIONNE ######");
-
-								if (Creature* washAwayTrigger = ObjectAccessor::GetCreature(*me, 15207990))
-								{
-									me->SetInCombatWith(washAwayTrigger);
-									me->AddThreat(washAwayTrigger, 999999);
-									DoCast(washAwayTrigger, SPELL_WASH_AWAY);
-									sLog->outDebug(LOG_FILTER_UNITS, "###### ET LA FONCTIONNE ######");
-								}
-
+								
 								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
 								//events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 0, 0, PHASE_WASH_AWAY);
+								washAway = true;
+
 								events.CancelEvent(EVENT_WASH_AWAY);
 								break;
 
@@ -528,8 +534,9 @@ public:
 								break;
 
 							/*case EVENT_WASH_AWAY_TURN:
+								if (Creature* washAwayTrigger = me->FindNearestCreature(NPC_WASH_AWAY_TRIGGER, 500, true))
+									DoCast(washAwayTrigger, SPELL_TRACK_ROTATE);
 								
-
 								events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 1, 0, PHASE_WASH_AWAY);
 								break;*/
 						}
