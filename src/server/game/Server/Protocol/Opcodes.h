@@ -485,7 +485,7 @@ enum Opcodes
     CMSG_REQUEST_RATED_BG_INFO                        = 0x1425,
     CMSG_REQUEST_RATED_BG_STATS                       = 0x1426,
     CMSG_REQUEST_RESEARCH_HISTORY                     = 0x1427,
-    CMSG_REQUEST_VEHICLE_EXIT                         = 0x1428,
+    CMSG_REQUEST_VEHICLE_EXIT                         = 0x0527,//16357
     CMSG_REQUEST_VEHICLE_NEXT_SEAT                    = 0x1429,
     CMSG_REQUEST_VEHICLE_PREV_SEAT                    = 0x1430,
     CMSG_REQUEST_VEHICLE_SWITCH_SEAT                  = 0x1431,
