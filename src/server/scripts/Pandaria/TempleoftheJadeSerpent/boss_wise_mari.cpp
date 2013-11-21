@@ -24,6 +24,7 @@ enum Spells
 	SPELL_HYDROLANCE_PULSE_SMALL		= 106319,
 	SPELL_CORRUPTED_WATERS				= 115165,
 	SPELL_WASH_AWAY						= 106329,
+	SPELL_WASH_AWAY_TRIGGERED			= 106331,
 	SPELL_WASH_AWAY_VISUAL				= 115575,
 	SPELL_TRACK_ROTATE					= 74758, // For the Wash away
 
@@ -170,7 +171,7 @@ public:
 				if (me->HasAura(SPELL_WATER_BUBBLE))
 					me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE);
 				if (me->HasAura(SPELL_WASH_AWAY))
-					me->RemoveAurasDueToSpell(SPELL_WASH_AWAY);
+					me->RemoveAurasDueToSpell(SPELL_WASH_AWAY_TRIGGERED);
 				if (me->HasAura(SPELL_WASH_AWAY_VISUAL))
 					me->RemoveAurasDueToSpell(SPELL_WASH_AWAY_VISUAL);
 
@@ -229,16 +230,16 @@ public:
 					}
 			}*/
 
-			if (instance)
-				if (washAway)
-					if (Creature* washAwayTrigger = me->FindNearestCreature(NPC_WASH_AWAY_TRIGGER, 500, true))
-					{
-						DoCast(washAwayTrigger, SPELL_TRACK_ROTATE);
-						me->SetFacingToObject(washAwayTrigger);
-					}
 
 			if (instance)
 			{
+				if (washAway)
+					if (Creature* washAwayTrigger = me->FindNearestCreature(NPC_WASH_AWAY_TRIGGER, 500, true))
+					{
+						me->CastSpell(washAwayTrigger, SPELL_TRACK_ROTATE);
+						me->SetFacingToObject(washAwayTrigger);
+					}
+
 				if (hydrolanceWaterCount == 5 && corruptWaterCount == 0) // First corrupt living water
 				{
 					events.ScheduleEvent(EVENT_CALL_SECOND_WATER, 2*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
