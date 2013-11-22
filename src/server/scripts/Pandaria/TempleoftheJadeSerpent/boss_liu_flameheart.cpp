@@ -2,7 +2,7 @@
 
 /*
 	Notes :
-	What is missing ? :	- Pending
+	What is missing ? :	- Flame waves system
 */
 
 #include "ScriptPCH.h"
@@ -57,6 +57,7 @@ enum Npcs
 	NPC_LIU_FLAMEHEART	= 56732,
 	NPC_MINION_OF_DOUBT	= 57109,
 	NPC_YU_LON			= 56762,
+	NPC_LIU_TRIGGER		= 400445
 };
 
 class boss_liu_flameheart: public CreatureScript
@@ -80,7 +81,6 @@ public:
 		EventMap events;
 		bool intro;
 		bool thirdPhaseHome; // When Liu comes to the center of the "room" in the third phase
-		bool yulonSummoned; // When Yu'Lon is summoned
 		
 		void Reset()
 		{
@@ -89,9 +89,10 @@ public:
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, NOT_STARTED);
 				intro = false;
 				thirdPhaseHome = false;
-				yulonSummoned = false;
 				me->setActive(false);
-
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 				me->HandleEmoteCommand(44); // Ready hands
 				me->CastSpell(me, SPELL_SHA_MASK);
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
@@ -118,9 +119,11 @@ public:
 			if (instance)
 			{
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, FAIL);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 				intro = false;
 				thirdPhaseHome = false;
-				yulonSummoned = false;
 				me->setActive(false);
 			}
 		}
@@ -179,20 +182,15 @@ public:
 			}
 
 			if (events.IsInPhase(PHASE_YU_LON) && !thirdPhaseHome)
-				if (me->GetPositionX() == 929.684998f && me->GetPositionY() == -2560.610107f && me->GetPositionZ() == 180.070007f)
+				if (Creature* liu = me->FindNearestCreature(NPC_LIU_TRIGGER, 0.1f, true))
 				{
 					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 					me->SetFacingTo(4.410300f);
 					me->CastSpell(me, SPELL_MEDITATE);
 					events.ScheduleEvent(EVENT_SUMMON_YU_LON, 0, 0, PHASE_YU_LON);
 					thirdPhaseHome = true;
-				}
-
-			if (events.IsInPhase(PHASE_YU_LON) && yulonSummoned)
-				if (Creature* yulon = me->FindNearestCreature(NPC_YU_LON, 500, false))
-				{
-					me->DealDamage(me, me->GetHealth());
-					yulon->DespawnOrUnsummon();
 				}
 
 			while(uint32 eventId = events.ExecuteEvent())
@@ -221,7 +219,6 @@ public:
 							o = 1.256324f;
 
 							me->SummonCreature(NPC_YU_LON, x, y, z, o, TEMPSUMMON_MANUAL_DESPAWN);
-							yulonSummoned = true;
 
 							events.CancelEvent(EVENT_SUMMON_YU_LON);
 							break;
@@ -319,7 +316,13 @@ public:
 				me->SetHealth(liu->GetHealth());
 		}
 
-		void JustDied(Unit *pWho) {	}
+		void JustDied(Unit *pWho)
+		{
+			if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
+				liu->DealDamage(me, me->GetHealth());
+
+			me->DespawnOrUnsummon();
+		}
 
 		void EnterCombat(Unit* /*who*/)
 		{
