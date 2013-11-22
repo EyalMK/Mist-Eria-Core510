@@ -1,9 +1,8 @@
-/* # Script de Tydrheal : Liu Flameheart # */
+/* # Script de Tydrheal & Sungis : Liu Flameheart # */
 
-/* Notes : Tester -- voir spells -- Ajouter SoundID
-Liu Flameheart : Script 95% (terminé -- voir spells)	
-Minon of doubt : Script 100%
-Yulon : Script 95% (voir spells)
+/*
+	Notes :
+	What is missing ? :	- Pending
 */
 
 #include "ScriptPCH.h"
@@ -12,70 +11,53 @@ Yulon : Script 95% (voir spells)
 enum Spells
 {
 	/* Liu Flameheart */
-	SPELL_SERPENT_STRIKE = 106823,
-	SPELL_SERPENT_KICK = 106856,
-	SPELL_SERPENT_WAVE = 106938,
-	SPELL_JADE_SERPENT_STRIKE = 106841,
-	SPELL_JADE_SERPENT_KICK = 106864,
-	SPELL_JADE_SERPENT_WAVE = 107053,
-	
-	/* Yu'lon */ 
-	SPELL_JADE_FIRE = 107045
+	SPELL_JADE_ESSENCE			= 106797,
+	SPELL_SERPENT_STRIKE		= 106823,
+	SPELL_JADE_STRIKE			= 106841,
+	SPELL_SHA_MASK				= 117691,
+	SPELL_SHA_CORRUPTION		= 128240,
+	SPELL_MEDITATE				= 124416,
 
+	/* Yu'lon */ 
+	SPELL_JADE_FIRE				= 107045,
 };
 
 enum Events
 {
-	EVENT_BEGIN,
-	EVENT_SERPENT_STRIKE,
-	EVENT_SERPENT_KICK,
-	EVENT_SERPENT_WAVE,
-	EVENT_SAY_LEAVE,
-	EVENT_SAY_AFTER_PHASE_2,
-	EVENT_JADE_SERPENT_STRIKE,
-	EVENT_JADE_SERPENT_KICK,
-	EVENT_JADE_SERPENT_WAVE,
+	/* Liu Flameheart */
+	EVENT_SERPENT_STRIKE	= 1,
+	EVENT_JADE_STRIKE		= 2,
+	EVENT_SUMMON_YU_LON		= 3,
 
 	/* Yu'lon */
-	EVENT_JADE_FIRE
-};
-
-enum Actions
-{
-	ACTION_BOSS_LIU_FLAMEHEART_RESET,
-	ACTION_BOSS_LIU_FLAMEHEART_DIED,
-	ACTION_MINION_DEATH,
-	ACTION_END
+	EVENT_JADE_FIRE = 4,
 };
 
 enum Texts
 {
-	SAY_BEGIN = 0,
-	SAY_COMBAT = 1,
-	SAY_LEAVE = 2,
-	SAY_PHASE_2 = 3,
-	SAY_AFTER_PHASE_2 = 4,
-	SAY_PHASE_3 = 5,
-	SAY_DEATH = 6,
-	SAY_SLAY_1 = 7,
-	SAY_SLAY_2 = 8
+	SAY_AGGRO							= 0,
+	SAY_DEATH							= 1,
+	SAY_PHASE_LIU_JADE_SERPENT_DANCE	= 2,
+	SAY_PHASE_YU_LON					= 3,
+	SAY_INTRO							= 4,
+	SAY_SLAY_1							= 5,
+	SAY_SLAY_2							= 6
 };
 
 enum Phases
 {
-	PHASE_BEGIN,
-	PHASE_COMBAT,
-	PHASE_2,
-	PHASE_3,
-	PHASE_END
+	PHASE_NULL						= 0,
+	PHASE_LIU_SERPENT_DANCE			= 1,
+	PHASE_LIU_JADE_SERPENT_DANCE	= 2,
+	PHASE_YU_LON					= 3
 };
 
-enum IdsCreatures
+enum Npcs
 {
-	MINION_OF_DOUBT = 57109,
-	YULON = 56762
+	NPC_LIU_FLAMEHEART	= 56732,
+	NPC_MINION_OF_DOUBT	= 57109,
+	NPC_YU_LON			= 56762,
 };
-
 
 class boss_liu_flameheart: public CreatureScript
 {
@@ -96,107 +78,122 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
+		bool intro;
+		bool thirdPhaseHome; // When Liu comes to the center of the "room" in the third phase
+		bool yulonSummoned; // When Yu'Lon is summoned
 		
-		bool checkLiuFlameheartAlive;
-		int counterMinionDeath;
-		std::list<Creature*> listMinion;
-		Position position;
-		
-		void Reset() 
+		void Reset()
 		{
-			me->GetPosition(&position);
-			counterMinionDeath = 0;
-			checkLiuFlameheartAlive = true;
-			checkLiuFlameheartAlive = me->isAlive();
-			
-			events.Reset();
-
 			if (instance)
 			{
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, NOT_STARTED);
-				me->AI()->DoAction(ACTION_BOSS_LIU_FLAMEHEART_RESET);
-				GetCreatureListWithEntryInGrid(listMinion, me, MINION_OF_DOUBT, 50000.0f);
-				for(std::list<Creature*>::const_iterator i = listMinion.begin() ; i != listMinion.end() ; ++i)
-				{
-					(*i)->RemoveCorpse();
-					(*i)->Respawn();
-				}
-			}
+				intro = false;
+				thirdPhaseHome = false;
+				yulonSummoned = false;
+				me->setActive(false);
 
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); 
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-			me->SetVisible(false);
-			
+				me->HandleEmoteCommand(44); // Ready hands
+				me->CastSpell(me, SPELL_SHA_MASK);
+				me->CastSpell(me, SPELL_SHA_CORRUPTION);
+			}
 		}
-
-		void DoAction(int32 action) 
-        {
-            switch (action)
-            {
-				case ACTION_BOSS_LIU_FLAMEHEART_RESET:
-					checkLiuFlameheartAlive = true;
-					break;
-				case ACTION_BOSS_LIU_FLAMEHEART_DIED:
-					checkLiuFlameheartAlive = false;
-					break;
-				case ACTION_MINION_DEATH:
-					counterMinionDeath++;
-					break;
-				case ACTION_END:
-					Talk(SAY_DEATH);
-					me->Kill(me);
-					break;
-			}
-        }
 
 		void JustDied(Unit *pWho)
 		{
 			if (instance)
 			{
-				me->AI()->DoAction(ACTION_BOSS_LIU_FLAMEHEART_DIED);
-
-				if (!checkLiuFlameheartAlive)
-					instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, DONE);
-
+				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, DONE);
+				Talk(SAY_DEATH);
 			}
-			
 		}
 
-		void KilledUnit(Unit *pWho) 
-		{	
-			Talk(urand(SAY_SLAY_1, SAY_SLAY_2));
+		void KilledUnit(Unit *pWho)
+		{
+			if (instance)
+				Talk(irand(SAY_SLAY_1, SAY_SLAY_2));
 		}
 		
 		void EnterEvadeMode()
 		{
 			if (instance)
-				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, FAIL);			
+			{
+				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, FAIL);
+				intro = false;
+				thirdPhaseHome = false;
+				yulonSummoned = false;
+				me->setActive(false);
+			}
 		}
 
-		void EnterCombat(Unit* /*who*/) 
+		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
+			{
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, IN_PROGRESS);
+				me->SetInCombatWithZone();
+				Talk(SAY_AGGRO);
+				me->setActive(true);
+			}
 
-			me->SetInCombatWithZone();
-			events.SetPhase(PHASE_COMBAT);
-			Talk(SAY_COMBAT);
-			events.ScheduleEvent(EVENT_SERPENT_STRIKE, 8*IN_MILLISECONDS, 0, PHASE_COMBAT);
-			events.ScheduleEvent(EVENT_SERPENT_KICK, 2*IN_MILLISECONDS, 0, PHASE_COMBAT);
-			events.ScheduleEvent(EVENT_SAY_LEAVE, 10*IN_MILLISECONDS, 0, PHASE_COMBAT);
-			events.ScheduleEvent(EVENT_SERPENT_WAVE, 5*IN_MILLISECONDS, 0, PHASE_COMBAT);
+			events.SetPhase(PHASE_LIU_SERPENT_DANCE);
+			events.ScheduleEvent(EVENT_SERPENT_STRIKE, 12*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
 		}
 
-		void UpdateAI(uint32 diff) 
+		void MoveInLineOfSight(Unit* who)
 		{
-			if(!UpdateVictim())
+			if (!me->IsWithinDistInMap(who, 30.0f) || intro)
+				return;
+
+			if (!who || !who->IsInWorld())
+				return;
+
+			if (who && who->GetTypeId() == TYPEID_PLAYER && !intro && !me->IsValidAttackTarget(who))
+			{
+				Talk(SAY_INTRO);
+				intro = true;
+			}
+		}
+
+		void UpdateAI(uint32 diff)
+		{
+			if	(!UpdateVictim())
 				return;
 
 			events.Update(diff);
 
-			if (me->HasUnitState(UNIT_STATE_CASTING))
-				return;
+			if (events.IsInPhase(PHASE_LIU_SERPENT_DANCE) && HealthBelowPct(70))
+			{
+				Talk(SAY_PHASE_LIU_JADE_SERPENT_DANCE);
+				me->CastSpell(me->getVictim(), SPELL_JADE_ESSENCE);
+				events.ScheduleEvent(EVENT_JADE_STRIKE, 12*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
+				events.SetPhase(PHASE_LIU_JADE_SERPENT_DANCE);
+			}
+
+			if (events.IsInPhase(PHASE_LIU_JADE_SERPENT_DANCE) && HealthBelowPct(30))
+			{
+				Talk(SAY_PHASE_YU_LON);
+				me->setActive(false);
+				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+				me->GetMotionMaster()->MovePoint(0, 929.684998f, -2560.610107f, 180.070007f);
+				events.SetPhase(PHASE_YU_LON);
+			}
+
+			if (events.IsInPhase(PHASE_YU_LON) && !thirdPhaseHome)
+				if (me->GetPositionX() == 929.684998f && me->GetPositionY() == -2560.610107f && me->GetPositionZ() == 180.070007f)
+				{
+					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+					me->SetFacingTo(4.410300f);
+					me->CastSpell(me, SPELL_MEDITATE);
+					events.ScheduleEvent(EVENT_SUMMON_YU_LON, 0, 0, PHASE_YU_LON);
+					thirdPhaseHome = true;
+				}
+
+			if (events.IsInPhase(PHASE_YU_LON) && yulonSummoned)
+				if (Creature* yulon = me->FindNearestCreature(NPC_YU_LON, 500, false))
+				{
+					me->DealDamage(me, me->GetHealth());
+					yulon->DespawnOrUnsummon();
+				}
 
 			while(uint32 eventId = events.ExecuteEvent())
 			{
@@ -204,61 +201,29 @@ public:
 				{
 					if (instance)
 					{
-						case EVENT_BEGIN:
-							me->SetVisible(true);
-							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
-							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); 
-							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-							Talk(SAY_BEGIN);
-							events.CancelEvent(EVENT_BEGIN);
-							break;
-
 						case EVENT_SERPENT_STRIKE:
-							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-								if(target->GetTypeId() == TYPEID_PLAYER)
-								{
-									DoCast(target, SPELL_SERPENT_STRIKE);
-								}
-							events.ScheduleEvent(EVENT_SERPENT_STRIKE, 10*IN_MILLISECONDS, 0, PHASE_COMBAT);
+							me->CastSpell(me->getVictim(), SPELL_SERPENT_STRIKE);
+
+							events.ScheduleEvent(EVENT_SERPENT_STRIKE, 12*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
 							break;
 
-						case EVENT_SERPENT_KICK:
-							DoCast(me, SPELL_SERPENT_KICK);
-							events.ScheduleEvent(EVENT_SERPENT_KICK, 8*IN_MILLISECONDS, 0, PHASE_COMBAT);
+						case EVENT_JADE_STRIKE:
+							me->CastSpell(me->getVictim(), SPELL_JADE_STRIKE);
+
+							events.ScheduleEvent(EVENT_JADE_STRIKE, 12*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
 							break;
 
-						case EVENT_SERPENT_WAVE:
-							DoCast(me, SPELL_SERPENT_WAVE);
-							events.ScheduleEvent(EVENT_SERPENT_WAVE, 8*IN_MILLISECONDS, 0, PHASE_COMBAT);
-							break;
+						case EVENT_SUMMON_YU_LON:
+							float x, y, z, o;
+							x = me->GetPositionX();
+							y = me->GetPositionY();
+							z = me->GetPositionZ();
+							o = 1.256324f;
 
-						case EVENT_SAY_LEAVE:
-							Talk(SAY_LEAVE);
-							events.CancelEvent(EVENT_SAY_LEAVE);
-							break;
+							me->SummonCreature(NPC_YU_LON, x, y, z, o, TEMPSUMMON_MANUAL_DESPAWN);
+							yulonSummoned = true;
 
-						case EVENT_SAY_AFTER_PHASE_2:
-							Talk(SAY_AFTER_PHASE_2);
-							events.CancelEvent(EVENT_SAY_AFTER_PHASE_2);
-							break;
-
-						case EVENT_JADE_SERPENT_STRIKE:
-							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-								if(target->GetTypeId() == TYPEID_PLAYER)
-								{
-									DoCast(target, SPELL_JADE_SERPENT_STRIKE);
-								}
-							events.ScheduleEvent(EVENT_JADE_SERPENT_STRIKE, 10*IN_MILLISECONDS, 0, PHASE_2);
-							break;
-
-						case EVENT_JADE_SERPENT_KICK:
-							DoCast(me, SPELL_JADE_SERPENT_KICK);
-							events.ScheduleEvent(EVENT_JADE_SERPENT_KICK, 8*IN_MILLISECONDS, 0, PHASE_2);
-							break;
-
-						case EVENT_JADE_SERPENT_WAVE:
-							DoCast(me, SPELL_JADE_SERPENT_WAVE);
-							events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 8*IN_MILLISECONDS, 0, PHASE_2);
+							events.CancelEvent(EVENT_SUMMON_YU_LON);
 							break;
 
 						default:
@@ -267,36 +232,7 @@ public:
 				}
 			}
 
-			if(counterMinionDeath = 3 && !events.IsInPhase(PHASE_BEGIN))
-			{
-				events.ScheduleEvent(EVENT_BEGIN, 0, 0, PHASE_BEGIN);
-				events.SetPhase(PHASE_BEGIN);
-			}
-
-			if(me->HealthBelowPct(70) && !events.IsInPhase(PHASE_COMBAT))
-			{
-				Talk(PHASE_2);
-				events.ScheduleEvent(EVENT_SAY_AFTER_PHASE_2, 5*IN_MILLISECONDS, 0, PHASE_2);
-				events.ScheduleEvent(EVENT_JADE_SERPENT_STRIKE, 1*IN_MILLISECONDS, 0, PHASE_2);
-				events.ScheduleEvent(EVENT_JADE_SERPENT_KICK, 2*IN_MILLISECONDS, 0, PHASE_2);
-				events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 4*IN_MILLISECONDS, 0, PHASE_2);
-				events.SetPhase(PHASE_2);
-			}
-
-			if(me->HealthBelowPct(30) && !events.IsInPhase(PHASE_2))
-			{
-				Talk(PHASE_3);
-				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); 
-				me->GetMotionMaster()->MovePoint(0, position);
-				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-				me->SummonCreature(YULON, position, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 360*IN_MILLISECONDS);
-				events.SetPhase(PHASE_3);
-			}
-			
-			if(!events.IsInPhase(PHASE_3))
-			{
-				DoMeleeAttackIfReady();
-			}
+			DoMeleeAttackIfReady();
 		}
 	};
 };
@@ -321,44 +257,23 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 		
-		void Reset() 
+		void Reset()
 		{
-			if(instance)
-				if (Creature* liu = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LIU_FLAMEHEART)))
-					if (liu->AI())
-					{
-						liu->AI()->Reset();
-					}
+
 		}
 
-		void DoAction(int32 action) 
-        {
-        }
-
-		void JustDied(Unit *pWho) 
-		{	
-			if(instance)
-				if (Creature* liu = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LIU_FLAMEHEART)))
-					if (liu->AI())
-					{
-						liu->AI()->DoAction(ACTION_MINION_DEATH);
-					}
-		}
-
-		void KilledUnit(Unit *pWho)
-		{	
-		}
-		
-		void EnterEvadeMode()
-		{	
-		}
-
-		void EnterCombat(Unit* /*who*/) 
+		void JustDied(Unit *pWho)
 		{
-			me->SetInCombatWithZone();
+			
 		}
 
-		void UpdateAI(uint32 diff) 
+		void EnterCombat(Unit* /*who*/)
+		{
+			if (instance)
+				me->SetInCombatWithZone();
+		}
+
+		void UpdateAI(uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
@@ -395,53 +310,30 @@ public:
 		
 		int health;
 
-		void Reset() 
+		void Reset()
 		{
 			events.Reset();
 
-			if (Creature* lorewalker = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LOREWALKER_STONESTEP)))
-				health = lorewalker->GetHealth();
-			me->SetHealth(health);
+			me->SetObjectScale(1.0f);
+			if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
+				me->SetHealth(liu->GetHealth());
 		}
 
-		void JustSummoned(Creature* creature) 
-		{
-			events.Reset();
+		void JustDied(Unit *pWho) {	}
 
-			if (Creature* lorewalker = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LOREWALKER_STONESTEP)))
-				health = lorewalker->GetHealth();
-			me->SetHealth(health);
-		}
-
-		void DoAction(int32 action) 
+		void EnterCombat(Unit* /*who*/)
 		{
-		}
-
-		void JustDied(Unit *pWho) 
-		{
-			events.SetPhase(PHASE_END);
-			if(instance)
-				if (Creature* lorewalker = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LOREWALKER_STONESTEP)))
-					if(lorewalker->AI())
-						lorewalker->AI()->DoAction(ACTION_END);
-		}
-
-		void EnterCombat(Unit* /*who*/) 
-		{
-			me->SetInCombatWithZone();
-			events.SetPhase(PHASE_3);
-			events.ScheduleEvent(EVENT_JADE_FIRE, 6*IN_MILLISECONDS, 0, PHASE_3);
+			if (instance)
+				me->SetInCombatWithZone();
 		}
 
 		void EnterEvadeMode()
 		{
-			me->DespawnOrUnsummon();
-			if (Creature* lorewalker = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LOREWALKER_STONESTEP)))
-				if(lorewalker->AI())
-					lorewalker->AI()->Reset();
+			if (instance)
+				me->DespawnOrUnsummon();
 		}
 
-		void UpdateAI(uint32 diff) 
+		void UpdateAI(uint32 diff)
 		{	
 			if(!UpdateVictim())
 				return;
@@ -460,10 +352,9 @@ public:
 						case EVENT_JADE_FIRE:
 							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
 								if(target->GetTypeId() == TYPEID_PLAYER)
-								{
-									DoCast(target, SPELL_JADE_FIRE);
-								}
-							events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS, 0, PHASE_3);
+									me->CastSpell(target, SPELL_JADE_FIRE);
+
+							events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
 							break;
 
 						default:
@@ -472,8 +363,7 @@ public:
 				}
 			}
 
-			DoMeleeAttackIfReady();
-					
+			DoMeleeAttackIfReady();	
 		}
 	};
 };

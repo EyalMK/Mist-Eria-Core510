@@ -3798,6 +3798,10 @@ void SpellMgr::LoadSpellInfoCorrections()
 			case 106062: // Water bubble
 				spellInfo->Effects[0].Amplitude = 1200;
 				break;
+			case 106864:
+				spellInfo->Effects[1].BasePoints = 10;
+				spellInfo->Effects[1].MiscValue = 10;
+				break;
             default:
                 break;
         }
