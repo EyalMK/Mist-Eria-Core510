@@ -880,9 +880,9 @@ void Group::SendLootStartRollToPlayer(uint32 countDown, uint32 mapid, Player* p,
 
     data << uint8(r.totalPlayersRolling);
 
-    data << uint32(mapid);
     data << uint32(r.itemRandomPropId);
     data << uint32(r.itemSlot);
+    data << uint32(mapid);
     data << uint32(r.itemCount);
     data << uint32(countDown);
     data << uint32(r.itemid);
