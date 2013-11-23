@@ -1023,7 +1023,9 @@ void Group::SendLootRoll(uint64 sourceGuid, uint64 targetGuid, uint8 rollNumber,
 
 	if(byte44) data << uint8(byte44);
 
-	//DataInSitu
+    //DataInSitu
+    data << uint32(0);
+
 
 	data.WriteByteSeq(target[2]);
 
