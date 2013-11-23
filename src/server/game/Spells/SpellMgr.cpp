@@ -3799,8 +3799,8 @@ void SpellMgr::LoadSpellInfoCorrections()
 				spellInfo->Effects[0].Amplitude = 1200;
 				break;
 			case 106864:
-				spellInfo->Effects[1].BasePoints = 80;
-				spellInfo->Effects[1].MiscValue = 80;
+				spellInfo->Effects[1].BasePoints = 100;
+				spellInfo->Effects[1].MiscValue = 100;
 				break;
             default:
                 break;

@@ -60,6 +60,7 @@ enum Npcs
 	NPC_LIU_FLAMEHEART	= 56732,
 	NPC_MINION_OF_DOUBT	= 57109,
 	NPC_YU_LON			= 56762,
+	NPC_JADE_FIRE		= 56893,
 	NPC_LIU_TRIGGER		= 400445
 };
 
@@ -97,7 +98,7 @@ public:
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-				me->HandleEmoteCommand(44); // Ready hands
+				me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
 				me->RemoveAurasDueToSpell(SPELL_MEDITATE);
 				me->CastSpell(me, SPELL_SHA_MASK);
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
@@ -110,6 +111,14 @@ public:
 			{
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, DONE);
 				Talk(SAY_DEATH);
+
+				std::list<Creature*> jadeFires;
+				me->GetCreatureListWithEntryInGrid(jadeFires, NPC_JADE_FIRE, 500.0f);
+				if (!jadeFires.empty())
+				{
+					for (std::list<Creature*>::iterator itr = jadeFires.begin(); itr != jadeFires.end(); ++itr)
+						(*itr)->DespawnOrUnsummon();
+				}
 			}
 		}
 
@@ -129,6 +138,7 @@ public:
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 				me->RemoveAurasDueToSpell(SPELL_MEDITATE);
+				me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
 				intro = false;
 				thirdPhaseHome = false;
 				me->setActive(false);
@@ -278,6 +288,8 @@ public:
 			me->SetInCombatWithZone();
 			if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
 				me->SetHealth(liu->GetHealth());
+
+			events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
         }
 
 		void JustDied(Unit *pWho)
@@ -307,9 +319,6 @@ public:
 
 			events.Update(diff);
 
-			if (me->HasUnitState(UNIT_STATE_CASTING))
-				return;
-
 			while(uint32 eventId = events.ExecuteEvent())
 			{
 				switch(eventId)
@@ -317,9 +326,9 @@ public:
 					if (instance)
 					{
 						case EVENT_JADE_FIRE:
-							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-								if(target->GetTypeId() == TYPEID_PLAYER)
-									me->CastSpell(target, SPELL_JADE_FIRE_MISSILE);
+							Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1);
+							if (target && target->GetTypeId() == TYPEID_PLAYER)
+								me->CastSpell(target, SPELL_JADE_FIRE_MISSILE);
 
 							events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
 							break;
