@@ -99,7 +99,7 @@ public:
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 				me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
-				me->RemoveAurasDueToSpell(SPELL_MEDITATE);
+				me->RemoveAurasDueToSpell(SPELL_MEDITATE, me->GetGUID());
 				me->CastSpell(me, SPELL_SHA_MASK);
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 			}
@@ -137,8 +137,10 @@ public:
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-				me->RemoveAurasDueToSpell(SPELL_MEDITATE);
+				me->RemoveAurasDueToSpell(SPELL_MEDITATE, me->GetGUID());
 				me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
+				me->CombatStop();
+				me->DeleteThreatList();
 				intro = false;
 				thirdPhaseHome = false;
 				me->setActive(false);
@@ -271,8 +273,9 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
+		bool healthApplied;
 
-		void Reset()
+		/*void Reset()
 		{
 			events.Reset();
             
@@ -285,16 +288,22 @@ public:
 				events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
 				me->SetInCombatWithZone();
 			}
-		}
+		}*/
 
 		void JustSummoned(Creature* summoned)
         {
 			events.Reset();
             
+			healthApplied = false;
+
 			if (instance)
 			{
 				if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
-					me->SetHealth(liu->GetMaxHealth() * 0.3f);
+					if (!healthApplied)
+					{
+						me->SetHealth(liu->GetMaxHealth() * 0.3f);
+						healthApplied = true;
+					}
 
 				me->SetObjectScale(1.0f);
 				events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
@@ -315,7 +324,6 @@ public:
 		{
 			if (instance)
 				events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
-		}
 
 		void EnterEvadeMode()
 		{
