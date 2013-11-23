@@ -327,6 +327,7 @@ public:
 				events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
 				me->SetObjectScale(1.0f);
 			}
+		}
 
 		void EnterEvadeMode()
 		{
