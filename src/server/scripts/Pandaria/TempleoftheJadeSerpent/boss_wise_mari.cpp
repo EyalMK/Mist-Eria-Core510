@@ -2,7 +2,7 @@
 
 /*
 	Notes :
-	What is missing ? :	- Wash away (Need to be fixed)
+	What is missing ? :	- Wash away (FIXED !)
 						- Doors (need a test)
 						- Water damage (Does not work)
 */

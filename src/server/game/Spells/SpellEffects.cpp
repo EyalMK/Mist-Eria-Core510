@@ -411,16 +411,9 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         damage = (m_caster->getLevel() - 60) * 4 + 60;
                         break;
                     }
-					case 106319:
+					case 106841:
 					{
-						if (unitTarget->GetMap()->IsDungeon())
-							uint32 damage = unitTarget->GetMap()->IsHeroic() ? 42749 : 18999;
-						break;
-					}
-					case 106267:
-					{
-						if (unitTarget->GetMap()->IsDungeon())
-							uint32 damage = unitTarget->GetMap()->IsHeroic() ? 42749 : 28499;
+						m_caster->CastSpell(m_caster, 106882);
 						break;
 					}
                 }
