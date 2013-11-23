@@ -271,8 +271,6 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
-		
-		int health;
 
 		void Reset()
 		{
@@ -280,14 +278,13 @@ public:
             
 			if (instance)
 			{
-				me->SetInCombatWithZone();
-
 				if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
-				me->SetHealth(liu->GetMaxHealth() * 0.3f);
-			}
+					me->SetHealth(liu->GetMaxHealth() * 0.3f);
 
-			me->SetObjectScale(1.0f);
-			events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
+				me->SetObjectScale(1.0f);
+				events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
+				me->SetInCombatWithZone();
+			}
 		}
 
 		void JustSummoned(Creature* summoned)
@@ -296,14 +293,13 @@ public:
             
 			if (instance)
 			{
-				me->SetInCombatWithZone();
-
 				if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
-				me->SetHealth(liu->GetMaxHealth() * 0.3f);
-			}
+					me->SetHealth(liu->GetMaxHealth() * 0.3f);
 
-			me->SetObjectScale(1.0f);
-			events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
+				me->SetObjectScale(1.0f);
+				events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
+				me->SetInCombatWithZone();
+			}
         }
 
 		void JustDied(Unit *pWho)
@@ -379,20 +375,12 @@ public:
 		void Reset()
 		{
 			me->setActive(false);
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 			me->CastSpell(me, SPELL_JADE_FIRE);
 		}
 
 		void JustSummoned(Creature* summoned)
         {
 			me->setActive(false);
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 			me->CastSpell(me, SPELL_JADE_FIRE);
         }
 	};
