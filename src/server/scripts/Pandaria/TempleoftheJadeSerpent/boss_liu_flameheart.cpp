@@ -326,12 +326,14 @@ public:
 					if (instance)
 					{
 						case EVENT_JADE_FIRE:
-							Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1);
-							if (target && target->GetTypeId() == TYPEID_PLAYER)
-								me->CastSpell(target, SPELL_JADE_FIRE_MISSILE);
+						{
+							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+								if (target && target->GetTypeId() == TYPEID_PLAYER)
+									me->CastSpell(target, SPELL_JADE_FIRE_MISSILE);
 
 							events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
 							break;
+						}
 
 						default:
 							break;
