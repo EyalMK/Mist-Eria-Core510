@@ -1965,7 +1965,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
     }
 
     ObjectGuid groupGuid = m_guid, leaderGuid = m_leaderGuid;
-    uint8 byte10 = m_groupType; //Probably smthng with challenge mode
+    uint8 byte10 = GetMembersCount()-1; //Probably smthng with challenge mode
     uint8 hasLootRule = GetMembersCount()-1; //For testing purpose
     uint8 isLFG = 0;
     uint8 byte74 = m_groupType; //Checked
@@ -2458,8 +2458,8 @@ void Group::SetDungeonDifficulty(Difficulty difficulty)
             continue;
 
         player->SetDungeonDifficulty(difficulty);
-        player->SendDungeonDifficulty(true);
     }
+    SendUpdate();
 }
 
 void Group::SetRaidDifficulty(Difficulty difficulty)
@@ -2482,8 +2482,8 @@ void Group::SetRaidDifficulty(Difficulty difficulty)
             continue;
 
         player->SetRaidDifficulty(difficulty);
-        player->SendRaidDifficulty(true);
     }
+    SendUpdate();
 }
 
 bool Group::InCombatToInstance(uint32 instanceId)
