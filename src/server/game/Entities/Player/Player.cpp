@@ -9448,9 +9448,6 @@ void Player::SendNotifyLootItemRemoved(uint8 lootSlot, ObjectGuid guid)
 {
     WorldPacket data(SMSG_LOOT_REMOVED, 1);
 
-    guid = GetLootGUID();
-
-
     data.WriteBit(guid[5]);
     data.WriteBit(guid[1]);
 	data.WriteBit(guid[3]);
