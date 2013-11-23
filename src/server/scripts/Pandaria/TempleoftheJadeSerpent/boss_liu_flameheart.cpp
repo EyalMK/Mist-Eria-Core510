@@ -118,9 +118,6 @@ public:
 			if (instance)
 			{
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, NOT_STARTED);
-				x = me->GetPositionX();
-				y = me->GetPositionY();
-				z = me->GetPositionZ();
 				intro = false;
 				thirdPhaseHome = false;
 				me->setActive(false);
@@ -164,9 +161,6 @@ public:
 			if (instance)
 			{
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, FAIL);
-				x = me->GetPositionX();
-				y = me->GetPositionY();
-				z = me->GetPositionZ();
 				intro = false;
 				thirdPhaseHome = false;
 				me->setActive(false);
@@ -281,6 +275,10 @@ public:
 
 						case EVENT_SUMMON_SERPENT_WAVE:
 						{
+							x = me->GetPositionX();
+							y = me->GetPositionY();
+							z = me->GetPositionZ();
+
 							float firstOrientation = me->GetOrientation();
 							float secondOrientation = me->GetOrientation() + 1.5f;
 							float thirdOrientation = me->GetOrientation() + 3.0f;
@@ -299,6 +297,7 @@ public:
 							secondWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x, y + 10.0f, z, secondOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
 							thirdWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x - 10.0f, y, z, thirdOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
 							fourthWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x, y - 10.0f, z, fourthOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
+
 							events.ScheduleEvent(EVENT_SERPENT_WAVE_MOVE, 3*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
 							events.ScheduleEvent(EVENT_SUMMON_SERPENT_WAVE, 14*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
 							break;
@@ -320,6 +319,9 @@ public:
 
 						case EVENT_SUMMON_JADE_SERPENT_WAVE:
 						{
+							x = me->GetPositionX();
+							y = me->GetPositionY();
+							z = me->GetPositionZ();
 							float firstOrientation = me->GetOrientation();
 							float secondOrientation = me->GetOrientation() + 1.5f;
 							float thirdOrientation = me->GetOrientation() + 3.0f;
@@ -348,7 +350,7 @@ public:
 							if (firstWave)
 								firstWave->GetMotionMaster()->MovePoint(0, x + 100.0f, y, z);
 							if (secondWave)
-								secondWave->GetMotionMaster()->MovePoint(0, x, y - 100.0f, z);
+								secondWave->GetMotionMaster()->MovePoint(0, x, y + 100.0f, z);
 							if (thirdWave)
 								thirdWave->GetMotionMaster()->MovePoint(0, x - 100.0f, y, z);
 							if (fourthWave)
