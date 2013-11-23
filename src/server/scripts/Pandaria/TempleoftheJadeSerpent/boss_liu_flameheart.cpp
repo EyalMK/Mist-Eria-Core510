@@ -305,7 +305,7 @@ public:
 						healthApplied = true;
 					}
 
-				me->SetObjectScale(1.0f);
+				me->SetObjectScale(0.1f);
 				events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
 				me->SetInCombatWithZone();
 			}
@@ -323,7 +323,10 @@ public:
 		void EnterCombat()
 		{
 			if (instance)
+			{
 				events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
+				me->SetObjectScale(1.0f);
+			}
 
 		void EnterEvadeMode()
 		{
