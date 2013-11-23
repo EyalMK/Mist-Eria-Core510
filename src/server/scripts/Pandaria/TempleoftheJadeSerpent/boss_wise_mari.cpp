@@ -230,7 +230,6 @@ public:
 					}
 			}*/
 
-
 			if (instance)
 			{
 				if (washAway)
@@ -324,7 +323,7 @@ public:
 								if (Creature* thirdTrigger = me->FindNearestCreature(NPC_THIRD_TRIGGER_WATER, 500, true))
 									thirdTrigger->CastSpell(thirdTrigger, SPELL_HYDROLANCE_PRECAST);
 								
-								events.ScheduleEvent(EVENT_THIRD_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_THIRD_TRIGGER_WATER_AURA, 4*IN_MILLISECONDS);
 								break;
 
 							case EVENT_CALL_FOURTH_WATER:
