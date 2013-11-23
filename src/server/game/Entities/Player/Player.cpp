@@ -20276,7 +20276,7 @@ void Player::SendDungeonDifficulty(bool IsInGroup)
         data << (uint32)GetDungeonDifficulty();
         GetSession()->SendPacket(&data);
     } else {
-        GetGroup()->SendUpdate();
+        GetGroup()->SendUpdateToPlayer(GetGUID());
     }
 }
 
@@ -20287,7 +20287,7 @@ void Player::SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty)
         data << uint32(GetRaidDifficulty());
         GetSession()->SendPacket(&data);
     } else {
-        GetGroup()->SendUpdate();
+        GetGroup()->SendUpdateToPlayer(GetGUID());
     }
 }
 
