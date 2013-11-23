@@ -201,6 +201,7 @@ public:
 			if (events.IsInPhase(PHASE_YU_LON) && !thirdPhaseHome)
 				if (Creature* liu = me->FindNearestCreature(NPC_LIU_TRIGGER, 0.1f, true))
 				{
+					me->Relocate(929.684998f, -2560.610107f, 180.070007f, 4.410300f);
 					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
@@ -276,26 +277,40 @@ public:
 		void Reset()
 		{
 			events.Reset();
+            
+			if (instance)
+			{
+				me->SetInCombatWithZone();
+
+				if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
+				me->SetHealth(liu->GetMaxHealth() * 0.3f);
+			}
 
 			me->SetObjectScale(1.0f);
-			if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
-				me->SetHealth(liu->GetHealth());
+			events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
 		}
 
 		void JustSummoned(Creature* summoned)
         {
-            me->SetObjectScale(1.0f);
-			me->SetInCombatWithZone();
-			if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
-				me->SetHealth(liu->GetHealth());
+			events.Reset();
+            
+			if (instance)
+			{
+				me->SetInCombatWithZone();
 
+				if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
+				me->SetHealth(liu->GetMaxHealth() * 0.3f);
+			}
+
+			me->SetObjectScale(1.0f);
 			events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
         }
 
 		void JustDied(Unit *pWho)
 		{
-			if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
-				liu->DealDamage(liu, liu->GetHealth());
+			if (instance)
+				if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
+					liu->DealDamage(liu, liu->GetHealth());
 
 			me->DespawnOrUnsummon();
 		}
@@ -326,14 +341,10 @@ public:
 					if (instance)
 					{
 						case EVENT_JADE_FIRE:
-						{
-							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
-								if (target && target->GetTypeId() == TYPEID_PLAYER)
-									me->CastSpell(target, SPELL_JADE_FIRE_MISSILE);
+							me->CastSpell(me->getVictim(), SPELL_JADE_FIRE_MISSILE);
 
 							events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
 							break;
-						}
 
 						default:
 							break;
