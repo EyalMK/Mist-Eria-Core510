@@ -143,6 +143,17 @@ public:
 				corruptWaterCount = 0; // 0 = first corrupt living water | 1 = second | 2 = third | 3 = fourth & phase 2
 				washAway = false;
 
+				std::list<Creature*> droplets;
+				me->GetCreatureListWithEntryInGrid(droplets, NPC_CORRUPT_DROPLET, 500.0f);
+				if (!droplets.empty())
+				{
+					for (std::list<Creature*>::iterator itr = droplets.begin(); itr != droplets.end(); ++itr)
+					{
+						if ((*itr)->isAlive())
+							(*itr)->DespawnOrUnsummon();
+					}
+				}
+
 				events.SetPhase(PHASE_NULL);
 			}
 		}
@@ -185,6 +196,17 @@ public:
 				hydrolanceWaterCount = 0; // Number of hydrolances casted before the new Corrupt living Water appears (5)
 				corruptWaterCount = 0; // 0 = first corrupt living water | 1 = second | 2 = third | 3 = fourth & phase 2
 				washAway = false;
+
+				std::list<Creature*> droplets;
+				me->GetCreatureListWithEntryInGrid(droplets, NPC_CORRUPT_DROPLET, 500.0f);
+				if (!droplets.empty())
+				{
+					for (std::list<Creature*>::iterator itr = droplets.begin(); itr != droplets.end(); ++itr)
+					{
+						if ((*itr)->isAlive())
+							(*itr)->DespawnOrUnsummon();
+					}
+				}
 			}
 		}
 
@@ -285,7 +307,7 @@ public:
 								if (Creature* firstTrigger = me->FindNearestCreature(NPC_FIRST_TRIGGER_WATER, 500, true))
 									firstTrigger->CastSpell(firstTrigger, SPELL_HYDROLANCE_PRECAST);
 									
-								events.ScheduleEvent(EVENT_FIRST_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_FIRST_TRIGGER_WATER_AURA, 1*IN_MILLISECONDS);
 								break;
 
 							case EVENT_CALL_SECOND_WATER:
@@ -304,7 +326,7 @@ public:
 								if (Creature* secondTrigger = me->FindNearestCreature(NPC_SECOND_TRIGGER_WATER, 500, true))
 									secondTrigger->CastSpell(secondTrigger, SPELL_HYDROLANCE_PRECAST);
 
-								events.ScheduleEvent(EVENT_SECOND_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_SECOND_TRIGGER_WATER_AURA, 1*IN_MILLISECONDS);
 								break;
 
 							case EVENT_CALL_THIRD_WATER:
@@ -342,7 +364,7 @@ public:
 								if (Creature* fourthTrigger = me->FindNearestCreature(NPC_FOURTH_TRIGGER_WATER, 500, true))
 									fourthTrigger->CastSpell(fourthTrigger, SPELL_HYDROLANCE_PRECAST);
 
-								events.ScheduleEvent(EVENT_FOURTH_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_FOURTH_TRIGGER_WATER_AURA, 1*IN_MILLISECONDS);
 								break;
 
 							case EVENT_HYDROLANCE:

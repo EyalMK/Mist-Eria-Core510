@@ -46,7 +46,7 @@ enum Events
 	EVENT_SUMMON_YU_LON				= 7,
 
 	/* Yu'lon */
-	EVENT_JADE_FIRE = 1,
+	EVENT_JADE_FIRE					= 1,
 
 	/* Serpent Wave */
 	EVENT_SERPENT_WAVE				= 1,
@@ -107,7 +107,7 @@ public:
 		EventMap events;
 		bool intro;
 		bool thirdPhaseHome; // When Liu comes to the center of the "room" in the third phase
-		float x, y, z, o, waveOrientation;
+		float x, y, z, o;
 		Creature* firstWave;
 		Creature* secondWave;
 		Creature* thirdWave;
@@ -265,6 +265,9 @@ public:
 
 						case EVENT_SUMMON_YU_LON:
 						{
+							x = me->GetPositionX();
+							y = me->GetPositionY();
+							z = me->GetPositionZ();
 							o = 1.256324f;
 
 							me->SummonCreature(NPC_YU_LON, x, y, z, o, TEMPSUMMON_MANUAL_DESPAWN);
@@ -299,7 +302,7 @@ public:
 							fourthWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x, y - 10.0f, z, fourthOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
 
 							events.ScheduleEvent(EVENT_SERPENT_WAVE_MOVE, 3*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
-							events.ScheduleEvent(EVENT_SUMMON_SERPENT_WAVE, 14*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
+							events.ScheduleEvent(EVENT_SUMMON_SERPENT_WAVE, 12*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
 							break;
 						}
 
@@ -313,7 +316,7 @@ public:
 							if (fourthWave)
 								fourthWave->GetMotionMaster()->MovePoint(0, x, y - 100.0f, z);
 
-							events.ScheduleEvent(EVENT_SUMMON_SERPENT_WAVE, 17*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
+							events.ScheduleEvent(EVENT_SUMMON_SERPENT_WAVE, 15*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
 							events.CancelEvent(EVENT_SERPENT_WAVE_MOVE);
 							break;
 
@@ -342,7 +345,7 @@ public:
 							fourthWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x, y - 10.0f, z, fourthOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
 
 							events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_MOVE, 3*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
-							events.ScheduleEvent(EVENT_SUMMON_JADE_SERPENT_WAVE, 14*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
+							events.ScheduleEvent(EVENT_SUMMON_JADE_SERPENT_WAVE, 12*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
 							break;
 						}
 
@@ -356,7 +359,7 @@ public:
 							if (fourthWave)
 								fourthWave->GetMotionMaster()->MovePoint(0, x, y - 100.0f, z);
 
-							events.ScheduleEvent(EVENT_SUMMON_SERPENT_WAVE, 17*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
+							events.ScheduleEvent(EVENT_SUMMON_SERPENT_WAVE, 15*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
 							events.CancelEvent(EVENT_SERPENT_WAVE_MOVE);
 							break;
 
