@@ -447,14 +447,6 @@ class spell_yulon_jade_fire : public SpellScriptLoader
         {
             PrepareSpellScript(spell_yulon_jade_fire_SpellScript);
 
-			SpellCastResult CheckCast()
-            {
-				if (GetHitUnit() == GetCaster())
-					return SPELL_FAILED_BAD_TARGETS;
-
-                return SPELL_CAST_OK;
-            }
-
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
                 int32 bp0 = GetEffectValue(); // 107098 dbc EffectBasePoints
@@ -464,7 +456,6 @@ class spell_yulon_jade_fire : public SpellScriptLoader
             void Register()
             {
                 OnEffectHit += SpellEffectFn(spell_yulon_jade_fire_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-				OnCheckCast += SpellCheckCastFn(spell_yulon_jade_fire_SpellScript::CheckCast);
             }
         };
 
