@@ -1023,7 +1023,9 @@ void Group::SendLootRoll(uint64 sourceGuid, uint64 targetGuid, uint8 rollNumber,
 
 	if(byte44) data << uint8(byte44);
 
-	//DataInSitu
+    //DataInSitu
+    data << uint32(0);
+
 
 	data.WriteByteSeq(target[2]);
 
@@ -1207,6 +1209,8 @@ void Group::SendLooter(Creature* creature, Player* groupLooter)
 
     WorldPacket data(SMSG_LOOT_LIST, (8+8));
     data << uint64(creature->GetGUID());
+
+    data << uint8(0);
 
     if (groupLooter)
         data.append(groupLooter->GetPackGUID());
@@ -1965,7 +1969,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
     }
 
     ObjectGuid groupGuid = m_guid, leaderGuid = m_leaderGuid;
-    uint8 byte10 = m_groupType; //Probably smthng with challenge mode
+    uint8 byte10 = GetMembersCount()-1; //Probably smthng with challenge mode
     uint8 hasLootRule = GetMembersCount()-1; //For testing purpose
     uint8 isLFG = 0;
     uint8 byte74 = m_groupType; //Checked
@@ -2458,8 +2462,8 @@ void Group::SetDungeonDifficulty(Difficulty difficulty)
             continue;
 
         player->SetDungeonDifficulty(difficulty);
-        player->SendDungeonDifficulty(true);
     }
+    SendUpdate();
 }
 
 void Group::SetRaidDifficulty(Difficulty difficulty)
@@ -2482,8 +2486,8 @@ void Group::SetRaidDifficulty(Difficulty difficulty)
             continue;
 
         player->SetRaidDifficulty(difficulty);
-        player->SendRaidDifficulty(true);
     }
+    SendUpdate();
 }
 
 bool Group::InCombatToInstance(uint32 instanceId)

@@ -334,7 +334,7 @@ enum Opcodes
     CMSG_LOOT_METHOD                                  = 0x0E3A,//16357
     CMSG_LOOT_MONEY                                   = 0x08D7,//16357
     CMSG_LOOT_RELEASE                                 = 0x0B13,//16357
-    CMSG_LOOT_ROLL                                    = 0x1286,
+    CMSG_LOOT_ROLL                                    = 0x099B,//16357
     CMSG_MAIL_CREATE_TEXT_ITEM                        = 0x0948,//16357
     CMSG_MAIL_DELETE                                  = 0x0A5F,//16357
     CMSG_MAIL_MARK_AS_READ                            = 0x0AA0,//16357
@@ -485,7 +485,7 @@ enum Opcodes
     CMSG_REQUEST_RATED_BG_INFO                        = 0x1425,
     CMSG_REQUEST_RATED_BG_STATS                       = 0x1426,
     CMSG_REQUEST_RESEARCH_HISTORY                     = 0x1427,
-    CMSG_REQUEST_VEHICLE_EXIT                         = 0x1428,
+    CMSG_REQUEST_VEHICLE_EXIT                         = 0x0527,//16357
     CMSG_REQUEST_VEHICLE_NEXT_SEAT                    = 0x1429,
     CMSG_REQUEST_VEHICLE_PREV_SEAT                    = 0x1430,
     CMSG_REQUEST_VEHICLE_SWITCH_SEAT                  = 0x1431,

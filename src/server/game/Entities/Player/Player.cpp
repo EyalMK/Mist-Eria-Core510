@@ -9448,12 +9448,12 @@ void Player::SendNotifyLootItemRemoved(uint8 lootSlot, ObjectGuid guid)
 {
     WorldPacket data(SMSG_LOOT_REMOVED, 1);
 
-	data.WriteBit(guid[1]);
+    data.WriteBit(guid[5]);
+    data.WriteBit(guid[1]);
 	data.WriteBit(guid[3]);
 	data.WriteBit(guid[4]);
 	data.WriteBit(guid[0]);
-	data.WriteBit(guid[6]);
-	data.WriteBit(guid[5]);
+    data.WriteBit(guid[6]);
 	data.WriteBit(guid[2]);
 	data.WriteBit(guid[7]);
 
@@ -20271,18 +20271,24 @@ void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
 
 void Player::SendDungeonDifficulty(bool IsInGroup)
 {
-    uint8 val = 0x00000001;
-    WorldPacket data(SMSG_SET_DUNGEON_DIFFICULTY, 4);
-    data << (uint32)GetDungeonDifficulty();
-    GetSession()->SendPacket(&data);
+    if (!IsInGroup) {
+        WorldPacket data(SMSG_SET_DUNGEON_DIFFICULTY, 4);
+        data << (uint32)GetDungeonDifficulty();
+        GetSession()->SendPacket(&data);
+    } else {
+        GetGroup()->SendUpdate();
+    }
 }
 
 void Player::SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty)
 {
-    uint8 val = 0x00000001;
-    WorldPacket data(SMSG_SET_RAID_DIFFICULTY, 4);
-    data << uint32(GetRaidDifficulty());
-    GetSession()->SendPacket(&data);
+    if (!IsInGroup) {
+        WorldPacket data(SMSG_SET_RAID_DIFFICULTY, 4);
+        data << uint32(GetRaidDifficulty());
+        GetSession()->SendPacket(&data);
+    } else {
+        GetGroup()->SendUpdate();
+    }
 }
 
 void Player::SendResetFailedNotify(uint32 mapid)

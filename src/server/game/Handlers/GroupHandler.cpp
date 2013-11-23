@@ -717,12 +717,31 @@ void WorldSession::HandleLootMethodOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleLootRoll(WorldPacket& recvData)
 {
-    uint64 guid;
-    uint32 itemSlot;
-    uint8  rollType;
-    recvData >> guid;                  // guid of the item rolled
+    uint8 itemSlot, rollType;
+    ObjectGuid guid;
+
     recvData >> itemSlot;
     recvData >> rollType;              // 0: pass, 1: need, 2: greed
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE lootRoll %u %u", itemSlot, rollType);
+
+    guid[3] = recvData.ReadBit();
+    guid[1] = recvData.ReadBit();
+    guid[6] = recvData.ReadBit();
+    guid[2] = recvData.ReadBit();
+    guid[4] = recvData.ReadBit();
+    guid[7] = recvData.ReadBit();
+    guid[0] = recvData.ReadBit();
+    guid[5] = recvData.ReadBit();
+
+    recvData.ReadByteSeq(guid[2]);
+    recvData.ReadByteSeq(guid[6]);
+    recvData.ReadByteSeq(guid[0]);
+    recvData.ReadByteSeq(guid[1]);
+    recvData.ReadByteSeq(guid[3]);
+    recvData.ReadByteSeq(guid[4]);
+    recvData.ReadByteSeq(guid[5]);
+    recvData.ReadByteSeq(guid[7]);
 
     Group* group = GetPlayer()->GetGroup();
     if (!group)
@@ -1590,8 +1609,10 @@ void WorldSession::HandleOptOutOfLootOpcode(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_OPT_OUT_OF_LOOT");
 
-    bool passOnLoot;
+    uint32 passOnLoot;
     recvData >> passOnLoot; // 1 always pass, 0 do not pass
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE passOnLoot : %u", passOnLoot);
 
     // ignore if player not loaded
     if (!GetPlayer())                                        // needed because STATUS_AUTHED

@@ -1,9 +1,8 @@
-/* # Script de Tydrheal : Liu Flameheart # */
+/* # Script de Tydrheal & Sungis : Liu Flameheart # */
 
-/* Notes : Tester -- voir spells -- Ajouter SoundID
-Liu Flameheart : Script 95% (terminé -- voir spells)	
-Minon of doubt : Script 100%
-Yulon : Script 95% (voir spells)
+/*
+	Notes :
+	What is missing ? :	- Flame waves system
 */
 
 #include "ScriptPCH.h"
@@ -12,70 +11,80 @@ Yulon : Script 95% (voir spells)
 enum Spells
 {
 	/* Liu Flameheart */
-	SPELL_SERPENT_STRIKE = 106823,
-	SPELL_SERPENT_KICK = 106856,
-	SPELL_SERPENT_WAVE = 106938,
-	SPELL_JADE_SERPENT_STRIKE = 106841,
-	SPELL_JADE_SERPENT_KICK = 106864,
-	SPELL_JADE_SERPENT_WAVE = 107053,
-	
-	/* Yu'lon */ 
-	SPELL_JADE_FIRE = 107045
+	SPELL_JADE_ESSENCE				= 106797,
+	SPELL_SERPENT_STRIKE			= 106823,
+	SPELL_JADE_STRIKE				= 106841,
+	SPELL_SHA_MASK					= 117691,
+	SPELL_SHA_CORRUPTION			= 128240,
+	SPELL_MEDITATE					= 124416,
 
+	/* Yu'lon */ 
+	SPELL_JADE_FIRE_MISSILE			= 107045,
+
+	/* Jade fire */
+	SPELL_JADE_FIRE					= 107108,
+
+	/* Serpent Wave */
+	SPELL_SERPENT_WAVE				= 106938,
+	SPELL_SERPENT_WAVE_VISUAL		= 106939,
+
+	/* Jade Serpent Wave */
+	SPELL_JADE_SERPENT_WAVE			= 107053,
+	SPELL_JADE_SERPENT_WAVE_VISUAL	= 107002,
+	SPELL_JADE_FIRE_SUMMON			= 107103
 };
 
 enum Events
 {
-	EVENT_BEGIN,
-	EVENT_SERPENT_STRIKE,
-	EVENT_SERPENT_KICK,
-	EVENT_SERPENT_WAVE,
-	EVENT_SAY_LEAVE,
-	EVENT_SAY_AFTER_PHASE_2,
-	EVENT_JADE_SERPENT_STRIKE,
-	EVENT_JADE_SERPENT_KICK,
-	EVENT_JADE_SERPENT_WAVE,
+	/* Liu Flameheart */
+	EVENT_SERPENT_STRIKE			= 1,
+	EVENT_JADE_STRIKE				= 2,
+	EVENT_SUMMON_SERPENT_WAVE		= 3,
+	EVENT_SUMMON_JADE_SERPENT_WAVE	= 4,
+	EVENT_SERPENT_WAVE_MOVE			= 5,
+	EVENT_JADE_SERPENT_WAVE_MOVE	= 6,
+	EVENT_SUMMON_YU_LON				= 7,
 
 	/* Yu'lon */
-	EVENT_JADE_FIRE
-};
+	EVENT_JADE_FIRE					= 1,
 
-enum Actions
-{
-	ACTION_BOSS_LIU_FLAMEHEART_RESET,
-	ACTION_BOSS_LIU_FLAMEHEART_DIED,
-	ACTION_MINION_DEATH,
-	ACTION_END
+	/* Serpent Wave */
+	EVENT_SERPENT_WAVE				= 1,
+
+	/* Jade Serpent Wave */
+	EVENT_JADE_SERPENT_WAVE			= 1,
+	EVENT_JADE_SERPENT_WAVE_FIRE	= 2
 };
 
 enum Texts
 {
-	SAY_BEGIN = 0,
-	SAY_COMBAT = 1,
-	SAY_LEAVE = 2,
-	SAY_PHASE_2 = 3,
-	SAY_AFTER_PHASE_2 = 4,
-	SAY_PHASE_3 = 5,
-	SAY_DEATH = 6,
-	SAY_SLAY_1 = 7,
-	SAY_SLAY_2 = 8
+	SAY_AGGRO							= 0,
+	SAY_DEATH							= 1,
+	SAY_PHASE_LIU_JADE_SERPENT_DANCE	= 2,
+	SAY_PHASE_YU_LON					= 3,
+	SAY_INTRO							= 4,
+	SAY_SLAY_1							= 5,
+	SAY_SLAY_2							= 6
 };
 
 enum Phases
 {
-	PHASE_BEGIN,
-	PHASE_COMBAT,
-	PHASE_2,
-	PHASE_3,
-	PHASE_END
+	PHASE_NULL						= 0,
+	PHASE_LIU_SERPENT_DANCE			= 1,
+	PHASE_LIU_JADE_SERPENT_DANCE	= 2,
+	PHASE_YU_LON					= 3
 };
 
-enum IdsCreatures
+enum Npcs
 {
-	MINION_OF_DOUBT = 57109,
-	YULON = 56762
+	NPC_LIU_FLAMEHEART				= 56732,
+	NPC_MINION_OF_DOUBT				= 57109,
+	NPC_YU_LON						= 56762,
+	NPC_JADE_FIRE					= 56893,
+	NPC_LIU_TRIGGER					= 400445,
+	NPC_SERPENT_WAVE_TRIGGER		= 400446,
+	NPC_JADE_SERPENT_WAVE_TRIGGER	= 400447
 };
-
 
 class boss_liu_flameheart: public CreatureScript
 {
@@ -96,107 +105,150 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
-		
-		bool checkLiuFlameheartAlive;
-		int counterMinionDeath;
-		std::list<Creature*> listMinion;
-		Position position;
-		
-		void Reset() 
-		{
-			me->GetPosition(&position);
-			counterMinionDeath = 0;
-			checkLiuFlameheartAlive = true;
-			checkLiuFlameheartAlive = me->isAlive();
-			
-			events.Reset();
+		bool intro;
+		bool thirdPhaseHome; // When Liu comes to the center of the "room" in the third phase
+		float x, y, z, o;
+		Creature* firstWave;
+		Creature* secondWave;
+		Creature* thirdWave;
+		Creature* fourthWave;
 
+		void Reset()
+		{
 			if (instance)
 			{
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, NOT_STARTED);
-				me->AI()->DoAction(ACTION_BOSS_LIU_FLAMEHEART_RESET);
-				GetCreatureListWithEntryInGrid(listMinion, me, MINION_OF_DOUBT, 50000.0f);
-				for(std::list<Creature*>::const_iterator i = listMinion.begin() ; i != listMinion.end() ; ++i)
-				{
-					(*i)->RemoveCorpse();
-					(*i)->Respawn();
-				}
+				intro = false;
+				thirdPhaseHome = false;
+				me->setActive(false);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+				me->RemoveAurasDueToSpell(SPELL_JADE_ESSENCE, me->GetGUID());
+				me->RemoveAurasDueToSpell(SPELL_MEDITATE, me->GetGUID());
+				me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
+				me->CastSpell(me, SPELL_SHA_MASK);
+				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 			}
-
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); 
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-			me->SetVisible(false);
-			
 		}
-
-		void DoAction(int32 action) 
-        {
-            switch (action)
-            {
-				case ACTION_BOSS_LIU_FLAMEHEART_RESET:
-					checkLiuFlameheartAlive = true;
-					break;
-				case ACTION_BOSS_LIU_FLAMEHEART_DIED:
-					checkLiuFlameheartAlive = false;
-					break;
-				case ACTION_MINION_DEATH:
-					counterMinionDeath++;
-					break;
-				case ACTION_END:
-					Talk(SAY_DEATH);
-					me->Kill(me);
-					break;
-			}
-        }
 
 		void JustDied(Unit *pWho)
 		{
 			if (instance)
 			{
-				me->AI()->DoAction(ACTION_BOSS_LIU_FLAMEHEART_DIED);
+				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, DONE);
+				Talk(SAY_DEATH);
 
-				if (!checkLiuFlameheartAlive)
-					instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, DONE);
-
+				std::list<Creature*> jadeFires;
+				me->GetCreatureListWithEntryInGrid(jadeFires, NPC_JADE_FIRE, 500.0f);
+				if (!jadeFires.empty())
+				{
+					for (std::list<Creature*>::iterator itr = jadeFires.begin(); itr != jadeFires.end(); ++itr)
+						(*itr)->DespawnOrUnsummon();
+				}
 			}
-			
 		}
 
-		void KilledUnit(Unit *pWho) 
-		{	
-			Talk(urand(SAY_SLAY_1, SAY_SLAY_2));
+		void KilledUnit(Unit *pWho)
+		{
+			if (instance)
+				Talk(irand(SAY_SLAY_1, SAY_SLAY_2));
 		}
 		
 		void EnterEvadeMode()
 		{
 			if (instance)
-				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, FAIL);			
+			{
+				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, FAIL);
+				intro = false;
+				thirdPhaseHome = false;
+				me->setActive(false);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+				me->Relocate(929.684998f, -2560.610107f, 180.070007f, 4.410300f);
+				me->RemoveAurasDueToSpell(SPELL_JADE_ESSENCE, me->GetGUID());
+				me->RemoveAurasDueToSpell(SPELL_MEDITATE, me->GetGUID());
+				me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
+				me->SetFacingTo(1.250660f);
+				me->CombatStop();
+				me->DeleteThreatList();
+			}
 		}
 
-		void EnterCombat(Unit* /*who*/) 
+		void MoveInLineOfSight(Unit* who)
+		{
+			if (!me->IsWithinDistInMap(who, 30.0f) || intro)
+				return;
+
+			if (!who || !who->IsInWorld())
+				return;
+
+			if (who && who->GetTypeId() == TYPEID_PLAYER && !intro && !me->IsValidAttackTarget(who))
+			{
+				Talk(SAY_INTRO);
+				intro = true;
+			}
+		}
+
+		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
+			{
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, IN_PROGRESS);
+				me->SetInCombatWithZone();
+				Talk(SAY_AGGRO);
+				me->setActive(true);
+			}
 
-			me->SetInCombatWithZone();
-			events.SetPhase(PHASE_COMBAT);
-			Talk(SAY_COMBAT);
-			events.ScheduleEvent(EVENT_SERPENT_STRIKE, 8*IN_MILLISECONDS, 0, PHASE_COMBAT);
-			events.ScheduleEvent(EVENT_SERPENT_KICK, 2*IN_MILLISECONDS, 0, PHASE_COMBAT);
-			events.ScheduleEvent(EVENT_SAY_LEAVE, 10*IN_MILLISECONDS, 0, PHASE_COMBAT);
-			events.ScheduleEvent(EVENT_SERPENT_WAVE, 5*IN_MILLISECONDS, 0, PHASE_COMBAT);
+			events.SetPhase(PHASE_LIU_SERPENT_DANCE);
+			events.ScheduleEvent(EVENT_SERPENT_STRIKE, 12*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
+			events.ScheduleEvent(EVENT_SUMMON_SERPENT_WAVE, 14*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
 		}
 
-		void UpdateAI(uint32 diff) 
+		void UpdateAI(uint32 diff)
 		{
-			if(!UpdateVictim())
+			if	(!UpdateVictim())
 				return;
 
 			events.Update(diff);
 
-			if (me->HasUnitState(UNIT_STATE_CASTING))
-				return;
+			if (events.IsInPhase(PHASE_LIU_SERPENT_DANCE) && HealthBelowPct(70))
+			{
+				Talk(SAY_PHASE_LIU_JADE_SERPENT_DANCE);
+				me->CastSpell(me->getVictim(), SPELL_JADE_ESSENCE);
+				events.CancelEvent(EVENT_SERPENT_STRIKE);
+				events.CancelEvent(EVENT_SUMMON_SERPENT_WAVE);
+				events.ScheduleEvent(EVENT_JADE_STRIKE, 12*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
+				events.ScheduleEvent(EVENT_SUMMON_JADE_SERPENT_WAVE, 14*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
+				events.SetPhase(PHASE_LIU_JADE_SERPENT_DANCE);
+			}
+
+			if (events.IsInPhase(PHASE_LIU_JADE_SERPENT_DANCE) && HealthBelowPct(30))
+			{
+				Talk(SAY_PHASE_YU_LON);
+				me->setActive(false);
+				events.CancelEvent(EVENT_JADE_STRIKE);
+				events.CancelEvent(EVENT_SUMMON_JADE_SERPENT_WAVE);
+				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+				me->GetMotionMaster()->MovePoint(0, 929.684998f, -2560.610107f, 180.070007f);
+				events.SetPhase(PHASE_YU_LON);
+			}
+
+			if (events.IsInPhase(PHASE_YU_LON) && !thirdPhaseHome)
+				if (Creature* liu = me->FindNearestCreature(NPC_LIU_TRIGGER, 0.1f, true))
+				{
+					me->Relocate(929.684998f, -2560.610107f, 180.070007f, 4.410300f);
+					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+					me->SetFacingTo(4.410300f);
+					me->CastSpell(me, SPELL_MEDITATE);
+					events.ScheduleEvent(EVENT_SUMMON_YU_LON, 0, 0, PHASE_YU_LON);
+					thirdPhaseHome = true;
+				}
 
 			while(uint32 eventId = events.ExecuteEvent())
 			{
@@ -204,61 +256,117 @@ public:
 				{
 					if (instance)
 					{
-						case EVENT_BEGIN:
-							me->SetVisible(true);
-							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
-							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); 
-							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-							Talk(SAY_BEGIN);
-							events.CancelEvent(EVENT_BEGIN);
-							break;
-
 						case EVENT_SERPENT_STRIKE:
-							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-								if(target->GetTypeId() == TYPEID_PLAYER)
-								{
-									DoCast(target, SPELL_SERPENT_STRIKE);
-								}
-							events.ScheduleEvent(EVENT_SERPENT_STRIKE, 10*IN_MILLISECONDS, 0, PHASE_COMBAT);
+							me->CastSpell(me->getVictim(), SPELL_SERPENT_STRIKE);
+
+							events.ScheduleEvent(EVENT_SERPENT_STRIKE, 12*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
 							break;
 
-						case EVENT_SERPENT_KICK:
-							DoCast(me, SPELL_SERPENT_KICK);
-							events.ScheduleEvent(EVENT_SERPENT_KICK, 8*IN_MILLISECONDS, 0, PHASE_COMBAT);
+						case EVENT_JADE_STRIKE:
+							me->CastSpell(me->getVictim(), SPELL_JADE_STRIKE);
+
+							events.ScheduleEvent(EVENT_JADE_STRIKE, 12*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
 							break;
 
-						case EVENT_SERPENT_WAVE:
-							DoCast(me, SPELL_SERPENT_WAVE);
-							events.ScheduleEvent(EVENT_SERPENT_WAVE, 8*IN_MILLISECONDS, 0, PHASE_COMBAT);
+						case EVENT_SUMMON_YU_LON:
+						{
+							x = me->GetPositionX();
+							y = me->GetPositionY();
+							z = me->GetPositionZ();
+							o = 1.256324f;
+
+							me->SummonCreature(NPC_YU_LON, x, y, z, o, TEMPSUMMON_MANUAL_DESPAWN);
+
+							events.CancelEvent(EVENT_SUMMON_YU_LON);
+							break;
+						}
+
+						case EVENT_SUMMON_SERPENT_WAVE:
+						{
+							x = me->GetPositionX();
+							y = me->GetPositionY();
+							z = me->GetPositionZ();
+
+							float firstOrientation = me->GetOrientation();
+							float secondOrientation = me->GetOrientation() + 1.5f;
+							float thirdOrientation = me->GetOrientation() + 3.0f;
+							float fourthOrientation = me->GetOrientation() + 4.5f;
+
+							if (firstOrientation > 6.0f)
+								firstOrientation - 6.0f;
+							if (secondOrientation > 6.0f)
+								secondOrientation - 6.0f;
+							if (thirdOrientation > 6.0f)
+								thirdOrientation - 6.0f;
+							if (fourthOrientation > 6.0f)
+								fourthOrientation - 6.0f;
+
+							firstWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x + 10.0f, y, z, firstOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
+							secondWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x, y + 10.0f, z, secondOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
+							thirdWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x - 10.0f, y, z, thirdOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
+							fourthWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x, y - 10.0f, z, fourthOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
+
+							events.ScheduleEvent(EVENT_SERPENT_WAVE_MOVE, 3*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
+							events.ScheduleEvent(EVENT_SUMMON_SERPENT_WAVE, 12*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
+							break;
+						}
+
+						case EVENT_SERPENT_WAVE_MOVE:
+							if (firstWave)
+								firstWave->GetMotionMaster()->MovePoint(0, x + 100.0f, y, z);
+							if (secondWave)
+								secondWave->GetMotionMaster()->MovePoint(0, x, y + 100.0f, z);
+							if (thirdWave)
+								thirdWave->GetMotionMaster()->MovePoint(0, x - 100.0f, y, z);
+							if (fourthWave)
+								fourthWave->GetMotionMaster()->MovePoint(0, x, y - 100.0f, z);
+
+							events.ScheduleEvent(EVENT_SUMMON_SERPENT_WAVE, 15*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
+							events.CancelEvent(EVENT_SERPENT_WAVE_MOVE);
 							break;
 
-						case EVENT_SAY_LEAVE:
-							Talk(SAY_LEAVE);
-							events.CancelEvent(EVENT_SAY_LEAVE);
-							break;
+						case EVENT_SUMMON_JADE_SERPENT_WAVE:
+						{
+							x = me->GetPositionX();
+							y = me->GetPositionY();
+							z = me->GetPositionZ();
 
-						case EVENT_SAY_AFTER_PHASE_2:
-							Talk(SAY_AFTER_PHASE_2);
-							events.CancelEvent(EVENT_SAY_AFTER_PHASE_2);
-							break;
+							float firstOrientation = me->GetOrientation();
+							float secondOrientation = me->GetOrientation() + 1.5f;
+							float thirdOrientation = me->GetOrientation() + 3.0f;
+							float fourthOrientation = me->GetOrientation() + 4.5f;
 
-						case EVENT_JADE_SERPENT_STRIKE:
-							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-								if(target->GetTypeId() == TYPEID_PLAYER)
-								{
-									DoCast(target, SPELL_JADE_SERPENT_STRIKE);
-								}
-							events.ScheduleEvent(EVENT_JADE_SERPENT_STRIKE, 10*IN_MILLISECONDS, 0, PHASE_2);
-							break;
+							if (firstOrientation > 6.0f)
+								firstOrientation - 6.0f;
+							if (secondOrientation > 6.0f)
+								secondOrientation - 6.0f;
+							if (thirdOrientation > 6.0f)
+								thirdOrientation - 6.0f;
+							if (fourthOrientation > 6.0f)
+								fourthOrientation - 6.0f;
 
-						case EVENT_JADE_SERPENT_KICK:
-							DoCast(me, SPELL_JADE_SERPENT_KICK);
-							events.ScheduleEvent(EVENT_JADE_SERPENT_KICK, 8*IN_MILLISECONDS, 0, PHASE_2);
-							break;
+							firstWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x + 10.0f, y, z, firstOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
+							secondWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x, y + 10.0f, z, secondOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
+							thirdWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x - 10.0f, y, z, thirdOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
+							fourthWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x, y - 10.0f, z, fourthOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
 
-						case EVENT_JADE_SERPENT_WAVE:
-							DoCast(me, SPELL_JADE_SERPENT_WAVE);
-							events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 8*IN_MILLISECONDS, 0, PHASE_2);
+							events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_MOVE, 3*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
+							events.ScheduleEvent(EVENT_SUMMON_JADE_SERPENT_WAVE, 12*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
+							break;
+						}
+
+						case EVENT_JADE_SERPENT_WAVE_MOVE:
+							if (firstWave)
+								firstWave->GetMotionMaster()->MovePoint(0, x + 100.0f, y, z);
+							if (secondWave)
+								secondWave->GetMotionMaster()->MovePoint(0, x, y + 100.0f, z);
+							if (thirdWave)
+								thirdWave->GetMotionMaster()->MovePoint(0, x - 100.0f, y, z);
+							if (fourthWave)
+								fourthWave->GetMotionMaster()->MovePoint(0, x, y - 100.0f, z);
+
+							events.ScheduleEvent(EVENT_SUMMON_JADE_SERPENT_WAVE, 15*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
+							events.CancelEvent(EVENT_JADE_SERPENT_WAVE_MOVE);
 							break;
 
 						default:
@@ -266,107 +374,6 @@ public:
 					}
 				}
 			}
-
-			if(counterMinionDeath = 3 && !events.IsInPhase(PHASE_BEGIN))
-			{
-				events.ScheduleEvent(EVENT_BEGIN, 0, 0, PHASE_BEGIN);
-				events.SetPhase(PHASE_BEGIN);
-			}
-
-			if(me->HealthBelowPct(70) && !events.IsInPhase(PHASE_COMBAT))
-			{
-				Talk(PHASE_2);
-				events.ScheduleEvent(EVENT_SAY_AFTER_PHASE_2, 5*IN_MILLISECONDS, 0, PHASE_2);
-				events.ScheduleEvent(EVENT_JADE_SERPENT_STRIKE, 1*IN_MILLISECONDS, 0, PHASE_2);
-				events.ScheduleEvent(EVENT_JADE_SERPENT_KICK, 2*IN_MILLISECONDS, 0, PHASE_2);
-				events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 4*IN_MILLISECONDS, 0, PHASE_2);
-				events.SetPhase(PHASE_2);
-			}
-
-			if(me->HealthBelowPct(30) && !events.IsInPhase(PHASE_2))
-			{
-				Talk(PHASE_3);
-				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); 
-				me->GetMotionMaster()->MovePoint(0, position);
-				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-				me->SummonCreature(YULON, position, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 360*IN_MILLISECONDS);
-				events.SetPhase(PHASE_3);
-			}
-			
-			if(!events.IsInPhase(PHASE_3))
-			{
-				DoMeleeAttackIfReady();
-			}
-		}
-	};
-};
-
-class npc_minion_of_doubt: public CreatureScript
-{
-public:
-	npc_minion_of_doubt() : CreatureScript("npc_minion_of_doubt") { }
-
-	CreatureAI* GetAI(Creature* creature) const
-	{
-		return new npc_minion_of_doubtAI(creature);
-	}
-
-	struct npc_minion_of_doubtAI : public ScriptedAI
-	{
-		npc_minion_of_doubtAI(Creature *creature) : ScriptedAI(creature)
-		{
-			instance = creature->GetInstanceScript();
-		}
-
-		InstanceScript* instance;
-		EventMap events;
-		
-		void Reset() 
-		{
-			if(instance)
-				if (Creature* liu = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LIU_FLAMEHEART)))
-					if (liu->AI())
-					{
-						liu->AI()->Reset();
-					}
-		}
-
-		void DoAction(int32 action) 
-        {
-        }
-
-		void JustDied(Unit *pWho) 
-		{	
-			if(instance)
-				if (Creature* liu = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LIU_FLAMEHEART)))
-					if (liu->AI())
-					{
-						liu->AI()->DoAction(ACTION_MINION_DEATH);
-					}
-		}
-
-		void KilledUnit(Unit *pWho)
-		{	
-		}
-		
-		void EnterEvadeMode()
-		{	
-		}
-
-		void EnterCombat(Unit* /*who*/) 
-		{
-			me->SetInCombatWithZone();
-		}
-
-		void UpdateAI(uint32 diff) 
-		{
-			if(!UpdateVictim())
-				return;
-
-			events.Update(diff);
-
-			if (me->HasUnitState(UNIT_STATE_CASTING))
-				return;
 
 			DoMeleeAttackIfReady();
 		}
@@ -392,64 +399,57 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
-		
-		int health;
+		bool healthApplied;
 
-		void Reset() 
+		void Reset()
 		{
 			events.Reset();
+            
+			healthApplied = false;
 
-			if (Creature* lorewalker = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LOREWALKER_STONESTEP)))
-				health = lorewalker->GetHealth();
-			me->SetHealth(health);
+			if (instance)
+			{
+				if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
+					if (!healthApplied)
+					{
+						me->SetHealth(liu->GetMaxHealth() * 0.3f);
+						healthApplied = true;
+					}
+
+				me->SetObjectScale(0.1f); // Spawn animation
+				me->SetObjectScale(1.0f); // Spawn animation
+				events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
+				me->SetInCombatWithZone();
+			}
 		}
 
-		void JustSummoned(Creature* creature) 
+		void JustDied(Unit *pWho)
 		{
-			events.Reset();
+			if (instance)
+				if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
+					liu->DealDamage(liu, liu->GetHealth());
 
-			if (Creature* lorewalker = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LOREWALKER_STONESTEP)))
-				health = lorewalker->GetHealth();
-			me->SetHealth(health);
+			me->DespawnOrUnsummon();
 		}
 
-		void DoAction(int32 action) 
+		void EnterCombat()
 		{
-		}
-
-		void JustDied(Unit *pWho) 
-		{
-			events.SetPhase(PHASE_END);
-			if(instance)
-				if (Creature* lorewalker = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LOREWALKER_STONESTEP)))
-					if(lorewalker->AI())
-						lorewalker->AI()->DoAction(ACTION_END);
-		}
-
-		void EnterCombat(Unit* /*who*/) 
-		{
-			me->SetInCombatWithZone();
-			events.SetPhase(PHASE_3);
-			events.ScheduleEvent(EVENT_JADE_FIRE, 6*IN_MILLISECONDS, 0, PHASE_3);
+			if (instance)
+				events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
 		}
 
 		void EnterEvadeMode()
 		{
-			me->DespawnOrUnsummon();
-			if (Creature* lorewalker = me->GetCreature(*me, instance->GetData64(DATA_BOSS_LOREWALKER_STONESTEP)))
-				if(lorewalker->AI())
-					lorewalker->AI()->Reset();
+			if (instance)
+				me->DespawnOrUnsummon();
 		}
 
-		void UpdateAI(uint32 diff) 
+		void UpdateAI(uint32 diff)
 		{	
 			if(!UpdateVictim())
 				return;
 
 			events.Update(diff);
-
-			if (me->HasUnitState(UNIT_STATE_CASTING))
-				return;
 
 			while(uint32 eventId = events.ExecuteEvent())
 			{
@@ -458,12 +458,9 @@ public:
 					if (instance)
 					{
 						case EVENT_JADE_FIRE:
-							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-								if(target->GetTypeId() == TYPEID_PLAYER)
-								{
-									DoCast(target, SPELL_JADE_FIRE);
-								}
-							events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS, 0, PHASE_3);
+							me->CastSpell(me->getVictim(), SPELL_JADE_FIRE_MISSILE);
+
+							events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
 							break;
 
 						default:
@@ -472,16 +469,202 @@ public:
 				}
 			}
 
-			DoMeleeAttackIfReady();
-					
+			DoMeleeAttackIfReady();	
 		}
 	};
 };
 
+class npc_jade_fire_trigger: public CreatureScript
+{
+public:
+	npc_jade_fire_trigger() : CreatureScript("npc_jade_fire_trigger") { }
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_jade_fire_triggerAI(creature);
+	}
+
+	struct npc_jade_fire_triggerAI : public ScriptedAI
+	{
+		npc_jade_fire_triggerAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
+
+		InstanceScript* instance;
+		
+		void Reset()
+		{
+			me->setActive(false);
+			me->CastSpell(me, SPELL_JADE_FIRE);
+		}
+
+		void JustSummoned(Creature* summoned)
+        {
+			me->setActive(false);
+			me->CastSpell(me, SPELL_JADE_FIRE);
+        }
+	};
+};
+
+class npc_serpent_wave_trigger: public CreatureScript
+{
+public:
+	npc_serpent_wave_trigger() : CreatureScript("npc_serpent_wave_trigger") { }
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_serpent_wave_triggerAI(creature);
+	}
+
+	struct npc_serpent_wave_triggerAI : public ScriptedAI
+	{
+		npc_serpent_wave_triggerAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
+
+		InstanceScript* instance;
+		EventMap events;
+
+		void Reset()
+		{
+			me->setActive(false);
+			me->CastSpell(me, SPELL_SERPENT_WAVE_VISUAL);
+			events.ScheduleEvent(EVENT_SERPENT_WAVE, 1*IN_MILLISECONDS);
+		}
+
+		void JustSummoned(Creature* summoned)
+        {
+			me->setActive(false);
+			me->CastSpell(me, SPELL_SERPENT_WAVE_VISUAL);
+			events.ScheduleEvent(EVENT_SERPENT_WAVE, 1*IN_MILLISECONDS);
+        }
+
+		void UpdateAI(uint32 diff)
+		{
+			events.Update(diff);
+
+			while(uint32 eventId = events.ExecuteEvent())
+			{
+				switch(eventId)
+				{
+					if (instance)
+					{
+						case EVENT_SERPENT_WAVE:
+							me->CastSpell(me, SPELL_SERPENT_WAVE);
+
+							events.ScheduleEvent(EVENT_SERPENT_WAVE, 500);
+							break;
+						default:
+							break;
+					}
+				}
+			}
+		}
+	};
+};
+
+class npc_jade_serpent_wave_trigger: public CreatureScript
+{
+public:
+	npc_jade_serpent_wave_trigger() : CreatureScript("npc_jade_serpent_wave_trigger") { }
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_jade_serpent_wave_triggerAI(creature);
+	}
+
+	struct npc_jade_serpent_wave_triggerAI : public ScriptedAI
+	{
+		npc_jade_serpent_wave_triggerAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
+
+		InstanceScript* instance;
+		EventMap events;
+
+		void Reset()
+		{
+			me->setActive(false);
+			me->CastSpell(me, SPELL_JADE_SERPENT_WAVE_VISUAL);
+			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 1*IN_MILLISECONDS);
+			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_FIRE, 3700);
+		}
+
+		void JustSummoned(Creature* summoned)
+        {
+			me->setActive(false);
+			me->CastSpell(me, SPELL_JADE_SERPENT_WAVE_VISUAL);
+			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 1*IN_MILLISECONDS);
+			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_FIRE, 3700);
+        }
+
+		void UpdateAI(uint32 diff)
+		{
+			events.Update(diff);
+
+			while(uint32 eventId = events.ExecuteEvent())
+			{
+				switch(eventId)
+				{
+					if (instance)
+					{
+						case EVENT_JADE_SERPENT_WAVE_FIRE:
+							me->CastSpell(me, SPELL_JADE_FIRE_SUMMON);
+
+							events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_FIRE, 700);
+							break;
+
+						case EVENT_JADE_SERPENT_WAVE:
+							me->CastSpell(me, SPELL_JADE_SERPENT_WAVE);
+
+							events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 500);
+							break;
+
+						default:
+							break;
+					}
+				}
+			}
+		}
+	};
+};
+
+class spell_yulon_jade_fire : public SpellScriptLoader
+{
+    public:
+        spell_yulon_jade_fire() : SpellScriptLoader("spell_yulon_jade_fire") { }
+
+        class spell_yulon_jade_fire_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_yulon_jade_fire_SpellScript);
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                int32 bp0 = GetEffectValue(); // 107098 dbc EffectBasePoints
+                GetCaster()->CastSpell(GetHitUnit(), bp0);
+            }
+
+            void Register()
+            {
+                OnEffectHit += SpellEffectFn(spell_yulon_jade_fire_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_yulon_jade_fire_SpellScript();
+        }
+};
 
 void AddSC_boss_liu_flameheart()
 {
 	new boss_liu_flameheart();
-	new npc_minion_of_doubt();
 	new npc_yulon();
+	new npc_jade_fire_trigger();
+	new npc_serpent_wave_trigger();
+	new npc_jade_serpent_wave_trigger();
+	new spell_yulon_jade_fire();
 }

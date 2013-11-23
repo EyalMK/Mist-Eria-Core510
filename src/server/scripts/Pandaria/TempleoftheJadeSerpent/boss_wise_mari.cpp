@@ -2,9 +2,9 @@
 
 /*
 	Notes :
-	What is missing ? :	- Hydroblast
-						- Hydrolance triggers system : missing 6 triggers (two first pulses)
-						- Water damage
+	What is missing ? :	- Wash away (FIXED !)
+						- Doors (need a test)
+						- Water damage (Does not work)
 */
 
 #include "ScriptPCH.h"
@@ -22,8 +22,13 @@ enum Spells
 	SPELL_HYDROLANCE_PRECAST			= 115220,
 	SPELL_HYDROLANCE_PULSE_BIG			= 106267,
 	SPELL_HYDROLANCE_PULSE_SMALL		= 106319,
+	SPELL_CORRUPTED_WATERS				= 115165,
+	SPELL_WASH_AWAY						= 106329,
+	SPELL_WASH_AWAY_TRIGGERED			= 106331,
+	SPELL_WASH_AWAY_VISUAL				= 115575,
+	SPELL_TRACK_ROTATE					= 74758, // For the Wash away
 
-	/* Corrupt Living Water */
+	/* Corrupt living Water */
 	SPELL_SHA_RESIDUE					= 106653
 };
 
@@ -43,7 +48,8 @@ enum Npcs
 	NPC_HYDROTRIGGER_ONE_LEFT		= 400440,
 	NPC_HYDROTRIGGER_TWO_LEFT		= 400441,
 	NPC_HYDROTRIGGER_ONE_RIGHT		= 400442,
-	NPC_HYDROTRIGGER_TWO_RIGHT		= 400443
+	NPC_HYDROTRIGGER_TWO_RIGHT		= 400443,
+	NPC_WASH_AWAY_TRIGGER			= 400444
 };
 
 enum Events
@@ -57,7 +63,7 @@ enum Events
 	EVENT_CALL_THIRD_WATER			= 7,
 	EVENT_CALL_FOURTH_WATER			= 8,
 	EVENT_BUBBLE_BURST				= 9,
-	EVENT_HYDROBLAST				= 10,
+	EVENT_WASH_AWAY					= 10,
 	EVENT_FIRST_TRIGGER_WATER_AURA	= 11,
 	EVENT_SECOND_TRIGGER_WATER_AURA	= 12,
 	EVENT_THIRD_TRIGGER_WATER_AURA	= 13,
@@ -67,7 +73,9 @@ enum Events
 	EVENT_HYDROTRIGGER_ONE_LEFT		= 17,
 	EVENT_HYDROTRIGGER_TWO_LEFT		= 18,
 	EVENT_HYDROTRIGGER_ONE_RIGHT	= 19,
-	EVENT_HYDROTRIGGER_TWO_RIGHT	= 20
+	EVENT_HYDROTRIGGER_TWO_RIGHT	= 20,
+	EVENT_SAY_TAUNT					= 21,
+	EVENT_WASH_AWAY_TURN			= 22
 };
 
 enum Texts
@@ -81,22 +89,20 @@ enum Texts
 	SAY_DEATH_2				= 6,
 	SAY_DEATH_3				= 7,
 	SAY_INTRO				= 8,
-	SAY_PHASE_HYDROBLAST	= 9,
+	SAY_PHASE_WASH_AWAY		= 9,
 	SAY_SLAY_1				= 10,
 	SAY_SLAY_2				= 11,
 	SAY_TAUNT_1				= 12,
 	SAY_TAUNT_2				= 13,
 	SAY_TAUNT_3				= 14
-
 };
 
 enum Phases
 {
 	PHASE_NULL,
 	PHASE_CORRUPT_LIVING_WATERS,
-	PHASE_HYDROBLAST,
+	PHASE_WASH_AWAY,
 };
-
 
 class boss_wise_mari : public CreatureScript
 {
@@ -120,6 +126,8 @@ public:
 		int32 hydrolanceCount;
 		int32 hydrolanceWaterCount;
 		int32 corruptWaterCount;
+		bool washAway;
+		bool intro;
 
 		void Reset()
 		{
@@ -129,12 +137,25 @@ public:
 			{
 				instance->SetBossState(DATA_BOSS_WISE_MARI, NOT_STARTED);
 				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-				me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE);
-				events.SetPhase(PHASE_NULL);
 
 				hydrolanceCount = 0; // 0 = front | 1 = left | 2 = right
-				hydrolanceWaterCount = 0; // Number of hydrolances casted before the new Corrupt living water appears (5)
-				corruptWaterCount = 0; // 0 = first corrupt living water | 1 = second | 2 = third | 3 = fourth | 4 = phase 2
+				hydrolanceWaterCount = 0; // Number of hydrolances casted before the new Corrupt living Water appears (5)
+				corruptWaterCount = 0; // 0 = first corrupt living water | 1 = second | 2 = third | 3 = fourth & phase 2
+				washAway = false;
+				intro = false;
+
+				std::list<Creature*> droplets;
+				me->GetCreatureListWithEntryInGrid(droplets, NPC_CORRUPT_DROPLET, 500.0f);
+				if (!droplets.empty())
+				{
+					for (std::list<Creature*>::iterator itr = droplets.begin(); itr != droplets.end(); ++itr)
+					{
+						if ((*itr)->isAlive())
+							(*itr)->DespawnOrUnsummon();
+					}
+				}
+
+				events.SetPhase(PHASE_NULL);
 			}
 		}
 
@@ -144,7 +165,8 @@ public:
 			{
 				Talk(irand(SAY_DEATH_1, SAY_DEATH_3));
 				instance->DoCastSpellOnPlayers(SPELL_BLESSING_OF_THE_WATERSPEAKER);
-				instance->DoUseDoorOrButton(GO_WISE_MARI_DOOR);
+				if (GameObject* go = GameObject::GetGameObject(*me, instance->GetData64(DATA_WISE_MARI_GATE)))
+                        instance->HandleGameObject(go->GetGUID(), false);
 			}
 		}
 
@@ -158,9 +180,50 @@ public:
 		{
 			if (instance)
 			{
-				instance->SetBossState(DATA_BOSS_WISE_MARI, FAIL);
+				if (me->HasAura(SPELL_WATER_BUBBLE))
+					me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE);
+				if (me->HasAura(SPELL_WASH_AWAY))
+					me->RemoveAurasDueToSpell(SPELL_WASH_AWAY_TRIGGERED);
+				if (me->HasAura(SPELL_WASH_AWAY_VISUAL))
+					me->RemoveAurasDueToSpell(SPELL_WASH_AWAY_VISUAL);
+
+				me->HandleEmoteCommand(0); // Remove emote
+				me->SetFacingTo(1.250952f);
 				me->CombatStop();
 				me->DeleteThreatList();
+				instance->SetBossState(DATA_BOSS_WISE_MARI, FAIL);
+
+				hydrolanceCount = 0; // 0 = front | 1 = left | 2 = right
+				hydrolanceWaterCount = 0; // Number of hydrolances casted before the new Corrupt living Water appears (5)
+				corruptWaterCount = 0; // 0 = first corrupt living water | 1 = second | 2 = third | 3 = fourth & phase 2
+				washAway = false;
+				intro = false;
+
+				std::list<Creature*> droplets;
+				me->GetCreatureListWithEntryInGrid(droplets, NPC_CORRUPT_DROPLET, 500.0f);
+				if (!droplets.empty())
+				{
+					for (std::list<Creature*>::iterator itr = droplets.begin(); itr != droplets.end(); ++itr)
+					{
+						if ((*itr)->isAlive())
+							(*itr)->DespawnOrUnsummon();
+					}
+				}
+			}
+		}
+
+		void MoveInLineOfSight(Unit* who)
+		{
+			if (!me->IsWithinDistInMap(who, 40.0f) || intro)
+				return;
+
+			if (!who || !who->IsInWorld())
+				return;
+
+			if (who && who->GetTypeId() == TYPEID_PLAYER && !intro && !me->IsValidAttackTarget(who))
+			{
+				Talk(SAY_INTRO);
+				intro = true;
 			}
 		}
 
@@ -170,6 +233,7 @@ public:
 			{
 				instance->SetBossState(DATA_BOSS_WISE_MARI, IN_PROGRESS);
 				me->SetInCombatWithZone();
+				me->HandleEmoteCommand(EMOTE_ONESHOT_CUSTOM_SPELL_01);
 				DoCast(SPELL_WATER_BUBBLE);
 				Talk(SAY_AGGRO);
 
@@ -184,13 +248,36 @@ public:
 			if(!UpdateVictim())
 				return;
 
-			if (me->HasUnitState(UNIT_STATE_CASTING))
+			if (me->HasUnitState(UNIT_STATE_CASTING) && !events.IsInPhase(PHASE_WASH_AWAY))
 				return;
 
 			events.Update(diff);
 
+			/*Map* map = me->GetMap();
+			if (map && map->IsDungeon())
+			{
+				Map::PlayerList const &PlayerList = map->GetPlayers();
+
+				if (!PlayerList.isEmpty())
+					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+					{
+						if (i->getSource()->isAlive() && i->getSource()->IsInWater() && !i->getSource()->HasAura(SPELL_CORRUPTED_WATERS))
+							i->getSource()->CastSpell(i->getSource(), SPELL_CORRUPTED_WATERS);
+
+						if (i->getSource()->isAlive() && !i->getSource()->IsInWater() && i->getSource()->HasAura(SPELL_CORRUPTED_WATERS))
+							i->getSource()->RemoveAurasDueToSpell(SPELL_CORRUPTED_WATERS);
+					}
+			}*/
+
 			if (instance)
 			{
+				if (washAway)
+					if (Creature* washAwayTrigger = me->FindNearestCreature(NPC_WASH_AWAY_TRIGGER, 500, true))
+					{
+						me->CastSpell(washAwayTrigger, SPELL_TRACK_ROTATE);
+						me->SetFacingToObject(washAwayTrigger);
+					}
+
 				if (hydrolanceWaterCount == 5 && corruptWaterCount == 0) // First corrupt living water
 				{
 					events.ScheduleEvent(EVENT_CALL_SECOND_WATER, 2*IN_MILLISECONDS, 0, PHASE_CORRUPT_LIVING_WATERS);
@@ -211,14 +298,14 @@ public:
 
 				if (hydrolanceWaterCount == 5 && corruptWaterCount == 3) // Fourth corrupt living water
 				{
-					events.SetPhase(PHASE_HYDROBLAST);
-					events.ScheduleEvent(EVENT_BUBBLE_BURST, 2*IN_MILLISECONDS, 0, PHASE_HYDROBLAST);
+					events.SetPhase(PHASE_WASH_AWAY);
+					events.ScheduleEvent(EVENT_BUBBLE_BURST, 3*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
 					hydrolanceWaterCount = 0;
 				}
-			
-				while(uint32 eventId = events.ExecuteEvent())
+
+				while (uint32 eventId = events.ExecuteEvent())
 				{
-					switch(eventId)
+					switch (eventId)
 					{
 						if (instance)
 						{
@@ -237,7 +324,7 @@ public:
 								if (Creature* firstTrigger = me->FindNearestCreature(NPC_FIRST_TRIGGER_WATER, 500, true))
 									firstTrigger->CastSpell(firstTrigger, SPELL_HYDROLANCE_PRECAST);
 									
-								events.ScheduleEvent(EVENT_FIRST_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_FIRST_TRIGGER_WATER_AURA, 1*IN_MILLISECONDS);
 								break;
 
 							case EVENT_CALL_SECOND_WATER:
@@ -256,7 +343,7 @@ public:
 								if (Creature* secondTrigger = me->FindNearestCreature(NPC_SECOND_TRIGGER_WATER, 500, true))
 									secondTrigger->CastSpell(secondTrigger, SPELL_HYDROLANCE_PRECAST);
 
-								events.ScheduleEvent(EVENT_SECOND_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_SECOND_TRIGGER_WATER_AURA, 1*IN_MILLISECONDS);
 								break;
 
 							case EVENT_CALL_THIRD_WATER:
@@ -275,7 +362,7 @@ public:
 								if (Creature* thirdTrigger = me->FindNearestCreature(NPC_THIRD_TRIGGER_WATER, 500, true))
 									thirdTrigger->CastSpell(thirdTrigger, SPELL_HYDROLANCE_PRECAST);
 								
-								events.ScheduleEvent(EVENT_THIRD_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_THIRD_TRIGGER_WATER_AURA, 4*IN_MILLISECONDS);
 								break;
 
 							case EVENT_CALL_FOURTH_WATER:
@@ -294,7 +381,7 @@ public:
 								if (Creature* fourthTrigger = me->FindNearestCreature(NPC_FOURTH_TRIGGER_WATER, 500, true))
 									fourthTrigger->CastSpell(fourthTrigger, SPELL_HYDROLANCE_PRECAST);
 
-								events.ScheduleEvent(EVENT_FOURTH_TRIGGER_WATER_AURA, 3*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_FOURTH_TRIGGER_WATER_AURA, 1*IN_MILLISECONDS);
 								break;
 
 							case EVENT_HYDROLANCE:
@@ -465,19 +552,28 @@ public:
 
 							case EVENT_BUBBLE_BURST:
 								DoCast(SPELL_BUBBLE_BURST);
-								Talk(SAY_PHASE_HYDROBLAST);
+								Talk(SAY_PHASE_WASH_AWAY);
 
-								events.ScheduleEvent(EVENT_HYDROBLAST, 0, 0, PHASE_HYDROBLAST);
+								events.ScheduleEvent(EVENT_WASH_AWAY, 4*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
 								events.CancelEvent(EVENT_BUBBLE_BURST);
 								break;
 	
-							case EVENT_HYDROBLAST:
+							case EVENT_WASH_AWAY:
 								me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE, me->GetGUID());
-								// Cast hydroblast spell
+								DoCast(SPELL_WASH_AWAY_VISUAL);
+								DoCast(SPELL_WASH_AWAY);
+								
+								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
+								washAway = true;
 
-								events.CancelEvent(EVENT_HYDROBLAST);
+								events.CancelEvent(EVENT_WASH_AWAY);
 								break;
-						
+
+							case EVENT_SAY_TAUNT:
+								Talk(irand(SAY_TAUNT_1, SAY_TAUNT_3));
+
+								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
+								break;
 						}
 
 						default:
@@ -512,6 +608,11 @@ public:
 		void Reset() 
 		{
 			me->SetInCombatWithZone();
+		}
+
+		void EnterEvadeMode() 
+		{
+			me->DespawnOrUnsummon();
 		}
 
 		void JustDied(Unit *pWho) 
