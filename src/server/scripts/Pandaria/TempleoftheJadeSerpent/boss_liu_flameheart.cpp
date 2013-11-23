@@ -270,14 +270,17 @@ public:
 							break;
 
 						case EVENT_SUMMON_YU_LON:
+						{
 							o = 1.256324f;
 
 							me->SummonCreature(NPC_YU_LON, x, y, z, o, TEMPSUMMON_MANUAL_DESPAWN);
 
 							events.CancelEvent(EVENT_SUMMON_YU_LON);
 							break;
+						}
 
 						case EVENT_SUMMON_SERPENT_WAVE:
+						{
 							float firstOrientation = me->GetOrientation();
 							float secondOrientation = me->GetOrientation() + 1.5f;
 							float thirdOrientation = me->GetOrientation() + 3.0f;
@@ -299,6 +302,7 @@ public:
 							events.ScheduleEvent(EVENT_SERPENT_WAVE_MOVE, 3*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
 							events.ScheduleEvent(EVENT_SUMMON_SERPENT_WAVE, 14*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
 							break;
+						}
 
 						case EVENT_SERPENT_WAVE_MOVE:
 							if (firstWave)
@@ -315,6 +319,7 @@ public:
 							break;
 
 						case EVENT_SUMMON_JADE_SERPENT_WAVE:
+						{
 							float firstOrientation = me->GetOrientation();
 							float secondOrientation = me->GetOrientation() + 1.5f;
 							float thirdOrientation = me->GetOrientation() + 3.0f;
@@ -337,6 +342,7 @@ public:
 							events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_MOVE, 3*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
 							events.ScheduleEvent(EVENT_SUMMON_JADE_SERPENT_WAVE, 14*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
 							break;
+						}
 
 						case EVENT_JADE_SERPENT_WAVE_MOVE:
 							if (firstWave)
