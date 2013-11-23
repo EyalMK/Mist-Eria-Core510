@@ -168,6 +168,7 @@ public:
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+				me->Relocate(929.684998f, -2560.610107f, 180.070007f, 4.410300f);
 				me->RemoveAurasDueToSpell(SPELL_JADE_ESSENCE, me->GetGUID());
 				me->RemoveAurasDueToSpell(SPELL_MEDITATE, me->GetGUID());
 				me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
@@ -218,6 +219,8 @@ public:
 			{
 				Talk(SAY_PHASE_LIU_JADE_SERPENT_DANCE);
 				me->CastSpell(me->getVictim(), SPELL_JADE_ESSENCE);
+				events.CancelEvent(EVENT_SERPENT_STRIKE);
+				events.CancelEvent(EVENT_SUMMON_SERPENT_WAVE);
 				events.ScheduleEvent(EVENT_JADE_STRIKE, 12*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
 				events.ScheduleEvent(EVENT_SUMMON_JADE_SERPENT_WAVE, 14*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
 				events.SetPhase(PHASE_LIU_JADE_SERPENT_DANCE);
@@ -227,6 +230,8 @@ public:
 			{
 				Talk(SAY_PHASE_YU_LON);
 				me->setActive(false);
+				events.CancelEvent(EVENT_JADE_STRIKE);
+				events.CancelEvent(EVENT_SUMMON_JADE_SERPENT_WAVE);
 				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 				me->GetMotionMaster()->MovePoint(0, 929.684998f, -2560.610107f, 180.070007f);
 				events.SetPhase(PHASE_YU_LON);
@@ -325,6 +330,7 @@ public:
 							x = me->GetPositionX();
 							y = me->GetPositionY();
 							z = me->GetPositionZ();
+
 							float firstOrientation = me->GetOrientation();
 							float secondOrientation = me->GetOrientation() + 1.5f;
 							float thirdOrientation = me->GetOrientation() + 3.0f;
@@ -359,8 +365,8 @@ public:
 							if (fourthWave)
 								fourthWave->GetMotionMaster()->MovePoint(0, x, y - 100.0f, z);
 
-							events.ScheduleEvent(EVENT_SUMMON_SERPENT_WAVE, 15*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
-							events.CancelEvent(EVENT_SERPENT_WAVE_MOVE);
+							events.ScheduleEvent(EVENT_SUMMON_JADE_SERPENT_WAVE, 15*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
+							events.CancelEvent(EVENT_JADE_SERPENT_WAVE_MOVE);
 							break;
 
 						default:
@@ -584,7 +590,7 @@ public:
 			me->setActive(false);
 			me->CastSpell(me, SPELL_JADE_SERPENT_WAVE_VISUAL);
 			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 1*IN_MILLISECONDS);
-			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_FIRE, 3500);
+			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_FIRE, 3700);
 		}
 
 		void JustSummoned(Creature* summoned)
@@ -592,7 +598,7 @@ public:
 			me->setActive(false);
 			me->CastSpell(me, SPELL_JADE_SERPENT_WAVE_VISUAL);
 			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 1*IN_MILLISECONDS);
-			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_FIRE, 3500);
+			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_FIRE, 3700);
         }
 
 		void UpdateAI(uint32 diff)
@@ -608,7 +614,7 @@ public:
 						case EVENT_JADE_SERPENT_WAVE_FIRE:
 							me->CastSpell(me, SPELL_JADE_FIRE_SUMMON);
 
-							events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_FIRE, 500);
+							events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_FIRE, 700);
 							break;
 
 						case EVENT_JADE_SERPENT_WAVE:
@@ -616,6 +622,7 @@ public:
 
 							events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 500);
 							break;
+
 						default:
 							break;
 					}
