@@ -91,9 +91,11 @@ public:
 				thirdPhaseHome = false;
 				me->setActive(false);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 				me->HandleEmoteCommand(44); // Ready hands
+				me->RemoveAurasDueToSpell(SPELL_MEDITATE);
 				me->CastSpell(me, SPELL_SHA_MASK);
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 			}
@@ -120,8 +122,10 @@ public:
 			{
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, FAIL);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+				me->RemoveAurasDueToSpell(SPELL_MEDITATE);
 				intro = false;
 				thirdPhaseHome = false;
 				me->setActive(false);
@@ -316,18 +320,20 @@ public:
 				me->SetHealth(liu->GetHealth());
 		}
 
+		void JustSummoned(Creature* summoned)
+        {
+            me->SetObjectScale(1.0f);
+			me->SetInCombatWithZone();
+			if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
+				me->SetHealth(liu->GetHealth());
+        }
+
 		void JustDied(Unit *pWho)
 		{
 			if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
-				liu->DealDamage(me, me->GetHealth());
+				liu->DealDamage(liu, liu->GetHealth());
 
 			me->DespawnOrUnsummon();
-		}
-
-		void EnterCombat(Unit* /*who*/)
-		{
-			if (instance)
-				me->SetInCombatWithZone();
 		}
 
 		void EnterEvadeMode()
