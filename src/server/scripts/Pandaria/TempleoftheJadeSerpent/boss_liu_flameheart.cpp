@@ -98,8 +98,10 @@ public:
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-				me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
+				me->RemoveAurasDueToSpell(SPELL_JADE_ESSENCE, me->GetGUID());
 				me->RemoveAurasDueToSpell(SPELL_MEDITATE, me->GetGUID());
+				me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
+				me->SetFacingTo(1.250660f);
 				me->CastSpell(me, SPELL_SHA_MASK);
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 			}
@@ -137,8 +139,10 @@ public:
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+				me->RemoveAurasDueToSpell(SPELL_JADE_ESSENCE, me->GetGUID());
 				me->RemoveAurasDueToSpell(SPELL_MEDITATE, me->GetGUID());
 				me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
+				me->SetFacingTo(1.250660f);
 				me->CombatStop();
 				me->DeleteThreatList();
 				intro = false;
@@ -275,22 +279,29 @@ public:
 		EventMap events;
 		bool healthApplied;
 
-		/*void Reset()
+		void Reset()
 		{
 			events.Reset();
             
+			healthApplied = false;
+
 			if (instance)
 			{
 				if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
-					me->SetHealth(liu->GetMaxHealth() * 0.3f);
+					if (!healthApplied)
+					{
+						me->SetHealth(liu->GetMaxHealth() * 0.3f);
+						healthApplied = true;
+					}
 
-				me->SetObjectScale(1.0f);
+				me->SetObjectScale(0.1f); // Spawn animation
+				me->SetObjectScale(1.0f); // Spawn animation
 				events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
 				me->SetInCombatWithZone();
 			}
-		}*/
+		}
 
-		void JustSummoned(Creature* summoned)
+		/*void JustSummoned(Creature* summoned)
         {
 			events.Reset();
             
@@ -309,7 +320,7 @@ public:
 				events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
 				me->SetInCombatWithZone();
 			}
-        }
+        }*/
 
 		void JustDied(Unit *pWho)
 		{
@@ -323,10 +334,7 @@ public:
 		void EnterCombat()
 		{
 			if (instance)
-			{
 				events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
-				me->SetObjectScale(1.0f);
-			}
 		}
 
 		void EnterEvadeMode()
