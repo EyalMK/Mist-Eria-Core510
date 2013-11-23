@@ -19,7 +19,10 @@ enum Spells
 	SPELL_MEDITATE				= 124416,
 
 	/* Yu'lon */ 
-	SPELL_JADE_FIRE				= 107045,
+	SPELL_JADE_FIRE_MISSILE		= 107045,
+
+	/* Jade fire */
+	SPELL_JADE_FIRE				= 107108
 };
 
 enum Events
@@ -238,6 +241,141 @@ public:
 	};
 };
 
+class npc_yulon : public CreatureScript 
+{
+public:
+	npc_yulon() : CreatureScript("npc_yulon") { }
+
+	CreatureAI* GetAI(Creature* creature) const 
+	{
+		return new npc_yulonAI(creature);
+	}
+
+	struct npc_yulonAI : public ScriptedAI
+	{
+		npc_yulonAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
+
+		InstanceScript* instance;
+		EventMap events;
+		
+		int health;
+
+		void Reset()
+		{
+			events.Reset();
+
+			me->SetObjectScale(1.0f);
+			if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
+				me->SetHealth(liu->GetHealth());
+		}
+
+		void JustSummoned(Creature* summoned)
+        {
+            me->SetObjectScale(1.0f);
+			me->SetInCombatWithZone();
+			if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
+				me->SetHealth(liu->GetHealth());
+        }
+
+		void JustDied(Unit *pWho)
+		{
+			if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
+				liu->DealDamage(liu, liu->GetHealth());
+
+			me->DespawnOrUnsummon();
+		}
+
+		void EnterCombat()
+		{
+			if (instance)
+				events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
+		}
+
+		void EnterEvadeMode()
+		{
+			if (instance)
+				me->DespawnOrUnsummon();
+		}
+
+		void UpdateAI(uint32 diff)
+		{	
+			if(!UpdateVictim())
+				return;
+
+			events.Update(diff);
+
+			if (me->HasUnitState(UNIT_STATE_CASTING))
+				return;
+
+			while(uint32 eventId = events.ExecuteEvent())
+			{
+				switch(eventId)
+				{
+					if (instance)
+					{
+						case EVENT_JADE_FIRE:
+							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+								if(target->GetTypeId() == TYPEID_PLAYER)
+									me->CastSpell(target, SPELL_JADE_FIRE_MISSILE);
+
+							events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
+							break;
+
+						default:
+							break;
+					}
+				}
+			}
+
+			DoMeleeAttackIfReady();	
+		}
+	};
+};
+
+class npc_jade_fire_trigger: public CreatureScript
+{
+public:
+	npc_jade_fire_trigger() : CreatureScript("npc_jade_fire_trigger") { }
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_jade_fire_triggerAI(creature);
+	}
+
+	struct npc_jade_fire_triggerAI : public ScriptedAI
+	{
+		npc_jade_fire_triggerAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
+
+		InstanceScript* instance;
+		
+		void Reset()
+		{
+			me->setActive(false);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+			me->CastSpell(me, SPELL_JADE_FIRE);
+		}
+
+		void JustSummoned(Creature* summoned)
+        {
+			me->setActive(false);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+			me->CastSpell(me, SPELL_JADE_FIRE);
+        }
+	};
+};
+
 class npc_minion_of_doubt: public CreatureScript
 {
 public:
@@ -289,98 +427,47 @@ public:
 	};
 };
 
-class npc_yulon : public CreatureScript 
+class spell_yulon_jade_fire : public SpellScriptLoader
 {
-public:
-	npc_yulon() : CreatureScript("npc_yulon") { }
+    public:
+        spell_yulon_jade_fire() : SpellScriptLoader("spell_yulon_jade_fire") { }
 
-	CreatureAI* GetAI(Creature* creature) const 
-	{
-		return new npc_yulonAI(creature);
-	}
-
-	struct npc_yulonAI : public ScriptedAI
-	{
-		npc_yulonAI(Creature *creature) : ScriptedAI(creature)
-		{
-			instance = creature->GetInstanceScript();
-		}
-
-		InstanceScript* instance;
-		EventMap events;
-		
-		int health;
-
-		void Reset()
-		{
-			events.Reset();
-
-			me->SetObjectScale(1.0f);
-			if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
-				me->SetHealth(liu->GetHealth());
-		}
-
-		void JustSummoned(Creature* summoned)
+        class spell_yulon_jade_fire_SpellScript : public SpellScript
         {
-            me->SetObjectScale(1.0f);
-			me->SetInCombatWithZone();
-			if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
-				me->SetHealth(liu->GetHealth());
+            PrepareSpellScript(spell_yulon_jade_fire_SpellScript);
+
+			SpellCastResult CheckCast()
+            {
+				if (GetHitUnit() == GetCaster())
+					return SPELL_FAILED_BAD_TARGETS;
+
+                return SPELL_CAST_OK;
+            }
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                int32 bp0 = GetEffectValue(); // 107098 dbc EffectBasePoints
+                GetCaster()->CastSpell(GetHitUnit(), bp0);
+            }
+
+            void Register()
+            {
+                OnEffectHit += SpellEffectFn(spell_yulon_jade_fire_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+				OnCheckCast += SpellCheckCastFn(spell_yulon_jade_fire_SpellScript::CheckCast);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_yulon_jade_fire_SpellScript();
         }
-
-		void JustDied(Unit *pWho)
-		{
-			if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
-				liu->DealDamage(liu, liu->GetHealth());
-
-			me->DespawnOrUnsummon();
-		}
-
-		void EnterEvadeMode()
-		{
-			if (instance)
-				me->DespawnOrUnsummon();
-		}
-
-		void UpdateAI(uint32 diff)
-		{	
-			if(!UpdateVictim())
-				return;
-
-			events.Update(diff);
-
-			if (me->HasUnitState(UNIT_STATE_CASTING))
-				return;
-
-			while(uint32 eventId = events.ExecuteEvent())
-			{
-				switch(eventId)
-				{
-					if (instance)
-					{
-						case EVENT_JADE_FIRE:
-							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-								if(target->GetTypeId() == TYPEID_PLAYER)
-									me->CastSpell(target, SPELL_JADE_FIRE);
-
-							events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
-							break;
-
-						default:
-							break;
-					}
-				}
-			}
-
-			DoMeleeAttackIfReady();	
-		}
-	};
 };
-
 
 void AddSC_boss_liu_flameheart()
 {
 	new boss_liu_flameheart();
-	new npc_minion_of_doubt();
 	new npc_yulon();
+	new npc_jade_fire_trigger();
+	new npc_minion_of_doubt();
+	new spell_yulon_jade_fire();
 }
