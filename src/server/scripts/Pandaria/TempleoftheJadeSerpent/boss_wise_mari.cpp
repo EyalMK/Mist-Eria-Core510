@@ -104,7 +104,6 @@ enum Phases
 	PHASE_WASH_AWAY,
 };
 
-
 class boss_wise_mari : public CreatureScript
 {
 public:
@@ -128,6 +127,7 @@ public:
 		int32 hydrolanceWaterCount;
 		int32 corruptWaterCount;
 		bool washAway;
+		bool intro;
 
 		void Reset()
 		{
@@ -142,6 +142,7 @@ public:
 				hydrolanceWaterCount = 0; // Number of hydrolances casted before the new Corrupt living Water appears (5)
 				corruptWaterCount = 0; // 0 = first corrupt living water | 1 = second | 2 = third | 3 = fourth & phase 2
 				washAway = false;
+				intro = false;
 
 				std::list<Creature*> droplets;
 				me->GetCreatureListWithEntryInGrid(droplets, NPC_CORRUPT_DROPLET, 500.0f);
@@ -196,6 +197,7 @@ public:
 				hydrolanceWaterCount = 0; // Number of hydrolances casted before the new Corrupt living Water appears (5)
 				corruptWaterCount = 0; // 0 = first corrupt living water | 1 = second | 2 = third | 3 = fourth & phase 2
 				washAway = false;
+				intro = false;
 
 				std::list<Creature*> droplets;
 				me->GetCreatureListWithEntryInGrid(droplets, NPC_CORRUPT_DROPLET, 500.0f);
@@ -207,6 +209,21 @@ public:
 							(*itr)->DespawnOrUnsummon();
 					}
 				}
+			}
+		}
+
+		void MoveInLineOfSight(Unit* who)
+		{
+			if (!me->IsWithinDistInMap(who, 40.0f) || intro)
+				return;
+
+			if (!who || !who->IsInWorld())
+				return;
+
+			if (who && who->GetTypeId() == TYPEID_PLAYER && !intro && !me->IsValidAttackTarget(who))
+			{
+				Talk(SAY_INTRO);
+				intro = true;
 			}
 		}
 
@@ -547,7 +564,6 @@ public:
 								DoCast(SPELL_WASH_AWAY);
 								
 								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
-								//events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 0, 0, PHASE_WASH_AWAY);
 								washAway = true;
 
 								events.CancelEvent(EVENT_WASH_AWAY);
@@ -558,13 +574,6 @@ public:
 
 								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);
 								break;
-
-							/*case EVENT_WASH_AWAY_TURN:
-								if (Creature* washAwayTrigger = me->FindNearestCreature(NPC_WASH_AWAY_TRIGGER, 500, true))
-									DoCast(washAwayTrigger, SPELL_TRACK_ROTATE);
-								
-								events.ScheduleEvent(EVENT_WASH_AWAY_TURN, 1, 0, PHASE_WASH_AWAY);
-								break;*/
 						}
 
 						default:
