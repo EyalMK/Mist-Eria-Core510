@@ -483,7 +483,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
         uint32 countdownMaxForBGType = isArena() ? ARENA_COUNTDOWN_MAX : BATTLEGROUND_COUNTDOWN_MAX;
 
         WorldPacket data(SMSG_START_TIMER, 4+4+4);
-        data << uint32(1); // unk
+        data << uint32(0); // unk
         data << uint32(countdownMaxForBGType - (GetElapsedTime() / 1000));
         data << uint32(countdownMaxForBGType);
 
