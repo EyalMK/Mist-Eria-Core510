@@ -273,7 +273,7 @@ bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data
     CreatureTemplate const* cinfo = normalInfo;
     for (uint8 diff = uint8(GetMap()->GetSpawnMode()); diff > 0;)
     {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIEDiff initEntry 1 %s %u %u", cinfo->Name, GetMap->GetSpawnMode(), diff);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIEDiff initEntry 1 %s %u %u", cinfo->Name, GetMap()->GetSpawnMode(), diff);
 
         // we already have valid Map pointer for current creature!
         if (normalInfo->DifficultyEntry[diff - 1])
