@@ -334,7 +334,7 @@ enum Opcodes
     CMSG_LOOT_METHOD                                  = 0x0E3A,//16357
     CMSG_LOOT_MONEY                                   = 0x08D7,//16357
     CMSG_LOOT_RELEASE                                 = 0x0B13,//16357
-    CMSG_LOOT_ROLL                                    = 0x1286,
+    CMSG_LOOT_ROLL                                    = 0x099B,//16357
     CMSG_MAIL_CREATE_TEXT_ITEM                        = 0x0948,//16357
     CMSG_MAIL_DELETE                                  = 0x0A5F,//16357
     CMSG_MAIL_MARK_AS_READ                            = 0x0AA0,//16357
