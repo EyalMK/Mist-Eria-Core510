@@ -1176,7 +1176,6 @@ class spell_warr_enrage : public SpellScriptLoader
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_bloodthirst();
-    new spell_warr_bloodthirst_heal();
     new spell_warr_charge();
     new spell_warr_concussion_blow();
     new spell_warr_deep_wounds();
