@@ -50,6 +50,9 @@ enum HunterSpells
     SPELL_HUNTER_READINESS                          = 23989,
     SPELL_HUNTER_SNIPER_TRAINING_R1                 = 53302,
     SPELL_HUNTER_SNIPER_TRAINING_BUFF_R1            = 64418,
+	SPELL_HUNTER_SERPENT_STING                      = 1978,
+	SPELL_HUNTER_STEADY_SHOT_FOCUS                  = 77443,
+	SPELL_HUNTER_COBRA_FOCUS                        = 91954,
     SPELL_DRAENEI_GIFT_OF_THE_NAARU                 = 59543,
 };
 
@@ -802,6 +805,99 @@ class spell_hun_target_only_pet_and_owner : public SpellScriptLoader
         }
 };
 
+/* 
+EXECUTE THOSE SQL QUERIES: 
+
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (77767, 'spell_hun_cobra_shot'); 
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (56641, 'spell_hun_steady_shot'); 
+
+*/
+
+// 77767 - Cobra Shot
+class spell_hun_cobra_shot : public SpellScriptLoader
+{
+    public:
+        spell_hun_cobra_shot() : SpellScriptLoader("spell_hun_cobra_shot") { }
+
+        class spell_hun_cobra_shot_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_hun_cobra_shot_SpellScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_COBRA_FOCUS) ||
+                    !sSpellMgr->GetSpellInfo(SPELL_HUNTER_SERPENT_STING))
+                    return false;
+                return true;
+            }
+
+            bool Load()
+            {
+                return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+            }
+
+            void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+            {
+                GetCaster()->CastSpell(GetCaster(), SPELL_HUNTER_COBRA_FOCUS, true);
+
+                if (Aura* aur = GetHitUnit()->GetAura(SPELL_HUNTER_SERPENT_STING, GetCaster()->GetGUID()))
+                {
+                    int32 newDuration = aur->GetDuration() + GetEffectValue() * IN_MILLISECONDS;
+                    aur->SetDuration(std::min(newDuration, aur->GetMaxDuration()), true);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_hun_cobra_shot_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_hun_cobra_shot_SpellScript();
+        }
+};
+
+// 56641 - Steady Shot
+class spell_hun_steady_shot : public SpellScriptLoader
+{
+    public:
+        spell_hun_steady_shot() : SpellScriptLoader("spell_hun_steady_shot") { }
+
+        class spell_hun_steady_shot_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_hun_steady_shot_SpellScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/) 
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_STEADY_SHOT_FOCUS))
+                    return false;
+                return true;
+            }
+
+            bool Load() 
+            {
+                return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+            }
+
+            void HandleOnHit()
+            {
+                GetCaster()->CastSpell(GetCaster(), SPELL_HUNTER_STEADY_SHOT_FOCUS, true);
+            }
+
+            void Register() 
+            {
+                OnHit += SpellHitFn(spell_hun_steady_shot_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const 
+        {
+            return new spell_hun_steady_shot_SpellScript();
+        }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     new spell_hun_aspect_of_the_beast();
@@ -820,4 +916,6 @@ void AddSC_hunter_spell_scripts()
     new spell_hun_sniper_training();
     new spell_hun_tame_beast();
     new spell_hun_target_only_pet_and_owner();
+	new spell_hun_cobra_shot();
+	new spell_hun_steady_shot();
 }
