@@ -656,15 +656,16 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
         case CHAT_MSG_MONSTER_YELL:
         case CHAT_MSG_MONSTER_WHISPER:
         case CHAT_MSG_MONSTER_EMOTE:
+		case CHAT_MSG_RAID_BOSS_EMOTE:
         case CHAT_MSG_RAID_BOSS_WHISPER:
-        case CHAT_MSG_RAID_BOSS_EMOTE:
         case CHAT_MSG_BATTLENET:
+		case CHAT_MSG_QUEST_BOSS_EMOTE:
         {
             *data << uint64(speaker->GetGUID());
             *data << uint32(0);                             // 2.1.0
             *data << uint32(speaker->GetName().size() + 1);
             *data << speaker->GetName();
-            uint64 listener_guid = 0;
+			uint64 listener_guid = 0;
             *data << uint64(listener_guid);
             if (listener_guid && !IS_PLAYER_GUID(listener_guid))
             {
@@ -675,7 +676,7 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
             *data << message;
             *data << uint16(0);
 
-            if (type == CHAT_MSG_RAID_BOSS_WHISPER || type == CHAT_MSG_RAID_BOSS_EMOTE)
+            if (type == CHAT_MSG_RAID_BOSS_WHISPER || type == CHAT_MSG_RAID_BOSS_EMOTE || type == CHAT_MSG_QUEST_BOSS_EMOTE)
             {
                 *data << float(0.0f);                       // Added in 4.2.0, unk
                 *data << uint8(0);                          // Added in 4.2.0, unk

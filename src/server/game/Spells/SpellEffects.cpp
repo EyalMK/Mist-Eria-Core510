@@ -2096,6 +2096,7 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
                     AddPct(damage, 25);
             break;
         }
+
         default:
             break;
     }

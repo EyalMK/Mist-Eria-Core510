@@ -811,9 +811,9 @@ void Group::SendLootStartRoll(uint32 countDown, uint32 mapid, const Roll &r)
 
     data << uint8(r.totalPlayersRolling);
 
-    data << uint32(mapid);
     data << uint32(r.itemRandomPropId);
     data << uint32(r.itemSlot);
+    data << uint32(mapid);
     data << uint32(r.itemCount);
     data << uint32(countDown);
     data << uint32(r.itemid);
@@ -880,9 +880,9 @@ void Group::SendLootStartRollToPlayer(uint32 countDown, uint32 mapid, Player* p,
 
     data << uint8(r.totalPlayersRolling);
 
-    data << uint32(mapid);
     data << uint32(r.itemRandomPropId);
     data << uint32(r.itemSlot);
+    data << uint32(mapid);
     data << uint32(r.itemCount);
     data << uint32(countDown);
     data << uint32(r.itemid);
@@ -2082,8 +2082,8 @@ void Group::UpdatePlayerOutOfRange(Player* player)
     for (GroupReference* itr = GetFirstMember(); itr != NULL; itr = itr->next())
     {
         member = itr->getSource();
-        /*if (member && !member->IsWithinDist(player, member->GetSightRange(), false))
-            member->GetSession()->SendPacket(&data);*/
+        if (member && !member->IsWithinDist(player, member->GetSightRange(), false))
+            member->GetSession()->SendPacket(&data);
     }
 }
 
