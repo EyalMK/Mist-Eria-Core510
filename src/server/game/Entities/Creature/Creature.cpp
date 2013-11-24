@@ -334,7 +334,7 @@ bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data
     else if (data && data->equipmentId != -1)               // override, -1 means no equipment
         LoadEquipment(data->equipmentId);
 
-    SetName(normalInfo->Name);                              // at normal entry always
+    //SetName(normalInfo->Name);                              // at normal entry always
 
     SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, minfo->bounding_radius);
     SetFloatValue(UNIT_FIELD_COMBATREACH, minfo->combat_reach);
