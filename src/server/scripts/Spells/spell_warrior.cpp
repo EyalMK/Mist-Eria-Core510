@@ -28,8 +28,7 @@
 
 enum WarriorSpells
 {
-    SPELL_WARRIOR_BLOODTHIRST                       = 23885,
-    SPELL_WARRIOR_BLOODTHIRST_DAMAGE                = 23881,
+    SPELL_WARRIOR_BLOODTHIRST						= 23881,
     SPELL_WARRIOR_CHARGE                            = 7922,
 	SPELL_WARRIOR_CHARGE_TALENT						= 105771,
 	SPELL_WARRIOR_CHARGE_TALENT_PASSIVE				= 103828,
@@ -55,6 +54,11 @@ enum WarriorSpells
 	SPELL_WARRIOR_IMPENDING_VICTORY					= 118340,
 	SPELL_WARRIOR_HEROIC_THROW						= 57755,
 	SPELL_WARRIOR_WILD_STRIKE						= 100130,
+	SPELL_WARRIOR_HEROIC_STRIKE						= 78,
+	SPELL_WARRIOR_RAGING_BLOW_MAIN					= 96103,
+	SPELL_WARRIOR_RAGING_BLOW_OFF					= 85384,
+	SPELL_WARRIOR_ENRAGE							= 12880,
+	SPELL_RAGING_BLOW_STACKS						= 131116,
     SPELL_PALADIN_BLESSING_OF_SANCTUARY             = 20911,
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
     SPELL_PRIEST_RENEWED_HOPE                       = 63944,
@@ -66,7 +70,7 @@ enum WarriorSpellIcons
     WARRIOR_ICON_ID_SUDDEN_DEATH                    = 1989,
 };
 
-/// Waiting for debug
+/// Updated 5.1.0 : Bloodthirst
 class spell_warr_bloodthirst : public SpellScriptLoader
 {
     public:
@@ -76,29 +80,33 @@ class spell_warr_bloodthirst : public SpellScriptLoader
         {
             PrepareSpellScript(spell_warr_bloodthirst_SpellScript);
 
-            void HandleDamage(SpellEffIndex /*effIndex*/)
+            bool Validate (SpellInfo const* /*spellEntry*/)
             {
-                int32 damage = GetEffectValue();
-                ApplyPct(damage, GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK));
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_BLOODTHIRST))
+                    return false;
 
-                if (Unit* target = GetHitUnit())
-                {
-                    damage = GetCaster()->SpellDamageBonusDone(target, GetSpellInfo(), uint32(damage), SPELL_DIRECT_DAMAGE);
-                    damage = target->SpellDamageBonusTaken(GetCaster(), GetSpellInfo(), uint32(damage), SPELL_DIRECT_DAMAGE);
-                }
-                SetHitDamage(damage);
+                return true;
             }
 
-            void HandleDummy(SpellEffIndex /*effIndex*/)
+            bool Load()
             {
-                int32 damage = GetEffectValue();
-                GetCaster()->CastCustomSpell(GetCaster(), SPELL_WARRIOR_BLOODTHIRST, &damage, NULL, NULL, true, NULL);
+                if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                    return false;
+
+                return true;
+            }
+
+            void HandleDamage(SpellEffIndex /*effIndex*/)
+            {                
+                Unit* caster = GetCaster();
+
+				int32 damage = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.9f;
+				SetHitDamage(damage);
             }
 
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_warr_bloodthirst_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-                OnEffectHit += SpellEffectFn(spell_warr_bloodthirst_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+                OnEffectHitTarget += SpellEffectFn(spell_warr_bloodthirst_SpellScript::HandleDamage, EFFECT_1, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
             }
         };
 
@@ -840,7 +848,12 @@ class spell_warr_colossus_smash : public SpellScriptLoader
 
             void HandleEffect(SpellEffIndex /*effIndex*/)
             {
-				GetCaster()->CastSpell(GetHitUnit(), SPELL_WARRIOR_PHYSICAL_VULNERABILITY, true);
+				if (Unit* caster = GetCaster())
+				{
+					caster->CastSpell(GetHitUnit(), SPELL_WARRIOR_PHYSICAL_VULNERABILITY, true);
+					int32 damage = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 1.75f;
+					SetHitDamage(damage);
+				}
             }
 
             void Register()
@@ -996,6 +1009,198 @@ class spell_warr_wild_strike : public SpellScriptLoader
         }
 };
 
+class spell_warr_heroic_strike : public SpellScriptLoader
+{
+    public:
+        spell_warr_heroic_strike() : SpellScriptLoader("spell_warr_heroic_strike") { }
+
+        class spell_warr_heroic_strike_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_heroic_strike_SpellScript);
+
+            bool Validate (SpellInfo const* /*spellEntry*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_HEROIC_STRIKE))
+                    return false;
+
+                return true;
+            }
+
+            bool Load()
+            {
+                if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                    return false;
+
+                return true;
+            }
+
+            void HandleDamage(SpellEffIndex /*effIndex*/)
+            {                
+                Unit* caster = GetCaster();
+
+				if (!caster->haveOffhandWeapon())
+				{
+					int32 damage = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 1.1f;
+					SetHitDamage(damage);
+				}
+
+				if (caster->haveOffhandWeapon())
+				{
+					int32 damage = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 1.54f;
+					SetHitDamage(damage);
+				}
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_warr_heroic_strike_SpellScript::HandleDamage, EFFECT_1, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_heroic_strike_SpellScript();
+        }
+};
+
+class spell_warr_raging_blow_main : public SpellScriptLoader
+{
+    public:
+        spell_warr_raging_blow_main() : SpellScriptLoader("spell_warr_raging_blow_main") { }
+
+        class spell_warr_raging_blow_main_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_raging_blow_main_SpellScript);
+
+            bool Validate (SpellInfo const* /*spellEntry*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_RAGING_BLOW_MAIN))
+                    return false;
+
+                return true;
+            }
+
+            bool Load()
+            {
+                if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                    return false;
+
+                return true;
+            }
+
+            void HandleDamage(SpellEffIndex /*effIndex*/)
+            {                
+                Unit* caster = GetCaster();
+
+				int32 damage = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 1.9f;
+				SetHitDamage(damage);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_warr_raging_blow_main_SpellScript::HandleDamage, EFFECT_1, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_raging_blow_main_SpellScript();
+        }
+};
+
+class spell_warr_raging_blow_off : public SpellScriptLoader
+{
+    public:
+        spell_warr_raging_blow_off() : SpellScriptLoader("spell_warr_raging_blow_off") { }
+
+        class spell_warr_raging_blow_off_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_raging_blow_off_SpellScript);
+
+            bool Validate (SpellInfo const* /*spellEntry*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_RAGING_BLOW_OFF))
+                    return false;
+
+                return true;
+            }
+
+            bool Load()
+            {
+                if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                    return false;
+
+                return true;
+            }
+
+            void HandleDamage(SpellEffIndex /*effIndex*/)
+            {                
+                Unit* caster = GetCaster();
+
+				int32 damage = caster->GetTotalAttackPowerValue(OFF_ATTACK) * 1.9f;
+				SetHitDamage(damage);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_warr_raging_blow_off_SpellScript::HandleDamage, EFFECT_1, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_raging_blow_off_SpellScript();
+        }
+};
+
+class spell_warr_enrage : public SpellScriptLoader
+{
+    public:
+        spell_warr_enrage() : SpellScriptLoader("spell_warr_enrage") { }
+
+        class spell_warr_enrage_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_enrage_SpellScript);
+
+            bool Validate (SpellInfo const* /*spellEntry*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_ENRAGE))
+                    return false;
+
+                return true;
+            }
+
+            bool Load()
+            {
+                if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                    return false;
+
+                return true;
+            }
+
+            void HandleEffect(SpellEffIndex /*effIndex*/)
+            {   
+				Player* caster = GetCaster()->ToPlayer();
+
+				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY)
+				{
+					caster->CastSpell(caster, SPELL_RAGING_BLOW_STACKS);
+					caster->CastSpell(caster, SPELL_RAGING_BLOW_STACKS); // Double stacks
+				}
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_warr_enrage_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_ENERGIZE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_enrage_SpellScript();
+        }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_bloodthirst();
@@ -1020,4 +1225,8 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_colossus_smash();
 	new spell_warr_heroic_throw();
 	new spell_warr_wild_strike();
+	new spell_warr_heroic_strike();
+	new spell_warr_raging_blow_main();
+	new spell_warr_raging_blow_off();
+	new spell_warr_enrage();
 }
