@@ -519,7 +519,7 @@ void ObjectMgr::LoadCreatureTemplates()
 
             uint32 l_Entry	= l_DiffFields[0].GetUInt32();
 
-            uint8 l_Difficulty			= l_DiffFields[1].GetUInt32() - 2;
+            uint8 l_Difficulty			= l_DiffFields[1].GetUInt32() - 1;
             uint32 l_DifficultyEntry	= l_DiffFields[2].GetUInt32();
 
             sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIEDiff loadCreature 1 %u %u %u", l_Entry, l_Difficulty, l_DifficultyEntry);

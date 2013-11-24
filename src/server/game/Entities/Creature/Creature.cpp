@@ -282,7 +282,7 @@ bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data
 
             cinfo = sObjectMgr->GetCreatureTemplate(normalInfo->DifficultyEntry[diff - 1]);
             if (cinfo) {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIEDiff initEntry 1 %s %u %u", cinfo->Name.c_str(), diff-1);
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIEDiff initEntry 1 %s %u", cinfo->Name.c_str(), diff-1);
                 break;                                      // template found
             }
             // check and reported at startup, so just ignore (restore normalInfo)
