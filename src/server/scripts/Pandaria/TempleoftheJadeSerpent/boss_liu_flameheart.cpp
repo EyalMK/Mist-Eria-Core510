@@ -169,18 +169,30 @@ public:
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, FAIL);
 				intro = false;
 				thirdPhaseHome = false;
+				me->CombatStop();
+				me->DeleteThreatList();
 				me->setActive(false);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 				me->Relocate(929.684998f, -2560.610107f, 180.070007f, 4.410300f);
-				me->RemoveAurasDueToSpell(SPELL_JADE_ESSENCE, me->GetGUID());
-				me->RemoveAurasDueToSpell(SPELL_MEDITATE, me->GetGUID());
 				me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
 				me->SetFacingTo(1.250660f);
-				me->CombatStop();
-				me->DeleteThreatList();
+				if (me->HasAura(SPELL_JADE_ESSENCE))
+					me->RemoveAurasDueToSpell(SPELL_JADE_ESSENCE, me->GetGUID());
+				if (me->HasAura(SPELL_MEDITATE))
+					me->RemoveAurasDueToSpell(SPELL_MEDITATE, me->GetGUID());
+				me->CastSpell(me, SPELL_SHA_MASK);
+				me->CastSpell(me, SPELL_SHA_CORRUPTION);
+
+				std::list<Creature*> jadeFires;
+				me->GetCreatureListWithEntryInGrid(jadeFires, NPC_JADE_FIRE, 500.0f);
+				if (!jadeFires.empty())
+				{
+					for (std::list<Creature*>::iterator itr = jadeFires.begin(); itr != jadeFires.end(); ++itr)
+						(*itr)->DespawnOrUnsummon();
+				}
 			}
 		}
 
