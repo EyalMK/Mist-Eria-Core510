@@ -53,7 +53,7 @@ enum Events
 
 	/* Jade Serpent Wave */
 	EVENT_JADE_SERPENT_WAVE			= 1,
-	EVENT_JADE_SERPENT_WAVE_FIRE	= 2
+	EVENT_JADE_FIRE_SUMMON	= 2
 };
 
 enum Texts
@@ -83,7 +83,8 @@ enum Npcs
 	NPC_JADE_FIRE					= 56893,
 	NPC_LIU_TRIGGER					= 400445,
 	NPC_SERPENT_WAVE_TRIGGER		= 400446,
-	NPC_JADE_SERPENT_WAVE_TRIGGER	= 400447
+	NPC_JADE_SERPENT_WAVE_TRIGGER	= 400447,
+	NPC_WAVE_TRACKER				= 400448
 };
 
 class boss_liu_flameheart: public CreatureScript
@@ -115,6 +116,8 @@ public:
 
 		void Reset()
 		{
+			events.Reset();
+
 			if (instance)
 			{
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, NOT_STARTED);
@@ -287,24 +290,21 @@ public:
 							y = me->GetPositionY();
 							z = me->GetPositionZ();
 
-							float firstOrientation = me->GetOrientation();
-							float secondOrientation = me->GetOrientation() + 1.5f;
-							float thirdOrientation = me->GetOrientation() + 3.0f;
-							float fourthOrientation = me->GetOrientation() + 4.5f;
+							if (Creature* firstTracker = me->SummonCreature(NPC_WAVE_TRACKER, x + 100.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
+								if (firstWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x + 10.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
+									firstWave->SetFacingToObject(firstTracker);
 
-							if (firstOrientation > 6.0f)
-								firstOrientation - 6.0f;
-							if (secondOrientation > 6.0f)
-								secondOrientation - 6.0f;
-							if (thirdOrientation > 6.0f)
-								thirdOrientation - 6.0f;
-							if (fourthOrientation > 6.0f)
-								fourthOrientation - 6.0f;
+							if (Creature* secondTracker = me->SummonCreature(NPC_WAVE_TRACKER, x, y + 100.0f, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
+								if (secondWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x, y + 10.0f, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
+									secondWave->SetFacingToObject(secondTracker);
+							
+							if (Creature* thirdTracker = me->SummonCreature(NPC_WAVE_TRACKER, x - 100.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
+								if (thirdWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x - 10.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
+									thirdWave->SetFacingToObject(thirdTracker);
 
-							firstWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x + 10.0f, y, z, firstOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
-							secondWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x, y + 10.0f, z, secondOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
-							thirdWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x - 10.0f, y, z, thirdOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
-							fourthWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x, y - 10.0f, z, fourthOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
+							if (Creature* fourthTracker = me->SummonCreature(NPC_WAVE_TRACKER, x, y - 100.0f, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
+								if (fourthWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x, y - 10.0f, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
+									fourthWave->SetFacingToObject(fourthTracker);
 
 							events.ScheduleEvent(EVENT_SERPENT_WAVE_MOVE, 3*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
 							events.ScheduleEvent(EVENT_SUMMON_SERPENT_WAVE, 12*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
@@ -331,25 +331,22 @@ public:
 							y = me->GetPositionY();
 							z = me->GetPositionZ();
 
-							float firstOrientation = me->GetOrientation();
-							float secondOrientation = me->GetOrientation() + 1.5f;
-							float thirdOrientation = me->GetOrientation() + 3.0f;
-							float fourthOrientation = me->GetOrientation() + 4.5f;
+							if (Creature* firstTracker = me->SummonCreature(NPC_WAVE_TRACKER, x + 100.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
+								if (firstWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x + 10.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
+									firstWave->SetFacingToObject(firstTracker);
 
-							if (firstOrientation > 6.0f)
-								firstOrientation - 6.0f;
-							if (secondOrientation > 6.0f)
-								secondOrientation - 6.0f;
-							if (thirdOrientation > 6.0f)
-								thirdOrientation - 6.0f;
-							if (fourthOrientation > 6.0f)
-								fourthOrientation - 6.0f;
+							if (Creature* secondTracker = me->SummonCreature(NPC_WAVE_TRACKER, x, y + 100.0f, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
+								if (secondWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x, y + 10.0f, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
+									secondWave->SetFacingToObject(secondTracker);
+							
+							if (Creature* thirdTracker = me->SummonCreature(NPC_WAVE_TRACKER, x - 100.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
+								if (thirdWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x - 10.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
+									thirdWave->SetFacingToObject(thirdTracker);
 
-							firstWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x + 10.0f, y, z, firstOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
-							secondWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x, y + 10.0f, z, secondOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
-							thirdWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x - 10.0f, y, z, thirdOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
-							fourthWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x, y - 10.0f, z, fourthOrientation, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS);
-
+							if (Creature* fourthTracker = me->SummonCreature(NPC_WAVE_TRACKER, x, y - 100.0f, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
+								if (fourthWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x, y - 10.0f, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
+									fourthWave->SetFacingToObject(fourthTracker);
+							
 							events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_MOVE, 3*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
 							events.ScheduleEvent(EVENT_SUMMON_JADE_SERPENT_WAVE, 12*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
 							break;
@@ -492,7 +489,7 @@ public:
 		}
 
 		InstanceScript* instance;
-		
+
 		void Reset()
 		{
 			me->setActive(false);
@@ -584,21 +581,24 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
+		int32 maxJadeFire;
 
 		void Reset()
 		{
+			maxJadeFire = 0;
 			me->setActive(false);
 			me->CastSpell(me, SPELL_JADE_SERPENT_WAVE_VISUAL);
 			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 1*IN_MILLISECONDS);
-			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_FIRE, 3700);
+			events.ScheduleEvent(EVENT_JADE_FIRE_SUMMON, 3700);
 		}
 
 		void JustSummoned(Creature* summoned)
         {
+			maxJadeFire = 0;
 			me->setActive(false);
 			me->CastSpell(me, SPELL_JADE_SERPENT_WAVE_VISUAL);
 			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 1*IN_MILLISECONDS);
-			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_FIRE, 3700);
+			events.ScheduleEvent(EVENT_JADE_FIRE_SUMMON, 3700);
         }
 
 		void UpdateAI(uint32 diff)
@@ -611,11 +611,17 @@ public:
 				{
 					if (instance)
 					{
-						case EVENT_JADE_SERPENT_WAVE_FIRE:
-							me->CastSpell(me, SPELL_JADE_FIRE_SUMMON);
+						case EVENT_JADE_FIRE_SUMMON:
+						{
+							if (maxJadeFire <= 5)
+							{
+								me->CastSpell(me, SPELL_JADE_FIRE_SUMMON);
+								maxJadeFire++;
+							}
 
-							events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_FIRE, 700);
+							events.ScheduleEvent(EVENT_JADE_FIRE_SUMMON, 700);
 							break;
+						}
 
 						case EVENT_JADE_SERPENT_WAVE:
 							me->CastSpell(me, SPELL_JADE_SERPENT_WAVE);
