@@ -119,23 +119,24 @@ public:
 			events.Reset();
 
 			if (instance)
-			{
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, NOT_STARTED);
-				intro = false;
-				thirdPhaseHome = false;
-				me->setActive(false);
-				me->HandleEmoteCommand(EMOTE_STATE_READYUNARMED_NOSOUND);
-				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-				if (me->HasAura(SPELL_JADE_ESSENCE))
-					me->RemoveAurasDueToSpell(SPELL_JADE_ESSENCE, me->GetGUID());
-				if (me->HasAura(SPELL_MEDITATE))
-					me->RemoveAurasDueToSpell(SPELL_MEDITATE, me->GetGUID());
-				me->CastSpell(me, SPELL_SHA_MASK);
-				me->CastSpell(me, SPELL_SHA_CORRUPTION);
-			}
+
+			intro = false;
+			thirdPhaseHome = false;
+
+			me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
+			me->setActive(false);
+			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+			me->CastSpell(me, SPELL_SHA_MASK);
+			me->CastSpell(me, SPELL_SHA_CORRUPTION);
+
+			if (me->HasAura(SPELL_JADE_ESSENCE))
+				me->RemoveAurasDueToSpell(SPELL_JADE_ESSENCE, me->GetGUID());
+			if (me->HasAura(SPELL_MEDITATE))
+				me->RemoveAurasDueToSpell(SPELL_MEDITATE, me->GetGUID());
 		}
 
 		void JustDied(Unit *pWho)
@@ -290,7 +291,7 @@ public:
 						{
 							x = me->GetPositionX();
 							y = me->GetPositionY();
-							z = me->GetPositionZ();
+							z = 179.821503;
 
 							if (Creature* firstTracker = me->SummonCreature(NPC_WAVE_TRACKER, x + 100.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
 								if (firstWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x + 10.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
@@ -329,7 +330,7 @@ public:
 						{
 							x = me->GetPositionX();
 							y = me->GetPositionY();
-							z = me->GetPositionZ();
+							z = 179.821503;
 
 							if (Creature* firstTracker = me->SummonCreature(NPC_WAVE_TRACKER, x + 100.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
 								if (firstWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x + 10.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
@@ -580,11 +581,11 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
-		int32 maxJadeFire;
+		int32 maxJadeFires;
 
 		void Reset()
 		{
-			maxJadeFire = 0;
+			maxJadeFires = 0;
 			me->setActive(false);
 			me->CastSpell(me, SPELL_JADE_SERPENT_WAVE_VISUAL);
 			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 1*IN_MILLISECONDS);
@@ -593,7 +594,7 @@ public:
 
 		void JustSummoned(Creature* summoned)
         {
-			maxJadeFire = 0;
+			maxJadeFires = 0;
 			me->setActive(false);
 			me->CastSpell(me, SPELL_JADE_SERPENT_WAVE_VISUAL);
 			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 1*IN_MILLISECONDS);
@@ -612,13 +613,13 @@ public:
 					{
 						case EVENT_JADE_FIRE_SUMMON:
 						{
-							if (maxJadeFire <= 5)
+							if (maxJadeFires <= 5)
 							{
 								me->CastSpell(me, SPELL_JADE_FIRE_SUMMON);
-								maxJadeFire++;
+								maxJadeFires++;
 							}
 
-							events.ScheduleEvent(EVENT_JADE_FIRE_SUMMON, 700);
+							events.ScheduleEvent(EVENT_JADE_FIRE_SUMMON, 500);
 							break;
 						}
 
