@@ -522,6 +522,8 @@ void ObjectMgr::LoadCreatureTemplates()
             uint8 l_Difficulty			= l_DiffFields[1].GetUInt32() - 2;
             uint32 l_DifficultyEntry	= l_DiffFields[2].GetUInt32();
 
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIEDiff loadCreature 1 %u %u %u", l_Entry, l_Difficulty, l_DifficultyEntry);
+
             CreatureTemplate& creatureTemplate = _creatureTemplateStore[l_Entry];
 
             if (_creatureTemplateStore.find(l_Entry) == _creatureTemplateStore.end()) {
