@@ -124,13 +124,15 @@ public:
 				intro = false;
 				thirdPhaseHome = false;
 				me->setActive(false);
+				me->HandleEmoteCommand(EMOTE_STATE_READYUNARMED_NOSOUND);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-				me->RemoveAurasDueToSpell(SPELL_JADE_ESSENCE, me->GetGUID());
-				me->RemoveAurasDueToSpell(SPELL_MEDITATE, me->GetGUID());
-				me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
+				if (me->HasAura(SPELL_JADE_ESSENCE))
+					me->RemoveAurasDueToSpell(SPELL_JADE_ESSENCE, me->GetGUID());
+				if (me->HasAura(SPELL_MEDITATE))
+					me->RemoveAurasDueToSpell(SPELL_MEDITATE, me->GetGUID());
 				me->CastSpell(me, SPELL_SHA_MASK);
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 			}
@@ -320,8 +322,6 @@ public:
 								thirdWave->GetMotionMaster()->MovePoint(0, x - 100.0f, y, z);
 							if (fourthWave)
 								fourthWave->GetMotionMaster()->MovePoint(0, x, y - 100.0f, z);
-
-							events.ScheduleEvent(EVENT_SUMMON_SERPENT_WAVE, 15*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
 							events.CancelEvent(EVENT_SERPENT_WAVE_MOVE);
 							break;
 
@@ -362,7 +362,6 @@ public:
 							if (fourthWave)
 								fourthWave->GetMotionMaster()->MovePoint(0, x, y - 100.0f, z);
 
-							events.ScheduleEvent(EVENT_SUMMON_JADE_SERPENT_WAVE, 15*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
 							events.CancelEvent(EVENT_JADE_SERPENT_WAVE_MOVE);
 							break;
 
