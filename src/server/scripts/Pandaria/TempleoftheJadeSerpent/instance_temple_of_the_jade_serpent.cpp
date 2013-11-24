@@ -1,12 +1,4 @@
-/* # Script de Tydrheal : Wise Mari # */
-
-/* Notes : Tester -- verifier les spells -- SoundID
-Ajouter l'ID du NPC_TRIGGER
-
-Wise Mari : Script 95% verifier spells
-Wise Mari Trigger : Script 100%	
-Corrupt Living Water : Script 95% verifier spells	
-*//* # Script de Tydrheal : Temple du serpent de jade. # */
+/* # Script de Tydrheal & Sungis : Temple of the Jade Serpent # */
 
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
