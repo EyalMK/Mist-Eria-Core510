@@ -241,6 +241,15 @@ public:
 				events.CancelEvent(EVENT_SUMMON_SERPENT_WAVE);
 				events.ScheduleEvent(EVENT_JADE_STRIKE, 12*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
 				events.ScheduleEvent(EVENT_SUMMON_JADE_SERPENT_WAVE, 14*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
+
+				std::list<Creature*> serpentWaves;
+				me->GetCreatureListWithEntryInGrid(serpentWaves, NPC_SERPENT_WAVE_TRIGGER, 500.0f);
+				if (!serpentWaves.empty())
+				{
+					for (std::list<Creature*>::iterator itr = serpentWaves.begin(); itr != serpentWaves.end(); ++itr)
+						(*itr)->DespawnOrUnsummon();
+				}
+
 				events.SetPhase(PHASE_LIU_JADE_SERPENT_DANCE);
 			}
 
@@ -252,6 +261,15 @@ public:
 				events.CancelEvent(EVENT_SUMMON_JADE_SERPENT_WAVE);
 				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 				me->GetMotionMaster()->MovePoint(0, 929.684998f, -2560.610107f, 180.070007f);
+
+				std::list<Creature*> jadeSerpentWaves;
+				me->GetCreatureListWithEntryInGrid(jadeSerpentWaves, NPC_JADE_SERPENT_WAVE_TRIGGER, 500.0f);
+				if (!jadeSerpentWaves.empty())
+				{
+					for (std::list<Creature*>::iterator itr = jadeSerpentWaves.begin(); itr != jadeSerpentWaves.end(); ++itr)
+						(*itr)->DespawnOrUnsummon();
+				}
+
 				events.SetPhase(PHASE_YU_LON);
 			}
 
@@ -303,7 +321,7 @@ public:
 						{
 							x = me->GetPositionX();
 							y = me->GetPositionY();
-							z = 179.821503;
+							z = 179.821503; // To prevent undermap
 
 							if (Creature* firstTracker = me->SummonCreature(NPC_WAVE_TRACKER, x + 100.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
 								if (firstWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x + 10.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
@@ -342,7 +360,7 @@ public:
 						{
 							x = me->GetPositionX();
 							y = me->GetPositionY();
-							z = 179.821503;
+							z = 179.821503; // To prevent undermap
 
 							if (Creature* firstTracker = me->SummonCreature(NPC_WAVE_TRACKER, x + 100.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
 								if (firstWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x + 10.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
@@ -425,7 +443,7 @@ public:
 						healthApplied = true;
 					}
 
-				me->SetObjectScale(0.1f); // Spawn animation
+				me->SetObjectScale(0.1f);
 				me->SetObjectScale(1.0f); // Spawn animation
 				events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);
 				me->SetInCombatWithZone();
@@ -478,7 +496,7 @@ public:
 				}
 			}
 
-			DoMeleeAttackIfReady();	
+			DoMeleeAttackIfReady();
 		}
 	};
 };
