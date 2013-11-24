@@ -1433,7 +1433,14 @@ class spell_dru_t10_restoration_4p_bonus : public SpellScriptLoader
             return new spell_dru_t10_restoration_4p_bonus_SpellScript();
         }
 };
-/*
+
+/* 
+EXECUTE THOSE SQL QUERIES: 
+
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (88747, 'spell_druid_wild_mushroom'); 
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (88751, 'spell_druid_wild_mushroom_detonate'); 
+*/
+
 // Wild mushroom, 88747
 class spell_druid_wild_mushroom : public SpellScriptLoader
 {
@@ -1497,6 +1504,7 @@ class spell_druid_wild_mushroom : public SpellScriptLoader
         }
 };
 
+/*
 // Wild mushroom : Detonate, 88751
 class spell_druid_wild_mushroom_detonate : public SpellScriptLoader
 {
@@ -1948,8 +1956,8 @@ void AddSC_druid_spell_scripts()
     new spell_dru_tiger_s_fury();
     new spell_dru_typhoon();
     new spell_dru_t10_restoration_4p_bonus();
-    /*new spell_druid_wild_mushroom();
-    new spell_druid_wild_mushroom_detonate();*/
+    new spell_druid_wild_mushroom();
+    //new spell_druid_wild_mushroom_detonate();
 	new spell_dru_displacer_beast();
 	new spell_dru_force_of_nature();
 	new npc_treant();
