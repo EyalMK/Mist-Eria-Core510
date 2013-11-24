@@ -279,15 +279,17 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
     // players are only allowed to enter 5 instances per hour
     if (entry->IsDungeon() && (!player->GetGroup() || (player->GetGroup() && !player->GetGroup()->isLFGGroup())))
     {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 11");
 
 
-        uint32 instaceIdToCheck = 0;
+        uint32 instanceIdToCheck = 0;
         if (InstanceSave* save = player->GetInstanceSave(mapid, entry->IsRaid()))
-            instaceIdToCheck = save->GetInstanceId();
+            instanceIdToCheck = save->GetInstanceId();
+
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 11 %u", instanceIdToCheck);
+
 
         // instanceId can never be 0 - will not be found
-        if (!player->CheckInstanceCount(instaceIdToCheck) && !player->isDead())
+        if (!player->CheckInstanceCount(instanceIdToCheck) && !player->isDead())
         {
             sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE canEnter 12");
 

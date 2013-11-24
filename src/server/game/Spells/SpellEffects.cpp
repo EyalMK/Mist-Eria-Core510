@@ -715,7 +715,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     damage = irand(minDMG, maxDMG);
                 }
                 break;
-                case 100787: // Tiger Palm
+               /* case 100787: // Tiger Palm
                 {
                     int32 baseDamage = 3;
 
@@ -782,7 +782,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 {
                     int32 baseDamage = 7;
                     damage = irand(6.0f*minMainHandDmg + 3.0f*minOffHandDmg + 0.477f*attackPower - baseDamage, 6.0f*maxMainHandDmg + 3.0f*maxOffHandDmg + 0.477f*attackPower + baseDamage);
-                    /* [ 600% of Mainhand Min DPS + 300% of Offhand Min DPS + 47.7% of AP - 7 ]					to [ 600% of Mainhand Max DPS + 300% of Offhand Max DPS + 47.7% of AP + 7 ] */
+                    // [ 600% of Mainhand Min DPS + 300% of Offhand Min DPS + 47.7% of AP - 7 ]					to [ 600% of Mainhand Max DPS + 300% of Offhand Max DPS + 47.7% of AP + 7 ]
                 }
                 break;
                 case 107428: // Rising Sun Kick
@@ -790,9 +790,9 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     int32 baseDamage = 13;
 
                     damage = irand(11.52f*minMainHandDmg + 5.76f*minOffHandDmg + 0.915f*attackPower - baseDamage, 11.52f*maxMainHandDmg + 5.76f*maxOffHandDmg + 0.915f*attackPower + baseDamage);
-                    /*[ 1,152% of Mainhand Min DPS + 576% of Offhand Min DPS + 91.5% of AP - 13 ]					to [ 1,152% of Mainhand Max DPS + 576% of Offhand Max DPS + 91.5% of AP + 13 ]*/
+                    //[ 1,152% of Mainhand Min DPS + 576% of Offhand Min DPS + 91.5% of AP - 13 ]					to [ 1,152% of Mainhand Max DPS + 576% of Offhand Max DPS + 91.5% of AP + 13 ]
                 }
-                break;
+                break;*/
                 default:
                     break;
                 }
