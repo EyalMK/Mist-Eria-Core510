@@ -87,7 +87,11 @@ enum MageSpells
 
 	SPELL_MAGE_RING_OF_FROST_SUMMON              = 113724,
 	SPELL_MAGE_RING_OF_FROST_FREEZE              = 82691,
-    SPELL_MAGE_RING_OF_FROST_DUMMY               = 91264
+    SPELL_MAGE_RING_OF_FROST_DUMMY               = 91264,
+
+	SPELL_MAGE_ICE_BLOCK                         = 45438,
+    SPELL_MAGE_CONE_OF_COLD                      = 120,
+    SPELL_MAGE_FROST_NOVA                        = 122
 };
 
 enum MageIcons
@@ -267,7 +271,7 @@ class spell_mage_blizzard : public SpellScriptLoader
        }
 };
 
-// 11958 - Cold Snap
+// Cold Snap - 11958
 class spell_mage_cold_snap : public SpellScriptLoader
 {
     public:
@@ -284,26 +288,18 @@ class spell_mage_cold_snap : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-                Player* caster = GetCaster()->ToPlayer();
-                // immediately finishes the cooldown on Frost spells
-                const SpellCooldowns& cm = caster->GetSpellCooldownMap();
-                for (SpellCooldowns::const_iterator itr = cm.begin(); itr != cm.end();)
+                if (Player* player = GetCaster()->ToPlayer())
                 {
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
-
-                    if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE &&
-                        (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) &&
-                        spellInfo->Id != SPELL_MAGE_COLD_SNAP && spellInfo->GetRecoveryTime() > 0)
-                    {
-                        caster->RemoveSpellCooldown((itr++)->first, true);
-                    }
-                    else
-                        ++itr;
+                    // Resets cooldown of Ice Block, Frost Nova and Cone of Cold
+                    player->RemoveSpellCooldown(SPELL_MAGE_ICE_BLOCK, true);
+                    player->RemoveSpellCooldown(SPELL_MAGE_FROST_NOVA, true);
+                    player->RemoveSpellCooldown(SPELL_MAGE_CONE_OF_COLD, true);
                 }
             }
 
             void Register()
             {
+                // add dummy effect spell handler to Cold Snap
                 OnEffectHit += SpellEffectFn(spell_mage_cold_snap_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
         };

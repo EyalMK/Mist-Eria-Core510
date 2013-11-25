@@ -63,6 +63,9 @@ enum WarriorSpells
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
     SPELL_PRIEST_RENEWED_HOPE                       = 63944,
     SPELL_GEN_DAMAGE_REDUCTION_AURA                 = 68066,
+	WARRIOR_SPELL_HEROIC_LEAP_DAMAGE            = 52174,
+	WARRIOR_SPELL_HEROIC_LEAP_SPEED             = 133278,
+	WARRIOR_SPELL_ITEM_PVP_SET_4P_BONUS         = 133277,
 };
 
 enum WarriorSpellIcons
@@ -742,7 +745,8 @@ class spell_warr_rallying_cry : public SpellScriptLoader
         }
 };
 
-// Heroic leap 6544
+// Heroic leap - 6544
+/*
 class spell_warr_heroic_leap : public SpellScriptLoader
 {
     public:
@@ -750,63 +754,95 @@ class spell_warr_heroic_leap : public SpellScriptLoader
 
         class spell_warr_heroic_leap_SpellScript : public SpellScript
         {
-            PrepareSpellScript(spell_warr_heroic_leap_SpellScript)
+            PrepareSpellScript(spell_warr_heroic_leap_SpellScript);
 
-            bool Validate(SpellInfo const* /*spellEntry*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(6544))
-                    return false;
-                return true;
-            }
+            std::list<Unit*> targetList;
 
             SpellCastResult CheckElevation()
             {
                 Unit* caster = GetCaster();
-                WorldLocation const* const dest = GetExplTargetDest();
 
-                if (dest->GetPositionZ() > caster->GetPositionZ() + 5.0f) // Cant jump to higher ground
+                WorldLocation* dest = const_cast<WorldLocation*>(GetExplTargetDest());
+                if (!dest)
+                    return SPELL_FAILED_DONT_REPORT;
+
+                if (dest->GetPositionZ() > caster->GetPositionZ() + 5.0f)
                     return SPELL_FAILED_NOPATH;
+                else if (caster->HasAuraType(SPELL_AURA_MOD_ROOT))
+                    return SPELL_FAILED_ROOTED;
+
                 return SPELL_CAST_OK;
+            }
+
+            void HandleAfterCast()
+            {
+                // Item - Warrior PvP Set 4P Bonus
+                if (GetCaster()->HasAura(WARRIOR_SPELL_ITEM_PVP_SET_4P_BONUS))
+                    GetCaster()->CastSpell(GetCaster(), WARRIOR_SPELL_HEROIC_LEAP_SPEED, true);
             }
 
             void Register()
             {
                 OnCheckCast += SpellCheckCastFn(spell_warr_heroic_leap_SpellScript::CheckElevation);
+                AfterCast += SpellCastFn(spell_warr_heroic_leap_SpellScript::HandleAfterCast);
             }
         };
 
-        SpellScript *GetSpellScript() const
+        SpellScript* GetSpellScript() const
         {
             return new spell_warr_heroic_leap_SpellScript();
         }
+
+        class spell_warr_heroic_leap_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warr_heroic_leap_AuraScript);
+
+            void OnRemove(constAuraEffectPtr aurEff, AuraEffectHandleModes /*mode)
+            {
+                if (Unit* caster = GetCaster())
+                    caster->CastSpell(caster, WARRIOR_SPELL_HEROIC_LEAP_DAMAGE, true);
+            }
+
+            void Register()
+            {
+                OnEffectRemove += AuraEffectRemoveFn(spell_warr_heroic_leap_AuraScript::OnRemove, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_warr_heroic_leap_AuraScript();
+        }
 };
 
-class spell_warr_heroic_leap_dummy : public SpellScriptLoader
+// Heroic Leap (damage) - 52174
+class spell_warr_heroic_leap_damage : public SpellScriptLoader
 {
-public:
-    spell_warr_heroic_leap_dummy() : SpellScriptLoader("spell_warr_heroic_leap_dummy") { }
+    public:
+        spell_warr_heroic_leap_damage() : SpellScriptLoader("spell_warr_heroic_leap_damage") { }
 
-    class spell_warr_heroic_leap_dummy_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_warr_heroic_leap_dummy_SpellScript);
-
-        void CalculateDamage(SpellEffIndex effect)
+        class spell_warr_heroic_leap_damage_SpellScript : public SpellScript
         {
-            if (Unit* caster = GetCaster())
-                SetHitDamage(int32(1 + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f));
-        }
+            PrepareSpellScript(spell_warr_heroic_leap_damage_SpellScript);
 
-        void Register()
+            void HandleOnHit()
+            {
+                if (Unit* caster = GetCaster())
+                    SetHitDamage(int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f));
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_warr_heroic_leap_damage_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
         {
-            OnEffectHitTarget += SpellEffectFn(spell_warr_heroic_leap_dummy::spell_warr_heroic_leap_dummy_SpellScript::CalculateDamage, EFFECT_3, SPELL_EFFECT_SCHOOL_DAMAGE);
+            return new spell_warr_heroic_leap_damage_SpellScript();
         }
-    };
-
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_warr_heroic_leap_dummy_SpellScript();
-    }
 };
+*/
 
 /// Updated 5.1.0 : 86346 - Colossus Smash
 class spell_warr_colossus_smash : public SpellScriptLoader
@@ -1191,8 +1227,8 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_vigilance();
     new spell_warr_vigilance_trigger();
 	new spell_warr_rallying_cry();
-	new spell_warr_heroic_leap();
-	new spell_warr_heroic_leap_dummy();
+	//new spell_warr_heroic_leap();
+	//new spell_warr_heroic_leap_damage();
 	new spell_warr_colossus_smash();
 	new spell_warr_heroic_throw();
 	new spell_warr_wild_strike();

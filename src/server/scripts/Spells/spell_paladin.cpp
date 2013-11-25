@@ -63,6 +63,13 @@ enum PaladinSpells
 
     SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS          = 25742,
 
+	SPELL_PALADIN_WORD_OF_GLORY                  = 85673,
+    SPELL_PALADIN_WORD_OF_GLORY_HEAL             = 130551,
+    SPELL_PALADIN_GLYPH_OF_WORD_OF_GLORY         = 54936,
+    SPELL_PALADIN_GLYPH_OF_WORD_OF_GLORY_DAMAGE  = 115522,
+	PALADIN_ITEM_PVP_HOLY_4P_BONUS               = 131665,
+	SPELL_PALADIN_DIVINE_PURPOSE                 = 90174,
+
     SPELL_GENERIC_ARENA_DAMPENING                = 74410,
     SPELL_GENERIC_BATTLEGROUND_DAMPENING         = 74411,
 	SPELL_EXORCISM								 = 879,
@@ -1101,93 +1108,70 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (85673, 'spel
 
 */
 
+// Word of Glory - 85673
 class spell_pal_word_of_glory : public SpellScriptLoader
 {
-public:
-    spell_pal_word_of_glory() : SpellScriptLoader("spell_pal_word_of_glory") { }
+    public:
+        spell_pal_word_of_glory() : SpellScriptLoader("spell_pal_word_of_glory") { }
 
-    class spell_pal_word_of_glory_heal_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_pal_word_of_glory_heal_SpellScript)
-
-        int32 totalheal;
-		int32 holyStack;
-
-        bool Load()
+        class spell_pal_word_of_glory_SpellScript : public SpellScript
         {
-            if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
-                return false;
+            PrepareSpellScript(spell_pal_word_of_glory_SpellScript);
 
-			holyStack = 0;
-
-            return true;
-        }
-
-        void HandleBeforeCast()
-        {
-			if (Unit* caster = GetCaster())
-				holyStack = caster->GetPower(POWER_HOLY_POWER);
-        }
-
-        void ChangeHeal(SpellEffIndex /*effIndex*/)
-        {
-            Unit* caster = GetCaster();
-            Unit* target = GetHitUnit();
-
-			int32 ap = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.198;
-			int32 sp = caster->ToPlayer()->GetBaseSpellPowerBonus() * 0.209;
-			int32 stack = caster->HasAura(SPELL_PALADIN_DIVINE_PURPOSE_PROC) ? 3 : caster->GetPower(POWER_HOLY_POWER);
-
-            if (!target)
-                return;
-
-			totalheal = (GetHitHeal() + ap + sp) * stack;
-
-            SetHitHeal(totalheal);
-        }
-
-        void Register()
-        {
-			BeforeCast += SpellCastFn(spell_pal_word_of_glory_heal_SpellScript::HandleBeforeCast);
-            OnEffectHitTarget += SpellEffectFn(spell_pal_word_of_glory_heal_SpellScript::ChangeHeal, EFFECT_0, SPELL_EFFECT_HEAL);
-        }
-    };
-
-    class spell_pal_word_of_glory_heal_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_pal_word_of_glory_heal_AuraScript)
-
-        bool Load()
-        {
-            if (!GetCaster() || GetCaster()->GetTypeId() != TYPEID_PLAYER)
-                return false;
-            return true;
-        }
-
-        void CalculateOvertime(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
-        {
-            if (AuraEffect const* longWord = GetCaster()->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 4127, 1))
+            bool Validate()
             {
-                canBeRecalculated = true;
-                amount = ((GetSpellInfo()->Effects[EFFECT_0].CalcValue() * longWord->GetAmount()) / 100) / 3;
+                if (!sSpellMgr->GetSpellInfo(SPELL_PALADIN_WORD_OF_GLORY))
+                    return false;
+                return true;
             }
-        }
 
-        void Register()
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (Unit* unitTarget = GetHitUnit())
+                    {
+                        if ((unitTarget->GetTypeId() != TYPEID_PLAYER && !unitTarget->isPet()) || unitTarget->IsHostileTo(_player))
+                            unitTarget = _player;
+
+                        int32 holyPower = _player->GetPower(POWER_HOLY_POWER);
+
+                        if (holyPower > 2)
+                            holyPower = 2;
+
+                        _player->CastSpell(unitTarget, SPELL_PALADIN_WORD_OF_GLORY_HEAL, true);
+
+                        if (_player->HasAura(SPELL_PALADIN_GLYPH_OF_WORD_OF_GLORY))
+                        {
+                            Aura* aura = _player->AddAura(SPELL_PALADIN_GLYPH_OF_WORD_OF_GLORY_DAMAGE, _player);
+
+                            if (aura)
+                            {
+                                aura->GetEffect(0)->ChangeAmount(aura->GetEffect(0)->GetAmount() * (holyPower + 1));
+                                aura->SetNeedClientUpdateForTargets();
+                            }
+                        }
+
+                        if (!_player->HasAura(SPELL_PALADIN_DIVINE_PURPOSE))
+                            _player->ModifyPower(POWER_HOLY_POWER, -holyPower);
+
+                        // Item - Paladin PvP Set Holy 4P Bonus
+                        if (_player->HasAura(PALADIN_ITEM_PVP_HOLY_4P_BONUS) && holyPower == 2)
+                            _player->ModifyPower(POWER_HOLY_POWER, 1);
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_pal_word_of_glory_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
         {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_word_of_glory_heal_AuraScript::CalculateOvertime, EFFECT_1, SPELL_AURA_PERIODIC_HEAL);
+            return new spell_pal_word_of_glory_SpellScript();
         }
-    };
-
-    AuraScript* GetAuraScript() const
-    {
-        return new spell_pal_word_of_glory_heal_AuraScript();
-    }
-
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_pal_word_of_glory_heal_SpellScript();
-    }
 };
 
 void AddSC_paladin_spell_scripts()

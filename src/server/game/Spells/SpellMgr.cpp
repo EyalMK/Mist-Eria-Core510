@@ -3758,6 +3758,9 @@ void SpellMgr::LoadSpellInfoCorrections()
 			case 132627:
 			case 53141:
 			case 44089:
+			case 88339:
+			case 88341:
+			case 49363:
 				spellInfo->Effects[0].Effect = SPELL_EFFECT_TELEPORT_UNITS;
 				spellInfo->Effects[0].TargetA = TARGET_DEST_DB;
 				break;

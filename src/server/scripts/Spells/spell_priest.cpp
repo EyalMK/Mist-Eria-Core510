@@ -51,6 +51,7 @@ enum PriestSpells
     SPELL_PRIEST_T9_HEALING_2P                      = 67201,
     SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL              = 64085,
 	SPELL_PRIEST_RENEW                              = 139,
+	SPELL_PRIEST_VOID_SHIFT                         = 108968,
 };
 
 enum PriestSpellIcons
@@ -853,6 +854,79 @@ public:
     }
 };
 
+/*
+
+MUST APPLY THIS TO DATABASE :
+
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (108968, 'spell_pri_void_shift');
+
+*/
+
+// Void Shift - 108968
+class spell_pri_void_shift : public SpellScriptLoader
+{
+    public:
+        spell_pri_void_shift() : SpellScriptLoader("spell_pri_void_shift") { }
+
+        class spell_pri_void_shift_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pri_void_shift_SpellScript);
+
+            bool Validate(SpellInfo const* /*spellEntry*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_PRIEST_VOID_SHIFT))
+                    return false;
+                return true;
+            }
+
+            SpellCastResult CheckTarget()
+            {
+                if (GetExplTargetUnit())
+                    if (GetExplTargetUnit()->GetTypeId() != TYPEID_PLAYER)
+                        return SPELL_FAILED_BAD_TARGETS;
+
+                return SPELL_CAST_OK;
+            }
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        float playerPct;
+                        float targetPct;
+
+                        playerPct = _player->GetHealthPct();
+                        targetPct = target->GetHealthPct();
+
+                        if (playerPct < 25.0f)
+                            playerPct = 25.0f;
+                        if (targetPct < 25.0f)
+                            targetPct = 25.0f;
+
+                        playerPct /= 100.0f;
+                        targetPct /= 100.0f;
+
+                        _player->SetHealth(_player->GetMaxHealth() * targetPct);
+                        target->SetHealth(target->GetMaxHealth() * playerPct);
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnCheckCast += SpellCheckCastFn(spell_pri_void_shift_SpellScript::CheckTarget);
+                OnEffectHitTarget += SpellEffectFn(spell_pri_void_shift_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pri_void_shift_SpellScript;
+        }
+};
+
 void AddSC_priest_spell_scripts()
 {
     new spell_pri_divine_aegis();
@@ -873,4 +947,5 @@ void AddSC_priest_spell_scripts()
     new spell_pri_shadowform();
     new spell_pri_vampiric_touch();
 	new spell_pri_chakra_serenity_proc();
+	new spell_pri_void_shift();
 }
