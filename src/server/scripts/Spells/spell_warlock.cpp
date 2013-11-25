@@ -1122,5 +1122,5 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_siphon_life();
     new spell_warl_soulshatter();
     new spell_warl_unstable_affliction();
-	new spell_warl_kil_jaedens_cunning();
+	//new spell_warl_kil_jaedens_cunning();
 }
