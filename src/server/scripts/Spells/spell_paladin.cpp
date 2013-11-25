@@ -1143,7 +1143,7 @@ class spell_pal_word_of_glory : public SpellScriptLoader
 
                         if (_player->HasAura(SPELL_PALADIN_GLYPH_OF_WORD_OF_GLORY))
                         {
-                            AuraPtr aura = _player->AddAura(SPELL_PALADIN_GLYPH_OF_WORD_OF_GLORY_DAMAGE, _player);
+                            Aura* aura = _player->AddAura(SPELL_PALADIN_GLYPH_OF_WORD_OF_GLORY_DAMAGE, _player);
 
                             if (aura)
                             {
