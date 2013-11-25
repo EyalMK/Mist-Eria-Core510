@@ -62,8 +62,123 @@ void BattlegroundTK::PostUpdateImpl(uint32 diff)
             ++_minutesElapsed;
             UpdateWorldState(BG_TK_STATE_TIMER, 25 - _minutesElapsed);
         }
-		
+
+		CalculatePoints(diff);
     }
+}
+
+void BattlegroundTK::CalculatePoints(uint32 diff)
+{
+	int32 tickTimer = 5000;
+	
+	if (tickTimer < 0)
+	{
+		for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+			{
+				if (player->GetTeam() == TEAM_ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
+					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
+						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
+						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
+						player->HasAura(BG_TK_AURA_ORB_ORANGE))
+						UpdateScore(TEAM_ALLIANCE, 250);
+
+				if (player->GetTeam() == TEAM_HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
+					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
+						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
+						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
+						player->HasAura(BG_TK_AURA_ORB_ORANGE))
+						UpdateScore(TEAM_HORDE, 250);
+
+				if (player->GetTeam() == TEAM_ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 200.0f)
+					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
+						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
+						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
+						player->HasAura(BG_TK_AURA_ORB_ORANGE))
+						UpdateScore(TEAM_ALLIANCE, 50);
+
+				if (player->GetTeam() == TEAM_HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 200.0f)
+					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
+						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
+						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
+						player->HasAura(BG_TK_AURA_ORB_ORANGE))
+						UpdateScore(TEAM_HORDE, 50);
+
+				if (player->GetTeam() == TEAM_ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 200.0f)
+					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
+						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
+						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
+						player->HasAura(BG_TK_AURA_ORB_ORANGE))
+						UpdateScore(TEAM_ALLIANCE, 10);
+
+				if (player->GetTeam() == TEAM_HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 200.0f)
+					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
+						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
+						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
+						player->HasAura(BG_TK_AURA_ORB_ORANGE))
+						UpdateScore(TEAM_HORDE, 10);
+
+				tickTimer = 5000;
+			} else tickTimer -= diff;
+		}
+}
+
+void BattlegroundTK::Reset()
+{
+    Battleground::Reset();
+
+	secondTimer0 = 1000;
+	secondTimer1 = 1000;
+	secondTimer2 = 1000;
+	secondTimer3 = 1000;
+	auraTimer0 = 15000;
+	auraTimer1 = 15000;
+	auraTimer2 = 15000;
+	auraTimer3 = 15000;
+	auraCounter0 = 0;
+	auraCounter1 = 0;
+	auraCounter2 = 0;
+	auraCounter3 = 0;
+    m_orbOwners[0]     = 0;
+    m_orbOwners[1]     = 0;
+	m_orbOwners[2]     = 0;
+    m_orbOwners[3]     = 0;
+	m_orbTeam[0]     = 2;
+    m_orbTeam[1]     = 2;
+	m_orbTeam[2]     = 2;
+    m_orbTeam[3]     = 2;
+	_orbZone[0]      = 0;
+	_orbZone[1]      = 0;
+	_orbZone[2]      = 0;
+	_orbZone[3]      = 0;
+
+    _orbState[0]        = BG_TK_ORB_STATE_ON_BASE;
+    _orbState[1]        = BG_TK_ORB_STATE_ON_BASE;
+	_orbState[2]        = BG_TK_ORB_STATE_ON_BASE;
+    _orbState[3]        = BG_TK_ORB_STATE_ON_BASE;
+    m_TeamScores[TEAM_ALLIANCE]      = 0;
+    m_TeamScores[TEAM_HORDE]         = 0;
+
+    if (sBattlegroundMgr->IsBGWeekend(GetTypeID()))
+    {
+        m_ReputationCapture = 45;
+        m_HonorWinKills = 3;
+        m_HonorEndKills = 4;
+    }
+    else
+    {
+        m_ReputationCapture = 35;
+        m_HonorWinKills = 1;
+        m_HonorEndKills = 2;
+    }
+
+    m_IsInformedNearVictory[0] = false;
+	m_IsInformedNearVictory[1] = false;
+
+	GetOrbState(BG_TK_OBJECT_ORB_BLUE) == BG_TK_ORB_STATE_ON_BASE;
+	GetOrbState(BG_TK_OBJECT_ORB_PURPLE) == BG_TK_ORB_STATE_ON_BASE;
+	GetOrbState(BG_TK_OBJECT_ORB_GREEN) == BG_TK_ORB_STATE_ON_BASE;
+	GetOrbState(BG_TK_OBJECT_ORB_ORANGE) == BG_TK_ORB_STATE_ON_BASE;
 }
 
 void BattlegroundTK::StartingEventCloseDoors()
@@ -219,13 +334,21 @@ void BattlegroundTK::EventPlayerClickedOnOrb(Player* Source, GameObject* target_
     int32 message_id = 0;
     ChatMsg type = CHAT_MSG_BG_SYSTEM_NEUTRAL;
 
-	// udapte orb blue picked up
+	// Udapte orb blue picked up
     if (GetOrbState(BG_TK_OBJECT_ORB_BLUE) == BG_TK_ORB_STATE_ON_BASE
         && BgObjects[BG_TK_OBJECT_ORB_BLUE] == target_obj->GetGUID())
     {
         message_id = LANG_BG_TK_PICKEDUP_ORB_BLUE;
-        type = CHAT_MSG_BG_SYSTEM_HORDE;
-        PlaySoundToAll(BG_TK_SOUND_ALLIANCE_ORB_PICKED_UP);
+		if (Source->GetTeam() == ALLIANCE)
+		{
+			type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
+			PlaySoundToAll(BG_TK_SOUND_ALLIANCE_ORB_PICKED_UP);
+		}
+		if (Source->GetTeam() ==  HORDE)
+		{
+			type = CHAT_MSG_BG_SYSTEM_HORDE;
+			PlaySoundToAll(BG_TK_SOUND_HORDE_ORB_PICKED_UP);
+		}
         SpawnBGObject(BG_TK_OBJECT_ORB_BLUE, RESPAWN_ONE_DAY);
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_BLUE);
         _orbState[BG_TK_OBJECT_ORB_BLUE] = BG_TK_ORB_STATE_ON_PLAYER;
@@ -233,51 +356,71 @@ void BattlegroundTK::EventPlayerClickedOnOrb(Player* Source, GameObject* target_
 		auraCounter0 = 0;
     }
 
-    // udapte orb purple picked up
+    // Udapte orb purple picked up
     if (GetOrbState(BG_TK_OBJECT_ORB_PURPLE) == BG_TK_ORB_STATE_ON_BASE
         && BgObjects[BG_TK_OBJECT_ORB_PURPLE] == target_obj->GetGUID())
     {
         message_id = LANG_BG_TK_PICKEDUP_ORB_PURPLE;
-        type = CHAT_MSG_BG_SYSTEM_HORDE;
-        PlaySoundToAll(BG_TK_SOUND_ALLIANCE_ORB_PICKED_UP);
+        if (Source->GetTeam() == ALLIANCE)
+		{
+			type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
+			PlaySoundToAll(BG_TK_SOUND_ALLIANCE_ORB_PICKED_UP);
+		}
+		if (Source->GetTeam() ==  HORDE)
+		{
+			type = CHAT_MSG_BG_SYSTEM_HORDE;
+			PlaySoundToAll(BG_TK_SOUND_HORDE_ORB_PICKED_UP);
+		}
         SpawnBGObject(BG_TK_OBJECT_ORB_PURPLE, RESPAWN_ONE_DAY);
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_PURPLE);
         _orbState[BG_TK_OBJECT_ORB_PURPLE] = BG_TK_ORB_STATE_ON_PLAYER;
         Source->CastSpell(Source, BG_TK_AURA_ORB_PURPLE, true);
 		auraCounter1 = 0;
     }
-        //called in HandleGameObjectUseOpcode:
-        //target_obj->Delete();
 
+	// Udapte orb green picked up
 	if (GetOrbState(BG_TK_OBJECT_ORB_GREEN) == BG_TK_ORB_STATE_ON_BASE
         && BgObjects[BG_TK_OBJECT_ORB_GREEN] == target_obj->GetGUID())
     {
         message_id = LANG_BG_TK_PICKEDUP_ORB_GREEN;
-        type = CHAT_MSG_BG_SYSTEM_HORDE;
-        PlaySoundToAll(BG_TK_SOUND_ALLIANCE_ORB_PICKED_UP);
+        if (Source->GetTeam() == ALLIANCE)
+		{
+			type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
+			PlaySoundToAll(BG_TK_SOUND_ALLIANCE_ORB_PICKED_UP);
+		}
+		if (Source->GetTeam() ==  HORDE)
+		{
+			type = CHAT_MSG_BG_SYSTEM_HORDE;
+			PlaySoundToAll(BG_TK_SOUND_HORDE_ORB_PICKED_UP);
+		}
         SpawnBGObject(BG_TK_OBJECT_ORB_GREEN, RESPAWN_ONE_DAY);
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_GREEN);
         _orbState[BG_TK_OBJECT_ORB_GREEN] = BG_TK_ORB_STATE_ON_PLAYER;
         Source->CastSpell(Source, BG_TK_AURA_ORB_GREEN, true);
 		auraCounter2 = 0;
     }
-        //called in HandleGameObjectUseOpcode:
-        //target_obj->Delete();
 
+	// Udapte orb orange picked up
 	if (GetOrbState(BG_TK_OBJECT_ORB_ORANGE) == BG_TK_ORB_STATE_ON_BASE
         && BgObjects[BG_TK_OBJECT_ORB_ORANGE] == target_obj->GetGUID())
     {
         message_id = LANG_BG_TK_PICKEDUP_ORB_ORANGE;
-        type = CHAT_MSG_BG_SYSTEM_HORDE;
-        PlaySoundToAll(BG_TK_SOUND_ALLIANCE_ORB_PICKED_UP);
+        if (Source->GetTeam() == ALLIANCE)
+		{
+			type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
+			PlaySoundToAll(BG_TK_SOUND_ALLIANCE_ORB_PICKED_UP);
+		}
+		if (Source->GetTeam() ==  HORDE)
+		{
+			type = CHAT_MSG_BG_SYSTEM_HORDE;
+			PlaySoundToAll(BG_TK_SOUND_HORDE_ORB_PICKED_UP);
+		}
         SpawnBGObject(BG_TK_OBJECT_ORB_ORANGE, RESPAWN_ONE_DAY);
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_ORANGE);
         _orbState[BG_TK_OBJECT_ORB_ORANGE] = BG_TK_ORB_STATE_ON_PLAYER;
         Source->CastSpell(Source, BG_TK_AURA_ORB_ORANGE, true);
 		auraCounter3 = 0;
     }
-        //called in HandleGameObjectUseOpcode:
-        //target_obj->Delete();
 
     if (!message_id)
         return;
@@ -368,6 +511,19 @@ void BattlegroundTK::UpdateScore(uint16 team, int16 points)
     }
 }
 
+WorldSafeLocsEntry const* BattlegroundTK::GetClosestGraveYard(Player* player)
+{
+	if (player->GetTeam() == ALLIANCE)
+	{
+		return sWorldSafeLocsStore.LookupEntry(BG_TK_GraveyardIds[0]);
+	}
+
+	else
+	{
+		return sWorldSafeLocsStore.LookupEntry(BG_TK_GraveyardIds[1]);
+	}
+}
+
 bool BattlegroundTK::SetupBattleground()
 {
     // Orbs
@@ -375,25 +531,25 @@ bool BattlegroundTK::SetupBattleground()
         || !AddObject(BG_TK_OBJECT_ORB_PURPLE, BG_OBJECT_TK_ORB_PURPLE, 1850.244995f, 1416.825195f, 10.662804f, 0.0f, 0, 0, 0.008726535f, 0.9999619f, RESPAWN_IMMEDIATELY)
 		|| !AddObject(BG_TK_OBJECT_ORB_GREEN, BG_OBJECT_TK_ORB_GREEN, 1716.775635f, 1416.752686f, 10.678053f, 0.0f, 0, 0, 0.008726535f, 0.9999619f, RESPAWN_IMMEDIATELY)
 		|| !AddObject(BG_TK_OBJECT_ORB_ORANGE, BG_OBJECT_TK_ORB_ORANGE, 1850.234375f, 1250.272827f, 10.689357f, 0.0f, 0, 0, 0.008726535f, 0.9999619f, RESPAWN_IMMEDIATELY)
-      // horde gate
+        // Horde gate
         || !AddObject(BG_TK_OBJECT_DOOR_H, BG_OBJECT_DOOR_TK_H, 1780.151733f, 1565.395874f, 22.469021f, 4.7027f, 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
-       // alliance gate
-        || !AddObject(BG_TK_OBJECT_DOOR_A, BG_OBJECT_DOOR_TK_A, 1783.735107f, 1104.960205f, 19.374258f, 1.59667f, 0.0f, 0.0f, 0.71615f, 0.697947f, RESPAWN_IMMEDIATELY)
+        // Alliance gate
+        || !AddObject(BG_TK_OBJECT_DOOR_A, BG_OBJECT_DOOR_TK_A, 1783.735107f, 1104.960205f, 19.374258f, 1.626256f, 0.0f, 0.0f, 0.71615f, 0.697947f, RESPAWN_IMMEDIATELY)
 		)
     {
         sLog->outError(LOG_FILTER_SQL, "BattleGroundTK: Failed to spawn some object Battleground not created!");
         return false;
     }
 
-    WorldSafeLocsEntry const* sg = sWorldSafeLocsStore.LookupEntry(TK_GRAVEYARD_MAIN_ALLIANCE);
-    if (!sg || !AddSpiritGuide(TK_SPIRIT_MAIN_ALLIANCE, sg->x, sg->y, sg->z, 3.124139f, ALLIANCE))
+    WorldSafeLocsEntry const* sg = sWorldSafeLocsStore.LookupEntry(BG_TK_GraveyardIds[0]); // Alliance
+    if (!sg || !AddSpiritGuide(TK_SPIRIT_MAIN_ALLIANCE, sg->x, sg->y, sg->z, 2.498876f, ALLIANCE))
     {
         sLog->outError(LOG_FILTER_SQL, "BattleGroundTK: Failed to spawn Alliance spirit guide! Battleground not created!");
         return false;
     }
 
-    sg = sWorldSafeLocsStore.LookupEntry(TK_GRAVEYARD_MAIN_HORDE);
-    if (!sg || !AddSpiritGuide(TK_SPIRIT_MAIN_HORDE, sg->x, sg->y, sg->z, 3.193953f, HORDE))
+    sg = sWorldSafeLocsStore.LookupEntry(BG_TK_GraveyardIds[1]); // Horde
+    if (!sg || !AddSpiritGuide(TK_SPIRIT_MAIN_HORDE, sg->x, sg->y, sg->z, 5.936957f, HORDE))
     {
         sLog->outError(LOG_FILTER_SQL, "BatlteGroundTK: Failed to spawn Horde spirit guide! Battleground not created!");
         return false;
@@ -402,59 +558,6 @@ bool BattlegroundTK::SetupBattleground()
     sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattleGroundTK: BG objects and spirit guides spawned");
 
     return true;
-}
-
-void BattlegroundTK::Reset()
-{
-    Battleground::Reset();
-
-	secondTimer0 = 1000;
-	secondTimer1 = 1000;
-	secondTimer2 = 1000;
-	secondTimer3 = 1000;
-	auraTimer0 = 15000;
-	auraTimer1 = 15000;
-	auraTimer2 = 15000;
-	auraTimer3 = 15000;
-	auraCounter0 = 0;
-	auraCounter1 = 0;
-	auraCounter2 = 0;
-	auraCounter3 = 0;
-    m_orbOwners[0]     = 0;
-    m_orbOwners[1]     = 0;
-	m_orbOwners[2]     = 0;
-    m_orbOwners[3]     = 0;
-	m_orbTeam[0]     = 2;
-    m_orbTeam[1]     = 2;
-	m_orbTeam[2]     = 2;
-    m_orbTeam[3]     = 2;
-	_orbZone[0]      = 0;
-	_orbZone[1]      = 0;
-	_orbZone[2]      = 0;
-	_orbZone[3]      = 0;
-
-    _orbState[0]        = BG_TK_ORB_STATE_ON_BASE;
-    _orbState[1]        = BG_TK_ORB_STATE_ON_BASE;
-	_orbState[2]        = BG_TK_ORB_STATE_ON_BASE;
-    _orbState[3]        = BG_TK_ORB_STATE_ON_BASE;
-    m_TeamScores[TEAM_ALLIANCE]      = 0;
-    m_TeamScores[TEAM_HORDE]         = 0;
-
-    if (sBattlegroundMgr->IsBGWeekend(GetTypeID()))
-    {
-        m_ReputationCapture = 45;
-        m_HonorWinKills = 3;
-        m_HonorEndKills = 4;
-    }
-    else
-    {
-        m_ReputationCapture = 35;
-        m_HonorWinKills = 1;
-        m_HonorEndKills = 2;
-    }
-
-    m_IsInformedNearVictory[0] = false;
-	m_IsInformedNearVictory[1] = false;
 }
 
 void BattlegroundTK::EndBattleground(uint32 winner)

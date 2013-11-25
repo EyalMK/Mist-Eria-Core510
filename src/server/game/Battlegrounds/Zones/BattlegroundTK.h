@@ -40,7 +40,6 @@ enum BG_TK_WorldStates
     BG_TK_RESOURCES_WARNING			= 1955,
     BG_TK_ORB_UNK_ALLIANCE			= 1545,
     BG_TK_ORB_UNK_HORDE				= 1546,
-//    ORB_UNK						= 1547,
     BG_TK_ORB_CAPTURES_ALLIANCE		= 1581,
     BG_TK_ORB_CAPTURES_HORDE		= 1582,
     BG_TK_ORB_CAPTURES_MAX			= 1601,
@@ -69,12 +68,6 @@ enum BG_TK_CreatureTypes
     BG_CREATURES_MAX_TK      = 2
 };
 
-enum BG_TK_Graveyards
-{
-    TK_GRAVEYARD_MAIN_ALLIANCE     = 3552,
-    TK_GRAVEYARD_MAIN_HORDE        = 3553
-};
-
 enum BG_TK_SpellId
 {
 	BG_TK_AURA_ORB_BLUE = 121164,
@@ -93,17 +86,7 @@ enum BG_TK_GameObjectId
 	BG_OBJECT_TK_ORB_ORANGE = 400423
 };
 
-const float BG_TK_ZoneLimit[8][4] =
-{
-    {0.0f, 0.0f, 0.0f, 0.0f},                   // 1 coin du rectangle limite zone 1 (extérieur) et 2 (pseudo-intérieur)
-    {0.0f, 0.0f, 0.0f, 0.0f},                    // 2 coin du rectangle limite zone 1 (extérieur) et 2 (pseudo-intérieur)
-    {0.0f, 0.0f, 0.0f, 0.0f},                     // 3 coin du rectangle limite zone 1 (extérieur) et 2 (pseudo-intérieur)
-    {0.0f, 0.0f, 0.0f, 0.0f},                     // 4 coin du rectangle limite zone 1 (extérieur) et 2 (pseudo-intérieur)
-    {0.0f, 0.0f, 0.0f, 0.0f},                    // 1 coin du rectangle limite zone 2 (pseudo-intérieur) et 3 (intérieur)
-    {0.0f, 0.0f, 0.0f, 0.0f},                   // 2 coin du rectangle limite zone 2 (pseudo-intérieur) et 3 (intérieur)
-    {0.0f, 0.0f, 0.0f, 0.0f},                     // 3 coin du rectangle limite zone 2 (pseudo-intérieur) et 3 (intérieur)
-	{0.0f, 0.0f, 0.0f, 0.0f}                    // 4 coin du rectangle limite zone 2 (pseudo-intérieur) et 3 (intérieur)
-};
+const uint32 BG_TK_GraveyardIds[2] = {3552, 3553};
 
 class BattlegroundTKScore : public BattlegroundScore
 {
@@ -138,9 +121,10 @@ class BattlegroundTK : public Battleground
         void Reset();
 		void Udapte(uint32 diff);
         void EndBattleground(uint32 winner);
+		WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
         void GetZonePlayerWithOrb(Player* player);
 
-		/* BG Orbs */
+		/* BG Orbs*/
         uint64 GetOrbPickerGUID(int32 team) const
         {
             if (team == TEAM_ALLIANCE || team == TEAM_HORDE)
@@ -197,6 +181,7 @@ class BattlegroundTK : public Battleground
 		uint32 auraCounter3;
 
         void PostUpdateImpl(uint32 diff);
+		void CalculatePoints(uint32 diff);
 };
 
 #endif
