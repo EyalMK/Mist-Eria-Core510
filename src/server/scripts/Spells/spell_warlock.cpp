@@ -1063,6 +1063,7 @@ class spell_warl_unstable_affliction : public SpellScriptLoader
 };
 
 // Kil'Jaeden's Cunning (passive with cooldown) - 119048
+/*
 class spell_warl_kil_jaedens_cunning : public SpellScriptLoader
 {
     public:
@@ -1072,13 +1073,13 @@ class spell_warl_kil_jaedens_cunning : public SpellScriptLoader
         {
             PrepareAuraScript(spell_warl_kil_jaedens_cunning_AuraScript);
 
-            void HandleApply(constAuraEffectPtr /*aurEff*/, AuraEffectHandleModes mode)
+            void HandleApply(constAuraEffectPtr /*aurEff, AuraEffectHandleModes mode)
             {
                 if (GetCaster())
                     GetCaster()->RemoveAura(WARLOCK_KIL_JAEDENS_CUNNING_PASSIVE);
             }
 
-            void HandleRemove(constAuraEffectPtr /*aurEff*/, AuraEffectHandleModes mode)
+            void HandleRemove(constAuraEffectPtr /*aurEff, AuraEffectHandleModes mode)
             {
                 if (GetCaster())
                     GetCaster()->CastSpell(GetCaster(), WARLOCK_KIL_JAEDENS_CUNNING_PASSIVE, true);
@@ -1096,6 +1097,7 @@ class spell_warl_kil_jaedens_cunning : public SpellScriptLoader
             return new spell_warl_kil_jaedens_cunning_AuraScript();
         }
 };
+*/
 
 void AddSC_warlock_spell_scripts()
 {
