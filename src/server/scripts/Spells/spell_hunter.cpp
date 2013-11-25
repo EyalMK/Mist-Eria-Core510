@@ -54,6 +54,10 @@ enum HunterSpells
 	SPELL_HUNTER_STEADY_SHOT_FOCUS                  = 77443,
 	SPELL_HUNTER_COBRA_FOCUS                        = 91954,
     SPELL_DRAENEI_GIFT_OF_THE_NAARU                 = 59543,
+	HUNTER_SPELL_POSTHASTE                          = 109215,
+    HUNTER_SPELL_POSTHASTE_INCREASE_SPEED           = 118922,
+    HUNTER_SPELL_NARROW_ESCAPE                      = 109298,
+    HUNTER_SPELL_NARROW_ESCAPE_RETS                 = 128405,
 };
 
 // 13161 - Aspect of the Beast
@@ -261,9 +265,36 @@ class spell_hun_disengage : public SpellScriptLoader
                 return SPELL_CAST_OK;
             }
 
+            void HandleAfterCast()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (_player->HasAura(HUNTER_SPELL_POSTHASTE))
+                    {
+                        _player->RemoveMovementImpairingAuras();
+                        _player->CastSpell(_player, HUNTER_SPELL_POSTHASTE_INCREASE_SPEED, true);
+                    }
+                    else if (_player->HasAura(HUNTER_SPELL_NARROW_ESCAPE))
+                    {
+                        std::list<Unit*> unitList;
+                        std::list<Unit*> retsList;
+
+                        _player->GetAttackableUnitListInRange(unitList, 8.0f);
+
+                        for (auto itr : unitList)
+                            if (_player->IsValidAttackTarget(itr))
+                                retsList.push_back(itr);
+
+                        for (auto itr : retsList)
+                            _player->CastSpell(itr, HUNTER_SPELL_NARROW_ESCAPE_RETS, true);
+                    }
+                }
+            }
+
             void Register()
             {
                 OnCheckCast += SpellCheckCastFn(spell_hun_disengage_SpellScript::CheckCast);
+                AfterCast += SpellCastFn(spell_hun_disengage_SpellScript::HandleAfterCast);
             }
         };
 
