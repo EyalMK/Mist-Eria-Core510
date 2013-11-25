@@ -1033,6 +1033,7 @@ class spell_hun_dire_beast : public SpellScriptLoader
 };
 
 // A Murder of Crows - 131894
+/*
 class spell_hun_a_murder_of_crows : public SpellScriptLoader
 {
     public:
@@ -1090,7 +1091,7 @@ class spell_hun_a_murder_of_crows : public SpellScriptLoader
         {
             return new spell_hun_a_murder_of_crows_AuraScript();
         }
-};
+};*/
 
 // Powershot - 109259
 class spell_hun_powershot : public SpellScriptLoader
@@ -1170,6 +1171,7 @@ class spell_hun_powershot : public SpellScriptLoader
 };
 
 // Glaive Toss (damage) - 120761 and 121414
+/*
 class spell_hun_glaive_toss_damage : public SpellScriptLoader
 {
     public:
@@ -1354,6 +1356,7 @@ class spell_hun_glaive_toss_missile : public SpellScriptLoader
             return new spell_hun_glaive_toss_missile_SpellScript();
         }
 };
+*/
 
 void AddSC_hunter_spell_scripts()
 {
@@ -1376,8 +1379,8 @@ void AddSC_hunter_spell_scripts()
 	new spell_hun_cobra_shot();
 	new spell_hun_steady_shot();
 	new spell_hun_dire_beast();
-    new spell_hun_a_murder_of_crows();
+    //new spell_hun_a_murder_of_crows();
 	new spell_hun_powershot();
-	new spell_hun_glaive_toss_damage();
-	new spell_hun_glaive_toss_missile();
+	//new spell_hun_glaive_toss_damage();
+	//new spell_hun_glaive_toss_missile();
 }
