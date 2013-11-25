@@ -51,6 +51,7 @@ enum PriestSpells
     SPELL_PRIEST_T9_HEALING_2P                      = 67201,
     SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL              = 64085,
 	SPELL_PRIEST_RENEW                              = 139,
+	SPELL_PRIEST_VOID_SHIFT                         = 108968,
 };
 
 enum PriestSpellIcons
@@ -873,7 +874,7 @@ class spell_pri_void_shift : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spellEntry*/)
             {
-                if (!sSpellMgr->GetSpellInfo(PRIEST_VOID_SHIFT))
+                if (!sSpellMgr->GetSpellInfo(SPELL_PRIEST_VOID_SHIFT))
                     return false;
                 return true;
             }
