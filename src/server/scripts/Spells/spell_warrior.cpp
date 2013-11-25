@@ -65,6 +65,7 @@ enum WarriorSpells
     SPELL_GEN_DAMAGE_REDUCTION_AURA                 = 68066,
 	WARRIOR_SPELL_HEROIC_LEAP_DAMAGE            = 52174,
 	WARRIOR_SPELL_HEROIC_LEAP_SPEED             = 133278,
+	WARRIOR_SPELL_ITEM_PVP_SET_4P_BONUS         = 133277,
 };
 
 enum WarriorSpellIcons
