@@ -288,6 +288,7 @@ class spell_hun_disengage : public SpellScriptLoader
                 return SPELL_CAST_OK;
             }
 
+			/*
             void HandleAfterCast()
             {
                 if (Player* _player = GetCaster()->ToPlayer())
@@ -313,11 +314,12 @@ class spell_hun_disengage : public SpellScriptLoader
                     }
                 }
             }
+			*/
 
             void Register()
             {
                 OnCheckCast += SpellCheckCastFn(spell_hun_disengage_SpellScript::CheckCast);
-                AfterCast += SpellCastFn(spell_hun_disengage_SpellScript::HandleAfterCast);
+                //AfterCast += SpellCastFn(spell_hun_disengage_SpellScript::HandleAfterCast);
             }
         };
 
@@ -1094,6 +1096,7 @@ class spell_hun_a_murder_of_crows : public SpellScriptLoader
 };*/
 
 // Powershot - 109259
+/*
 class spell_hun_powershot : public SpellScriptLoader
 {
     public:
@@ -1169,6 +1172,7 @@ class spell_hun_powershot : public SpellScriptLoader
             return new spell_hun_powershot_SpellScript();
         }
 };
+*/
 
 // Glaive Toss (damage) - 120761 and 121414
 /*
@@ -1380,7 +1384,7 @@ void AddSC_hunter_spell_scripts()
 	new spell_hun_steady_shot();
 	new spell_hun_dire_beast();
     //new spell_hun_a_murder_of_crows();
-	new spell_hun_powershot();
+	//new spell_hun_powershot();
 	//new spell_hun_glaive_toss_damage();
 	//new spell_hun_glaive_toss_missile();
 }
