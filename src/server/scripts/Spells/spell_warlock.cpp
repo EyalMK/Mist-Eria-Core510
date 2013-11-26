@@ -754,8 +754,7 @@ class spell_warl_health_funnel : public SpellScriptLoader
         }
 };
 
-// 1454 - Life Tap
-/// Updated 4.3.4
+// Life Tap - 1454
 class spell_warl_life_tap : public SpellScriptLoader
 {
     public:
@@ -765,72 +764,28 @@ class spell_warl_life_tap : public SpellScriptLoader
         {
             PrepareSpellScript(spell_warl_life_tap_SpellScript);
 
-            bool Load()
+            SpellCastResult CheckLife()
             {
-                return GetCaster()->GetTypeId() == TYPEID_PLAYER;
-            }
-
-            bool Validate(SpellInfo const* /*spellInfo*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_LIFE_TAP_ENERGIZE) || !sSpellMgr->GetSpellInfo(SPELL_WARLOCK_LIFE_TAP_ENERGIZE_2))
-                    return false;
-                return true;
-            }
-
-            void HandleEnergize(SpellEffIndex /*effIndex*/)
-            {
-                Player* caster = GetCaster()->ToPlayer();
-                if (Unit* target = GetHitUnit())
-                {
-                    int32 damage = caster->CountPctFromMaxHealth(GetSpellInfo()->Effects[EFFECT_2].CalcValue());
-                    int32 mana = CalculatePct(damage, GetSpellInfo()->Effects[EFFECT_1].CalcValue());
-
-                    // Shouldn't Appear in Combat Log
-                    target->ModifyHealth(-damage);
-
-                    SetHitDamage(mana);
-                }
-            }
-
-            void HandleDummy(SpellEffIndex /*effIndex*/)
-            {
-                Player* caster = GetCaster()->ToPlayer();
-                if (Unit* target = GetHitUnit())
-                {
-                    int32 damage = caster->CountPctFromMaxHealth(GetSpellInfo()->Effects[EFFECT_2].CalcValue());
-                    int32 mana = CalculatePct(damage, GetSpellInfo()->Effects[EFFECT_1].CalcValue());
-
-                    // Shouldn't Appear in Combat Log
-                    target->ModifyHealth(-damage);
-
-                    // Improved Life Tap mod
-                    if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_IMPROVED_LIFE_TAP, 0))
-                        AddPct(mana, aurEff->GetAmount());
-
-                    caster->CastCustomSpell(target, SPELL_WARLOCK_LIFE_TAP_ENERGIZE, &mana, NULL, NULL, false);
-
-                    // Mana Feed
-                    if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_MANA_FEED, 0))
-                    {
-                        int32 manaFeedVal = aurEff->GetAmount();
-                        ApplyPct(manaFeedVal, mana);
-                        caster->CastCustomSpell(caster, SPELL_WARLOCK_LIFE_TAP_ENERGIZE_2, &manaFeedVal, NULL, NULL, true, NULL);
-                    }
-                }
-            }
-
-            SpellCastResult CheckCast()
-            {
-                if (int32(GetCaster()->GetHealth()) > int32(GetCaster()->CountPctFromMaxHealth(GetSpellInfo()->Effects[EFFECT_2].CalcValue())))
+                if (GetCaster()->GetHealthPct() > 15.0f)
                     return SPELL_CAST_OK;
                 return SPELL_FAILED_FIZZLE;
             }
 
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    int32 healthCost = int32(_player->GetMaxHealth() * 0.15f);
+
+                    _player->SetHealth(_player->GetHealth() - healthCost);
+                    _player->EnergizeBySpell(_player, 1454, healthCost, POWER_MANA);
+                }
+            }
+
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_warl_life_tap_SpellScript::HandleEnergize, EFFECT_0, SPELL_EFFECT_ENERGIZE);
-                //OnEffectHitTarget += SpellEffectFn(spell_warl_life_tap_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
-                OnCheckCast += SpellCheckCastFn(spell_warl_life_tap_SpellScript::CheckCast);
+                OnCheckCast += SpellCheckCastFn(spell_warl_life_tap_SpellScript::CheckLife);
+                OnHit += SpellHitFn(spell_warl_life_tap_SpellScript::HandleOnHit);
             }
         };
 
