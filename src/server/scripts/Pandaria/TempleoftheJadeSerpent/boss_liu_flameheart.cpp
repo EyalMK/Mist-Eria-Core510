@@ -459,7 +459,7 @@ public:
 			me->DespawnOrUnsummon();
 		}
 
-		void EnterCombat()
+		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
 				events.ScheduleEvent(EVENT_JADE_FIRE, 15*IN_MILLISECONDS);

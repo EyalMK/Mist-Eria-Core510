@@ -1118,7 +1118,7 @@ class spell_pal_word_of_glory : public SpellScriptLoader
         {
             PrepareSpellScript(spell_pal_word_of_glory_SpellScript);
 
-            bool Validate()
+            bool Validate(SpellInfo const* /*spellInfo*/)
             {
                 if (!sSpellMgr->GetSpellInfo(SPELL_PALADIN_WORD_OF_GLORY))
                     return false;
