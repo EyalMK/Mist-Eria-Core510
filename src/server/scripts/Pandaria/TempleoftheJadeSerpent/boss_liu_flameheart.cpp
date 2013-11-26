@@ -31,7 +31,7 @@ enum Spells
 	/* Jade Serpent Wave */
 	SPELL_JADE_SERPENT_WAVE			= 107053,
 	SPELL_JADE_SERPENT_WAVE_VISUAL	= 107002,
-	SPELL_JADE_FIRE_SUMMON			= 107103
+	SPELL_SUMMON_JADE_FIRE			= 107103
 };
 
 enum Events
@@ -44,6 +44,7 @@ enum Events
 	EVENT_SERPENT_WAVE_MOVE			= 5,
 	EVENT_JADE_SERPENT_WAVE_MOVE	= 6,
 	EVENT_SUMMON_YU_LON				= 7,
+	EVENT_SUMMON_JADE_FIRE			= 8,
 
 	/* Yu'lon */
 	EVENT_JADE_FIRE					= 1,
@@ -52,8 +53,7 @@ enum Events
 	EVENT_SERPENT_WAVE				= 1,
 
 	/* Jade Serpent Wave */
-	EVENT_JADE_SERPENT_WAVE			= 1,
-	EVENT_JADE_FIRE_SUMMON	= 2
+	EVENT_JADE_SERPENT_WAVE			= 1
 };
 
 enum Texts
@@ -109,6 +109,7 @@ public:
 		bool intro;
 		bool thirdPhaseHome; // When Liu comes to the center of the "room" in the third phase
 		float x, y, z, o;
+		int32 maxJadeFires;
 		Creature* firstWave;
 		Creature* secondWave;
 		Creature* thirdWave;
@@ -130,13 +131,14 @@ public:
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-			me->CastSpell(me, SPELL_SHA_MASK);
-			me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
 			if (me->HasAura(SPELL_JADE_ESSENCE))
 				me->RemoveAurasDueToSpell(SPELL_JADE_ESSENCE, me->GetGUID());
 			if (me->HasAura(SPELL_MEDITATE))
 				me->RemoveAurasDueToSpell(SPELL_MEDITATE, me->GetGUID());
+
+			me->CastSpell(me, SPELL_SHA_MASK);
+			me->CastSpell(me, SPELL_SHA_CORRUPTION);
 		}
 
 		void JustDied(Unit *pWho)
@@ -169,6 +171,7 @@ public:
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, FAIL);
 				intro = false;
 				thirdPhaseHome = false;
+
 				me->CombatStop();
 				me->DeleteThreatList();
 				me->setActive(false);
@@ -179,10 +182,12 @@ public:
 				me->Relocate(929.684998f, -2560.610107f, 180.070007f, 4.410300f);
 				me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
 				me->SetFacingTo(1.250660f);
+
 				if (me->HasAura(SPELL_JADE_ESSENCE))
 					me->RemoveAurasDueToSpell(SPELL_JADE_ESSENCE, me->GetGUID());
 				if (me->HasAura(SPELL_MEDITATE))
 					me->RemoveAurasDueToSpell(SPELL_MEDITATE, me->GetGUID());
+
 				me->CastSpell(me, SPELL_SHA_MASK);
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
@@ -339,7 +344,7 @@ public:
 								if (fourthWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x, y - 10.0f, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
 									fourthWave->SetFacingToObject(fourthTracker);
 
-							events.ScheduleEvent(EVENT_SERPENT_WAVE_MOVE, 3*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
+							events.ScheduleEvent(EVENT_SERPENT_WAVE_MOVE, 2*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
 							events.ScheduleEvent(EVENT_SUMMON_SERPENT_WAVE, 12*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
 							break;
 						}
@@ -353,6 +358,7 @@ public:
 								thirdWave->GetMotionMaster()->MovePoint(0, x - 100.0f, y, z);
 							if (fourthWave)
 								fourthWave->GetMotionMaster()->MovePoint(0, x, y - 100.0f, z);
+
 							events.CancelEvent(EVENT_SERPENT_WAVE_MOVE);
 							break;
 
@@ -378,7 +384,7 @@ public:
 								if (fourthWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x, y - 10.0f, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
 									fourthWave->SetFacingToObject(fourthTracker);
 							
-							events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_MOVE, 3*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
+							events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE_MOVE, 2*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
 							events.ScheduleEvent(EVENT_SUMMON_JADE_SERPENT_WAVE, 12*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
 							break;
 						}
@@ -393,7 +399,71 @@ public:
 							if (fourthWave)
 								fourthWave->GetMotionMaster()->MovePoint(0, x, y - 100.0f, z);
 
+							maxJadeFires = 0;
+
+							events.ScheduleEvent(EVENT_SUMMON_JADE_FIRE, 0, 0, PHASE_LIU_JADE_SERPENT_DANCE);
 							events.CancelEvent(EVENT_JADE_SERPENT_WAVE_MOVE);
+							break;
+
+						case EVENT_SUMMON_JADE_FIRE:
+							if (firstWave && secondWave && thirdWave && fourthWave)
+							{
+								if (maxJadeFires == 0)
+								{
+									firstWave->CastSpell(x + 17.0f, y, z, SPELL_SUMMON_JADE_FIRE, true);
+									secondWave->CastSpell(x, y + 17.0f, z, SPELL_SUMMON_JADE_FIRE, true);
+									thirdWave->CastSpell(x - 17.0f, y, z, SPELL_SUMMON_JADE_FIRE, true);
+									fourthWave->CastSpell(x, y- 17.0f, z, SPELL_SUMMON_JADE_FIRE, true);
+									maxJadeFires++;
+
+									events.ScheduleEvent(EVENT_SUMMON_JADE_FIRE, 600, 0, PHASE_LIU_JADE_SERPENT_DANCE);
+								}
+
+								if (maxJadeFires == 1)
+								{
+									firstWave->CastSpell(x + 24.0f, y, z, SPELL_SUMMON_JADE_FIRE, true);
+									secondWave->CastSpell(x, y + 24.0f, z, SPELL_SUMMON_JADE_FIRE, true);
+									thirdWave->CastSpell(x - 24.0f, y, z, SPELL_SUMMON_JADE_FIRE, true);
+									fourthWave->CastSpell(x, y- 24.0f, z, SPELL_SUMMON_JADE_FIRE, true);
+									maxJadeFires++;
+
+									events.ScheduleEvent(EVENT_SUMMON_JADE_FIRE, 600, 0, PHASE_LIU_JADE_SERPENT_DANCE);
+								}
+
+								if (maxJadeFires == 2)
+								{
+									firstWave->CastSpell(x + 31.0f, y, z, SPELL_SUMMON_JADE_FIRE, true);
+									secondWave->CastSpell(x, y + 31.0f, z, SPELL_SUMMON_JADE_FIRE, true);
+									thirdWave->CastSpell(x - 31.0f, y, z, SPELL_SUMMON_JADE_FIRE, true);
+									fourthWave->CastSpell(x, y- 31.0f, z, SPELL_SUMMON_JADE_FIRE, true);
+									maxJadeFires++;
+
+									events.ScheduleEvent(EVENT_SUMMON_JADE_FIRE, 600, 0, PHASE_LIU_JADE_SERPENT_DANCE);
+								}
+
+								if (maxJadeFires == 3)
+								{
+									firstWave->CastSpell(x + 38.0f, y, z, SPELL_SUMMON_JADE_FIRE, true);
+									secondWave->CastSpell(x, y + 38.0f, z, SPELL_SUMMON_JADE_FIRE, true);
+									thirdWave->CastSpell(x - 38.0f, y, z, SPELL_SUMMON_JADE_FIRE, true);
+									fourthWave->CastSpell(x, y- 38.0f, z, SPELL_SUMMON_JADE_FIRE, true);
+									maxJadeFires++;
+
+									events.ScheduleEvent(EVENT_SUMMON_JADE_FIRE, 600, 0, PHASE_LIU_JADE_SERPENT_DANCE);
+								}
+
+								if (maxJadeFires == 4)
+								{
+									firstWave->CastSpell(x + 45.0f, y, z, SPELL_SUMMON_JADE_FIRE, true);
+									secondWave->CastSpell(x, y + 45.0f, z, SPELL_SUMMON_JADE_FIRE, true);
+									thirdWave->CastSpell(x - 45.0f, y, z, SPELL_SUMMON_JADE_FIRE, true);
+									fourthWave->CastSpell(x, y- 45.0f, z, SPELL_SUMMON_JADE_FIRE, true);
+									maxJadeFires++;
+								}
+
+								if (maxJadeFires >= 5)
+									events.CancelEvent(EVENT_SUMMON_JADE_FIRE);
+							}
 							break;
 
 						default:
@@ -611,24 +681,19 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
-		int32 maxJadeFires;
 
 		void Reset()
 		{
-			maxJadeFires = 0;
 			me->setActive(false);
 			me->CastSpell(me, SPELL_JADE_SERPENT_WAVE_VISUAL);
 			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 1*IN_MILLISECONDS);
-			events.ScheduleEvent(EVENT_JADE_FIRE_SUMMON, 3700);
 		}
 
 		void JustSummoned(Creature* summoned)
         {
-			maxJadeFires = 0;
 			me->setActive(false);
 			me->CastSpell(me, SPELL_JADE_SERPENT_WAVE_VISUAL);
 			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 1*IN_MILLISECONDS);
-			events.ScheduleEvent(EVENT_JADE_FIRE_SUMMON, 3700);
         }
 
 		void UpdateAI(uint32 diff)
@@ -641,18 +706,6 @@ public:
 				{
 					if (instance)
 					{
-						case EVENT_JADE_FIRE_SUMMON:
-						{
-							if (maxJadeFires <= 5)
-							{
-								me->CastSpell(me, SPELL_JADE_FIRE_SUMMON);
-								maxJadeFires++;
-							}
-
-							events.ScheduleEvent(EVENT_JADE_FIRE_SUMMON, 500);
-							break;
-						}
-
 						case EVENT_JADE_SERPENT_WAVE:
 							me->CastSpell(me, SPELL_JADE_SERPENT_WAVE);
 
