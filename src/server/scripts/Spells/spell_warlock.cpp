@@ -60,7 +60,23 @@ enum WarlockSpells
     SPELL_WARLOCK_UNSTABLE_AFFLICTION               = 30108,
     SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL        = 31117,
 	 WARLOCK_KIL_JAEDENS_CUNNING_PASSIVE     = 108507,
-	 WARLOCK_HARVEST_LIFE_HEAL               = 125314
+	 WARLOCK_HARVEST_LIFE_HEAL               = 125314,
+	 WARLOCK_SUPPLANT_DEMONIC_COMMAND        = 119904,
+	 WARLOCK_GRIMOIRE_OF_SACRIFICE           = 108503
+};
+
+enum WarlockMisc
+{
+	ENTRY_IMP								= 0,
+	ENTRY_VOIDWALKER						= 1,
+	ENTRY_SUCCUBUS							= 2,
+	ENTRY_FELHUNTER							= 3,
+	ENTRY_FELGUARD							= 4,
+
+	SPEC_WARLOCK_AFFLICTION					= 5,
+	SPEC_WARLOCK_DEMONOLOGY					= 6,
+	SPEC_WARLOCK_DESTRUCTION				= 7,
+	SPEC_NONE								= 8
 };
 
 enum WarlockSpellIcons
@@ -1131,6 +1147,165 @@ class spell_warl_harvest_life : public SpellScriptLoader
         }
 };
 
+// Grimoire of Sacrifice - 108503
+class spell_warl_grimoire_of_sacrifice : public SpellScriptLoader
+{
+    public:
+        spell_warl_grimoire_of_sacrifice() : SpellScriptLoader("spell_warl_grimoire_of_sacrifice") { }
+
+        class spell_warl_grimoire_of_sacrifice_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warl_grimoire_of_sacrifice_SpellScript);
+
+            void HandleAfterCast()
+            {
+                if (Player* player = GetCaster()->ToPlayer())
+                {
+                    if (Pet* pet = player->GetPet())
+                    {
+                        // Supplant Command Demon
+                        if (player->getLevel() >= 56)
+                        {
+                            int32 bp = 0;
+
+                            player->RemoveAura(WARLOCK_SUPPLANT_DEMONIC_COMMAND);
+
+                            switch (pet->GetEntry())
+                            {
+                                case ENTRY_IMP:
+                                    bp = 132411;// Single Magic
+                                    break;
+                                case ENTRY_VOIDWALKER:
+                                    bp = 132413;// Shadow Bulwark
+                                    break;
+                                case ENTRY_SUCCUBUS:
+                                    bp = 137706;// Whiplash
+                                    break;
+                                case ENTRY_FELHUNTER:
+                                    bp = 132409;// Spell Lock
+                                    break;
+                                case ENTRY_FELGUARD:
+                                    bp = 132410;// Pursuit
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            if (bp)
+                                player->CastCustomSpell(player, WARLOCK_SUPPLANT_DEMONIC_COMMAND, &bp, NULL, NULL, true);
+                        }
+                    }
+                }
+            }
+
+            void HandleOnHit()
+            {
+                if (Player* player = GetCaster()->ToPlayer())
+                {
+                    // EFFECT_0 : Instakill
+                    // EFFECT_1 : 2% health every 5s
+                    // EFFECT_2 : +50% DOT damage for Malefic Grasp, Drain Life and Drain Soul
+                    // EFFECT_3 : +30% damage for Shadow Bolt, Hand of Gul'Dan, Soul Fire, Wild Imps and Fel Flame
+                    // EFFECT_4 : +25% damage for Incinerate, Conflagrate, Chaos Bolt, Shadowburn and Fel Flame
+                    // EFFECT_5 : +50% damage for Fel Flame
+                    // EFFECT_6 : +20% Health if Soul Link talent is also chosen
+                    // EFFECT_7 : +50% on EFFECT_2 of Malefic Grasp
+                    // EFFECT_8 : +50% on EFFECT_4 and EFFECT_5 of Drain Soul -> Always set to 0
+                    // EFFECT_9 : Always set to 0
+                    // EFFECT_10 : Always set to 0
+                    if (Aura* grimoireOfSacrifice = player->GetAura(WARLOCK_GRIMOIRE_OF_SACRIFICE))
+                    {
+                        if (grimoireOfSacrifice->GetEffect(EFFECT_10))
+                            grimoireOfSacrifice->GetEffect(EFFECT_10)->SetAmount(0);
+                        if (grimoireOfSacrifice->GetEffect(EFFECT_9))
+                            grimoireOfSacrifice->GetEffect(EFFECT_9)->SetAmount(0);
+                        if (grimoireOfSacrifice->GetEffect(EFFECT_8))
+                            grimoireOfSacrifice->GetEffect(EFFECT_8)->SetAmount(0);
+
+                        switch (player->GetPrimaryTalentTree(player->GetActiveSpec()))
+                        {
+                            case SPEC_WARLOCK_AFFLICTION:
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_3))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_3)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_4))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_4)->SetAmount(0);
+                                break;
+                            case SPEC_WARLOCK_DEMONOLOGY:
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_2))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_2)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_4))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_4)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_5))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_5)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_7))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_7)->SetAmount(0);
+                                break;
+                            case SPEC_WARLOCK_DESTRUCTION:
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_2))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_2)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_3))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_3)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_5))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_5)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_7))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_7)->SetAmount(0);
+                                break;
+                            case SPEC_NONE:
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_2))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_2)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_3))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_3)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_4))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_4)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_5))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_5)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_7))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_7)->SetAmount(0);
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                AfterCast += SpellCastFn(spell_warl_grimoire_of_sacrifice_SpellScript::HandleAfterCast);
+                OnHit += SpellHitFn(spell_warl_grimoire_of_sacrifice_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warl_grimoire_of_sacrifice_SpellScript();
+        }
+
+        class spell_warl_grimoire_of_sacrifice_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warl_grimoire_of_sacrifice_AuraScript);
+
+            void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes mode)
+            {
+                if (!GetTarget())
+                    return;
+
+                if (Player* _player = GetTarget()->ToPlayer())
+                    if (_player->HasAura(WARLOCK_SUPPLANT_DEMONIC_COMMAND))
+                        _player->RemoveAura(WARLOCK_SUPPLANT_DEMONIC_COMMAND);
+            }
+
+            void Register()
+            {
+                OnEffectRemove += AuraEffectApplyFn(spell_warl_grimoire_of_sacrifice_AuraScript::HandleRemove, EFFECT_1, SPELL_AURA_OBS_MOD_HEALTH, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_warl_grimoire_of_sacrifice_AuraScript();
+        }
+};
+
 void AddSC_warlock_spell_scripts()
 {
     new spell_warl_bane_of_doom();
@@ -1157,4 +1332,5 @@ void AddSC_warlock_spell_scripts()
 	new spell_warl_kil_jaedens_cunning();
 	new spell_warl_burning_rush();
 	new spell_warl_harvest_life();
+	new spell_warl_grimoire_of_sacrifice();
 }
