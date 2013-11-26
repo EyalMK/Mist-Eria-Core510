@@ -59,7 +59,8 @@ enum WarlockSpells
     SPELL_WARLOCK_SOULSHATTER                       = 32835,
     SPELL_WARLOCK_UNSTABLE_AFFLICTION               = 30108,
     SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL        = 31117,
-	 WARLOCK_KIL_JAEDENS_CUNNING_PASSIVE     = 108507
+	 WARLOCK_KIL_JAEDENS_CUNNING_PASSIVE     = 108507,
+	 WARLOCK_HARVEST_LIFE_HEAL               = 125314
 };
 
 enum WarlockSpellIcons
@@ -1085,6 +1086,51 @@ class spell_warl_burning_rush : public SpellScriptLoader
         }
 };
 
+// Harvest Life - 108371
+class spell_warl_harvest_life : public SpellScriptLoader
+{
+    public:
+        spell_warl_harvest_life() : SpellScriptLoader("spell_warl_harvest_life") { }
+
+        class spell_warl_harvest_life_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warl_harvest_life_AuraScript);
+
+            void OnTick(AuraEffect const* aurEff)
+            {
+                if (!GetCaster())
+                    return;
+
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    // Restoring 3-4.5% of the caster's total health every 1s - With 33% bonus
+                    int32 basepoints = int32(frand(0.03f, 0.045f) * _player->GetMaxHealth());
+
+                    AddPct(basepoints, 33);
+
+                    if (!_player->HasSpellCooldown(WARLOCK_HARVEST_LIFE_HEAL))
+                    {
+                        _player->CastCustomSpell(_player, WARLOCK_HARVEST_LIFE_HEAL, &basepoints, NULL, NULL, true);
+                        // prevent the heal to proc off for each targets
+                        _player->AddSpellCooldown(WARLOCK_HARVEST_LIFE_HEAL, 0, time(NULL) + 1);
+                    }
+
+                    _player->EnergizeBySpell(_player, aurEff->GetSpellInfo()->Id, 4, POWER_DEMONIC_FURY);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_warl_harvest_life_AuraScript::OnTick, EFFECT_2, SPELL_AURA_PERIODIC_DAMAGE);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_warl_harvest_life_AuraScript();
+        }
+};
+
 void AddSC_warlock_spell_scripts()
 {
     new spell_warl_bane_of_doom();
@@ -1110,4 +1156,5 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_unstable_affliction();
 	new spell_warl_kil_jaedens_cunning();
 	new spell_warl_burning_rush();
+	new spell_warl_harvest_life();
 }
