@@ -15,7 +15,7 @@
 #include "WorldPacket.h"
 
 // Modifier les Worldstates
-// Calculs fonction zone player
+// Calculs fonction zone player : a tester
 // Spells de nerf
 // FillInitial (packet)
 
@@ -562,12 +562,12 @@ bool BattlegroundTK::SetupBattleground()
 
 void BattlegroundTK::EndBattleground(uint32 winner)
 {
-    // Win reward
     if (winner == ALLIANCE)
         RewardHonorToTeam(GetBonusHonorFromKill(m_HonorWinKills), ALLIANCE);
+
     if (winner == HORDE)
         RewardHonorToTeam(GetBonusHonorFromKill(m_HonorWinKills), HORDE);
-    // Complete map_end rewards (even if no team wins)
+
     RewardHonorToTeam(GetBonusHonorFromKill(m_HonorEndKills), ALLIANCE);
     RewardHonorToTeam(GetBonusHonorFromKill(m_HonorEndKills), HORDE);
 
@@ -607,12 +607,14 @@ void BattlegroundTK::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
 
     switch (type)
     {
-        case SCORE_ORB_POSSESIONS : // Orbes possédées
+        case SCORE_ORB_POSSESIONS : // Orbes possedees
             ((BattlegroundTKScore*)itr->second)->OrbPossesions += value;
             break;
+
         case SCORE_POINTS_SCORED: // Points obtenus
             ((BattlegroundTKScore*)itr->second)->PointsScored += value;
             break;
+
         default:
             Battleground::UpdatePlayerScore(Source, type, value, doAddHonor);
             break;
@@ -632,7 +634,7 @@ void BattlegroundTK::GetZonePlayerWithOrb(Player* player)
 	Position* position;
 	uint8 zone(0);
 	player->GetPosition(position);
-	//faire les calculs pour détecter la zone
+	//faire les calculs pour detecter la zone
 
 	if(m_orbOwners[0] == player->GetGUID()) //blue
 		SetOrbZone(zone, BG_TK_OBJECT_ORB_BLUE);
