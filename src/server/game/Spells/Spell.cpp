@@ -614,9 +614,6 @@ Spell::~Spell()
 
     delete m_spellValue;
 
-	if(m_spellInfo->GetDifficulty())
-		delete m_spellInfo;
-
     CheckEffectExecuteData();
 }
 

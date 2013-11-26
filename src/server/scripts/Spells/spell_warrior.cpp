@@ -746,7 +746,7 @@ class spell_warr_rallying_cry : public SpellScriptLoader
 };
 
 // Heroic leap - 6544
-/*
+
 class spell_warr_heroic_leap : public SpellScriptLoader
 {
     public:
@@ -797,7 +797,7 @@ class spell_warr_heroic_leap : public SpellScriptLoader
         {
             PrepareAuraScript(spell_warr_heroic_leap_AuraScript);
 
-            void OnRemove(constAuraEffectPtr aurEff, AuraEffectHandleModes /*mode)
+            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
                 if (Unit* caster = GetCaster())
                     caster->CastSpell(caster, WARRIOR_SPELL_HEROIC_LEAP_DAMAGE, true);
@@ -842,7 +842,7 @@ class spell_warr_heroic_leap_damage : public SpellScriptLoader
             return new spell_warr_heroic_leap_damage_SpellScript();
         }
 };
-*/
+
 
 /// Updated 5.1.0 : 86346 - Colossus Smash
 class spell_warr_colossus_smash : public SpellScriptLoader
@@ -1227,8 +1227,8 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_vigilance();
     new spell_warr_vigilance_trigger();
 	new spell_warr_rallying_cry();
-	//new spell_warr_heroic_leap();
-	//new spell_warr_heroic_leap_damage();
+	new spell_warr_heroic_leap();
+	new spell_warr_heroic_leap_damage();
 	new spell_warr_colossus_smash();
 	new spell_warr_heroic_throw();
 	new spell_warr_wild_strike();

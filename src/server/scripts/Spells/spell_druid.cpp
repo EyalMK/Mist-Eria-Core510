@@ -52,13 +52,13 @@ enum DruidSpells
     SPELL_DRUID_LIVING_SEED_HEAL            = 48503,
     SPELL_DRUID_LIVING_SEED_PROC            = 48504,
     SPELL_DRUID_NATURES_SPLENDOR            = 57865,
-    SPELL_DRUID_SURVIVAL_INSTINCTS          = 50322,
     SPELL_DRUID_SAVAGE_ROAR                 = 62071,
     SPELL_DRUID_TIGER_S_FURY_ENERGIZE       = 51178,
     SPELL_DRUID_ITEM_T8_BALANCE_RELIC       = 64950,
     SPELL_DRUID_FUNGAL_GROWTH               = 81283,
     SPELL_DRUID_WILD_MUSHROOM_SUICIDE       = 92853,
-    SPELL_DRUID_WILD_MUSHROOM_DAMAGE        = 78777
+    SPELL_DRUID_WILD_MUSHROOM_DAMAGE        = 78777,
+	DRUID_SURVIVAL_INSTINCTS                = 50322
 };
 
 enum DruidCreatures
@@ -1222,52 +1222,24 @@ class spell_dru_starfall_dummy : public SpellScriptLoader
         }
 };
 
-// 61336 - Survival Instincts
+// Survival Instincts - 61336
 class spell_dru_survival_instincts : public SpellScriptLoader
 {
     public:
         spell_dru_survival_instincts() : SpellScriptLoader("spell_dru_survival_instincts") { }
 
-        class spell_dru_survival_instincts_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_dru_survival_instincts_SpellScript);
-
-            SpellCastResult CheckCast()
-            {
-                Unit* caster = GetCaster();
-                if (!caster->IsInFeralForm())
-                    return SPELL_FAILED_ONLY_SHAPESHIFT;
-
-                return SPELL_CAST_OK;
-            }
-
-            void Register()
-            {
-                OnCheckCast += SpellCheckCastFn(spell_dru_survival_instincts_SpellScript::CheckCast);
-            }
-        };
-
         class spell_dru_survival_instincts_AuraScript : public AuraScript
         {
             PrepareAuraScript(spell_dru_survival_instincts_AuraScript);
 
-            bool Validate(SpellInfo const* /*spell*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_SURVIVAL_INSTINCTS))
-                    return false;
-                return true;
-            }
-
             void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
-                Unit* target = GetTarget();
-                int32 bp0 = target->CountPctFromMaxHealth(aurEff->GetAmount());
-                target->CastCustomSpell(target, SPELL_DRUID_SURVIVAL_INSTINCTS, &bp0, NULL, NULL, true);
+                GetTarget()->CastSpell(GetTarget(), DRUID_SURVIVAL_INSTINCTS, true);
             }
 
             void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-                GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_SURVIVAL_INSTINCTS);
+                GetTarget()->RemoveAurasDueToSpell(DRUID_SURVIVAL_INSTINCTS);
             }
 
             void Register()
@@ -1276,11 +1248,6 @@ class spell_dru_survival_instincts : public SpellScriptLoader
                 AfterEffectRemove += AuraEffectRemoveFn(spell_dru_survival_instincts_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK);
             }
         };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_dru_survival_instincts_SpellScript();
-        }
 
         AuraScript* GetAuraScript() const
         {

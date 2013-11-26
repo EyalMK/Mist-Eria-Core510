@@ -690,9 +690,9 @@ class SpellMgr
         SpellAreaForAreaMapBounds GetSpellAreaForAreaMapBounds(uint32 area_id) const;
 
         // SpellInfo object management
-        SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : NULL; }
-		SpellInfo const* GetSpellInfo(uint32 spellId, Unit* caster) const;
-        uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap.size(); }
+        SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[0][spellId] : NULL; }
+		SpellInfo const* GetSpellInfo(uint32 spellId, Unit* caster) const; //Difficulty system
+        uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap[0].size(); }
 
 		// Spell Override
 		uint32 GetOverrideSpell(Player *player, uint32 id) const;
@@ -753,7 +753,7 @@ class SpellMgr
         SkillLineAbilityMap        mSkillLineAbilityMap;
         PetLevelupSpellMap         mPetLevelupSpellMap;
         PetDefaultSpellsMap        mPetDefaultSpellsMap;           // only spells not listed in related mPetLevelupSpellMap entry
-        SpellInfoMap               mSpellInfoMap;
+        SpellInfoMap               mSpellInfoMap[MAX_DIFFICULTY];
 };
 
 #define sSpellMgr ACE_Singleton<SpellMgr, ACE_Null_Mutex>::instance()

@@ -26,6 +26,7 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
+#include "Pet.h"
 
 enum WarlockSpells
 {
@@ -59,7 +60,24 @@ enum WarlockSpells
     SPELL_WARLOCK_SOULSHATTER                       = 32835,
     SPELL_WARLOCK_UNSTABLE_AFFLICTION               = 30108,
     SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL        = 31117,
-	 WARLOCK_KIL_JAEDENS_CUNNING_PASSIVE     = 108507
+	 WARLOCK_KIL_JAEDENS_CUNNING_PASSIVE     = 108507,
+	 WARLOCK_HARVEST_LIFE_HEAL               = 125314,
+	 WARLOCK_SUPPLANT_DEMONIC_COMMAND        = 119904,
+	 WARLOCK_GRIMOIRE_OF_SACRIFICE           = 108503
+};
+
+enum WarlockMisc
+{
+	ENTRY_IMP								= 0,
+	ENTRY_VOIDWALKER						= 1,
+	ENTRY_SUCCUBUS							= 2,
+	ENTRY_FELHUNTER							= 3,
+	ENTRY_FELGUARD							= 4,
+
+	SPEC_WARLOCK_AFFLICTION					= 5,
+	SPEC_WARLOCK_DEMONOLOGY					= 6,
+	SPEC_WARLOCK_DESTRUCTION				= 7,
+	SPEC_NONE								= 8
 };
 
 enum WarlockSpellIcons
@@ -754,8 +772,7 @@ class spell_warl_health_funnel : public SpellScriptLoader
         }
 };
 
-// 1454 - Life Tap
-/// Updated 4.3.4
+// Life Tap - 1454
 class spell_warl_life_tap : public SpellScriptLoader
 {
     public:
@@ -765,72 +782,28 @@ class spell_warl_life_tap : public SpellScriptLoader
         {
             PrepareSpellScript(spell_warl_life_tap_SpellScript);
 
-            bool Load()
+            SpellCastResult CheckLife()
             {
-                return GetCaster()->GetTypeId() == TYPEID_PLAYER;
-            }
-
-            bool Validate(SpellInfo const* /*spellInfo*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_LIFE_TAP_ENERGIZE) || !sSpellMgr->GetSpellInfo(SPELL_WARLOCK_LIFE_TAP_ENERGIZE_2))
-                    return false;
-                return true;
-            }
-
-            void HandleEnergize(SpellEffIndex /*effIndex*/)
-            {
-                Player* caster = GetCaster()->ToPlayer();
-                if (Unit* target = GetHitUnit())
-                {
-                    int32 damage = caster->CountPctFromMaxHealth(GetSpellInfo()->Effects[EFFECT_2].CalcValue());
-                    int32 mana = CalculatePct(damage, GetSpellInfo()->Effects[EFFECT_1].CalcValue());
-
-                    // Shouldn't Appear in Combat Log
-                    target->ModifyHealth(-damage);
-
-                    SetHitDamage(mana);
-                }
-            }
-
-            void HandleDummy(SpellEffIndex /*effIndex*/)
-            {
-                Player* caster = GetCaster()->ToPlayer();
-                if (Unit* target = GetHitUnit())
-                {
-                    int32 damage = caster->CountPctFromMaxHealth(GetSpellInfo()->Effects[EFFECT_2].CalcValue());
-                    int32 mana = CalculatePct(damage, GetSpellInfo()->Effects[EFFECT_1].CalcValue());
-
-                    // Shouldn't Appear in Combat Log
-                    target->ModifyHealth(-damage);
-
-                    // Improved Life Tap mod
-                    if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_IMPROVED_LIFE_TAP, 0))
-                        AddPct(mana, aurEff->GetAmount());
-
-                    caster->CastCustomSpell(target, SPELL_WARLOCK_LIFE_TAP_ENERGIZE, &mana, NULL, NULL, false);
-
-                    // Mana Feed
-                    if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_MANA_FEED, 0))
-                    {
-                        int32 manaFeedVal = aurEff->GetAmount();
-                        ApplyPct(manaFeedVal, mana);
-                        caster->CastCustomSpell(caster, SPELL_WARLOCK_LIFE_TAP_ENERGIZE_2, &manaFeedVal, NULL, NULL, true, NULL);
-                    }
-                }
-            }
-
-            SpellCastResult CheckCast()
-            {
-                if (int32(GetCaster()->GetHealth()) > int32(GetCaster()->CountPctFromMaxHealth(GetSpellInfo()->Effects[EFFECT_2].CalcValue())))
+                if (GetCaster()->GetHealthPct() > 15.0f)
                     return SPELL_CAST_OK;
                 return SPELL_FAILED_FIZZLE;
             }
 
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    int32 healthCost = int32(_player->GetMaxHealth() * 0.15f);
+
+                    _player->SetHealth(_player->GetHealth() - healthCost);
+                    _player->EnergizeBySpell(_player, 1454, healthCost, POWER_MANA);
+                }
+            }
+
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_warl_life_tap_SpellScript::HandleEnergize, EFFECT_0, SPELL_EFFECT_ENERGIZE);
-                //OnEffectHitTarget += SpellEffectFn(spell_warl_life_tap_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
-                OnCheckCast += SpellCheckCastFn(spell_warl_life_tap_SpellScript::CheckCast);
+                OnCheckCast += SpellCheckCastFn(spell_warl_life_tap_SpellScript::CheckLife);
+                OnHit += SpellHitFn(spell_warl_life_tap_SpellScript::HandleOnHit);
             }
         };
 
@@ -1063,7 +1036,6 @@ class spell_warl_unstable_affliction : public SpellScriptLoader
 };
 
 // Kil'Jaeden's Cunning (passive with cooldown) - 119048
-/*
 class spell_warl_kil_jaedens_cunning : public SpellScriptLoader
 {
     public:
@@ -1073,13 +1045,13 @@ class spell_warl_kil_jaedens_cunning : public SpellScriptLoader
         {
             PrepareAuraScript(spell_warl_kil_jaedens_cunning_AuraScript);
 
-            void HandleApply(constAuraEffectPtr /*aurEff, AuraEffectHandleModes mode)
+            void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes mode)
             {
                 if (GetCaster())
                     GetCaster()->RemoveAura(WARLOCK_KIL_JAEDENS_CUNNING_PASSIVE);
             }
 
-            void HandleRemove(constAuraEffectPtr /*aurEff, AuraEffectHandleModes mode)
+            void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes mode)
             {
                 if (GetCaster())
                     GetCaster()->CastSpell(GetCaster(), WARLOCK_KIL_JAEDENS_CUNNING_PASSIVE, true);
@@ -1097,7 +1069,243 @@ class spell_warl_kil_jaedens_cunning : public SpellScriptLoader
             return new spell_warl_kil_jaedens_cunning_AuraScript();
         }
 };
-*/
+
+// Burning Rush - 111400
+class spell_warl_burning_rush : public SpellScriptLoader
+{
+    public:
+        spell_warl_burning_rush() : SpellScriptLoader("spell_warl_burning_rush") { }
+
+        class spell_warl_burning_rush_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warl_burning_rush_AuraScript);
+
+            void OnTick(AuraEffect const* /*aurEff*/)
+            {
+                if (GetCaster())
+                {
+                    // Drain 4% of health every second
+                    int32 basepoints = GetCaster()->CountPctFromMaxHealth(4);
+
+                    GetCaster()->DealDamage(GetCaster(), basepoints, NULL, NODAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_warl_burning_rush_AuraScript::OnTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_warl_burning_rush_AuraScript();
+        }
+};
+
+// Harvest Life - 108371
+class spell_warl_harvest_life : public SpellScriptLoader
+{
+    public:
+        spell_warl_harvest_life() : SpellScriptLoader("spell_warl_harvest_life") { }
+
+        class spell_warl_harvest_life_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warl_harvest_life_AuraScript);
+
+            void OnTick(AuraEffect const* aurEff)
+            {
+                if (!GetCaster())
+                    return;
+
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    // Restoring 3-4.5% of the caster's total health every 1s - With 33% bonus
+                    int32 basepoints = int32(frand(0.03f, 0.045f) * _player->GetMaxHealth());
+
+                    AddPct(basepoints, 33);
+
+                    if (!_player->HasSpellCooldown(WARLOCK_HARVEST_LIFE_HEAL))
+                    {
+                        _player->CastCustomSpell(_player, WARLOCK_HARVEST_LIFE_HEAL, &basepoints, NULL, NULL, true);
+                        // prevent the heal to proc off for each targets
+                        _player->AddSpellCooldown(WARLOCK_HARVEST_LIFE_HEAL, 0, time(NULL) + 1);
+                    }
+
+                    _player->EnergizeBySpell(_player, aurEff->GetSpellInfo()->Id, 4, POWER_DEMONIC_FURY);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_warl_harvest_life_AuraScript::OnTick, EFFECT_2, SPELL_AURA_PERIODIC_DAMAGE);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_warl_harvest_life_AuraScript();
+        }
+};
+
+// Grimoire of Sacrifice - 108503
+class spell_warl_grimoire_of_sacrifice : public SpellScriptLoader
+{
+    public:
+        spell_warl_grimoire_of_sacrifice() : SpellScriptLoader("spell_warl_grimoire_of_sacrifice") { }
+
+        class spell_warl_grimoire_of_sacrifice_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warl_grimoire_of_sacrifice_SpellScript);
+
+            void HandleAfterCast()
+            {
+                if (Player* player = GetCaster()->ToPlayer())
+                {
+                    if (Pet* pet = player->GetPet())
+                    {
+                        // Supplant Command Demon
+                        if (player->getLevel() >= 56)
+                        {
+                            int32 bp = 0;
+
+                            player->RemoveAura(WARLOCK_SUPPLANT_DEMONIC_COMMAND);
+
+                            switch (pet->GetEntry())
+                            {
+                                case ENTRY_IMP:
+                                    bp = 132411;// Single Magic
+                                    break;
+                                case ENTRY_VOIDWALKER:
+                                    bp = 132413;// Shadow Bulwark
+                                    break;
+                                case ENTRY_SUCCUBUS:
+                                    bp = 137706;// Whiplash
+                                    break;
+                                case ENTRY_FELHUNTER:
+                                    bp = 132409;// Spell Lock
+                                    break;
+                                case ENTRY_FELGUARD:
+                                    bp = 132410;// Pursuit
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            if (bp)
+                                player->CastCustomSpell(player, WARLOCK_SUPPLANT_DEMONIC_COMMAND, &bp, NULL, NULL, true);
+                        }
+                    }
+                }
+            }
+
+            void HandleOnHit()
+            {
+                if (Player* player = GetCaster()->ToPlayer())
+                {
+                    // EFFECT_0 : Instakill
+                    // EFFECT_1 : 2% health every 5s
+                    // EFFECT_2 : +50% DOT damage for Malefic Grasp, Drain Life and Drain Soul
+                    // EFFECT_3 : +30% damage for Shadow Bolt, Hand of Gul'Dan, Soul Fire, Wild Imps and Fel Flame
+                    // EFFECT_4 : +25% damage for Incinerate, Conflagrate, Chaos Bolt, Shadowburn and Fel Flame
+                    // EFFECT_5 : +50% damage for Fel Flame
+                    // EFFECT_6 : +20% Health if Soul Link talent is also chosen
+                    // EFFECT_7 : +50% on EFFECT_2 of Malefic Grasp
+                    // EFFECT_8 : +50% on EFFECT_4 and EFFECT_5 of Drain Soul -> Always set to 0
+                    // EFFECT_9 : Always set to 0
+                    // EFFECT_10 : Always set to 0
+                    if (Aura* grimoireOfSacrifice = player->GetAura(WARLOCK_GRIMOIRE_OF_SACRIFICE))
+                    {
+                        if (grimoireOfSacrifice->GetEffect(EFFECT_10))
+                            grimoireOfSacrifice->GetEffect(EFFECT_10)->SetAmount(0);
+                        if (grimoireOfSacrifice->GetEffect(EFFECT_9))
+                            grimoireOfSacrifice->GetEffect(EFFECT_9)->SetAmount(0);
+                        if (grimoireOfSacrifice->GetEffect(EFFECT_8))
+                            grimoireOfSacrifice->GetEffect(EFFECT_8)->SetAmount(0);
+
+                        switch (player->GetPrimaryTalentTree(player->GetActiveSpec()))
+                        {
+                            case SPEC_WARLOCK_AFFLICTION:
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_3))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_3)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_4))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_4)->SetAmount(0);
+                                break;
+                            case SPEC_WARLOCK_DEMONOLOGY:
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_2))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_2)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_4))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_4)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_5))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_5)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_7))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_7)->SetAmount(0);
+                                break;
+                            case SPEC_WARLOCK_DESTRUCTION:
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_2))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_2)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_3))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_3)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_5))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_5)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_7))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_7)->SetAmount(0);
+                                break;
+                            case SPEC_NONE:
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_2))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_2)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_3))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_3)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_4))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_4)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_5))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_5)->SetAmount(0);
+                                if (grimoireOfSacrifice->GetEffect(EFFECT_7))
+                                    grimoireOfSacrifice->GetEffect(EFFECT_7)->SetAmount(0);
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                AfterCast += SpellCastFn(spell_warl_grimoire_of_sacrifice_SpellScript::HandleAfterCast);
+                OnHit += SpellHitFn(spell_warl_grimoire_of_sacrifice_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warl_grimoire_of_sacrifice_SpellScript();
+        }
+
+        class spell_warl_grimoire_of_sacrifice_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warl_grimoire_of_sacrifice_AuraScript);
+
+            void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes mode)
+            {
+                if (!GetTarget())
+                    return;
+
+                if (Player* _player = GetTarget()->ToPlayer())
+                    if (_player->HasAura(WARLOCK_SUPPLANT_DEMONIC_COMMAND))
+                        _player->RemoveAura(WARLOCK_SUPPLANT_DEMONIC_COMMAND);
+            }
+
+            void Register()
+            {
+                OnEffectRemove += AuraEffectApplyFn(spell_warl_grimoire_of_sacrifice_AuraScript::HandleRemove, EFFECT_1, SPELL_AURA_OBS_MOD_HEALTH, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_warl_grimoire_of_sacrifice_AuraScript();
+        }
+};
 
 void AddSC_warlock_spell_scripts()
 {
@@ -1122,5 +1330,8 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_siphon_life();
     new spell_warl_soulshatter();
     new spell_warl_unstable_affliction();
-	//new spell_warl_kil_jaedens_cunning();
+	new spell_warl_kil_jaedens_cunning();
+	new spell_warl_burning_rush();
+	new spell_warl_harvest_life();
+	new spell_warl_grimoire_of_sacrifice();
 }

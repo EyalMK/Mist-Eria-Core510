@@ -1200,8 +1200,8 @@ class spell_hun_glaive_toss_damage : public SpellScriptLoader
                 std::list<Unit*> targetList;
                 float radius = 50.0f;
 
-                JadeCore::NearestAttackableUnitInObjectRangeCheck u_check(GetCaster(), GetCaster(), radius);
-                JadeCore::UnitListSearcher<JadeCore::NearestAttackableUnitInObjectRangeCheck> searcher(GetCaster(), targetList, u_check);
+                Trinity::NearestAttackableUnitInObjectRangeCheck u_check(GetCaster(), GetCaster(), radius);
+                Trinity::UnitListSearcher<Trinity::NearestAttackableUnitInObjectRangeCheck> searcher(GetCaster(), targetList, u_check);
                 GetCaster()->VisitNearbyObject(radius, searcher);
 
                 for (auto itr : targetList)
@@ -1234,8 +1234,8 @@ class spell_hun_glaive_toss_damage : public SpellScriptLoader
                 std::list<Unit*> targetList;
                 float radius = 50.0f;
 
-                JadeCore::NearestAttackableUnitInObjectRangeCheck u_check(GetCaster(), GetCaster(), radius);
-                JadeCore::UnitListSearcher<JadeCore::NearestAttackableUnitInObjectRangeCheck> searcher(GetCaster(), targetList, u_check);
+                Trinity::NearestAttackableUnitInObjectRangeCheck u_check(GetCaster(), GetCaster(), radius);
+                Trinity::UnitListSearcher<Trinity::NearestAttackableUnitInObjectRangeCheck> searcher(GetCaster(), targetList, u_check);
                 GetCaster()->VisitNearbyObject(radius, searcher);
 
                 for (auto itr : targetList)
