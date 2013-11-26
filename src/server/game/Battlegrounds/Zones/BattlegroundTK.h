@@ -25,7 +25,7 @@ enum BG_TK_Score
 {
 	BG_TK_KILL_TEAM_SCORE				= 10, // 10 points pour la team par kill
 	BG_TK_KILL_ORB_TEAM_SCORE			= 20, // 20 points pour la team par kill de possesseur d'orb
-	BG_TK_EXT_TEAM_SCORE				= 3, // 3 VP par seconde avec l'orb en possession à l'exterieur du temple
+	BG_TK_EXT_TEAM_SCORE				= 3, // 3 VP par seconde avec l'orb en possession a l'exterieur du temple
 	BG_TK_IN_TEAM_SCORE					= 4, // 4 VP par seconde avec l'orb en possession dans le temple
 	BG_TK_MIDDLE_TEAM_SCORE				= 5, // 5 VP par seconde avec l'orb en possession au milieu du BG
     BG_TK_WARNING_NEAR_VICTORY_SCORE    = 1400,
@@ -111,9 +111,8 @@ class BattlegroundTK : public Battleground
         void StartingEventOpenDoors();
 
 		 /* Battleground Events */
-        void EventPlayerDroppedOrb(Player* Source, uint32 orb);
-        void EventPlayerClickedOnOrb(Player* Source, GameObject* target_obj);
-        void EventPlayerCapturedOrb(Player* Source);
+        void EventPlayerDroppedFlag(Player* Source);
+        void EventPlayerClickedOnFlag(Player* Source, GameObject* target_obj);
 
         void RemovePlayer(Player* player, uint64 guid, uint32 team);
         void HandleKillPlayer(Player* player, Player* killer);
@@ -143,6 +142,7 @@ class BattlegroundTK : public Battleground
 		void RespawnOrb(uint32 orb);
 		void RespawnOrbAfterDrop(uint32 orb);
 		bool HasAnOrb(Player* player);
+        uint32 GetOwnersOrb(Player* player);
 
 		uint32 GetPrematureWinner();
         void UpdateScore(uint16 team, int16 points);
