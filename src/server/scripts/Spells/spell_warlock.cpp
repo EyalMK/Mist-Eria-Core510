@@ -26,6 +26,7 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
+#include "Pet.h"
 
 enum WarlockSpells
 {
