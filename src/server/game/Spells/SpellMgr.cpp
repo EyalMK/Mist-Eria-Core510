@@ -1254,7 +1254,11 @@ void SpellMgr::LoadSpellRanks()
     // cleanup core data before reload - remove reference to ChainNode from SpellInfo
     for (SpellChainMap::iterator itr = mSpellChains.begin(); itr != mSpellChains.end(); ++itr)
     {
-        mSpellInfoMap[0][itr->first]->ChainEntry = NULL;
+		for (uint8 d = 0; d < MAX_DIFFICULTY; ++d)
+		{
+			if(mSpellInfoMap[d][itr->first])
+				mSpellInfoMap[d][itr->first]->ChainEntry = NULL;
+		}
     }
     mSpellChains.clear();
     //                                                     0             1      2
@@ -2690,7 +2694,10 @@ void SpellMgr::LoadSpellInfoStore()
     uint32 oldMSTime = getMSTime();
 
     UnloadSpellInfoStore();
-    mSpellInfoMap[0].resize(sSpellStore.GetNumRows(), NULL);
+	for (uint8 d = 0; d < MAX_DIFFICULTY; ++d)
+	{
+		mSpellInfoMap[d].resize(sSpellStore.GetNumRows(), NULL);
+	}
 
     std::map<uint32, SpellEffectArray> effectsBySpell[MAX_DIFFICULTY];
 
