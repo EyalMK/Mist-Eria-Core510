@@ -508,7 +508,10 @@ void BattlegroundTK::UpdateScore(uint16 team, int16 points)
             m_IsInformedNearVictory[team] = true;
         }
 		else if (m_Team_Scores[teamindex] >= BG_TK_MAX_TEAM_SCORE)
+		{
+			m_TeamScores[teamindex] = BG_TK_MAX_TEAM_SCORE;
 			EndBattleground((teamindex == TEAM_ALLIANCE)?ALLIANCE:HORDE);
+		}
     }
 }
 
@@ -641,13 +644,8 @@ uint32 BattlegroundTK::GetOwnersOrb(Player* player)
 
 void BattlegroundTK::FillInitialWorldStates(WorldPacket& data)
 {
-	data << uint32(BG_TK_RESOURCES_ALLIANCE) << uint32(/*GetTeamScore(TEAM_ALLIANCE)*/48); // Testing worldstates
-    data << uint32(BG_TK_RESOURCES_HORDE) << uint32(/*GetTeamScore(TEAM_HORDE)*/41); // Testing worldstates
-	data << uint32(6300) << uint32(53); // Testing worldstates
-	data << uint32(6306) << uint32(71); // Testing worldstates
-	data << uint32(6307) << uint32(46); // Testing worldstates
-	data << uint32(6308) << uint32(37); // Testing worldstates
-	data << uint32(6309) << uint32(39); // Testing worldstates
+	data << uint32(BG_TK_RESOURCES_ALLIANCE) << uint32(GetTeamScore(TEAM_ALLIANCE)); // Testing worldstates
+    data << uint32(BG_TK_RESOURCES_HORDE) << uint32(GetTeamScore(TEAM_HORDE)); // Testing worldstates
 
     /*if (GetStatus() == STATUS_IN_PROGRESS)
     {
