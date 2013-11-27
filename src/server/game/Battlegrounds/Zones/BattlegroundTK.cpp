@@ -60,7 +60,7 @@ void BattlegroundTK::PostUpdateImpl(uint32 diff)
         else if (GetElapsedTime() > uint32(_minutesElapsed * MINUTE * IN_MILLISECONDS) +  3 * MINUTE * IN_MILLISECONDS)
         {
             ++_minutesElapsed;
-            UpdateWorldState(BG_TK_STATE_TIMER, 25 - _minutesElapsed);
+            //UpdateWorldState(BG_TK_STATE_TIMER, 25 - _minutesElapsed);
         }
 
 		CalculatePoints(diff);
@@ -174,11 +174,6 @@ void BattlegroundTK::Reset()
 
     m_IsInformedNearVictory[0] = false;
 	m_IsInformedNearVictory[1] = false;
-
-	GetOrbState(BG_TK_OBJECT_ORB_BLUE) == BG_TK_ORB_STATE_ON_BASE;
-	GetOrbState(BG_TK_OBJECT_ORB_PURPLE) == BG_TK_ORB_STATE_ON_BASE;
-	GetOrbState(BG_TK_OBJECT_ORB_GREEN) == BG_TK_ORB_STATE_ON_BASE;
-	GetOrbState(BG_TK_OBJECT_ORB_ORANGE) == BG_TK_ORB_STATE_ON_BASE;
 }
 
 void BattlegroundTK::StartingEventCloseDoors()
@@ -191,8 +186,8 @@ void BattlegroundTK::StartingEventCloseDoors()
     for (uint32 i = BG_TK_OBJECT_ORB_BLUE; i <= BG_TK_OBJECT_ORB_ORANGE; ++i)
         SpawnBGObject(i, RESPAWN_ONE_DAY);
 
-    UpdateWorldState(BG_TK_STATE_TIMER_ACTIVE, 1);
-    UpdateWorldState(BG_TK_STATE_TIMER, 25);
+    //UpdateWorldState(BG_TK_STATE_TIMER_ACTIVE, 1);
+    //UpdateWorldState(BG_TK_STATE_TIMER, 25);
 }
 
 void BattlegroundTK::StartingEventOpenDoors()
@@ -359,7 +354,7 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_BLUE);
         _orbState[BG_TK_OBJECT_ORB_BLUE] = BG_TK_ORB_STATE_ON_PLAYER;
         Source->CastSpell(Source, BG_TK_AURA_ORB_BLUE, true);
-		auraCounter0 = 0;
+		//auraCounter0 = 0;
     }
 
     // Udapte orb purple picked up
@@ -381,7 +376,7 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_PURPLE);
         _orbState[BG_TK_OBJECT_ORB_PURPLE] = BG_TK_ORB_STATE_ON_PLAYER;
         Source->CastSpell(Source, BG_TK_AURA_ORB_PURPLE, true);
-		auraCounter1 = 0;
+		//auraCounter1 = 0;
     }
 
 	// Udapte orb green picked up
@@ -403,7 +398,7 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_GREEN);
         _orbState[BG_TK_OBJECT_ORB_GREEN] = BG_TK_ORB_STATE_ON_PLAYER;
         Source->CastSpell(Source, BG_TK_AURA_ORB_GREEN, true);
-		auraCounter2 = 0;
+		//auraCounter2 = 0;
     }
 
 	// Udapte orb orange picked up
@@ -425,7 +420,7 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_ORANGE);
         _orbState[BG_TK_OBJECT_ORB_ORANGE] = BG_TK_ORB_STATE_ON_PLAYER;
         Source->CastSpell(Source, BG_TK_AURA_ORB_ORANGE, true);
-		auraCounter3 = 0;
+		//auraCounter3 = 0;
     }
 
     if (!message_id)
@@ -644,215 +639,23 @@ uint32 BattlegroundTK::GetOwnersOrb(Player* player)
     return 0;
 }
 
-void BattlegroundTK::GetZonePlayerWithOrb(Player* player)
-{
-	Position* position;
-	uint8 zone(0);
-	player->GetPosition(position);
-	//faire les calculs pour detecter la zone
-
-	if(m_orbOwners[0] == player->GetGUID()) //blue
-		SetOrbZone(zone, BG_TK_OBJECT_ORB_BLUE);
-	if(m_orbOwners[1] == player->GetGUID()) //purple
-		SetOrbZone(zone, BG_TK_OBJECT_ORB_PURPLE);
-	if(m_orbOwners[2] == player->GetGUID()) //green
-		SetOrbZone(zone, BG_TK_OBJECT_ORB_GREEN);
-	if(m_orbOwners[3] == player->GetGUID()) //orange
-		SetOrbZone(zone, BG_TK_OBJECT_ORB_ORANGE);
-}
-
-void BattlegroundTK::Udapte(uint32 diff)
-{
-	if (GetStatus() != STATUS_IN_PROGRESS)
-        return;
-
-	if(m_orbOwners[0] != 0)
-	{
-		GetZonePlayerWithOrb(sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(0)));
-	}
-
-	if(m_orbOwners[1] != 0)
-	{
-		GetZonePlayerWithOrb(sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(1)));
-	}
-
-	if(m_orbOwners[2] != 0)
-	{
-		GetZonePlayerWithOrb(sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(2)));
-	}
-
-	if(m_orbOwners[3] != 0)
-	{
-		GetZonePlayerWithOrb(sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(3)));
-	}
-
-	if(_orbZone[0] != 0)
-	{
-		if(_orbZone[0] == 1)
-		{
-			if (secondTimer0 <= diff)
-            {
-				UpdateScore((sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(0)))->GetTeam(), BG_TK_EXT_TEAM_SCORE);
-                secondTimer0 = 1000;
-            } else secondTimer0 -= diff;
-		}
-		if(_orbZone[0] == 2)
-		{
-			if (secondTimer0 <= diff)
-            {
-				UpdateScore((sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(0)))->GetTeam(), BG_TK_EXT_TEAM_SCORE);
-                secondTimer0 = 1000;
-            } else secondTimer0 -= diff;
-		}
-		if(_orbZone[0] == 3)
-		{
-			if (secondTimer0 <= diff)
-            {
-				UpdateScore((sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(0)))->GetTeam(), BG_TK_EXT_TEAM_SCORE);
-                secondTimer0 = 1000;
-            } else secondTimer0 -= diff;
-		}
-
-		if(auraCounter0 < 3)
-		{
-			if(auraTimer0 <= diff)
-			{
-				(sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(0)))->CastSpell((sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(0))), BG_TK_AURA_ORB_GREEN, true);
-				auraCounter0++;
-				auraTimer0 = 15000;
-			} else auraTimer0 -= diff;
-		}
-	}
-
-	if(_orbZone[1] != 0)
-	{
-		if(_orbZone[1] == 1)
-		{
-			if (secondTimer1 <= diff)
-            {
-				UpdateScore((sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(1)))->GetTeam(), BG_TK_EXT_TEAM_SCORE);
-                secondTimer1 = 1000;
-            } else secondTimer1 -= diff;
-		}
-		if(_orbZone[1] == 2)
-		{
-			if (secondTimer1 <= diff)
-            {
-				UpdateScore((sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(1)))->GetTeam(), BG_TK_EXT_TEAM_SCORE);
-                secondTimer1 = 1000;
-            } else secondTimer1 -= diff;
-		}
-		if(_orbZone[1] == 3)
-		{
-			if (secondTimer1 <= diff)
-            {
-				UpdateScore((sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(1)))->GetTeam(), BG_TK_EXT_TEAM_SCORE);
-                secondTimer1 = 1000;
-            } else secondTimer1 -= diff;
-		}
-
-		if(auraCounter1 < 3)
-		{
-			if(auraTimer1 <= diff)
-			{
-				(sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(1)))->CastSpell((sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(1))), BG_TK_AURA_ORB_ORANGE, true);
-				auraCounter1++;
-				auraTimer1 = 15000;
-			} else auraTimer1 -= diff;
-		}
-	}
-
-	if(_orbZone[2] != 0)
-	{
-		if(_orbZone[2] == 1)
-		{
-			if (secondTimer2 <= diff)
-            {
-				UpdateScore((sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(2)))->GetTeam(), BG_TK_IN_TEAM_SCORE);
-                secondTimer2 = 1000;
-            } else secondTimer2 -= diff;
-		}
-		if(_orbZone[2] == 2)
-		{
-			if (secondTimer2 <= diff)
-            {
-				UpdateScore((sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(2)))->GetTeam(), BG_TK_IN_TEAM_SCORE);
-                secondTimer2 = 1000;
-            } else secondTimer2 -= diff;
-		}
-		if(_orbZone[2] == 3)
-		{
-			if (secondTimer2 <= diff)
-            {
-				UpdateScore((sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(2)))->GetTeam(), BG_TK_IN_TEAM_SCORE);
-                secondTimer2 = 1000;
-            } else secondTimer2 -= diff;
-		}
-
-		if(auraCounter2 < 3)
-		{
-			if(auraTimer2 <= diff)
-			{
-				(sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(2)))->CastSpell((sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(2))), BG_TK_AURA_ORB_BLUE, true);
-				auraCounter2++;
-				auraTimer2 = 15000;
-			} else auraTimer2 -= diff;
-		}
-	}
-
-	if(_orbZone[3] != 0)
-	{
-		if(_orbZone[3] == 1)
-		{
-			if (secondTimer3 <= diff)
-            {
-				UpdateScore((sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(3)))->GetTeam(), BG_TK_MIDDLE_TEAM_SCORE);
-                secondTimer3 = 1000;
-            } else secondTimer3 -= diff;
-		}
-		if(_orbZone[3] == 2)
-		{
-			if (secondTimer3 <= diff)
-            {
-				UpdateScore((sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(3)))->GetTeam(), BG_TK_MIDDLE_TEAM_SCORE);
-                secondTimer3 = 1000;
-            } else secondTimer3 -= diff;
-		}
-		if(_orbZone[3] == 3)
-		{
-			if (secondTimer3 <= diff)
-            {
-				UpdateScore((sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(3)))->GetTeam(), BG_TK_MIDDLE_TEAM_SCORE);
-                secondTimer3 = 1000;
-            } else secondTimer3 -= diff;
-		}
-
-		if(auraCounter3 < 3)
-		{
-			if(auraTimer3 <= diff)
-			{
-				(sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(3)))->CastSpell((sObjectMgr->GetPlayerByLowGUID(GetOrbOwners(3))), BG_TK_AURA_ORB_PURPLE, true);
-				auraCounter3++;
-				auraTimer3 = 15000;
-			} else auraTimer3 -= diff;
-		}
-	}
-}
-
 void BattlegroundTK::FillInitialWorldStates(WorldPacket& data)
 {
-	data << uint32(BG_TK_RESOURCES_MAX)      << uint32(BG_TK_MAX_TEAM_SCORE);
-    data << uint32(BG_TK_RESOURCES_WARNING)  << uint32(BG_TK_WARNING_NEAR_VICTORY_SCORE);
-	data << uint32(BG_TK_RESOURCES_ALLIANCE) << uint32(GetTeamScore(TEAM_ALLIANCE));
-    data << uint32(BG_TK_RESOURCES_HORDE) << uint32(GetTeamScore(TEAM_HORDE));
+	data << uint32(BG_TK_RESOURCES_ALLIANCE) << uint32(/*GetTeamScore(TEAM_ALLIANCE)*/48); // Testing worldstates
+    data << uint32(BG_TK_RESOURCES_HORDE) << uint32(/*GetTeamScore(TEAM_HORDE)*/41); // Testing worldstates
+	data << uint32(6300) << uint32(53); // Testing worldstates
+	data << uint32(6306) << uint32(71); // Testing worldstates
+	data << uint32(6307) << uint32(46); // Testing worldstates
+	data << uint32(6308) << uint32(37); // Testing worldstates
+	data << uint32(6309) << uint32(39); // Testing worldstates
 
-    if (GetStatus() == STATUS_IN_PROGRESS)
+    /*if (GetStatus() == STATUS_IN_PROGRESS)
     {
         data << uint32(BG_TK_STATE_TIMER_ACTIVE) << uint32(1);
         data << uint32(BG_TK_STATE_TIMER) << uint32(25-_minutesElapsed);
     }
     else
-        data << uint32(BG_TK_STATE_TIMER_ACTIVE) << uint32(0);
+        data << uint32(BG_TK_STATE_TIMER_ACTIVE) << uint32(0);*/
 }
 
 uint32 BattlegroundTK::GetPrematureWinner()
