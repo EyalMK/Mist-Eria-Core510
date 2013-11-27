@@ -6,7 +6,6 @@
 
 #include "Battleground.h"
 
-
 enum BG_TK_Sound
 {
     BG_TK_SOUND_HORDE_ORB_PICKED_UP		= 8212,
@@ -23,11 +22,10 @@ enum BG_TK_OrbState
 
 enum BG_TK_Score
 {
-	BG_TK_KILL_TEAM_SCORE				= 10, // 10 points pour la team par kill
-	BG_TK_KILL_ORB_TEAM_SCORE			= 20, // 20 points pour la team par kill de possesseur d'orb
-	BG_TK_EXT_TEAM_SCORE				= 3, // 3 VP par seconde avec l'orb en possession a l'exterieur du temple
-	BG_TK_IN_TEAM_SCORE					= 4, // 4 VP par seconde avec l'orb en possession dans le temple
-	BG_TK_MIDDLE_TEAM_SCORE				= 5, // 5 VP par seconde avec l'orb en possession au milieu du BG
+	BG_TK_PLAYER_KILL_POINTS			= 4,
+	BG_TK_CENTER_POINTS					= 6,
+	BG_TK_INDOOR_POINTS					= 4,
+	BG_TK_OUTDOOR_POINTS				= 2,
     BG_TK_WARNING_NEAR_VICTORY_SCORE    = 1400,
     BG_TK_MAX_TEAM_SCORE                = 1600
 };
@@ -152,6 +150,7 @@ class BattlegroundTK : public Battleground
 		int32 m_Team_Scores[2];
 		bool m_IsInformedNearVictory[2];
 
+		int32 pointsTimer;
         uint32 m_ReputationCapture;
         uint32 m_HonorWinKills;
         uint32 m_HonorEndKills;

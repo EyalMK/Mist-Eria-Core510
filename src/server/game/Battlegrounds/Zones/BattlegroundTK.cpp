@@ -62,16 +62,14 @@ void BattlegroundTK::PostUpdateImpl(uint32 diff)
             ++_minutesElapsed;
             //UpdateWorldState(BG_TK_STATE_TIMER, 25 - _minutesElapsed);
         }
-
-		CalculatePoints(diff);
+		
+		BattlegroundTK::CalculatePoints(diff);
     }
 }
 
 void BattlegroundTK::CalculatePoints(uint32 diff)
 {
-	int32 tickTimer = 5000;
-	
-	if (tickTimer < 0)
+	if (pointsTimer <= 0)
 	{
 		for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
 			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
@@ -118,8 +116,8 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
 						UpdateScore(TEAM_HORDE, 10);
 
-				tickTimer = 5000;
-			} else tickTimer -= diff;
+				pointsTimer = 5000;
+			} else pointsTimer -= diff;
 		}
 }
 
@@ -127,6 +125,7 @@ void BattlegroundTK::Reset()
 {
     Battleground::Reset();
 
+	pointsTimer = 5000;
 	secondTimer0 = 1000;
 	secondTimer1 = 1000;
 	secondTimer2 = 1000;
@@ -488,7 +487,7 @@ void BattlegroundTK::RemovePlayer(Player* player, uint64 guid, uint32 /*team*/)
 }
 
 void BattlegroundTK::UpdateScore(uint16 team, int16 points)
-{ //note: to remove reinforcementpoints points must be negative, for adding reinforcements points must be positive
+{
     ASSERT(team == ALLIANCE || team == HORDE);
     uint8 teamindex = GetTeamIndexByTeamId(team); //0=ally 1=horde
     m_Team_Scores[teamindex] += points;
@@ -518,14 +517,10 @@ void BattlegroundTK::UpdateScore(uint16 team, int16 points)
 WorldSafeLocsEntry const* BattlegroundTK::GetClosestGraveYard(Player* player)
 {
 	if (player->GetTeam() == ALLIANCE)
-	{
 		return sWorldSafeLocsStore.LookupEntry(BG_TK_GraveyardIds[0]);
-	}
 
 	else
-	{
 		return sWorldSafeLocsStore.LookupEntry(BG_TK_GraveyardIds[1]);
-	}
 }
 
 bool BattlegroundTK::SetupBattleground()
@@ -585,11 +580,12 @@ void BattlegroundTK::HandleKillPlayer(Player* player, Player* killer)
 
 	if(HasAnOrb(player))
 	{
-		UpdateScore(killer->GetTeam(), BG_TK_KILL_ORB_TEAM_SCORE);
+		UpdateScore(killer->GetTeam(), BG_TK_PLAYER_KILL_POINTS);
 		UpdatePlayerScore(killer, SCORE_LEADERS_KILLED, 1);
 	}
+
 	else
-		UpdateScore(killer->GetTeam(), BG_TK_KILL_TEAM_SCORE);
+		UpdateScore(killer->GetTeam(), BG_TK_PLAYER_KILL_POINTS);
 
 	if(m_orbOwners[0] == player->GetGUID()) //blue
         EventPlayerDroppedFlag(player);
