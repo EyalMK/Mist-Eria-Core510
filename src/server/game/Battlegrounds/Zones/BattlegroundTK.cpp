@@ -77,42 +77,42 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 65.0f)
+					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 50.0f)
 						UpdateScore(ALLIANCE, BG_TK_CENTER_POINTS);
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 65.0f)
+					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 50.0f)
 						UpdateScore(HORDE, BG_TK_CENTER_POINTS);
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 65.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 130.0f)
+					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 50.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
 						UpdateScore(ALLIANCE, BG_TK_INDOOR_POINTS);
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 65.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 130.0f)
+					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 50.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
 						UpdateScore(HORDE, BG_TK_INDOOR_POINTS);
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 130.0f)
+					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f)
 						UpdateScore(ALLIANCE, BG_TK_OUTDOOR_POINTS);
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 130.0f)
+					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f)
 						UpdateScore(HORDE, BG_TK_OUTDOOR_POINTS);
 
 					pointsTimer = 4000;
@@ -236,16 +236,19 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
         && BgObjects[BG_TK_OBJECT_ORB_BLUE] == target_obj->GetGUID())
     {
         message_id = LANG_BG_TK_PICKEDUP_ORB_BLUE;
+
 		if (Source->GetTeam() == ALLIANCE)
 		{
 			type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
 			PlaySoundToAll(BG_TK_SOUND_ALLIANCE_ORB_PICKED_UP);
 		}
+
 		if (Source->GetTeam() ==  HORDE)
 		{
 			type = CHAT_MSG_BG_SYSTEM_HORDE;
 			PlaySoundToAll(BG_TK_SOUND_HORDE_ORB_PICKED_UP);
 		}
+
         SpawnBGObject(BG_TK_OBJECT_ORB_BLUE, RESPAWN_ONE_DAY);
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_BLUE);
         _orbState[BG_TK_OBJECT_ORB_BLUE] = BG_TK_ORB_STATE_ON_PLAYER;
@@ -257,16 +260,19 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
         && BgObjects[BG_TK_OBJECT_ORB_PURPLE] == target_obj->GetGUID())
     {
         message_id = LANG_BG_TK_PICKEDUP_ORB_PURPLE;
+
         if (Source->GetTeam() == ALLIANCE)
 		{
 			type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
 			PlaySoundToAll(BG_TK_SOUND_ALLIANCE_ORB_PICKED_UP);
 		}
-		if (Source->GetTeam() ==  HORDE)
+
+		if (Source->GetTeam() == HORDE)
 		{
 			type = CHAT_MSG_BG_SYSTEM_HORDE;
 			PlaySoundToAll(BG_TK_SOUND_HORDE_ORB_PICKED_UP);
 		}
+
         SpawnBGObject(BG_TK_OBJECT_ORB_PURPLE, RESPAWN_ONE_DAY);
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_PURPLE);
         _orbState[BG_TK_OBJECT_ORB_PURPLE] = BG_TK_ORB_STATE_ON_PLAYER;
@@ -283,11 +289,13 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
 			type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
 			PlaySoundToAll(BG_TK_SOUND_ALLIANCE_ORB_PICKED_UP);
 		}
+
 		if (Source->GetTeam() ==  HORDE)
 		{
 			type = CHAT_MSG_BG_SYSTEM_HORDE;
 			PlaySoundToAll(BG_TK_SOUND_HORDE_ORB_PICKED_UP);
 		}
+
         SpawnBGObject(BG_TK_OBJECT_ORB_GREEN, RESPAWN_ONE_DAY);
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_GREEN);
         _orbState[BG_TK_OBJECT_ORB_GREEN] = BG_TK_ORB_STATE_ON_PLAYER;
