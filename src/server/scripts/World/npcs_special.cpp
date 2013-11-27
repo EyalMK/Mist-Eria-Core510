@@ -3179,4 +3179,5 @@ void AddSC_npcs_special()
     new npc_neutral_faction_select_auto();
     new npc_warrior_banner();
     new npc_transcendance();
+	new npc_winter_reveler();
 }

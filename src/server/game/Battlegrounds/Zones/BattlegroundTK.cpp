@@ -69,6 +69,9 @@ void BattlegroundTK::PostUpdateImpl(uint32 diff)
 
 void BattlegroundTK::CalculatePoints(uint32 diff)
 {
+	if (GetStatus() != STATUS_IN_PROGRESS)
+        return;
+
 	if (pointsTimer <= 0)
 	{
 		for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
@@ -80,7 +83,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
 					{
-						UpdateScore(TEAM_ALLIANCE, BG_TK_CENTER_POINTS);
+						//UpdateScore(TEAM_ALLIANCE, BG_TK_CENTER_POINTS);
 						UpdateWorldState(BG_TK_RESOURCES_ALLIANCE, GetTeamScore(TEAM_ALLIANCE));
 					}
 
@@ -90,7 +93,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
 					{
-						UpdateScore(TEAM_HORDE, BG_TK_CENTER_POINTS);
+						//UpdateScore(TEAM_HORDE, BG_TK_CENTER_POINTS);
 						UpdateWorldState(BG_TK_RESOURCES_HORDE, GetTeamScore(TEAM_HORDE));
 					}
 
@@ -100,7 +103,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
 					{
-						UpdateScore(TEAM_ALLIANCE, BG_TK_INDOOR_POINTS);
+						//UpdateScore(TEAM_ALLIANCE, BG_TK_INDOOR_POINTS);
 						UpdateWorldState(BG_TK_RESOURCES_ALLIANCE, GetTeamScore(TEAM_ALLIANCE));
 					}
 
@@ -110,7 +113,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
 					{
-						UpdateScore(TEAM_HORDE, BG_TK_INDOOR_POINTS);
+						//UpdateScore(TEAM_HORDE, BG_TK_INDOOR_POINTS);
 						UpdateWorldState(BG_TK_RESOURCES_HORDE, GetTeamScore(TEAM_HORDE));
 					}
 
@@ -120,7 +123,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
 					{
-						UpdateScore(TEAM_ALLIANCE, BG_TK_OUTDOOR_POINTS);
+						//UpdateScore(TEAM_ALLIANCE, BG_TK_OUTDOOR_POINTS);
 						UpdateWorldState(BG_TK_RESOURCES_ALLIANCE, GetTeamScore(TEAM_ALLIANCE));
 					}
 
@@ -130,7 +133,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
 					{
-						UpdateScore(TEAM_HORDE, BG_TK_OUTDOOR_POINTS);
+						//UpdateScore(TEAM_HORDE, BG_TK_OUTDOOR_POINTS);
 						UpdateWorldState(BG_TK_RESOURCES_HORDE, GetTeamScore(TEAM_HORDE));
 					}
 
@@ -144,18 +147,6 @@ void BattlegroundTK::Reset()
     Battleground::Reset();
 
 	pointsTimer = 5000;
-	secondTimer0 = 1000;
-	secondTimer1 = 1000;
-	secondTimer2 = 1000;
-	secondTimer3 = 1000;
-	auraTimer0 = 15000;
-	auraTimer1 = 15000;
-	auraTimer2 = 15000;
-	auraTimer3 = 15000;
-	auraCounter0 = 0;
-	auraCounter1 = 0;
-	auraCounter2 = 0;
-	auraCounter3 = 0;
     m_orbOwners[0]     = 0;
     m_orbOwners[1]     = 0;
 	m_orbOwners[2]     = 0;
@@ -164,10 +155,6 @@ void BattlegroundTK::Reset()
     m_orbTeam[1]     = 2;
 	m_orbTeam[2]     = 2;
     m_orbTeam[3]     = 2;
-	_orbZone[0]      = 0;
-	_orbZone[1]      = 0;
-	_orbZone[2]      = 0;
-	_orbZone[3]      = 0;
 
     _orbState[0]        = BG_TK_ORB_STATE_ON_BASE;
     _orbState[1]        = BG_TK_ORB_STATE_ON_BASE;
@@ -307,30 +294,29 @@ void BattlegroundTK::EventPlayerDroppedFlag(Player* Source)
 
     uint32 orb = GetOwnersOrb(Source);
 
-
     if (GetStatus() != STATUS_IN_PROGRESS)
     {
         SetOrbPicker(0, orb);
 
-		if(orb == BG_TK_OBJECT_ORB_BLUE)
+		if (orb == BG_TK_OBJECT_ORB_BLUE)
 		{
 			Source->RemoveAurasDueToSpell(BG_TK_AURA_ORB_BLUE);
 			RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_BLUE);
 		}
 
-		if(orb == BG_TK_OBJECT_ORB_PURPLE)
+		if (orb == BG_TK_OBJECT_ORB_PURPLE)
 		{
 			Source->RemoveAurasDueToSpell(BG_TK_AURA_ORB_PURPLE);
 			RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_PURPLE);
 		}
 
-		if(orb == BG_TK_OBJECT_ORB_GREEN)
+		if (orb == BG_TK_OBJECT_ORB_GREEN)
 		{
 			Source->RemoveAurasDueToSpell(BG_TK_AURA_ORB_GREEN);
 			RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_GREEN);
 		}
 
-		if(orb == BG_TK_OBJECT_ORB_ORANGE)
+		if (orb == BG_TK_OBJECT_ORB_ORANGE)
 		{
 			Source->RemoveAurasDueToSpell(BG_TK_AURA_ORB_ORANGE);
 			RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_ORANGE);
@@ -371,7 +357,6 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_BLUE);
         _orbState[BG_TK_OBJECT_ORB_BLUE] = BG_TK_ORB_STATE_ON_PLAYER;
         Source->CastSpell(Source, BG_TK_AURA_ORB_BLUE, true);
-		//auraCounter0 = 0;
     }
 
     // Udapte orb purple picked up
@@ -393,7 +378,6 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_PURPLE);
         _orbState[BG_TK_OBJECT_ORB_PURPLE] = BG_TK_ORB_STATE_ON_PLAYER;
         Source->CastSpell(Source, BG_TK_AURA_ORB_PURPLE, true);
-		//auraCounter1 = 0;
     }
 
 	// Udapte orb green picked up
@@ -415,7 +399,6 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_GREEN);
         _orbState[BG_TK_OBJECT_ORB_GREEN] = BG_TK_ORB_STATE_ON_PLAYER;
         Source->CastSpell(Source, BG_TK_AURA_ORB_GREEN, true);
-		//auraCounter2 = 0;
     }
 
 	// Udapte orb orange picked up
@@ -437,7 +420,6 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_ORANGE);
         _orbState[BG_TK_OBJECT_ORB_ORANGE] = BG_TK_ORB_STATE_ON_PLAYER;
         Source->CastSpell(Source, BG_TK_AURA_ORB_ORANGE, true);
-		//auraCounter3 = 0;
     }
 
     if (!message_id)
@@ -605,14 +587,28 @@ void BattlegroundTK::HandleKillPlayer(Player* player, Player* killer)
 	else
 		UpdateScore(killer->GetTeam(), BG_TK_PLAYER_KILL_POINTS);
 
-	if(m_orbOwners[0] == player->GetGUID()) //blue
+	if(m_orbOwners[0] == player->GetGUID())
+	{
+        BattlegroundTK::EventPlayerDroppedFlag(player);
+		BattlegroundTK::RespawnOrb(0); // Blue
+	}
+
+	if(m_orbOwners[1] == player->GetGUID()) // Purple
+	{
         EventPlayerDroppedFlag(player);
-	if(m_orbOwners[1] == player->GetGUID()) //purple
+		BattlegroundTK::RespawnOrb(1);
+	}
+	if(m_orbOwners[2] == player->GetGUID())
+	{
         EventPlayerDroppedFlag(player);
-	if(m_orbOwners[2] == player->GetGUID()) //green
+		BattlegroundTK::RespawnOrb(2); // Green
+	}
+
+	if(m_orbOwners[3] == player->GetGUID())
+	{
         EventPlayerDroppedFlag(player);
-	if(m_orbOwners[3] == player->GetGUID()) //orange
-        EventPlayerDroppedFlag(player);
+		BattlegroundTK::RespawnOrb(3); // Orange
+	}
 
     Battleground::HandleKillPlayer(player, killer);
 }
@@ -679,4 +675,3 @@ uint32 BattlegroundTK::GetPrematureWinner()
 
     return Battleground::GetPrematureWinner();
 }
-
