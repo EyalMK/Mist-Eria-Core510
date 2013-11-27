@@ -70,74 +70,50 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 {
 	if (pointsTimer <= 0)
 	{
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "Points timer !");
 		for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
 			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
 			{
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "Joueurs recuperes !");
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-				{
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "Avant les pts !");
-					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
-					{
+					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 65.0f)
 						UpdateScore(ALLIANCE, BG_TK_CENTER_POINTS);
-						sLog->outDebug(LOG_FILTER_NETWORKIO, "DONNE LES PTS !");
-					}
-				}
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
-					{
+					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 65.0f)
 						UpdateScore(HORDE, BG_TK_CENTER_POINTS);
-						sLog->outDebug(LOG_FILTER_NETWORKIO, "DONNE LES PTS !");
-					}
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 200.0f)
-					{
+					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 65.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 130.0f)
 						UpdateScore(ALLIANCE, BG_TK_INDOOR_POINTS);
-						sLog->outDebug(LOG_FILTER_NETWORKIO, "DONNE LES PTS !");
-					}
-					else pointsTimer = 5000;
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 200.0f)
-					{
+					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 65.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 130.0f)
 						UpdateScore(HORDE, BG_TK_INDOOR_POINTS);
-						sLog->outDebug(LOG_FILTER_NETWORKIO, "DONNE LES PTS !");
-					}
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 200.0f)
-					{
+					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 130.0f)
 						UpdateScore(ALLIANCE, BG_TK_OUTDOOR_POINTS);
-						sLog->outDebug(LOG_FILTER_NETWORKIO, "DONNE LES PTS !");
-					}
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 200.0f)
-					{
+					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 130.0f)
 						UpdateScore(HORDE, BG_TK_OUTDOOR_POINTS);
-						sLog->outDebug(LOG_FILTER_NETWORKIO, "DONNE LES PTS !");
-					}
 
 					pointsTimer = 5000;
 			}
