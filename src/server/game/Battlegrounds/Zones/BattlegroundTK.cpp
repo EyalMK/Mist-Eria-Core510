@@ -79,42 +79,60 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
-						UpdateScore(TEAM_ALLIANCE, 250);
+					{
+						UpdateScore(TEAM_ALLIANCE, BG_TK_CENTER_POINTS);
+						UpdateWorldState(BG_TK_RESOURCES_ALLIANCE, GetTeamScore(TEAM_ALLIANCE));
+					}
 
 				if (player->GetTeam() == TEAM_HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
 					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
 						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
-						UpdateScore(TEAM_HORDE, 250);
+					{
+						UpdateScore(TEAM_HORDE, BG_TK_CENTER_POINTS);
+						UpdateWorldState(BG_TK_RESOURCES_HORDE, GetTeamScore(TEAM_HORDE));
+					}
 
 				if (player->GetTeam() == TEAM_ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 200.0f)
 					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
 						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
-						UpdateScore(TEAM_ALLIANCE, 50);
+					{
+						UpdateScore(TEAM_ALLIANCE, BG_TK_INDOOR_POINTS);
+						UpdateWorldState(BG_TK_RESOURCES_ALLIANCE, GetTeamScore(TEAM_ALLIANCE));
+					}
 
 				if (player->GetTeam() == TEAM_HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 200.0f)
 					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
 						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
-						UpdateScore(TEAM_HORDE, 50);
+					{
+						UpdateScore(TEAM_HORDE, BG_TK_INDOOR_POINTS);
+						UpdateWorldState(BG_TK_RESOURCES_HORDE, GetTeamScore(TEAM_HORDE));
+					}
 
 				if (player->GetTeam() == TEAM_ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 200.0f)
 					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
 						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
-						UpdateScore(TEAM_ALLIANCE, 10);
+					{
+						UpdateScore(TEAM_ALLIANCE, BG_TK_OUTDOOR_POINTS);
+						UpdateWorldState(BG_TK_RESOURCES_ALLIANCE, GetTeamScore(TEAM_ALLIANCE));
+					}
 
 				if (player->GetTeam() == TEAM_HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 200.0f)
 					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
 						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
-						UpdateScore(TEAM_HORDE, 10);
+					{
+						UpdateScore(TEAM_HORDE, BG_TK_OUTDOOR_POINTS);
+						UpdateWorldState(BG_TK_RESOURCES_HORDE, GetTeamScore(TEAM_HORDE));
+					}
 
 				pointsTimer = 5000;
 			} else pointsTimer -= diff;

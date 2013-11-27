@@ -3102,6 +3102,47 @@ public:
     }
 };
 
+enum WinterRevelerSpells
+{
+	// Pick one of the three
+	SPELL_CREATE_MISTLETOE   = 26206,
+	SPELL_CREATE_SNOWFLAKES  = 45036,
+	SPELL_CREATE_FRESHHOLY   = 26207,
+            
+	// And then cast this one
+	SPELL_MISTLETOE         = 26218
+};
+
+class npc_winter_reveler : public CreatureScript
+{
+public :
+    npc_winter_reveler() : CreatureScript("npc_winter_reveler")
+    {
+    }
+    
+    struct npc_winter_revelerAI : public ScriptedAI
+    {
+    public :
+        npc_winter_revelerAI(Creature* c) : ScriptedAI(c)
+        {
+        }
+        
+        void ReceiveEmote(Player *who, uint32 emoteId)
+		{
+            if(who && emoteId == EMOTE_ONESHOT_KISS && !who->HasAura(SPELL_MISTLETOE))
+			{
+                me->CastSpell(who, RAND(SPELL_CREATE_MISTLETOE, SPELL_CREATE_SNOWFLAKES, SPELL_CREATE_FRESHHOLY), true);
+                me->CastSpell(who, SPELL_MISTLETOE);
+            }
+        }
+    };
+    
+    CreatureAI* GetAI(Creature *c) const
+    {
+        return new npc_winter_revelerAI(c);
+    }
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
