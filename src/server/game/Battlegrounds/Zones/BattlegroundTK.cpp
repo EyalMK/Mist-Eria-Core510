@@ -54,6 +54,8 @@ void BattlegroundTK::PostUpdateImpl(uint32 diff)
                 EndBattleground(HORDE);
             else
                 EndBattleground(ALLIANCE);
+
+			BattlegroundTK::CalculatePoints(diff);
         }
         // first update needed after 1 minute of game already in progress
         else if (GetElapsedTime() > uint32(_minutesElapsed * MINUTE * IN_MILLISECONDS) +  3 * MINUTE * IN_MILLISECONDS)
@@ -61,27 +63,30 @@ void BattlegroundTK::PostUpdateImpl(uint32 diff)
             ++_minutesElapsed;
             //UpdateWorldState(BG_TK_STATE_TIMER, 25 - _minutesElapsed);
         }
-		
-		BattlegroundTK::CalculatePoints(diff);
     }
 }
 
 void BattlegroundTK::CalculatePoints(uint32 diff)
 {
-	if (GetStatus() != STATUS_IN_PROGRESS)
-        return;
-
 	if (pointsTimer <= 0)
 	{
+		sLog->outError(LOG_FILTER_BATTLEGROUND, "Points timer !");
 		for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
 			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
 			{
+				sLog->outError(LOG_FILTER_BATTLEGROUND, "Joueurs recuperes !");
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
+				{
+					sLog->outError(LOG_FILTER_BATTLEGROUND, "Avant les pts !");
 					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
+					{
 						UpdateScore(ALLIANCE, BG_TK_CENTER_POINTS);
+						sLog->outError(LOG_FILTER_BATTLEGROUND, "DONNE LES PTS !");
+					}
+				}
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
