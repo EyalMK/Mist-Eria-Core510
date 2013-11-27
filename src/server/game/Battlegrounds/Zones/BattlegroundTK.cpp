@@ -115,7 +115,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 130.0f)
 						UpdateScore(HORDE, BG_TK_OUTDOOR_POINTS);
 
-					pointsTimer = 5000;
+					pointsTimer = 4000;
 			}
 		} else pointsTimer -= diff;
 }
@@ -124,7 +124,7 @@ void BattlegroundTK::Reset()
 {
     Battleground::Reset();
 
-	pointsTimer			= 5000;
+	pointsTimer			= 4000;
     m_orbOwners[0]		= 0;
     m_orbOwners[1]		= 0;
 	m_orbOwners[2]		= 0;
