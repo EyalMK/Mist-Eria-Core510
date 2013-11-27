@@ -98,7 +98,6 @@ class BattlegroundTK : public Battleground
         void StartingEventOpenDoors();
 
 		 /* Battleground Events */
-        void EventPlayerDroppedFlag(Player* Source);
         void EventPlayerClickedOnFlag(Player* Source, GameObject* target_obj);
 
         void RemovePlayer(Player* player, uint64 guid, uint32 team);
@@ -119,17 +118,12 @@ class BattlegroundTK : public Battleground
         }
 
         void SetOrbPicker(uint64 guid, uint32 orb)     { m_orbOwners[orb] = guid; }
-		void SetOrbTeam(uint64 team, uint32 orb)     { m_orbTeam[orb] = team; }
-		void SetOrbZone(uint8 zone, uint32 orb)      {_orbZone[orb] = zone; }
         bool IsAllianceOrbPickedup() const         { return m_orbOwners[TEAM_ALLIANCE] != 0; }
         bool IsHordeOrbPickedup() const            { return m_orbOwners[TEAM_HORDE] != 0; }
-		uint64 GetOrbOwners(uint8 orb)             { return m_orbOwners[orb]; }
         uint8 GetOrbState(uint32 orb)             { return _orbState[orb]; }
-		uint8 GetOrbZone(uint8 orb)              { return _orbZone[orb]; }
-		void RespawnOrb(uint32 orb);
 		void RespawnOrbAfterDrop(uint32 orb);
 		bool HasAnOrb(Player* player);
-        uint32 GetOwnersOrb(Player* player);
+        uint32 GetOrbOwners(Player* player);
 
 		uint32 GetPrematureWinner();
         void UpdateScore(uint16 team, int16 points);
@@ -142,31 +136,15 @@ class BattlegroundTK : public Battleground
 
 		 private:
         uint64 m_orbOwners[4];                            // 0 = orb 1, 1 = orb 2, 2 = orb 3, 3 = orb 4 (for the guid player)
-		uint64 m_orbTeam[4];                               // for the team who has this orb
- 
         uint8 _orbState[4];                               // for checking orb state (on player, on base)
-		uint8 _orbZone[4]; // 0 = orb 1, 1 = orb 2, 2 = orb 3, 3 = orb 4 (for the zone: 0: base, 1: zone 1, 2: zone 2, 3: zone 3)
 
 		int32 m_Team_Scores[2];
 		bool m_IsInformedNearVictory[2];
 
 		int32 pointsTimer;
-        uint32 m_ReputationCapture;
         uint32 m_HonorWinKills;
         uint32 m_HonorEndKills;
 		uint32 _minutesElapsed;
-        uint32 secondTimer0;
-		uint32 secondTimer1;
-		uint32 secondTimer2;
-		uint32 secondTimer3;
-		uint32 auraTimer0;
-		uint32 auraTimer1;
-		uint32 auraTimer2;
-		uint32 auraTimer3;
-		uint32 auraCounter0;
-		uint32 auraCounter1;
-		uint32 auraCounter2;
-		uint32 auraCounter3;
 
         void PostUpdateImpl(uint32 diff);
 		void CalculatePoints(uint32 diff);
