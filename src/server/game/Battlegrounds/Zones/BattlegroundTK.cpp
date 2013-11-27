@@ -37,6 +37,8 @@ void BattlegroundTK::PostUpdateImpl(uint32 diff)
 {
     if (GetStatus() == STATUS_IN_PROGRESS)
     {
+		BattlegroundTK::CalculatePoints(diff);
+
         if (GetElapsedTime() >= 27*MINUTE*IN_MILLISECONDS)
         {
             if (m_Team_Scores[TEAM_ALLIANCE] == 0)
@@ -54,8 +56,6 @@ void BattlegroundTK::PostUpdateImpl(uint32 diff)
                 EndBattleground(HORDE);
             else
                 EndBattleground(ALLIANCE);
-
-			BattlegroundTK::CalculatePoints(diff);
         }
         // first update needed after 1 minute of game already in progress
         else if (GetElapsedTime() > uint32(_minutesElapsed * MINUTE * IN_MILLISECONDS) +  3 * MINUTE * IN_MILLISECONDS)
@@ -93,39 +93,55 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
 					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
+					{
 						UpdateScore(HORDE, BG_TK_CENTER_POINTS);
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "DONNE LES PTS !");
+					}
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
 					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 200.0f)
+					{
 						UpdateScore(ALLIANCE, BG_TK_INDOOR_POINTS);
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "DONNE LES PTS !");
+					}
+					else pointsTimer = 5000;
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
 					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 200.0f)
+					{
 						UpdateScore(HORDE, BG_TK_INDOOR_POINTS);
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "DONNE LES PTS !");
+					}
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
 					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 200.0f)
+					{
 						UpdateScore(ALLIANCE, BG_TK_OUTDOOR_POINTS);
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "DONNE LES PTS !");
+					}
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
 					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 200.0f)
+					{
 						UpdateScore(HORDE, BG_TK_OUTDOOR_POINTS);
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "DONNE LES PTS !");
+					}
 
-				pointsTimer = 5000;
-			} else pointsTimer -= diff;
-		}
+					pointsTimer = 5000;
+			}
+		} else pointsTimer -= diff;
 }
 
 void BattlegroundTK::Reset()
