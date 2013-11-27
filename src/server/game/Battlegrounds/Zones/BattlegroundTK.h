@@ -130,11 +130,9 @@ class BattlegroundTK : public Battleground
         void UpdatePlayerScore(Player* Source, uint32 type, uint32 value, bool doAddHonor = true);
 		void FillInitialWorldStates(WorldPacket& data);
 		/* Scorekeeping */
-        void AddPoint(uint32 TeamID, uint32 Points = 1)     { m_TeamScores[GetTeamIndexByTeamId(TeamID)] += Points; }
-        void SetTeamPoint(uint32 TeamID, uint32 Points = 0) { m_TeamScores[GetTeamIndexByTeamId(TeamID)] = Points; }
-        void RemovePoint(uint32 TeamID, uint32 Points = 1)  { m_TeamScores[GetTeamIndexByTeamId(TeamID)] -= Points; }
+        void AddPoint(uint32 TeamID, uint32 Points)     { m_Team_Scores[GetTeamIndexByTeamId(TeamID)] += Points; }
 
-		 private:
+		private:
         uint64 m_orbOwners[4];                            // 0 = orb 1, 1 = orb 2, 2 = orb 3, 3 = orb 4 (for the guid player)
         uint8 _orbState[4];                               // for checking orb state (on player, on base)
 
