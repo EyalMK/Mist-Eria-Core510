@@ -133,7 +133,7 @@ class BattlegroundTK : public Battleground
         void AddPoint(uint32 TeamID, uint32 Points)     { m_Team_Scores[GetTeamIndexByTeamId(TeamID)] += Points; }
 
 		private:
-        uint64 m_orbOwners[4];                            // 0 = orb 1, 1 = orb 2, 2 = orb 3, 3 = orb 4 (for the guid player)
+        uint64 m_orbOwners[4];                            // 0 = orb 1, 1 = orb 2, 2 = orb 3, 3 = orb 4 (for player's guids)
         uint8 _orbState[4];                               // for checking orb state (on player, on base)
 
 		int32 m_Team_Scores[2];

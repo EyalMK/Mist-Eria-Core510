@@ -76,65 +76,47 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 		for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
 			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
 			{
-				if (player->GetTeam() == TEAM_ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
-					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
-						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
-						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
-						player->HasAura(BG_TK_AURA_ORB_ORANGE))
-					{
-						UpdateScore(TEAM_ALLIANCE, BG_TK_CENTER_POINTS);
-						UpdateWorldState(BG_TK_RESOURCES_ALLIANCE, m_Team_Scores[TEAM_ALLIANCE]);
-					}
+				if (player->GetGUID() == m_orbOwners[0] ||
+						player->GetGUID() == m_orbOwners[1] ||
+						player->GetGUID() == m_orbOwners[2] ||
+						player->GetGUID() == m_orbOwners[3])
+					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
+						UpdateScore(ALLIANCE, BG_TK_CENTER_POINTS);
 
-				if (player->GetTeam() == TEAM_HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
-					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
-						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
-						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
-						player->HasAura(BG_TK_AURA_ORB_ORANGE))
-					{
-						UpdateScore(TEAM_HORDE, BG_TK_CENTER_POINTS);
-						UpdateWorldState(BG_TK_RESOURCES_HORDE, m_Team_Scores[TEAM_HORDE]);
-					}
+				if (player->GetGUID() == m_orbOwners[0] ||
+						player->GetGUID() == m_orbOwners[1] ||
+						player->GetGUID() == m_orbOwners[2] ||
+						player->GetGUID() == m_orbOwners[3])
+					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
+						UpdateScore(HORDE, BG_TK_CENTER_POINTS);
 
-				if (player->GetTeam() == TEAM_ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 200.0f)
-					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
-						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
-						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
-						player->HasAura(BG_TK_AURA_ORB_ORANGE))
-					{
-						UpdateScore(TEAM_ALLIANCE, BG_TK_INDOOR_POINTS);
-						UpdateWorldState(BG_TK_RESOURCES_ALLIANCE, m_Team_Scores[TEAM_ALLIANCE]);
-					}
+				if (player->GetGUID() == m_orbOwners[0] ||
+						player->GetGUID() == m_orbOwners[1] ||
+						player->GetGUID() == m_orbOwners[2] ||
+						player->GetGUID() == m_orbOwners[3])
+					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 200.0f)
+						UpdateScore(ALLIANCE, BG_TK_INDOOR_POINTS);
 
-				if (player->GetTeam() == TEAM_HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 200.0f)
-					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
-						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
-						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
-						player->HasAura(BG_TK_AURA_ORB_ORANGE))
-					{
-						UpdateScore(TEAM_HORDE, BG_TK_INDOOR_POINTS);
-						UpdateWorldState(BG_TK_RESOURCES_HORDE, m_Team_Scores[TEAM_HORDE]);
-					}
+				if (player->GetGUID() == m_orbOwners[0] ||
+						player->GetGUID() == m_orbOwners[1] ||
+						player->GetGUID() == m_orbOwners[2] ||
+						player->GetGUID() == m_orbOwners[3])
+					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 200.0f)
+						UpdateScore(HORDE, BG_TK_INDOOR_POINTS);
 
-				if (player->GetTeam() == TEAM_ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 200.0f)
-					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
-						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
-						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
-						player->HasAura(BG_TK_AURA_ORB_ORANGE))
-					{
-						UpdateScore(TEAM_ALLIANCE, BG_TK_OUTDOOR_POINTS);
-						UpdateWorldState(BG_TK_RESOURCES_ALLIANCE, m_Team_Scores[TEAM_ALLIANCE]);
-					}
+				if (player->GetGUID() == m_orbOwners[0] ||
+						player->GetGUID() == m_orbOwners[1] ||
+						player->GetGUID() == m_orbOwners[2] ||
+						player->GetGUID() == m_orbOwners[3])
+					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 200.0f)
+						UpdateScore(ALLIANCE, BG_TK_OUTDOOR_POINTS);
 
-				if (player->GetTeam() == TEAM_HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 200.0f)
-					if (player->HasAura(BG_TK_AURA_ORB_BLUE) ||
-						player->HasAura(BG_TK_AURA_ORB_PURPLE) ||
-						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
-						player->HasAura(BG_TK_AURA_ORB_ORANGE))
-					{
-						UpdateScore(TEAM_HORDE, BG_TK_OUTDOOR_POINTS);
-						UpdateWorldState(BG_TK_RESOURCES_HORDE, m_Team_Scores[TEAM_HORDE]);
-					}
+				if (player->GetGUID() == m_orbOwners[0] ||
+						player->GetGUID() == m_orbOwners[1] ||
+						player->GetGUID() == m_orbOwners[2] ||
+						player->GetGUID() == m_orbOwners[3])
+					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 200.0f)
+						UpdateScore(HORDE, BG_TK_OUTDOOR_POINTS);
 
 				pointsTimer = 5000;
 			} else pointsTimer -= diff;
@@ -145,11 +127,11 @@ void BattlegroundTK::Reset()
 {
     Battleground::Reset();
 
-	pointsTimer = 5000;
-    m_orbOwners[0]     = 0;
-    m_orbOwners[1]     = 0;
-	m_orbOwners[2]     = 0;
-    m_orbOwners[3]     = 0;
+	pointsTimer			= 5000;
+    m_orbOwners[0]		= 0;
+    m_orbOwners[1]		= 0;
+	m_orbOwners[2]		= 0;
+    m_orbOwners[3]		= 0;
 
     _orbState[0]        = BG_TK_ORB_STATE_ON_BASE;
     _orbState[1]        = BG_TK_ORB_STATE_ON_BASE;
@@ -444,9 +426,9 @@ bool BattlegroundTK::SetupBattleground()
 		|| !AddObject(BG_TK_OBJECT_ORB_GREEN, BG_OBJECT_TK_ORB_GREEN, 1716.775635f, 1416.752686f, 10.678053f, 0.0f, 0, 0, 0.008726535f, 0.9999619f, RESPAWN_IMMEDIATELY)
 		|| !AddObject(BG_TK_OBJECT_ORB_ORANGE, BG_OBJECT_TK_ORB_ORANGE, 1850.234375f, 1250.272827f, 10.689357f, 0.0f, 0, 0, 0.008726535f, 0.9999619f, RESPAWN_IMMEDIATELY)
         // Horde gate
-        || !AddObject(BG_TK_OBJECT_DOOR_H, BG_OBJECT_DOOR_TK_H, 1780.151733f, 1565.395874f, 22.469021f, 4.7027f, 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
+        || !AddObject(BG_TK_OBJECT_DOOR_H, BG_OBJECT_DOOR_TK_H, 1780.151733f, 1565.395874f, 22.469021f, 4.70132f, 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
         // Alliance gate
-        || !AddObject(BG_TK_OBJECT_DOOR_A, BG_OBJECT_DOOR_TK_A, 1783.735107f, 1104.960205f, 19.374258f, 1.626256f, 0.0f, 0.0f, 0.71615f, 0.697947f, RESPAWN_IMMEDIATELY)
+        || !AddObject(BG_TK_OBJECT_DOOR_A, BG_OBJECT_DOOR_TK_A, 1783.735107f, 1104.960205f, 19.374258f, 1.59529f, 0.0f, 0.0f, 0.71615f, 0.697947f, RESPAWN_IMMEDIATELY)
 		)
     {
         sLog->outError(LOG_FILTER_SQL, "BattleGroundTK: Failed to spawn some object Battleground not created!");
