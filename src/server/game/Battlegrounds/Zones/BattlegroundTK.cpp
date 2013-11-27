@@ -14,10 +14,9 @@
 #include "World.h"
 #include "WorldPacket.h"
 
-// Modifier les Worldstates
 // Calculs fonction zone player : a tester
-// Spells de nerf
-// FillInitial (packet)
+// Debuff spell
+// FillInitial incomplete ?
 
 BattlegroundTK::BattlegroundTK()
 {
@@ -83,7 +82,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
 					{
-						//UpdateScore(TEAM_ALLIANCE, BG_TK_CENTER_POINTS);
+						UpdateScore(TEAM_ALLIANCE, BG_TK_CENTER_POINTS);
 						UpdateWorldState(BG_TK_RESOURCES_ALLIANCE, m_Team_Scores[TEAM_ALLIANCE]);
 					}
 
@@ -93,7 +92,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
 					{
-						//UpdateScore(TEAM_HORDE, BG_TK_CENTER_POINTS);
+						UpdateScore(TEAM_HORDE, BG_TK_CENTER_POINTS);
 						UpdateWorldState(BG_TK_RESOURCES_HORDE, m_Team_Scores[TEAM_HORDE]);
 					}
 
@@ -103,7 +102,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
 					{
-						//UpdateScore(TEAM_ALLIANCE, BG_TK_INDOOR_POINTS);
+						UpdateScore(TEAM_ALLIANCE, BG_TK_INDOOR_POINTS);
 						UpdateWorldState(BG_TK_RESOURCES_ALLIANCE, m_Team_Scores[TEAM_ALLIANCE]);
 					}
 
@@ -113,7 +112,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
 					{
-						//UpdateScore(TEAM_HORDE, BG_TK_INDOOR_POINTS);
+						UpdateScore(TEAM_HORDE, BG_TK_INDOOR_POINTS);
 						UpdateWorldState(BG_TK_RESOURCES_HORDE, m_Team_Scores[TEAM_HORDE]);
 					}
 
@@ -123,7 +122,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
 					{
-						//UpdateScore(TEAM_ALLIANCE, BG_TK_OUTDOOR_POINTS);
+						UpdateScore(TEAM_ALLIANCE, BG_TK_OUTDOOR_POINTS);
 						UpdateWorldState(BG_TK_RESOURCES_ALLIANCE, m_Team_Scores[TEAM_ALLIANCE]);
 					}
 
@@ -133,7 +132,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->HasAura(BG_TK_AURA_ORB_GREEN) ||
 						player->HasAura(BG_TK_AURA_ORB_ORANGE))
 					{
-						//UpdateScore(TEAM_HORDE, BG_TK_OUTDOOR_POINTS);
+						UpdateScore(TEAM_HORDE, BG_TK_OUTDOOR_POINTS);
 						UpdateWorldState(BG_TK_RESOURCES_HORDE, m_Team_Scores[TEAM_HORDE]);
 					}
 
