@@ -70,21 +70,21 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 {
 	if (pointsTimer <= 0)
 	{
-		sLog->outError(LOG_FILTER_BATTLEGROUND, "Points timer !");
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "Points timer !");
 		for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
 			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
 			{
-				sLog->outError(LOG_FILTER_BATTLEGROUND, "Joueurs recuperes !");
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Joueurs recuperes !");
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
 				{
-					sLog->outError(LOG_FILTER_BATTLEGROUND, "Avant les pts !");
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Avant les pts !");
 					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
 					{
 						UpdateScore(ALLIANCE, BG_TK_CENTER_POINTS);
-						sLog->outError(LOG_FILTER_BATTLEGROUND, "DONNE LES PTS !");
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "DONNE LES PTS !");
 					}
 				}
 
@@ -340,7 +340,7 @@ void BattlegroundTK::RemovePlayer(Player* player, uint64 guid, uint32 /*team*/)
     {
         if (!player)
         {
-            sLog->outError(LOG_FILTER_BATTLEGROUND, "BattlegroundTK: Removing offline player who has the ORB!");
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "BattlegroundTK: Removing offline player who has the ORB!");
 			player->RemoveAurasDueToSpell(BG_TK_AURA_ORB_BLUE);
             SetOrbPicker(0, BG_TK_OBJECT_ORB_BLUE);
             BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_BLUE);
@@ -353,7 +353,7 @@ void BattlegroundTK::RemovePlayer(Player* player, uint64 guid, uint32 /*team*/)
     {
         if (!player)
         {
-            sLog->outError(LOG_FILTER_BATTLEGROUND, "BattlegroundTK: Removing offline player who has the ORB!");
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "BattlegroundTK: Removing offline player who has the ORB!");
 			player->RemoveAurasDueToSpell(BG_TK_AURA_ORB_PURPLE);
             SetOrbPicker(0, BG_TK_OBJECT_ORB_PURPLE);
             BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_PURPLE);
@@ -366,7 +366,7 @@ void BattlegroundTK::RemovePlayer(Player* player, uint64 guid, uint32 /*team*/)
     {
         if (!player)
         {
-            sLog->outError(LOG_FILTER_BATTLEGROUND, "BattlegroundTK: Removing offline player who has the ORB!");
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "BattlegroundTK: Removing offline player who has the ORB!");
 			player->RemoveAurasDueToSpell(BG_TK_AURA_ORB_GREEN);
             SetOrbPicker(0, BG_TK_OBJECT_ORB_GREEN);
             BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_GREEN);
@@ -379,7 +379,7 @@ void BattlegroundTK::RemovePlayer(Player* player, uint64 guid, uint32 /*team*/)
     {
         if (!player)
         {
-            sLog->outError(LOG_FILTER_BATTLEGROUND, "BattlegroundTK: Removing offline player who has the ORB!");
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "BattlegroundTK: Removing offline player who has the ORB!");
 			player->RemoveAurasDueToSpell(BG_TK_AURA_ORB_ORANGE);
             SetOrbPicker(0, BG_TK_OBJECT_ORB_ORANGE);
             BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_ORANGE);
@@ -436,25 +436,25 @@ bool BattlegroundTK::SetupBattleground()
         || !AddObject(BG_TK_OBJECT_DOOR_A, BG_OBJECT_DOOR_TK_A, 1783.735107f, 1104.960205f, 19.374258f, 1.59529f, 0.0f, 0.0f, 0.71615f, 0.697947f, RESPAWN_IMMEDIATELY)
 		)
     {
-        sLog->outError(LOG_FILTER_SQL, "BattleGroundTK: Failed to spawn some object Battleground not created!");
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "BattleGroundTK: Failed to spawn some object Battleground not created!");
         return false;
     }
 
     WorldSafeLocsEntry const* sg = sWorldSafeLocsStore.LookupEntry(BG_TK_GraveyardIds[0]); // Alliance
     if (!sg || !AddSpiritGuide(TK_SPIRIT_MAIN_ALLIANCE, sg->x, sg->y, sg->z, 2.498876f, ALLIANCE))
     {
-        sLog->outError(LOG_FILTER_SQL, "BattleGroundTK: Failed to spawn Alliance spirit guide! Battleground not created!");
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "BattleGroundTK: Failed to spawn Alliance spirit guide! Battleground not created!");
         return false;
     }
 
     sg = sWorldSafeLocsStore.LookupEntry(BG_TK_GraveyardIds[1]); // Horde
     if (!sg || !AddSpiritGuide(TK_SPIRIT_MAIN_HORDE, sg->x, sg->y, sg->z, 5.936957f, HORDE))
     {
-        sLog->outError(LOG_FILTER_SQL, "BatlteGroundTK: Failed to spawn Horde spirit guide! Battleground not created!");
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "BatlteGroundTK: Failed to spawn Horde spirit guide! Battleground not created!");
         return false;
     }
 
-    sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattleGroundTK: BG objects and spirit guides spawned");
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "BattleGroundTK: BG objects and spirit guides spawned");
 
     return true;
 }
