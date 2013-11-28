@@ -704,6 +704,11 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
         ASSERT(addonPrefix);
         *data << addonPrefix;
     }
+    else if (type == CHAT_MSG_BG_SYSTEM_NEUTRAL ||
+             type == CHAT_MSG_BG_SYSTEM_ALLIANCE ||
+             type == CHAT_MSG_BG_SYSTEM_HORDE) {
+        *data << uint64(0);
+    }
     else
         *data << uint64(target_guid);
 
