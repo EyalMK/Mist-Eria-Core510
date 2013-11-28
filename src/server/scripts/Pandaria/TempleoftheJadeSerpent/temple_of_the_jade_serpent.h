@@ -1,4 +1,4 @@
-/* Script de Tydrheal : Temple du serpent de jade. */
+/* Script de Tydrheal & Sungis : Temple du serpent de jade. */
 
 #ifndef DEF_TEMPLE_OF_THE_JADE_SERPENT_H
 #define DEF_TEMPLE_OF_THE_JADE_SERPENT_H
@@ -17,26 +17,6 @@ enum Data64
 	DATA_NPC_SUN_5,
 	DATA_BOSS_LIU_FLAMEHEART,
 	DATA_BOSS_SHA_OF_DOUBT
-};
-
-enum CreaturesIds
-{
-	BOSS_WISE_MARI				= 56448,
-	BOSS_LOREWALKER_STONESTEP	= 56843,
-	NPC_ZAO_SUNSEEKER			= 58826,
-	NPC_CORRUPTED_SCROLL		= 57080,
-	BOSS_LIU_FLAMEHEART			= 56732,
-	BOSS_SHA_OF_DOUBT			= 56439
-
-};
-
-enum CreaturesGUID
-{
-	NPC_SUN_1			= 0,
-	NPC_SUN_2			= 1,
-	NPC_SUN_3			= 2,
-	NPC_SUN_4			= 3,
-	NPC_SUN_5			= 4,
 };
 
 enum GameObjects
