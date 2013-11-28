@@ -14,9 +14,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 
-// Calculs fonction zone player : a tester
 // Debuff spell
-// FillInitial incomplete ?
 
 BattlegroundTK::BattlegroundTK()
 {
