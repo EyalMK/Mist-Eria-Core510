@@ -452,6 +452,7 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
         uint32 values;
         switch(bg->GetMapId())
         {
+        case 998:
         case 566: values = 1; break;
         case 489:
         case 529:
@@ -545,6 +546,9 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
 
         switch(bg->GetMapId())
         {
+        case 998:
+            *data << uint32(((BattlegroundTKScore*)itr->second)->OrbPossesions);
+            break;
         case 566:
             *data << uint32(((BattlegroundEYScore*)itr->second)->FlagCaptures);        // flag captures
             break;
