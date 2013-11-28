@@ -22,11 +22,6 @@ enum Events
 
 };
 
-enum Actions
-{
-
-};
-
 enum Texts
 {
 
@@ -41,10 +36,10 @@ enum Npcs
 {
 	NPC_LOREWALKER_STONESTEP	= 56843,
 	NPC_CORRUPTED_SCROLL		= 57080,
-	NPC_STRIFE					= 0,
-	NPC_PERIL					= 0,
-	NPC_YAUNGOL					= 0,
-	NPC_SUN						= 0,
+	NPC_STRIFE					= 59051,
+	NPC_PERIL					= 59726,
+	NPC_OSONG					= 56872,
+	NPC_SUN						= 56915, // Missing template
 };
 
 class boss_lorewalker_stonestep : public CreatureScript
@@ -154,7 +149,13 @@ public:
 		void JustDied(Unit *pWho) 
 		{
 			if (instance)
+			{
 				instance->DoCastSpellOnPlayers(SPELL_CAMERA_SHAKE);
+
+				me->SummonCreature(NPC_OSONG, 848.020325f, 2449.538818f, 174.961197f, 4.385465f, TEMPSUMMON_MANUAL_DESPAWN);
+				//me->SummonCreature(NPC_PERIL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN);
+				//me->SummonCreature(NPC_STRIFE, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN);
+			}
 		}
 	};
 };
