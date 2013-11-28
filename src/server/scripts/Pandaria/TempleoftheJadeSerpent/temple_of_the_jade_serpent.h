@@ -13,7 +13,7 @@ enum Data64
 	DATA_BOSS_SHA_OF_DOUBT
 };
 
-enum Npcs
+enum CreatureIds
 {
 	BOSS_WISE_MARI				= 56448,
 	BOSS_LOREWALKER_STONESTEP	= 56843,
