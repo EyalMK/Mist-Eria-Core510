@@ -1770,10 +1770,10 @@ void BattlegroundMgr::ScheduleQueueUpdate(uint32 arenaMatchmakerRating, uint8 ar
 {
     //This method must be atomic, TODO add mutex
     //we will use only 1 number created of bgTypeId and bracket_id
-    uint64 const scheduleId = ((uint64)arenaMatchmakerRating << 48) | (bgTypeId << 32) | (arenaType << 24) | (bgQueueTypeId << 16) | bracket_id;
+    uint64 const scheduleId = ((uint64) (uint16)arenaMatchmakerRating << 48) | (bgTypeId << 32) | (arenaType << 24) | (bgQueueTypeId << 16) | bracket_id;
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE set schedule : %u %u %u %u %u", arenaMatchmakerRating, bgTypeId, arenaType, bgQueueTypeId, bracket_id);
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE set schedule : " UI64FMTD "", scheduleId);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE set schedule : %u%u", ((uint32)scheduleId << 32), (uint32)scheduleId);
 
     if (std::find(m_QueueUpdateScheduler.begin(), m_QueueUpdateScheduler.end(), scheduleId) == m_QueueUpdateScheduler.end())
         m_QueueUpdateScheduler.push_back(scheduleId);
