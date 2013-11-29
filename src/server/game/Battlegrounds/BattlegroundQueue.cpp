@@ -748,8 +748,7 @@ should be called from Battleground::RemovePlayer function in some cases
 */
 void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id, uint8 arenaType, bool isRated, uint32 arenaRating)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE queueUpdate 1");
-
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE queueUpdate 1 %u %u %u %u %u", bgTypeId, bracket_id, arenaType, isRated?1:0, arenaRating);
 
     //if no players in queue - do nothing
     if (m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_ALLIANCE].empty() &&
