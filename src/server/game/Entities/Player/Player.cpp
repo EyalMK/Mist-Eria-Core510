@@ -9940,6 +9940,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
                 data << uint32(0xe1a) << uint32(0x0);           // 9 show
             }
             break;
+			// Isle of Conquest
         case 4710:
             if (bg && bg->GetTypeID(true) == BATTLEGROUND_IC)
                 bg->FillInitialWorldStates(data);
@@ -10032,6 +10033,11 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
         // Battle for Gilneas
         case 5449:
             if (bg && bg->GetTypeID(true) == BATTLEGROUND_BFG)
+                bg->FillInitialWorldStates(data);
+            break;
+		// Temple of Kotmogu
+		case 6051:
+            if (bg && bg->GetTypeID(true) == BATTLEGROUND_TK)
                 bg->FillInitialWorldStates(data);
             break;
         // Wintergrasp

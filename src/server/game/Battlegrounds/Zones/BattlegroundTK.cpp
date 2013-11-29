@@ -140,6 +140,7 @@ void BattlegroundTK::Reset()
         m_HonorWinKills = 3;
         m_HonorEndKills = 4;
     }
+
     else
     {
         m_HonorWinKills = 1;
@@ -397,14 +398,14 @@ void BattlegroundTK::UpdateScore(uint16 team, int16 points)
 
     if (points > 0)
     {
-        if (!m_IsInformedNearVictory[team] && m_Team_Scores[teamindex] > BG_TK_WARNING_NEAR_VICTORY_SCORE)
+        if (!m_IsInformedNearVictory[team] && m_Team_Scores[teamindex] >= BG_TK_WARNING_NEAR_VICTORY_SCORE)
         {
             SendMessageToAll(teamindex == TEAM_HORDE?LANG_BG_TK_H_NEAR_VICTORY :LANG_BG_TK_A_NEAR_VICTORY, teamindex == TEAM_HORDE ? CHAT_MSG_BG_SYSTEM_HORDE : CHAT_MSG_BG_SYSTEM_ALLIANCE);
             PlaySoundToAll(BG_TK_SOUND_NEAR_VICTORY);
             m_IsInformedNearVictory[team] = true;
         }
 		
-		if (m_Team_Scores[teamindex] > BG_TK_MAX_TEAM_SCORE)
+		if (m_Team_Scores[teamindex] >= BG_TK_MAX_TEAM_SCORE)
 		{
 			m_Team_Scores[teamindex] = BG_TK_MAX_TEAM_SCORE;
 			EndBattleground((teamindex == TEAM_ALLIANCE)?ALLIANCE:HORDE);
