@@ -430,6 +430,9 @@ uint32 BattlegroundQueue::GetPlayersInQueue(TeamId id)
 
 bool BattlegroundQueue::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, uint32 side)
 {
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE inviteGroupToBG 1");
+
+
     // set side if needed
     if (side)
         ginfo->Team = side;
@@ -769,9 +772,15 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
             // call a function that does the job for us
             FillPlayersToBG(bg, bracket_id);
 
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE inviteGroupToBG call 1");
+
+
             // now everything is set, invite players
             for (GroupsQueueType::const_iterator citr = m_SelectionPools[TEAM_ALLIANCE].SelectedGroups.begin(); citr != m_SelectionPools[TEAM_ALLIANCE].SelectedGroups.end(); ++citr)
                 InviteGroupToBG((*citr), bg, (*citr)->Team);
+
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE inviteGroupToBG call 2");
+
 
             for (GroupsQueueType::const_iterator citr = m_SelectionPools[TEAM_HORDE].SelectedGroups.begin(); citr != m_SelectionPools[TEAM_HORDE].SelectedGroups.end(); ++citr)
                 InviteGroupToBG((*citr), bg, (*citr)->Team);
@@ -824,6 +833,9 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
                 return;
             }
             // invite those selection pools
+
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE inviteGroupToBG call 3");
+
             for (uint32 i = 0; i < BG_TEAMS_COUNT; i++)
                 for (GroupsQueueType::const_iterator citr = m_SelectionPools[TEAM_ALLIANCE + i].SelectedGroups.begin(); citr != m_SelectionPools[TEAM_ALLIANCE + i].SelectedGroups.end(); ++citr)
                     InviteGroupToBG((*citr), bg2, (*citr)->Team);
@@ -851,6 +863,9 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
             }
 
             // invite those selection pools
+
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE inviteGroupToBG call 4");
+
             for (uint32 i = 0; i < BG_TEAMS_COUNT; i++)
                 for (GroupsQueueType::const_iterator citr = m_SelectionPools[TEAM_ALLIANCE + i].SelectedGroups.begin(); citr != m_SelectionPools[TEAM_ALLIANCE + i].SelectedGroups.end(); ++citr)
                     InviteGroupToBG((*citr), bg2, (*citr)->Team);
@@ -969,6 +984,9 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
 
             arena->SetArenaMatchmakerRating(ALLIANCE, aTeam->ArenaMatchmakerRating);
             arena->SetArenaMatchmakerRating(   HORDE, hTeam->ArenaMatchmakerRating);
+
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE inviteGroupToBG call 5-6");
+
             InviteGroupToBG(aTeam, arena, ALLIANCE);
             InviteGroupToBG(hTeam, arena, HORDE);
 
