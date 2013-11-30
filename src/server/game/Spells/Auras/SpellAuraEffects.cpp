@@ -3179,8 +3179,14 @@ void AuraEffect::HandleAuraModDecreaseSpeed(AuraApplication const* aurApp, uint8
     target->UpdateSpeed(MOVE_RUN_BACK, true);
     target->UpdateSpeed(MOVE_SWIM_BACK, true);
     target->UpdateSpeed(MOVE_FLIGHT_BACK, true);
-}
 
+    if(GetSpellInfo()->Id == 8056) //Horion de givre
+    {
+        Unit *caster = GetCaster();
+        if(caster || caster->HasAura(63374))
+            caster->CastSpell(target, 63685, true);
+    }
+}
 void AuraEffect::HandleAuraModUseNormalSpeed(AuraApplication const* aurApp, uint8 mode, bool /*apply*/) const
 {
     if (!(mode & AURA_EFFECT_HANDLE_REAL))
