@@ -430,7 +430,6 @@ uint32 BattlegroundQueue::GetPlayersInQueue(TeamId id)
 
 bool BattlegroundQueue::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, uint32 side)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE inviteGroupToBG 1");
 
 
     // set side if needed
@@ -748,7 +747,6 @@ should be called from Battleground::RemovePlayer function in some cases
 */
 void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id, uint8 arenaType, bool isRated, uint32 arenaRating)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE queueUpdate 1 %u %u %u %u %u", bgTypeId, bracket_id, arenaType, isRated?1:0, arenaRating);
 
     //if no players in queue - do nothing
     if (m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_ALLIANCE].empty() &&
@@ -756,8 +754,6 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
         m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].empty() &&
         m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].empty())
         return;
-
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE queueUpdate 2");
 
     // battleground with free slot for player should be always in the beggining of the queue
     // maybe it would be better to create bgfreeslotqueue for each bracket_id
@@ -776,15 +772,9 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
             // call a function that does the job for us
             FillPlayersToBG(bg, bracket_id);
 
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE inviteGroupToBG call 1");
-
-
             // now everything is set, invite players
             for (GroupsQueueType::const_iterator citr = m_SelectionPools[TEAM_ALLIANCE].SelectedGroups.begin(); citr != m_SelectionPools[TEAM_ALLIANCE].SelectedGroups.end(); ++citr)
                 InviteGroupToBG((*citr), bg, (*citr)->Team);
-
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE inviteGroupToBG call 2");
-
 
             for (GroupsQueueType::const_iterator citr = m_SelectionPools[TEAM_HORDE].SelectedGroups.begin(); citr != m_SelectionPools[TEAM_HORDE].SelectedGroups.end(); ++citr)
                 InviteGroupToBG((*citr), bg, (*citr)->Team);
@@ -793,9 +783,6 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
                 bg->RemoveFromBGFreeSlotQueue();
         }
     }
-
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE queueUpdate 3");
-
 
     // finished iterating through the bgs with free slots, maybe we need to create a new bg
 
@@ -806,16 +793,12 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
         return;
     }
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE queueUpdate 4");
-
     PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketById(bg_template->GetMapId(), bracket_id);
     if (!bracketEntry)
     {
         sLog->outError(LOG_FILTER_BATTLEGROUND, "Battleground: Update: bg bracket entry not found for map %u bracket id %u", bg_template->GetMapId(), bracket_id);
         return;
     }
-
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE queueUpdate 5");
 
     // get the min. players per team, properly for larger arenas as well. (must have full teams for arena matches!)
     uint32 MinPlayersPerTeam = bg_template->GetMinPlayersPerTeam();
@@ -834,8 +817,6 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
 
     if (bg_template->isBattleground())
     {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE queueUpdate 6");
-
         if (CheckPremadeMatch(bracket_id, MinPlayersPerTeam, MaxPlayersPerTeam))
         {
             // create new battleground
@@ -846,8 +827,6 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
                 return;
             }
             // invite those selection pools
-
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE inviteGroupToBG call 3");
 
             for (uint32 i = 0; i < BG_TEAMS_COUNT; i++)
                 for (GroupsQueueType::const_iterator citr = m_SelectionPools[TEAM_ALLIANCE + i].SelectedGroups.begin(); citr != m_SelectionPools[TEAM_ALLIANCE + i].SelectedGroups.end(); ++citr)
@@ -863,10 +842,6 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
     // now check if there are in queues enough players to start new game of (normal battleground, or non-rated arena)
     if (!isRated)
     {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE queueUpdate 7");
-
-
-
         // if there are enough players in pools, start new battleground or non rated arena
         if (CheckNormalMatch(bg_template, bracket_id, MinPlayersPerTeam, MaxPlayersPerTeam)
             || (bg_template->isArena() && CheckSkirmishForSameFaction(bracket_id, MinPlayersPerTeam)))
@@ -880,9 +855,6 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
             }
 
             // invite those selection pools
-
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE inviteGroupToBG call 4");
-
             for (uint32 i = 0; i < BG_TEAMS_COUNT; i++)
                 for (GroupsQueueType::const_iterator citr = m_SelectionPools[TEAM_ALLIANCE + i].SelectedGroups.begin(); citr != m_SelectionPools[TEAM_ALLIANCE + i].SelectedGroups.end(); ++citr)
                     InviteGroupToBG((*citr), bg2, (*citr)->Team);
@@ -1001,8 +973,6 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
 
             arena->SetArenaMatchmakerRating(ALLIANCE, aTeam->ArenaMatchmakerRating);
             arena->SetArenaMatchmakerRating(   HORDE, hTeam->ArenaMatchmakerRating);
-
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE inviteGroupToBG call 5-6");
 
             InviteGroupToBG(aTeam, arena, ALLIANCE);
             InviteGroupToBG(hTeam, arena, HORDE);

@@ -121,8 +121,6 @@ void BattlegroundMgr::Update(uint32 diff)
 
         for (uint8 i = 0; i < scheduled.size(); i++)
         {
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE get scheduled %u : " UI64FMTD "", i, scheduled[i]);
-
             uint32 arenaMMRating = (uint32)(scheduled[i] >> 48); // uint16
             BattlegroundTypeId bgTypeId = BattlegroundTypeId((scheduled[i] >> 32) & 0xFFFF); //uint16
 
@@ -171,8 +169,8 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             data->Initialize(SMSG_BATTLEFIELD_STATUS);
 
             *data << uint32(1);                         // unk, always 1 0 => testing ?
-			*data << uint32(QueueSlot);                 // Queue slot
-            *data << uint32(Time1);                     // Join Time
+            *data << uint32(1);                 // Queue slot
+            *data << uint32(1);                     // Join Time
 
             data->WriteBit(playerGuid[5]);
             data->WriteBit(playerGuid[6]);
@@ -1771,9 +1769,6 @@ void BattlegroundMgr::ScheduleQueueUpdate(uint32 arenaMatchmakerRating, uint8 ar
     //This method must be atomic, TODO add mutex
     //we will use only 1 number created of bgTypeId and bracket_id
     uint64 const scheduleId = ((uint64)((uint16)arenaMatchmakerRating) << 48) | ((uint64)((uint16)bgTypeId) << 32) | (arenaType << 24) | (bgQueueTypeId << 16) | bracket_id;
-
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE set schedule : %u %u %u %u %u", arenaMatchmakerRating, bgTypeId, arenaType, bgQueueTypeId, bracket_id);
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE set schedule : %u%u", (uint32)((uint64)scheduleId >> 32), (uint32)scheduleId);
 
     if (std::find(m_QueueUpdateScheduler.begin(), m_QueueUpdateScheduler.end(), scheduleId) == m_QueueUpdateScheduler.end())
         m_QueueUpdateScheduler.push_back(scheduleId);
