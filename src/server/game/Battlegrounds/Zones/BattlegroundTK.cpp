@@ -59,23 +59,23 @@ void BattlegroundTK::PostUpdateImpl(uint32 diff)
         else if (GetElapsedTime() > uint32(_minutesElapsed * MINUTE * IN_MILLISECONDS) +  3 * MINUTE * IN_MILLISECONDS)
         {
             ++_minutesElapsed;
-            //UpdateWorldState(BG_TK_STATE_TIMER, 25 - _minutesElapsed);
+            //UpdateWorldState(BG_TK_STATE_TIMER, 27 - _minutesElapsed);
         }
 
 		for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
 			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
 			{
 				if (player->GetGUID() == m_orbOwners[0] && player->IsMounted())
-					SetOrbPicker(0, BG_TK_OBJECT_ORB_BLUE);
+					BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_BLUE);
 
 				if (player->GetGUID() == m_orbOwners[1] && player->IsMounted())
-					SetOrbPicker(0, BG_TK_OBJECT_ORB_PURPLE);
+					BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_PURPLE);
 
 				if (player->GetGUID() == m_orbOwners[2] && player->IsMounted())
-					SetOrbPicker(0, BG_TK_OBJECT_ORB_GREEN);
+					BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_GREEN);
 
 				if (player->GetGUID() == m_orbOwners[3] && player->IsMounted())
-					SetOrbPicker(0, BG_TK_OBJECT_ORB_ORANGE);
+					BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_ORANGE);
 			}
     }
 }
