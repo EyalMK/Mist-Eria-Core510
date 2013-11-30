@@ -1554,22 +1554,22 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
     if (!bracketEntry)
         return;
 
-    uint32 winner_conquest = (player->GetRandomWinner() ? BG_REWARD_WINNER_CONQUEST_FIRST : BG_REWARD_WINNER_CONQUEST_LAST);
-    uint32 winner_honor = (player->GetRandomWinner() ? BG_REWARD_WINNER_HONOR_FIRST : BG_REWARD_WINNER_HONOR_LAST);
+    uint32 winner_conquest = (!player->GetRandomWinner() ? BG_REWARD_WINNER_CONQUEST_FIRST : BG_REWARD_WINNER_CONQUEST_LAST);
+    uint32 winner_honor = (!player->GetRandomWinner() ? BG_REWARD_WINNER_HONOR_FIRST : BG_REWARD_WINNER_HONOR_LAST);
     uint32 loser_honor = (!player->GetRandomWinner() ? BG_REWARD_LOSER_HONOR_FIRST : BG_REWARD_LOSER_HONOR_LAST);
 
     ObjectGuid guidBytes = guid;
 
     data->Initialize(SMSG_BATTLEFIELD_LIST);
-    *data << uint8(27/*bracketEntry->maxLevel*/)                  // max level
-          << uint32(39)                        // Winner Conquest Reward or Random Winner Conquest Reward
-          << uint32(loser_honor)                        // Winner Conquest Reward or Random Winner Conquest Reward
-          << uint32(14/*bgTypeId*/)                            // battleground id
-          << uint8(86/*bracketEntry->minLevel*/)                  // min level
-          << uint32(winner_honor)                               // Loser Honor Reward or Random Loser Honor Reward
-          << uint32(loser_honor)                            // Loser Honor Reward or Random Loser Honor Reward
-          << uint32(78)                           // Winner Honor Reward or Random Winner Honor Reward
-          << uint32(winner_honor);                          // Winner Honor Reward or Random Winner Honor Reward
+    *data << uint8(27/*bracketEntry->maxLevel*/)// Max level
+          << uint32(39)							// Winner Conquest Reward or Random Winner Conquest Reward
+          << uint32(loser_honor)				// Winner Conquest Reward or Random Winner Conquest Reward
+          << uint32(bgTypeId)					// Battleground id
+          << uint8(86/*bracketEntry->minLevel*/)// Min level
+          << uint32(winner_honor)				// Winner Honor Reward or Random Winner Honor Reward
+          << uint32(loser_honor)				// Loser Honor Reward or Random Loser Honor Reward
+          << uint32(78)							// Unknown
+          << uint32(winner_honor);				// Winner Honor Reward or Random Winner Honor Reward
 
     data->WriteBit(guidBytes[4]);
     data->WriteBit(guidBytes[1]);
