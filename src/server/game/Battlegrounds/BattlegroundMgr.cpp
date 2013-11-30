@@ -168,9 +168,12 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
         {
             data->Initialize(SMSG_BATTLEFIELD_STATUS);
 
-            *data << uint32(1);                         // unk, always 1 0 => testing ?
-            *data << uint32(1);                 // Queue slot
-            *data << uint32(1);                     // Join Time
+            *data << uint32(0);                         // unk, always 1 0 => testing ?
+            *data << uint32(0);                 // Queue slot
+            *data << uint32(0);                     // Join Time
+
+
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE BGGUID : %u", bg?1:0);
 
             data->WriteBit(playerGuid[5]);
             data->WriteBit(playerGuid[6]);
@@ -180,6 +183,8 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             data->WriteBit(playerGuid[2]);
             data->WriteBit(playerGuid[1]);
             data->WriteBit(playerGuid[3]);
+
+            data->FlushBits();
 
             data->WriteByteSeq(playerGuid[6]);
             data->WriteByteSeq(playerGuid[0]);
