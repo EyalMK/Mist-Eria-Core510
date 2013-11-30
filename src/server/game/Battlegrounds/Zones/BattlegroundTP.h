@@ -42,10 +42,10 @@ enum BG_TP_Sound
 
 enum BG_TP_SpellId
 {
-    BG_TP_SPELL_HORDE_FLAG				= 23333,
+    BG_TP_SPELL_HORDE_FLAG				= 32610,
     BG_TP_SPELL_HORDE_FLAG_DROPPED		= 23334,
     BG_TP_SPELL_HORDE_FLAG_PICKED		= 61266,    // fake spell, does not exist but used as timer start event
-    BG_TP_SPELL_ALLIANCE_FLAG			= 23335,
+    BG_TP_SPELL_ALLIANCE_FLAG			= 32609,
     BG_TP_SPELL_ALLIANCE_FLAG_DROPPED	= 23336,
     BG_TP_SPELL_ALLIANCE_FLAG_PICKED	= 61265,    // fake spell, does not exist but used as timer start event
     BG_TP_SPELL_FOCUSED_ASSAULT         = 46392,
@@ -86,16 +86,16 @@ enum BG_TP_ObjectTypes
 
 enum BG_TP_ObjectEntry
 {
-    BG_OBJECT_DOOR_A_1_TP_ENTRY          = 402191,
-    BG_OBJECT_DOOR_A_2_TP_ENTRY          = 402190,
-    BG_OBJECT_DOOR_A_3_TP_ENTRY          = 402189,
-    BG_OBJECT_DOOR_H_1_TP_ENTRY          = 402364,
-    BG_OBJECT_DOOR_H_2_TP_ENTRY          = 402365,
-    BG_OBJECT_DOOR_H_3_TP_ENTRY          = 402366,
-    BG_OBJECT_A_FLAG_TP_ENTRY            = 179830,
-    BG_OBJECT_H_FLAG_TP_ENTRY            = 179831,
-    BG_OBJECT_A_FLAG_GROUND_TP_ENTRY     = 179785,
-    BG_OBJECT_H_FLAG_GROUND_TP_ENTRY     = 179786
+    BG_OBJECT_DOOR_A_1_TP_ENTRY          = 400445,
+    BG_OBJECT_DOOR_A_2_TP_ENTRY          = 400446,
+    BG_OBJECT_DOOR_A_3_TP_ENTRY          = 400447,
+    BG_OBJECT_DOOR_H_1_TP_ENTRY          = 400448,
+    BG_OBJECT_DOOR_H_2_TP_ENTRY          = 400449,
+    BG_OBJECT_DOOR_H_3_TP_ENTRY          = 400450,
+    BG_OBJECT_A_FLAG_TP_ENTRY            = 400451,
+    BG_OBJECT_H_FLAG_TP_ENTRY            = 400452,
+    BG_OBJECT_A_FLAG_GROUND_TP_ENTRY     = 400453,
+    BG_OBJECT_H_FLAG_GROUND_TP_ENTRY     = 400454
 };
 
 enum BG_TP_FlagState

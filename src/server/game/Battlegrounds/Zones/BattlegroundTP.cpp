@@ -88,7 +88,7 @@ void BattlegroundTP::PostUpdateImpl(uint32 diff)
 {
     if (GetStatus() == STATUS_IN_PROGRESS)
     {
-        if (GetElapsedTime() >= 25*MINUTE*IN_MILLISECONDS)
+        if (GetElapsedTime() >= 27*MINUTE*IN_MILLISECONDS)
         {
             if (GetTeamScore(ALLIANCE) == 0)
             {
@@ -112,7 +112,7 @@ void BattlegroundTP::PostUpdateImpl(uint32 diff)
         else if (GetElapsedTime() > uint32(m_minutesElapsed * MINUTE * IN_MILLISECONDS))
         {
             ++m_minutesElapsed;
-            UpdateWorldState(BG_TP_STATE_TIMER, 25 - m_minutesElapsed);
+            UpdateWorldState(BG_TP_STATE_TIMER, 27 - m_minutesElapsed);
         }
 
         if (m_FlagState[TEAM_ALLIANCE] == BG_TP_FLAG_STATE_WAIT_RESPAWN)
@@ -209,10 +209,7 @@ void BattlegroundTP::StartingEventCloseDoors()
 void BattlegroundTP::StartingEventOpenDoors()
 {
     for (uint32 i = BG_TP_OBJECT_DOOR_A_1; i <= BG_TP_OBJECT_DOOR_H_3; ++i)
-    {
         DoorOpen(i);
-        SpawnBGObject(i, RESPAWN_ONE_DAY);
-    }
 
     for (uint32 i = BG_TP_OBJECT_A_FLAG; i <= BG_TP_OBJECT_BERSERKBUFF_2; ++i)
         SpawnBGObject(i, RESPAWN_IMMEDIATELY);
