@@ -401,6 +401,9 @@ bool SpellEffectInfo::IsAPSPModified() const
 			case SPELL_AURA_ADD_PCT_MODIFIER:
 			case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE:
 			case SPELL_AURA_MOD_DAMAGE_FROM_CASTER:
+			case SPELL_AURA_MOD_MELEE_RANGED_HASTE_2:
+			case SPELL_AURA_MOD_EXPERTISE:
+			case SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT:
                 return false;
             default:
                 break;
