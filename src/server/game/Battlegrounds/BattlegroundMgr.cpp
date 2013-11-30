@@ -175,11 +175,11 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             *data << uint32(Time1);                     // Join Time
 
             data->WriteBit(playerGuid[5]);
+            data->WriteBit(playerGuid[6]);
             data->WriteBit(playerGuid[4]);
             data->WriteBit(playerGuid[7]);
             data->WriteBit(playerGuid[0]);
             data->WriteBit(playerGuid[2]);
-            data->WriteBit(playerGuid[6]);
             data->WriteBit(playerGuid[1]);
             data->WriteBit(playerGuid[3]);
 
