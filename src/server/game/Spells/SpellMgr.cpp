@@ -3835,6 +3835,9 @@ void SpellMgr::LoadSpellInfoCorrections()
 					spellInfo->Effects[1].BasePoints = 100;
 					spellInfo->Effects[1].MiscValue = 100;
 					break;
+                case 113792:
+                    spellInfo->MaxAffectedTargets = 1;
+                    break;
 				default:
 					break;
 			}
