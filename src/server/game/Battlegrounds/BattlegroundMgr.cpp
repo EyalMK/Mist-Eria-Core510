@@ -121,11 +121,12 @@ void BattlegroundMgr::Update(uint32 diff)
 
         for (uint8 i = 0; i < scheduled.size(); i++)
         {
-            uint32 arenaMMRating = scheduled[i] >> 32;
-            uint8 arenaType = scheduled[i] >> 24 & 255;
-            BattlegroundQueueTypeId bgQueueTypeId = BattlegroundQueueTypeId(scheduled[i] >> 16 & 255);
-            BattlegroundTypeId bgTypeId = BattlegroundTypeId((scheduled[i] >> 8) & 255);
-            BattlegroundBracketId bracket_id = BattlegroundBracketId(scheduled[i] & 255);
+            uint32 arenaMMRating = (uint32)(scheduled[i] >> 48); // uint16
+            BattlegroundTypeId bgTypeId = BattlegroundTypeId((scheduled[i] >> 32) & 0xFFFF); //uint16
+
+            uint8 arenaType = scheduled[i] >> 24 & 0xFF; //uint8
+            BattlegroundQueueTypeId bgQueueTypeId = BattlegroundQueueTypeId(scheduled[i] >> 16 & 0xFF); //uint8
+            BattlegroundBracketId bracket_id = BattlegroundBracketId(scheduled[i] & 0xFF); //uint8
             m_BattlegroundQueues[bgQueueTypeId].BattlegroundQueueUpdate(diff, bgTypeId, bracket_id, arenaType, arenaMMRating > 0, arenaMMRating);
         }
     }
@@ -167,18 +168,24 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
         {
             data->Initialize(SMSG_BATTLEFIELD_STATUS);
 
-            *data << uint32(0);                         // unk, always 1 0 => testing ?
-			*data << uint32(QueueSlot);                 // Queue slot
-            *data << uint32(Time1);                     // Join Time
+
+            *data << uint32(QueueSlot);                         // unk, always 1 0 => testing ?
+            *data << uint32(QueueSlot);                 // Join Time
+            *data << uint32(QueueSlot);                     // Queue slot
+
+
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE BGGUID : %u %u", bg?1:0, QueueSlot);
 
             data->WriteBit(playerGuid[5]);
+            data->WriteBit(playerGuid[6]);
             data->WriteBit(playerGuid[4]);
             data->WriteBit(playerGuid[7]);
             data->WriteBit(playerGuid[0]);
             data->WriteBit(playerGuid[2]);
-            data->WriteBit(playerGuid[6]);
             data->WriteBit(playerGuid[1]);
             data->WriteBit(playerGuid[3]);
+
+            data->FlushBits();
 
             data->WriteByteSeq(playerGuid[6]);
             data->WriteByteSeq(playerGuid[0]);
@@ -1767,7 +1774,8 @@ void BattlegroundMgr::ScheduleQueueUpdate(uint32 arenaMatchmakerRating, uint8 ar
 {
     //This method must be atomic, TODO add mutex
     //we will use only 1 number created of bgTypeId and bracket_id
-    uint64 const scheduleId = ((uint64)arenaMatchmakerRating << 32) | (arenaType << 24) | (bgQueueTypeId << 16) | (bgTypeId << 8) | bracket_id;
+    uint64 const scheduleId = ((uint64)((uint16)arenaMatchmakerRating) << 48) | ((uint64)((uint16)bgTypeId) << 32) | (arenaType << 24) | (bgQueueTypeId << 16) | bracket_id;
+
     if (std::find(m_QueueUpdateScheduler.begin(), m_QueueUpdateScheduler.end(), scheduleId) == m_QueueUpdateScheduler.end())
         m_QueueUpdateScheduler.push_back(scheduleId);
 }

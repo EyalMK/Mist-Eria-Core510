@@ -430,6 +430,8 @@ uint32 BattlegroundQueue::GetPlayersInQueue(TeamId id)
 
 bool BattlegroundQueue::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, uint32 side)
 {
+
+
     // set side if needed
     if (side)
         ginfo->Team = side;
@@ -745,6 +747,7 @@ should be called from Battleground::RemovePlayer function in some cases
 */
 void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id, uint8 arenaType, bool isRated, uint32 arenaRating)
 {
+
     //if no players in queue - do nothing
     if (m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_ALLIANCE].empty() &&
         m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_HORDE].empty() &&
@@ -824,6 +827,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
                 return;
             }
             // invite those selection pools
+
             for (uint32 i = 0; i < BG_TEAMS_COUNT; i++)
                 for (GroupsQueueType::const_iterator citr = m_SelectionPools[TEAM_ALLIANCE + i].SelectedGroups.begin(); citr != m_SelectionPools[TEAM_ALLIANCE + i].SelectedGroups.end(); ++citr)
                     InviteGroupToBG((*citr), bg2, (*citr)->Team);
@@ -969,6 +973,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
 
             arena->SetArenaMatchmakerRating(ALLIANCE, aTeam->ArenaMatchmakerRating);
             arena->SetArenaMatchmakerRating(   HORDE, hTeam->ArenaMatchmakerRating);
+
             InviteGroupToBG(aTeam, arena, ALLIANCE);
             InviteGroupToBG(hTeam, arena, HORDE);
 
