@@ -381,7 +381,7 @@ enum Opcodes
     CMSG_MOVE_GRAVITY_ENABLE_ACK                      = 0x1325,
     CMSG_MOVE_HOVER_ACK                               = 0x0376,//16357
     CMSG_MOVE_KNOCK_BACK_ACK                          = 0x1327,
-    CMSG_MOVE_NOT_ACTIVE_MOVER                        = 0x1328,
+    CMSG_MOVE_NOT_ACTIVE_MOVER                        = 0x03F6,//16357
     CMSG_MOVE_SET_CAN_FLY                             = 0x007E,//16357
     CMSG_MOVE_SET_CAN_FLY_ACK                         = 0x1330,
     CMSG_MOVE_SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY_ACK = 0x1331,
