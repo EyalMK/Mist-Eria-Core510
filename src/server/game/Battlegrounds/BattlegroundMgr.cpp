@@ -169,7 +169,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             data->Initialize(SMSG_BATTLEFIELD_STATUS);
 
 
-            *data << uint32(QueueSlot);                         // unk, always 1 0 => testing ?
+            *data << uint32(1);                         // unk, always 1 0 => testing ?
             *data << uint32(QueueSlot);                 // Join Time
             *data << uint32(QueueSlot);                     // Queue slot
 
