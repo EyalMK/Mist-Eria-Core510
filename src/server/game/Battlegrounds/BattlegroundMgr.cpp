@@ -170,8 +170,8 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
 
 
             *data << uint32(QueueSlot);                         // unk, always 1 0 => testing ?
-            *data << uint32(QueueSlot);                 // Join Time
-            *data << uint32(1);                     // Queue slot
+            *data << uint32(1);                 // Join Time
+            *data << uint32(QueueSlot);                     // Queue slot
 
 
             sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE BGGUID : %u %u", bg?1:0, QueueSlot);
