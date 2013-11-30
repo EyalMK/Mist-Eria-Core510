@@ -6835,6 +6835,14 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 /*damage*/, Aura* triggeredByAura
                 }
                 return true;
             }
+            else if(dummySpell->Id == 59578) //Art de la guerre
+            {
+                *handled = true;
+                Player *plr = ToPlayer();
+                if(plr)
+                    plr->RemoveSpellCooldown(879, true);
+                return true;
+            }
             break;
         }
         case SPELLFAMILY_MAGE:
