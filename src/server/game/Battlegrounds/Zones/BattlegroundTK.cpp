@@ -61,6 +61,22 @@ void BattlegroundTK::PostUpdateImpl(uint32 diff)
             ++_minutesElapsed;
             //UpdateWorldState(BG_TK_STATE_TIMER, 25 - _minutesElapsed);
         }
+
+		for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+			{
+				if (player->GetGUID() == m_orbOwners[0] && player->IsMounted())
+					SetOrbPicker(0, BG_TK_OBJECT_ORB_BLUE);
+
+				if (player->GetGUID() == m_orbOwners[1] && player->IsMounted())
+					SetOrbPicker(0, BG_TK_OBJECT_ORB_PURPLE);
+
+				if (player->GetGUID() == m_orbOwners[2] && player->IsMounted())
+					SetOrbPicker(0, BG_TK_OBJECT_ORB_GREEN);
+
+				if (player->GetGUID() == m_orbOwners[3] && player->IsMounted())
+					SetOrbPicker(0, BG_TK_OBJECT_ORB_ORANGE);
+			}
     }
 }
 
