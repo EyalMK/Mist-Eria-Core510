@@ -20,12 +20,6 @@ enum BG_TK_OrbState
     BG_TK_ORB_STATE_ON_PLAYER		= 1
 };
 
-enum BG_TK_Objectives
-{
-    AB_OBJECTIVE_WIN_BATTLEGROUND		= 122,
-    AB_OBJECTIVE_DEFEND_BASE			= 123
-};
-
 enum BG_TK_Score
 {
 	BG_TK_PLAYER_KILL_POINTS			= 10,
