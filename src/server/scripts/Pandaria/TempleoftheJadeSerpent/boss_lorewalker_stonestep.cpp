@@ -296,7 +296,7 @@ public:
 
 		void DamageTaken(Unit* who, uint32& damage)
 		{
-			damage += damageDealt;
+			damageDealt += damage;
 		}
 
 		void EnterCombat(Unit* /*who*/)
@@ -445,7 +445,7 @@ public:
 
 		void DamageTaken(Unit* who, uint32& damage)
 		{
-			damage += damageDealt;
+			damageDealt += damage;
 		}
 
 		void EnterCombat(Unit* /*who*/)
