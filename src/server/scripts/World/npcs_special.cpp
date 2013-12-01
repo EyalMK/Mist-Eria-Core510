@@ -3129,7 +3129,7 @@ public :
         
         void ReceiveEmote(Player *who, uint32 emoteId)
 		{
-            if(who && emoteId == EMOTE_ONESHOT_KISS && !who->HasAura(SPELL_MISTLETOE))
+            if(who && emoteId == TEXT_EMOTE_KISS && !who->HasAura(SPELL_MISTLETOE))
 			{
                 me->CastSpell(who, RAND(SPELL_CREATE_MISTLETOE, SPELL_CREATE_SNOWFLAKES, SPELL_CREATE_FRESHHOLY), true);
                 me->CastSpell(who, SPELL_MISTLETOE);

@@ -50,11 +50,11 @@ void WorldSession::SendTaxiStatus(uint64 guid)
 
     uint32 curloc = sObjectMgr->GetNearestTaxiNode(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), unit->GetMapId(), GetPlayer()->GetTeam());
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: current location %u ", curloc);
-
     // not found nearest
     if (curloc == 0)
         return;
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: current location %u ", curloc);
 
     WorldPacket data(SMSG_TAXINODE_STATUS, 9);
     data << guid;
@@ -94,7 +94,6 @@ void WorldSession::SendTaxiMenu(Creature* unit)
 {
     // find current node
     uint32 curloc = sObjectMgr->GetNearestTaxiNode(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), unit->GetMapId(), GetPlayer()->GetTeam());
-
     if (!curloc)
         return;
 
