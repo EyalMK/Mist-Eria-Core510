@@ -344,6 +344,7 @@ public:
 								events.ScheduleEvent(EVENT_AGONY, 0);
 								events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
 								me->setActive(true);
+								me->setFaction(14);
 								me->SetInCombatWithZone();
 
 								events.CancelEvent(EVENT_ATTACK_START);
@@ -384,7 +385,8 @@ public:
 							break;
 
 						case EVENT_DISSIPATION:
-							me->CastSpell(me, SPELL_DISSIPATION);
+							if (!me->HasAura(SPELL_ULTIMATE_POWER))
+								me->CastSpell(me, SPELL_DISSIPATION);
 
 							if (me->HasAura(SPELL_INTENSITY))
 							{
@@ -516,6 +518,7 @@ public:
 								events.ScheduleEvent(EVENT_AGONY, 0);
 								events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
 								me->setActive(true);
+								me->setFaction(14);
 								me->SetInCombatWithZone();
 
 								events.CancelEvent(EVENT_ATTACK_START);
@@ -556,7 +559,8 @@ public:
 							break;
 
 						case EVENT_DISSIPATION:
-							me->CastSpell(me, SPELL_DISSIPATION);
+							if (!me->HasAura(SPELL_ULTIMATE_POWER))
+								me->CastSpell(me, SPELL_DISSIPATION);
 
 							if (me->HasAura(SPELL_INTENSITY))
 							{
@@ -601,19 +605,14 @@ public:
 		void Reset()
 		{
 			events.Reset();
-			events.ScheduleEvent(EVENT_AGGRO, 5*IN_MILLISECONDS);
-		}
-
-		void EnterCombat(Unit* /*who*/) 
-		{
-			if (instance)
-				if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 500.0f))
-					if (!peril->isInCombat())
-						peril->SetInCombatWithZone();
-
-			//Talk(SAY_AGGRO);
 			events.ScheduleEvent(EVENT_ATTACK_PERIL, 3*IN_MILLISECONDS);
 		}
+
+		void JustSummoned(Creature* summoned)
+        {
+			events.Reset();
+			events.ScheduleEvent(EVENT_ATTACK_PERIL, 3*IN_MILLISECONDS);
+        }
 
 		void EnterEvadeMode()
 		{
@@ -621,10 +620,7 @@ public:
 		}
 
 		void UpdateAI(uint32 diff)
-		{	
-			if(!UpdateVictim())
-				return;
-
+		{
 			events.Update(diff);
 
 			while(uint32 eventId = events.ExecuteEvent())
@@ -633,6 +629,12 @@ public:
 				{
 					if (instance)
 					{
+						case EVENT_AGGRO:
+							//Talk(SAY_OSONG_AGGRO);
+
+							events.ScheduleEvent(EVENT_ATTACK_STRIFE, 2*IN_MILLISECONDS);
+							break;
+
 						case EVENT_ATTACK_STRIFE:
 							if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 500.0f))
 							{
