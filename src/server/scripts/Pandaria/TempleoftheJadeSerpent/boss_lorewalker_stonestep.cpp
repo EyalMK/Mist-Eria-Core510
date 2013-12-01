@@ -267,7 +267,11 @@ public:
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-			me->CastSpell(me, SPELL_SHA_CORRUPTION);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+
+			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
+				me->CastSpell(me, SPELL_SHA_CORRUPTION);
+
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
 		}
 
@@ -275,11 +279,18 @@ public:
         {
 			events.Reset();
 
+			damageDealt = 0;
+			intensityStacks = 0;
+
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-			me->CastSpell(me, SPELL_SHA_CORRUPTION);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+
+			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
+				me->CastSpell(me, SPELL_SHA_CORRUPTION);
+
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
         }
 
@@ -327,11 +338,12 @@ public:
 										if (!peril->isInCombat())
 											peril->SetInCombatWithZone();
 
-								me->setActive(true);
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 								events.ScheduleEvent(EVENT_AGONY, 0);
 								events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
+								me->setActive(true);
 								me->SetInCombatWithZone();
 
 								events.CancelEvent(EVENT_ATTACK_START);
@@ -347,7 +359,7 @@ public:
 			{
 				me->RemoveAurasDueToSpell(SPELL_DISSIPATION);
 				me->CastSpell(me, SPELL_INTENSITY);
-				events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
+				events.RescheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
 				intensityStacks++;
 				damageDealt = 0;
 			}
@@ -380,7 +392,7 @@ public:
 								me->RemoveAurasDueToSpell(SPELL_INTENSITY, me->GetGUID());
 							}
 
-							events.ScheduleEvent(EVENT_DISSIPATION, 2*IN_MILLISECONDS);
+							events.RescheduleEvent(EVENT_DISSIPATION, 2*IN_MILLISECONDS);
 							break;
 
 						default:
@@ -427,7 +439,11 @@ public:
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-			me->CastSpell(me, SPELL_SHA_CORRUPTION);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+
+			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
+				me->CastSpell(me, SPELL_SHA_CORRUPTION);
+
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
 		}
 
@@ -435,11 +451,18 @@ public:
         {
 			events.Reset();
 
+			damageDealt = 0;
+			intensityStacks = 0;
+
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-			me->CastSpell(me, SPELL_SHA_CORRUPTION);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+
+			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
+				me->CastSpell(me, SPELL_SHA_CORRUPTION);
+
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
         }
 
@@ -487,11 +510,12 @@ public:
 										if (!strife->isInCombat())
 											strife->SetInCombatWithZone();
 
-								me->setActive(true);
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 								events.ScheduleEvent(EVENT_AGONY, 0);
 								events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
+								me->setActive(true);
 								me->SetInCombatWithZone();
 
 								events.CancelEvent(EVENT_ATTACK_START);
@@ -507,7 +531,7 @@ public:
 			{
 				me->RemoveAurasDueToSpell(SPELL_DISSIPATION);
 				me->CastSpell(me, SPELL_INTENSITY);
-				events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
+				events.RescheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
 				intensityStacks++;
 				damageDealt = 0;
 			}
@@ -540,7 +564,7 @@ public:
 								me->RemoveAurasDueToSpell(SPELL_INTENSITY, me->GetGUID());
 							}
 
-							events.ScheduleEvent(EVENT_DISSIPATION, 2*IN_MILLISECONDS);
+							events.RescheduleEvent(EVENT_DISSIPATION, 2*IN_MILLISECONDS);
 							break;
 
 						default:

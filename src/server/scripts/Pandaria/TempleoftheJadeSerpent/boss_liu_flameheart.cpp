@@ -107,7 +107,7 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 		bool intro;
-		bool thirdPhaseHome; // When Liu comes to the center of the "room" in the third phase
+		bool thirdPhaseHome; // When Liu moves to the center of the "room" in the third phase
 		float x, y, z, o;
 		int32 maxJadeFires;
 		Creature* firstWave;
