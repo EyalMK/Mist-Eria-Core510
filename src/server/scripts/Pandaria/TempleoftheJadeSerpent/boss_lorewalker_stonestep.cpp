@@ -255,7 +255,6 @@ public:
 		EventMap events;
 		int32 damageDealt;
 		int32 intensityStacks;
-		bool eventAgony;
 
 		void Reset()
 		{
@@ -263,7 +262,6 @@ public:
 
 			damageDealt = 0;
 			intensityStacks = 0;
-			eventAgony = false;
 
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -274,6 +272,7 @@ public:
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
+			events.ScheduleEvent(EVENT_AGONY, 5*IN_MILLISECONDS);
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
 		}
 
@@ -283,7 +282,6 @@ public:
 
 			damageDealt = 0;
 			intensityStacks = 0;
-			eventAgony = false;
 
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -294,6 +292,7 @@ public:
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
+			events.ScheduleEvent(EVENT_AGONY, 5*IN_MILLISECONDS);
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
         }
 
@@ -322,12 +321,12 @@ public:
 				me->DeleteThreatList();
 
 				if (Creature* scroll = me->FindNearestCreature(NPC_CORRUPTED_SCROLL, 500.0f))
-					me->Respawn(true);
+					scroll->Respawn(true);
 
 				if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 500.0f))
 				{
 					me->Kill(lorewalker);
-					me->Respawn(true);
+					lorewalker->Respawn(true);
 					lorewalker->GetMotionMaster()->MovePoint(0, lorewalker->GetHomePosition());
 					lorewalker->Relocate(lorewalker->GetHomePosition());
 				}
@@ -344,37 +343,20 @@ public:
 			events.Update(diff);
 
 			if	(!UpdateVictim())
-			{
-				while(uint32 eventId = events.ExecuteEvent())
-				{
-					switch(eventId)
-					{
+				if (uint32 eventId = events.ExecuteEvent())
+					if (eventId == EVENT_ATTACK_START)
 						if (instance)
 						{
-							case EVENT_ATTACK_START:
-								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-								events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
-								me->setActive(true);
-								me->setFaction(14);
-								me->SetInCombatWithZone();
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+							events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
+							me->setActive(true);
+							me->setFaction(14);
+							me->SetInCombatWithZone();
 
-								events.CancelEvent(EVENT_ATTACK_START);
-								break;
-
-							default:
-								break;
+							events.CancelEvent(EVENT_ATTACK_START);
 						}
-					}
-				}
-			}
-
-			if (!eventAgony)
-			{
-				events.ScheduleEvent(EVENT_AGONY, 0);
-				eventAgony = true;
-			}
 
 			if (!me->HasAura(SPELL_INTENSITY) && intensityStacks != 0)
 				intensityStacks = 0;
@@ -451,7 +433,6 @@ public:
 		EventMap events;
 		int32 damageDealt;
 		int32 intensityStacks;
-		bool eventAgony;
 
 		void Reset()
 		{
@@ -459,7 +440,6 @@ public:
 
 			damageDealt = 0;
 			intensityStacks = 0;
-			eventAgony = false;
 
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -470,6 +450,7 @@ public:
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
+			events.ScheduleEvent(EVENT_AGONY, 5*IN_MILLISECONDS);
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
 		}
 
@@ -479,7 +460,6 @@ public:
 
 			damageDealt = 0;
 			intensityStacks = 0;
-			eventAgony = false;
 
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -490,6 +470,7 @@ public:
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
+			events.ScheduleEvent(EVENT_AGONY, 5*IN_MILLISECONDS);
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
         }
 
@@ -518,12 +499,12 @@ public:
 				me->DeleteThreatList();
 
 				if (Creature* scroll = me->FindNearestCreature(NPC_CORRUPTED_SCROLL, 500.0f))
-					me->Respawn(true);
+					scroll->Respawn(true);
 
 				if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 500.0f))
 				{
 					me->Kill(lorewalker);
-					me->Respawn(true);
+					lorewalker->Respawn(true);
 					lorewalker->GetMotionMaster()->MovePoint(0, lorewalker->GetHomePosition());
 					lorewalker->Relocate(lorewalker->GetHomePosition());
 				}
@@ -540,37 +521,20 @@ public:
 			events.Update(diff);
 
 			if	(!UpdateVictim())
-			{
-				while(uint32 eventId = events.ExecuteEvent())
-				{
-					switch(eventId)
-					{
+				if (uint32 eventId = events.ExecuteEvent())
+					if (eventId == EVENT_ATTACK_START)
 						if (instance)
 						{
-							case EVENT_ATTACK_START:
-								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-								events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
-								me->setActive(true);
-								me->setFaction(14);
-								me->SetInCombatWithZone();
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+							events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
+							me->setActive(true);
+							me->setFaction(14);
+							me->SetInCombatWithZone();
 
-								events.CancelEvent(EVENT_ATTACK_START);
-								break;
-
-							default:
-								break;
+							events.CancelEvent(EVENT_ATTACK_START);
 						}
-					}
-				}
-			}
-
-			if (!eventAgony)
-			{
-				events.ScheduleEvent(EVENT_AGONY, 0);
-				eventAgony = true;
-			}
 
 			if (!me->HasAura(SPELL_INTENSITY) && intensityStacks != 0)
 				intensityStacks = 0;
