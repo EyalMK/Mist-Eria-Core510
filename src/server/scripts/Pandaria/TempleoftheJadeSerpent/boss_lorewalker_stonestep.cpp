@@ -317,8 +317,27 @@ public:
 			{
 				me->CombatStop();
 				me->DeleteThreatList();
+
+				if (Creature* scroll = me->FindNearestCreature(NPC_CORRUPTED_SCROLL, 500.0f))
+					scroll->Respawn(true);
+
+				if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 500.0f))
+				{
+					lorewalker->Kill(lorewalker);
+					lorewalker->Relocate(lorewalker->GetHomePosition());
+					lorewalker->Respawn(true);
+				}
+
+				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 500.0f))
+					osong->DespawnOrUnsummon();
+
 				me->DespawnOrUnsummon();
 			}
+		}
+
+		void EnterCombat(Unit* /*who*/) 
+		{
+			events.ScheduleEvent(EVENT_AGONY, 0);
 		}
 
 		void UpdateAI(uint32 diff)
@@ -326,6 +345,7 @@ public:
 			events.Update(diff);
 
 			if	(!UpdateVictim())
+			{
 				while(uint32 eventId = events.ExecuteEvent())
 				{
 					switch(eventId)
@@ -336,7 +356,6 @@ public:
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-								events.ScheduleEvent(EVENT_AGONY, 0);
 								events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
 								me->setActive(true);
 								me->setFaction(14);
@@ -350,6 +369,10 @@ public:
 						}
 					}
 				}
+			}
+
+			if (!me->HasAura(SPELL_INTENSITY))
+				intensityStacks = 0;
 
 			if (damageDealt >= me->GetMaxHealth() * 0.02f)
 			{
@@ -485,8 +508,27 @@ public:
 			{
 				me->CombatStop();
 				me->DeleteThreatList();
+
+				if (Creature* scroll = me->FindNearestCreature(NPC_CORRUPTED_SCROLL, 500.0f))
+					scroll->Respawn(true);
+
+				if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 500.0f))
+				{
+					lorewalker->Kill(lorewalker);
+					lorewalker->Relocate(lorewalker->GetHomePosition());
+					lorewalker->Respawn(true);
+				}
+
+				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 500.0f))
+					osong->DespawnOrUnsummon();
+
 				me->DespawnOrUnsummon();
 			}
+		}
+
+		void EnterCombat(Unit* /*who*/) 
+		{
+			events.ScheduleEvent(EVENT_AGONY, 0);
 		}
 
 		void UpdateAI(uint32 diff)
@@ -494,6 +536,7 @@ public:
 			events.Update(diff);
 
 			if	(!UpdateVictim())
+			{
 				while(uint32 eventId = events.ExecuteEvent())
 				{
 					switch(eventId)
@@ -504,7 +547,6 @@ public:
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-								events.ScheduleEvent(EVENT_AGONY, 0);
 								events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
 								me->setActive(true);
 								me->setFaction(14);
@@ -518,6 +560,10 @@ public:
 						}
 					}
 				}
+			}
+
+			if (!me->HasAura(SPELL_INTENSITY))
+				intensityStacks = 0;
 
 			if (damageDealt >= me->GetMaxHealth() * 0.02f)
 			{
