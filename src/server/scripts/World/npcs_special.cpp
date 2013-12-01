@@ -3143,6 +3143,174 @@ public :
     }
 };
 
+enum Spells
+{
+    SPELL_SEETHE				= 119487,
+    SPELL_ENDLESS_RAGE			= 119446,
+    SPELL_BITTER_THOUGHTS		= 119601,
+    SPELL_GROWING_ANGER			= 119622,
+    SPELL_AGGRESSIVE_BEHAVIOUR	= 119626,
+    SPELL_UNLEASHED_WRATH		= 119488,
+    SPELL_RAGE_OF_THE_SHA       = 117609
+};
+
+enum Events
+{
+    EVENT_SEETHE				= 1,
+    EVENT_ENDLESS_RAGE			= 2,
+    EVENT_GROWING_ANGER			= 3,
+    EVENT_INCREASE_RAGE			= 4,
+    EVENT_DECREASE_RAGE			= 5
+};
+
+enum Phases
+{
+    PHASE_GROWING_ANGER		= 0,
+    PHASE_UNLEASHED_WRATH	= 1
+};
+
+enum Texts
+{
+    SAY_AGGRO				= 0,
+    SAY_DEATH				= 1,
+    SAY_SLAY				= 2,
+    SAY_ENDLESS_RAGE		= 3,
+    SAY_GROWING_ANGER		= 4,
+    SAY_UNLEASHED_WRATH		= 5
+};
+
+#define NPC_IRE             60579
+#define NPC_SHA_OF_ANGER    61523
+
+class boss_sha_of_anger : public CreatureScript
+{
+public:
+    boss_sha_of_anger() : CreatureScript("boss_sha_of_anger") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new boss_sha_of_angerAI(creature);
+    }
+
+    struct boss_sha_of_angerAI : public ScriptedAI
+    {
+        boss_sha_of_angerAI(Creature *creature) : ScriptedAI(creature)
+        {
+        }
+
+        EventMap events;
+
+        void Reset()
+        {
+            events.Reset();
+
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetPower(POWER_RAGE, 0);
+        }
+
+        void JustDied(Unit* /*who*/)
+        {
+            Talk(SAY_DEATH);
+        }
+
+        void KilledUnit(Unit* /*who*/)
+        {
+            Talk(SAY_SLAY);
+        }
+
+        void EnterCombat(Unit* /*who*/)
+        {
+            Talk(SAY_AGGRO);
+
+            events.SetPhase(PHASE_GROWING_ANGER);
+            events.ScheduleEvent(EVENT_INCREASE_RAGE, 1*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
+            events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_ENDLESS_RAGE, 22*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS));
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if(!UpdateVictim())
+                return;
+
+            ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
+            ThreatContainer::StorageType::const_iterator i = threatlist.begin();
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            if (me->GetPower(POWER_RAGE) > 100)
+                me->SetPower(POWER_RAGE, 100);
+
+            if (me->GetPower(POWER_RAGE) < 0)
+                me->SetPower(POWER_RAGE, 0);
+
+            if (me->GetPower(POWER_RAGE) == 100 && events.IsInPhase(PHASE_GROWING_ANGER))
+            {
+                me->CastSpell(me, SPELL_UNLEASHED_WRATH);
+                Talk(SAY_UNLEASHED_WRATH);
+                events.ScheduleEvent(EVENT_DECREASE_RAGE, 1*IN_MILLISECONDS, 0, PHASE_UNLEASHED_WRATH);
+                events.ScheduleEvent(EVENT_ENDLESS_RAGE, 10*IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_GROWING_ANGER, urand(20*IN_MILLISECONDS, 25*IN_MILLISECONDS));
+                events.SetPhase(PHASE_UNLEASHED_WRATH);
+            }
+
+            if (me->GetPower(POWER_RAGE) == 0 && events.IsInPhase(PHASE_UNLEASHED_WRATH))
+            {
+                events.ScheduleEvent(EVENT_INCREASE_RAGE, 1*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
+                events.SetPhase(PHASE_GROWING_ANGER);
+            }
+
+            while(uint32 eventId = events.ExecuteEvent())
+            {
+                switch(eventId)
+                {
+                    case EVENT_INCREASE_RAGE:
+                        me->ModifyPower(POWER_RAGE, 2);
+                        events.ScheduleEvent(EVENT_INCREASE_RAGE, 1*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
+                        break;
+
+                    case EVENT_DECREASE_RAGE:
+                        me->ModifyPower(POWER_RAGE, -4);
+                        events.ScheduleEvent(EVENT_DECREASE_RAGE, 1*IN_MILLISECONDS);
+                        break;
+
+                    case EVENT_SEETHE:
+                        for (i = threatlist.begin(); i != threatlist.end(); ++i)
+                        {
+                            if (Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid()))
+                                if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && me->IsWithinMeleeRange(me->GetVictim()))
+                                    me->CastSpell(me->GetVictim(), SPELL_SEETHE);
+                        }
+
+                        events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
+                        break;
+
+                    case EVENT_ENDLESS_RAGE: /* Vérifier Timer + nombre de cible */
+                        me->CastSpell(me, SPELL_ENDLESS_RAGE);
+                        Talk(SAY_ENDLESS_RAGE);
+                        events.ScheduleEvent(EVENT_ENDLESS_RAGE, 23*IN_MILLISECONDS);
+                        break;
+
+                    case EVENT_GROWING_ANGER:
+                        me->CastSpell(me, SPELL_GROWING_ANGER);
+                        Talk(SAY_GROWING_ANGER);
+                        events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS));
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3180,4 +3348,5 @@ void AddSC_npcs_special()
     new npc_warrior_banner();
     new npc_transcendance();
 	new npc_winter_reveler();
+    new boss_sha_of_anger();
 }
