@@ -333,11 +333,6 @@ public:
 						if (instance)
 						{
 							case EVENT_ATTACK_START:
-								if (instance)
-									if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 500.0f))
-										if (!peril->isInCombat())
-											peril->SetInCombatWithZone();
-
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
@@ -381,7 +376,7 @@ public:
 						case EVENT_AGONY:
 							me->CastSpell(me->getVictim(), SPELL_AGONY);
 
-							events.ScheduleEvent(EVENT_AGONY, 2*IN_MILLISECONDS);
+							events.RescheduleEvent(EVENT_AGONY, 2*IN_MILLISECONDS);
 							break;
 
 						case EVENT_DISSIPATION:
@@ -507,11 +502,6 @@ public:
 						if (instance)
 						{
 							case EVENT_ATTACK_START:
-								if (instance)
-									if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 500.0f))
-										if (!strife->isInCombat())
-											strife->SetInCombatWithZone();
-
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
@@ -555,7 +545,7 @@ public:
 						case EVENT_AGONY:
 							me->CastSpell(me->getVictim(), SPELL_AGONY);
 
-							events.ScheduleEvent(EVENT_AGONY, 2*IN_MILLISECONDS);
+							events.RescheduleEvent(EVENT_AGONY, 2*IN_MILLISECONDS);
 							break;
 
 						case EVENT_DISSIPATION:
