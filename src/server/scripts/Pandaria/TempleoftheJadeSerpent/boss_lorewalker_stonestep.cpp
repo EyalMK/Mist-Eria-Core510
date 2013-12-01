@@ -296,7 +296,8 @@ public:
 
 		void DamageTaken(Unit* who, uint32& damage)
 		{
-			damageDealt += damage;
+			if (int32 dmg = damageDealt + damage)
+				damageDealt = dmg;
 		}
 
 		void EnterCombat(Unit* /*who*/)
@@ -328,8 +329,9 @@ public:
 		{
 			events.Update(diff);
 
-			if (damageDealt >= me->GetMaxHealth() * 0.2f)
+			if (damageDealt >= me->GetMaxHealth() * 0.02f)
 			{
+				me->RemoveAurasDueToSpell(SPELL_DISSIPATION);
 				me->CastSpell(me, SPELL_INTENSITY);
 				events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
 				intensityStacks++;
@@ -363,6 +365,7 @@ public:
 
 						case EVENT_DISSIPATION:
 							me->CastSpell(me, SPELL_DISSIPATION);
+
 							if (me->HasAura(SPELL_INTENSITY))
 							{
 								intensityStacks = 0;
@@ -445,7 +448,8 @@ public:
 
 		void DamageTaken(Unit* who, uint32& damage)
 		{
-			damageDealt += damage;
+			if (int32 dmg = damageDealt + damage)
+				damageDealt = dmg;
 		}
 
 		void EnterCombat(Unit* /*who*/)
@@ -477,8 +481,9 @@ public:
 		{
 			events.Update(diff);
 
-			if (damageDealt >= me->GetMaxHealth() * 0.2f)
+			if (damageDealt >= me->GetMaxHealth() * 0.02f)
 			{
+				me->RemoveAurasDueToSpell(SPELL_DISSIPATION);
 				me->CastSpell(me, SPELL_INTENSITY);
 				events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
 				intensityStacks++;
@@ -512,6 +517,7 @@ public:
 
 						case EVENT_DISSIPATION:
 							me->CastSpell(me, SPELL_DISSIPATION);
+
 							if (me->HasAura(SPELL_INTENSITY))
 							{
 								intensityStacks = 0;
