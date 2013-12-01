@@ -35,6 +35,7 @@ enum Events
 	/* Strife & Peril */
 	EVENT_START_ATTACK			= 1,
 	EVENT_AGONY					= 2,
+	EVENT_DISSIPATION			= 3,
 	
 	/* Osong */
 	EVENT_AGGRO					= 1,
@@ -192,6 +193,7 @@ public:
 			{
 				damage = 0;
 				me->SetHealth(1);
+
 				if (!oneHp)
 				{
 					instance->DoCastSpellOnPlayers(SPELL_CAMERA_SHAKE);
@@ -251,10 +253,16 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
+		int32 damageDealt;
+		int32 intensityStacks;
 
 		void Reset()
 		{
 			events.Reset();
+
+			damageDealt = 0;
+			intensityStacks = 0;
+
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -266,6 +274,7 @@ public:
 		void JustSummoned(Creature* summoned)
         {
 			events.Reset();
+
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -277,12 +286,18 @@ public:
 		void JustDied(Unit *pWho)
 		{
 			if (instance)
-				if (Creature* peril = me->FindNearestCreature(NPC_STRIFE, 500.0f))
+				if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 500.0f))
 					if (!peril->isAlive())
 					{
 						instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, DONE);
 						instance->DoCastSpellOnPlayers(SPELL_LOREWALKER_S_ALACRITY);
 					}
+		}
+
+		void DamageTaken(Unit* who, uint32& damage)
+		{
+			if (int32 dmg = damageDealt + damage)
+				damageDealt = dmg;
 		}
 
 		void EnterCombat(Unit* /*who*/)
@@ -297,16 +312,38 @@ public:
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetInCombatWithZone();
 			events.ScheduleEvent(EVENT_AGONY, 0);
+			events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
 		}
 
 		void EnterEvadeMode()
 		{
-			me->DespawnOrUnsummon();
+			if (instance)
+			{
+				me->CombatStop();
+				me->DeleteThreatList();
+				me->DespawnOrUnsummon();
+			}
 		}
 
 		void UpdateAI(uint32 diff)
 		{
 			events.Update(diff);
+
+			if (damageDealt >= me->GetMaxHealth() * 0.02f)
+			{
+				me->RemoveAurasDueToSpell(SPELL_DISSIPATION);
+				me->CastSpell(me, SPELL_INTENSITY);
+				events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
+				intensityStacks++;
+				damageDealt = 0;
+			}
+
+			if (intensityStacks == 10)
+			{
+				me->CastSpell(me, SPELL_ULTIMATE_POWER);
+				me->RemoveAurasDueToSpell(SPELL_INTENSITY);
+				intensityStacks = 0;
+			}
 
 			while(uint32 eventId = events.ExecuteEvent())
 			{
@@ -324,6 +361,20 @@ public:
 							me->CastSpell(me->getVictim(), SPELL_AGONY);
 
 							events.ScheduleEvent(EVENT_AGONY, 2*IN_MILLISECONDS);
+							break;
+
+						case EVENT_DISSIPATION:
+							me->CastSpell(me, SPELL_DISSIPATION);
+
+							if (me->HasAura(SPELL_INTENSITY))
+							{
+								intensityStacks = 0;
+								me->RemoveAurasDueToSpell(SPELL_INTENSITY, me->GetGUID());
+							}
+
+							events.ScheduleEvent(EVENT_DISSIPATION, 2*IN_MILLISECONDS);
+							break;
+
 						default:
 							break;
 					}
@@ -354,10 +405,16 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
+		int32 damageDealt;
+		int32 intensityStacks;
 
 		void Reset()
 		{
 			events.Reset();
+
+			damageDealt = 0;
+			intensityStacks = 0;
+
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -369,6 +426,7 @@ public:
 		void JustSummoned(Creature* summoned)
         {
 			events.Reset();
+
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -388,6 +446,12 @@ public:
 					}
 		}
 
+		void DamageTaken(Unit* who, uint32& damage)
+		{
+			if (int32 dmg = damageDealt + damage)
+				damageDealt = dmg;
+		}
+
 		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
@@ -400,16 +464,38 @@ public:
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetInCombatWithZone();
 			events.ScheduleEvent(EVENT_AGONY, 0);
+			events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
 		}
 
 		void EnterEvadeMode()
 		{
-			me->DespawnOrUnsummon();
+			if (instance)
+			{
+				me->CombatStop();
+				me->DeleteThreatList();
+				me->DespawnOrUnsummon();
+			}
 		}
 
 		void UpdateAI(uint32 diff)
 		{
 			events.Update(diff);
+
+			if (damageDealt >= me->GetMaxHealth() * 0.02f)
+			{
+				me->RemoveAurasDueToSpell(SPELL_DISSIPATION);
+				me->CastSpell(me, SPELL_INTENSITY);
+				events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
+				intensityStacks++;
+				damageDealt = 0;
+			}
+
+			if (intensityStacks == 10)
+			{
+				me->CastSpell(me, SPELL_ULTIMATE_POWER);
+				me->RemoveAurasDueToSpell(SPELL_INTENSITY);
+				intensityStacks = 0;
+			}
 
 			while(uint32 eventId = events.ExecuteEvent())
 			{
@@ -427,6 +513,20 @@ public:
 							me->CastSpell(me->getVictim(), SPELL_AGONY);
 
 							events.ScheduleEvent(EVENT_AGONY, 2*IN_MILLISECONDS);
+							break;
+
+						case EVENT_DISSIPATION:
+							me->CastSpell(me, SPELL_DISSIPATION);
+
+							if (me->HasAura(SPELL_INTENSITY))
+							{
+								intensityStacks = 0;
+								me->RemoveAurasDueToSpell(SPELL_INTENSITY, me->GetGUID());
+							}
+
+							events.ScheduleEvent(EVENT_DISSIPATION, 2*IN_MILLISECONDS);
+							break;
+
 						default:
 							break;
 					}

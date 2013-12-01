@@ -279,6 +279,9 @@ public:
 			}
 
 			if (events.IsInPhase(PHASE_YU_LON) && !thirdPhaseHome)
+			{
+				me->SetHealth(me->GetMaxHealth() * 0.3f);
+
 				if (Creature* liu = me->FindNearestCreature(NPC_LIU_TRIGGER, 0.1f, true))
 				{
 					me->Relocate(929.684998f, -2560.610107f, 180.070007f, 4.410300f);
@@ -290,7 +293,7 @@ public:
 					events.ScheduleEvent(EVENT_SUMMON_YU_LON, 0, 0, PHASE_YU_LON);
 					thirdPhaseHome = true;
 				}
-
+			}
 			while(uint32 eventId = events.ExecuteEvent())
 			{
 				switch(eventId)

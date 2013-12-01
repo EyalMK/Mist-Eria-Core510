@@ -58,6 +58,7 @@ enum WarriorSpells
 	SPELL_WARRIOR_RAGING_BLOW_MAIN					= 96103,
 	SPELL_WARRIOR_RAGING_BLOW_OFF					= 85384,
 	SPELL_WARRIOR_ENRAGE							= 12880,
+	SPELL_WARRIOR_STORM_BOLT						= 107570,
 	SPELL_RAGING_BLOW_STACKS						= 131116,
     SPELL_PALADIN_BLESSING_OF_SANCTUARY             = 20911,
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
@@ -1209,6 +1210,48 @@ class spell_warr_enrage : public SpellScriptLoader
         }
 };
 
+/*class spell_warr_storm_bolt : public SpellScriptLoader
+{
+    public:
+        spell_warr_storm_bolt() : SpellScriptLoader("spell_warr_storm_bolt") { }
+
+        class spell_warr_storm_bolt_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_storm_bolt_SpellScript);
+
+            bool Validate (SpellInfo const*)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_STORM_BOLT))
+                    return false;
+
+                return true;
+            }
+
+            bool Load()
+            {
+                if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                    return false;
+
+                return true;
+            }
+
+            void HandleEffect(SpellEffIndex)
+            {
+				Unit* target = GetHitUnit()->ToCreature();
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_warr_storm_bolt_SpellScript::HandleEffect, EFFECT_1, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_storm_bolt_SpellScript();
+        }
+};*/
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_bloodthirst();
@@ -1236,4 +1279,5 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_raging_blow_main();
 	new spell_warr_raging_blow_off();
 	new spell_warr_enrage();
+	//new spell_warr_storm_bolt();
 }
