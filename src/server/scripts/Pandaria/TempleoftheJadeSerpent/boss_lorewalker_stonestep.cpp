@@ -342,9 +342,12 @@ public:
 		{
 			events.Update(diff);
 
-			if	(!UpdateVictim())
-				if (uint32 eventId = events.ExecuteEvent())
-					if (eventId == EVENT_ATTACK_START)
+			if (!UpdateVictim())
+			{
+				while(uint32 eventId = events.ExecuteEvent())
+				{
+					switch(eventId)
+					{
 						if (instance)
 						{
 							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -357,6 +360,9 @@ public:
 
 							events.CancelEvent(EVENT_ATTACK_START);
 						}
+					}
+				}
+			}
 
 			if (!me->HasAura(SPELL_INTENSITY) && intensityStacks != 0)
 				intensityStacks = 0;
@@ -520,9 +526,12 @@ public:
 		{
 			events.Update(diff);
 
-			if	(!UpdateVictim())
-				if (uint32 eventId = events.ExecuteEvent())
-					if (eventId == EVENT_ATTACK_START)
+			if (!UpdateVictim())
+			{
+				while(uint32 eventId = events.ExecuteEvent())
+				{
+					switch(eventId)
+					{
 						if (instance)
 						{
 							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -535,6 +544,9 @@ public:
 
 							events.CancelEvent(EVENT_ATTACK_START);
 						}
+					}
+				}
+			}
 
 			if (!me->HasAura(SPELL_INTENSITY) && intensityStacks != 0)
 				intensityStacks = 0;
