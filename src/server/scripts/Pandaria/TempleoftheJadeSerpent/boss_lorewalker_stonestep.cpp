@@ -33,7 +33,7 @@ enum Events
 	EVENT_SUMMON_BOSSES			= 1,
 
 	/* Strife & Peril */
-	EVENT_START_ATTACK			= 1,
+	EVENT_ATTACK_START			= 1,
 	EVENT_AGONY					= 2,
 	EVENT_DISSIPATION			= 3,
 	
@@ -268,7 +268,7 @@ public:
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->CastSpell(me, SPELL_SHA_CORRUPTION);
-			events.ScheduleEvent(EVENT_START_ATTACK, 5*IN_MILLISECONDS);
+			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
 		}
 
 		void JustSummoned(Creature* summoned)
@@ -280,7 +280,7 @@ public:
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->CastSpell(me, SPELL_SHA_CORRUPTION);
-			events.ScheduleEvent(EVENT_START_ATTACK, 5*IN_MILLISECONDS);
+			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
         }
 
 		void JustDied(Unit *pWho)
@@ -300,6 +300,16 @@ public:
 				damageDealt = dmg;
 		}
 
+		void EnterEvadeMode()
+		{
+			if (instance)
+			{
+				me->CombatStop();
+				me->DeleteThreatList();
+				me->DespawnOrUnsummon();
+			}
+		}
+
 		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
@@ -310,19 +320,8 @@ public:
 			me->setActive(true);
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-			me->SetInCombatWithZone();
 			events.ScheduleEvent(EVENT_AGONY, 0);
 			events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
-		}
-
-		void EnterEvadeMode()
-		{
-			if (instance)
-			{
-				me->CombatStop();
-				me->DeleteThreatList();
-				me->DespawnOrUnsummon();
-			}
 		}
 
 		void UpdateAI(uint32 diff)
@@ -351,10 +350,10 @@ public:
 				{
 					if (instance)
 					{
-						case EVENT_START_ATTACK:
-							EnterCombat(me);
+						case EVENT_ATTACK_START:
+							me->SetInCombatWithZone();
 
-							events.CancelEvent(EVENT_START_ATTACK);
+							events.CancelEvent(EVENT_ATTACK_START);
 							break;
 
 						case EVENT_AGONY:
@@ -420,7 +419,7 @@ public:
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->CastSpell(me, SPELL_SHA_CORRUPTION);
-			events.ScheduleEvent(EVENT_START_ATTACK, 5*IN_MILLISECONDS);
+			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
 		}
 
 		void JustSummoned(Creature* summoned)
@@ -432,7 +431,7 @@ public:
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->CastSpell(me, SPELL_SHA_CORRUPTION);
-			events.ScheduleEvent(EVENT_START_ATTACK, 5*IN_MILLISECONDS);
+			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
         }
 
 		void JustDied(Unit *pWho)
@@ -452,6 +451,16 @@ public:
 				damageDealt = dmg;
 		}
 
+		void EnterEvadeMode()
+		{
+			if (instance)
+			{
+				me->CombatStop();
+				me->DeleteThreatList();
+				me->DespawnOrUnsummon();
+			}
+		}
+
 		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
@@ -462,19 +471,8 @@ public:
 			me->setActive(true);
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-			me->SetInCombatWithZone();
 			events.ScheduleEvent(EVENT_AGONY, 0);
 			events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
-		}
-
-		void EnterEvadeMode()
-		{
-			if (instance)
-			{
-				me->CombatStop();
-				me->DeleteThreatList();
-				me->DespawnOrUnsummon();
-			}
 		}
 
 		void UpdateAI(uint32 diff)
@@ -503,10 +501,10 @@ public:
 				{
 					if (instance)
 					{
-						case EVENT_START_ATTACK:
-							EnterCombat(me);
+						case EVENT_ATTACK_START:
+							me->SetInCombatWithZone();
 
-							events.CancelEvent(EVENT_START_ATTACK);
+							events.CancelEvent(EVENT_ATTACK_START);
 							break;
 
 						case EVENT_AGONY:
