@@ -192,6 +192,7 @@ public:
 			{
 				damage = 0;
 				me->SetHealth(1);
+
 				if (!oneHp)
 				{
 					instance->DoCastSpellOnPlayers(SPELL_CAMERA_SHAKE);
@@ -255,6 +256,7 @@ public:
 		void Reset()
 		{
 			events.Reset();
+
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -266,6 +268,7 @@ public:
 		void JustSummoned(Creature* summoned)
         {
 			events.Reset();
+
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -301,12 +304,17 @@ public:
 
 		void EnterEvadeMode()
 		{
+			me->CombatStop();
+			me->DeleteThreatList();
 			me->DespawnOrUnsummon();
 		}
 
 		void UpdateAI(uint32 diff)
 		{
 			events.Update(diff);
+
+			if (me->HasUnitState(UNIT_STATE_CASTING))
+				return;
 
 			while(uint32 eventId = events.ExecuteEvent())
 			{
@@ -323,7 +331,7 @@ public:
 						case EVENT_AGONY:
 							me->CastSpell(me->getVictim(), SPELL_AGONY);
 
-							events.ScheduleEvent(EVENT_AGONY, 2*IN_MILLISECONDS);
+							events.ScheduleEvent(EVENT_AGONY, 1*IN_MILLISECONDS);
 						default:
 							break;
 					}
@@ -358,6 +366,7 @@ public:
 		void Reset()
 		{
 			events.Reset();
+
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -369,6 +378,7 @@ public:
 		void JustSummoned(Creature* summoned)
         {
 			events.Reset();
+
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -404,12 +414,17 @@ public:
 
 		void EnterEvadeMode()
 		{
+			me->CombatStop();
+			me->DeleteThreatList();
 			me->DespawnOrUnsummon();
 		}
 
 		void UpdateAI(uint32 diff)
 		{
 			events.Update(diff);
+
+			if (me->HasUnitState(UNIT_STATE_CASTING))
+				return;
 
 			while(uint32 eventId = events.ExecuteEvent())
 			{
@@ -426,7 +441,7 @@ public:
 						case EVENT_AGONY:
 							me->CastSpell(me->getVictim(), SPELL_AGONY);
 
-							events.ScheduleEvent(EVENT_AGONY, 2*IN_MILLISECONDS);
+							events.ScheduleEvent(EVENT_AGONY, 1*IN_MILLISECONDS);
 						default:
 							break;
 					}
