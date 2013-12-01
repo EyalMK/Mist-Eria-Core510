@@ -749,23 +749,26 @@ int32 Aura::CalcMaxDuration(Unit* caster) const
     if (maxDuration != -1 && modOwner)
         modOwner->ApplySpellMod(GetId(), SPELLMOD_DURATION, maxDuration);
 
-    Player *plr = caster->ToPlayer();
-    if(plr)
+    if(caster)
     {
-        if(plr->getClass() == CLASS_WARLOCK) //Talent pandemie (131973)
+        Player *plr = caster->ToPlayer();
+        if(plr)
         {
-            if(plr->HasAura(131973)) //Pandemie
+            if(plr->getClass() == CLASS_WARLOCK) //Talent pandemie (131973)
             {
-                if(m_spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK)
+                if(plr->HasAura(131973)) //Pandemie
                 {
-                    Unit *owner = GetUnitOwner();
-                    if(owner->HasAura(m_spellInfo->Id))
+                    if(m_spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK)
                     {
-                        Aura *prevApp = owner->GetAura(m_spellInfo->Id);
-                        if(prevApp)
+                        Unit *owner = GetUnitOwner();
+                        if(owner && owner->HasAura(m_spellInfo->Id))
                         {
-                            uint32 newDuration = maxDuration + prevApp->GetDuration();
-                            maxDuration = std::min(newDuration, uint32(maxDuration * 1.5f));
+                            Aura *prevApp = owner->GetAura(m_spellInfo->Id);
+                            if(prevApp)
+                            {
+                                uint32 newDuration = maxDuration + prevApp->GetDuration();
+                                maxDuration = std::min(newDuration, uint32(maxDuration * 1.5f));
+                            }
                         }
                     }
                 }
