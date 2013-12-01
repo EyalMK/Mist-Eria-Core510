@@ -8,6 +8,7 @@
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "Spell.h"
+#include "GridNotifiers.h"
 
 enum MonkSpells
 {
