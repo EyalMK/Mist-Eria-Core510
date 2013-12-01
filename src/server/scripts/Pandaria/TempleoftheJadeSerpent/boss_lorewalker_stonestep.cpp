@@ -384,10 +384,9 @@ public:
 								me->CastSpell(me, SPELL_DISSIPATION);
 
 							if (me->HasAura(SPELL_INTENSITY))
-							{
-								intensityStacks = 0;
 								me->RemoveAurasDueToSpell(SPELL_INTENSITY, me->GetGUID());
-							}
+
+							intensityStacks = 0;
 
 							events.RescheduleEvent(EVENT_DISSIPATION, 2*IN_MILLISECONDS);
 							break;
@@ -553,10 +552,9 @@ public:
 								me->CastSpell(me, SPELL_DISSIPATION);
 
 							if (me->HasAura(SPELL_INTENSITY))
-							{
-								intensityStacks = 0;
 								me->RemoveAurasDueToSpell(SPELL_INTENSITY, me->GetGUID());
-							}
+
+							intensityStacks = 0;
 
 							events.RescheduleEvent(EVENT_DISSIPATION, 2*IN_MILLISECONDS);
 							break;
