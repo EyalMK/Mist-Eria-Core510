@@ -255,6 +255,7 @@ public:
 		EventMap events;
 		int32 damageDealt;
 		int32 intensityStacks;
+		bool eventAgony;
 
 		void Reset()
 		{
@@ -262,6 +263,7 @@ public:
 
 			damageDealt = 0;
 			intensityStacks = 0;
+			eventAgony = false;
 
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -281,6 +283,7 @@ public:
 
 			damageDealt = 0;
 			intensityStacks = 0;
+			eventAgony = false;
 
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -319,25 +322,21 @@ public:
 				me->DeleteThreatList();
 
 				if (Creature* scroll = me->FindNearestCreature(NPC_CORRUPTED_SCROLL, 500.0f))
-					scroll->Respawn(true);
+					me->Respawn(true);
 
 				if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 500.0f))
 				{
-					lorewalker->Kill(lorewalker);
+					me->Kill(lorewalker);
+					me->Respawn(true);
+					lorewalker->GetMotionMaster()->MovePoint(0, lorewalker->GetHomePosition());
 					lorewalker->Relocate(lorewalker->GetHomePosition());
-					lorewalker->Respawn(true);
 				}
 
 				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 500.0f))
 					osong->DespawnOrUnsummon();
 
-				me->DespawnOrUnsummon();
+				me->DespawnOrUnsummon(1*IN_MILLISECONDS);
 			}
-		}
-
-		void EnterCombat(Unit* /*who*/) 
-		{
-			events.ScheduleEvent(EVENT_AGONY, 0);
 		}
 
 		void UpdateAI(uint32 diff)
@@ -371,7 +370,13 @@ public:
 				}
 			}
 
-			if (!me->HasAura(SPELL_INTENSITY))
+			if (!eventAgony)
+			{
+				events.ScheduleEvent(EVENT_AGONY, 0);
+				eventAgony = true;
+			}
+
+			if (!me->HasAura(SPELL_INTENSITY) && intensityStacks != 0)
 				intensityStacks = 0;
 
 			if (damageDealt >= me->GetMaxHealth() * 0.02f)
@@ -446,6 +451,7 @@ public:
 		EventMap events;
 		int32 damageDealt;
 		int32 intensityStacks;
+		bool eventAgony;
 
 		void Reset()
 		{
@@ -453,6 +459,7 @@ public:
 
 			damageDealt = 0;
 			intensityStacks = 0;
+			eventAgony = false;
 
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -472,6 +479,7 @@ public:
 
 			damageDealt = 0;
 			intensityStacks = 0;
+			eventAgony = false;
 
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -510,25 +518,21 @@ public:
 				me->DeleteThreatList();
 
 				if (Creature* scroll = me->FindNearestCreature(NPC_CORRUPTED_SCROLL, 500.0f))
-					scroll->Respawn(true);
+					me->Respawn(true);
 
 				if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 500.0f))
 				{
-					lorewalker->Kill(lorewalker);
+					me->Kill(lorewalker);
+					me->Respawn(true);
+					lorewalker->GetMotionMaster()->MovePoint(0, lorewalker->GetHomePosition());
 					lorewalker->Relocate(lorewalker->GetHomePosition());
-					lorewalker->Respawn(true);
 				}
 
 				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 500.0f))
 					osong->DespawnOrUnsummon();
 
-				me->DespawnOrUnsummon();
+				me->DespawnOrUnsummon(1*IN_MILLISECONDS);
 			}
-		}
-
-		void EnterCombat(Unit* /*who*/) 
-		{
-			events.ScheduleEvent(EVENT_AGONY, 0);
 		}
 
 		void UpdateAI(uint32 diff)
@@ -562,7 +566,13 @@ public:
 				}
 			}
 
-			if (!me->HasAura(SPELL_INTENSITY))
+			if (!eventAgony)
+			{
+				events.ScheduleEvent(EVENT_AGONY, 0);
+				eventAgony = true;
+			}
+
+			if (!me->HasAura(SPELL_INTENSITY) && intensityStacks != 0)
 				intensityStacks = 0;
 
 			if (damageDealt >= me->GetMaxHealth() * 0.02f)
