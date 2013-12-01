@@ -448,7 +448,7 @@ bool BattlegroundTK::SetupBattleground()
         // Horde gate
         || !AddObject(BG_TK_OBJECT_DOOR_H, BG_OBJECT_DOOR_TK_H, 1780.151733f, 1565.395874f, 22.469021f, 4.70132f, 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
         // Alliance gate
-        || !AddObject(BG_TK_OBJECT_DOOR_A, BG_OBJECT_DOOR_TK_A, 1783.735107f, 1104.960205f, 19.374258f, 1.59529f, 0.0f, 0.0f, 0.71615f, 0.697947f, RESPAWN_IMMEDIATELY)
+        || !AddObject(BG_TK_OBJECT_DOOR_A, BG_OBJECT_DOOR_TK_A, 1783.735107f, 1104.960205f, 19.374258f, 1.62f, 0.0f, 0.0f, 0.71615f, 0.697947f, RESPAWN_IMMEDIATELY)
 		)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "BattleGroundTK: Failed to spawn some object Battleground not created!");
