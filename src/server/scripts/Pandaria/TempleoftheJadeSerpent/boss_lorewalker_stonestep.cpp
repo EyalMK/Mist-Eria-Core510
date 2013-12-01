@@ -21,7 +21,7 @@ enum Spells
 	SPELL_INTENSITY				= 113315,
 	SPELL_DISSIPATION			= 113379,
 	SPELL_ULTIMATE_POWER		= 113309,
-
+	SPELL_SHA_CORRUPTION		= 115086,
 };
 
 enum Events
@@ -61,6 +61,7 @@ enum Npcs
 	NPC_STRIFE					= 59051,
 	NPC_PERIL					= 59726,
 	NPC_OSONG					= 56872,
+	NPC_LOREWALKER_TRIGGER		= 400449,
   //NPC_SUN						= 56915, Missing template
 };
 
@@ -112,13 +113,25 @@ public:
 
 		void UpdateAI(uint32 diff) 
 		{
+			events.Update(diff);
+
 			if (!emote)
 			{
 				me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
 				emote = true;
 			}
 
-			events.Update(diff);
+			if (Creature* trigger = me->FindNearestCreature(NPC_LOREWALKER_TRIGGER, 0.1f, true))
+				if (!events.IsInPhase(PHASE_BOSSES))
+					{
+						me->Relocate(824.674438f, -2453.281738f, 176.302979f, 5.957958f);
+						me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+						me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+						me->HandleEmoteCommand(0);
+						me->SetFacingTo(5.957958f);
+						events.CancelEvent(EVENT_SPINNING_CRANE_KICK);
+						events.SetPhase(PHASE_BOSSES);
+					}
 
 			if (Creature* scroll = me->FindNearestCreature(NPC_CORRUPTED_SCROLL, 500.0f))
 				if (!scroll->isAlive())
@@ -175,13 +188,16 @@ public:
 
 		void DamageTaken(Unit* who, uint32& damage)
 		{
-			if (damage >= me->GetHealth() && !oneHp)
+			if (damage >= me->GetHealth())
 			{
 				damage = 0;
 				me->SetHealth(1);
-				instance->DoCastSpellOnPlayers(SPELL_CAMERA_SHAKE);
-				events.ScheduleEvent(EVENT_SUMMON_BOSSES, 4*IN_MILLISECONDS);
-				oneHp = true;
+				if (!oneHp)
+				{
+					instance->DoCastSpellOnPlayers(SPELL_CAMERA_SHAKE);
+					events.ScheduleEvent(EVENT_SUMMON_BOSSES, 4*IN_MILLISECONDS);
+					oneHp = true;
+				}
 			}
 		}
 
@@ -201,10 +217,7 @@ public:
 							me->SummonCreature(NPC_STRIFE, 848.223511f, -2470.850586f, 174.961578f, 1.537897f, TEMPSUMMON_MANUAL_DESPAWN);
 							
 							if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 500.0f))
-							{
 								lorewalker->GetMotionMaster()->MovePoint(0, 824.674438f, -2453.281738f, 176.302979f);
-								lorewalker->SetFacingTo(5.957958f);
-							}
 
 							me->DespawnOrUnsummon();
 							events.CancelEvent(EVENT_SUMMON_BOSSES);
@@ -246,6 +259,7 @@ public:
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->CastSpell(me, SPELL_SHA_CORRUPTION);
 			events.ScheduleEvent(EVENT_START_ATTACK, 5*IN_MILLISECONDS);
 		}
 
@@ -256,6 +270,7 @@ public:
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->CastSpell(me, SPELL_SHA_CORRUPTION);
 			events.ScheduleEvent(EVENT_START_ATTACK, 5*IN_MILLISECONDS);
         }
 
@@ -347,6 +362,7 @@ public:
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->CastSpell(me, SPELL_SHA_CORRUPTION);
 			events.ScheduleEvent(EVENT_START_ATTACK, 5*IN_MILLISECONDS);
 		}
 
@@ -357,6 +373,7 @@ public:
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->CastSpell(me, SPELL_SHA_CORRUPTION);
 			events.ScheduleEvent(EVENT_START_ATTACK, 5*IN_MILLISECONDS);
         }
 
