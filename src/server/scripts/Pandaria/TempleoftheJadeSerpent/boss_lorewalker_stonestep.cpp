@@ -310,20 +310,6 @@ public:
 			}
 		}
 
-		void EnterCombat(Unit* /*who*/)
-		{
-			if (instance)
-				if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 500.0f))
-					if (!peril->isInCombat())
-						peril->SetInCombatWithZone();
-
-			me->setActive(true);
-			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-			events.ScheduleEvent(EVENT_AGONY, 0);
-			events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
-		}
-
 		void UpdateAI(uint32 diff)
 		{
 			events.Update(diff);
@@ -351,7 +337,17 @@ public:
 					if (instance)
 					{
 						case EVENT_ATTACK_START:
+							if (instance)
+								if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 500.0f))
+									if (!peril->isInCombat())
+										peril->SetInCombatWithZone();
+
 							me->SetInCombatWithZone();
+							me->setActive(true);
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+							events.ScheduleEvent(EVENT_AGONY, 0);
+							events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
 
 							events.CancelEvent(EVENT_ATTACK_START);
 							break;
@@ -461,20 +457,6 @@ public:
 			}
 		}
 
-		void EnterCombat(Unit* /*who*/)
-		{
-			if (instance)
-				if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 500.0f))
-					if (!strife->isInCombat())
-						strife->SetInCombatWithZone();
-
-			me->setActive(true);
-			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-			events.ScheduleEvent(EVENT_AGONY, 0);
-			events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
-		}
-
 		void UpdateAI(uint32 diff)
 		{
 			events.Update(diff);
@@ -502,7 +484,17 @@ public:
 					if (instance)
 					{
 						case EVENT_ATTACK_START:
+							if (instance)
+								if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 500.0f))
+									if (!strife->isInCombat())
+										strife->SetInCombatWithZone();
+
 							me->SetInCombatWithZone();
+							me->setActive(true);
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+							events.ScheduleEvent(EVENT_AGONY, 0);
+							events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
 
 							events.CancelEvent(EVENT_ATTACK_START);
 							break;
