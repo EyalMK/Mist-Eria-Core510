@@ -25055,7 +25055,7 @@ void Player::HandleFall(MovementInfo const& movementInfo)
         {
             uint32 damage = (uint32)(damageperc * GetMaxHealth()*sWorld->getRate(RATE_DAMAGE_FALL));
 
-			damage += damage * GetTotalAuraModifier(SPELL_AURA_MOD_FALL_DAMAGE) / 100.f;
+			AddPct(damage, GetTotalAuraModifier(SPELL_AURA_MOD_FALL_DAMAGE));
 
             float height = movementInfo.pos.m_positionZ;
             UpdateGroundPositionZ(movementInfo.pos.m_positionX, movementInfo.pos.m_positionY, height);
