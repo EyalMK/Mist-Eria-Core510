@@ -76,7 +76,10 @@ enum Texts
 	SAY_ZAO_INTRO_4		= 19,
 	SAY_ZAO_INTRO_5		= 20,
 	SAY_ZAO_INTRO_6		= 21,
-	SAY_ZAO_INTRO_7		= 22
+	SAY_ZAO_INTRO_7		= 22,
+
+	/* Osong */
+	SAY_OSONG_AGGRO		= 0
 };
 
 enum Phases
@@ -299,7 +302,10 @@ public:
 							me->SummonCreature(NPC_STRIFE, 848.223511f, -2470.850586f, 174.961578f, 1.537897f, TEMPSUMMON_MANUAL_DESPAWN);
 							
 							if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 500.0f))
+							{
 								lorewalker->GetMotionMaster()->MovePoint(0, 824.674438f, -2453.281738f, 176.302979f);
+								lorewalker->Say(SAY_OSONG_INTRO_1, 0, 0);
+							}
 
 							me->DespawnOrUnsummon();
 							events.CancelEvent(EVENT_SUMMON_BOSSES);
@@ -762,7 +768,7 @@ public:
 					if (instance)
 					{
 						case EVENT_AGGRO:
-							//Talk(SAY_OSONG_AGGRO);
+							Talk(SAY_OSONG_AGGRO);
 
 							events.ScheduleEvent(EVENT_ATTACK_STRIFE, 2*IN_MILLISECONDS);
 							break;
