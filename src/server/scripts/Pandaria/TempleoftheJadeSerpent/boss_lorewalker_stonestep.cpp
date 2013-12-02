@@ -118,6 +118,7 @@ public:
 		EventMap events;
 		bool emote;
 		bool intro;
+		bool end;
 
 		void Reset()
 		{
@@ -127,6 +128,7 @@ public:
 
 			emote = false;
 			intro = false;
+			end = false;
 
 			events.SetPhase(PHASE_ATTACK_SCROLL);
 			events.ScheduleEvent(EVENT_SPINNING_CRANE_KICK, 0, 0, PHASE_ATTACK_SCROLL);
@@ -142,6 +144,7 @@ public:
 
 				emote = false;
 				intro = false;
+				end = false;
 			}
 		}
 
@@ -190,8 +193,11 @@ public:
 						events.SetPhase(PHASE_BOSSES);
 					}
 
-			if (me->FindNearestCreature(NPC_STRIFE, 500.0f, false) && me->FindNearestCreature(NPC_PERIL, 500.0f, false))
+			if (me->FindNearestCreature(NPC_STRIFE, 500.0f, false) && me->FindNearestCreature(NPC_PERIL, 500.0f, false) && !end)
+			{
 				events.ScheduleEvent(EVENT_SAY_END_1, 0, 0, PHASE_BOSSES);
+				end = true;
+			}
 
 			while(uint32 eventId = events.ExecuteEvent())
 			{
