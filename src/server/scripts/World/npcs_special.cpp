@@ -3146,7 +3146,7 @@ public :
 enum Spells
 {
     SPELL_SEETHE				= 119487,
-    SPELL_ENDLESS_RAGE			= 119446,
+    SPELL_ENDLESS_RAGE			= 119592,
     SPELL_BITTER_THOUGHTS		= 119601,
     SPELL_GROWING_ANGER			= 119622,
     SPELL_AGGRESSIVE_BEHAVIOUR	= 119626,
@@ -3225,7 +3225,7 @@ public:
             events.SetPhase(PHASE_GROWING_ANGER);
             events.ScheduleEvent(EVENT_INCREASE_RAGE, 1*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
             events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_ENDLESS_RAGE, 22*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_ENDLESS_RAGE, 25*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS));
         }
 
@@ -3269,7 +3269,7 @@ public:
                 switch(eventId)
                 {
                     case EVENT_INCREASE_RAGE:
-                        me->ModifyPower(POWER_RAGE, 2);
+                        me->ModifyPower(POWER_RAGE, +2);
                         events.ScheduleEvent(EVENT_INCREASE_RAGE, 1*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
                         break;
 
@@ -3282,17 +3282,17 @@ public:
                         for (i = threatlist.begin(); i != threatlist.end(); ++i)
                         {
                             if (Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid()))
-                                if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && me->IsWithinMeleeRange(me->getVictim()))
+                                if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && !me->IsWithinMeleeRange(me->getVictim()))
                                     me->CastSpell(me->getVictim(), SPELL_SEETHE);
                         }
 
                         events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
                         break;
 
-                    case EVENT_ENDLESS_RAGE: /* Vérifier Timer + nombre de cible */
-                        me->CastSpell(me, SPELL_ENDLESS_RAGE);
+                    case EVENT_ENDLESS_RAGE: /* nombre de cible */
+                        me->CastSpell(me->getVictim(), SPELL_ENDLESS_RAGE);
                         Talk(SAY_ENDLESS_RAGE);
-                        events.ScheduleEvent(EVENT_ENDLESS_RAGE, 23*IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_ENDLESS_RAGE, 25*IN_MILLISECONDS);
                         break;
 
                     case EVENT_GROWING_ANGER:
@@ -3307,6 +3307,40 @@ public:
             }
 
             DoMeleeAttackIfReady();
+        }
+    };
+};
+
+class npc_sha_of_anger : public CreatureScript
+{
+public:
+    npc_sha_of_anger() : CreatureScript("npc_sha_of_anger") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_sha_of_angerAI(creature);
+    }
+
+    struct npc_sha_of_angerAI : public ScriptedAI
+    {
+        npc_sha_of_angerAI(Creature* creature) : ScriptedAI(creature) {}
+
+        uint32 uiBitterThoughtsTimer;
+
+        void Reset()
+        {
+            uiBitterThoughtsTimer = 1*IN_MILLISECONDS;
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (uiBitterThoughtsTimer <= diff)
+            {
+                me->CastSpell(me, SPELL_BITTER_THOUGHTS);
+            } else uiBitterThoughtsTimer -= diff;
         }
     };
 };
@@ -3349,4 +3383,5 @@ void AddSC_npcs_special()
     new npc_transcendance();
 	new npc_winter_reveler();
     new boss_sha_of_anger();
+    new npc_sha_of_anger();
 }
