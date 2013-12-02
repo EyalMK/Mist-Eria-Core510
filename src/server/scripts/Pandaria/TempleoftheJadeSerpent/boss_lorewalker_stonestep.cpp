@@ -255,6 +255,7 @@ public:
 		EventMap events;
 		int32 damageDealt;
 		int32 intensityStacks;
+		bool eventAgony;
 
 		void Reset()
 		{
@@ -262,6 +263,7 @@ public:
 
 			damageDealt = 0;
 			intensityStacks = 0;
+			eventAgony = false;
 
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -272,7 +274,6 @@ public:
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
-			//events.ScheduleEvent(EVENT_AGONY, 5*IN_MILLISECONDS);
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
 		}
 
@@ -282,6 +283,7 @@ public:
 
 			damageDealt = 0;
 			intensityStacks = 0;
+			eventAgony = false;
 
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -292,7 +294,6 @@ public:
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
-			//events.ScheduleEvent(EVENT_AGONY, 5*IN_MILLISECONDS);
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
         }
 
@@ -331,7 +332,7 @@ public:
 					lorewalker->Relocate(lorewalker->GetHomePosition());
 				}
 
-				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 500.0f))
+				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 500.0f, true))
 					osong->DespawnOrUnsummon();
 
 				me->DespawnOrUnsummon(1*IN_MILLISECONDS);
@@ -350,15 +351,20 @@ public:
 					{
 						if (instance)
 						{
-							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-							events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
-							me->setActive(true);
-							me->setFaction(14);
-							me->SetInCombatWithZone();
+							case EVENT_ATTACK_START:
+								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+								events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
+								me->setActive(true);
+								me->setFaction(14);
+								me->SetInCombatWithZone();
 
-							events.CancelEvent(EVENT_ATTACK_START);
+								events.CancelEvent(EVENT_ATTACK_START);
+								break;
+
+							default:
+								break;
 						}
 					}
 				}
@@ -383,32 +389,41 @@ public:
 				intensityStacks = 0;
 			}
 
-			while(uint32 eventId = events.ExecuteEvent())
+			if (UpdateVictim())
 			{
-				switch(eventId)
+				if (!eventAgony)
 				{
-					if (instance)
+					events.ScheduleEvent(EVENT_AGONY, 0);
+					eventAgony = true;
+				}
+
+				while(uint32 eventId = events.ExecuteEvent())
+				{
+					switch(eventId)
 					{
-						case EVENT_AGONY:
-							me->CastSpell(me->getVictim(), SPELL_AGONY);
+						if (instance)
+						{
+							case EVENT_AGONY:
+								me->CastSpell(me->getVictim(), SPELL_AGONY);
 
-							events.RescheduleEvent(EVENT_AGONY, 2*IN_MILLISECONDS);
-							break;
+								events.RescheduleEvent(EVENT_AGONY, 2*IN_MILLISECONDS);
+								break;
 
-						case EVENT_DISSIPATION:
-							if (!me->HasAura(SPELL_ULTIMATE_POWER))
-								me->CastSpell(me, SPELL_DISSIPATION);
+							case EVENT_DISSIPATION:
+								if (!me->HasAura(SPELL_ULTIMATE_POWER))
+									me->CastSpell(me, SPELL_DISSIPATION);
 
-							if (me->HasAura(SPELL_INTENSITY))
-								me->RemoveAurasDueToSpell(SPELL_INTENSITY, me->GetGUID());
+								if (me->HasAura(SPELL_INTENSITY))
+									me->RemoveAurasDueToSpell(SPELL_INTENSITY, me->GetGUID());
 
-							intensityStacks = 0;
+								intensityStacks = 0;
 
-							events.RescheduleEvent(EVENT_DISSIPATION, 2*IN_MILLISECONDS);
-							break;
+								events.RescheduleEvent(EVENT_DISSIPATION, 2*IN_MILLISECONDS);
+								break;
 
-						default:
-							break;
+							default:
+								break;
+						}
 					}
 				}
 			}
@@ -439,6 +454,7 @@ public:
 		EventMap events;
 		int32 damageDealt;
 		int32 intensityStacks;
+		bool eventAgony;
 
 		void Reset()
 		{
@@ -446,6 +462,7 @@ public:
 
 			damageDealt = 0;
 			intensityStacks = 0;
+			eventAgony = false;
 
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -456,7 +473,6 @@ public:
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
-			//events.ScheduleEvent(EVENT_AGONY, 5*IN_MILLISECONDS);
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
 		}
 
@@ -466,6 +482,7 @@ public:
 
 			damageDealt = 0;
 			intensityStacks = 0;
+			eventAgony = false;
 
 			me->setActive(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -476,7 +493,6 @@ public:
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
-			//events.ScheduleEvent(EVENT_AGONY, 5*IN_MILLISECONDS);
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
         }
 
@@ -515,7 +531,7 @@ public:
 					lorewalker->Relocate(lorewalker->GetHomePosition());
 				}
 
-				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 500.0f))
+				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 500.0f, true))
 					osong->DespawnOrUnsummon();
 
 				me->DespawnOrUnsummon(1*IN_MILLISECONDS);
@@ -534,15 +550,20 @@ public:
 					{
 						if (instance)
 						{
-							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-							events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
-							me->setActive(true);
-							me->setFaction(14);
-							me->SetInCombatWithZone();
+							case EVENT_ATTACK_START:
+								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+								events.ScheduleEvent(EVENT_DISSIPATION, 4*IN_MILLISECONDS);
+								me->setActive(true);
+								me->setFaction(14);
+								me->SetInCombatWithZone();
 
-							events.CancelEvent(EVENT_ATTACK_START);
+								events.CancelEvent(EVENT_ATTACK_START);
+								break;
+
+							default:
+								break;
 						}
 					}
 				}
@@ -567,32 +588,41 @@ public:
 				intensityStacks = 0;
 			}
 
-			while(uint32 eventId = events.ExecuteEvent())
+			if (UpdateVictim())
 			{
-				switch(eventId)
+				if (!eventAgony)
 				{
-					if (instance)
+					events.ScheduleEvent(EVENT_AGONY, 0);
+					eventAgony = true;
+				}
+
+				while(uint32 eventId = events.ExecuteEvent())
+				{
+					switch(eventId)
 					{
-						case EVENT_AGONY:
-							me->CastSpell(me->getVictim(), SPELL_AGONY);
+						if (instance)
+						{
+							case EVENT_AGONY:
+								me->CastSpell(me->getVictim(), SPELL_AGONY);
 
-							events.RescheduleEvent(EVENT_AGONY, 2*IN_MILLISECONDS);
-							break;
+								events.RescheduleEvent(EVENT_AGONY, 2*IN_MILLISECONDS);
+								break;
 
-						case EVENT_DISSIPATION:
-							if (!me->HasAura(SPELL_ULTIMATE_POWER))
-								me->CastSpell(me, SPELL_DISSIPATION);
+							case EVENT_DISSIPATION:
+								if (!me->HasAura(SPELL_ULTIMATE_POWER))
+									me->CastSpell(me, SPELL_DISSIPATION);
 
-							if (me->HasAura(SPELL_INTENSITY))
-								me->RemoveAurasDueToSpell(SPELL_INTENSITY, me->GetGUID());
+								if (me->HasAura(SPELL_INTENSITY))
+									me->RemoveAurasDueToSpell(SPELL_INTENSITY, me->GetGUID());
 
-							intensityStacks = 0;
+								intensityStacks = 0;
 
-							events.RescheduleEvent(EVENT_DISSIPATION, 2*IN_MILLISECONDS);
-							break;
+								events.RescheduleEvent(EVENT_DISSIPATION, 2*IN_MILLISECONDS);
+								break;
 
-						default:
-							break;
+							default:
+								break;
+						}
 					}
 				}
 			}
