@@ -108,6 +108,7 @@ public:
 		EventMap events;
 		bool intro;
 		bool thirdPhaseHome; // When Liu moves to the center of the "room" in the third phase
+		bool emote;
 		float x, y, z, o;
 		int32 maxJadeFires;
 		Creature* firstWave;
@@ -124,6 +125,7 @@ public:
 
 			intro = false;
 			thirdPhaseHome = false;
+			emote = false;
 
 			me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
 			me->setActive(false);
@@ -171,6 +173,7 @@ public:
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, FAIL);
 				intro = false;
 				thirdPhaseHome = false;
+				emote = false;
 
 				me->CombatStop();
 				me->DeleteThreatList();
@@ -234,8 +237,10 @@ public:
 		void UpdateAI(uint32 diff)
 		{
 			if	(!UpdateVictim())
-				return;
-
+				if (!emote)
+					me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
+				else return;
+				
 			events.Update(diff);
 
 			if (events.IsInPhase(PHASE_LIU_SERPENT_DANCE) && HealthBelowPct(70))
