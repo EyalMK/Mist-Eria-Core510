@@ -374,7 +374,7 @@ public:
 		void JustDied(Unit *pWho)
 		{
 			if (instance)
-				if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 500.0f), false)
+				if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 500.0f, false))
 					if (!peril->isAlive())
 					{
 						instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, DONE);
