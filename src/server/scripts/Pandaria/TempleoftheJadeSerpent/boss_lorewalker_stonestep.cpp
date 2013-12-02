@@ -272,7 +272,7 @@ public:
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
-			events.ScheduleEvent(EVENT_AGONY, 5*IN_MILLISECONDS);
+			//events.ScheduleEvent(EVENT_AGONY, 5*IN_MILLISECONDS);
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
 		}
 
@@ -292,7 +292,7 @@ public:
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
-			events.ScheduleEvent(EVENT_AGONY, 5*IN_MILLISECONDS);
+			//events.ScheduleEvent(EVENT_AGONY, 5*IN_MILLISECONDS);
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
         }
 
@@ -456,7 +456,7 @@ public:
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
-			events.ScheduleEvent(EVENT_AGONY, 5*IN_MILLISECONDS);
+			//events.ScheduleEvent(EVENT_AGONY, 5*IN_MILLISECONDS);
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
 		}
 
@@ -476,7 +476,7 @@ public:
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
-			events.ScheduleEvent(EVENT_AGONY, 5*IN_MILLISECONDS);
+			//events.ScheduleEvent(EVENT_AGONY, 5*IN_MILLISECONDS);
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
         }
 
