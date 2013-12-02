@@ -411,6 +411,7 @@ public:
 					osong->DespawnOrUnsummon();
 
 				me->DespawnOrUnsummon(1*IN_MILLISECONDS);
+			}
 		}
 
 		void UpdateAI(uint32 diff)
