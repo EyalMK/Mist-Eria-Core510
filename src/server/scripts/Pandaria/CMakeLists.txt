@@ -8,8 +8,8 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-set(scripts_STAT_SRCS
-  ${scripts_STAT_SRCS}
+set(sources
+  ${sources}
   Pandaria/boss_sha_of_anger.cpp
   Pandaria/zone_wandering_isle.cpp
   Pandaria/zone_vale_of_eternal_blossoms.cpp

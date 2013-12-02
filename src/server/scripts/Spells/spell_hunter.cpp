@@ -289,7 +289,7 @@ class spell_hun_disengage : public SpellScriptLoader
             }
 
 			
-            void HandleBeforeCast()
+            void HandleAfterCast()
             {
                 if (Player* _player = GetCaster()->ToPlayer())
                 {
@@ -320,7 +320,7 @@ class spell_hun_disengage : public SpellScriptLoader
             void Register()
             {
                 OnCheckCast += SpellCheckCastFn(spell_hun_disengage_SpellScript::CheckCast);
-                BeforeCast += SpellCastFn(spell_hun_disengage_SpellScript::HandleBeforeCast);
+                AfterCast += SpellCastFn(spell_hun_disengage_SpellScript::HandleAfterCast);
             }
         };
 
