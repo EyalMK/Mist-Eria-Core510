@@ -1,6 +1,7 @@
 /* # Script de Tydrheal & Sungis : Lorewalker Stonestep # */
 
-/* Notes : What is missing ? - Pending ...
+/* Notes : What is missing ?	- Zao's & Sun's scripts
+								- Texts
 */
 
 #include "ScriptPCH.h"
@@ -28,6 +29,9 @@ enum Events
 {
 	/* Lorewalker Stonestep */
 	EVENT_SPINNING_CRANE_KICK	= 1,
+	EVENT_SAY_INTRO_2_3_4_5		= 2,
+	EVENT_SAY_END_1				= 3,
+	EVENT_SAY_END_2				= 4,
 
 	/* Scroll */
 	EVENT_SUMMON_BOSSES			= 1,
@@ -45,7 +49,34 @@ enum Events
 
 enum Texts
 {
+	/* Lorewalker Stonestep */
+	SAY_END_1			= 0,
+	SAY_END_2			= 1,
+	SAY_INTRO_1			= 2,
+	SAY_INTRO_2			= 3,
+	SAY_INTRO_3			= 4,
+	SAY_INTRO_4			= 5,
+	SAY_INTRO_5			= 6,
+	SAY_RANDOM_1		= 7,
+	SAY_RANDOM_2		= 8,
+	SAY_RANDOM_3		= 9,
+	SAY_RANDOM_4		= 10,
 
+	/* Lorewalker => Osong */
+	SAY_OSONG_INTRO_1	= 11,
+	SAY_OSONG_INTRO_2	= 12,
+	SAY_OSONG_INTRO_3	= 13,
+	SAY_OSONG_INTRO_4	= 14,
+	SAY_OSONG_INTRO_5	= 15,
+
+	/* Lorewalker => Zao */
+	SAY_ZAO_INTRO_1		= 16,
+	SAY_ZAO_INTRO_2		= 17,
+	SAY_ZAO_INTRO_3		= 18,
+	SAY_ZAO_INTRO_4		= 19,
+	SAY_ZAO_INTRO_5		= 20,
+	SAY_ZAO_INTRO_6		= 21,
+	SAY_ZAO_INTRO_7		= 22
 };
 
 enum Phases
@@ -86,12 +117,17 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 		bool emote;
-		bool scrollAlive;
-		
+		bool intro;
+
 		void Reset()
 		{
-			emote = false;
 			events.Reset();
+
+			instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, NOT_STARTED);
+
+			emote = false;
+			intro = false;
+
 			events.SetPhase(PHASE_ATTACK_SCROLL);
 			events.ScheduleEvent(EVENT_SPINNING_CRANE_KICK, 0, 0, PHASE_ATTACK_SCROLL);
 		}
@@ -100,9 +136,28 @@ public:
 		{
 			if (instance)
 			{
-				instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, FAIL);
-				emote = false;
 				events.Reset();
+
+				instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, FAIL);
+
+				emote = false;
+				intro = false;
+			}
+		}
+
+		void MoveInLineOfSight(Unit* who)
+		{
+			if (!me->IsWithinDistInMap(who, 40.0f) || intro)
+				return;
+
+			if (!who || !who->IsInWorld())
+				return;
+
+			if (who && who->GetTypeId() == TYPEID_PLAYER && !intro && !me->IsValidAttackTarget(who))
+			{
+				Talk(SAY_INTRO_1);
+				events.ScheduleEvent(EVENT_SAY_INTRO_2_3_4_5, 20*IN_MILLISECONDS, 0, PHASE_ATTACK_SCROLL);
+				intro = true;
 			}
 		}
 
@@ -131,12 +186,12 @@ public:
 						me->HandleEmoteCommand(0);
 						me->SetFacingTo(5.957958f);
 						events.CancelEvent(EVENT_SPINNING_CRANE_KICK);
+						events.CancelEvent(EVENT_SAY_INTRO_2_3_4_5);
 						events.SetPhase(PHASE_BOSSES);
 					}
 
-			if (Creature* scroll = me->FindNearestCreature(NPC_CORRUPTED_SCROLL, 500.0f))
-				if (!scroll->isAlive())
-					events.SetPhase(PHASE_BOSSES);
+			if (me->FindNearestCreature(NPC_STRIFE, 500.0f, false) && me->FindNearestCreature(NPC_PERIL, 500.0f, false))
+				events.ScheduleEvent(EVENT_SAY_END_1, 0, 0, PHASE_BOSSES);
 
 			while(uint32 eventId = events.ExecuteEvent())
 			{
@@ -148,6 +203,25 @@ public:
 							me->CastSpell(me, SPELL_SPINNING_CRANE_KICK);
 
 							events.ScheduleEvent(EVENT_SPINNING_CRANE_KICK, 16*IN_MILLISECONDS, 0, PHASE_ATTACK_SCROLL);
+							break;
+
+						case EVENT_SAY_INTRO_2_3_4_5:
+							Talk(irand(SAY_INTRO_2, SAY_INTRO_5));
+
+							events.ScheduleEvent(EVENT_SAY_INTRO_2_3_4_5, 20*IN_MILLISECONDS, 0, PHASE_ATTACK_SCROLL);
+							break;
+
+						case EVENT_SAY_END_1:
+							Talk(SAY_END_1);
+
+							events.ScheduleEvent(EVENT_SAY_END_2, 9*IN_MILLISECONDS, 0, PHASE_BOSSES);
+							events.CancelEvent(EVENT_SAY_END_1);
+							break;
+
+						case EVENT_SAY_END_2:
+							Talk(SAY_END_2);
+
+							events.CancelEvent(EVENT_SAY_END_2);
 							break;
 
 						default:
@@ -300,7 +374,7 @@ public:
 		void JustDied(Unit *pWho)
 		{
 			if (instance)
-				if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 500.0f))
+				if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 500.0f), false)
 					if (!peril->isAlive())
 					{
 						instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, DONE);
@@ -321,22 +395,22 @@ public:
 				me->CombatStop();
 				me->DeleteThreatList();
 
-				if (Creature* scroll = me->FindNearestCreature(NPC_CORRUPTED_SCROLL, 500.0f))
+				if (Creature* scroll = me->FindNearestCreature(NPC_CORRUPTED_SCROLL, 500.0f, false))
 					scroll->Respawn(true);
 
-				if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 500.0f))
+				if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 500.0f, true))
 				{
 					me->Kill(lorewalker);
 					lorewalker->Respawn(true);
 					lorewalker->GetMotionMaster()->MovePoint(0, lorewalker->GetHomePosition());
 					lorewalker->Relocate(lorewalker->GetHomePosition());
+					lorewalker->SetFacingTo(1.252402f);
 				}
 
 				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 500.0f, true))
 					osong->DespawnOrUnsummon();
 
 				me->DespawnOrUnsummon(1*IN_MILLISECONDS);
-			}
 		}
 
 		void UpdateAI(uint32 diff)
@@ -499,7 +573,7 @@ public:
 		void JustDied(Unit *pWho)
 		{
 			if (instance)
-				if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 500.0f))
+				if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 500.0f, false))
 					if (!strife->isAlive())
 					{
 						instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, DONE);
@@ -520,15 +594,16 @@ public:
 				me->CombatStop();
 				me->DeleteThreatList();
 
-				if (Creature* scroll = me->FindNearestCreature(NPC_CORRUPTED_SCROLL, 500.0f))
+				if (Creature* scroll = me->FindNearestCreature(NPC_CORRUPTED_SCROLL, 500.0f, false))
 					scroll->Respawn(true);
 
-				if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 500.0f))
+				if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 500.0f, true))
 				{
 					me->Kill(lorewalker);
 					lorewalker->Respawn(true);
 					lorewalker->GetMotionMaster()->MovePoint(0, lorewalker->GetHomePosition());
 					lorewalker->Relocate(lorewalker->GetHomePosition());
+					lorewalker->SetFacingTo(1.252402f);
 				}
 
 				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 500.0f, true))
