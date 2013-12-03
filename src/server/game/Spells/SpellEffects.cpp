@@ -4462,6 +4462,8 @@ void Spell::EffectAddComboPoints(SpellEffIndex /*effIndex*/)
     if (damage < 0)
         return;
 
+    std::cout << "Adding " << damage << "combo" << std::endl;
+
     if(damage > 0)
     {
         //Shadow Blades
