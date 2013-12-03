@@ -3182,6 +3182,46 @@ enum Texts
 #define NPC_IRE             60579
 #define NPC_SHA_OF_ANGER    61523
 
+
+enum Spells
+{
+    SPELL_SEETHE				= 119487,
+    SPELL_ENDLESS_RAGE			= 119446,
+    SPELL_BITTER_THOUGHTS		= 119601,
+    SPELL_GROWING_ANGER			= 119622,
+    SPELL_AGGRESSIVE_BEHAVIOUR	= 119626,
+    SPELL_UNLEASHED_WRATH		= 119488,
+    SPELL_RAGE_OF_THE_SHA       = 117609
+};
+
+enum Events
+{
+    EVENT_SEETHE				= 1,
+    EVENT_ENDLESS_RAGE			= 2,
+    EVENT_GROWING_ANGER			= 3,
+    EVENT_INCREASE_RAGE			= 4,
+    EVENT_DECREASE_RAGE			= 5
+};
+
+enum Phases
+{
+    PHASE_GROWING_ANGER		= 0,
+    PHASE_UNLEASHED_WRATH	= 1
+};
+
+enum Texts
+{
+    SAY_AGGRO				= 0,
+    SAY_DEATH				= 1,
+    SAY_SLAY				= 2,
+    SAY_ENDLESS_RAGE		= 3,
+    SAY_GROWING_ANGER		= 4,
+    SAY_UNLEASHED_WRATH		= 5
+};
+
+#define NPC_IRE             60579
+#define NPC_SHA_OF_ANGER    61523
+
 class boss_sha_of_anger : public CreatureScript
 {
 public:
@@ -3269,12 +3309,12 @@ public:
                 switch(eventId)
                 {
                     case EVENT_INCREASE_RAGE:
-                        me->ModifyPower(POWER_RAGE, +2);
+                        me->ModifyPower(POWER_RAGE, me->GetPower(POWER_RAGE) + 2);
                         events.ScheduleEvent(EVENT_INCREASE_RAGE, 1*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
                         break;
 
                     case EVENT_DECREASE_RAGE:
-                        me->ModifyPower(POWER_RAGE, -4);
+                        me->ModifyPower(POWER_RAGE, me->GetPower(POWER_RAGE) - 4);
                         events.ScheduleEvent(EVENT_DECREASE_RAGE, 1*IN_MILLISECONDS);
                         break;
 
@@ -3335,12 +3375,12 @@ public:
         void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
-                return;
-
-            if (uiBitterThoughtsTimer <= diff)
             {
-                me->CastSpell(me, SPELL_BITTER_THOUGHTS);
-            } else uiBitterThoughtsTimer -= diff;
+                if (uiBitterThoughtsTimer <= diff)
+                {
+                    me->CastSpell(me, SPELL_BITTER_THOUGHTS);
+                } else uiBitterThoughtsTimer -= diff;
+            }
         }
     };
 };
