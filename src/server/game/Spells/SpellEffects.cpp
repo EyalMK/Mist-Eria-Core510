@@ -826,6 +826,30 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
     bool triggered = true;
     SpellCastTargets targets;
 
+    switch (m_spellInfo->Id)
+    {
+        case 125430:
+            if(m_caster)
+            {
+                Player *caster = m_caster->ToPlayer();
+                if(!caster)
+                    return;
+
+                if(caster->HasSpell(44457))
+                    caster->CastSpell(caster->GetSelectedUnit(), 44457, true);
+                else if(caster->HasSpell(112948))
+                    caster->CastSpell(caster->GetSelectedUnit(), 112948, true);
+                else if(caster->HasSpell(114923))
+                    caster->CastSpell(caster->GetSelectedUnit(), 114923, true);
+
+                if(spell_id)
+                    triggered = true;
+            }
+            break;
+        default:
+            break;
+    }
+
     // selection by spell family
     switch (m_spellInfo->SpellFamilyName)
     {
