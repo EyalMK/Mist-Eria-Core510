@@ -154,11 +154,11 @@ public:
                         break;
 
                     case EVENT_PHASE_GROWING_ANGER:
-                        events.SetPhase(PHASE_UNLEASHED_WRATH);
+                        events.SetPhase(PHASE_GROWING_ANGER);
                         break;
 
                     case EVENT_PHASE_UNLEASHED_WRATH:
-                        events.SetPhase(PHASE_GROWING_ANGER);
+						events.SetPhase(PHASE_UNLEASHED_WRATH);
                         break;
 
                     default:
