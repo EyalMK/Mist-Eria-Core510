@@ -77,10 +77,12 @@ public:
         }
 
         EventMap events;
+        bool checkPhase;
 
         void Reset()
         {
             events.Reset();
+            checkPhase = true;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
         }
 
@@ -113,18 +115,20 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            if (events.IsInPhase(PHASE_GROWING_ANGER))
+            if (events.IsInPhase(PHASE_GROWING_ANGER) && checkPhase)
             {
                 events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
                 events.ScheduleEvent(EVENT_ENDLESS_RAGE, 25*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
                 events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS), 0, PHASE_GROWING_ANGER);
                 events.ScheduleEvent(EVENT_PHASE_UNLEASHED_WRATH, 51*IN_MILLISECONDS);
+                checkPhase = false;
             }
 
-            if (events.IsInPhase(PHASE_UNLEASHED_WRATH))
+            if (events.IsInPhase(PHASE_UNLEASHED_WRATH) && checkPhase)
             {
                 me->CastSpell(me, SPELL_UNLEASHED_WRATH);
                 events.ScheduleEvent(EVENT_PHASE_GROWING_ANGER, 26*IN_MILLISECONDS);
+                checkPhase = false;
             }
 
             while(uint32 eventId = events.ExecuteEvent())
@@ -154,11 +158,13 @@ public:
                         break;
 
                     case EVENT_PHASE_GROWING_ANGER:
+                        checkPhase = true;
                         events.SetPhase(PHASE_GROWING_ANGER);
                         break;
 
                     case EVENT_PHASE_UNLEASHED_WRATH:
-						events.SetPhase(PHASE_UNLEASHED_WRATH);
+                        checkPhase = true;
+                        events.SetPhase(PHASE_UNLEASHED_WRATH);
                         break;
 
                     default:
@@ -167,40 +173,6 @@ public:
             }
 
             DoMeleeAttackIfReady();
-        }
-    };
-};
-
-class npc_sha_of_anger : public CreatureScript
-{
-public:
-    npc_sha_of_anger() : CreatureScript("npc_sha_of_anger") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_sha_of_angerAI(creature);
-    }
-
-    struct npc_sha_of_angerAI : public ScriptedAI
-    {
-        npc_sha_of_angerAI(Creature* creature) : ScriptedAI(creature) {}
-
-        uint32 uiBitterThoughtsTimer;
-
-        void Reset()
-        {
-            uiBitterThoughtsTimer = 1*IN_MILLISECONDS;
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (!UpdateVictim())
-            {
-                if (uiBitterThoughtsTimer <= diff)
-                {
-                    me->CastSpell(me, SPELL_BITTER_THOUGHTS);
-                } else uiBitterThoughtsTimer -= diff;
-            }
         }
     };
 };
@@ -261,6 +233,5 @@ public:
 void AddSC_boss_sha_of_anger()
 {
     new boss_sha_of_anger();
-    new npc_sha_of_anger();
 	new npc_sha_of_anger_test();
 };
