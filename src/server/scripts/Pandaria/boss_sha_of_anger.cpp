@@ -24,7 +24,7 @@ INSERT INTO creature_text (entry, groupid, id, text, type, language, probability
 enum Spells
 {
     SPELL_SEETHE				= 119487,
-    SPELL_ENDLESS_RAGE			= 119446,
+    SPELL_ENDLESS_RAGE			= 119586,
     SPELL_BITTER_THOUGHTS		= 119601,
     SPELL_GROWING_ANGER			= 119622,
     SPELL_AGGRESSIVE_BEHAVIOUR	= 119626,
@@ -37,8 +37,8 @@ enum Events
     EVENT_SEETHE				= 1,
     EVENT_ENDLESS_RAGE			= 2,
     EVENT_GROWING_ANGER			= 3,
-    EVENT_INCREASE_RAGE			= 4,
-    EVENT_DECREASE_RAGE			= 5
+    EVENT_PHASE_GROWING_ANGER	= 4,
+    EVENT_PHASE_UNLEASHED_WRATH = 5
 };
 
 enum Phases
@@ -81,9 +81,7 @@ public:
         void Reset()
         {
             events.Reset();
-
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-            me->SetPower(POWER_RAGE, 0);
         }
 
         void JustDied(Unit* /*who*/)
@@ -99,12 +97,7 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_AGGRO);
-
             events.SetPhase(PHASE_GROWING_ANGER);
-            events.ScheduleEvent(EVENT_INCREASE_RAGE, 1*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
-            events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_ENDLESS_RAGE, 25*IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS));
         }
 
         void UpdateAI(uint32 diff)
@@ -120,42 +113,24 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            if (me->GetPower(POWER_RAGE) > 100)
-                me->SetPower(POWER_RAGE, 100);
-
-            if (me->GetPower(POWER_RAGE) < 0)
-                me->SetPower(POWER_RAGE, 0);
-
-            if (me->GetPower(POWER_RAGE) == 100 && events.IsInPhase(PHASE_GROWING_ANGER))
+            if (events.IsInPhase(PHASE_GROWING_ANGER))
             {
-                me->CastSpell(me, SPELL_UNLEASHED_WRATH);
-                Talk(SAY_UNLEASHED_WRATH);
-                events.ScheduleEvent(EVENT_DECREASE_RAGE, 1*IN_MILLISECONDS, 0, PHASE_UNLEASHED_WRATH);
-                events.ScheduleEvent(EVENT_ENDLESS_RAGE, 10*IN_MILLISECONDS);
-                events.ScheduleEvent(EVENT_GROWING_ANGER, urand(20*IN_MILLISECONDS, 25*IN_MILLISECONDS));
-                events.SetPhase(PHASE_UNLEASHED_WRATH);
+                events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_ENDLESS_RAGE, 25*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
+                events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS), 0, PHASE_GROWING_ANGER);
+                events.ScheduleEvent(EVENT_PHASE_UNLEASHED_WRATH, 51*IN_MILLISECONDS);
             }
 
-            if (me->GetPower(POWER_RAGE) == 0 && events.IsInPhase(PHASE_UNLEASHED_WRATH))
+            if (events.IsInPhase(PHASE_UNLEASHED_WRATH))
             {
-                events.ScheduleEvent(EVENT_INCREASE_RAGE, 1*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
-                events.SetPhase(PHASE_GROWING_ANGER);
+                me->CastSpell(me, SPELL_UNLEASHED_WRATH);
+                events.ScheduleEvent(EVENT_PHASE_GROWING_ANGER, 26*IN_MILLISECONDS);
             }
 
             while(uint32 eventId = events.ExecuteEvent())
             {
                 switch(eventId)
                 {
-                    case EVENT_INCREASE_RAGE:
-                        me->ModifyPower(POWER_RAGE, +2);
-                        events.ScheduleEvent(EVENT_INCREASE_RAGE, 1*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
-                        break;
-
-                    case EVENT_DECREASE_RAGE:
-                        me->ModifyPower(POWER_RAGE, -4);
-                        events.ScheduleEvent(EVENT_DECREASE_RAGE, 1*IN_MILLISECONDS);
-                        break;
-
                     case EVENT_SEETHE:
                         for (i = threatlist.begin(); i != threatlist.end(); ++i)
                         {
@@ -163,11 +138,10 @@ public:
                                 if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && !me->IsWithinMeleeRange(me->getVictim()))
                                     me->CastSpell(me->getVictim(), SPELL_SEETHE);
                         }
-
                         events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
                         break;
 
-                    case EVENT_ENDLESS_RAGE: /* nombre de cible */
+                    case EVENT_ENDLESS_RAGE:
                         me->CastSpell(me->getVictim(), SPELL_ENDLESS_RAGE);
                         Talk(SAY_ENDLESS_RAGE);
                         events.ScheduleEvent(EVENT_ENDLESS_RAGE, 25*IN_MILLISECONDS);
@@ -177,6 +151,14 @@ public:
                         me->CastSpell(me, SPELL_GROWING_ANGER);
                         Talk(SAY_GROWING_ANGER);
                         events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS));
+                        break;
+
+                    case EVENT_PHASE_GROWING_ANGER:
+                        events.SetPhase(PHASE_UNLEASHED_WRATH);
+                        break;
+
+                    case EVENT_PHASE_UNLEASHED_WRATH:
+                        events.SetPhase(PHASE_GROWING_ANGER);
                         break;
 
                     default:
@@ -213,12 +195,12 @@ public:
         void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
-                return;
-
-            if (uiBitterThoughtsTimer <= diff)
             {
-                me->AddAura(SPELL_BITTER_THOUGHTS ,me);
-            } else uiBitterThoughtsTimer -= diff;
+                if (uiBitterThoughtsTimer <= diff)
+                {
+                    me->CastSpell(me, SPELL_BITTER_THOUGHTS);
+                } else uiBitterThoughtsTimer -= diff;
+            }
         }
     };
 };
