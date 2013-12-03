@@ -165,8 +165,9 @@ public:
 			{
 				Talk(irand(SAY_DEATH_1, SAY_DEATH_3));
 				instance->DoCastSpellOnPlayers(SPELL_BLESSING_OF_THE_WATERSPEAKER);
-				if (GameObject* go = GameObject::GetGameObject(*me, instance->GetData64(DATA_WISE_MARI_GATE)))
-                        instance->HandleGameObject(go->GetGUID(), false);
+
+				if (GameObject* go = me->FindNearestGameObject(GO_MARI_LOREWALKER_GATE, 9999.0f))
+					go->UseDoorOrButton();
 			}
 		}
 

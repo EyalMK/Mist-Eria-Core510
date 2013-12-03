@@ -221,6 +221,9 @@ public:
 							break;
 
 						case EVENT_SAY_END_1:
+							if (GameObject* go = me->FindNearestGameObject(GO_MARI_LOREWALKER_GATE, 9999.0f))
+								go->UseDoorOrButton();
+
 							Talk(SAY_END_1);
 
 							events.ScheduleEvent(EVENT_SAY_END_2, 9*IN_MILLISECONDS, 0, PHASE_BOSSES);
@@ -230,7 +233,7 @@ public:
 						case EVENT_SAY_END_2:
 							Talk(SAY_END_2);
 
-							events.CancelEvent(EVENT_SAY_END_2);
+							events.CancelEvent(EVENT_SAY_END_2); // End of the script
 							break;
 
 						default:

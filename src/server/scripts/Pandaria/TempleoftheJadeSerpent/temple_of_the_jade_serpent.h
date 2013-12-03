@@ -24,7 +24,9 @@ enum CreatureIds
 
 enum GameObjects
 {
-	GO_WISE_MARI_GATE	= 400428,
+	GO_SHA_OF_DOUBT_GATE	= 400426,
+	GO_LIU_GATE				= 400427,
+	GO_MARI_LOREWALKER_GATE	= 400428,
 };
 
 #endif

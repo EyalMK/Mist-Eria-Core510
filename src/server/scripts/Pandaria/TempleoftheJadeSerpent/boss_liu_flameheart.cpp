@@ -157,6 +157,12 @@ public:
 					for (std::list<Creature*>::iterator itr = jadeFires.begin(); itr != jadeFires.end(); ++itr)
 						(*itr)->DespawnOrUnsummon();
 				}
+
+				if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
+					go->UseDoorOrButton();
+
+				if (GameObject* go = me->FindNearestGameObject(GO_LIU_GATE, 9999.0f))
+					go->UseDoorOrButton();
 			}
 		}
 

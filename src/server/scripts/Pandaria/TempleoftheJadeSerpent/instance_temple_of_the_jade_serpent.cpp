@@ -185,7 +185,7 @@ public:
 			if (me->FindNearestCreature(BOSS_WISE_MARI, 999.0f, false) &&
 				me->FindNearestCreature(BOSS_LOREWALKER_STONESTEP, 999.0f, false) &&
 				me->FindNearestCreature(BOSS_LIU_FLAMEHEART, 999.0f, false))
-				instance->DoUseDoorOrButton(433321, 999999);
+				instance->DoUseDoorOrButton(433536, 999999);
 
 			if (!wiseMariFirstDoor)
 				instance->DoUseDoorOrButton(433323, 999999);
