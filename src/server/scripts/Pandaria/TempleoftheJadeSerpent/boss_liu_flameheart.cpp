@@ -107,7 +107,8 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 		bool intro;
-		bool thirdPhaseHome; // When Liu comes to the center of the "room" in the third phase
+		bool thirdPhaseHome; // When Liu moves to the center of the "room" in the third phase
+		bool emote;
 		float x, y, z, o;
 		int32 maxJadeFires;
 		Creature* firstWave;
@@ -124,6 +125,7 @@ public:
 
 			intro = false;
 			thirdPhaseHome = false;
+			emote = false;
 
 			me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
 			me->setActive(false);
@@ -171,6 +173,7 @@ public:
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, FAIL);
 				intro = false;
 				thirdPhaseHome = false;
+				emote = false;
 
 				me->CombatStop();
 				me->DeleteThreatList();
@@ -234,8 +237,10 @@ public:
 		void UpdateAI(uint32 diff)
 		{
 			if	(!UpdateVictim())
-				return;
-
+				if (!emote)
+					me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
+				else return;
+				
 			events.Update(diff);
 
 			if (events.IsInPhase(PHASE_LIU_SERPENT_DANCE) && HealthBelowPct(70))
@@ -279,6 +284,9 @@ public:
 			}
 
 			if (events.IsInPhase(PHASE_YU_LON) && !thirdPhaseHome)
+			{
+				me->SetHealth(me->GetMaxHealth() * 0.3f);
+
 				if (Creature* liu = me->FindNearestCreature(NPC_LIU_TRIGGER, 0.1f, true))
 				{
 					me->Relocate(929.684998f, -2560.610107f, 180.070007f, 4.410300f);
@@ -290,7 +298,7 @@ public:
 					events.ScheduleEvent(EVENT_SUMMON_YU_LON, 0, 0, PHASE_YU_LON);
 					thirdPhaseHome = true;
 				}
-
+			}
 			while(uint32 eventId = events.ExecuteEvent())
 			{
 				switch(eventId)

@@ -288,7 +288,7 @@ class spell_hun_disengage : public SpellScriptLoader
                 return SPELL_CAST_OK;
             }
 
-			/*
+			
             void HandleAfterCast()
             {
                 if (Player* _player = GetCaster()->ToPlayer())
@@ -298,6 +298,7 @@ class spell_hun_disengage : public SpellScriptLoader
                         _player->RemoveMovementImpairingAuras();
                         _player->CastSpell(_player, HUNTER_SPELL_POSTHASTE_INCREASE_SPEED, true);
                     }
+					/*
                     else if (_player->HasAura(HUNTER_SPELL_NARROW_ESCAPE))
                     {
                         std::list<Unit*> unitList;
@@ -311,15 +312,15 @@ class spell_hun_disengage : public SpellScriptLoader
 
                         for (auto itr : retsList)
                             _player->CastSpell(itr, HUNTER_SPELL_NARROW_ESCAPE_RETS, true);
-                    }
+                    }*/
                 }
             }
-			*/
+			
 
             void Register()
             {
                 OnCheckCast += SpellCheckCastFn(spell_hun_disengage_SpellScript::CheckCast);
-                //AfterCast += SpellCastFn(spell_hun_disengage_SpellScript::HandleAfterCast);
+                AfterCast += SpellCastFn(spell_hun_disengage_SpellScript::HandleAfterCast);
             }
         };
 

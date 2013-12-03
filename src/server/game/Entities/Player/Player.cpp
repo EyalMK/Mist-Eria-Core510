@@ -7297,6 +7297,7 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
 
         // apply honor multiplier from aura (not stacking-get highest)
         AddPct(honor_f, GetMaxPositiveAuraModifier(SPELL_AURA_MOD_HONOR_GAIN_PCT));
+		AddPct(honor_f, GetMaxPositiveAuraModifier(SPELL_AURA_MOD_HONOR_GAIN_PCT_2));
     }
 
     honor_f *= sWorld->getRate(RATE_HONOR);
@@ -25053,6 +25054,8 @@ void Player::HandleFall(MovementInfo const& movementInfo)
         if (damageperc > 0)
         {
             uint32 damage = (uint32)(damageperc * GetMaxHealth()*sWorld->getRate(RATE_DAMAGE_FALL));
+
+			AddPct(damage, GetTotalAuraModifier(SPELL_AURA_MOD_FALL_DAMAGE));
 
             float height = movementInfo.pos.m_positionZ;
             UpdateGroundPositionZ(movementInfo.pos.m_positionX, movementInfo.pos.m_positionY, height);
