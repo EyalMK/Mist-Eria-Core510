@@ -3838,6 +3838,9 @@ void SpellMgr::LoadSpellInfoCorrections()
                 case 113792:
                     spellInfo->MaxAffectedTargets = 1;
                     break;
+                case 116:
+                    spellInfo->StackAmount = 1;
+                    break;
 				default:
 					break;
 			}
