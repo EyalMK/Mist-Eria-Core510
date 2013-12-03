@@ -64,7 +64,7 @@ class instance_temple_of_the_jade_serpent : public InstanceMapScript
             {
                 switch (go->GetEntry())
                 {
-					case GO_WISE_MARI_GATE:
+					case GO_MARI_LOREWALKER_GATE:
 						WiseMariGateGUID = go->GetGUID();
 						break;
 				}
