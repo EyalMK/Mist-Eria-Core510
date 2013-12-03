@@ -43,8 +43,8 @@ enum Events
 
 enum Phases
 {
-    PHASE_GROWING_ANGER		= 0,
-    PHASE_UNLEASHED_WRATH	= 1
+    PHASE_GROWING_ANGER		= 1,
+    PHASE_UNLEASHED_WRATH	= 2
 };
 
 enum Texts
@@ -226,7 +226,7 @@ public:
 			events.Reset();
         }
 
-		 void EnterCombat(Unit* /*who*/)
+		void EnterCombat(Unit* /*who*/)
         {
 			events.ScheduleEvent(1, 1*IN_MILLISECONDS);
         }
@@ -236,12 +236,14 @@ public:
             if (!UpdateVictim())
 				return;
 
+			events.Update(diff);
+
 			while(uint32 eventId = events.ExecuteEvent())
             {
                 switch(eventId)
                 {
 					case 1:
-						me->CastSpell(me->getVictim(), 119626);
+						me->CastSpell(me->getVictim()->ToPlayer(), 119626);
 
 						events.ScheduleEvent(1, 40*IN_MILLISECONDS);
 						break;
@@ -251,6 +253,7 @@ public:
                 }
             }
 
+			DoMeleeAttackIfReady();
         }
     };
 };
