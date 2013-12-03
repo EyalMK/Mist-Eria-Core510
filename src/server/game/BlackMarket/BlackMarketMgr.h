@@ -116,7 +116,7 @@ class BlackMarketMgr
 
 
         //auction messages
-        void SendAuctionWon(BMAuctionEntry* auction, SQLTransaction& trans);
+        bool SendAuctionWon(BMAuctionEntry* auction, SQLTransaction& trans);
         void SendAuctionOutbidded(BMAuctionEntry* auction, uint32 newPrice, Player* newBidder, SQLTransaction& trans);
 
 		void LoadTemplates();
