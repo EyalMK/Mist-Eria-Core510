@@ -205,8 +205,59 @@ public:
     };
 };
 
+class npc_sha_of_anger_test : public CreatureScript
+{
+public:
+    npc_sha_of_anger_test() : CreatureScript("npc_sha_of_anger_test") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_sha_of_anger_testAI(creature);
+    }
+
+    struct npc_sha_of_anger_testAI : public ScriptedAI
+    {
+        npc_sha_of_anger_testAI(Creature* creature) : ScriptedAI(creature) {}
+
+        EventMap events;
+
+        void Reset()
+        {
+			events.Reset();
+        }
+
+		 void EnterCombat(Unit* /*who*/)
+        {
+			events.ScheduleEvent(1, 1*IN_MILLISECONDS);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+				return;
+
+			while(uint32 eventId = events.ExecuteEvent())
+            {
+                switch(eventId)
+                {
+					case 1:
+						me->CastSpell(me->getVictim(), 119626);
+
+						events.ScheduleEvent(1, 40*IN_MILLISECONDS);
+						break;
+
+                    default:
+                        break;
+                }
+            }
+
+        }
+    };
+};
+
 void AddSC_boss_sha_of_anger()
 {
     new boss_sha_of_anger();
     new npc_sha_of_anger();
+	new npc_sha_of_anger_test();
 };
