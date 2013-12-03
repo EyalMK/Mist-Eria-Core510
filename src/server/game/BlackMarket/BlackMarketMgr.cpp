@@ -123,8 +123,7 @@ void BlackMarketMgr::LoadTemplates()
 		bm_template->itemCount	= fields[2].GetUInt32();
 		bm_template->seller		= fields[3].GetUInt32();
 		bm_template->startBid	= fields[4].GetUInt64();
-		//bm_template->duration	= fields[5].GetUInt32();
-		bm_template->duration	= 100;
+		bm_template->duration	= fields[5].GetUInt32();
 		bm_template->chance		= fields[6].GetUInt32();
 
 		BMTemplatesMap[bm_template->id] = bm_template;
@@ -190,13 +189,9 @@ void BlackMarketMgr::Update()
 		if (auction->IsExpired())
 		{
 			if (auction->bidder)
-			{
-				if (SendAuctionWon(auction, trans))
-				{
-					auction->DeleteFromDB(trans);
-					BMAuctionsMap.erase((itr++)->first);
-				}
-			}
+				SendAuctionWon(auction, trans);
+			auction->DeleteFromDB(trans);
+			BMAuctionsMap.erase((itr++)->first);
 		}
 		else
 			++itr;
@@ -254,12 +249,9 @@ void BlackMarketMgr::CreateAuctions(uint32 number, SQLTransaction& trans)
 		auction->id = GetNewAuctionId();
 		auction->bid = selTemplate->startBid;
 		auction->bidder = 0;
-		/*
 		auction->startTime = time(NULL) + sWorld->getIntConfig(CONFIG_BLACKMARKET_AUCTION_DELAY)
 										+ urand(0, sWorld->getIntConfig(CONFIG_BLACKMARKET_AUCTION_DELAY_MOD)*2)
 										- sWorld->getIntConfig(CONFIG_BLACKMARKET_AUCTION_DELAY_MOD) / 2;
-		*/
-		auction->startTime = time(NULL);
 
 		auction->bm_template = selTemplate;
 		auction->templateId = selTemplate->id;
@@ -364,7 +356,7 @@ void BlackMarketMgr::SendAuctionOutbidded(BMAuctionEntry* auction, uint32 newPri
 	}
 }
 
-bool BlackMarketMgr::SendAuctionWon(BMAuctionEntry* auction, SQLTransaction& trans)
+void BlackMarketMgr::SendAuctionWon(BMAuctionEntry* auction, SQLTransaction& trans)
 {
 	if (Player* bidder = sObjectAccessor->FindPlayer(MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER)))
 	{
@@ -376,24 +368,12 @@ bool BlackMarketMgr::SendAuctionWon(BMAuctionEntry* auction, SQLTransaction& tra
 
 		ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(auction->bm_template->itemEntry);
         if (!itemTemplate)
-		{
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "BLACKMARKET : Item template %d doesn't exist", auction->bm_template->itemEntry);
-            return false;
-		}
+            return;
 
 		Item* pItem = Item::CreateItem(auction->bm_template->itemEntry, auction->bm_template->itemCount, bidder);
-		if (!pItem)
-		{
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "BLACKMARKET : Item not created", auction->bm_template->itemEntry);
-			return false;
-		}
 
 		MailDraft(auction->BuildAuctionMailSubject(BM_AUCTION_WON), auction->BuildAuctionMailBody(auction->bidder))
             .AddItem(pItem)
             .SendMailTo(trans, MailReceiver(bidder, auction->bidder), MailSender(auction), MAIL_CHECK_MASK_COPIED);
-
-		return true;
 	}
-
-	return false;
 }
