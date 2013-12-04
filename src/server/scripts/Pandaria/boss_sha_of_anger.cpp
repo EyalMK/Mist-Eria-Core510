@@ -101,7 +101,7 @@ public:
 			events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
 			events.ScheduleEvent(EVENT_ENDLESS_RAGE, 25*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
 			events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS), 0, PHASE_GROWING_ANGER);
-			events.ScheduleEvent(EVENT_PHASE_UNLEASHED_WRATH, 51*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
+			events.ScheduleEvent(EVENT_PHASE_UNLEASHED_WRATH, 51*IN_MILLISECONDS);
 
             events.SetPhase(PHASE_GROWING_ANGER);
         }
@@ -155,10 +155,10 @@ public:
                         break;
 
                     case EVENT_PHASE_UNLEASHED_WRATH:
-                        events.SetPhase(PHASE_UNLEASHED_WRATH);
+						events.SetPhase(PHASE_UNLEASHED_WRATH);
                         me->CastSpell(me, SPELL_UNLEASHED_WRATH);
 						events.ScheduleEvent(EVENT_PHASE_GROWING_ANGER, 25*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
-
+						
 						events.CancelEvent(EVENT_PHASE_UNLEASHED_WRATH);
                         break;
 
