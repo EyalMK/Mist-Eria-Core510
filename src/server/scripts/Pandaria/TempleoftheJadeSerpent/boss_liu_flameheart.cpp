@@ -1,8 +1,7 @@
 /* # Script de Tydrheal & Sungis : Liu Flameheart # */
 
 /*
-	Notes :
-	What is missing ? :	- Flame waves system
+	Notes : What is missing ?	- Flame waves system
 */
 
 #include "ScriptPCH.h"
@@ -151,7 +150,7 @@ public:
 				Talk(SAY_DEATH);
 
 				std::list<Creature*> jadeFires;
-				me->GetCreatureListWithEntryInGrid(jadeFires, NPC_JADE_FIRE, 500.0f);
+				me->GetCreatureListWithEntryInGrid(jadeFires, NPC_JADE_FIRE, 99999.0f);
 				if (!jadeFires.empty())
 				{
 					for (std::list<Creature*>::iterator itr = jadeFires.begin(); itr != jadeFires.end(); ++itr)
@@ -201,7 +200,7 @@ public:
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
 				std::list<Creature*> jadeFires;
-				me->GetCreatureListWithEntryInGrid(jadeFires, NPC_JADE_FIRE, 500.0f);
+				me->GetCreatureListWithEntryInGrid(jadeFires, NPC_JADE_FIRE, 99999.0f);
 				if (!jadeFires.empty())
 				{
 					for (std::list<Creature*>::iterator itr = jadeFires.begin(); itr != jadeFires.end(); ++itr)
@@ -259,7 +258,7 @@ public:
 				events.ScheduleEvent(EVENT_SUMMON_JADE_SERPENT_WAVE, 14*IN_MILLISECONDS, 0, PHASE_LIU_JADE_SERPENT_DANCE);
 
 				std::list<Creature*> serpentWaves;
-				me->GetCreatureListWithEntryInGrid(serpentWaves, NPC_SERPENT_WAVE_TRIGGER, 500.0f);
+				me->GetCreatureListWithEntryInGrid(serpentWaves, NPC_SERPENT_WAVE_TRIGGER, 99999.0f);
 				if (!serpentWaves.empty())
 				{
 					for (std::list<Creature*>::iterator itr = serpentWaves.begin(); itr != serpentWaves.end(); ++itr)
@@ -279,7 +278,7 @@ public:
 				me->GetMotionMaster()->MovePoint(0, 929.684998f, -2560.610107f, 180.070007f);
 
 				std::list<Creature*> jadeSerpentWaves;
-				me->GetCreatureListWithEntryInGrid(jadeSerpentWaves, NPC_JADE_SERPENT_WAVE_TRIGGER, 500.0f);
+				me->GetCreatureListWithEntryInGrid(jadeSerpentWaves, NPC_JADE_SERPENT_WAVE_TRIGGER, 99999.0f);
 				if (!jadeSerpentWaves.empty())
 				{
 					for (std::list<Creature*>::iterator itr = jadeSerpentWaves.begin(); itr != jadeSerpentWaves.end(); ++itr)
@@ -293,9 +292,9 @@ public:
 			{
 				me->SetHealth(me->GetMaxHealth() * 0.3f);
 
-				if (Creature* liu = me->FindNearestCreature(NPC_LIU_TRIGGER, 0.1f, true))
+				if (me->FindNearestCreature(NPC_LIU_TRIGGER, 0.1f, true))
 				{
-					me->Relocate(929.684998f, -2560.610107f, 180.070007f, 4.410300f);
+					me->Relocate(me->GetHomePosition());
 					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);

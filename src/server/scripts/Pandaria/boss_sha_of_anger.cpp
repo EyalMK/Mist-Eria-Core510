@@ -77,12 +77,14 @@ public:
         }
 
         EventMap events;
-        bool checkPhase;
+        bool checkPhaseGrowing;
+        bool checkPhaseUnleashed;
 
         void Reset()
         {
             events.Reset();
-            checkPhase = true;
+            checkPhaseGrowing = true;
+            checkPhaseUnleashed = true;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
         }
 
@@ -115,20 +117,20 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            if (events.IsInPhase(PHASE_GROWING_ANGER) && checkPhase)
+            if (events.IsInPhase(PHASE_GROWING_ANGER) && checkPhaseGrowing)
             {
                 events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
                 events.ScheduleEvent(EVENT_ENDLESS_RAGE, 25*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
                 events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS), 0, PHASE_GROWING_ANGER);
                 events.ScheduleEvent(EVENT_PHASE_UNLEASHED_WRATH, 51*IN_MILLISECONDS);
-                checkPhase = false;
+                checkPhaseGrowing = false;
             }
 
-            if (events.IsInPhase(PHASE_UNLEASHED_WRATH) && checkPhase)
+            if (events.IsInPhase(PHASE_UNLEASHED_WRATH) && checkPhaseUnleashed)
             {
                 me->CastSpell(me, SPELL_UNLEASHED_WRATH);
                 events.ScheduleEvent(EVENT_PHASE_GROWING_ANGER, 26*IN_MILLISECONDS);
-                checkPhase = false;
+                checkPhaseUnleashed = false;
             }
 
             while(uint32 eventId = events.ExecuteEvent())
@@ -158,13 +160,13 @@ public:
                         break;
 
                     case EVENT_PHASE_GROWING_ANGER:
-                        checkPhase = true;
                         events.SetPhase(PHASE_GROWING_ANGER);
+                        checkPhaseGrowing = true;
                         break;
 
                     case EVENT_PHASE_UNLEASHED_WRATH:
-                        checkPhase = true;
                         events.SetPhase(PHASE_UNLEASHED_WRATH);
+                        checkPhaseUnleashed = true;
                         break;
 
                     default:
@@ -177,55 +179,36 @@ public:
     };
 };
 
-class npc_sha_of_anger_test : public CreatureScript
+class npc_sha_of_anger : public CreatureScript
 {
 public:
-    npc_sha_of_anger_test() : CreatureScript("npc_sha_of_anger_test") { }
+    npc_sha_of_anger() : CreatureScript("npc_sha_of_anger") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_sha_of_anger_testAI(creature);
+        return new npc_sha_of_angerAI(creature);
     }
 
-    struct npc_sha_of_anger_testAI : public ScriptedAI
+    struct npc_sha_of_angerAI : public ScriptedAI
     {
-        npc_sha_of_anger_testAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_sha_of_angerAI(Creature* creature) : ScriptedAI(creature) {}
 
-        EventMap events;
+        uint32 uiBitterThoughtsTimer;
 
         void Reset()
         {
-			events.Reset();
-        }
-
-		void EnterCombat(Unit* /*who*/)
-        {
-			events.ScheduleEvent(1, 1*IN_MILLISECONDS);
+            uiBitterThoughtsTimer = 1*IN_MILLISECONDS;
         }
 
         void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
-				return;
-
-			events.Update(diff);
-
-			while(uint32 eventId = events.ExecuteEvent())
             {
-                switch(eventId)
+                if (uiBitterThoughtsTimer <= diff)
                 {
-					case 1:
-						me->CastSpell(me->getVictim()->ToPlayer(), 119626);
-
-						events.ScheduleEvent(1, 40*IN_MILLISECONDS);
-						break;
-
-                    default:
-                        break;
-                }
+                    me->CastSpell(me, SPELL_BITTER_THOUGHTS);
+                } else uiBitterThoughtsTimer -= diff;
             }
-
-			DoMeleeAttackIfReady();
         }
     };
 };
@@ -233,5 +216,5 @@ public:
 void AddSC_boss_sha_of_anger()
 {
     new boss_sha_of_anger();
-	new npc_sha_of_anger_test();
+    new npc_sha_of_anger();
 };
