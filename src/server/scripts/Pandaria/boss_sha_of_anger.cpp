@@ -155,8 +155,8 @@ public:
                         break;
 
                     case EVENT_PHASE_UNLEASHED_WRATH:
+						DoCast(SPELL_UNLEASHED_WRATH);
 						events.SetPhase(PHASE_UNLEASHED_WRATH);
-                        me->CastSpell(me, SPELL_UNLEASHED_WRATH);
 						events.ScheduleEvent(EVENT_PHASE_GROWING_ANGER, 25*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
 						
 						events.CancelEvent(EVENT_PHASE_UNLEASHED_WRATH);
