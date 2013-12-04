@@ -199,6 +199,6 @@ public:
 void AddSC_instance_temple_of_the_jade_serpent()
 {
    new instance_temple_of_the_jade_serpent();
-   new npc_instance_trigger_totjs();
+   //new npc_instance_trigger_totjs();
 }
 
