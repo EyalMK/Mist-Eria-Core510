@@ -1255,14 +1255,14 @@ class spell_warr_enrage : public SpellScriptLoader
 };*/
 
 // 29838 - Second Wind
-class spell_warr_second_will : public SpellScriptLoader
+class spell_warr_second_wind : public SpellScriptLoader
 {
     public:
-        spell_warr_second_will() : SpellScriptLoader("spell_warr_second_will") { }
+        spell_warr_second_wind() : SpellScriptLoader("spell_warr_second_wind") { }
 
-        class spell_warr_second_will_AuraScript : public AuraScript
+        class spell_warr_second_wind_AuraScript : public AuraScript
         {
-            PrepareAuraScript(spell_warr_second_will_AuraScript);
+            PrepareAuraScript(spell_warr_second_wind_AuraScript);
 
             bool Validate(SpellInfo const* /*spellInfo*/)
             {
@@ -1271,7 +1271,7 @@ class spell_warr_second_will : public SpellScriptLoader
                 return true;
             }
 
-            void HandleEffectPeriodic(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+            void HandleEffectPeriodic(AuraEffect const* aurEff)
             {
                 if(Unit *caster = GetCaster())
 				{
@@ -1290,14 +1290,14 @@ class spell_warr_second_will : public SpellScriptLoader
 
             void Register()
             {
-				OnEffectPeriodic += AuraEffectPeriodicFn(spell_warr_second_will_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+				OnEffectPeriodic += AuraEffectPeriodicFn(spell_warr_second_wind_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             }
 
         };
 
         AuraScript* GetAuraScript() const
         {
-            return new spell_warr_second_will_AuraScript();
+            return new spell_warr_second_wind_AuraScript();
         }
 };
 
@@ -1329,5 +1329,5 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_raging_blow_off();
 	new spell_warr_enrage();
 	//new spell_warr_storm_bolt();
-	new spell_warr_second_will();
+	new spell_warr_second_wind();
 }
