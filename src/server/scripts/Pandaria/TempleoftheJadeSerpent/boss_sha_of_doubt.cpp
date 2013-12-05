@@ -15,14 +15,24 @@ enum Spells
 	SPELL_TOUCH_OF_NOTHINGNESS		= 106113,
 	SPELL_FIGMENT_OF_DOUBT_CLONE	= 106935,
 	SPELL_FIGMENT_OF_DOUBT			= 106936,
+
+	/* Figment of Doubt */
+	SPELL_SHADOWFORM				= 107903,
+	SPELL_RELEASE_DOUBT				= 106112,
+	SPELL_GATHERING_DOUBT			= 117570,
 };
 
 enum Events
 {
+	/* Sha Of Doubt */
 	EVENT_WITHER_WILL				= 1,
 	EVENT_TOUCH_OF_NOTHINGNESS		= 2,
 	EVENT_BOUNDS_OF_REALITY			= 3,
-	EVENT_SUMMON_FIGMENT_OF_DOUBT	= 4
+	EVENT_SUMMON_FIGMENT_OF_DOUBT	= 4,
+
+	/* Figment of Doubt */
+	EVENT_ATTACK_PLAYERS			= 1,
+	EVENT_RELEASE_DOUBT				= 2,
 };
 
 enum Texts
@@ -39,7 +49,8 @@ enum Phases
 
 enum Npcs
 {
-	NPC_SHA_TRIGGER = 400453,
+	NPC_FIGMENT_OF_DOUBT	= 56792,
+	NPC_SHA_TRIGGER			= 400453,
 };
 
 class boss_sha_of_doubt : public CreatureScript
@@ -212,10 +223,47 @@ public:
 
 		InstanceScript* instance;
         EventMap events;
+		Unit* player;
+		bool emote;
 
         void Reset()
 		{
 			events.Reset();
+
+			emote = false;
+
+			me->setActive(false);
+			me->SetDisableGravity(false);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+			me->CastSpell(me, SPELL_SHADOWFORM);
+
+			events.ScheduleEvent(EVENT_ATTACK_PLAYERS, 4*IN_MILLISECONDS);
+			events.ScheduleEvent(EVENT_RELEASE_DOUBT, 30*IN_MILLISECONDS);
+
+			Map* map = me->GetMap();
+			if (map && map->IsDungeon())
+			{
+				Map::PlayerList const &PlayerList = map->GetPlayers();
+
+				if (!PlayerList.isEmpty())
+					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+					{
+						if (player = i->getSource())
+							if (Creature* figment = i->getSource()->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
+							{
+								float x, y, z, o;
+								x = player->GetPositionX();
+								y = player->GetPositionX();
+								z = player->GetPositionX();
+								o = player->GetOrientation();
+								figment->Relocate(x, y, z + 5.0f, o);
+								player->CastSpell(figment, SPELL_FIGMENT_OF_DOUBT_CLONE);
+								figment->SetDisplayId(player->GetDisplayId());
+							}
+					}
+			}
 		}
 
 		void EnterEvadeMode()
@@ -226,17 +274,67 @@ public:
 
         void JustDied(Unit *pWho)
         {
+			if (instance)
+			{
+				if (me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
+					me->DespawnOrUnsummon();
 
+				else
+					if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
+					{
+						sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, sha->GetGUID());
+						me->DespawnOrUnsummon();
+					}
+			}
         }
 
-        void EnterCombat(Unit* /*who*/)
-        {
-
-        }
+        void EnterCombat(Unit*) {	}
 
         void UpdateAI(uint32 diff)
         {
             events.Update(diff);
+
+			if (!emote)
+			{
+				me->HandleEmoteCommand(EMOTE_STATE_DROWNED);
+				emote = true;
+			}
+
+			while(uint32 eventId = events.ExecuteEvent())
+			{
+				switch(eventId)
+				{
+					if (instance)
+					{
+						case EVENT_ATTACK_PLAYERS:
+							me->setActive(true);
+							me->SetDisableGravity(true);
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+							me->HandleEmoteCommand(EMOTE_ONESHOT_NONE);
+							me->setFaction(14);
+							me->CastSpell(me, SPELL_GATHERING_DOUBT);
+							me->SetInCombatWith(player);
+							me->AddThreat(player, 99999.0f);
+							
+							events.CancelEvent(EVENT_ATTACK_PLAYERS);
+							break;
+
+						case EVENT_RELEASE_DOUBT:
+							me->CastSpell(me, SPELL_RELEASE_DOUBT);
+							me->Kill(me);
+
+							events.CancelEvent(EVENT_RELEASE_DOUBT);
+							break;
+
+						default:
+							break;
+					}
+				}
+			}
+
+			DoMeleeAttackIfReady();
         }
     };
 };
