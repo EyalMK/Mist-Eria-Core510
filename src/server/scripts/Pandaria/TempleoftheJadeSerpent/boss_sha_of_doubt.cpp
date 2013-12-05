@@ -75,6 +75,7 @@ public:
 		bool boundsOfReality;
 		bool seventyFivePct;
 		bool fiftyPct;
+		uint32 boundsCount;
 
 		void Reset()
 		{		
@@ -85,6 +86,8 @@ public:
 				boundsOfReality = false;
 				seventyFivePct = false;
 				fiftyPct = false;
+				boundsCount = 0;
+
 				events.SetPhase(PHASE_NULL);
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, NOT_STARTED);
 			}
@@ -105,6 +108,8 @@ public:
 				boundsOfReality = false;
 				seventyFivePct = false;
 				fiftyPct = false;
+				boundsCount = 0;
+
 				events.SetPhase(PHASE_NULL);
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, FAIL);
 			}
@@ -134,12 +139,14 @@ public:
 
 			if (HealthBelowPct(75) && events.IsInPhase(PHASE_COMBAT) && !seventyFivePct)
 			{
+				boundsCount = 1;
 				events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 1*IN_MILLISECONDS, 0, PHASE_BOUNDS_OF_REALITY);
 				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
 			}
 
 			if (HealthBelowPct(50) && events.IsInPhase(PHASE_COMBAT) && !fiftyPct)
 			{
+				boundsCount = 2;
 				events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 1*IN_MILLISECONDS, 0, PHASE_BOUNDS_OF_REALITY);
 				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
 			}
@@ -188,10 +195,10 @@ public:
 							if (Creature* trigger = me->FindNearestCreature(NPC_SHA_TRIGGER, 99999.0f, true))
 								me->GetMotionMaster()->MovePoint(0, trigger->GetHomePosition());
 
-							if (HealthBelowPct(75))
+							if (boundsCount == 1)
 								seventyFivePct = true;
 
-							if (HealthBelowPct(50))
+							if (boundsCount == 2)
 								fiftyPct = true;
 
 							events.CancelEvent(EVENT_BOUNDS_OF_REALITY);
@@ -237,74 +244,34 @@ public:
 
         void Reset()
 		{
+			events.Reset();
+
+			emote = false;
+
+			me->setActive(false);
+			me->SetDisableGravity(false);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+			me->CastSpell(me, SPELL_SHADOWFORM);
+
+			events.ScheduleEvent(EVENT_ATTACK_PLAYERS, 4*IN_MILLISECONDS);
+			events.ScheduleEvent(EVENT_RELEASE_DOUBT, 30*IN_MILLISECONDS);
+
 			if (instance)
 			{
-				events.Reset();
-
-				emote = false;
-
-				me->setActive(false);
-				me->SetDisableGravity(false);
-				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-				me->CastSpell(me, SPELL_SHADOWFORM);
-
-				events.ScheduleEvent(EVENT_ATTACK_PLAYERS, 4*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_RELEASE_DOUBT, 30*IN_MILLISECONDS);
-
 				Map* map = me->GetMap();
+
 				if (map && map->IsDungeon())
 				{
 					Map::PlayerList const &PlayerList = map->GetPlayers();
 
 					if (!PlayerList.isEmpty())
+					{
 						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 						{
 							if (player = i->getSource())
-								if (Creature* figment = i->getSource()->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
-								{
-									float x, y, z, o;
-									x = player->GetPositionX();
-									y = player->GetPositionX();
-									z = player->GetPositionX();
-									o = player->GetOrientation();
-									figment->Relocate(x, y, z + 5.0f, o);
-									player->CastSpell(figment, SPELL_FIGMENT_OF_DOUBT_CLONE);
-									figment->SetDisplayId(player->GetDisplayId());
-								}
-						}
-				}
-			}
-		}
-
-		void JustSummoned(Creature* summoned)
-        {
-			if (instance)
-			{
-				events.Reset();
-
-				emote = false;
-
-				me->setActive(false);
-				me->SetDisableGravity(false);
-				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-				me->CastSpell(me, SPELL_SHADOWFORM);
-
-				events.ScheduleEvent(EVENT_ATTACK_PLAYERS, 4*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_RELEASE_DOUBT, 30*IN_MILLISECONDS);
-
-				Map* map = me->GetMap();
-				if (map && map->IsDungeon())
-				{
-					Map::PlayerList const &PlayerList = map->GetPlayers();
-
-					if (!PlayerList.isEmpty())
-						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-						{
-							if (player = i->getSource())
+							{
 								if (Creature* figment = player->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
 								{
 									float x, y, z, o;
@@ -316,7 +283,57 @@ public:
 									player->CastSpell(figment, SPELL_FIGMENT_OF_DOUBT_CLONE);
 									figment->SetDisplayId(player->GetDisplayId());
 								}
+							}
 						}
+					}
+				}
+			}
+		}
+
+		void JustSummoned(Creature* summoned)
+        {
+			events.Reset();
+
+			emote = false;
+
+			me->setActive(false);
+			me->SetDisableGravity(false);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+			me->CastSpell(me, SPELL_SHADOWFORM);
+
+			events.ScheduleEvent(EVENT_ATTACK_PLAYERS, 4*IN_MILLISECONDS);
+			events.ScheduleEvent(EVENT_RELEASE_DOUBT, 30*IN_MILLISECONDS);
+
+			if (instance)
+			{
+				Map* map = me->GetMap();
+
+				if (map && map->IsDungeon())
+				{
+					Map::PlayerList const &PlayerList = map->GetPlayers();
+
+					if (!PlayerList.isEmpty())
+					{
+						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+						{
+							if (player = i->getSource())
+							{
+								if (Creature* figment = player->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
+								{
+									float x, y, z, o;
+									x = player->GetPositionX();
+									y = player->GetPositionY();
+									z = player->GetPositionZ();
+									o = player->GetOrientation();
+									figment->Relocate(x, y, z + 5.0f, o);
+									player->CastSpell(figment, SPELL_FIGMENT_OF_DOUBT_CLONE);
+									figment->SetDisplayId(player->GetDisplayId());
+								}
+							}
+						}
+					}
 				}
 			}
         }
@@ -335,15 +352,15 @@ public:
 					me->DespawnOrUnsummon();
 
 				else
+				{
 					if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 					{
 						sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, sha->GetGUID());
 						me->DespawnOrUnsummon();
 					}
+				}
 			}
         }
-
-        void EnterCombat(Unit*) {	}
 
         void UpdateAI(uint32 diff)
         {
@@ -355,39 +372,39 @@ public:
 				emote = true;
 			}
 
-			while(uint32 eventId = events.ExecuteEvent())
+			if (!UpdateVictim())
 			{
-				switch(eventId)
+				while(uint32 eventId = events.ExecuteEvent())
 				{
-					if (instance)
+					switch(eventId)
 					{
-						case EVENT_ATTACK_PLAYERS:
-							if (instance)
-							{
+						if (instance)
+						{
+							case EVENT_ATTACK_PLAYERS:
 								me->setActive(true);
 								me->SetDisableGravity(true);
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 								me->HandleEmoteCommand(EMOTE_ONESHOT_NONE);
-								me->setFaction(14);
 								me->CastSpell(me, SPELL_GATHERING_DOUBT);
+								me->setFaction(14);
 								me->SetInCombatWith(player);
 								me->AddThreat(player, 99999.0f);
 							
 								events.CancelEvent(EVENT_ATTACK_PLAYERS);
-							}
-							break;
+								break;
 
-						case EVENT_RELEASE_DOUBT:
-							me->CastSpell(me, SPELL_RELEASE_DOUBT);
-							me->Kill(me);
+							case EVENT_RELEASE_DOUBT:
+								me->CastSpell(me, SPELL_RELEASE_DOUBT);
+								me->Kill(me);
 
-							events.CancelEvent(EVENT_RELEASE_DOUBT);
-							break;
+								events.CancelEvent(EVENT_RELEASE_DOUBT);
+								break;
 
-						default:
-							break;
+							default:
+								break;
+						}
 					}
 				}
 			}
