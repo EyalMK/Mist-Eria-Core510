@@ -190,7 +190,7 @@ public:
 						me->Relocate(824.674438f, -2453.281738f, 176.302979f, 5.957958f);
 						me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 						me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-						me->HandleEmoteCommand(EMOTE_ONESHOT_NONE)
+						me->HandleEmoteCommand(EMOTE_ONESHOT_NONE);
 						me->SetFacingTo(5.957958f);
 						events.CancelEvent(EVENT_SPINNING_CRANE_KICK);
 						events.CancelEvent(EVENT_SAY_INTRO_2_3_4_5);
