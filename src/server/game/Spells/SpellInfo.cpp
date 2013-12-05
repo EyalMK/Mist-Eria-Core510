@@ -460,6 +460,16 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
     int32 basePoints = bp ? *bp : BasePoints;
     float comboDamage = PointsPerComboPoint;
 
+    if(Effect == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE ||
+            Effect == SPELL_EFFECT_KNOCK_BACK ||
+            Effect == SPELL_EFFECT_ADD_EXTRA_ATTACKS ||
+            Effect == SPELL_EFFECT_ADD_COMBO_POINTS ||
+            ApplyAuraName == SPELL_AURA_MOD_SPEED_ALWAYS ||
+            ApplyAuraName == SPELL_AURA_MOD_SPEED_NOT_STACK ||
+            ApplyAuraName == SPELL_AURA_MOD_INCREASE_SPEED ||
+            ApplyAuraName == SPELL_AURA_MOD_DECREASE_SPEED)
+        return *bp;
+
     // base amount modification based on spell lvl vs caster lvl
     if (ScalingMultiplier != 0.0f)
     {
@@ -536,6 +546,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
                 Effect != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
                 Effect != SPELL_EFFECT_KNOCK_BACK &&
                 Effect != SPELL_EFFECT_ADD_EXTRA_ATTACKS &&
+                Effect != SPELL_EFFECT_ADD_COMBO_POINTS &&
                 ApplyAuraName != SPELL_AURA_MOD_SPEED_ALWAYS &&
                 ApplyAuraName != SPELL_AURA_MOD_SPEED_NOT_STACK &&
                 ApplyAuraName != SPELL_AURA_MOD_INCREASE_SPEED &&

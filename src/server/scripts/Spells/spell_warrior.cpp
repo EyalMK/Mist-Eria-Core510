@@ -67,6 +67,8 @@ enum WarriorSpells
 	WARRIOR_SPELL_HEROIC_LEAP_DAMAGE            = 52174,
 	WARRIOR_SPELL_HEROIC_LEAP_SPEED             = 133278,
 	WARRIOR_SPELL_ITEM_PVP_SET_4P_BONUS         = 133277,
+	SPELL_WARRIOR_SECOND_WIND						= 29838,
+	SPELL_WARRIOR_SECOND_WIND_REGEN					= 16491,
 };
 
 enum WarriorSpellIcons
@@ -1252,6 +1254,53 @@ class spell_warr_enrage : public SpellScriptLoader
         }
 };*/
 
+// 29838 - Second Wind
+class spell_warr_second_wind : public SpellScriptLoader
+{
+    public:
+        spell_warr_second_wind() : SpellScriptLoader("spell_warr_second_wind") { }
+
+        class spell_warr_second_wind_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warr_second_wind_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_SECOND_WIND_REGEN))
+                    return false;
+                return true;
+            }
+
+            void HandleEffectPeriodic(AuraEffect const* aurEff)
+            {
+                if(Unit *caster = GetCaster())
+				{
+					if(caster->GetHealthPct() < 35.f  && !caster->isAlive())
+					{
+						if(!caster->HasAura(SPELL_WARRIOR_SECOND_WIND_REGEN))
+							caster->CastSpell(caster, SPELL_WARRIOR_SECOND_WIND_REGEN, true);
+					}
+					else
+					{
+						if(caster->HasAura(SPELL_WARRIOR_SECOND_WIND_REGEN))
+							caster->RemoveAura(SPELL_WARRIOR_SECOND_WIND_REGEN);
+					}
+				}
+            }
+
+            void Register()
+            {
+				OnEffectPeriodic += AuraEffectPeriodicFn(spell_warr_second_wind_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+            }
+
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_warr_second_wind_AuraScript();
+        }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_bloodthirst();
@@ -1280,4 +1329,5 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_raging_blow_off();
 	new spell_warr_enrage();
 	//new spell_warr_storm_bolt();
+	new spell_warr_second_wind();
 }

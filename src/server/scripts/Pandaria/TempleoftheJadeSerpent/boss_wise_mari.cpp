@@ -1,10 +1,7 @@
 /* # Script de Tydrheal & Sungis : Wise Mari # */
 
 /*
-	Notes :
-	What is missing ? :	- Wash away (FIXED !)
-						- Doors (need a test)
-						- Water damage (Does not work)
+	Notes : What is missing ?	- Water damage (Does not work)
 */
 
 #include "ScriptPCH.h"
@@ -145,7 +142,7 @@ public:
 				intro = false;
 
 				std::list<Creature*> droplets;
-				me->GetCreatureListWithEntryInGrid(droplets, NPC_CORRUPT_DROPLET, 500.0f);
+				me->GetCreatureListWithEntryInGrid(droplets, NPC_CORRUPT_DROPLET, 99999.0f);
 				if (!droplets.empty())
 				{
 					for (std::list<Creature*>::iterator itr = droplets.begin(); itr != droplets.end(); ++itr)
@@ -165,8 +162,9 @@ public:
 			{
 				Talk(irand(SAY_DEATH_1, SAY_DEATH_3));
 				instance->DoCastSpellOnPlayers(SPELL_BLESSING_OF_THE_WATERSPEAKER);
-				if (GameObject* go = GameObject::GetGameObject(*me, instance->GetData64(DATA_WISE_MARI_GATE)))
-                        instance->HandleGameObject(go->GetGUID(), false);
+
+				if (GameObject* go = me->FindNearestGameObject(GO_MARI_LOREWALKER_GATE, 9999.0f))
+					go->UseDoorOrButton();
 			}
 		}
 
@@ -200,7 +198,7 @@ public:
 				intro = false;
 
 				std::list<Creature*> droplets;
-				me->GetCreatureListWithEntryInGrid(droplets, NPC_CORRUPT_DROPLET, 500.0f);
+				me->GetCreatureListWithEntryInGrid(droplets, NPC_CORRUPT_DROPLET, 99999.0f);
 				if (!droplets.empty())
 				{
 					for (std::list<Creature*>::iterator itr = droplets.begin(); itr != droplets.end(); ++itr)
@@ -391,7 +389,7 @@ public:
 									me->SetFacingTo(1.250952f);
 
 									std::list<Creature*> hydrolanceTriggers;
-						            me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_FRONT, 500.0f);
+						            me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_FRONT, 99999.0f);
 							        if (!hydrolanceTriggers.empty())
 								    {
 									    for (std::list<Creature*>::iterator itr = hydrolanceTriggers.begin(); itr != hydrolanceTriggers.end(); ++itr)
@@ -412,7 +410,7 @@ public:
 									me->SetFacingTo(5.240993f);
 									
 									std::list<Creature*> hydrolanceTriggers;
-						            me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_LEFT, 500.0f);
+						            me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_LEFT, 99999.0f);
 							        if (!hydrolanceTriggers.empty())
 								    {
 									    for (std::list<Creature*>::iterator itr = hydrolanceTriggers.begin(); itr != hydrolanceTriggers.end(); ++itr)
@@ -433,7 +431,7 @@ public:
 									me->SetFacingTo(3.504827f);
 									
 									std::list<Creature*> hydrolanceTriggers;
-						            me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_RIGHT, 500.0f);
+						            me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_RIGHT, 99999.0f);
 							        if (!hydrolanceTriggers.empty())
 								    {
 									    for (std::list<Creature*>::iterator itr = hydrolanceTriggers.begin(); itr != hydrolanceTriggers.end(); ++itr)
@@ -499,7 +497,7 @@ public:
 							case EVENT_HYDROLANCE_FRONT:
 							{
 								std::list<Creature*> hydrolanceTriggers;
-								me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_FRONT, 500.0f);
+								me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_FRONT, 99999.0f);
 								if (!hydrolanceTriggers.empty())
 								{
 									for (std::list<Creature*>::iterator itr = hydrolanceTriggers.begin(); itr != hydrolanceTriggers.end(); ++itr)
@@ -517,7 +515,7 @@ public:
 							case EVENT_HYDROLANCE_LEFT:
 							{
 								std::list<Creature*> hydrolanceTriggers;
-								me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_LEFT, 500.0f);
+								me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_LEFT, 99999.0f);
 								if (!hydrolanceTriggers.empty())
 								{
 									for (std::list<Creature*>::iterator itr = hydrolanceTriggers.begin(); itr != hydrolanceTriggers.end(); ++itr)
@@ -535,7 +533,7 @@ public:
 							case EVENT_HYDROLANCE_RIGHT:
 							{
 								std::list<Creature*> hydrolanceTriggers;
-								me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_RIGHT, 500.0f);
+								me->GetCreatureListWithEntryInGrid(hydrolanceTriggers, NPC_HYDROLANCE_TRIGGER_RIGHT, 99999.0f);
 								if (!hydrolanceTriggers.empty())
 								{
 									for (std::list<Creature*>::iterator itr = hydrolanceTriggers.begin(); itr != hydrolanceTriggers.end(); ++itr)

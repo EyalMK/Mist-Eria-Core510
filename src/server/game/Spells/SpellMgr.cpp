@@ -3819,16 +3819,16 @@ void SpellMgr::LoadSpellInfoCorrections()
 				case 118253:
 					spellInfo->Effects[EFFECT_1].Effect = 0; // This effect is completely fucked up
 					break;
-				case 106331: // Wash away
+				case 106331: // Wash Away
 					spellInfo->Effects[0].Amplitude = 2000;
 					break;
-				case 106267: // Hydrolance pulse big
+				case 106267: // Hydrolance Pulse Big
 					spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_3_YARDS);
 					break;
-				case 106319: // Hydrolance pulse small
+				case 106319: // Hydrolance Pulse Small
 					spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_2_YARDS);
 					break;
-				case 106062: // Water bubble
+				case 106062: // Water Bubble
 					spellInfo->Effects[0].Amplitude = 1200;
 					break;
 				case 106864:
@@ -3838,6 +3838,24 @@ void SpellMgr::LoadSpellInfoCorrections()
                 case 113792:
                     spellInfo->MaxAffectedTargets = 1;
                     break;
+                case 116:
+                    spellInfo->StackAmount = 1;
+                    break;
+				case 106736: // Wither Will
+					spellInfo->MaxAffectedTargets = 2;
+					break;
+				case 119586: // 10 Targets
+					spellInfo->MaxAffectedTargets = 1;
+					break;
+				case 119622: // 3 Targets
+					spellInfo->MaxAffectedTargets = 1;
+					break;
+				case 119488: // 10 Targets
+					spellInfo->MaxAffectedTargets = 1;
+					break;
+				case 29838:
+					spellInfo->Effects[EFFECT_0].Effect = SPELL_AURA_PERIODIC_DUMMY;
+					spellInfo->Effects[EFFECT_0].Amplitude = 1000;
 				default:
 					break;
 			}

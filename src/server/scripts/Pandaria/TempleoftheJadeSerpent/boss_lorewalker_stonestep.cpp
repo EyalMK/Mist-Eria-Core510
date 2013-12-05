@@ -1,7 +1,8 @@
 /* # Script de Tydrheal & Sungis : Lorewalker Stonestep # */
 
-/* Notes : What is missing ?	- Zao's & Sun's scripts
-								- Texts
+/*
+	Notes : What is missing ?	- Zao's & Sun's scripts
+								- Some texts
 */
 
 #include "ScriptPCH.h"
@@ -189,14 +190,14 @@ public:
 						me->Relocate(824.674438f, -2453.281738f, 176.302979f, 5.957958f);
 						me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 						me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-						me->HandleEmoteCommand(0);
+						me->HandleEmoteCommand(EMOTE_ONESHOT_NONE);
 						me->SetFacingTo(5.957958f);
 						events.CancelEvent(EVENT_SPINNING_CRANE_KICK);
 						events.CancelEvent(EVENT_SAY_INTRO_2_3_4_5);
 						events.SetPhase(PHASE_BOSSES);
 					}
 
-			if (me->FindNearestCreature(NPC_STRIFE, 500.0f, false) && me->FindNearestCreature(NPC_PERIL, 500.0f, false) && !end)
+			if (me->FindNearestCreature(NPC_STRIFE, 99999.0f, false) && me->FindNearestCreature(NPC_PERIL, 99999.0f, false) && !end)
 			{
 				events.ScheduleEvent(EVENT_SAY_END_1, 0, 0, PHASE_BOSSES);
 				end = true;
@@ -221,6 +222,9 @@ public:
 							break;
 
 						case EVENT_SAY_END_1:
+							if (GameObject* go = me->FindNearestGameObject(GO_MARI_LOREWALKER_GATE, 9999.0f))
+								go->UseDoorOrButton();
+
 							Talk(SAY_END_1);
 
 							events.ScheduleEvent(EVENT_SAY_END_2, 9*IN_MILLISECONDS, 0, PHASE_BOSSES);
@@ -230,7 +234,7 @@ public:
 						case EVENT_SAY_END_2:
 							Talk(SAY_END_2);
 
-							events.CancelEvent(EVENT_SAY_END_2);
+							events.CancelEvent(EVENT_SAY_END_2); // End of the script
 							break;
 
 						default:
@@ -301,7 +305,7 @@ public:
 							me->SummonCreature(NPC_PERIL, 835.478394f, -2466.505859f, 174.961578f, 0.935758f, TEMPSUMMON_MANUAL_DESPAWN);
 							me->SummonCreature(NPC_STRIFE, 848.223511f, -2470.850586f, 174.961578f, 1.537897f, TEMPSUMMON_MANUAL_DESPAWN);
 							
-							if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 500.0f))
+							if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 99999.0f))
 							{
 								lorewalker->GetMotionMaster()->MovePoint(0, 824.674438f, -2453.281738f, 176.302979f);
 								lorewalker->Say(SAY_OSONG_INTRO_1, 0, 0);
@@ -386,7 +390,7 @@ public:
 		void JustDied(Unit *pWho)
 		{
 			if (instance)
-				if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 500.0f, false))
+				if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 99999.0f, false))
 					if (!peril->isAlive())
 					{
 						instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, DONE);
@@ -407,10 +411,10 @@ public:
 				me->CombatStop();
 				me->DeleteThreatList();
 
-				if (Creature* scroll = me->FindNearestCreature(NPC_CORRUPTED_SCROLL, 500.0f, false))
+				if (Creature* scroll = me->FindNearestCreature(NPC_CORRUPTED_SCROLL, 99999.0f, false))
 					scroll->Respawn(true);
 
-				if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 500.0f, true))
+				if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 99999.0f, true))
 				{
 					me->Kill(lorewalker);
 					lorewalker->Respawn(true);
@@ -419,7 +423,7 @@ public:
 					lorewalker->SetFacingTo(1.252402f);
 				}
 
-				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 500.0f, true))
+				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 99999.0f, true))
 					osong->DespawnOrUnsummon();
 
 				me->DespawnOrUnsummon(1*IN_MILLISECONDS);
@@ -586,7 +590,7 @@ public:
 		void JustDied(Unit *pWho)
 		{
 			if (instance)
-				if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 500.0f, false))
+				if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 99999.0f, false))
 					if (!strife->isAlive())
 					{
 						instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, DONE);
@@ -607,10 +611,10 @@ public:
 				me->CombatStop();
 				me->DeleteThreatList();
 
-				if (Creature* scroll = me->FindNearestCreature(NPC_CORRUPTED_SCROLL, 500.0f, false))
+				if (Creature* scroll = me->FindNearestCreature(NPC_CORRUPTED_SCROLL, 99999.0f, false))
 					scroll->Respawn(true);
 
-				if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 500.0f, true))
+				if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 99999.0f, true))
 				{
 					me->Kill(lorewalker);
 					lorewalker->Respawn(true);
@@ -619,7 +623,7 @@ public:
 					lorewalker->SetFacingTo(1.252402f);
 				}
 
-				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 500.0f, true))
+				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 99999.0f, true))
 					osong->DespawnOrUnsummon();
 
 				me->DespawnOrUnsummon(1*IN_MILLISECONDS);
@@ -774,7 +778,7 @@ public:
 							break;
 
 						case EVENT_ATTACK_STRIFE:
-							if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 500.0f))
+							if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 99999.0f))
 							{
 								me->AddThreat(strife, 999.0f);
 								me->Attack(strife, true);
@@ -785,7 +789,7 @@ public:
 							break;
 
 						case EVENT_ATTACK_PERIL:
-							if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 500.0f))
+							if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 99999.0f))
 							{
 								me->AddThreat(peril, 999.0f);
 								me->Attack(peril, true);

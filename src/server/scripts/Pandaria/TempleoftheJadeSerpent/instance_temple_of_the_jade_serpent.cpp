@@ -64,7 +64,7 @@ class instance_temple_of_the_jade_serpent : public InstanceMapScript
             {
                 switch (go->GetEntry())
                 {
-					case GO_WISE_MARI_GATE:
+					case GO_MARI_LOREWALKER_GATE:
 						WiseMariGateGUID = go->GetGUID();
 						break;
 				}
@@ -122,7 +122,7 @@ class instance_temple_of_the_jade_serpent : public InstanceMapScript
 		}
 };
 
-class npc_instance_trigger_totjs: public CreatureScript
+/*class npc_instance_trigger_totjs: public CreatureScript
 {
 public:
 	npc_instance_trigger_totjs() : CreatureScript("npc_instance_trigger_totjs") { }
@@ -185,7 +185,7 @@ public:
 			if (me->FindNearestCreature(BOSS_WISE_MARI, 999.0f, false) &&
 				me->FindNearestCreature(BOSS_LOREWALKER_STONESTEP, 999.0f, false) &&
 				me->FindNearestCreature(BOSS_LIU_FLAMEHEART, 999.0f, false))
-				instance->DoUseDoorOrButton(433321, 999999);
+				instance->DoUseDoorOrButton(433536, 999999);
 
 			if (!wiseMariFirstDoor)
 				instance->DoUseDoorOrButton(433323, 999999);
@@ -194,10 +194,11 @@ public:
 				instance->DoUseDoorOrButton(433325, 999999);
 		}
 	};
-};
+};*/
+
 void AddSC_instance_temple_of_the_jade_serpent()
 {
    new instance_temple_of_the_jade_serpent();
-   new npc_instance_trigger_totjs();
+   //new npc_instance_trigger_totjs();
 }
 
