@@ -73,6 +73,8 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 		bool boundsOfReality;
+		bool seventyFivePct;
+		bool fiftyPct;
 
 		void Reset()
 		{		
@@ -81,6 +83,8 @@ public:
 			if (instance)
 			{
 				boundsOfReality = false;
+				seventyFivePct = false;
+				fiftyPct = false;
 				events.SetPhase(PHASE_NULL);
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, NOT_STARTED);
 			}
@@ -92,16 +96,15 @@ public:
 					instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, DONE);
 		}
 
-		void KilledUnit(Unit *pWho)
-		{
-
-		}
+		void KilledUnit(Unit *pWho) {	}
 		
 		void EnterEvadeMode()
 		{
 			if (instance)
 			{
 				boundsOfReality = false;
+				seventyFivePct = false;
+				fiftyPct = false;
 				events.SetPhase(PHASE_NULL);
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, FAIL);
 			}
@@ -129,13 +132,13 @@ public:
 			if (me->HasUnitState(UNIT_STATE_CASTING))
 				return;
 
-			if (HealthBelowPct(75) && events.IsInPhase(PHASE_COMBAT))
+			if (HealthBelowPct(75) && events.IsInPhase(PHASE_COMBAT) && !seventyFivePct)
 			{
 				events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 1*IN_MILLISECONDS, 0, PHASE_BOUNDS_OF_REALITY);
 				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
 			}
 
-			if (HealthBelowPct(50) && events.IsInPhase(PHASE_COMBAT))
+			if (HealthBelowPct(50) && events.IsInPhase(PHASE_COMBAT) && !fiftyPct)
 			{
 				events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 1*IN_MILLISECONDS, 0, PHASE_BOUNDS_OF_REALITY);
 				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
@@ -185,6 +188,12 @@ public:
 							if (Creature* trigger = me->FindNearestCreature(NPC_SHA_TRIGGER, 99999.0f, true))
 								me->GetMotionMaster()->MovePoint(0, trigger->GetHomePosition());
 
+							if (HealthBelowPct(75))
+								seventyFivePct = true;
+
+							if (HealthBelowPct(50))
+								fiftyPct = true;
+
 							events.CancelEvent(EVENT_BOUNDS_OF_REALITY);
 							break;
 
@@ -223,48 +232,94 @@ public:
 
 		InstanceScript* instance;
         EventMap events;
-		Unit* player;
+		Player* player;
 		bool emote;
 
         void Reset()
 		{
-			events.Reset();
-
-			emote = false;
-
-			me->setActive(false);
-			me->SetDisableGravity(false);
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-			me->CastSpell(me, SPELL_SHADOWFORM);
-
-			events.ScheduleEvent(EVENT_ATTACK_PLAYERS, 4*IN_MILLISECONDS);
-			events.ScheduleEvent(EVENT_RELEASE_DOUBT, 30*IN_MILLISECONDS);
-
-			Map* map = me->GetMap();
-			if (map && map->IsDungeon())
+			if (instance)
 			{
-				Map::PlayerList const &PlayerList = map->GetPlayers();
+				events.Reset();
 
-				if (!PlayerList.isEmpty())
-					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-					{
-						if (player = i->getSource())
-							if (Creature* figment = i->getSource()->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
-							{
-								float x, y, z, o;
-								x = player->GetPositionX();
-								y = player->GetPositionX();
-								z = player->GetPositionX();
-								o = player->GetOrientation();
-								figment->Relocate(x, y, z + 5.0f, o);
-								player->CastSpell(figment, SPELL_FIGMENT_OF_DOUBT_CLONE);
-								figment->SetDisplayId(player->GetDisplayId());
-							}
-					}
+				emote = false;
+
+				me->setActive(false);
+				me->SetDisableGravity(false);
+				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+				me->CastSpell(me, SPELL_SHADOWFORM);
+
+				events.ScheduleEvent(EVENT_ATTACK_PLAYERS, 4*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_RELEASE_DOUBT, 30*IN_MILLISECONDS);
+
+				Map* map = me->GetMap();
+				if (map && map->IsDungeon())
+				{
+					Map::PlayerList const &PlayerList = map->GetPlayers();
+
+					if (!PlayerList.isEmpty())
+						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+						{
+							if (player = i->getSource())
+								if (Creature* figment = i->getSource()->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
+								{
+									float x, y, z, o;
+									x = player->GetPositionX();
+									y = player->GetPositionX();
+									z = player->GetPositionX();
+									o = player->GetOrientation();
+									figment->Relocate(x, y, z + 5.0f, o);
+									player->CastSpell(figment, SPELL_FIGMENT_OF_DOUBT_CLONE);
+									figment->SetDisplayId(player->GetDisplayId());
+								}
+						}
+				}
 			}
 		}
+
+		void JustSummoned(Creature* summoned)
+        {
+			if (instance)
+			{
+				events.Reset();
+
+				emote = false;
+
+				me->setActive(false);
+				me->SetDisableGravity(false);
+				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+				me->CastSpell(me, SPELL_SHADOWFORM);
+
+				events.ScheduleEvent(EVENT_ATTACK_PLAYERS, 4*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_RELEASE_DOUBT, 30*IN_MILLISECONDS);
+
+				Map* map = me->GetMap();
+				if (map && map->IsDungeon())
+				{
+					Map::PlayerList const &PlayerList = map->GetPlayers();
+
+					if (!PlayerList.isEmpty())
+						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+						{
+							if (player = i->getSource())
+								if (Creature* figment = player->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
+								{
+									float x, y, z, o;
+									x = player->GetPositionX();
+									y = player->GetPositionY();
+									z = player->GetPositionZ();
+									o = player->GetOrientation();
+									figment->Relocate(x, y, z + 5.0f, o);
+									player->CastSpell(figment, SPELL_FIGMENT_OF_DOUBT_CLONE);
+									figment->SetDisplayId(player->GetDisplayId());
+								}
+						}
+				}
+			}
+        }
 
 		void EnterEvadeMode()
 		{
@@ -307,18 +362,21 @@ public:
 					if (instance)
 					{
 						case EVENT_ATTACK_PLAYERS:
-							me->setActive(true);
-							me->SetDisableGravity(true);
-							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-							me->HandleEmoteCommand(EMOTE_ONESHOT_NONE);
-							me->setFaction(14);
-							me->CastSpell(me, SPELL_GATHERING_DOUBT);
-							me->SetInCombatWith(player);
-							me->AddThreat(player, 99999.0f);
+							if (instance)
+							{
+								me->setActive(true);
+								me->SetDisableGravity(true);
+								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+								me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+								me->HandleEmoteCommand(EMOTE_ONESHOT_NONE);
+								me->setFaction(14);
+								me->CastSpell(me, SPELL_GATHERING_DOUBT);
+								me->SetInCombatWith(player);
+								me->AddThreat(player, 99999.0f);
 							
-							events.CancelEvent(EVENT_ATTACK_PLAYERS);
+								events.CancelEvent(EVENT_ATTACK_PLAYERS);
+							}
 							break;
 
 						case EVENT_RELEASE_DOUBT:
