@@ -1275,13 +1275,15 @@ class spell_warr_second_wind : public SpellScriptLoader
             {
                 if(Unit *caster = GetCaster())
 				{
-					if(caster->GetHealthPct() < 35.f  && caster->isAlive())
+					if((caster->GetHealthPct() < 35.f)  && caster->isAlive())
 					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO,"DEBUG TERAH 0");
 						if(!caster->HasAura(SPELL_WARRIOR_SECOND_WIND_REGEN))
 							caster->CastSpell(caster, SPELL_WARRIOR_SECOND_WIND_REGEN, true);
 					}
 					else
 					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH 1");
 						if(caster->HasAura(SPELL_WARRIOR_SECOND_WIND_REGEN))
 							caster->RemoveAura(SPELL_WARRIOR_SECOND_WIND_REGEN);
 					}
