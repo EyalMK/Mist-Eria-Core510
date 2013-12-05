@@ -3820,7 +3820,7 @@ void SpellMgr::LoadSpellInfoCorrections()
 					spellInfo->Effects[EFFECT_1].Effect = 0; // This effect is completely fucked up
 					break;
 				case 106331: // Wash Away
-					spellInfo->Effects[0].Amplitude = 1500;
+					spellInfo->Effects[0].Amplitude = 2000;
 					break;
 				case 106267: // Hydrolance Pulse Big
 					spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_3_YARDS);
@@ -3843,6 +3843,15 @@ void SpellMgr::LoadSpellInfoCorrections()
                     break;
 				case 106736: // Wither Will
 					spellInfo->MaxAffectedTargets = 2;
+					break;
+				case 119586: // 10 Targets
+					spellInfo->MaxAffectedTargets = 1;
+					break;
+				case 119622: // 3 Targets
+					spellInfo->MaxAffectedTargets = 1;
+					break;
+				case 119488: // 10 Targets
+					spellInfo->MaxAffectedTargets = 1;
 					break;
 				default:
 					break;

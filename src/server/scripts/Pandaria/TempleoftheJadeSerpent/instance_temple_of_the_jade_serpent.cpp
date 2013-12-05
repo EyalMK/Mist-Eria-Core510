@@ -122,7 +122,7 @@ class instance_temple_of_the_jade_serpent : public InstanceMapScript
 		}
 };
 
-class npc_instance_trigger_totjs: public CreatureScript
+/*class npc_instance_trigger_totjs: public CreatureScript
 {
 public:
 	npc_instance_trigger_totjs() : CreatureScript("npc_instance_trigger_totjs") { }
@@ -194,10 +194,11 @@ public:
 				instance->DoUseDoorOrButton(433325, 999999);
 		}
 	};
-};
+};*/
+
 void AddSC_instance_temple_of_the_jade_serpent()
 {
    new instance_temple_of_the_jade_serpent();
-   new npc_instance_trigger_totjs();
+   //new npc_instance_trigger_totjs();
 }
 
