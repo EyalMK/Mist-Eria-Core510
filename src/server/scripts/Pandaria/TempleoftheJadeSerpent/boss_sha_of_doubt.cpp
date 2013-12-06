@@ -152,7 +152,10 @@ public:
 		
 		void UpdateAI(uint32 diff)
 		{
-			if(!UpdateVictim())
+			if (!UpdateVictim())
+				return;
+
+			if (me->HasAura(SPELL_BOUNDS_OF_REALITY))
 				return;
 
 			events.Update(diff);
@@ -177,6 +180,7 @@ public:
 
 			if (boundsOfReality && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
 			{
+				me->InterruptSpell(CURRENT_CHANNELED_SPELL);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				events.SetPhase(PHASE_COMBAT);
@@ -344,6 +348,7 @@ public:
 				else
 					if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 					{
+						sha->InterruptSpell(CURRENT_CHANNELED_SPELL);
 						sha->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 						sha->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 						sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, sha->GetGUID());
@@ -377,7 +382,8 @@ public:
 							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 							me->setFaction(14);
 							me->setActive(true);
-							me->SetInCombatWith(player);
+							me->SetInCombatWithZone();
+							me->Attack(player, true);
 							me->AddThreat(player, 99999.0f);
 						
 							events.CancelEvent(EVENT_ATTACK_PLAYERS);
