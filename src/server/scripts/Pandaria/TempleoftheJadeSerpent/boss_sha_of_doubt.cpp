@@ -155,9 +155,6 @@ public:
 			if (!UpdateVictim())
 				return;
 
-			if (me->HasAura(SPELL_BOUNDS_OF_REALITY))
-				return;
-
 			events.Update(diff);
 
 			if (HealthBelowPct(75) && events.IsInPhase(PHASE_COMBAT) && !seventyFivePct)
