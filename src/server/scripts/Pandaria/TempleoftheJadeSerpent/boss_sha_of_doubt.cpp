@@ -138,16 +138,17 @@ public:
 		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
+			{
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, IN_PROGRESS);
-
-			me->SetInCombatWithZone();
+				me->SetInCombatWithZone();
+			}
 
 			events.SetPhase(PHASE_COMBAT);
 			events.ScheduleEvent(EVENT_WITHER_WILL, 2*IN_MILLISECONDS, 0, PHASE_COMBAT);
 			events.ScheduleEvent(EVENT_TOUCH_OF_NOTHINGNESS, 8*IN_MILLISECONDS, 0, PHASE_COMBAT);
 
 			if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
-					go->Use(me);
+					go->UseDoorOrButton();
 		}
 		
 		void UpdateAI(uint32 diff)
@@ -171,7 +172,7 @@ public:
 				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
 			}
 
-			if (events.IsInPhase(PHASE_BOUNDS_OF_REALITY) && !boundsOfReality)
+			if (events.IsInPhase(PHASE_BOUNDS_OF_REALITY))
 				if (me->FindNearestCreature(NPC_SHA_TRIGGER, 0.1f, true))
 					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 0, 0, PHASE_BOUNDS_OF_REALITY);
 
@@ -208,34 +209,35 @@ public:
 							if (Creature* trigger = me->FindNearestCreature(NPC_SHA_TRIGGER, 99999.0f, true))
 								me->GetMotionMaster()->MovePoint(0, trigger->GetHomePosition());
 
-							if (boundsCount == 1)
-								seventyFivePct = true;
-
-							if (boundsCount == 2)
-								fiftyPct = true;
-
 							events.CancelEvent(EVENT_MOVE_TO_THE_CENTER);
 							break;
 
 						case EVENT_BOUNDS_OF_REALITY:
 						{
-							if (Creature* trigger = me->FindNearestCreature(NPC_SHA_TRIGGER, 0.1f, true))
+							if (Creature* trigger = me->FindNearestCreature(NPC_SHA_TRIGGER, 99999.0f, true))
 							{
 								me->Relocate(trigger->GetHomePosition());
 								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->SetOrientation(4.410300f);
 								me->CastSpell(me, SPELL_BOUNDS_OF_REALITY);
-								events.ScheduleEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT, 0, 0, PHASE_BOUNDS_OF_REALITY);
 							}
 
+							if (boundsCount == 1)
+								seventyFivePct = true;
+
+							if (boundsCount == 2)
+								fiftyPct = true;
+
+							events.ScheduleEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT, 0, 0, PHASE_BOUNDS_OF_REALITY);
 							events.CancelEvent(EVENT_BOUNDS_OF_REALITY);
 							break;
 						}
 
 						case EVENT_SUMMON_FIGMENT_OF_DOUBT:
 						{
-							boundsOfReality = true;
+							if (me->HasAura(SPELL_BOUNDS_OF_REALITY))
+								boundsOfReality = true;
 
 							map = me->GetMap();
 
@@ -343,7 +345,7 @@ public:
 				if (me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
 					me->DespawnOrUnsummon();
 
-				else
+				if (!me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
 					if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 					{
 						sha->InterruptSpell(CURRENT_CHANNELED_SPELL);
