@@ -172,7 +172,7 @@ public:
 				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
 			}
 
-			if (events.IsInPhase(PHASE_BOUNDS_OF_REALITY))
+			if (events.IsInPhase(PHASE_BOUNDS_OF_REALITY) && !boundsOfReality)
 				if (me->FindNearestCreature(NPC_SHA_TRIGGER, 0.1f, true))
 					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 0, 0, PHASE_BOUNDS_OF_REALITY);
 
