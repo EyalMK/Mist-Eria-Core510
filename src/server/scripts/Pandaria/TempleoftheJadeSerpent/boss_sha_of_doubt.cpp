@@ -172,9 +172,11 @@ public:
 				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
 			}
 
-			if (events.IsInPhase(PHASE_BOUNDS_OF_REALITY) && !boundsOfReality)
+			if (events.IsInPhase(PHASE_BOUNDS_OF_REALITY) && !boundsOfReality && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
 				if (me->FindNearestCreature(NPC_SHA_TRIGGER, 0.1f, true))
 				{
+					me->CastSpell(me, SPELL_BOUNDS_OF_REALITY);
+
 					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 0, 0, PHASE_BOUNDS_OF_REALITY);
 					events.ScheduleEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT, 0, 0, PHASE_BOUNDS_OF_REALITY);
 				}
@@ -223,7 +225,7 @@ public:
 								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->SetOrientation(4.410300f);
-								me->CastSpell(me, SPELL_BOUNDS_OF_REALITY);
+								//me->CastSpell(me, SPELL_BOUNDS_OF_REALITY);
 							}
 
 							if (boundsCount == 1)
