@@ -12556,7 +12556,9 @@ int32 Unit::GetCreatePowers(Powers power) const
 		case POWER_CHAOS_ORB:
 			return 3; // shadow priest orbs
 		case POWER_BURNING_EMBERS:
-			return 4; // destruction warlock embers
+			return 40; // destruction warlock embers
+		case POWER_DEMONIC_FURY:
+			return 1000; // destruction warlock embers
         case POWER_HEALTH:
             return 0;
         default:
