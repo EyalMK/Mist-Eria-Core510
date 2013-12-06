@@ -298,8 +298,6 @@ public:
 			emote = false;
 
 			me->setActive(false);
-			me->AddUnitMovementFlag(MOVEMENTFLAG_CAN_FLY|MOVEMENTFLAG_FLYING);
-			me->SetDisableGravity(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -307,7 +305,7 @@ public:
 			me->CastSpell(me, SPELL_GATHERING_DOUBT);
 
 			events.ScheduleEvent(EVENT_ATTACK_PLAYERS, 4*IN_MILLISECONDS);
-			events.ScheduleEvent(EVENT_RELEASE_DOUBT, 34*IN_MILLISECONDS);
+			events.ScheduleEvent(EVENT_RELEASE_DOUBT, 30*IN_MILLISECONDS);
 
 			if (instance)
 			{
@@ -327,7 +325,7 @@ public:
 									y = player->GetPositionY();
 									z = player->GetPositionZ();
 									o = player->GetOrientation();
-									figment->Relocate(x, y, z + 2.0f, o);
+									figment->Relocate(x, y, z, o);
 									//player->CastSpell(figment, SPELL_FIGMENT_OF_DOUBT_CLONE);
 									figment->SetDisplayId(player->GetDisplayId());
 								}
@@ -346,7 +344,7 @@ public:
 			if (instance)
 			{
 				if (me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
-					me->DespawnOrUnsummon();
+					me->DespawnOrUnsummon(2*IN_MILLISECONDS);
 
 				if (!me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
 					if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
@@ -355,7 +353,7 @@ public:
 						sha->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 						sha->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 						sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, sha->GetGUID());
-						me->DespawnOrUnsummon();
+						me->DespawnOrUnsummon(2*IN_MILLISECONDS);
 					}
 			}
         }
@@ -377,8 +375,6 @@ public:
 					if (instance)
 					{
 						case EVENT_ATTACK_PLAYERS:
-							me->RemoveUnitMovementFlag(MOVEMENTFLAG_CAN_FLY|MOVEMENTFLAG_FLYING);
-							me->SetDisableGravity(true);
 							me->HandleEmoteCommand(EMOTE_ONESHOT_NONE);
 							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
