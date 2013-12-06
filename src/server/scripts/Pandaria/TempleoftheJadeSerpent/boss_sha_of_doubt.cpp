@@ -27,8 +27,9 @@ enum Events
 	/* Sha Of Doubt */
 	EVENT_WITHER_WILL				= 1,
 	EVENT_TOUCH_OF_NOTHINGNESS		= 2,
-	EVENT_BOUNDS_OF_REALITY			= 3,
-	EVENT_SUMMON_FIGMENT_OF_DOUBT	= 4,
+	EVENT_MOVE_TO_THE_CENTER		= 3,
+	EVENT_BOUNDS_OF_REALITY			= 4,
+	EVENT_SUMMON_FIGMENT_OF_DOUBT	= 5,
 
 	/* Figment of Doubt */
 	EVENT_ATTACK_PLAYERS			= 1,
@@ -49,7 +50,7 @@ enum Phases
 
 enum Npcs
 {
-	NPC_FIGMENT_OF_DOUBT	= 56792,
+	NPC_FIGMENT_OF_DOUBT	= 56792, // displayid = 15435
 	NPC_SHA_TRIGGER			= 400453,
 };
 
@@ -72,6 +73,8 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
+		Map* map;
+		Unit* player;
 		bool boundsOfReality;
 		bool seventyFivePct;
 		bool fiftyPct;
@@ -143,28 +146,20 @@ public:
 			if (HealthBelowPct(75) && events.IsInPhase(PHASE_COMBAT) && !seventyFivePct)
 			{
 				boundsCount = 1;
-				events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 1*IN_MILLISECONDS, 0, PHASE_BOUNDS_OF_REALITY);
+				events.ScheduleEvent(EVENT_MOVE_TO_THE_CENTER, 1*IN_MILLISECONDS, 0, PHASE_BOUNDS_OF_REALITY);
 				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
 			}
 
 			if (HealthBelowPct(50) && events.IsInPhase(PHASE_COMBAT) && !fiftyPct)
 			{
 				boundsCount = 2;
-				events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 1*IN_MILLISECONDS, 0, PHASE_BOUNDS_OF_REALITY);
+				events.ScheduleEvent(EVENT_MOVE_TO_THE_CENTER, 1*IN_MILLISECONDS, 0, PHASE_BOUNDS_OF_REALITY);
 				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
 			}
 
 			if (events.IsInPhase(PHASE_BOUNDS_OF_REALITY) && !boundsOfReality)
-				if (Creature* trigger = me->FindNearestCreature(NPC_SHA_TRIGGER, 0.1f, true))
-				{
-					me->Relocate(trigger->GetHomePosition());
-					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-					me->SetFacingTo(4.410300f);
-					me->CastSpell(me, SPELL_BOUNDS_OF_REALITY);
-					events.ScheduleEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT, 0, 0, PHASE_BOUNDS_OF_REALITY);
-					boundsOfReality = true;
-				}
+				if (me->FindNearestCreature(NPC_SHA_TRIGGER, 0.1f, true))
+					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 0, 0, PHASE_BOUNDS_OF_REALITY);
 
 			if (boundsOfReality && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
 			{
@@ -194,7 +189,7 @@ public:
 							events.ScheduleEvent(EVENT_TOUCH_OF_NOTHINGNESS, 18*IN_MILLISECONDS);
 							break;
 
-						case EVENT_BOUNDS_OF_REALITY:
+						case EVENT_MOVE_TO_THE_CENTER:
 							if (Creature* trigger = me->FindNearestCreature(NPC_SHA_TRIGGER, 99999.0f, true))
 								me->GetMotionMaster()->MovePoint(0, trigger->GetHomePosition());
 
@@ -204,15 +199,44 @@ public:
 							if (boundsCount == 2)
 								fiftyPct = true;
 
-							events.CancelEvent(EVENT_BOUNDS_OF_REALITY);
+							events.CancelEvent(EVENT_MOVE_TO_THE_CENTER);
 							break;
 
+						case EVENT_BOUNDS_OF_REALITY:
+						{
+							if (Creature* trigger = me->FindNearestCreature(NPC_SHA_TRIGGER, 0.1f, true))
+							{
+								me->Relocate(trigger->GetHomePosition());
+								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+								me->SetOrientation(4.410300f);
+								me->CastSpell(me, SPELL_BOUNDS_OF_REALITY);
+								events.ScheduleEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT, 0, 0, PHASE_BOUNDS_OF_REALITY);
+								boundsOfReality = true;
+							}
+
+							events.CancelEvent(EVENT_BOUNDS_OF_REALITY);
+							break;
+						}
+
 						case EVENT_SUMMON_FIGMENT_OF_DOUBT:
-							instance->DoCastSpellOnPlayers(SPELL_FIGMENT_OF_DOUBT);
+						{
+							map = me->GetMap();
+
+							if (map && map->IsDungeon())
+							{
+								Map::PlayerList const &PlayerList = map->GetPlayers();
+
+								if (!PlayerList.isEmpty())
+									for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+										if (player = i->getSource()->ToPlayer())
+											player->CastSpell(player, SPELL_FIGMENT_OF_DOUBT);
+							}
 
 							events.CancelEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT);
 							break;
-
+						}
+							
 						default:
 							break;
 					}
@@ -253,18 +277,20 @@ public:
 			emote = false;
 
 			me->setActive(false);
-			//me->SetDisableGravity(false);
+			me->AddUnitMovementFlag(MOVEMENTFLAG_CAN_FLY|MOVEMENTFLAG_FLYING);
+			me->SetDisableGravity(false);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 			me->CastSpell(me, SPELL_SHADOWFORM);
+			me->CastSpell(me, SPELL_GATHERING_DOUBT);
 
 			events.ScheduleEvent(EVENT_ATTACK_PLAYERS, 4*IN_MILLISECONDS);
 			events.ScheduleEvent(EVENT_RELEASE_DOUBT, 34*IN_MILLISECONDS);
 
 			if (instance)
 			{
-				 map = me->GetMap();
+				map = me->GetMap();
 
 				if (map && map->IsDungeon())
 				{
@@ -280,9 +306,9 @@ public:
 									y = player->GetPositionY();
 									z = player->GetPositionZ();
 									o = player->GetOrientation();
-									figment->Relocate(x, y, z + 5.0f, o);
-									//player->CastSpell(figment, SPELL_FIGMENT_OF_DOUBT_CLONE);
-									figment->SetDisplayId(player->GetDisplayId());
+									figment->Relocate(x, y, z + 2.0f, o);
+									player->CastSpell(figment, SPELL_FIGMENT_OF_DOUBT_CLONE);
+									//figment->SetDisplayId(player->GetDisplayId());
 								}
 				}
 			}
@@ -290,8 +316,8 @@ public:
 
 		void EnterEvadeMode()
 		{
-			//if (instance)
-				//me->DespawnOrUnsummon();
+			if (instance)
+				me->DespawnOrUnsummon();
 		}
 
         void JustDied(Unit *pWho)
@@ -302,13 +328,11 @@ public:
 					me->DespawnOrUnsummon();
 
 				else
-				{
 					if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 					{
 						sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, sha->GetGUID());
 						me->DespawnOrUnsummon();
 					}
-				}
 			}
         }
 
@@ -329,9 +353,9 @@ public:
 					if (instance)
 					{
 						case EVENT_ATTACK_PLAYERS:
-							//me->SetDisableGravity(true);
+							me->RemoveUnitMovementFlag(MOVEMENTFLAG_CAN_FLY|MOVEMENTFLAG_FLYING);
+							me->SetDisableGravity(true);
 							me->HandleEmoteCommand(EMOTE_ONESHOT_NONE);
-							me->CastSpell(me, SPELL_GATHERING_DOUBT);
 							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
