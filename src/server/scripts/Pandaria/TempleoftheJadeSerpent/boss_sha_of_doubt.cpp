@@ -280,7 +280,7 @@ public:
 									z = player->GetPositionZ();
 									o = player->GetOrientation();
 									figment->Relocate(x, y, z + 5.0f, o);
-									player->CastSpell(figment, SPELL_FIGMENT_OF_DOUBT_CLONE);
+									//player->CastSpell(figment, SPELL_FIGMENT_OF_DOUBT_CLONE);
 									figment->SetDisplayId(player->GetDisplayId());
 								}
 							}
