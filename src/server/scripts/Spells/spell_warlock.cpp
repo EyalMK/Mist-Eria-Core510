@@ -1323,14 +1323,30 @@ class spell_warl_burning_embers : public SpellScriptLoader
                 if (!GetOwner())
                     return;
 
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "TERAH DEBUG PROC, spellid = %d", eventInfo.GetDamageInfo()->GetSpellInfo()->Id);
+				uint32 spellId = eventInfo.GetDamageInfo()->GetSpellInfo()->Id;
+				int32 embers = 0;
+				bool crit = (eventInfo.GetHitMask() & PROC_HIT_CRITICAL);
+
+				switch(spellId)
+				{
+				case 17962:
+				case 77799:
+				case 29722:
+					embers = 1;
+					if (crit)
+						embers *= 2;
+					break;
+				case 348:
+					embers = crit ? 2 : 0;
+					break;
+				default:
+					return;
+				}
 
                 if (Player* _player = GetOwner()->ToPlayer())
                 {
-					if(eventInfo.GetHitMask() & PROC_HIT_CRITICAL)
-						_player->ModifyPower(POWER_BURNING_EMBERS, 2);
-					else
-						_player->ModifyPower(POWER_BURNING_EMBERS, 1);
+					_player->ModifyPower(POWER_BURNING_EMBERS, embers);
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "### DEBUG TERAH ### \n### BURNING EMBERS : %d ###", _player->GetPower(POWER_BURNING_EMBERS));
                 }
             }
 
