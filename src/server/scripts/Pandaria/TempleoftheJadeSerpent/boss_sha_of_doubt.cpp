@@ -113,14 +113,17 @@ public:
 				fiftyPct = false;
 				boundsCount = 0;
 
+				events.SetPhase(PHASE_NULL);
+				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, FAIL);
+
 				me->CombatStop();
 				me->DeleteThreatList();
 
 				if (me->HasAura(SPELL_BOUNDS_OF_REALITY))
 					me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
 
-				events.SetPhase(PHASE_NULL);
-				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, FAIL);
+				if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
+					go->UseDoorOrButton();
 
 				std::list<Creature*> figments;
 				me->GetCreatureListWithEntryInGrid(figments, NPC_FIGMENT_OF_DOUBT, 99999.0f);
@@ -153,9 +156,6 @@ public:
 				return;
 
 			events.Update(diff);
-
-			if (me->HasUnitState(UNIT_STATE_CASTING))
-				return;
 
 			if (HealthBelowPct(75) && events.IsInPhase(PHASE_COMBAT) && !seventyFivePct)
 			{
@@ -321,8 +321,8 @@ public:
 									z = player->GetPositionZ();
 									o = player->GetOrientation();
 									figment->Relocate(x, y, z + 2.0f, o);
-									player->CastSpell(figment, SPELL_FIGMENT_OF_DOUBT_CLONE);
-									//figment->SetDisplayId(player->GetDisplayId());
+									//player->CastSpell(figment, SPELL_FIGMENT_OF_DOUBT_CLONE);
+									figment->SetDisplayId(player->GetDisplayId());
 								}
 				}
 			}
@@ -344,6 +344,8 @@ public:
 				else
 					if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 					{
+						sha->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+						sha->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 						sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, sha->GetGUID());
 						me->DespawnOrUnsummon();
 					}
