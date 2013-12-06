@@ -1323,7 +1323,7 @@ class spell_warl_burning_embers : public SpellScriptLoader
                 if (!GetOwner())
                     return;
 
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "TERAH DEBUG PROC, spellid = %d", eventInfo.GetSpellInfo()->Id);
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "TERAH DEBUG PROC, spellid = %d", eventInfo.GetDamageInfo()->GetSpellInfo()->Id);
 
                 if (Player* _player = GetOwner()->ToPlayer())
                 {
