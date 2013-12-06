@@ -1320,12 +1320,12 @@ class spell_warl_burning_embers : public SpellScriptLoader
 
             void OnProcHandler(ProcEventInfo& eventInfo)
             {
-                if (!GetCaster())
+                if (!GetOwner())
                     return;
 
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "TERAH DEBUG PROC, spellid = %d", eventInfo.GetSpellInfo()->Id);
 
-                if (Player* _player = GetCaster()->ToPlayer())
+                if (Player* _player = GetOwner()->ToPlayer())
                 {
 					if(eventInfo.GetHitMask() & PROC_HIT_CRITICAL)
 						_player->ModifyPower(POWER_BURNING_EMBERS, 2);
