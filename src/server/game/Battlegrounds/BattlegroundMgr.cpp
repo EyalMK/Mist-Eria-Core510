@@ -478,7 +478,7 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
         data->WriteBit(guid[6]);
         data->WriteBit(guid[1]);
         data->WriteBit(field38); //field38
-        data->WriteBit(player->GetBGTeam() == HORDE ? 0 : 1); //dwordF8+12
+        data->WriteBit((player && player->GetBGTeam() == HORDE) ? 0 : 1); //dwordF8+12
         data->WriteBit(guid[5]);
 
 
@@ -546,7 +546,7 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
         data->WriteByteSeq(guid[3]);
         data->WriteByteSeq(guid[2]);
 
-        *data << int32(player->GetPrimaryTalentTree(player->GetActiveSpec()));
+        *data << int32(player ? player->GetPrimaryTalentTree(player->GetActiveSpec()): 0);
 
         if(field40)
             *data << uint32(0);

@@ -1307,6 +1307,61 @@ class spell_warl_grimoire_of_sacrifice : public SpellScriptLoader
         }
 };
 
+
+// Burning Embers - 108647
+class spell_warl_burning_embers : public SpellScriptLoader
+{
+    public:
+        spell_warl_burning_embers() : SpellScriptLoader("spell_warl_burning_embers") { }
+
+        class spell_warl_burning_embers_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warl_burning_embers_AuraScript);
+
+            void OnProcHandler(ProcEventInfo& eventInfo)
+            {
+                if (!GetOwner())
+                    return;
+
+				uint32 spellId = eventInfo.GetDamageInfo()->GetSpellInfo()->Id;
+				int32 embers = 0;
+				bool crit = (eventInfo.GetHitMask() & PROC_HIT_CRITICAL);
+
+				switch(spellId)
+				{
+				case 17962:
+				case 77799:
+				case 29722:
+					embers = 1;
+					if (crit)
+						embers *= 2;
+					break;
+				case 348:
+					embers = crit ? 2 : 0;
+					break;
+				default:
+					return;
+				}
+
+                if (Player* _player = GetOwner()->ToPlayer())
+                {
+					_player->ModifyPower(POWER_BURNING_EMBERS, embers);
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "### DEBUG TERAH ### \n### BURNING EMBERS : %d ###", _player->GetPower(POWER_BURNING_EMBERS));
+                }
+            }
+
+            void Register()
+            {
+				OnProc += AuraProcFn(spell_warl_burning_embers_AuraScript::OnProcHandler);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_warl_burning_embers_AuraScript();
+        }
+};
+
 void AddSC_warlock_spell_scripts()
 {
     new spell_warl_bane_of_doom();
@@ -1334,4 +1389,5 @@ void AddSC_warlock_spell_scripts()
 	new spell_warl_burning_rush();
 	new spell_warl_harvest_life();
 	new spell_warl_grimoire_of_sacrifice();
+	new spell_warl_burning_embers();
 }

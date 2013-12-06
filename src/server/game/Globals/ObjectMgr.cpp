@@ -2459,7 +2459,7 @@ void ObjectMgr::LoadItemTemplates()
     //                                        126            127                  128       129                130        131
                                              "GemProperties, ArmorDamageModifier, Duration, ItemLimitCategory, HolidayId, StatScalingFactor, "
     //                                        132                     133
-                                             "CurrencySubstitutionId, CurrencySubstitutionCount "
+                                             "CurrencySubstitutionId, CurrencySubstitutionCount, DisenchantID "
                                              "FROM item_template");
 
     if (result)
@@ -2573,6 +2573,7 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.CurrencySubstitutionId    = fields[132].GetInt32();
             itemTemplate.CurrencySubstitutionCount = fields[133].GetInt32();
             itemTemplate.ScriptId                  = 0;
+            itemTemplate.DisenchantID              = fields[134].GetInt32();
             itemTemplate.FoodType                  = 0;
             itemTemplate.MinMoneyLoot              = 0;
             itemTemplate.MaxMoneyLoot              = 0;
