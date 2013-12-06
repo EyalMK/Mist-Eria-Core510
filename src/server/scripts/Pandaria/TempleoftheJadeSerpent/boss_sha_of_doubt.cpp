@@ -193,7 +193,7 @@ public:
 						case EVENT_WITHER_WILL:
 							me->CastSpell(me, SPELL_WITHER_WILL);
 
-							events.ScheduleEvent(EVENT_WITHER_WILL, 7*IN_MILLISECONDS);
+							events.ScheduleEvent(EVENT_WITHER_WILL, 7*IN_MILLISECONDS, 0, PHASE_COMBAT);
 							break;
 
 						case EVENT_TOUCH_OF_NOTHINGNESS:
@@ -201,7 +201,7 @@ public:
 								if (target && target->GetTypeId() == TYPEID_PLAYER)
 									target->CastSpell(target, SPELL_TOUCH_OF_NOTHINGNESS);
 
-							events.ScheduleEvent(EVENT_TOUCH_OF_NOTHINGNESS, 18*IN_MILLISECONDS);
+							events.ScheduleEvent(EVENT_TOUCH_OF_NOTHINGNESS, 18*IN_MILLISECONDS, 0, PHASE_COMBAT);
 							break;
 
 						case EVENT_MOVE_TO_THE_CENTER:
