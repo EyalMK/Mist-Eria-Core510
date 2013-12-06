@@ -174,7 +174,10 @@ public:
 
 			if (events.IsInPhase(PHASE_BOUNDS_OF_REALITY) && !boundsOfReality)
 				if (me->FindNearestCreature(NPC_SHA_TRIGGER, 0.1f, true))
+				{
 					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 0, 0, PHASE_BOUNDS_OF_REALITY);
+					events.ScheduleEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT, 0, 0, PHASE_BOUNDS_OF_REALITY);
+				}
 
 			if (boundsOfReality && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
 			{
@@ -229,15 +232,13 @@ public:
 							if (boundsCount == 2)
 								fiftyPct = true;
 
-							events.ScheduleEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT, 0, 0, PHASE_BOUNDS_OF_REALITY);
 							events.CancelEvent(EVENT_BOUNDS_OF_REALITY);
 							break;
 						}
 
 						case EVENT_SUMMON_FIGMENT_OF_DOUBT:
 						{
-							if (me->HasAura(SPELL_BOUNDS_OF_REALITY))
-								boundsOfReality = true;
+							boundsOfReality = true;
 
 							map = me->GetMap();
 
