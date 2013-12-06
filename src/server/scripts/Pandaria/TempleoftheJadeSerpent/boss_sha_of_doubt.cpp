@@ -113,8 +113,22 @@ public:
 				fiftyPct = false;
 				boundsCount = 0;
 
+				me->CombatStop();
+				me->DeleteThreatList();
+
+				if (me->HasAura(SPELL_BOUNDS_OF_REALITY))
+					me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
+
 				events.SetPhase(PHASE_NULL);
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, FAIL);
+
+				std::list<Creature*> figments;
+				me->GetCreatureListWithEntryInGrid(figments, NPC_FIGMENT_OF_DOUBT, 99999.0f);
+				if (!figments.empty())
+				{
+					for (std::list<Creature*>::iterator itr = figments.begin(); itr != figments.end(); ++itr)
+						(*itr)->DespawnOrUnsummon();
+				}
 			}
 		}
 
