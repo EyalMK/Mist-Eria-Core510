@@ -147,7 +147,7 @@ public:
 			events.ScheduleEvent(EVENT_TOUCH_OF_NOTHINGNESS, 8*IN_MILLISECONDS, 0, PHASE_COMBAT);
 
 			if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
-					go->UseDoorOrButton();
+					go->Use(me);
 		}
 		
 		void UpdateAI(uint32 diff)
@@ -227,7 +227,6 @@ public:
 								me->SetOrientation(4.410300f);
 								me->CastSpell(me, SPELL_BOUNDS_OF_REALITY);
 								events.ScheduleEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT, 0, 0, PHASE_BOUNDS_OF_REALITY);
-								boundsOfReality = true;
 							}
 
 							events.CancelEvent(EVENT_BOUNDS_OF_REALITY);
@@ -236,6 +235,8 @@ public:
 
 						case EVENT_SUMMON_FIGMENT_OF_DOUBT:
 						{
+							boundsOfReality = true;
+
 							map = me->GetMap();
 
 							if (map && map->IsDungeon())
