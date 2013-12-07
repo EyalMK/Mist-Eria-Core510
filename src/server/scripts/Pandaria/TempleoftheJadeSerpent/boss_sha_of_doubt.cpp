@@ -171,7 +171,8 @@ public:
 
 			if (HealthBelowPct(75) && !seventyFivePct)
 			{
-				events.ScheduleEvent(EVENT_MOVE_TO_THE_CENTER, 1*IN_MILLISECONDS, 0, PHASE_BOUNDS_OF_REALITY);
+				events.ScheduleEvent(EVENT_MOVE_TO_THE_CENTER, 0, 0, PHASE_BOUNDS_OF_REALITY);
+				events.ScheduleEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT, 0, 0, PHASE_BOUNDS_OF_REALITY);
 				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
 				seventyFivePct = true;
 			}
@@ -183,25 +184,17 @@ public:
 				fiftyPct = true;
 			}
 
-			if (events.IsInPhase(PHASE_BOUNDS_OF_REALITY) && !boundsOfReality)
+			if (events.IsInPhase(PHASE_BOUNDS_OF_REALITY) && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
 				if (me->FindNearestCreature(NPC_SHA_TRIGGER, 0.1f, true))
-				{
-					me->CastSpell(me, SPELL_BOUNDS_OF_REALITY);
+					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 1, 0, PHASE_BOUNDS_OF_REALITY);
 
-					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 0, 0, PHASE_BOUNDS_OF_REALITY);
-					events.ScheduleEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT, 0, 0, PHASE_BOUNDS_OF_REALITY);
-				}
-
-			if (boundsOfReality)
-				if (!me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f))
-				{
-					me->InterruptSpell(CURRENT_CHANNELED_SPELL);
-					me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
-					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-					events.SetPhase(PHASE_COMBAT);
-					boundsOfReality = false;
-				}
+			if (boundsOfReality && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
+				me->InterruptSpell(CURRENT_CHANNELED_SPELL);
+				me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+				events.SetPhase(PHASE_COMBAT);
+				boundsOfReality = false;
 
 			while (uint32 eventId = events.ExecuteEvent())
 			{
@@ -233,10 +226,12 @@ public:
 						case EVENT_BOUNDS_OF_REALITY:
 							if (Creature* trigger = me->FindNearestCreature(NPC_SHA_TRIGGER, 99999.0f, true))
 							{
+								me->CastSpell(me, SPELL_BOUNDS_OF_REALITY);
 								me->Relocate(trigger->GetHomePosition());
 								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->SetOrientation(4.410300f);
+								boundsOfReality = true;
 							}
 
 							events.CancelEvent(EVENT_BOUNDS_OF_REALITY);
@@ -253,10 +248,7 @@ public:
 								if (!PlayerList.isEmpty())
 									for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 										if (Unit* player = i->getSource()->ToPlayer())
-										{
 											player->CastSpell(player, SPELL_FIGMENT_OF_DOUBT);
-											boundsOfReality = true;
-										}
 							}
 
 							events.CancelEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT);
