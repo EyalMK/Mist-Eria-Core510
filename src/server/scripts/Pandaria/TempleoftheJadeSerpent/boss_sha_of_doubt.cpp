@@ -193,7 +193,7 @@ public:
 				}
 
 			if (boundsOfReality)
-				if (!me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
+				if (!me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f))
 				{
 					me->InterruptSpell(CURRENT_CHANNELED_SPELL);
 					me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
@@ -203,9 +203,9 @@ public:
 					boundsOfReality = false;
 				}
 
-			while(uint32 eventId = events.ExecuteEvent())
+			while (uint32 eventId = events.ExecuteEvent())
 			{
-				switch(eventId)
+				switch (eventId)
 				{
 					if (instance)
 					{
@@ -231,7 +231,6 @@ public:
 							break;
 
 						case EVENT_BOUNDS_OF_REALITY:
-						{
 							if (Creature* trigger = me->FindNearestCreature(NPC_SHA_TRIGGER, 99999.0f, true))
 							{
 								me->Relocate(trigger->GetHomePosition());
@@ -242,7 +241,6 @@ public:
 
 							events.CancelEvent(EVENT_BOUNDS_OF_REALITY);
 							break;
-						}
 
 						case EVENT_SUMMON_FIGMENT_OF_DOUBT:
 						{
@@ -341,10 +339,10 @@ public:
         {
 			if (instance)
 			{
-				if (me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
+				/*if (me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f))
 					me->DespawnOrUnsummon();
 
-				if (!me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
+				if (!me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f))
 					if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 					{
 						sha->InterruptSpell(CURRENT_CHANNELED_SPELL);
@@ -352,7 +350,9 @@ public:
 						sha->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 						sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, sha->GetGUID());
 						me->DespawnOrUnsummon();
-					}
+					}*/
+
+				me->DespawnOrUnsummon();
 			}
         }
 
