@@ -333,9 +333,6 @@ public:
         {
 			if (instance)
 			{
-				/*if (me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f))
-					me->DespawnOrUnsummon();
-
 				if (!me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f))
 					if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 					{
@@ -344,7 +341,7 @@ public:
 						sha->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 						sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, sha->GetGUID());
 						me->DespawnOrUnsummon();
-					}*/
+					}
 
 				me->DespawnOrUnsummon();
 			}
