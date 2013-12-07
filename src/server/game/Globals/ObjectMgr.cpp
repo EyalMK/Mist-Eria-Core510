@@ -1041,7 +1041,7 @@ void ObjectMgr::LoadEquipmentTemplates()
     {
         Field* fields = result->Fetch();
 
-        uint16 entry = fields[0].GetUInt32();
+        uint32 entry = fields[0].GetUInt32();
 
         EquipmentInfo& equipmentInfo = _equipmentInfoStore[entry];
 
