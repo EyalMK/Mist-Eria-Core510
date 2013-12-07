@@ -262,11 +262,8 @@ std::string PlayerTaxi::SaveTaxiDestinationsToString()
 
     std::ostringstream ss;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE Taxi size : %u", m_TaxiDestinations.size());
-
     for (std::list<uint32>::const_iterator it = m_TaxiDestinations.begin() ; it != m_TaxiDestinations.end() ; ++it) {
         ss << *it << ' ';
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE Taxi : %u", *it);
     }
     return ss.str();
 }
@@ -1860,8 +1857,6 @@ void Player::Update(uint32 p_time)
     //we should execute delayed teleports only for alive(!) players
     //because we don't want player's ghost teleported from graveyard
     if (IsHasDelayedTeleport() && isAlive()) {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE is delayed teleport");
-
         TeleportTo(m_teleport_dest, m_teleport_options);
     }
 }
@@ -2173,12 +2168,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
     if (m_transport)
     {
-
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE m_transport at teleport");
         if (!(options & TELE_TO_NOT_LEAVE_TRANSPORT))
         {
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE m_transport at teleport FCK FCK FCK");
-
             m_transport->RemovePassenger(this);
             m_transport = NULL;
             m_movementInfo.t_pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
@@ -2257,7 +2248,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         //Map* map = sMapMgr->FindBaseNonInstanceMap(mapid);
         //if (!map || map->CanEnter(this))
         {
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE teleportto test 1");
             //lets reset near teleport flag if it wasn't reset during chained teleports
             SetSemaphoreTeleportNear(false);
             //setup delayed teleport flag
@@ -2266,8 +2256,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             //then we need to delay it until update process will be finished
             if (IsHasDelayedTeleport())
             {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE teleportto test 2 %u %u %f %f %f", GetMapId(), mapid, x, y, z);
-
                 SetSemaphoreTeleportFar(true);
                 //lets save teleport destination for player
                 m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);

@@ -1165,7 +1165,7 @@ enum Opcodes
     SMSG_PARTY_COMMAND_RESULT                         = 0x0980,//16357
     SMSG_PARTY_MEMBER_STATS                           = 0x09A0,//16357
     SMSG_PARTY_MEMBER_STATS_FULL                      = 0x08A9,//16357
-    SMSG_PAUSE_MIRROR_TIMER                           = 0x1989,
+    SMSG_PAUSE_MIRROR_TIMER                           = 0x0BAD,//16357
     SMSG_PERIODICAURALOG                              = 0x0540,//16357
     SMSG_PETGODMODE                                   = 0x0260,//16357
     SMSG_PETITION_ALREADY_SIGNED                      = 0xC39, //16357
@@ -1366,10 +1366,10 @@ enum Opcodes
     SMSG_SPLINE_MOVE_WATER_WALK                       = 0x2112,
     SMSG_STABLE_RESULT                                = 0x0EE5,//16357
     SMSG_STANDSTATE_UPDATE                            = 0x0180,//16357
-    SMSG_START_MIRROR_TIMER                           = 0x2115,
+    SMSG_START_MIRROR_TIMER                           = 0x0A20,//16357
     SMSG_START_TIMER                                  = 0x9B0, //16357
     SMSG_STOP_DANCE                                   = 0x0680,//16357
-    SMSG_STOP_MIRROR_TIMER                            = 0x2118,
+    SMSG_STOP_MIRROR_TIMER                            = 0x0E41,//16357
     SMSG_STREAMING_MOVIE                              = 0x9FD, //16357
     SMSG_SUMMON_CANCEL                                = 0x2119,
     SMSG_SUMMON_REQUEST                               = 0x092D,//16357

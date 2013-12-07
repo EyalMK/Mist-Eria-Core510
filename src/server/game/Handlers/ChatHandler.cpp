@@ -45,9 +45,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     uint32 type = 0;
     uint32 lang;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE chat test : %u", recvData.GetOpcode());
-
-
 
     switch (recvData.GetOpcode())
     {
@@ -531,7 +528,6 @@ void WorldSession::HandleAddonMessagechatOpcode(WorldPacket& recvData)
     Player* sender = GetPlayer();
     ChatMsg type;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE chat test : %u", recvData.GetOpcode());
     switch (recvData.GetOpcode())
     {
     /*case CMSG_MESSAGECHAT_ADDON_BATTLEGROUND:
