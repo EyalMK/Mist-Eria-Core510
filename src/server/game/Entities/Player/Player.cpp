@@ -2416,6 +2416,8 @@ void Player::ProcessDelayedOperations()
         SetPower(POWER_HOLY_POWER, 0);
 		SetPower(POWER_CHAOS_ORB, 0);
 		SetPower(POWER_BURNING_EMBERS, 0);
+		SetPower(POWER_DEMONIC_FURY, 0);
+		SetPower(POWER_SOUL_SHARDS, 0);
         SetPower(POWER_RUNIC_POWER, 0);
         SetPower(POWER_FOCUS, GetMaxPower(POWER_FOCUS));
 
@@ -2780,6 +2782,12 @@ void Player::ResetAllPowers()
 			break;
 		case POWER_BURNING_EMBERS:
 			SetPower(POWER_BURNING_EMBERS, 0);
+			break;
+		case POWER_DEMONIC_FURY:
+			SetPower(POWER_DEMONIC_FURY, 0);
+			break;
+		case POWER_SOUL_SHARDS:
+			SetPower(POWER_SOUL_SHARDS, 0);
 			break;
         case POWER_RUNIC_POWER:
             SetPower(POWER_RUNIC_POWER, 0);
@@ -5149,6 +5157,8 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         SetPower(POWER_HOLY_POWER, 0);
 		SetPower(POWER_CHAOS_ORB, 0);
 		SetPower(POWER_BURNING_EMBERS, 0);
+		SetPower(POWER_DEMONIC_FURY, 0);
+		SetPower(POWER_SOUL_SHARDS, 0);
         SetPower(POWER_RUNIC_POWER, 0);
     }
 
@@ -23926,6 +23936,8 @@ void Player::ResurectUsingRequestData()
     SetPower(POWER_HOLY_POWER, 0);
 	SetPower(POWER_CHAOS_ORB, 0);
 	SetPower(POWER_BURNING_EMBERS, 0);
+	SetPower(POWER_DEMONIC_FURY, 0);
+	SetPower(POWER_SOUL_SHARDS, 0);
     SetPower(POWER_RUNIC_POWER, 0);
 
     if (uint32 aura = _resurrectionData->Aura)

@@ -568,8 +568,6 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
 
         value += apdamage + spdamage;
 
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "PEXIRN : DAMAGE Spell Id(%u) Effect(%u) : %f damage with %f flat, %f (%f %) from AP (%i AP), %f (%f %) from SP (%i SP)",
-            _spellInfo->Id, _effIndex, value, flat, apdamage, _spellInfo->APMultiplier, ap, spdamage, SPMultiplier, sp);
     }
 
     return int32(value);
