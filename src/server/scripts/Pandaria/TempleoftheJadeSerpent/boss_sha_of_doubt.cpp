@@ -189,12 +189,14 @@ public:
 					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 1, 0, PHASE_BOUNDS_OF_REALITY);
 
 			if (boundsOfReality && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
+			{
 				me->InterruptSpell(CURRENT_CHANNELED_SPELL);
 				me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				events.SetPhase(PHASE_COMBAT);
 				boundsOfReality = false;
+			}
 
 			while (uint32 eventId = events.ExecuteEvent())
 			{
