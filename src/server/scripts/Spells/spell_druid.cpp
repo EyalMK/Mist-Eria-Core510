@@ -41,6 +41,7 @@ enum DruidSpells
     SPELL_DRUID_SOLAR_ECLIPSE_MARKER        = 67483, // Will make the yellow arrow on eclipse bar point to the yellow side (solar)
     SPELL_DRUID_SOLAR_ECLIPSE               = 48517,
     SPELL_DRUID_LUNAR_ECLIPSE               = 48518,
+	SPELL_DRUID_EUPHORIA					= 81062,
     SPELL_DRUID_ENRAGE_MOD_DAMAGE           = 51185,
     SPELL_DRUID_GLYPH_OF_TYPHOON            = 62135,
     SPELL_DRUID_IDOL_OF_FERAL_SHADOWS       = 34241,
@@ -414,7 +415,8 @@ class spell_dru_eclipse_energize : public SpellScriptLoader
 				if(!caster)
 					return;
 
-				int32 eclipse = caster->GetPower(POWER_ECLIPSE) + val;
+				caster->CastCustomSpell(caster, SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE, &val, 0, 0, true);
+				int32 eclipse = caster->GetPower(POWER_ECLIPSE);
 
 				if(!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER) && !caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
 				{
@@ -455,27 +457,7 @@ class spell_dru_eclipse_energize : public SpellScriptLoader
 					caster->CastSpell(caster, SPELL_DRUID_LUNAR_ECLIPSE, true);
 					caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE_MARKER, true);
 				}
-
-				/*
-				//Check marckers auras
-				if (caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
-				{
-					if(caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
-						caster->RemoveAurasDueToSpell(SPELL_DRUID_LUNAR_ECLIPSE_MARKER);
-					if(!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
-						caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE_MARKER, true);
-				}
-
-				if (caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
-				{
-					if(caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
-						caster->RemoveAurasDueToSpell(SPELL_DRUID_SOLAR_ECLIPSE_MARKER);
-					if(!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
-						caster->CastSpell(caster, SPELL_DRUID_LUNAR_ECLIPSE_MARKER, true);
-				}
-				*/
-
-				caster->SetPower(POWER_ECLIPSE, eclipse);
+				
 			};
 
             void HandleEnergize(SpellEffIndex effIndex)
@@ -512,6 +494,10 @@ class spell_dru_eclipse_energize : public SpellScriptLoader
                         break;
                     }
                 }
+
+				if (caster->HasAura(SPELL_DRUID_EUPHORIA))
+					if(!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE) && !caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE))
+						energizeAmount *= 2;
 
 				ModEclipsePower(energizeAmount);
             }
