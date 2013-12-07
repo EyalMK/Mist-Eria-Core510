@@ -259,6 +259,84 @@ MovementStatusElements MovementFallLandSequence[] =
 };
 
 //5.1.0 16357 OK
+MovementStatusElements MovementFallResetSequence[] =
+{
+    MSEPositionY,
+    MSEPositionX,
+    MSEPositionZ,
+    MSEHasGuidByte2,
+    MSEHasPitch,
+    MSEHasGuidByte0,
+    MSEZeroBit,
+    MSEHasOrientation,
+    MSEIsAlive,
+    MSEZeroBit,
+    MSEHasFallData,
+    MSEHasCounter,
+    MSEHasMovementFlags2,
+    MSEHasSpline,
+    MSEHasGuidByte7,
+    MSEHasTransportData,
+    MSEHasTimestamp,
+    MSEHasGuidByte5,
+    MSEHasSplineElevation,
+    MSEHasGuidByte3,
+    MSEHasMovementFlags,
+    MSEHasGuidByte1,
+    MSEHasGuidByte4,
+    MSEHasGuidByte6,
+    MSEHasTransportGuidByte4,
+    MSEHasTransportGuidByte1,
+    MSEHasTransportTime3,
+    MSEHasTransportGuidByte2,
+    MSEHasTransportGuidByte3,
+    MSEHasTransportGuidByte7,
+    MSEHasTransportGuidByte0,
+    MSEHasTransportTime2,
+    MSEHasTransportGuidByte5,
+    MSEHasTransportGuidByte6,
+    MSEHasFallDirection,
+    MSEMovementFlags2,
+    MSEMovementFlags,
+    MSEGuidByte1,
+    MSEGuidByte0,
+    MSEGuidByte7,
+    MSECounter,
+    MSEGuidByte5,
+    MSEGuidByte6,
+    MSEGuidByte2,
+    MSEGuidByte3,
+    MSEGuidByte4,
+    MSETransportPositionX,
+    MSETransportGuidByte0,
+    MSETransportTime2,
+    MSETransportGuidByte4,
+    MSETransportGuidByte5,
+    MSETransportGuidByte3,
+    MSETransportSeat,
+    MSETransportGuidByte7,
+    MSETransportOrientation,
+    MSETransportPositionZ,
+    MSETransportPositionY,
+    MSETransportGuidByte6,
+    MSETransportTime,
+    MSETransportGuidByte2,
+    MSETransportTime3,
+    MSETransportGuidByte1,
+    MSEPitch,
+    MSEFallCosAngle,
+    MSEFallSinAngle,
+    MSEFallHorizontalSpeed,
+    MSEFallVerticalSpeed,
+    MSEFallTime,
+    MSEOrientation,
+    MSETimestamp,
+    MSESplineElevation,
+    MSEAlive,
+    MSEEnd,
+};
+
+//5.1.0 16357 OK
 MovementStatusElements MovementHeartBeatSequence[] =
 {
     MSEPositionX,
@@ -2376,6 +2454,8 @@ MovementStatusElements* GetMovementStatusElementsSequence(Opcodes opcode)
 {
     switch (opcode)
     {
+    case CMSG_MOVE_FALL_RESET:
+        return MovementFallResetSequence;
     case MSG_MOVE_FALL_LAND:
         return MovementFallLandSequence;
     case MSG_MOVE_HEARTBEAT:
