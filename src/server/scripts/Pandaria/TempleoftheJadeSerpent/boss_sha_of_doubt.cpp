@@ -99,7 +99,22 @@ public:
 		void JustDied(Unit *pWho)
 		{
 			if (instance)
-					instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, DONE);
+			{
+				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, DONE);
+
+				map = me->GetMap();
+
+				if (map && map->IsDungeon())
+				{
+					Map::PlayerList const &PlayerList = map->GetPlayers();
+
+					if (!PlayerList.isEmpty())
+						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+							if (player = i->getSource()->ToPlayer())
+								if (player->HasAura(SPELL_TOUCH_OF_NOTHINGNESS))
+									player->RemoveAurasDueToSpell(SPELL_TOUCH_OF_NOTHINGNESS, player->GetGUID());
+				}
+			}
 		}
 
 		void KilledUnit(Unit *pWho) {	}
