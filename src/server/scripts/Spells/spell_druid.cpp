@@ -42,6 +42,7 @@ enum DruidSpells
     SPELL_DRUID_SOLAR_ECLIPSE               = 48517,
     SPELL_DRUID_LUNAR_ECLIPSE               = 48518,
 	SPELL_DRUID_EUPHORIA					= 81062,
+	SPELL_DRUID_SOUL_OF_THE_FOREST			= 114107,
     SPELL_DRUID_ENRAGE_MOD_DAMAGE           = 51185,
     SPELL_DRUID_GLYPH_OF_TYPHOON            = 62135,
     SPELL_DRUID_IDOL_OF_FERAL_SHADOWS       = 34241,
@@ -415,9 +416,7 @@ class spell_dru_eclipse_energize : public SpellScriptLoader
 				if(!caster)
 					return;
 
-				caster->CastCustomSpell(caster, SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE, &val, 0, 0, true);
-				int32 eclipse = caster->GetPower(POWER_ECLIPSE);
-
+				//If the player has just logged in
 				if(!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER) && !caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
 				{
 					caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE_MARKER, true);
@@ -425,19 +424,35 @@ class spell_dru_eclipse_energize : public SpellScriptLoader
 						caster->RemoveAurasDueToSpell(SPELL_DRUID_LUNAR_ECLIPSE);
 					if (caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE))
 						caster->RemoveAurasDueToSpell(SPELL_DRUID_SOLAR_ECLIPSE);
-					eclipse = 0;
 				}
+
+				// Prevent eclipse to got in the wrong direction
+				if(caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER) && val < 0)
+					return;
+				if(caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER) && val > 0)
+					return;
+
+				caster->CastCustomSpell(caster, SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE, &val, 0, 0, true);
+				int32 eclipse = caster->GetPower(POWER_ECLIPSE);
 
 				//Removing eclipses auras when passing 0
 				if (eclipse >= 0)
 				{
 					if (caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE))
+					{
 						caster->RemoveAurasDueToSpell(SPELL_DRUID_LUNAR_ECLIPSE);
+						if(caster->HasAura(SPELL_DRUID_SOUL_OF_THE_FOREST))
+							ModEclipsePower(20);
+					}
 				}
 				if (eclipse <= 0)
 				{
 					if (caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE))
+					{
 						caster->RemoveAurasDueToSpell(SPELL_DRUID_SOLAR_ECLIPSE);
+						if(caster->HasAura(SPELL_DRUID_SOUL_OF_THE_FOREST))
+							ModEclipsePower(-20);
+					}
 				}
 
 				//Check if player has reached an eclipse
@@ -445,7 +460,6 @@ class spell_dru_eclipse_energize : public SpellScriptLoader
 				{
 					if (caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
 						caster->RemoveAurasDueToSpell(SPELL_DRUID_SOLAR_ECLIPSE_MARKER);
-					eclipse = 100;
 					caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE, true);
 					caster->CastSpell(caster, SPELL_DRUID_LUNAR_ECLIPSE_MARKER, true);
 				}
@@ -453,7 +467,6 @@ class spell_dru_eclipse_energize : public SpellScriptLoader
 				{
 					if (caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
 						caster->RemoveAurasDueToSpell(SPELL_DRUID_LUNAR_ECLIPSE_MARKER);
-					eclipse = -100;
 					caster->CastSpell(caster, SPELL_DRUID_LUNAR_ECLIPSE, true);
 					caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE_MARKER, true);
 				}
