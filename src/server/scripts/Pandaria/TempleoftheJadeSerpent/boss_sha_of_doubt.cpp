@@ -74,11 +74,9 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 		Map* map;
-		Unit* player;
 		bool boundsOfReality;
 		bool seventyFivePct;
 		bool fiftyPct;
-		uint32 boundsCount;
 
 		void Reset()
 		{		
@@ -89,7 +87,6 @@ public:
 				boundsOfReality = false;
 				seventyFivePct = false;
 				fiftyPct = false;
-				boundsCount = 0;
 
 				events.SetPhase(PHASE_NULL);
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, NOT_STARTED);
@@ -110,7 +107,7 @@ public:
 
 					if (!PlayerList.isEmpty())
 						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-							if (player = i->getSource()->ToPlayer())
+							if (Unit* player = i->getSource()->ToPlayer())
 								if (player->HasAura(SPELL_TOUCH_OF_NOTHINGNESS))
 									player->RemoveAurasDueToSpell(SPELL_TOUCH_OF_NOTHINGNESS, player->GetGUID());
 				}
@@ -126,7 +123,6 @@ public:
 				boundsOfReality = false;
 				seventyFivePct = false;
 				fiftyPct = false;
-				boundsCount = 0;
 
 				events.SetPhase(PHASE_NULL);
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, FAIL);
@@ -168,46 +164,43 @@ public:
 		
 		void UpdateAI(uint32 diff)
 		{
-			if (!UpdateVictim())
+			if (!UpdateVictim() && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
 				return;
 
 			events.Update(diff);
 
-			if (HealthBelowPct(75) && events.IsInPhase(PHASE_COMBAT) && !seventyFivePct)
+			if (HealthBelowPct(75) && !seventyFivePct)
 			{
-				boundsCount = 1;
-				events.ScheduleEvent(EVENT_MOVE_TO_THE_CENTER, 1*IN_MILLISECONDS, 0, PHASE_BOUNDS_OF_REALITY);
+				events.ScheduleEvent(EVENT_MOVE_TO_THE_CENTER, 0, 0, PHASE_BOUNDS_OF_REALITY);
+				events.ScheduleEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT, 0, 0, PHASE_BOUNDS_OF_REALITY);
 				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
+				seventyFivePct = true;
 			}
 
-			if (HealthBelowPct(50) && events.IsInPhase(PHASE_COMBAT) && !fiftyPct)
+			if (HealthBelowPct(50) && !fiftyPct)
 			{
-				boundsCount = 2;
 				events.ScheduleEvent(EVENT_MOVE_TO_THE_CENTER, 1*IN_MILLISECONDS, 0, PHASE_BOUNDS_OF_REALITY);
 				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
+				fiftyPct = true;
 			}
 
-			if (events.IsInPhase(PHASE_BOUNDS_OF_REALITY) && !boundsOfReality && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
+			if (events.IsInPhase(PHASE_BOUNDS_OF_REALITY) && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
 				if (me->FindNearestCreature(NPC_SHA_TRIGGER, 0.1f, true))
-				{
-					me->CastSpell(me, SPELL_BOUNDS_OF_REALITY);
-
-					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 0, 0, PHASE_BOUNDS_OF_REALITY);
-					events.ScheduleEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT, 0, 0, PHASE_BOUNDS_OF_REALITY);
-				}
+					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 1, 0, PHASE_BOUNDS_OF_REALITY);
 
 			if (boundsOfReality && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
 			{
 				me->InterruptSpell(CURRENT_CHANNELED_SPELL);
+				me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				events.SetPhase(PHASE_COMBAT);
 				boundsOfReality = false;
 			}
 
-			while(uint32 eventId = events.ExecuteEvent())
+			while (uint32 eventId = events.ExecuteEvent())
 			{
-				switch(eventId)
+				switch (eventId)
 				{
 					if (instance)
 					{
@@ -233,30 +226,21 @@ public:
 							break;
 
 						case EVENT_BOUNDS_OF_REALITY:
-						{
 							if (Creature* trigger = me->FindNearestCreature(NPC_SHA_TRIGGER, 99999.0f, true))
 							{
+								me->CastSpell(me, SPELL_BOUNDS_OF_REALITY);
 								me->Relocate(trigger->GetHomePosition());
 								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->SetOrientation(4.410300f);
-								//me->CastSpell(me, SPELL_BOUNDS_OF_REALITY);
+								boundsOfReality = true;
 							}
-
-							if (boundsCount == 1)
-								seventyFivePct = true;
-
-							if (boundsCount == 2)
-								fiftyPct = true;
 
 							events.CancelEvent(EVENT_BOUNDS_OF_REALITY);
 							break;
-						}
 
 						case EVENT_SUMMON_FIGMENT_OF_DOUBT:
 						{
-							boundsOfReality = true;
-
 							map = me->GetMap();
 
 							if (map && map->IsDungeon())
@@ -265,7 +249,7 @@ public:
 
 								if (!PlayerList.isEmpty())
 									for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-										if (player = i->getSource()->ToPlayer())
+										if (Unit* player = i->getSource()->ToPlayer())
 											player->CastSpell(player, SPELL_FIGMENT_OF_DOUBT);
 							}
 
@@ -302,8 +286,8 @@ public:
 
 		InstanceScript* instance;
         EventMap events;
-		Map* map;
 		Unit* player;
+		Map* map;
 		bool emote;
 
         void Reset()
@@ -334,16 +318,7 @@ public:
 						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 							if (player = i->getSource()->ToPlayer())
 								if (Creature* figment = player->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
-								{
-									float x, y, z, o;
-									x = player->GetPositionX();
-									y = player->GetPositionY();
-									z = player->GetPositionZ();
-									o = player->GetOrientation();
-									figment->Relocate(x, y, z, o);
-									//player->CastSpell(figment, SPELL_FIGMENT_OF_DOUBT_CLONE);
 									figment->SetDisplayId(player->GetDisplayId());
-								}
 				}
 			}
 		}
@@ -358,18 +333,17 @@ public:
         {
 			if (instance)
 			{
-				if (me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
-					me->DespawnOrUnsummon(2*IN_MILLISECONDS);
-
-				if (!me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
+				if (!me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f))
 					if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 					{
 						sha->InterruptSpell(CURRENT_CHANNELED_SPELL);
 						sha->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 						sha->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 						sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, sha->GetGUID());
-						me->DespawnOrUnsummon(2*IN_MILLISECONDS);
+						me->DespawnOrUnsummon();
 					}
+
+				me->DespawnOrUnsummon();
 			}
         }
 
