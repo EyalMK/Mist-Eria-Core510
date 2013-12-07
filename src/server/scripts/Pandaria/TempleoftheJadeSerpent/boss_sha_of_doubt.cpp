@@ -164,7 +164,7 @@ public:
 		
 		void UpdateAI(uint32 diff)
 		{
-			if (!UpdateVictim())
+			if (!UpdateVictim() && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
 				return;
 
 			events.Update(diff);
