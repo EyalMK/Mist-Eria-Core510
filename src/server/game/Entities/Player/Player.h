@@ -23,6 +23,9 @@
 #include "GroupReference.h"
 #include "MapReference.h"
 
+#include "BattlePetMgr.h"
+
+
 #include "Item.h"
 #include "PetDefines.h"
 #include "PhaseMgr.h"
