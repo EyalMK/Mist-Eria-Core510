@@ -1282,10 +1282,17 @@ class spell_warr_second_wind : public SpellScriptLoader
         {
             return new spell_warr_second_wind_SpellScript();
         }
+};
 
-        class spell_warr_second_wind_AuraScript : public AuraScript
+// 16491 - Second Wind aura
+class spell_warr_second_wind_aura : public SpellScriptLoader
+{
+    public:
+        spell_warr_second_wind_aura() : SpellScriptLoader("spell_warr_second_wind_aura") { }
+
+        class spell_warr_second_wind_aura_AuraScript : public AuraScript
         {
-            PrepareAuraScript(spell_warr_second_wind_AuraScript);
+            PrepareAuraScript(spell_warr_second_wind_aura_AuraScript);
 
             void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
@@ -1296,17 +1303,17 @@ class spell_warr_second_wind : public SpellScriptLoader
 
             void Register()
             {
-                OnEffectRemove += AuraEffectRemoveFn(spell_warr_second_wind_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                OnEffectRemove += AuraEffectRemoveFn(spell_warr_second_wind_aura_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
         AuraScript* GetAuraScript() const
         {
-            return new spell_warr_second_wind_AuraScript();
+            return new spell_warr_second_wind_aura_AuraScript();
         }
 };
 
-void AddSC_SPELL_WARRIOR_scripts()
+void AddSC_spell_warrior_scripts()
 {
     new spell_warr_bloodthirst();
     new spell_warr_charge();
@@ -1334,5 +1341,5 @@ void AddSC_SPELL_WARRIOR_scripts()
 	new spell_warr_raging_blow_off();
 	new spell_warr_enrage();
 	//new spell_warr_storm_bolt();
-	new spell_warr_second_wind();
+	new spell_warr_second_wind_aura();
 }
