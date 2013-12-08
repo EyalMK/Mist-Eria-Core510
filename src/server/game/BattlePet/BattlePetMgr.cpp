@@ -49,8 +49,8 @@ BattlePetMgr::BattlePetMgr(Player* owner) : m_player(owner)
 
 void BattlePetMgr::GetBattlePetList(PetBattleDataList &battlePetList) const
 {
-    auto spellMap = m_player->GetSpellMap();
-    for (auto itr : spellMap)
+    PlayerSpellMap spellMap = m_player->GetSpellMap();
+    for (PlayerSpell* itr : spellMap)
     {
         if (itr.second->state == PLAYERSPELL_REMOVED)
             continue;
@@ -93,7 +93,7 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
     data->WriteBits(0, 21); // unk counter, may be related to battle pet slot
 
     // bits part
-    for (auto pet : petList)
+    for (PetBattleData pet : petList)
     {
         data->WriteBit(true); // hasBreed, inverse
         data->WriteBit(true); // hasQuality, inverse
@@ -104,7 +104,7 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
     }
 
     // data part
-    for (auto pet : petList)
+    for (PetBattleData pet : petList)
     {
         *data << uint32(pet.m_displayID);
         *data << uint32(pet.m_summonSpellID); // Pet Entry
