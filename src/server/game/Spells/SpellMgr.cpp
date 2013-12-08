@@ -3858,7 +3858,7 @@ void SpellMgr::LoadSpellInfoCorrections()
 					spellInfo->Effects[EFFECT_0].Amplitude = 1000;
 					break;
 				case 106937:
-					spellInfo->Effects[1].Amplitude = 0;
+					spellInfo->Effects[1].Amplitude = 1;
 					break;
 				default:
 					break;
