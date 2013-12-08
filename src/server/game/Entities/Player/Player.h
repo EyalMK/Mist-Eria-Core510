@@ -3178,6 +3178,7 @@ public:
 
         AchievementMgr<Player>* m_achievementMgr;
         ReputationMgr*  m_reputationMgr;
+        BattlePetMgr   m_battlePetMgr;
 
         SpellCooldowns m_spellCooldowns;
 
