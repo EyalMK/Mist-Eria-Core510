@@ -164,9 +164,6 @@ public:
 		
 		void UpdateAI(uint32 diff)
 		{
-			if (!UpdateVictim() && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
-				return;
-
 			events.Update(diff);
 
 			if (HealthBelowPct(75) && !seventyFivePct)
@@ -191,9 +188,12 @@ public:
 			if (boundsOfReality && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
 			{
 				me->InterruptSpell(CURRENT_CHANNELED_SPELL);
+				me->InterruptSpell(CURRENT_GENERIC_SPELL);
+				me->FinishSpell(CURRENT_CHANNELED_SPELL, true);
+				me->FinishSpell(CURRENT_GENERIC_SPELL, true);
 				me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
-				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+				me->GetMotionMaster()->MoveChase(me->getVictim(), 99999.0f);
 				events.SetPhase(PHASE_COMBAT);
 				boundsOfReality = false;
 			}
@@ -230,7 +230,6 @@ public:
 							{
 								me->CastSpell(me, SPELL_BOUNDS_OF_REALITY);
 								me->Relocate(trigger->GetHomePosition());
-								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->SetOrientation(4.410300f);
 								boundsOfReality = true;
@@ -337,9 +336,12 @@ public:
 					if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 					{
 						sha->InterruptSpell(CURRENT_CHANNELED_SPELL);
-						sha->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+						sha->InterruptSpell(CURRENT_GENERIC_SPELL);
+						sha->FinishSpell(CURRENT_CHANNELED_SPELL, true);
+						sha->FinishSpell(CURRENT_GENERIC_SPELL, true);
 						sha->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 						sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, sha->GetGUID());
+						sha->GetMotionMaster()->MoveChase(me->getVictim(), 99999.0f);
 						me->DespawnOrUnsummon();
 					}
 
