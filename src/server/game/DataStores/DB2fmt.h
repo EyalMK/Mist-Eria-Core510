@@ -22,5 +22,6 @@ const char Itemfmt[]="niiiiiii";
 const char ItemCurrencyCostfmt[]="xn";
 const char ItemSparsefmt[]="niiifffiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiifiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiisssssiiiiiiiiiiiiiiiiiiiiiifiiifii"; // i think it's right
 const char ItemExtendedCostEntryfmt[]="nxxiiiiiiiiiiiixiiiiiiiiiixxxxx";
+const char BattlePetSpeciesEntryfmt[]="inxxxxxxx";
 
 #endif

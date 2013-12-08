@@ -2827,6 +2827,13 @@ public:
 
         SpyMgr &GetSpyMgr() {return m_spyMgr;}
 
+        /*********************************************************/
+        /***              BATTLE PET SYSTEM                    ***/
+        /*********************************************************/
+
+        BattlePetMgr& GetBattlePetMgr() { return m_battlePetMgr; }
+        BattlePetMgr const& GetBattlePetMgr() const { return m_battlePetMgr; }
+
     protected:
         // Gamemaster whisper whitelist
         WhisperListContainer WhisperList;
