@@ -1313,7 +1313,7 @@ class spell_warr_second_wind_aura : public SpellScriptLoader
         }
 };
 
-void AddSC_spell_warrior_scripts()
+void AddSC_warrior_spell_scripts()
 {
     new spell_warr_bloodthirst();
     new spell_warr_charge();
