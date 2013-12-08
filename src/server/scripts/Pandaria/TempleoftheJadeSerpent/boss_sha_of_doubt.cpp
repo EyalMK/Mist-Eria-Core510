@@ -39,7 +39,13 @@ enum Events
 
 enum Texts
 {
-
+	SAY_AGGRO		= 0,
+	SAY_DEATH		= 1,
+	SAY_FIGMENT_1	= 2,
+	SAY_FIGMENT_2	= 3,
+	SAY_RESET		= 4,
+	SAY_SLAY_1		= 5,
+	SAY_SLAY_2		= 6
 };
 
 enum Phases
@@ -113,9 +119,14 @@ public:
 									player->RemoveAurasDueToSpell(SPELL_TOUCH_OF_NOTHINGNESS, player->GetGUID());
 				}
 			}
+
+			Talk(SAY_DEATH);
 		}
 
-		void KilledUnit(Unit *pWho) {	}
+		void KilledUnit(Unit *pWho)
+		{
+			Talk(irand(SAY_SLAY_1, SAY_SLAY_2));
+		}
 		
 		void EnterEvadeMode()
 		{
@@ -159,8 +170,10 @@ public:
 			events.ScheduleEvent(EVENT_WITHER_WILL, 2*IN_MILLISECONDS, 0, PHASE_COMBAT);
 			events.ScheduleEvent(EVENT_TOUCH_OF_NOTHINGNESS, 8*IN_MILLISECONDS, 0, PHASE_COMBAT);
 
-			if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
-					go->UseDoorOrButton();
+			/*if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
+					go->UseDoorOrButton(); Close door when combat starts*/
+
+			Talk(SAY_AGGRO);
 		}
 		
 		void UpdateAI(uint32 diff)
@@ -192,17 +205,9 @@ public:
 
 			if (!me->HasAura(SPELL_BOUNDS_OF_REALITY) && boundsOfReality)
 			{
-				me->InterruptSpell(CURRENT_CHANNELED_SPELL);
-				me->InterruptSpell(CURRENT_GENERIC_SPELL);
-				me->FinishSpell(CURRENT_CHANNELED_SPELL, true);
-				me->FinishSpell(CURRENT_GENERIC_SPELL, true);
-				me->RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
-				me->RemoveUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
 				me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-				me->GetMotionMaster()->MoveChase(me->getVictim(), 99999.0f);
 				events.SetPhase(PHASE_COMBAT);
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS Sha of Doubt PHASE COMBAT");
 				boundsOfReality = false;
 			}
 
@@ -214,7 +219,6 @@ public:
 					{
 						case EVENT_WITHER_WILL:
 							me->CastSpell(me, SPELL_WITHER_WILL);
-							sLog->outDebug(LOG_FILTER_NETWORKIO, "Sungis Sha of Doubt WITHER WILL");
 
 							events.ScheduleEvent(EVENT_WITHER_WILL, 7*IN_MILLISECONDS, 0, PHASE_COMBAT);
 							break;
@@ -241,9 +245,7 @@ public:
 								me->Relocate(trigger->GetHomePosition());
 								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->SetOrientation(4.410300f);
-								me->GetMotionMaster()->Clear();
-								me->GetMotionMaster()->MoveIdle();
-								sLog->outDebug(LOG_FILTER_NETWORKIO, "Sungis Sha of Doubt RELOCATE & ORIENTATION");
+								me->GetMotionMaster()->Clear(true);
 							}
 
 							events.ScheduleEvent(EVENT_BOUNDS_DONE, 1, 0, PHASE_BOUNDS_OF_REALITY);
@@ -264,13 +266,14 @@ public:
 											player->CastSpell(player, SPELL_FIGMENT_OF_DOUBT);
 							}
 
+							Talk(irand(SAY_FIGMENT_1, SAY_FIGMENT_2));
+
 							events.CancelEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT);
 							break;
 						}
 						
 						case EVENT_BOUNDS_DONE:
 							boundsOfReality = true;
-							sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS Sha of Doubt phase BOOL BOUNDS DONE");
 
 							events.CancelEvent(EVENT_BOUNDS_DONE);
 							break;
@@ -314,7 +317,7 @@ public:
 
 			emote = false;
 
-			me->setActive(false);
+			me->SetReactState(REACT_PASSIVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -352,20 +355,14 @@ public:
 			if (instance)
 			{
 				if (!me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f))
+				{
 					if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 					{
-						sha->InterruptSpell(CURRENT_CHANNELED_SPELL);
-						sha->InterruptSpell(CURRENT_GENERIC_SPELL);
-						sha->FinishSpell(CURRENT_CHANNELED_SPELL, true);
-						sha->FinishSpell(CURRENT_GENERIC_SPELL, true);
-						sha->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 						sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, sha->GetGUID());
-						sha->GetMotionMaster()->MoveChase(me->getVictim(), 99999.0f);
-						sLog->outDebug(LOG_FILTER_NETWORKIO, "Sungis Figment INTERRUPT SHA SPELL");
 						me->DespawnOrUnsummon();
 					}
-
-				me->DespawnOrUnsummon();
+				}
+				else me->DespawnOrUnsummon();
 			}
         }
 
@@ -391,11 +388,9 @@ public:
 							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 							me->setFaction(14);
-							me->setActive(true);
-							me->SetInCombatWithZone();
-							me->Attack(player, true);
+							me->SetReactState(REACT_AGGRESSIVE);
+							me->SetInCombatWith(player);
 							me->AddThreat(player, 99999.0f);
-							me->GetMotionMaster()->MoveChase(me->getVictim(), 99999.0f);
 						
 							events.CancelEvent(EVENT_ATTACK_PLAYERS);
 							break;
