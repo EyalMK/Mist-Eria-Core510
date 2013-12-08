@@ -1341,5 +1341,6 @@ void AddSC_spell_warrior_scripts()
 	new spell_warr_raging_blow_off();
 	new spell_warr_enrage();
 	//new spell_warr_storm_bolt();
+	new spell_warr_second_wind();
 	new spell_warr_second_wind_aura();
 }
