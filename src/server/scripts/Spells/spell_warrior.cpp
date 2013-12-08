@@ -1303,6 +1303,38 @@ class spell_warr_second_wind : public SpellScriptLoader
         }
 };
 
+// 16491 - Second Wind aura
+class spell_warr_second_wind_aura : public SpellScriptLoader
+{
+    public:
+        spell_warr_second_wind_aura() : SpellScriptLoader("spell_warr_second_wind_aura") { }
+
+        class spell_warr_second_wind_aura_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warr_second_wind_aura_AuraScript);
+
+            void HandleEffectPeriodic(AuraEffect const* aurEff)
+            {
+                if(Unit *caster = GetCaster())
+				{
+					if((caster->GetHealthPct() < 35.f)  && caster->isAlive())
+							caster->CastSpell(caster, SPELL_WARRIOR_SECOND_WIND_ICON, true);
+					else caster->RemoveAura(SPELL_WARRIOR_SECOND_WIND_ICON);
+				}
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_warr_second_wind_aura_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_warr_second_wind_aura_AuraScript();
+        }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_bloodthirst();
@@ -1332,4 +1364,5 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_enrage();
 	//new spell_warr_storm_bolt();
 	new spell_warr_second_wind();
+	new spell_warr_second_wind_aura();
 }
