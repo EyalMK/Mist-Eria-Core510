@@ -1,30 +1,25 @@
-/*
-    Dungeon : Stormstout Brewery 85-87
-    Instance General Script
-*/
+#ifndef DEF_STORMSTOUT_BREWERY_H_
+#define DEF_STORMSTOUT_BREWERY_H_
 
-#ifndef STORMSTOUT_BREWERY_H_
-#define STORMSTOUT_BREWERY_H_
+#define MAX_ENCOUNTERS 3
 
-#include "SpellScript.h"
-#include "Map.h"
-#include "Creature.h"
-#include "CreatureAIImpl.h"
-
-#define SBScriptName "instance_stormstout_brewery"
-
-enum DataTypes
+enum Creatures
 {
-    DATA_OOK_OOK   = 1,
-    DATA_HOPTALLUS = 2,
-    DATA_YAN_ZHU   = 3
+	BOSS_HOPTALLUS   = 56717,
+    BOSS_OOKOOK  = 56637,
+    BOSS_YANZHU_THE_UNCASKED  = 59479,   
 };
 
-enum CreaturesIds
+enum Objects
 {
-    NPC_OOK_OOK     = 56637,
-    NPC_HOPTALLUS   = 56717,
-    NPC_YAN_ZHU     = 59479
+    
 };
 
-#endif // STORMSTOUT_BREWERY_H_
+enum Data
+{
+	DATA_OOKOOK  = 1,
+    DATA_HOPTALLUS   = 2,
+    DATA_YANZHU_THE_UNCASKED  = 3,
+};
+
+#endif
