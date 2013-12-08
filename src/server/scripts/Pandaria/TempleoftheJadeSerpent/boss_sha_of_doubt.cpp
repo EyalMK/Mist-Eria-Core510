@@ -30,6 +30,7 @@ enum Events
 	EVENT_MOVE_TO_THE_CENTER		= 3,
 	EVENT_BOUNDS_OF_REALITY			= 4,
 	EVENT_SUMMON_FIGMENT_OF_DOUBT	= 5,
+	EVENT_BOUNDS_DONE				= 6,
 
 	/* Figment of Doubt */
 	EVENT_ATTACK_PLAYERS			= 1,
@@ -38,7 +39,13 @@ enum Events
 
 enum Texts
 {
-
+	SAY_AGGRO		= 0,
+	SAY_DEATH		= 1,
+	SAY_FIGMENT_1	= 2,
+	SAY_FIGMENT_2	= 3,
+	SAY_RESET		= 4,
+	SAY_SLAY_1		= 5,
+	SAY_SLAY_2		= 6
 };
 
 enum Phases
@@ -112,9 +119,14 @@ public:
 									player->RemoveAurasDueToSpell(SPELL_TOUCH_OF_NOTHINGNESS, player->GetGUID());
 				}
 			}
+
+			Talk(SAY_DEATH);
 		}
 
-		void KilledUnit(Unit *pWho) {	}
+		void KilledUnit(Unit *pWho)
+		{
+			Talk(irand(SAY_SLAY_1, SAY_SLAY_2));
+		}
 		
 		void EnterEvadeMode()
 		{
@@ -127,7 +139,7 @@ public:
 				events.SetPhase(PHASE_NULL);
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, FAIL);
 
-				me->CombatStop();
+				me->CombatStop(true);
 				me->DeleteThreatList();
 
 				if (me->HasAura(SPELL_BOUNDS_OF_REALITY))
@@ -158,8 +170,10 @@ public:
 			events.ScheduleEvent(EVENT_WITHER_WILL, 2*IN_MILLISECONDS, 0, PHASE_COMBAT);
 			events.ScheduleEvent(EVENT_TOUCH_OF_NOTHINGNESS, 8*IN_MILLISECONDS, 0, PHASE_COMBAT);
 
-			if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
-					go->UseDoorOrButton();
+			/*if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
+					go->UseDoorOrButton(); Close door when combat starts*/
+
+			Talk(SAY_AGGRO);
 		}
 		
 		void UpdateAI(uint32 diff)
@@ -171,28 +185,27 @@ public:
 
 			if (HealthBelowPct(75) && !seventyFivePct)
 			{
+				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
 				events.ScheduleEvent(EVENT_MOVE_TO_THE_CENTER, 0, 0, PHASE_BOUNDS_OF_REALITY);
 				events.ScheduleEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT, 0, 0, PHASE_BOUNDS_OF_REALITY);
-				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
 				seventyFivePct = true;
 			}
 
 			if (HealthBelowPct(50) && !fiftyPct)
 			{
-				events.ScheduleEvent(EVENT_MOVE_TO_THE_CENTER, 1*IN_MILLISECONDS, 0, PHASE_BOUNDS_OF_REALITY);
 				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
+				events.ScheduleEvent(EVENT_MOVE_TO_THE_CENTER, 0, 0, PHASE_BOUNDS_OF_REALITY);
+				events.ScheduleEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT, 0, 0, PHASE_BOUNDS_OF_REALITY);
 				fiftyPct = true;
 			}
 
 			if (events.IsInPhase(PHASE_BOUNDS_OF_REALITY) && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
 				if (me->FindNearestCreature(NPC_SHA_TRIGGER, 0.1f, true))
-					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 1, 0, PHASE_BOUNDS_OF_REALITY);
+					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 0, 0, PHASE_BOUNDS_OF_REALITY);
 
-			if (boundsOfReality && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
+			if (!me->HasAura(SPELL_BOUNDS_OF_REALITY) && boundsOfReality)
 			{
-				me->InterruptSpell(CURRENT_CHANNELED_SPELL);
 				me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
-				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				events.SetPhase(PHASE_COMBAT);
 				boundsOfReality = false;
@@ -230,12 +243,12 @@ public:
 							{
 								me->CastSpell(me, SPELL_BOUNDS_OF_REALITY);
 								me->Relocate(trigger->GetHomePosition());
-								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->SetOrientation(4.410300f);
-								boundsOfReality = true;
+								me->GetMotionMaster()->Clear(true);
 							}
 
+							events.ScheduleEvent(EVENT_BOUNDS_DONE, 1, 0, PHASE_BOUNDS_OF_REALITY);
 							events.CancelEvent(EVENT_BOUNDS_OF_REALITY);
 							break;
 
@@ -253,10 +266,18 @@ public:
 											player->CastSpell(player, SPELL_FIGMENT_OF_DOUBT);
 							}
 
+							Talk(irand(SAY_FIGMENT_1, SAY_FIGMENT_2));
+
 							events.CancelEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT);
 							break;
 						}
-							
+						
+						case EVENT_BOUNDS_DONE:
+							boundsOfReality = true;
+
+							events.CancelEvent(EVENT_BOUNDS_DONE);
+							break;
+
 						default:
 							break;
 					}
@@ -296,7 +317,7 @@ public:
 
 			emote = false;
 
-			me->setActive(false);
+			me->SetReactState(REACT_PASSIVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -334,16 +355,14 @@ public:
 			if (instance)
 			{
 				if (!me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f))
+				{
 					if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 					{
-						sha->InterruptSpell(CURRENT_CHANNELED_SPELL);
-						sha->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-						sha->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 						sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, sha->GetGUID());
 						me->DespawnOrUnsummon();
 					}
-
-				me->DespawnOrUnsummon();
+				}
+				else me->DespawnOrUnsummon();
 			}
         }
 
@@ -369,9 +388,8 @@ public:
 							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 							me->setFaction(14);
-							me->setActive(true);
-							me->SetInCombatWithZone();
-							me->Attack(player, true);
+							me->SetReactState(REACT_AGGRESSIVE);
+							me->SetInCombatWith(player);
 							me->AddThreat(player, 99999.0f);
 						
 							events.CancelEvent(EVENT_ATTACK_PLAYERS);

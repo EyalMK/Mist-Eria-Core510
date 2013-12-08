@@ -64,11 +64,13 @@ enum WarriorSpells
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
     SPELL_PRIEST_RENEWED_HOPE                       = 63944,
     SPELL_GEN_DAMAGE_REDUCTION_AURA                 = 68066,
-	WARRIOR_SPELL_HEROIC_LEAP_DAMAGE            = 52174,
-	WARRIOR_SPELL_HEROIC_LEAP_SPEED             = 133278,
-	WARRIOR_SPELL_ITEM_PVP_SET_4P_BONUS         = 133277,
+	SPELL_WARRIOR_HEROIC_LEAP_DAMAGE				= 52174,
+	SPELL_WARRIOR_HEROIC_LEAP_SPEED					= 133278,
+	SPELL_WARRIOR_ITEM_PVP_SET_4P_BONUS				= 133277,
 	SPELL_WARRIOR_SECOND_WIND						= 29838,
 	SPELL_WARRIOR_SECOND_WIND_REGEN					= 16491,
+	SPELL_WARRIOR_SECOND_WIND_ICON					= 125667,
+	SPELL_WARRIOR_BLOODTHIRDT_HEAL					= 117313,
 };
 
 enum WarriorSpellIcons
@@ -108,6 +110,7 @@ class spell_warr_bloodthirst : public SpellScriptLoader
 
 				int32 damage = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.9f;
 				SetHitDamage(damage);
+				caster->CastSpell(caster, SPELL_WARRIOR_BLOODTHIRDT_HEAL);
             }
 
             void Register()
@@ -780,8 +783,8 @@ class spell_warr_heroic_leap : public SpellScriptLoader
             void HandleAfterCast()
             {
                 // Item - Warrior PvP Set 4P Bonus
-                if (GetCaster()->HasAura(WARRIOR_SPELL_ITEM_PVP_SET_4P_BONUS))
-                    GetCaster()->CastSpell(GetCaster(), WARRIOR_SPELL_HEROIC_LEAP_SPEED, true);
+                if (GetCaster()->HasAura(SPELL_WARRIOR_ITEM_PVP_SET_4P_BONUS))
+                    GetCaster()->CastSpell(GetCaster(), SPELL_WARRIOR_HEROIC_LEAP_SPEED, true);
             }
 
             void Register()
@@ -803,7 +806,7 @@ class spell_warr_heroic_leap : public SpellScriptLoader
             void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
                 if (Unit* caster = GetCaster())
-                    caster->CastSpell(caster, WARRIOR_SPELL_HEROIC_LEAP_DAMAGE, true);
+                    caster->CastSpell(caster, SPELL_WARRIOR_HEROIC_LEAP_DAMAGE, true);
             }
 
             void Register()
@@ -1264,13 +1267,6 @@ class spell_warr_second_wind : public SpellScriptLoader
         {
             PrepareAuraScript(spell_warr_second_wind_AuraScript);
 
-            bool Validate(SpellInfo const* /*spellInfo*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_SECOND_WIND_REGEN))
-                    return false;
-                return true;
-            }
-
             void HandleEffectPeriodic(AuraEffect const* aurEff)
             {
                 if(Unit *caster = GetCaster())
@@ -1278,26 +1274,64 @@ class spell_warr_second_wind : public SpellScriptLoader
 					if((caster->GetHealthPct() < 35.f)  && caster->isAlive())
 					{
 						if(!caster->HasAura(SPELL_WARRIOR_SECOND_WIND_REGEN))
+						{
+							caster->CastSpell(caster, SPELL_WARRIOR_SECOND_WIND_ICON, true);
 							caster->CastSpell(caster, SPELL_WARRIOR_SECOND_WIND_REGEN, true);
+						}
 					}
+
 					else
 					{
 						if(caster->HasAura(SPELL_WARRIOR_SECOND_WIND_REGEN))
+						{
+							caster->RemoveAura(SPELL_WARRIOR_SECOND_WIND_ICON);
 							caster->RemoveAura(SPELL_WARRIOR_SECOND_WIND_REGEN);
+						}
 					}
 				}
             }
 
             void Register()
             {
-				OnEffectPeriodic += AuraEffectPeriodicFn(spell_warr_second_wind_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_warr_second_wind_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             }
-
         };
 
         AuraScript* GetAuraScript() const
         {
             return new spell_warr_second_wind_AuraScript();
+        }
+};
+
+// 16491 - Second Wind aura
+class spell_warr_second_wind_aura : public SpellScriptLoader
+{
+    public:
+        spell_warr_second_wind_aura() : SpellScriptLoader("spell_warr_second_wind_aura") { }
+
+        class spell_warr_second_wind_aura_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warr_second_wind_aura_AuraScript);
+
+            void HandleEffectPeriodic(AuraEffect const* aurEff)
+            {
+                if(Unit *caster = GetCaster())
+				{
+					if((caster->GetHealthPct() < 35.f)  && caster->isAlive())
+							caster->CastSpell(caster, SPELL_WARRIOR_SECOND_WIND_ICON, true);
+					else caster->RemoveAura(SPELL_WARRIOR_SECOND_WIND_ICON);
+				}
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_warr_second_wind_aura_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_warr_second_wind_aura_AuraScript();
         }
 };
 
@@ -1330,4 +1364,5 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_enrage();
 	//new spell_warr_storm_bolt();
 	new spell_warr_second_wind();
+	new spell_warr_second_wind_aura();
 }
