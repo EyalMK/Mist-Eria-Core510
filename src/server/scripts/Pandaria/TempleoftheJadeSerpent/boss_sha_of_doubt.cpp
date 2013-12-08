@@ -375,6 +375,7 @@ public:
 							me->SetInCombatWithZone();
 							me->Attack(player, true);
 							me->AddThreat(player, 99999.0f);
+							me->GetMotionMaster()->MoveChase(me->getVictim(), 99999.0f);
 						
 							events.CancelEvent(EVENT_ATTACK_PLAYERS);
 							break;
