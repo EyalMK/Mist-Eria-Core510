@@ -30,6 +30,7 @@ enum Events
 	EVENT_MOVE_TO_THE_CENTER		= 3,
 	EVENT_BOUNDS_OF_REALITY			= 4,
 	EVENT_SUMMON_FIGMENT_OF_DOUBT	= 5,
+	EVENT_BOUNDS_DONE				= 6,
 
 	/* Figment of Doubt */
 	EVENT_ATTACK_PLAYERS			= 1,
@@ -164,28 +165,32 @@ public:
 		
 		void UpdateAI(uint32 diff)
 		{
+			if (!UpdateVictim && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
+				return;
+
 			events.Update(diff);
 
 			if (HealthBelowPct(75) && !seventyFivePct)
 			{
+				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
 				events.ScheduleEvent(EVENT_MOVE_TO_THE_CENTER, 0, 0, PHASE_BOUNDS_OF_REALITY);
 				events.ScheduleEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT, 0, 0, PHASE_BOUNDS_OF_REALITY);
-				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
 				seventyFivePct = true;
 			}
 
 			if (HealthBelowPct(50) && !fiftyPct)
 			{
-				events.ScheduleEvent(EVENT_MOVE_TO_THE_CENTER, 1*IN_MILLISECONDS, 0, PHASE_BOUNDS_OF_REALITY);
 				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
+				events.ScheduleEvent(EVENT_MOVE_TO_THE_CENTER, 0, 0, PHASE_BOUNDS_OF_REALITY);
+				events.ScheduleEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT, 0, 0, PHASE_BOUNDS_OF_REALITY);
 				fiftyPct = true;
 			}
 
 			if (events.IsInPhase(PHASE_BOUNDS_OF_REALITY) && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
 				if (me->FindNearestCreature(NPC_SHA_TRIGGER, 0.1f, true))
-					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 1, 0, PHASE_BOUNDS_OF_REALITY);
+					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 0, 0, PHASE_BOUNDS_OF_REALITY);
 
-			if (boundsOfReality && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
+			if (!me->HasAura(SPELL_BOUNDS_OF_REALITY) && boundsOfReality)
 			{
 				me->InterruptSpell(CURRENT_CHANNELED_SPELL);
 				me->InterruptSpell(CURRENT_GENERIC_SPELL);
@@ -232,9 +237,9 @@ public:
 								me->Relocate(trigger->GetHomePosition());
 								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->SetOrientation(4.410300f);
-								boundsOfReality = true;
 							}
 
+							events.ScheduleEvent(EVENT_BOUNDS_DONE, 1, 0, PHASE_BOUNDS_OF_REALITY);
 							events.CancelEvent(EVENT_BOUNDS_OF_REALITY);
 							break;
 
@@ -255,7 +260,13 @@ public:
 							events.CancelEvent(EVENT_SUMMON_FIGMENT_OF_DOUBT);
 							break;
 						}
-							
+						
+						case EVENT_BOUNDS_DONE:
+							boundsOfReality = true;
+
+							events.CancelEvent(EVENT_BOUNDS_DONE);
+							break;
+
 						default:
 							break;
 					}
