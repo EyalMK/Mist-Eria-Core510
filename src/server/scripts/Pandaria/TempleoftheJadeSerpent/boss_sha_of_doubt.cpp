@@ -200,6 +200,7 @@ public:
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				me->GetMotionMaster()->MoveChase(me->getVictim(), 99999.0f);
 				events.SetPhase(PHASE_COMBAT);
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS Sha of Doubt PHASE COMBAT");
 				boundsOfReality = false;
 			}
 
@@ -211,6 +212,7 @@ public:
 					{
 						case EVENT_WITHER_WILL:
 							me->CastSpell(me, SPELL_WITHER_WILL);
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Sungis Sha of Doubt WITHER WILL");
 
 							events.ScheduleEvent(EVENT_WITHER_WILL, 7*IN_MILLISECONDS, 0, PHASE_COMBAT);
 							break;
@@ -237,6 +239,7 @@ public:
 								me->Relocate(trigger->GetHomePosition());
 								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->SetOrientation(4.410300f);
+								sLog->outDebug(LOG_FILTER_NETWORKIO, "Sungis Sha of Doubt RELOCATE & ORIENTATION");
 							}
 
 							events.ScheduleEvent(EVENT_BOUNDS_DONE, 1, 0, PHASE_BOUNDS_OF_REALITY);
@@ -263,6 +266,7 @@ public:
 						
 						case EVENT_BOUNDS_DONE:
 							boundsOfReality = true;
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS Sha of Doubt phase BOOL BOUNDS DONE");
 
 							events.CancelEvent(EVENT_BOUNDS_DONE);
 							break;
@@ -353,6 +357,7 @@ public:
 						sha->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 						sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, sha->GetGUID());
 						sha->GetMotionMaster()->MoveChase(me->getVictim(), 99999.0f);
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Sungis Figment INTERRUPT SHA SPELL");
 						me->DespawnOrUnsummon();
 					}
 
