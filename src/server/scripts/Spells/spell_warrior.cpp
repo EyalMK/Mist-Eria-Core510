@@ -1269,7 +1269,7 @@ class spell_warr_second_wind : public SpellScriptLoader
             void HandleOnHit()
             {
                 if (Player* _player = GetCaster()->ToPlayer())
-                    _player->CastSpell(_player, WARRIOR_SPELL_SECOND_WIND_REGEN, true);
+                    _player->CastSpell(_player, SPELL_WARRIOR_SECOND_WIND_REGEN, true);
             }
 
             void Register()
@@ -1287,11 +1287,11 @@ class spell_warr_second_wind : public SpellScriptLoader
         {
             PrepareAuraScript(spell_warr_second_wind_AuraScript);
 
-            void OnRemove(constAuraEffectPtr aurEff, AuraEffectHandleModes /*mode*/)
+            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
                 if (Unit* caster = GetCaster())
-                    if (caster->HasAura(WARRIOR_SPELL_SECOND_WIND_REGEN))
-                        caster->RemoveAura(WARRIOR_SPELL_SECOND_WIND_REGEN);
+                    if (caster->HasAura(SPELL_WARRIOR_SECOND_WIND_REGEN))
+                        caster->RemoveAura(SPELL_WARRIOR_SECOND_WIND_REGEN);
             }
 
             void Register()
