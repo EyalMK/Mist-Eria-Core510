@@ -672,7 +672,7 @@ void KillRewarder::Reward()
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
-Player::Player(WorldSession* session): Unit(true), phaseMgr(this)
+Player::Player(WorldSession* session): Unit(true), phaseMgr(this), m_battlePetMgr(this)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)

@@ -86,6 +86,42 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
     data->Initialize(SMSG_BATTLE_PET_JOURNAL);
     *data << uint16(0); // unk
     data->WriteBit(1); // unk
+
+    GetBattlePetList(petList);
+    data->WriteBits(petList.size(), 20);
+
+    data->WriteBits(0, 21); // unk counter, may be related to battle pet slot
+
+    // bits part
+    for (auto pet : petList)
+    {
+        data->WriteBit(true); // hasBreed, inverse
+        data->WriteBit(true); // hasQuality, inverse
+        data->WriteBit(true); // hasUnk, inverse
+        data->WriteBits(0, 7); // name lenght
+        data->WriteBit(false); // unk bit
+        data->WriteBit(false); // has guid
+    }
+
+    // data part
+    for (auto pet : petList)
+    {
+        *data << uint32(pet.m_displayID);
+        *data << uint32(pet.m_summonSpellID); // Pet Entry
+        *data << uint16(0); // xp
+        *data << uint32(1); // health
+        *data << uint16(1); // level
+        // name
+        *data << uint32(1); // speed
+        *data << uint32(1); // max health
+        *data << uint32(pet.m_entry); // Creature ID
+        *data << uint32(1); // power
+        *data << uint32(pet.m_speciesID); // species
+    }
+
+/*
+    *data << uint16(0); // unk
+    data->WriteBit(1); // unk
     data->WriteBits(0, 20); // unk counter, may be related to battle pet slot
 
     GetBattlePetList(petList);
@@ -117,6 +153,9 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
         *data << uint32(1); // power
         *data << uint32(pet.m_speciesID); // species
     }
+
+    */
+
 }
 
 void WorldSession::HandleSummonBattlePet(WorldPacket& recvData)
