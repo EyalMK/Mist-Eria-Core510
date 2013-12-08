@@ -828,7 +828,7 @@ public:
         {
 			Player* caster = GetCaster()->ToPlayer();
 
-			caster->AddSpellCooldown(SPELL_SHAMAN_LAVA_BURST, 0, time(NULL) + 8);
+			caster->RemoveSpellCooldown(SPELL_SHAMAN_LAVA_BURST, true);
         }
 
         void Register()
