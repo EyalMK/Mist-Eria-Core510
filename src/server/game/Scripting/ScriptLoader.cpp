@@ -17,24 +17,6 @@
 
 #include "ScriptLoader.h"
 
-void AddSC_boss_gekkan();
-void AddSC_instance_mogushan_palace();
-
-// Pandaria zones
-void AddSC_vale_of_eternal_blossoms();
-
-// Shado-Pan Monastery
-void AddSC_boss_gu_cloudstrike();
-void AddSC_boss_master_snowdrift();
-void AddSC_boss_sha_of_violence();
-void AddSC_boss_taran_zhu();
-void AddSC_instance_shado_pan_monastery();
-
-// Include : Stormstout Brewery
-void AddSC_boss_hoptallus();
-void AddSC_boss_ook_ook();
-void AddSC_boss_yan_zhu();
-
 // Temple du serpent de jade
 void AddSC_boss_wise_mari();
 void AddSC_boss_lorewalker_stonestep();
@@ -1305,23 +1287,6 @@ void AddPandariaScripts()
 {
 #ifdef SCRIPTS
 	AddSC_wandering_isle();
-
-    AddSC_boss_gekkan();
-    AddSC_instance_mogushan_palace();
-
-	AddSC_vale_of_eternal_blossoms();
-
-    AddSC_boss_gu_cloudstrike();			//Shado-Pan Monastery
-    AddSC_boss_master_snowdrift();
-    AddSC_boss_sha_of_violence();
-    AddSC_boss_taran_zhu();
-    AddSC_instance_shado_pan_monastery();
-
-    // Stormstout Brewery
-    AddSC_boss_hoptallus();
-    AddSC_boss_ook_ook();
-    AddSC_boss_yan_zhu();
-
 
     AddSC_boss_wise_mari();                 //Temple of the Jade Serpent
     AddSC_boss_lorewalker_stonestep();

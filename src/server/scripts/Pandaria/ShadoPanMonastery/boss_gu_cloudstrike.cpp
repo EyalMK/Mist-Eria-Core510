@@ -1,543 +1,458 @@
-/* # Script de Tydrheal : Gu Cloudstrike # */
+/*
+ * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-/* Notes : Il faudra tester les scripts et vérifier les sorts ainsi qu'ajouter les SoundID SAY_PHASE3 ("Puissance ! Glorieuse puissance !")
-Ajouter l'ID du NPC_TRIGGER
-
-Gu Cloudstrike : Script 95%		A test
-Azure Serpent : Script 95%		A test
-Gu Trigger : Script 95%         A test -- ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilité du PNJ par les joueurs.
-
-UPDATE creature_template SET ScriptName = 'boss_gu_cloudstrike' WHERE entry = 56747;
-UPDATE creature_template SET ScriptName = 'npc_azure_serpent' WHERE entry = 56754;
-UPDATE creature_template SET ScriptName = 'npc_gu_intro_trigger' WHERE entry = ?????;
-
-INSERT INTO creature_text (entry, groupid, id, text, type, language, probability, emote, duration, sound, comment) VALUES
-(56747, 0, 0, "Gringalets… faisons de la place pour nos invités.", 12, 0, 100, 0, 0, 28322, "GuCloudstrike - Intro1"),
-(56747, 1, 0, "Approchez… votre trépas vous attend.", 12, 0, 100, 0, 0, 28323, "GuCloudstrike - Intro2"),
-(56747, 2, 0, "Laissez-moi vous montrer ma puissance.", 12, 0, 100, 0, 0, 28317, "GuCloudstrike - EnterCombat1"),
-(56747, 3, 0, "Viens à moi, serpent-dragon ! Ensemble, nous allons détruire ces intrus.", 12, 0, 100, 0, 0, 28318, "GuCloudstrike - EnterCombat2"),
-(56747, 4, 0, "Serpent-dragon, que ta puissance me recharge !", 12, 0, 100, 0, 0, 28324, "GuCloudstrike - Phase2"),
-(56747, 5, 0, "Leur énergie est puissante !", 14, 0, 100, 0, 0, 28320, "GuCloudstrike - HalfLifeSerpent"),
-(56747, 6, 0, "Non, non ! Ne me laisse pas !", 14, 0, 100, 0, 0, 28321, "GuCloudstrike - SerpentDead"),
-(56747, 7, 0, "Puissance ! Glorieuse puissance !", 12, 0, 100, 0, 0, ??????, "GuCloudstrike - Phase3"),
-(56747, 8, 0, "Même… ensemble… c’est l’échec...", 14, 0, 100, 0, 0, 28319,, "GuCloudstrike - Death"),
-(56747, 9, 0, "Gringalet !", 14, 0, 100, 0, 0, 28325, "GuCloudstrike - Slay1"),
-(56747, 10, 0, "La foudre ignore la pitié !", 14, 0, 100, 0, 0, 28326, "GuCloudstrike - Slay2"),
-(56747, 11, 0, "Nul ne peut défier les Pandashan !", 14, 0, 100, 0, 0, 28327, "GuCloudstrike - Slay3");
-
-*/
-
-#include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "shadopan_monastery.h"
 
-enum Spells
+enum eSpells
 {
-	/* Gu Cloudstrike */
-	SPELL_CHARGING_SOUL			= 110945,
-	SPELL_INVOKE_LIGHTNING		= 106984,
-	SPELL_LIGHTNING_PURGE		= 114927,
-	SPELL_OVERCHARGED_SOUL		= 110852,
-	
-	/* Azure Serpent */
-	SPELL_LIGHTNING_BREATH		= 102573,
-	SPELL_LIGHTNING_SHIELDED	= 123496,
-	SPELL_MAGNETIC_SHROUD		= 107140,
-	SPELL_STATIC_FIELD			= 106923
+    // Gu
+    SPELL_KILL_GUARDIANS            = 114927,
+
+    SPELL_INVOKE_LIGHTNING          = 106984,
+    SPELL_CHARGING_SOUL             = 110945,
+    
+    SPELL_OVERCHARGED_SOUL          = 110852,
+    SPELL_OVERCHARGED_SOUL_DAMAGE   = 111129,
+
+    // Azure Serpent
+    SPELL_LIGHTNING_SHIELD          = 123496,
+    SPELL_STATIC_FIELD              = 106923,
+
+    SPELL_LIGHTNING_BREATH          = 102573,
+    SPELL_MAGNETIC_SHROUD           = 107140, // TODO
 };
 
-enum Events
+enum eEvents
 {
-	EVENT_INTRO_1,
-	EVENT_INTRO_2,
-	EVENT_AGGRO_PART_1,
-	EVENT_AGGRO_PART_2, 
-	EVENT_AGGRO_PART_3,
-	EVENT_PHASE_2,
-	EVENT_INVOKE_LIGHTNING,
-	EVENT_AZURE_SERPENT,
-	EVENT_LIGHTNING_BREATH,
-	EVENT_STATIC_FIELD,
-	EVENT_OVERCHARGED_SOUL,
-	EVENT_LIGHTNING_PURGE,
-	EVENT_MAGNETIC_SHROUD,
-	EVENT_MOVE,
-	EVENT_PHASE_3
+    // Gu
+    EVENT_INVOKE_LIGHTNING  = 1,
+    EVENT_OVERCHARGED_SOUL  = 2,
+
+    // Azure Serpent
+    EVENT_STATIC_FIELD      = 3,
+    EVENT_LIGHTNING_BREATH  = 4,
+    EVENT_MAGNETIC_SHROUD   = 5,
 };
 
-enum Phases
+enum eActions
 {
-	PHASE_INTRO,
-	PHASE_COMBAT,
-	PHASE_1,
-	PHASE_2,
-	PHASE_3
+    // Gu
+    ACTION_INTRO                = 1,
+    ACTION_GU_P_3               = 2,
+    
+    // Azure Serpent
+    ACTION_AZURE_SERPENT_P_1    = 3,
+    ACTION_AZURE_SERPENT_P_2    = 4,
+    ACTION_AZURE_SERPENT_RESET  = 5,
 };
 
-enum Actions
+enum ePhases
 {
-	ACTION_BOSS_GU_CLOUDSTRIKE_RESET,
-	ACTION_BOSS_GU_CLOUDSTRIKE_DIED,
-	ACTION_AZURE_SERPENT_RESET,
-	ACTION_AZURE_SERPENT_DIED,
-	ACTION_GU_INTRO,
-
-	/* Azure Serpent */
-	ACTION_VISIBLE
-};
-
-enum Texts
-{
-	SAY_INTRO_1 = 0, 
-	SAY_INTRO_2 = 1, 
-	SAY_ENTERCOMBAT_1 = 2,
-	SAY_ENTERCOMBAT_2 = 3,
-	SAY_PHASE_2 = 4,
-	SAY_HALF_LIFE_SERPENT = 5,
-	SAY_SERPENT_DEATH = 6,
-	SAY_PHASE_3 = 7,
-	SAY_DEATH = 8,
-	SAY_SLAY1 = 9,
-	SAY_SLAY2 = 10,
-	SAY_SLAY3 = 11
-};
-
-enum TriggerIds
-{
-	NPC_TRIGGER = 00000
+    PHASE_ONE   = 1,
+    PHASE_TWO   = 2,
+    PHASE_THREE = 3
 };
 
 class boss_gu_cloudstrike : public CreatureScript
 {
-public:
-	boss_gu_cloudstrike() : CreatureScript("boss_gu_cloudstrike") { }
+    public:
+        boss_gu_cloudstrike() : CreatureScript("boss_gu_cloudstrike") {}
 
-	CreatureAI* GetAI(Creature* creature) const
-	{
-		return new boss_gu_cloudstrikeAI(creature);
-	}
-
-	struct boss_gu_cloudstrikeAI : public ScriptedAI
-	{
-		boss_gu_cloudstrikeAI(Creature *creature) : ScriptedAI(creature)
-		{
-			instance = creature->GetInstanceScript();
-		}
-
-		InstanceScript* instance;
-		EventMap events;
-		
-		bool checkGuCloudstrikeAlive;
-		bool checkAzureSerpentAlive;
-		bool checkSaySerpentLife;
-		
-		void Reset()
-		{
-			checkGuCloudstrikeAlive = true;
-			checkAzureSerpentAlive = true;
-			checkGuCloudstrikeAlive = me->isAlive();
-			checkSaySerpentLife = false;
-			
-			if(Aura* aura = me->GetAura(SPELL_CHARGING_SOUL))
-				me->RemoveAura(aura);
-				
-			if(Aura* aura = me->GetAura(SPELL_INVOKE_LIGHTNING))
-				me->RemoveAura(aura);
-
-			events.Reset();
-
-			if (instance)
-			{
-				if (Creature* serpent = me->GetCreature(*me, instance->GetData64(DATA_NPC_AZURE_SERPENT)))
-						if (serpent->AI())
-						{
-							serpent->RemoveCorpse();
-							serpent->Respawn();
-						}
-				instance->SetBossState(DATA_BOSS_GU_CLOUDSTRIKE, NOT_STARTED);
-				me->AI()->DoAction(ACTION_BOSS_GU_CLOUDSTRIKE_RESET);
-				if(Creature *triggers = me->FindNearestCreature(NPC_TRIGGER, 50000.0f))
-					if(triggers->AI())
-					   triggers->AI()->Reset();
-			}
-		}
-
-		void DoAction(int32 action)
+        struct boss_gu_cloudstrikeAI : public BossAI
         {
-            switch (action)
+            boss_gu_cloudstrikeAI(Creature* creature) : BossAI(creature, DATA_GU_CLOUDSTRIKE)
             {
-				case ACTION_BOSS_GU_CLOUDSTRIKE_RESET:
-					checkGuCloudstrikeAlive = true;
-					break;
-				case ACTION_BOSS_GU_CLOUDSTRIKE_DIED:
-					checkGuCloudstrikeAlive = false;
-					break;
-				case ACTION_AZURE_SERPENT_RESET:
-					checkAzureSerpentAlive = true;
-					break;
-				case ACTION_AZURE_SERPENT_DIED:
-					checkAzureSerpentAlive = false;
-					break;
-				case ACTION_GU_INTRO:
-					events.SetPhase(PHASE_INTRO);
-					events.ScheduleEvent(EVENT_INTRO_1, 1*IN_MILLISECONDS, 0, PHASE_INTRO);
-					events.ScheduleEvent(EVENT_INTRO_2, 4*IN_MILLISECONDS, 0, PHASE_INTRO);
-					break;
-			}
+                pInstance = creature->GetInstanceScript();
+                introDone = false;
+            }
+
+            InstanceScript* pInstance;
+            bool introDone;
+
+            uint8 phase;
+
+            void Reset()
+            {
+                _Reset();
+                me->RemoveAurasDueToSpell(SPELL_CHARGING_SOUL);
+
+                if (Creature* azureSerpent = GetAzureSerpent())
+                    if (azureSerpent->AI())
+                        azureSerpent->AI()->DoAction(ACTION_AZURE_SERPENT_RESET);
+
+                phase = 1;
+                events.ScheduleEvent(EVENT_INVOKE_LIGHTNING, urand(5000, 10000), PHASE_ONE);
+            }
+
+            Creature* GetAzureSerpent()
+            {
+                return pInstance->instance->GetCreature(pInstance->GetData64(NPC_AZURE_SERPENT));
+            }
+
+            void JustReachedHome()
+            {
+                pInstance->SetBossState(DATA_GU_CLOUDSTRIKE, FAIL);
+                summons.DespawnAll();
+            }
+
+            void DamageTaken(Unit* attacker, uint32& damage)
+            {
+                if (phase == 1 && me->HealthBelowPctDamaged(50, damage))
+                {
+                    phase = 2;
+                    events.CancelEventGroup(PHASE_ONE);
+
+                    events.ScheduleEvent(EVENT_OVERCHARGED_SOUL, 2500, PHASE_TWO);
+                    
+                    me->SetReactState(REACT_PASSIVE);
+                    me->CastSpell(me, SPELL_CHARGING_SOUL, false);
+
+                    if (Creature* azureSerpent = GetAzureSerpent())
+                        if (azureSerpent->AI())
+                            azureSerpent->AI()->DoAction(ACTION_AZURE_SERPENT_P_2);
+                }
+            }
+
+            void DoAction(const int32 action)
+            {
+                if (action == ACTION_INTRO)
+                {
+                    if (!introDone)
+                    {
+                        // Say machin
+                        me->CastSpell(me, SPELL_KILL_GUARDIANS);
+                        introDone = true;
+                    }
+                }
+                else if (action == ACTION_GU_P_3)
+                {
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->CastSpell(me, SPELL_OVERCHARGED_SOUL, true);
+                    me->RemoveAurasDueToSpell(SPELL_CHARGING_SOUL);
+                }
+            }
+
+            void JustSummoned(Creature* summoned)
+            {
+                summons.Summon(summoned);
+            }
+
+            void EnterCombat(Unit* who)
+            {
+                if (Creature* azureSerpent = GetAzureSerpent())
+                    if (azureSerpent->AI())
+                        azureSerpent->AI()->DoAction(ACTION_AZURE_SERPENT_P_1);
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                switch(events.ExecuteEvent())
+                {
+                    case EVENT_INVOKE_LIGHTNING:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0, true))
+                            me->CastSpell(target, SPELL_INVOKE_LIGHTNING, false);
+
+                        events.ScheduleEvent(EVENT_INVOKE_LIGHTNING, urand(5000, 10000), PHASE_ONE);
+                        break;
+                    case EVENT_OVERCHARGED_SOUL:
+                        me->CastSpell(me, SPELL_OVERCHARGED_SOUL_DAMAGE, false);
+                        events.ScheduleEvent(EVENT_OVERCHARGED_SOUL, 2500, PHASE_TWO);
+                        break;
+                    default:
+                        break;
+                }
+
+                DoMeleeAttackIfReady();
+            }
+        };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new boss_gu_cloudstrikeAI(creature);
         }
+};
 
-		void JustDied(Unit *pWho)
-		{
-			if (instance)
-			{
-				me->AI()->DoAction(ACTION_BOSS_GU_CLOUDSTRIKE_DIED);
-				me->AI()->DoAction(ACTION_AZURE_SERPENT_DIED);
-
-				if (!checkGuCloudstrikeAlive)
-					instance->SetBossState(DATA_BOSS_GU_CLOUDSTRIKE, DONE);
-
-			}
-
-			Talk(SAY_DEATH);
-		}
-
-		void KilledUnit(Unit *pWho)
-		{
-			Talk(urand(SAY_SLAY1, SAY_SLAY3));
-		}
-		
-		void EnterEvadeMode()
-		{
-			if (instance)
-				instance->SetBossState(DATA_BOSS_GU_CLOUDSTRIKE, FAIL);
-		}
-
-		void EnterCombat(Unit* /*who*/)
-		{
-			if (instance)
-				instance->SetBossState(DATA_BOSS_GU_CLOUDSTRIKE, IN_PROGRESS);
-
-			me->SetInCombatWithZone();
-
-			events.SetPhase(PHASE_COMBAT);
-			events.ScheduleEvent(EVENT_AGGRO_PART_1, 2*IN_MILLISECONDS, 0, PHASE_COMBAT); 
-			events.ScheduleEvent(EVENT_AGGRO_PART_2, 6*IN_MILLISECONDS, 0, PHASE_COMBAT);
-			events.ScheduleEvent(EVENT_AGGRO_PART_3, 9*IN_MILLISECONDS, 0, PHASE_COMBAT);
-
-		}
-
-		void UpdateAI(uint32 diff)
-		{
-			if(!UpdateVictim())
-				return;
-
-			events.Update(diff);
-
-			if (me->HasUnitState(UNIT_STATE_CASTING))
-				return;
-
-			while(uint32 eventId = events.ExecuteEvent())
-			{
-				switch(eventId)
-				{
-					if (instance)
-					{
-						case EVENT_INTRO_1:
-							Talk(SAY_INTRO_1);
-							events.CancelEvent(EVENT_INTRO_1);
-							break;
-
-						case EVENT_INTRO_2:
-							Talk(SAY_INTRO_2);
-							events.CancelEvent(EVENT_INTRO_2);
-							break;
-
-						case EVENT_AGGRO_PART_1:
-							Talk(SAY_ENTERCOMBAT_1);
-							events.CancelEvent(EVENT_AGGRO_PART_1);
-							break;
-						
-						case EVENT_AGGRO_PART_2:
-							Talk(SAY_ENTERCOMBAT_2);
-							events.CancelEvent(EVENT_AGGRO_PART_2);
-							break;
-						
-						case EVENT_AGGRO_PART_3:
-							if (Creature* serpent = me->GetCreature(*me, instance->GetData64(DATA_NPC_AZURE_SERPENT)))
-								if (serpent->AI())
-										serpent->AI()->DoAction(ACTION_VISIBLE);
-
-							events.SetPhase(PHASE_1);
-							events.ScheduleEvent(EVENT_INVOKE_LIGHTNING, 2*IN_MILLISECONDS, 0, PHASE_1);
-							events.CancelEvent(EVENT_AGGRO_PART_3);
-							break;
-						
-						case EVENT_INVOKE_LIGHTNING:
-							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-								if(target->GetTypeId() == TYPEID_PLAYER)
-								{
-									DoCast(target, SPELL_INVOKE_LIGHTNING);
-								}
-							events.ScheduleEvent(EVENT_INVOKE_LIGHTNING, 16*IN_MILLISECONDS, 0, PHASE_1);
-							break;
-							
-						case EVENT_PHASE_2:
-							DoCast(me, SPELL_CHARGING_SOUL);
-							events.CancelEvent(EVENT_PHASE_2);							
-							break;
-						
-						case EVENT_OVERCHARGED_SOUL:
-							DoCast(me, SPELL_OVERCHARGED_SOUL);
-							events.CancelEvent(EVENT_OVERCHARGED_SOUL);	
-							break;
-						
-						case EVENT_LIGHTNING_PURGE:
-							DoCast(me, SPELL_LIGHTNING_PURGE);	
-							events.CancelEvent(EVENT_LIGHTNING_PURGE);	
-							break;
-
-						case EVENT_PHASE_3:
-							Talk(SAY_PHASE_3);
-							events.CancelEvent(EVENT_PHASE_3);	
-							break;
-
-						default:
-							break;
-					}
-				}
-			}
-			
-			if(me->HealthBelowPct(50) && !events.IsInPhase(PHASE_2) && !events.IsInPhase(PHASE_3))
-			{
-				events.ScheduleEvent(EVENT_PHASE_2, 1*IN_MILLISECONDS, 0, PHASE_2);
-				events.SetPhase(PHASE_2);
-			}
-			
-			if (Creature* serpent = me->GetCreature(*me, instance->GetData64(DATA_NPC_AZURE_SERPENT)))
-			{
-				if(serpent->HealthBelowPct(55) && !checkSaySerpentLife)
-				{
-					Talk(SAY_HALF_LIFE_SERPENT);
-					checkSaySerpentLife = true;
-				}
-		
-				if(!checkAzureSerpentAlive)
-				{
-					Talk(SAY_SERPENT_DEATH);
-					if(Aura* aura = me->GetAura(SPELL_CHARGING_SOUL))
-						me->RemoveAura(aura);
-					events.SetPhase(PHASE_3);
-					events.ScheduleEvent(EVENT_PHASE_3, 2*IN_MILLISECONDS, 0, PHASE_3);
-					events.ScheduleEvent(EVENT_INVOKE_LIGHTNING, 3*IN_MILLISECONDS, 0, PHASE_3);
-					events.ScheduleEvent(EVENT_OVERCHARGED_SOUL, 25*IN_MILLISECONDS, 0, PHASE_3);
-					events.ScheduleEvent(EVENT_LIGHTNING_PURGE, 60*IN_MILLISECONDS, 0, PHASE_3);
-				}
-			}
-
-			DoMeleeAttackIfReady();
-		}
-	};
+Position azureSerpentPositions[4] =
+{
+    {3835.01f, 2906.63f, 753.33f},
+    {3850.37f, 2738.14f, 814.84f},
+    {3758.79f, 2692.08f, 778.60f},
+    {3736.37f, 2680.89f, 778.60f}
 };
 
 class npc_azure_serpent : public CreatureScript
 {
-public:
-	npc_azure_serpent() : CreatureScript("npc_azure_serpent") { }
+    public:
+        npc_azure_serpent() :  CreatureScript("npc_azure_serpent") { }
 
-	CreatureAI* GetAI(Creature* creature) const
-	{
-		return new npc_azure_serpentAI(creature);
-	}
-
-	struct npc_azure_serpentAI : public ScriptedAI
-	{
-		npc_azure_serpentAI(Creature *creature) : ScriptedAI(creature)
-		{
-			instance = creature->GetInstanceScript();
-		}
-
-		InstanceScript* instance;
-		EventMap events;
-
-		void Reset()
-		{
-			if (instance)
-				if (Creature* gu = me->GetCreature(*me, instance->GetData64(DATA_BOSS_GU_CLOUDSTRIKE)))
-					if (gu->AI())
-					    gu->AI()->DoAction(ACTION_AZURE_SERPENT_RESET);
-						
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE); 
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); 
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED); 
-			me->SetVisible(false);
-			
-			events.Reset();
-		}
-
-		void DoAction(int32 action)
+        struct npc_azure_serpentAI : public ScriptedAI
         {
-            switch (action)
+            npc_azure_serpentAI(Creature* creature) : ScriptedAI(creature)
             {
-				case ACTION_VISIBLE:
-					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-					me->SetVisible(true);
-					break;
-			}
+                pInstance = creature->GetInstanceScript();
+            }
+
+            InstanceScript* pInstance;
+            EventMap events;
+            uint8 phase;
+
+            uint32 movementTimer;
+            uint8 lastMovementId;
+
+            void Reset()
+            {
+                phase = 0;
+
+                me->setActive(true);
+                me->SetReactState(REACT_PASSIVE);
+
+                events.Reset();
+
+                me->AddAura(SPELL_LIGHTNING_SHIELD, me);
+
+                movementTimer = 0;
+                lastMovementId = 0;
+
+                me->SetSpeed(MOVE_FLIGHT, 5.0f);
+            }
+
+            Creature* GetGu()
+            {
+                return pInstance->instance->GetCreature(pInstance->GetData64(NPC_GU_CLOUDSTRIKE));
+            }
+
+            void JustDied(Unit* /*killer*/)
+            {
+                if (Creature* gu = GetGu())
+                    if (gu->AI())
+                        gu->AI()->DoAction(ACTION_GU_P_3);
+            }
+
+            void DoAction(const int32 action)
+            {
+                switch (action)
+                {
+                    case ACTION_AZURE_SERPENT_P_1:
+                        movementTimer = 100;
+                        break;
+                    case ACTION_AZURE_SERPENT_P_2:
+                        events.CancelEventGroup(PHASE_ONE);
+                        events.ScheduleEvent(EVENT_MAGNETIC_SHROUD, urand(10000, 15000), PHASE_TWO);
+                        events.ScheduleEvent(EVENT_LIGHTNING_BREATH, urand (2500, 7500), PHASE_TWO);
+                        
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        me->GetMotionMaster()->MovePoint(4, azureSerpentPositions[3].GetPositionX(), azureSerpentPositions[3].GetPositionY(), azureSerpentPositions[3].GetPositionZ());
+                        me->RemoveAurasDueToSpell(SPELL_LIGHTNING_SHIELD);
+
+                        DoZoneInCombat();
+                        break;
+                    case ACTION_AZURE_SERPENT_RESET:
+                        if (!me->isAlive())
+                            me->Respawn();
+
+                        me->CombatStop();
+                        Reset();
+                        me->NearTeleportTo(3829.19f, 2927.29f, 705.71f, 0.0f);
+                        break;
+                }
+            }
+
+            void MovementInform(uint32 uiType, uint32 id)
+            {
+                if (!id || uiType != POINT_MOTION_TYPE)
+                    return;
+
+                if (id < 3)
+                {
+                    lastMovementId = id;
+                    movementTimer = 500;
+                }
+                else if (id == 3)
+                {
+                    // Movement Finished, stop move start event
+                    phase = 1;
+                    events.ScheduleEvent(EVENT_STATIC_FIELD, 10000, PHASE_ONE);
+                    DoZoneInCombat();
+                }
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if (movementTimer != 0)
+                {
+                    if (movementTimer <= diff)
+                    {
+                        me->GetMotionMaster()->MovePoint(lastMovementId + 1, azureSerpentPositions[lastMovementId].GetPositionX(), azureSerpentPositions[lastMovementId].GetPositionY(), azureSerpentPositions[lastMovementId].GetPositionZ());
+                        movementTimer = 0;
+                    }
+                    else movementTimer -= diff;
+                }
+
+                if (!phase)
+                    return;
+
+                events.Update(diff);
+
+                switch(events.ExecuteEvent())
+                {
+                    case EVENT_STATIC_FIELD:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0, true))
+                            me->CastSpell(target, SPELL_STATIC_FIELD, false);
+                        events.ScheduleEvent(EVENT_STATIC_FIELD, 10000, PHASE_ONE);
+                        break;
+                    case EVENT_MAGNETIC_SHROUD:
+                        me->CastSpell(me, SPELL_MAGNETIC_SHROUD, false);
+                        events.ScheduleEvent(EVENT_MAGNETIC_SHROUD, urand(10000, 15000), PHASE_TWO);
+                        break;
+                    case EVENT_LIGHTNING_BREATH:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 0, true))
+                            me->CastSpell(target, SPELL_LIGHTNING_BREATH, false);
+                        events.ScheduleEvent(EVENT_LIGHTNING_BREATH, urand(7500, 12500), PHASE_TWO);
+                        break;
+                }
+            }
+        };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_azure_serpentAI(creature);
         }
-		void JustDied(Unit *pWho)
-		{
-			if (instance)
-				if (Creature* gu = me->GetCreature(*me, instance->GetData64(DATA_BOSS_GU_CLOUDSTRIKE)))
-					if (gu->AI())
-					    gu->AI()->DoAction(ACTION_AZURE_SERPENT_DIED);
-		}
-
-		void EnterCombat(Unit* /*who*/)
-		{
-			me->SetInCombatWithZone();
-			events.SetPhase(PHASE_1);
-			events.ScheduleEvent(EVENT_STATIC_FIELD, 1*IN_MILLISECONDS, 0, PHASE_1);
-		}
-
-		void UpdateAI(uint32 diff)
-		{
-			if(!UpdateVictim())
-				return;
-
-			events.Update(diff);
-
-			if (me->HasUnitState(UNIT_STATE_CASTING))
-				return;
-
-			while(uint32 eventId = events.ExecuteEvent())
-			{
-				switch(eventId)
-				{
-					if (instance)
-					{
-						case EVENT_STATIC_FIELD:
-							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-								if(target->GetTypeId() == TYPEID_PLAYER)
-								{
-									DoCast(target, SPELL_STATIC_FIELD);
-								}
-								
-							events.ScheduleEvent(EVENT_STATIC_FIELD, 8*IN_MILLISECONDS, 0, PHASE_1);
-							break;
-							
-						case EVENT_LIGHTNING_BREATH:
-							DoCast(me, SPELL_LIGHTNING_BREATH);
-							
-							events.ScheduleEvent(EVENT_LIGHTNING_BREATH, 8*IN_MILLISECONDS, 0, PHASE_2);
-							break;
-							
-						case EVENT_MAGNETIC_SHROUD:
-							DoCast(me, SPELL_MAGNETIC_SHROUD);
-							
-							events.ScheduleEvent(EVENT_MAGNETIC_SHROUD, 12*IN_MILLISECONDS, 0, PHASE_2);
-							break;
-
-						case EVENT_MOVE:
-							me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-							events.CancelEvent(EVENT_MOVE);
-							break;
-
-						default:
-							break;
-					}
-				}
-			}
-			
-			if (Creature* gu = me->GetCreature(*me, instance->GetData64(DATA_BOSS_GU_CLOUDSTRIKE)))
-				if(gu->HealthBelowPct(50) && !events.IsInPhase(PHASE_2))
-				{
-					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-					events.ScheduleEvent(EVENT_MOVE, 3*IN_MILLISECONDS, 0, PHASE_2);
-					events.ScheduleEvent(EVENT_LIGHTNING_BREATH, 5*IN_MILLISECONDS, 0, PHASE_2);
-					events.ScheduleEvent(EVENT_MAGNETIC_SHROUD, 9*IN_MILLISECONDS, 0, PHASE_2);
-					events.SetPhase(PHASE_2);
-				}
-
-			DoMeleeAttackIfReady();
-		}
-	};
 };
 
-class npc_gu_intro_trigger : public CreatureScript 
+class AreaTrigger_at_gu_intro : public AreaTriggerScript
 {
-public:
-	npc_gu_intro_trigger() : CreatureScript("npc_gu_intro_trigger") { }
+    public:
+        AreaTrigger_at_gu_intro() : AreaTriggerScript("at_gu_intro") {}
 
-	CreatureAI* GetAI(Creature* creature) const
-	{
-		return new npc_gu_intro_triggerAI(creature);
-	}
+        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+        {
+            if (InstanceScript* pInstance = player->GetInstanceScript())
+                if (Creature* gu = pInstance->instance->GetCreature(pInstance->GetData64(NPC_GU_CLOUDSTRIKE)))
+                    if (gu->AI())
+                        gu->AI()->DoAction(ACTION_INTRO);
 
-	struct npc_gu_intro_triggerAI : public ScriptedAI
-	{
-		npc_gu_intro_triggerAI(Creature *creature) : ScriptedAI(creature)
-		{
-			instance = creature->GetInstanceScript();
-		}
-
-		InstanceScript* instance;
-		EventMap events;
-		
-		bool checkTrigger; 
-
-		void Reset()
-		{
-			checkTrigger = true;
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE); 
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); 
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED); 
-			//ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilité du PNJ par les joueurs.
-		}
-
-		void JustDied(Unit *pWho)
-		{
-
-		}
-
-		void EnterCombat(Unit* /*who*/)
-		{
-
-		}
-
-		void UpdateAI(uint32 diff)
-		{	
-			if(checkTrigger)
-			{
-				Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
-				if (!PlayerList.isEmpty())
-				{
-					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-					{
-						if (me->GetExactDist2d(i->getSource()->GetPositionX(),i->getSource()->GetPositionY()) < 12) // A tester si cela fonctionne.
-						{
-							if (instance)
-								if (Creature* gu = me->GetCreature(*me, instance->GetData64(DATA_BOSS_GU_CLOUDSTRIKE)))
-									if (gu->AI())
-									{
-										gu->AI()->DoAction(ACTION_GU_INTRO);
-										checkTrigger = false;
-									}
-						}
-					}
-				}
-			}
-		}
-	};
+            return false;
+        }
 };
 
+class OnlyGuardianPredicate
+{
+    public:
+        OnlyGuardianPredicate() {}
 
+        bool operator()(WorldObject* target)
+        {
+            return target->GetEntry() != NPC_GUARDIAN;
+        }
+};
+
+class spell_kill_guardians : public SpellScriptLoader
+{
+    public:
+        spell_kill_guardians() : SpellScriptLoader("spell_kill_guardians") { }
+
+        class spell_kill_guardians_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_kill_guardians_SpellScript);
+
+            bool Validate(SpellInfo const* spell)
+            {
+                return true;
+            }
+
+            // set up initial variables and check if caster is creature
+            // this will let use safely use ToCreature() casts in entire script
+            bool Load()
+            {
+                return true;
+            }
+
+            void SelectTarget(std::list<WorldObject*>& targetList)
+            {
+                targetList.remove_if(OnlyGuardianPredicate());
+                _targetList = targetList;
+            }
+
+            void KillTarget(std::list<WorldObject*>& targetList)
+            {
+                targetList = _targetList;
+
+                for (auto itr: targetList)
+                    if (Creature* target = itr->ToCreature())
+                        target->DespawnOrUnsummon(2000);
+            }
+
+            void Register()
+            {
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kill_guardians_SpellScript::SelectTarget, EFFECT_0, TARGET_SRC_CASTER);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kill_guardians_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kill_guardians_SpellScript::KillTarget, EFFECT_1, TARGET_SRC_CASTER);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kill_guardians_SpellScript::KillTarget, EFFECT_1, TARGET_UNIT_SRC_AREA_ENTRY);
+            }
+
+            std::list<WorldObject*> _targetList;
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_kill_guardians_SpellScript();
+        }
+};
+
+class spell_overcharged_soul_damage : public SpellScriptLoader
+{
+    public:
+        spell_overcharged_soul_damage() : SpellScriptLoader("spell_overcharged_soul_damage") { }
+
+        class spell_overcharged_soul_damage_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_overcharged_soul_damage_SpellScript);
+
+            void ChangeDamage(SpellEffIndex effIndex)
+            {
+                if (Unit* caster = GetCaster())
+                    SetHitDamage(25000 / caster->GetHealthPct());
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_overcharged_soul_damage_SpellScript::ChangeDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_overcharged_soul_damage_SpellScript();
+        }
+};
 
 void AddSC_boss_gu_cloudstrike()
 {
-	new boss_gu_cloudstrike();
-	new npc_azure_serpent();
-	new npc_gu_intro_trigger();
+    new boss_gu_cloudstrike();
+    new npc_azure_serpent();
+    new AreaTrigger_at_gu_intro();
+    new spell_kill_guardians();
+    new spell_overcharged_soul_damage();
 }
