@@ -49,7 +49,12 @@ enum ShamanSpells
     SPELL_SHAMAN_TOTEM_EARTHBIND_EARTHGRAB      = 64695,
     SPELL_SHAMAN_TOTEM_EARTHBIND_TOTEM          = 6474,
     SPELL_SHAMAN_TOTEM_EARTHEN_POWER            = 59566,
-    SPELL_SHAMAN_TOTEM_HEALING_STREAM_HEAL      = 52042
+    SPELL_SHAMAN_TOTEM_HEALING_STREAM_HEAL      = 52042,
+	SPELL_SHAMAN_ASCENDANCE						= 114049,
+	SPELL_SHAMAN_ASCENDANCE_ELEMENTAL			= 114050,
+	SPELL_SHAMAN_ASCENDANCE_ENHANCEMENT			= 114051,
+	SPELL_SHAMAN_ASCENDANCE_RESTORATION			= 114052,
+	SPELL_SHAMAN_LAVA_BURST						= 51505,
 };
 
 enum ShamanSpellIcons
@@ -757,6 +762,87 @@ public:
     }
 };
 
+// Updated 5.1 : Ascendance - 114049
+class spell_sha_ascendance : public SpellScriptLoader
+{
+    public:
+        spell_sha_ascendance() : SpellScriptLoader("spell_sha_ascendance") { }
+
+        class spell_sha_ascendance_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_sha_ascendance_SpellScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_SHAMAN_ASCENDANCE))
+                    return false;
+                return true;
+            }
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+				Player* caster = GetCaster()->ToPlayer();
+
+				switch (caster->GetPrimaryTalentTree(caster->ToPlayer()->GetActiveSpec()))
+				{
+					case TALENT_TREE_SHAMAN_ELEMENTAL:
+						caster->CastSpell(caster, SPELL_SHAMAN_ASCENDANCE_ELEMENTAL);
+						break;
+
+					case TALENT_TREE_SHAMAN_ENHANCEMENT:
+						caster->CastSpell(caster, SPELL_SHAMAN_ASCENDANCE_ENHANCEMENT);
+						break;
+
+					case TALENT_TREE_SHAMAN_RESTORATION:
+						caster->CastSpell(caster, SPELL_SHAMAN_ASCENDANCE_RESTORATION);
+						break;
+
+					default:
+						break;
+				}
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_sha_ascendance_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_sha_ascendance_SpellScript();
+        }
+};
+
+// Updated 5.1 : Ascendance elemental - 114050
+class spell_sha_ascendance_elemental : public SpellScriptLoader
+{
+public:
+    spell_sha_ascendance_elemental() : SpellScriptLoader("spell_sha_ascendance_elemental") { }
+
+    class spell_sha_ascendance_elemental_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_sha_ascendance_elemental_AuraScript);
+
+        void EffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+			Player* caster = GetCaster()->ToPlayer();
+
+			caster->AddSpellCooldown(SPELL_SHAMAN_LAVA_BURST, 0, time(NULL) + 8);
+        }
+
+        void Register()
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_sha_ascendance_elemental_AuraScript::EffectRemove, EFFECT_0, SPELL_EFFECT_APPLY_AURA, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_sha_ascendance_elemental_AuraScript;
+    }
+};
+
 void AddSC_shaman_spell_scripts()
 {
     new spell_sha_ancestral_awakening_proc();
@@ -774,4 +860,6 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_thunderstorm();
     new spell_sha_healing_rain();
     new spell_sha_unleash_elements();
+	new spell_sha_ascendance();
+	new spell_sha_ascendance_elemental();
 }
