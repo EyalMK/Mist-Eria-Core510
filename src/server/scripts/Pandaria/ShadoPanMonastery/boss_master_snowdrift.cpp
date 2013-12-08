@@ -1,770 +1,958 @@
-/*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+/* # Script de Tydrheal : Master Snowdrift # */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
+/* Notes : Tester -- Voir Spells -- voir pour spwan coffre à la fin du boss -- SOUNDID
+Ajouter l'ID du NPC_TRIGGER
+
+Master Snowdrift : Script 95% (terminé -- voir spells)	
+Master Trigger	: Script 95% (terminé) -- ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilité du PNJ par les joueurs.
+ShadoPan Novice : Script 100% 
+Flying Snow : Script 100%
+Fragrant Lotus : Script 100%
+Miroir Master Snowdrift : Script 95% (terminé -- voir spells)
+
+
+
+UPDATE creature_template SET ScriptName = 'boss_master_snowdrift' WHERE entry = 56541;
+UPDATE creature_template SET ScriptName = 'npc_master_trigger' WHERE entry = ?????;
+UPDATE creature_template SET ScriptName = 'npc_shadopan_novice' WHERE entry = 56395;
+UPDATE creature_template SET ScriptName = 'npc_fragrant_lotus' WHERE entry = 56472;
+UPDATE creature_template SET ScriptName = 'npc_flying_snow' WHERE entry = 56473;
+UPDATE creature_template SET ScriptName = 'npc_miroir_master_snowdrift' WHERE entry = ?????;
+
+
+INSERT INTO creature_text (entry, groupid, id, text, type, language, probability, emote, duration, sound, comment) VALUES
+(56541, 0, 0, "Très bien, étrangers. Découvrons votre vraie force.", 14, 0, 100, 0, 0, ???????, "MasterSnowdrift - EnterCombat1"),
+(56541, 1, 0, "Savoir manier une arme n’est que la manifestation physique de la force martiale. Laissez-moi vous montrer ce qu’est la force spirituelle !", 14, 0, 100, 0, 0, ???????, "MasterSnowdrift - Phase2"),
+(56541, 2, 0, "Quand je n’étais qu’un jeune pandaren, mes poings étaient faibles, mais les années d’entraînement m’ont ouvert tant de possibilités !", 14, 0, 100, 0, 0, ???????, "MasterSnowdrift - Phase3"),
+(56541, 3, 0, "Vous ! Vous avez permis le réveil du sha après toutes ces années !", 14, 0, 100, 0, 0, ???????, "MasterSnowdrift - Intro1"),
+(56541, 4, 0, "Si vous voulez vraiment arrêter ce que les vôtres ont déchaîné sur nos terres, vous devez d’abord faire vos preuves dans notre école.", 14, 0, 100, 0, 0, ???????, "MasterSnowdrift - Intro2BeforeSpawn"),
+(56541, 5, 0, "Vous affronterez tout d’abord nos initiés…", 14, 0, 100, 0, 0, ???????, "MasterSnowdrift - Intro3SecondSpawn"),
+(56541, 6, 0, "Quand l'un mord la poussière, un autre se lève et prend sa place.", 14, 0, 100, 0, 0, ???????, "MasterSnowdrift - Intro4AndIntro6"),
+(56541, 7, 0, "Vous avez beaucoup à apprendre si vous voulez aider votre peuple à se défendre des initiés des sha. Placez-vous sur le côté !", 14, 0, 100, 0, 0, ???????, "MasterSnowdrift - Intro5ThirdSpawn"),
+(56541, 8, 0, "Vous avez vaincu nos plus jeunes élèves. Maintenant, vous allez affronter les plus aguerris.", 14, 0, 100, 0, 0, ???????, "MasterSnowdrift - Intro7"),
+(56541, 9, 0, "Neige Virevoltante ! Brise de Lotus ! Avancez !", 14, 0, 100, 0, 0, ???????, "MasterSnowdrift - Intro8SpawnBestStudents"),
+(56541, 10, 0, "Vous avez vaincu mes meilleurs disciples. Vous pourrez peut-être nous être utiles, finalement…", 14, 0, 100, 0, 0, ???????, "MasterSnowdrift - Intro9DeathBestStudents"),
+(56541, 11, 0, "Comme mon maître avait coutume de le dire, « on ne connaît vraiment quelqu'un qu’après l'avoir combattu. »", 14, 0, 100, 0, 0, ???????, "MasterSnowdrift - Intro10OpenDoor"),
+(56541, 12, 0, "Avancez, que nous fassions les présentations dans les formes.", 14, 0, 100, 0, 0, ???????, "MasterSnowdrift - Intro11BeforeMove"),
+(56541, 13, 0, "Votre technique est imparfaite.", 14, 0, 100, 0, 0, ???????, "MasterSnowdrift - Slay1"),
+(56541, 14, 0, "Vous avez besoin de vous entraîner plus !", 14, 0, 100, 0, 0, ???????, "MasterSnowdrift - InPhase1");
+
+
+*/
+
+#include "ScriptPCH.h"
 #include "shadopan_monastery.h"
-#include "Vehicle.h"
 
-enum eSpells
+enum Spells
 {
-    // Snowdrift
-
-    SPELL_CHASE_DOWN            = 118961,
-    SPELL_FIST_OF_FURY          = 106853,
-    SPELL_PARRY_STANCE          = 106454,
-    SPELL_QUIVERING_PALM        = 106422,
-    SPELL_TORNADO_KICK          = 106434,
-
-    SPELL_SMOKE_BOMB            = 110444,
-
-    // Novices
-
-    // Flagrant Lotus
-    SPELL_BALL_OF_FIRE          = 113760,
-    SPELL_BALL_OF_FIRE_DAMAGE   = 106470,
-    SPELL_FLYING_KICK           = 106439,
-
-    SPELL_CALL_STAFF            = 106681,
-    SPELL_RELEASE_STAFF         = 106680,
-
-    // Flying Snow
-    SPELL_WHIRLING_STEEL_FOCUS  = 106699,
-    SPELL_WHIRLING_STEEL_DAMAGE = 106646,
-
-    // Both
-    SPELL_FLARE                 = 132951,
+	/* Master Snowdrift */
+	SPELL_CHASE_DOWN = 118961,
+	SPELL_FISTS_OF_FURY = 113656,
+	SPELL_TORNADO_KICK = 106434,
+	SPELL_BALL_OF_FIRE = 106533,
+	SPELL_TORNADO_SLAM = 106352,
+	SPELL_PARRY_STANCE = 106447,
+	SPELL_QUIVERING_PALM = 106422,
+	SPELL_UNLEASH_VIBRATIONS = 106423,
+	SPELL_FLYING_KICK = 106439
 };
 
-enum eEvents
+enum Events
 {
-    // Snowdrift
-    EVENT_FIRST_EVENT           = 1,
-    EVENT_CHECK_WIPE            = 2,
+	/* Intro balcon -- trigger */
+	EVENT_SPAWN_BALCON_NOVICE_STUDENTS,
+	EVENT_SPAWN_BALCON_BEST_STUDENTS,
+	EVENT_INTRO_2,
+	EVENT_INTRO_3,
+	
 
-    EVENT_CHASE_DOWN            = 3,
-    EVENT_FIST_OF_FURY          = 4,
-    EVENT_PARRY_STANCE          = 5,
-    EVENT_QUIVERING_PALM        = 6,
-    EVENT_TORNADO_KICK          = 7,
-    EVENT_FIREBALL              = 8,
-    EVENT_PHASE_3               = 9,
+	/* Boss Master Snowdrift */
+	EVENT_INTRO_8,
+	EVENT_INTRO_10,
+	EVENT_INTRO_11,
+	EVENT_MOVE,
+	EVENT_BEFORE_COMBAT,
+	EVENT_MORE_TRAINING_TEXT,
 
-    EVENT_DISAPPEAR             = 10,
-    EVENT_DISAPPEAR_TWO         = 11,
+	EVENT_CHASE_DOWN,
+	EVENT_FISTS_OF_FURY,
+	EVENT_TORNADO_KICK,
+	EVENT_PHASE_2,
+	EVENT_PHASE_2_PART_1,
+	EVENT_PHASE_2_SPAWN_1,
+	EVENT_PHASE_2_PART_2,
+	EVENT_PHASE_2_SPAWN_2,
+	EVENT_PHASE_2_PART_3,
+	EVENT_PHASE_2_SPAWN_3,
+	EVENT_BALL_OF_FIRE,
+	EVENT_PHASE_3,
+	EVENT_TORNADO_SLAM,
+	EVENT_PARRY_STANCE,
+	EVENT_QUIVERING_PALM,
+	EVENT_FLYING_KICK,
+	EVENT_UNLEASH_VIBRATIONS,
+	EVENT_REMOVE_AURA,
+	EVENT_END,
 
-    // Miniboss
-    EVENT_BALL_OF_FIRE          = 12,
-    EVENT_FLYING_KICK           = 13,
-    EVENT_CALL_STAFF            = 14,
-    EVENT_RELEASE_STAFF         = 15,
-    
-    EVENT_WHIRLING_STEEL_FOCUS  = 16,
-    EVENT_WHIRLING_STEEL_CHANGE = 17,
-    EVENT_WHIRLING_STEEL_STOP   = 18
+	/* Npc Miroir Master Snowdrift */
+	EVENT_NPC_BALL_OF_FIRE
 };
 
-enum ePhases
+enum Phases
 {
-    PHASE_FIRST_EVENT   = 1,
-    PHASE_FIGHT_1       = 2,
-    PHASE_FIGHT_2       = 3,
-    PHASE_FIGHT_3       = 4
+	PHASE_1,
+	PHASE_2,
+	PHASE_3,
+	PHASE_END
 };
 
-enum ePoints
+enum Actions
 {
-    POINT_BEGIN_EVENT               = 1,
-    POINT_PHASE_FIGHT               = 2,
-
-    POINT_NOVICE_JUMP               = 3,
-    POINT_NOVICE_DEFEATED           = 4,
-    POINT_NOVICE_DEFEATED_SECOND    = 5,
-
-    POINT_MINIBOSS_JUMP             = 6,
-    POINT_MINIBOSS_DEFEATED         = 7
+	ACTION_BOSS_MASTER_SNOWDRIFT_RESET,
+	ACTION_BOSS_MASTER_SNOWDRIFT_DIED,
+	ACTION_FRAGRANT_LOTUS_DEATH,
+	ACTION_FLYING_SNOW_DEATH,
+	ACTION_INTRO_1,
+	ACTION_INTRO_2,
+	ACTION_INTRO_3,
+	ACTION_INTRO_4,
+	ACTION_INTRO_5,
+	ACTION_INTRO_7,
+	ACTION_SPAWN_SHADOPAN_NOVICE
 };
 
-Position SnowdriftPos[2] =
+enum Texts
 {
-    {3680.56f, 3045.27f, 816.20f},
-    {3713.60f, 3091.87f, 817.31f}
+	SAY_COMBAT = 0,
+	SAY_PHASE_2 = 1,
+	SAY_PHASE_3 = 2,
+	SAY_INTRO_1 = 3,
+	SAY_INTRO_2 = 4,
+	SAY_INTRO_3 = 5,
+	SAY_INTRO_4 = 6,
+	SAY_INTRO_5 = 7,
+	SAY_INTRO_7 = 8,
+	SAY_INTRO_8 = 9,
+	SAY_INTRO_9 = 10,
+	SAY_INTRO_10 = 11,
+	SAY_INTRO_11 = 12,
+	SAY_SLAY = 13,
+	SAY_MORE_TRAINING = 14
 };
 
-Position InitiateSpawnPos[5] =
+enum MovePoints
 {
-    {3708.56f, 3039.60f, 816.28f},
-    {3699.19f, 3049.62f, 816.28f},
-    {3688.03f, 3055.68f, 816.28f},
-    {3675.10f, 3066.98f, 816.28f},
-    {3668.95f, 3070.81f, 816.28f}
+    POINT_SPAWN_1  = 0,
+	POINT_SPAWN_2 = 0,
+	POINT_SPAWN_3 = 0
 };
 
-Position MinibossSpawnPos[2] =
+enum SpawnIds
 {
-    {3683.72f, 3053.94f, 816.28f},
-    {3687.77f, 3051.30f, 816.28f}
+    MIROIR_MASTER_SNOWDRIFT  = 0000,
+	/* SNOWDRIFTS_POSSESSIONS = 214518 */
+	SHADOPAN_NOVICE = 56395,
+	FRAGRANT_LOTUS = 56472,
+	FLYING_SNOW = 56473
 };
 
-Position ClonePos[3] =
+Position const spawnPos[6] =
 {
-    {3683.37f, 3087.65f, 815.70f, 0.0f},
-    {3719.41f, 3062.31f, 815.70f, 1.88f},
-    {3718.04f, 3097.97f, 817.40f, 4.06f}
+	{0.0f, 0.0f, 0.0f, 0.0f}, // Spawn balcon gauche
+	{0.0f, 0.0f, 0.0f, 0.0f}, // Spawn balcon droite
+    {0.0f, 0.0f, 0.0f, 0.0f}, // Spawn 1
+    {0.0f, 0.0f, 0.0f, 0.0f}, // Spawn 2
+	{0.0f, 0.0f, 0.0f, 0.0f}, // Spawn 3
+	{0.0f, 0.0f, 0.0f, 0.0f}
 };
 
-#define defaultrand urand(1000, 10000)
+enum TriggerIds
+{
+	NPC_TRIGGER = 00000
+};
+
+enum goIds
+{
+	GO_SNOWDRIFTS_POSSESIONS = 214518
+};
 
 class boss_master_snowdrift : public CreatureScript
 {
-    public:
-        boss_master_snowdrift() : CreatureScript("boss_master_snowdrift") {}
+public:
+	boss_master_snowdrift() : CreatureScript("boss_master_snowdrift") { }
 
-        struct boss_master_snowdriftAI : public BossAI
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new boss_master_snowdriftAI(creature);
+	}
+
+	struct boss_master_snowdriftAI : public ScriptedAI
+	{
+		boss_master_snowdriftAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
+
+		InstanceScript* instance;
+		EventMap events;
+		
+		bool checkMasterSnowdriftAlive;
+		bool checkFlyingSnowDeath;
+		bool checkFragrantLotusDeath;
+		bool checkIntro9;
+		bool checkBallOfFire;
+		int introTerminee;
+		int counterShadoPanNovice;
+		
+		
+		void Reset()
+		{
+			checkBallOfFire = false;
+			checkFlyingSnowDeath = false;
+			checkIntro9 = false;
+			checkFragrantLotusDeath = false;
+			checkMasterSnowdriftAlive = true;
+			checkMasterSnowdriftAlive = me->isAlive();
+			counterShadoPanNovice = 4;
+			
+			events.Reset();
+
+			if (introTerminee != 5)
+			{
+				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
+				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); 
+				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+				if(Creature *triggers = me->FindNearestCreature(NPC_TRIGGER, 50000.0f))
+					if(triggers->AI())
+					   triggers->AI()->Reset();
+			}
+			
+			if(Aura* aura = me->GetAura(SPELL_PARRY_STANCE))
+				me->RemoveAura(aura);
+
+			if (instance)
+			{
+				instance->SetBossState(DATA_BOSS_MASTER_SNOWDRIFT, NOT_STARTED);
+				me->AI()->DoAction(ACTION_BOSS_MASTER_SNOWDRIFT_RESET);
+			}
+		
+		}
+
+		void DoAction(int32 action)
         {
-            boss_master_snowdriftAI(Creature* creature) : BossAI(creature, DATA_MASTER_SNOWDRIFT)
+            switch (action)
             {
-                pInstance = creature->GetInstanceScript();
-            }
-
-            InstanceScript* pInstance;
-            bool introStarted;
-
-            uint8 phase;
-            uint8 eventPhase;
-
-            void Reset()
-            {
-                _Reset();
-
-                introStarted = false;
-                phase = PHASE_FIRST_EVENT;
-                eventPhase = 0;
-
-                Position pos;
-                SnowdriftPos[POINT_BEGIN_EVENT - 1].GetPosition(&pos);
-                me->GetMotionMaster()->Clear();
-                me->GetMotionMaster()->MovePoint(POINT_BEGIN_EVENT, pos);
-
-                me->setFaction(35);
-                me->SetReactState(REACT_PASSIVE);
-                SetCanSeeEvenInPassiveMode(true);
-            }
-
-            void EnterCombat(Unit* /*who*/)
-            {
-                pInstance->SetBossState(DATA_MASTER_SNOWDRIFT, IN_PROGRESS);
-                initDefaultEventsForPhase();
-            }
-
-            void initDefaultEventsForPhase()
-            {
-                events.CancelEventGroup(PHASE_FIGHT_1);
-                events.CancelEventGroup(PHASE_FIGHT_2);
-                events.CancelEventGroup(PHASE_FIGHT_3);
-
-                switch (phase)
-                {
-                    case PHASE_FIGHT_1:
-                        events.ScheduleEvent(EVENT_TORNADO_KICK, urand(7500, 12500), PHASE_FIGHT_1);
-                        events.ScheduleEvent(EVENT_FIST_OF_FURY, urand(5000, 10000), PHASE_FIGHT_1);
-                        events.ScheduleEvent(EVENT_CHASE_DOWN, defaultrand, PHASE_FIGHT_1);
-                        break;
-                    case PHASE_FIGHT_2:
-                        events.ScheduleEvent(EVENT_FIREBALL, urand(2500, 5000), PHASE_FIGHT_2);
-                        events.ScheduleEvent(EVENT_PHASE_3, urand(10000, 15000), PHASE_FIGHT_2);
-                        break;
-                    case PHASE_FIGHT_3:
-                        events.ScheduleEvent(EVENT_PARRY_STANCE, urand(10000, 15000), PHASE_FIGHT_3);
-                        events.ScheduleEvent(EVENT_QUIVERING_PALM, urand(5000, 10000), PHASE_FIGHT_3);
-                        break;
-                }
-            }
-
-            void MoveInLineOfSight(Unit* who)
-            {
-                if (who->ToPlayer())
-                {
-                    if (who->ToPlayer()->isGameMaster())
-                        return;
-
-                    if (me->GetDistance(who) < 45.0f && !introStarted)
-                    {
-                        introStarted = true;
-                        pInstance->SetBossState(DATA_MASTER_SNOWDRIFT, SPECIAL);
-                        events.ScheduleEvent(EVENT_FIRST_EVENT, 1000);
-                        events.ScheduleEvent(EVENT_CHECK_WIPE, 1000);
-                    }
-                }
-            }
-
-            void JustReachedHome()
-            {
-                Position pos;
-                SnowdriftPos[POINT_BEGIN_EVENT - 1].GetPosition(&pos);
-                me->GetMotionMaster()->Clear();
-                me->GetMotionMaster()->MovePoint(POINT_BEGIN_EVENT, pos);
-
-                pInstance->SetBossState(DATA_MASTER_SNOWDRIFT, FAIL);
-                summons.DespawnAll();
-            }
-
-            void DoAction(const int32 action)
-            {
-                if (action == ACTION_NOVICE_DONE)
-                {
-                    std::list<Creature*> noviceList;
-                    GetCreatureListWithEntryInGrid(noviceList, me, NPC_NOVICE, 100.0f);
-
-                    for (auto novice : noviceList)
-                        if (Creature* position = pInstance->instance->GetCreature(pInstance->GetData64(DATA_RANDOM_SECOND_POS)))
-                            novice->GetMotionMaster()->MoveJump(position->GetPositionX(), position->GetPositionY(), position->GetPositionZ(), 20.0f, 30.0f, POINT_NOVICE_DEFEATED_SECOND);
-
-                    ++eventPhase;
-                    events.ScheduleEvent(EVENT_FIRST_EVENT, urand(1000, 2000));
-                }
-                else if (action == ACTION_MINIBOSS_DONE)
-                {
-                    ++eventPhase;
-                    events.ScheduleEvent(EVENT_FIRST_EVENT, urand(1000, 2000));
-                }
-            }
-
-            void MovementInform(uint32 uiType, uint32 id)
-            {
-                if (uiType != POINT_MOTION_TYPE)
-                    return;
-
-                switch (id)
-                {
-                    case POINT_PHASE_FIGHT:
-                        me->setFaction(14);
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        // No Break
-                    case POINT_BEGIN_EVENT:
-                        me->SetFacingTo(me->GetAngle(3659.08f, 3015.38f));
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            void DoEvent()
-            {
-                switch (eventPhase)
-                {
-                    case 0:
-                    case 1:
-                    case 2:
-                        //Talk(eventPhase);
-                        ++eventPhase;
-                        events.ScheduleEvent(EVENT_FIRST_EVENT, 5000);
-                        break;
-                    // There is five novices waves
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                    {
-                        // Last wave have 4 initiates (for a total of 24)
-                        uint8 maxInitiateByWave = eventPhase == 7 ? 4: 5;
-
-                        for (uint8 i = 0; i < maxInitiateByWave; ++i)
-                            me->SummonCreature(NPC_NOVICE, InitiateSpawnPos[i].GetPositionX(), InitiateSpawnPos[i].GetPositionY(), InitiateSpawnPos[i].GetPositionZ());
-
-                        // When last wave, we wait for all initiate to be defeated
-                        if (eventPhase != 7)
-                        {
-                            ++eventPhase;
-                            events.ScheduleEvent(EVENT_FIRST_EVENT, urand(12500, 17500));
-                        }
-                        break;
-                    }
-                    case 8:
-                    {
-                        me->SummonCreature(NPC_FLAGRANT_LOTUS, MinibossSpawnPos[0].GetPositionX(), MinibossSpawnPos[0].GetPositionY(), MinibossSpawnPos[0].GetPositionZ());
-                        me->SummonCreature(NPC_FLYING_SNOW,    MinibossSpawnPos[1].GetPositionX(), MinibossSpawnPos[1].GetPositionY(), MinibossSpawnPos[1].GetPositionZ());
-                        break;
-                    }
-                    case 9:
-                    {
-                        me->GetMotionMaster()->MovePoint(POINT_PHASE_FIGHT, SnowdriftPos[POINT_PHASE_FIGHT - 1].GetPositionX(), SnowdriftPos[POINT_PHASE_FIGHT - 1].GetPositionY(), SnowdriftPos[POINT_PHASE_FIGHT - 1].GetPositionZ());
-                        phase = PHASE_FIGHT_1;
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            }
-
-            void DamageTaken(Unit* /*attacker*/, uint32& damage)
-            {
-                if (phase == PHASE_FIGHT_1)
-                {
-                    if (me->HealthBelowPctDamaged(70, damage))
-                    {
-                        me->CombatStop();
-                        me->SetReactState(REACT_PASSIVE);
-
-                        me->CastSpell(me, SPELL_SMOKE_BOMB, true);
-                        me->SetVisible(false); // We set this for two seconds, time to let client erase players' focus from the boss
-
-                        phase = PHASE_FIGHT_2;
-                        events.Reset();
-                        events.ScheduleEvent(EVENT_DISAPPEAR, 2000);
-                    }
-                }
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-                events.Update(diff);
-
-                switch(uint32 eventId = events.ExecuteEvent())
-                {
-                    // Event Script
-                    case EVENT_FIRST_EVENT:
-                        DoEvent();
-                        break;
-                    case EVENT_CHECK_WIPE:
-                        if (pInstance->IsWipe())
-                            Reset();
-                        events.ScheduleEvent(EVENT_CHECK_WIPE, defaultrand);
-                        break;
-                    // Combat Script
-                    /// Phase 1
-                    case EVENT_TORNADO_KICK:
-                        me->CastSpell(me, SPELL_TORNADO_KICK, false);
-                        events.ScheduleEvent(EVENT_TORNADO_KICK, urand(7500, 12500));
-                        break;
-                    case EVENT_FIST_OF_FURY:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
-                            me->CastSpell(target, SPELL_FIST_OF_FURY, false);
-
-                        events.ScheduleEvent(EVENT_FIST_OF_FURY, urand(5000, 10000));
-                        break;
-                    case EVENT_CHASE_DOWN:
-                        // Todo
-                        events.ScheduleEvent(eventId, defaultrand);
-                        break;
-                    /// Phase 2
-                    case EVENT_DISAPPEAR:
-                    {
-                        std::vector<uint8> randomIndex;
-                        for (int i = 0; i < 3; ++i) randomIndex.push_back(i); // 0 1 2
-                        std::random_shuffle(randomIndex.begin(), randomIndex.end());
-
-                        bool isBoss = true;
-
-                        for (auto index : randomIndex)
-                        {
-                            // The first random pos is for the boss, the two others are for his clones
-                            if (isBoss)
-                            {
-                                me->NearTeleportTo(ClonePos[index].GetPositionX(), ClonePos[index].GetPositionY(), ClonePos[index].GetPositionZ(), ClonePos[index].GetOrientation());
-                                me->SetVisible(true);
-                                me->CastSpell(me, SPELL_SMOKE_BOMB, true);
-                                isBoss = false;
-                            }
-                            else
-                                if (Creature* clone = me->SummonCreature(NPC_SNOWDRIFT_CLONE, ClonePos[index].GetPositionX(), ClonePos[index].GetPositionY(), ClonePos[index].GetPositionZ(), ClonePos[index].GetOrientation()))
-                                    clone->CastSpell(clone, SPELL_SMOKE_BOMB, true);
-                        }
-
-                        initDefaultEventsForPhase();
-                        break;
-                    }
-                    case EVENT_FIREBALL:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                            me->CastSpell(target, SPELL_BALL_OF_FIRE, false);
-
-                        events.ScheduleEvent(EVENT_FIREBALL, urand(2500, 5000));
-                        break;
-                    /// Phase 3
-                    case EVENT_PHASE_3:
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        phase = PHASE_FIGHT_3;
-                        initDefaultEventsForPhase();
-                        break;
-                    case EVENT_PARRY_STANCE:
-                        me->CastSpell(me, SPELL_PARRY_STANCE, false);
-                        events.ScheduleEvent(EVENT_PARRY_STANCE, urand(10000, 15000));
-                        break;
-                    case EVENT_QUIVERING_PALM:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                            me->CastSpell(target, SPELL_QUIVERING_PALM, false);
-
-                        events.ScheduleEvent(EVENT_QUIVERING_PALM, urand(5000, 10000));
-                        break;
-                    default:
-                        break;
-                }
-
-                if (phase == PHASE_FIGHT_1 || phase == PHASE_FIGHT_3)
-                    DoMeleeAttackIfReady();
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_master_snowdriftAI(creature);
+				case ACTION_BOSS_MASTER_SNOWDRIFT_RESET:
+					checkMasterSnowdriftAlive = true;
+					break;
+				case ACTION_SPAWN_SHADOPAN_NOVICE:
+					if (counterShadoPanNovice < 30)
+					{
+						me->SummonCreature(SHADOPAN_NOVICE, spawnPos[urand(0,1)], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30*IN_MILLISECONDS);
+						counterShadoPanNovice++;
+						if (counterShadoPanNovice == 8)
+							DoAction(ACTION_INTRO_4);
+						if (counterShadoPanNovice == 12)
+							DoAction(ACTION_INTRO_5);
+						if (counterShadoPanNovice == 16)
+							DoAction(ACTION_INTRO_4);
+					}
+					if (counterShadoPanNovice >= 30)
+					{
+						DoAction(ACTION_INTRO_7);
+					}
+					break;
+				case ACTION_BOSS_MASTER_SNOWDRIFT_DIED:
+					checkMasterSnowdriftAlive = false;
+					break;
+				case ACTION_INTRO_1:
+					if(introTerminee != 5)
+						Talk(SAY_INTRO_1);
+					break;
+				case ACTION_INTRO_2:
+					if(introTerminee != 5)
+					{
+						Talk(SAY_INTRO_2);
+						me->SummonCreature(SHADOPAN_NOVICE, spawnPos[0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30*IN_MILLISECONDS);
+						me->SummonCreature(SHADOPAN_NOVICE, spawnPos[0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30*IN_MILLISECONDS);
+						me->SummonCreature(SHADOPAN_NOVICE, spawnPos[1], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30*IN_MILLISECONDS);
+						me->SummonCreature(SHADOPAN_NOVICE, spawnPos[1], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30*IN_MILLISECONDS);
+					}
+					break;
+				case ACTION_INTRO_3:
+					Talk(SAY_INTRO_3);
+					break;
+				case ACTION_INTRO_4:
+					Talk(SAY_INTRO_4);
+					break;
+				case ACTION_INTRO_5:
+					Talk(SAY_INTRO_5);
+					break;
+				case ACTION_INTRO_7:
+					Talk(SAY_INTRO_7);
+					events.ScheduleEvent(EVENT_INTRO_8, 10*IN_MILLISECONDS);
+					break;
+				case ACTION_FRAGRANT_LOTUS_DEATH:
+					checkFragrantLotusDeath = true;
+					break;
+				case ACTION_FLYING_SNOW_DEATH:
+					checkFlyingSnowDeath = true;
+					break;
+			}
         }
+
+		void JustDied(Unit *pWho)
+		{
+			if (instance)
+			{
+				instance->SetBossState(DATA_BOSS_MASTER_SNOWDRIFT, DONE);
+			}
+			introTerminee = 0;
+			//au cas ou
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+			me->RemoveCorpse(); 
+			me->Respawn();
+			me->GetMotionMaster()->MoveJump(spawnPos[2].GetPositionX(), spawnPos[2].GetPositionY(), spawnPos[2].GetPositionZ(), me->GetExactDist2d(spawnPos[2].GetPositionX(), spawnPos[2].GetPositionY()) * 10.0f / 1.0f, 1.0f); //voir pour le speedZ 1.0f
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+			me->SummonGameObject(GO_SNOWDRIFTS_POSSESIONS, spawnPos[5].GetPositionX(), spawnPos[5].GetPositionY(), spawnPos[5].GetPositionZ(), 0, 0, 0, 0, 0, 9000000);
+		}
+
+		void KilledUnit(Unit *pWho)
+		{
+			Talk(SAY_SLAY);
+		}
+		
+		void EnterEvadeMode()
+		{
+			if (instance)
+				instance->SetBossState(DATA_BOSS_MASTER_SNOWDRIFT, FAIL);
+			introTerminee = 5;
+			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
+			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+			me->GetMotionMaster()->MoveJump(spawnPos[2].GetPositionX(), spawnPos[2].GetPositionY(), spawnPos[2].GetPositionZ(), me->GetExactDist2d(spawnPos[2].GetPositionX(), spawnPos[2].GetPositionY()) * 10.0f / 1.0f, 1.0f); //voir pour le speedZ 1.0f
+		}
+
+		void EnterCombat(Unit* /*who*/)
+		{
+			if (instance)
+				instance->SetBossState(DATA_BOSS_MASTER_SNOWDRIFT, IN_PROGRESS);
+
+			me->SetInCombatWithZone();
+			events.SetPhase(PHASE_1);
+			Talk(SAY_COMBAT);
+			events.ScheduleEvent(EVENT_FISTS_OF_FURY, 5*IN_MILLISECONDS, 0, PHASE_1);
+			events.ScheduleEvent(EVENT_MORE_TRAINING_TEXT, 10*IN_MILLISECONDS, 0, PHASE_1);
+			events.ScheduleEvent(EVENT_TORNADO_KICK, 15*IN_MILLISECONDS, 0, PHASE_1);
+			
+		}
+
+		void UpdateAI(uint32 diff)
+		{
+			if(!UpdateVictim())
+				return;
+
+			events.Update(diff);
+
+			if (me->HasUnitState(UNIT_STATE_CASTING))
+				return;
+
+			while(uint32 eventId = events.ExecuteEvent())
+			{
+				switch(eventId)
+				{
+					if (instance)
+					{
+						case EVENT_INTRO_8:
+							Talk(SAY_INTRO_8);
+							me->SummonCreature(FLYING_SNOW, spawnPos[0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 180*IN_MILLISECONDS);
+							me->SummonCreature(FRAGRANT_LOTUS, spawnPos[1], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 180*IN_MILLISECONDS);
+							events.CancelEvent(EVENT_INTRO_8);
+							break;
+						
+						case EVENT_INTRO_10:
+							Talk(SAY_INTRO_10);
+							events.ScheduleEvent(EVENT_INTRO_11, 10*IN_MILLISECONDS);
+							events.CancelEvent(EVENT_INTRO_10);
+							break;
+						
+						case EVENT_INTRO_11:
+							Talk(SAY_INTRO_11);
+							events.ScheduleEvent(EVENT_MOVE, 3*IN_MILLISECONDS);
+							events.CancelEvent(EVENT_INTRO_11);
+							break;
+						
+						case EVENT_MOVE:
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
+							me->GetMotionMaster()->MoveJump(spawnPos[2].GetPositionX(), spawnPos[2].GetPositionY(), spawnPos[2].GetPositionZ(), me->GetExactDist2d(spawnPos[2].GetPositionX(), spawnPos[2].GetPositionY()) * 10.0f / 1.0f, 1.0f); //voir pour le speedZ 1.0f
+							events.ScheduleEvent(EVENT_BEFORE_COMBAT, 4*IN_MILLISECONDS);
+							events.CancelEvent(EVENT_MOVE);
+							break;
+
+						case EVENT_BEFORE_COMBAT:
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+							events.CancelEvent(EVENT_BEFORE_COMBAT);
+							break;
+
+						case EVENT_FISTS_OF_FURY:
+							DoCast(me, SPELL_FISTS_OF_FURY);
+							events.CancelEvent(EVENT_FISTS_OF_FURY);
+							break;
+
+						case EVENT_TORNADO_KICK:
+							DoCast(me, SPELL_TORNADO_KICK);
+							events.CancelEvent(EVENT_TORNADO_KICK);
+							break;
+
+						case EVENT_MORE_TRAINING_TEXT:
+							Talk(SAY_MORE_TRAINING);
+							events.ScheduleEvent(EVENT_MORE_TRAINING_TEXT, 13*IN_MILLISECONDS, 0 , PHASE_1);
+							break;
+
+						case EVENT_PHASE_2:
+							Talk(SAY_PHASE_2);
+							events.ScheduleEvent(EVENT_PHASE_2_PART_1, 0, 0 , PHASE_2);
+							events.CancelEvent(EVENT_PHASE_2);
+							break;
+
+						case EVENT_PHASE_2_PART_1:
+							me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+							me->GetMotionMaster()->MovePoint(POINT_SPAWN_2, spawnPos[3]);
+							events.ScheduleEvent(EVENT_PHASE_2_SPAWN_1, 5*IN_MILLISECONDS, 0 , PHASE_2);
+							events.CancelEvent(EVENT_PHASE_2_PART_1);
+							break;
+
+						case EVENT_PHASE_2_SPAWN_1:
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+							me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
+							me->SummonCreature(MIROIR_MASTER_SNOWDRIFT, spawnPos[2], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 15*IN_MILLISECONDS);
+							me->SummonCreature(MIROIR_MASTER_SNOWDRIFT, spawnPos[4], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 15*IN_MILLISECONDS);
+							checkBallOfFire = true;
+							events.ScheduleEvent(EVENT_BALL_OF_FIRE, 2*IN_MILLISECONDS, 0, PHASE_2);
+							events.ScheduleEvent(EVENT_PHASE_2_PART_2, 15*IN_MILLISECONDS, 0, PHASE_2);
+							events.CancelEvent(EVENT_PHASE_2_SPAWN_1);
+							break;
+
+						case EVENT_BALL_OF_FIRE:
+							if(checkBallOfFire)
+							{
+								DoCast(me, SPELL_BALL_OF_FIRE);
+								events.ScheduleEvent(EVENT_BALL_OF_FIRE, 2*IN_MILLISECONDS, 0, PHASE_2);
+							}
+							else
+								events.CancelEvent(EVENT_BALL_OF_FIRE);
+							break;
+
+						case EVENT_PHASE_2_PART_2:
+							checkBallOfFire = false;
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
+							me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+							me->GetMotionMaster()->MovePoint(POINT_SPAWN_3, spawnPos[4]);
+							events.ScheduleEvent(EVENT_PHASE_2_SPAWN_2, 5*IN_MILLISECONDS, 0 , PHASE_2);
+							events.CancelEvent(EVENT_PHASE_2_PART_2);
+							break;
+
+						case EVENT_PHASE_2_SPAWN_2:
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+							me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
+							me->SummonCreature(MIROIR_MASTER_SNOWDRIFT, spawnPos[2], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 15*IN_MILLISECONDS);
+							me->SummonCreature(MIROIR_MASTER_SNOWDRIFT, spawnPos[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 15*IN_MILLISECONDS);
+							checkBallOfFire = true;
+							events.ScheduleEvent(EVENT_BALL_OF_FIRE, 2*IN_MILLISECONDS, 0, PHASE_2);
+							events.ScheduleEvent(EVENT_PHASE_2_PART_3, 15*IN_MILLISECONDS, 0, PHASE_2);
+							events.CancelEvent(EVENT_PHASE_2_SPAWN_2);
+							break;
+
+						case EVENT_PHASE_2_PART_3:
+							checkBallOfFire = false;
+							me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
+							me->GetMotionMaster()->MovePoint(POINT_SPAWN_1, spawnPos[2]);
+							events.ScheduleEvent(EVENT_PHASE_2_SPAWN_3, 5*IN_MILLISECONDS, 0 , PHASE_2);
+							events.CancelEvent(EVENT_PHASE_2_PART_3);
+							break;
+
+						case EVENT_PHASE_2_SPAWN_3:
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+							me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
+							me->SummonCreature(MIROIR_MASTER_SNOWDRIFT, spawnPos[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 15*IN_MILLISECONDS);
+							me->SummonCreature(MIROIR_MASTER_SNOWDRIFT, spawnPos[4], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 15*IN_MILLISECONDS);
+							checkBallOfFire = true;
+							events.ScheduleEvent(EVENT_BALL_OF_FIRE, 2*IN_MILLISECONDS, 0, PHASE_2);
+							events.ScheduleEvent(EVENT_PHASE_3, 15*IN_MILLISECONDS, 0, PHASE_2);
+							events.CancelEvent(EVENT_PHASE_2_SPAWN_3);
+							break;
+
+						case EVENT_PHASE_3:
+							checkBallOfFire = false;
+							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+							Talk(SAY_PHASE_3);
+							events.SetPhase(PHASE_3);
+							events.ScheduleEvent(EVENT_CHASE_DOWN, 0, 0, PHASE_3);
+							events.ScheduleEvent(EVENT_TORNADO_SLAM, 10*IN_MILLISECONDS, 0, PHASE_3);
+							events.ScheduleEvent(EVENT_PARRY_STANCE, 20*IN_MILLISECONDS, 0, PHASE_3);
+							events.CancelEvent(EVENT_PHASE_3);
+							break;
+
+						case EVENT_CHASE_DOWN:
+							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+								if(target->GetTypeId() == TYPEID_PLAYER)
+								{
+									DoCast(target, SPELL_CHASE_DOWN);
+								}
+							events.CancelEvent(EVENT_CHASE_DOWN);
+							break;
+
+						case EVENT_TORNADO_SLAM:
+							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+								if(target->GetTypeId() == TYPEID_PLAYER)
+								{
+									DoCast(target, SPELL_TORNADO_SLAM);
+								}
+							events.CancelEvent(EVENT_TORNADO_SLAM);
+							break;
+
+						case EVENT_PARRY_STANCE:
+							DoCast(me, SPELL_PARRY_STANCE);
+							events.ScheduleEvent(urand(EVENT_QUIVERING_PALM, EVENT_FLYING_KICK), 4*IN_MILLISECONDS, 0, PHASE_3);
+							events.CancelEvent(EVENT_PARRY_STANCE);
+							break;
+
+						case EVENT_QUIVERING_PALM:
+							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+								if(target->GetTypeId() == TYPEID_PLAYER)
+								{
+									DoCast(target, SPELL_QUIVERING_PALM);
+								}
+							events.ScheduleEvent(EVENT_UNLEASH_VIBRATIONS, 6*IN_MILLISECONDS, 0, PHASE_3);
+							events.CancelEvent(EVENT_QUIVERING_PALM);
+							break;
+
+						case EVENT_UNLEASH_VIBRATIONS:
+							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+								if(target->GetTypeId() == TYPEID_PLAYER)
+								{
+									DoCast(target, SPELL_UNLEASH_VIBRATIONS);
+								}
+							events.ScheduleEvent(EVENT_REMOVE_AURA, 4*IN_MILLISECONDS, 0, PHASE_3);
+							events.CancelEvent(EVENT_UNLEASH_VIBRATIONS);
+							break;
+
+						case EVENT_FLYING_KICK:
+							if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+								if(target->GetTypeId() == TYPEID_PLAYER)
+								{
+									DoCast(target, SPELL_FLYING_KICK);
+								}
+							events.ScheduleEvent(EVENT_REMOVE_AURA, 4*IN_MILLISECONDS, 0, PHASE_3);
+							events.CancelEvent(EVENT_FLYING_KICK);
+							break;
+
+						case EVENT_REMOVE_AURA:
+							if(Aura* aura = me->GetAura(SPELL_PARRY_STANCE))
+								me->RemoveAura(aura);
+							events.ScheduleEvent(EVENT_CHASE_DOWN, 2*IN_MILLISECONDS, 0, PHASE_3);
+							events.CancelEvent(EVENT_REMOVE_AURA);
+							break;
+
+						case EVENT_END:
+							introTerminee = 0;
+							me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+							me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+							if (instance)
+							{
+								instance->SetBossState(DATA_BOSS_MASTER_SNOWDRIFT, DONE);
+							}
+							me->GetMotionMaster()->MoveJump(spawnPos[2].GetPositionX(), spawnPos[2].GetPositionY(), spawnPos[2].GetPositionZ(), me->GetExactDist2d(spawnPos[2].GetPositionX(), spawnPos[2].GetPositionY()) * 10.0f / 1.0f, 1.0f); //voir pour le speedZ 1.0f
+							me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+							events.CancelEvent(EVENT_END);
+							break;
+
+						default:
+							break;
+					}
+				}
+			}
+
+			if (checkFragrantLotusDeath && checkFlyingSnowDeath && !checkIntro9)
+			{
+				Talk(SAY_INTRO_9);
+				events.ScheduleEvent(EVENT_INTRO_10, 10*IN_MILLISECONDS);
+				checkIntro9 = true;
+			}
+
+			if (me->HealthBelowPct(75) && events.IsInPhase(PHASE_1))
+			{
+				
+				events.ScheduleEvent(EVENT_PHASE_2, 0, 0, PHASE_2);
+				events.SetPhase(PHASE_2);
+			}
+
+			if (me->HealthBelowPct(3) && events.IsInPhase(PHASE_3))
+			{
+				events.ScheduleEvent(EVENT_END, 0, 0, PHASE_END);
+				events.SetPhase(PHASE_END);
+			}
+			
+
+			DoMeleeAttackIfReady();
+		}
+	};
 };
 
-class npc_snowdrift_novice : public CreatureScript
+class npc_master_trigger : public CreatureScript 
 {
-    public:
-        npc_snowdrift_novice() :  CreatureScript("npc_snowdrift_novice") { }
+public:
+	npc_master_trigger() : CreatureScript("npc_master_trigger") { }
 
-        struct npc_snowdrift_noviceAI : public ScriptedAI
-        {
-            npc_snowdrift_noviceAI(Creature* creature) : ScriptedAI(creature)
-            {
-                pInstance = creature->GetInstanceScript();
-                jumpDone = false;
-                stillInFight = true;
-            }
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_master_triggerAI(creature);
+	}
 
-            InstanceScript* pInstance;
-            EventMap events;
-            bool jumpDone;
-            bool stillInFight;
+	struct npc_master_triggerAI : public ScriptedAI
+	{
+		npc_master_triggerAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
 
-            void Reset()
-            {
-                events.Reset();
-                if (!jumpDone)
-                {
-                    float x, y;
-                    GetPositionWithDistInOrientation(me, 40.0f, 4.0f, x, y);
-                    me->GetMotionMaster()->MoveJump(x, y, me->GetMap()->GetHeight(x, y, me->GetPositionZ()), 20, 10, POINT_NOVICE_JUMP);
-                    jumpDone = true;
-                }
-            }
+		InstanceScript* instance;
+		EventMap events;
+		
+		bool checkTrigger; 
 
-            void MovementInform(uint32 uiType, uint32 id)
-            {
-                if (uiType != EFFECT_MOTION_TYPE)
-                    return;
+		void Reset()
+		{
+			checkTrigger = true;
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); 
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE); 
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); 
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED); 
+			//ajouter le flag pour qu'il soit invisible => Modifier dans la db pour la visibilité du PNJ par les joueurs.
+		}
 
-                switch (id)
-                {
-                    case POINT_NOVICE_JUMP:
-                        if (!stillInFight)
-                            break;
+		void JustDied(Unit *pWho)
+		{
 
-                        if (Player* target = me->SelectNearestPlayerNotGM(100.0f))
-                            AttackStart(target);
-                        break;
-                    case POINT_NOVICE_DEFEATED:
-                        if (pInstance)
-                            pInstance->SetData(DATA_DEFEATED_NOVICE, 1);
-                        break;
-                    case POINT_NOVICE_DEFEATED_SECOND:
-                        me->SetFacingTo(me->GetAngle(3659.08f, 3015.38f));
-                        break;
-                    default:
-                        break;
-                }
-            }
+		}
 
-            void DamageTaken(Unit* attacker, uint32& damage)
-            {
-                if (!stillInFight)
-                    return;
+		void EnterCombat(Unit* /*who*/)
+		{
 
-                if (damage >= me->GetHealth())
-                {
-                    damage = 0;
-                    me->SetReactState(REACT_PASSIVE);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
-                    me->setFaction(35);
-                    me->AttackStop();
-                    me->CombatStop();
-                    stillInFight = false;
-                    events.Reset();
+		}
 
-                    if (Creature* position = pInstance->instance->GetCreature(pInstance->GetData64(DATA_RANDOM_FIRST_POS)))
-                    {
-                        me->GetMotionMaster()->MoveJump(position->GetPositionX(), position->GetPositionY(), position->GetPositionZ(), 20.0f, 10.0f, POINT_NOVICE_DEFEATED);
-                        me->SetHomePosition(position->GetPositionX(), position->GetPositionY(), position->GetPositionZ(), position->GetOrientation());
-                    }
-                }
-            }
+		void UpdateAI(uint32 diff)
+		{	
+			events.Update(diff);
 
-            void UpdateAI(const uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
+			while(uint32 eventId = events.ExecuteEvent())
+			{
+				switch(eventId)
+				{
+					if (instance)
+					{
+						case EVENT_INTRO_2:
+							if (instance)
+								if (Creature* master = me->GetCreature(*me, instance->GetData64(DATA_BOSS_MASTER_SNOWDRIFT)))
+									if (master->AI())
+									{
+										master->AI()->DoAction(ACTION_INTRO_2);
+										events.ScheduleEvent(EVENT_INTRO_3, 10*IN_MILLISECONDS);
+										events.CancelEvent(EVENT_INTRO_2);
+									}
+							break;
 
-                DoMeleeAttackIfReady();
-            }
-        };
+							case EVENT_INTRO_3:
+								if (instance)
+									if (Creature* master = me->GetCreature(*me, instance->GetData64(DATA_BOSS_MASTER_SNOWDRIFT)))
+										if (master->AI())
+										{
+											master->AI()->DoAction(ACTION_INTRO_3);
+										}
+								events.CancelEvent(EVENT_INTRO_3);							
+							break;
 
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_snowdrift_noviceAI(creature);
-        }
+						default:
+							break;
+					}
+				}
+			}
+
+			if(checkTrigger)
+			{
+				Map::PlayerList const &playerList = me->GetMap()->GetPlayers();
+				if (!playerList.isEmpty())
+				{
+					for (Map::PlayerList::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
+					{
+						if (me->GetExactDist2d(i->getSource()->GetPositionX(),i->getSource()->GetPositionY()) < 12) 
+						{
+							if (instance)
+								if (Creature* master = me->GetCreature(*me, instance->GetData64(DATA_BOSS_MASTER_SNOWDRIFT)))
+									if (master->AI())
+									{
+										master->AI()->DoAction(ACTION_INTRO_1);
+										events.ScheduleEvent(EVENT_INTRO_2, 8*IN_MILLISECONDS);
+										checkTrigger = false;
+									}
+						}
+					}
+				}
+			}
+		}
+	};
 };
 
-class npc_snowdrift_miniboss : public CreatureScript
+class npc_shadopan_novice : public CreatureScript 
 {
-    public:
-        npc_snowdrift_miniboss() :  CreatureScript("npc_snowdrift_miniboss") { }
+public:
+	npc_shadopan_novice() : CreatureScript("npc_shadopan_novice") { }
 
-        struct npc_snowdrift_minibossAI : public ScriptedAI
-        {
-            npc_snowdrift_minibossAI(Creature* creature) : ScriptedAI(creature)
-            {
-                pInstance = creature->GetInstanceScript();
-                jumpDone = false;
-                stillInFight = true;
-            }
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_shadopan_noviceAI(creature);
+	}
 
-            InstanceScript* pInstance;
-            EventMap events;
-            bool jumpDone;
-            bool stillInFight;
-            uint8 whirlwindProgress;
+	struct npc_shadopan_noviceAI : public ScriptedAI
+	{
+		npc_shadopan_noviceAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
 
-            void Reset()
-            {
-                events.Reset();
-                whirlwindProgress = 0;
+		InstanceScript* instance;
+		EventMap events;
 
-                if (!jumpDone)
-                {
-                    float x, y;
-                    GetPositionWithDistInOrientation(me, 30.0f, 4.23f, x, y);
-                    me->GetMotionMaster()->MoveJump(x, y, me->GetMap()->GetHeight(x, y, me->GetPositionZ()), 20, 10, POINT_MINIBOSS_JUMP);
-                    jumpDone = true;
 
-                    if (me->GetEntry() == NPC_FLAGRANT_LOTUS)
-                    {
-                        events.ScheduleEvent(EVENT_BALL_OF_FIRE,    1000);
-                        events.ScheduleEvent(EVENT_FLYING_KICK,     1000);
-                        events.ScheduleEvent(EVENT_CALL_STAFF,      1000);
-                        events.ScheduleEvent(EVENT_RELEASE_STAFF,   1000);
-                    }
-                    else
-                    {
-                        events.ScheduleEvent(EVENT_WHIRLING_STEEL_FOCUS,  1000);
-                    }
-                }
-            }
+		void Reset()
+		{
+		}
 
-            void MovementInform(uint32 uiType, uint32 id)
-            {
-                if (uiType != POINT_MOTION_TYPE)
-                    return;
+		void JustDied(Unit *pWho)
+		{
+			if (instance)
+				if (Creature* master = me->GetCreature(*me, instance->GetData64(DATA_BOSS_MASTER_SNOWDRIFT)))
+						if (master->AI())
+						{
+							master->AI()->DoAction(ACTION_SPAWN_SHADOPAN_NOVICE);
+						}
+		}
 
-                switch (id)
-                {
-                    case POINT_MINIBOSS_DEFEATED:
-                        me->SetFacingTo(me->GetAngle(3659.08f, 3015.38f));
-                        break;
-                    default:
-                        break;
-                }
-            }
+		void EnterCombat(Unit* /*who*/)
+		{
 
-            void DamageTaken(Unit* attacker, uint32& damage)
-            {
-                if (!stillInFight)
-                    return;
+		}
 
-                if (damage >= me->GetHealth())
-                {
-                    damage = 0;
-                    me->setFaction(35);
-                    me->SetReactState(REACT_PASSIVE);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
-                    me->CombatStop();
-                    events.Reset();
-                    stillInFight = false;
+		void UpdateAI(uint32 diff)
+		{	
+			if(!UpdateVictim())
+				return;
 
-                    if (Creature* position = pInstance->instance->GetCreature(pInstance->GetData64(DATA_RANDOM_MINIBOSS_POS)))
-                    {
-                        me->GetMotionMaster()->MovePoint(POINT_MINIBOSS_DEFEATED, position->GetPositionX(), position->GetPositionY(), position->GetPositionZ());
-                        me->SetHomePosition(position->GetPositionX(), position->GetPositionY(), position->GetPositionZ(), position->GetOrientation());
-                    }
+			events.Update(diff);
 
-                    if (pInstance)
-                        pInstance->SetData(DATA_DEFEATED_MINIBOSS, 1);
-                }
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-                if (!stillInFight)
-                    return;
-
-                events.Update(diff);
-
-                switch(events.ExecuteEvent())
-                {
-                    case EVENT_BALL_OF_FIRE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                            me->CastSpell(target, SPELL_BALL_OF_FIRE, false);
-
-                        events.ScheduleEvent(EVENT_BALL_OF_FIRE, 10000);
-                        break;
-                    case EVENT_FLYING_KICK:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                            me->CastSpell(target, SPELL_FLYING_KICK, false);
-
-                        events.ScheduleEvent(EVENT_FLYING_KICK, 10000);
-                        break;
-                    case EVENT_CALL_STAFF:
-                        //me->CastSpell(me, SPELL_CALL_STAFF, false);
-                        events.ScheduleEvent(EVENT_CALL_STAFF, 10000);
-                        break;
-                    case EVENT_RELEASE_STAFF:
-                        if (me->GetVehicleKit())
-                            if (me->GetVehicleKit()->GetPassenger(0))
-                                me->GetVehicleKit()->GetPassenger(0)->ExitVehicle();
-                        events.ScheduleEvent(EVENT_CALL_STAFF, 10000);
-                        break;
-                    case EVENT_WHIRLING_STEEL_FOCUS:
-                        me->AddAura(SPELL_WHIRLING_STEEL_DAMAGE, me);
-                        me->SetReactState(REACT_PASSIVE);
-                        // no break
-                    case EVENT_WHIRLING_STEEL_CHANGE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                        {
-                            me->AddAura(SPELL_WHIRLING_STEEL_FOCUS, target);
-                            me->GetMotionMaster()->Clear();
-                            me->GetMotionMaster()->MoveChase(target);
-                        }
-                        if (++whirlwindProgress >= 5)
-                            events.ScheduleEvent(EVENT_WHIRLING_STEEL_CHANGE, 2000);
-                        else
-                            events.ScheduleEvent(EVENT_WHIRLING_STEEL_STOP, 2000);
-                        break;
-                    case EVENT_WHIRLING_STEEL_STOP:
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        me->GetMotionMaster()->Clear();
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                            AttackStart(target);
-                        events.ScheduleEvent(EVENT_WHIRLING_STEEL_FOCUS, 10000);
-                        break;
-                    default:
-                        break;
-                }
-
-                DoMeleeAttackIfReady();
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_snowdrift_minibossAI(creature);
-        }
+			if (me->HasUnitState(UNIT_STATE_CASTING))
+				return;
+			
+			DoMeleeAttackIfReady();
+		}
+	};
 };
 
-class npc_snowdrift_clone : public CreatureScript
+class npc_fragrant_lotus : public CreatureScript 
 {
-    public:
-        npc_snowdrift_clone() :  CreatureScript("npc_snowdrift_clone") { }
+public:
+	npc_fragrant_lotus() : CreatureScript("npc_fragrant_lotus") { }
 
-        struct npc_snowdrift_cloneAI : public ScriptedAI
-        {
-            npc_snowdrift_cloneAI(Creature* creature) : ScriptedAI(creature) {}
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_fragrant_lotusAI(creature);
+	}
 
-            uint32 fireBallTimer;
+	struct npc_fragrant_lotusAI : public ScriptedAI
+	{
+		npc_fragrant_lotusAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
 
-            void Reset()
-            {
-                me->SetReactState(REACT_PASSIVE);
-                me->setFaction(14);
-                DoZoneInCombat();
+		InstanceScript* instance;
+		EventMap events;
 
-                fireBallTimer = 500;
-            }
 
-            void UpdateAI(const uint32 diff)
-            {
-                if (fireBallTimer <= diff)
-                {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0, true))
-                        me->CastSpell(target, SPELL_BALL_OF_FIRE, true);
+		void Reset()
+		{
 
-                    fireBallTimer = 500;
-                }
-                else fireBallTimer -= diff;
-            }
-        };
+		}
 
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_snowdrift_cloneAI(creature);
-        }
+		void JustDied(Unit *pWho)
+		{
+			if (instance)
+					if (Creature* master = me->GetCreature(*me, instance->GetData64(DATA_BOSS_MASTER_SNOWDRIFT)))
+							if (master->AI())
+							{
+								master->AI()->DoAction(ACTION_FRAGRANT_LOTUS_DEATH);
+							}
+		}
+
+		void EnterCombat(Unit* /*who*/)
+		{
+
+		}
+
+		void UpdateAI(uint32 diff)
+		{	
+			if(!UpdateVictim())
+				return;
+
+			events.Update(diff);
+
+			if (me->HasUnitState(UNIT_STATE_CASTING))
+				return;
+			
+			DoMeleeAttackIfReady();
+		}
+	};
 };
 
-class npc_snowdrift_fireball : public CreatureScript
+class npc_flying_snow : public CreatureScript 
 {
-    public:
-        npc_snowdrift_fireball() :  CreatureScript("npc_snowdrift_fireball") { }
+public:
+	npc_flying_snow() : CreatureScript("npc_flying_snow") { }
 
-        struct npc_snowdrift_fireballAI : public ScriptedAI
-        {
-            npc_snowdrift_fireballAI(Creature* creature) : ScriptedAI(creature) {}
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_flying_snowAI(creature);
+	}
 
-            uint32 damageTimer;
+	struct npc_flying_snowAI : public ScriptedAI
+	{
+		npc_flying_snowAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
 
-            void Reset()
-            {
-                float x, y;
-                GetPositionWithDistInOrientation(me, 100.0f, me->GetOrientation(), x, y);
-                me->GetMotionMaster()->MovePoint(0, x, y, me->GetPositionZ());
+		InstanceScript* instance;
+		EventMap events;
 
-                me->SetReactState(REACT_PASSIVE);
-                me->setFaction(14);
 
-                damageTimer = 500;
-            }
+		void Reset()
+		{
 
-            void UpdateAI(const uint32 diff)
-            {
-                if (damageTimer <= diff)
-                {
-                    if (Unit* target = me->SelectNearestTarget())
-                        if (me->GetDistance(target) <= 1.0f)
-                            me->CastSpell(target, SPELL_BALL_OF_FIRE_DAMAGE, true);
+		}
 
-                    damageTimer = 500;
-                }
-                else damageTimer -= diff;
-            }
-        };
+		void JustDied(Unit *pWho)
+		{
+			if (instance)
+					if (Creature* master = me->GetCreature(*me, instance->GetData64(DATA_BOSS_MASTER_SNOWDRIFT)))
+							if (master->AI())
+							{
+								master->AI()->DoAction(ACTION_FLYING_SNOW_DEATH);
+							}
+		}
 
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_snowdrift_fireballAI(creature);
-        }
+		void EnterCombat(Unit* /*who*/)
+		{
+
+		}
+
+		void UpdateAI(uint32 diff)
+		{	
+			if(!UpdateVictim())
+				return;
+
+			events.Update(diff);
+
+			if (me->HasUnitState(UNIT_STATE_CASTING))
+				return;
+			
+			DoMeleeAttackIfReady();
+		}
+	};
 };
+
+class npc_miroir_master_snowdrift : public CreatureScript 
+{
+public:
+	npc_miroir_master_snowdrift() : CreatureScript("npc_miroir_master_snowdrift") { }
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_miroir_master_snowdriftAI(creature);
+	}
+
+	struct npc_miroir_master_snowdriftAI : public ScriptedAI
+	{
+		npc_miroir_master_snowdriftAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
+
+		InstanceScript* instance;
+		EventMap events;
+
+
+		void Reset()
+		{
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+		}
+
+		void JustSummoned(Creature* creature)
+		{
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+		}
+
+		void JustDied(Unit *pWho)
+		{
+	
+		}
+
+		void EnterCombat(Unit* /*who*/)
+		{
+			events.ScheduleEvent(EVENT_NPC_BALL_OF_FIRE, 2*IN_MILLISECONDS);
+		}
+
+		void UpdateAI(uint32 diff)
+		{	
+			if(!UpdateVictim())
+				return;
+
+			events.Update(diff);
+
+			if (me->HasUnitState(UNIT_STATE_CASTING))
+				return;
+
+			while(uint32 eventId = events.ExecuteEvent())
+			{
+				switch(eventId)
+				{
+					if (instance)
+					{
+						case EVENT_NPC_BALL_OF_FIRE:
+							DoCast(me, SPELL_BALL_OF_FIRE);
+							events.ScheduleEvent(EVENT_NPC_BALL_OF_FIRE, 2*IN_MILLISECONDS);
+							break;
+
+						default:
+							break;
+					}
+				}
+			}
+			
+			DoMeleeAttackIfReady();
+		}
+	};
+};
+
 
 void AddSC_boss_master_snowdrift()
 {
-    new boss_master_snowdrift();
-    new npc_snowdrift_novice();
-    new npc_snowdrift_miniboss();
-    new npc_snowdrift_clone();
-    new npc_snowdrift_fireball();
+	new boss_master_snowdrift();
+	new npc_master_trigger();
+	new npc_shadopan_novice();
+	new npc_fragrant_lotus();
+	new npc_flying_snow();
+	new npc_miroir_master_snowdrift();
 }

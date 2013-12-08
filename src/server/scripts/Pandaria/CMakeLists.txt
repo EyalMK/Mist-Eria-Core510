@@ -13,7 +13,19 @@ set(sources
   Pandaria/boss_sha_of_anger.cpp
   Pandaria/zone_wandering_isle.cpp
   Pandaria/zone_vale_of_eternal_blossoms.cpp
-  
+  Pandaria/MoguShanPalace/boss_gekkan.cpp
+  Pandaria/MoguShanPalace/boss_xin_the_weaponmaster.cpp
+  Pandaria/MoguShanPalace/instance_mogushan_palace.cpp
+  Pandaria/MoguShanPalace/mogushan_palace.h
+  Pandaria/ShadoPanMonastery/shadopan_monastery.h
+  Pandaria/ShadoPanMonastery/instance_shadopan_monastery.cpp
+  Pandaria/ShadoPanMonastery/boss_gu_cloudstrike.cpp
+  Pandaria/ShadoPanMonastery/boss_master_snowdrift.cpp
+  Pandaria/ShadoPanMonastery/boss_sha_of_violence.cpp
+  Pandaria/ShadoPanMonastery/boss_taran_zhu.cpp
+  Pandaria/StormstoutBrewery/boss_hoptallus.cpp
+  Pandaria/StormstoutBrewery/boss_ook_ook.cpp
+  Pandaria/StormstoutBrewery/boss_yan_zhu.cpp
   Pandaria/TempleoftheJadeSerpent/temple_of_the_jade_serpent.h
   Pandaria/TempleoftheJadeSerpent/instance_temple_of_the_jade_serpent.cpp
   Pandaria/TempleoftheJadeSerpent/boss_wise_mari.cpp
