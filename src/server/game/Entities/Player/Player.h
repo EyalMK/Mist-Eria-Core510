@@ -23,6 +23,9 @@
 #include "GroupReference.h"
 #include "MapReference.h"
 
+#include "BattlePetMgr.h"
+
+
 #include "Item.h"
 #include "PetDefines.h"
 #include "PhaseMgr.h"
@@ -2827,6 +2830,13 @@ public:
 
         SpyMgr &GetSpyMgr() {return m_spyMgr;}
 
+        /*********************************************************/
+        /***              BATTLE PET SYSTEM                    ***/
+        /*********************************************************/
+
+        BattlePetMgr& GetBattlePetMgr() { return m_battlePetMgr; }
+        BattlePetMgr const& GetBattlePetMgr() const { return m_battlePetMgr; }
+
     protected:
         // Gamemaster whisper whitelist
         WhisperListContainer WhisperList;
@@ -3171,6 +3181,7 @@ public:
 
         AchievementMgr<Player>* m_achievementMgr;
         ReputationMgr*  m_reputationMgr;
+        BattlePetMgr   m_battlePetMgr;
 
         SpellCooldowns m_spellCooldowns;
 
