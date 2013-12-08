@@ -3857,12 +3857,8 @@ void SpellMgr::LoadSpellInfoCorrections()
 					spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
 					spellInfo->Effects[EFFECT_0].Amplitude = 1000;
 					break;
-				case 106937: // Figment of Doubt (trigger Bounds of Reality)
-					spellInfo->Effects[1].Amplitude = 1;
-					break;
 				case 117665: // Bounds of Reality
-					spellInfo->Effects[EFFECT_1].Effect = 0;
-					spellInfo->Effects[EFFECT_0].Effect = 0;
+					spellInfo->Effects[EFFECT_1].MiscValue = 0;
 					break;
 				default:
 					break;
