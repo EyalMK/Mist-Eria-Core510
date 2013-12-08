@@ -196,6 +196,8 @@ public:
 				me->InterruptSpell(CURRENT_GENERIC_SPELL);
 				me->FinishSpell(CURRENT_CHANNELED_SPELL, true);
 				me->FinishSpell(CURRENT_GENERIC_SPELL, true);
+				me->RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
+				me->RemoveUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
 				me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 				me->GetMotionMaster()->MoveChase(me->getVictim(), 99999.0f);
