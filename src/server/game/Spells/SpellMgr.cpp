@@ -3859,6 +3859,7 @@ void SpellMgr::LoadSpellInfoCorrections()
 					break;
 				case 117665: // Bounds of Reality
 					spellInfo->Effects[EFFECT_0].Effect = 0;
+					spellInfo->Effects[EFFECT_1].Effect = 0;
 					break;
 				default:
 					break;
