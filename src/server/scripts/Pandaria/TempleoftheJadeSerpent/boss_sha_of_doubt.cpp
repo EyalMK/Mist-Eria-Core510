@@ -128,7 +128,7 @@ public:
 				events.SetPhase(PHASE_NULL);
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, FAIL);
 
-				me->CombatStop();
+				me->CombatStop(true);
 				me->DeleteThreatList();
 
 				if (me->HasAura(SPELL_BOUNDS_OF_REALITY))
@@ -241,6 +241,8 @@ public:
 								me->Relocate(trigger->GetHomePosition());
 								me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 								me->SetOrientation(4.410300f);
+								me->GetMotionMaster()->Clear();
+								me->GetMotionMaster()->MoveIdle();
 								sLog->outDebug(LOG_FILTER_NETWORKIO, "Sungis Sha of Doubt RELOCATE & ORIENTATION");
 							}
 
