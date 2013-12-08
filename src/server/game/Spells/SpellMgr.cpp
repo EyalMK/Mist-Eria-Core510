@@ -3858,7 +3858,7 @@ void SpellMgr::LoadSpellInfoCorrections()
 					spellInfo->Effects[EFFECT_0].Amplitude = 1000;
 					break;
 				case 117665: // Bounds of Reality
-					spellInfo->Effects[EFFECT_1].MiscValue = 0;
+					spellInfo->Effects[EFFECT_0].Effect = 0;
 					break;
 				default:
 					break;
