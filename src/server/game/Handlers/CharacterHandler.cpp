@@ -1232,6 +1232,8 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket& recvData)
         WorldPacket data(SMSG_CHAR_RENAME, 1);
         data << uint8(CHAR_NAME_NO_NAME);
         SendPacket(&data);
+
+        KickPlayer();
         return;
     }
 
@@ -1243,6 +1245,8 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket& recvData)
         data << uint64(guid);
         data << newName;
         SendPacket(&data);
+
+        KickPlayer();
         return;
     }
 
@@ -1251,6 +1255,8 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket& recvData)
     {
         WorldPacket data(SMSG_CHAR_RENAME, 1);
         data << uint8(CHAR_NAME_RESERVED);
+
+        KickPlayer();
         SendPacket(&data);
         return;
     }
@@ -1277,6 +1283,8 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(PreparedQueryResult resu
         WorldPacket data(SMSG_CHAR_RENAME, 1);
         data << uint8(CHAR_CREATE_ERROR);
         SendPacket(&data);
+
+        KickPlayer();
         return;
     }
 
@@ -1309,6 +1317,7 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(PreparedQueryResult resu
     data << uint8(RESPONSE_SUCCESS);
     data << uint64(guid);
     data << newName;
+    KickPlayer();
     SendPacket(&data);
 
     sWorld->UpdateCharacterNameData(guidLow, newName);
@@ -1762,6 +1771,8 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
         WorldPacket data(SMSG_CHAR_FACTION_CHANGE, 1);
         data << uint8(CHAR_CREATE_ERROR);
         SendPacket(&data);
+
+        KickPlayer();
         return;
     }
 
@@ -1775,6 +1786,8 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
         WorldPacket data(SMSG_CHAR_FACTION_CHANGE, 1);
         data << uint8(CHAR_CREATE_ERROR);
         SendPacket(&data);
+
+        KickPlayer();
         return;
     }
 
@@ -1783,6 +1796,8 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
         WorldPacket data(SMSG_CHAR_FACTION_CHANGE, 1);
         data << uint8(CHAR_CREATE_ERROR);
         SendPacket(&data);
+
+        KickPlayer();
         return;
     }
 
@@ -1794,6 +1809,8 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
             WorldPacket data(SMSG_CHAR_FACTION_CHANGE, 1);
             data << uint8(CHAR_CREATE_ERROR);
             SendPacket(&data);
+
+            KickPlayer();
             return;
         }
     }
@@ -1804,6 +1821,8 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
         WorldPacket data(SMSG_CHAR_FACTION_CHANGE, 1);
         data << uint8(CHAR_NAME_NO_NAME);
         SendPacket(&data);
+
+        KickPlayer();
         return;
     }
 
@@ -1813,6 +1832,8 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
         WorldPacket data(SMSG_CHAR_FACTION_CHANGE, 1);
         data << uint8(res);
         SendPacket(&data);
+
+        KickPlayer();
         return;
     }
 
@@ -1822,6 +1843,8 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
         WorldPacket data(SMSG_CHAR_FACTION_CHANGE, 1);
         data << uint8(CHAR_NAME_RESERVED);
         SendPacket(&data);
+
+        KickPlayer();
         return;
     }
 
@@ -1833,6 +1856,8 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
             WorldPacket data(SMSG_CHAR_FACTION_CHANGE, 1);
             data << uint8(CHAR_CREATE_NAME_IN_USE);
             SendPacket(&data);
+
+            KickPlayer();
             return;
         }
     }
@@ -2150,6 +2175,8 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
                     WorldPacket data(SMSG_CHAR_FACTION_CHANGE, 1);
                     data << uint8(CHAR_CREATE_ERROR);
                     SendPacket(&data);
+
+                    KickPlayer();
                     return;
                 }
 
@@ -2263,6 +2290,8 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
     data << uint8(facialHair);
     data << uint8(race);
     SendPacket(&data);
+
+    KickPlayer();
 }
 
 void WorldSession::HandleRandomizeCharNameOpcode(WorldPacket& recvData)
