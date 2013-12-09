@@ -97,7 +97,7 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
 
     data->Initialize(SMSG_BATTLE_PET_JOURNAL);
     *data << uint16(0); // unk
-    data->WriteBit(0); // unk
+    data->WriteBit(1); // unk
 
     data->WriteBits(petList.size(), 20);
 
