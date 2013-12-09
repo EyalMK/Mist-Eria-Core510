@@ -931,6 +931,10 @@ class WorldSession
 		void HandleBlackMarketBid(WorldPacket& recvData);
 		void SendBlackMarketBidResult();
 
+        // Battle Pet
+
+        void HandleSummonBattlePet(WorldPacket& recvData);
+
         // Miscellaneous
         void HandleSpellClick(WorldPacket& recvData);
         void HandleMirrorImageDataRequest(WorldPacket& recvData);

@@ -50,15 +50,18 @@ BattlePetMgr::BattlePetMgr(Player* owner) : m_player(owner)
 void BattlePetMgr::GetBattlePetList(PetBattleDataList &battlePetList) const
 {
     PlayerSpellMap spellMap = m_player->GetSpellMap();
-    for (PlayerSpell* itr : spellMap)
-    {
-        if (itr.second->state == PLAYERSPELL_REMOVED)
+
+    for (PlayerSpell::iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr) {
+        PlayerSpell* s = itr->second;
+
+
+        if (s->state == PLAYERSPELL_REMOVED)
             continue;
 
-        if (!itr.second->active || itr.second->disabled)
+        if (!s->active || s->disabled)
             continue;
 
-        SpellInfo const* spell = sSpellMgr->GetSpellInfo(itr.first);
+        SpellInfo const* spell = sSpellMgr->GetSpellInfo(itr->first);
         if (!spell)
             continue;
 
@@ -93,8 +96,7 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
     data->WriteBits(0, 21); // unk counter, may be related to battle pet slot
 
     // bits part
-    for (PetBattleData pet : petList)
-    {
+    for (PlayerSpell::iterator pet = petList.begin(); pet != petList.end(); ++pet) {
         data->WriteBit(true); // hasBreed, inverse
         data->WriteBit(true); // hasQuality, inverse
         data->WriteBit(true); // hasUnk, inverse
@@ -104,7 +106,7 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
     }
 
     // data part
-    for (PetBattleData pet : petList)
+    for (PlayerSpell::iterator pet = petList.begin(); pet != petList.end(); ++pet) {
     {
         *data << uint32(pet.m_displayID);
         *data << uint32(pet.m_summonSpellID); // Pet Entry
