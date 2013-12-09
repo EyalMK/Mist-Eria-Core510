@@ -705,13 +705,20 @@ int dtNavMesh::queryPolygonsInTile(const dtMeshTile* tile, const float* qmin, co
 dtStatus dtNavMesh::addTile(unsigned char* data, int dataSize, int flags,
 							dtTileRef lastRef, dtTileRef* result)
 {
-	// Make sure the data is in right format.
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "nobodie addtile 1");
+
+    // Make sure the data is in right format.
 	dtMeshHeader* header = (dtMeshHeader*)data;
 	if (header->magic != DT_NAVMESH_MAGIC)
 		return DT_FAILURE_DATA_MAGIC;
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "nobodie addtile 2");
+
+
 	if (header->version != DT_NAVMESH_VERSION)
 		return DT_FAILURE_DATA_VERSION;
 		
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "nobodie addtile 3");
 	// Make sure the location is free.
 	if (getTileAt(header->x, header->y))
 		return DT_FAILURE;
@@ -726,9 +733,14 @@ dtStatus dtNavMesh::addTile(unsigned char* data, int dataSize, int flags,
 			m_nextFree = tile->next;
 			tile->next = 0;
 		}
+
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "nobodie addtile 4");
+
 	}
 	else
 	{
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "nobodie addtile 5");
+
 		// Try to relocate the tile to specific index with same salt.
 		int tileIndex = (int)decodePolyIdTile((dtPolyRef)lastRef);
 		if (tileIndex >= m_maxTiles)
@@ -755,10 +767,14 @@ dtStatus dtNavMesh::addTile(unsigned char* data, int dataSize, int flags,
 		tile->salt = decodePolyIdSalt((dtPolyRef)lastRef);
 	}
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "nobodie addtile 6");
+
 	// Make sure we could allocate a tile.
 	if (!tile)
 		return DT_FAILURE_OUT_OF_MEMORY;
 	
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "nobodie addtile 7");
+
 	// Insert tile into the position lut.
 	int h = computeTileHash(header->x, header->y, m_tileLutMask);
 	tile->next = m_posLookup[h];
@@ -811,6 +827,8 @@ dtStatus dtNavMesh::addTile(unsigned char* data, int dataSize, int flags,
 			connectExtOffMeshLinks(tile, nei, i);
 			connectExtOffMeshLinks(nei, tile, dtOppositeTile(i));
 		}
+
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "nobodie addtile 8");
 	}
 	
 	if (result)
