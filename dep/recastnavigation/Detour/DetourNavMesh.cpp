@@ -705,20 +705,21 @@ int dtNavMesh::queryPolygonsInTile(const dtMeshTile* tile, const float* qmin, co
 dtStatus dtNavMesh::addTile(unsigned char* data, int dataSize, int flags,
 							dtTileRef lastRef, dtTileRef* result)
 {
-    std::cout << "nobodie addtile 1";
+    printf("nobodie addtile 1");
+
 
     // Make sure the data is in right format.
 	dtMeshHeader* header = (dtMeshHeader*)data;
 	if (header->magic != DT_NAVMESH_MAGIC)
 		return DT_FAILURE_DATA_MAGIC;
 
-    std::cout << "nobodie addtile 2";
+    printf("nobodie addtile 2");
 
 
 	if (header->version != DT_NAVMESH_VERSION)
 		return DT_FAILURE_DATA_VERSION;
 		
-    std::cout << "nobodie addtile 3";
+    printf("nobodie addtile 3");
 
     // Make sure the location is free.
 	if (getTileAt(header->x, header->y))
@@ -735,12 +736,12 @@ dtStatus dtNavMesh::addTile(unsigned char* data, int dataSize, int flags,
 			tile->next = 0;
 		}
 
-        std::cout << "nobodie addtile 4";
+        printf("nobodie addtile 4");
 
 	}
 	else
 	{
-        std::cout << "nobodie addtile 5";
+        printf("nobodie addtile 5");
 
 		// Try to relocate the tile to specific index with same salt.
 		int tileIndex = (int)decodePolyIdTile((dtPolyRef)lastRef);
@@ -768,13 +769,13 @@ dtStatus dtNavMesh::addTile(unsigned char* data, int dataSize, int flags,
 		tile->salt = decodePolyIdSalt((dtPolyRef)lastRef);
 	}
 
-    std::cout << "nobodie addtile 6";
+    printf("nobodie addtile 6");
 
 	// Make sure we could allocate a tile.
 	if (!tile)
 		return DT_FAILURE_OUT_OF_MEMORY;
 	
-    std::cout << "nobodie addtile 7";
+    printf("nobodie addtile 7");
 
 	// Insert tile into the position lut.
 	int h = computeTileHash(header->x, header->y, m_tileLutMask);
@@ -829,7 +830,7 @@ dtStatus dtNavMesh::addTile(unsigned char* data, int dataSize, int flags,
 			connectExtOffMeshLinks(nei, tile, dtOppositeTile(i));
 		}
 
-        std::cout << "nobodie addtile 8";
+        printf("nobodie addtile 8");
     }
 	
 	if (result)
