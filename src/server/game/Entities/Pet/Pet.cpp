@@ -50,12 +50,6 @@ Pet::Pet(Player* owner, PetType type) : Guardian(NULL, owner, true),
         InitCharmInfo();
     }
 
-	if(owner->getClass() == CLASS_WARLOCK)
-	{
-		m_petType = DEMON_PET;
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "DEMONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
-	}
-
     m_name = "Pet";
     m_regenTimer = PET_FOCUS_REGEN_INTERVAL;
 }
@@ -367,7 +361,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     }
 
     //set last used pet number (for use in BG's)
-    if (owner->GetTypeId() == TYPEID_PLAYER && isControlled() && !isTemporarySummoned() && (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET ||getPetType() == DEMON_PET))
+    if (owner->GetTypeId() == TYPEID_PLAYER && isControlled() && !isTemporarySummoned() && (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET))
         owner->ToPlayer()->SetLastPetNumber(pet_number);
 
     m_loading = false;
