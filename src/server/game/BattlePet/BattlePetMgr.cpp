@@ -89,7 +89,7 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
 
     uint8 quality = 5, gap81_7 = 17;
 
-    uint16 dword18 = 1, dword14 = 2, petLevel = 1, dword1A = 4;
+    uint16 dword18 = 1, dword14 = 1, petLevel = 1, dword1A = 1;
     std::string name = "Mascotte";
 
     uint32 petHealth = 100, petMaxHealth = 100, petPower = 100, petSpeed = 100;
@@ -170,6 +170,10 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
         *data << uint32((*pet).m_displayID);
         *data << uint32(petHealth);                       // UNK
         *data << uint16(petLevel);                       // petlevel
+
+        dword14 ++;
+        dword18 ++;
+        dword1C ++;
     }
 
 /*
