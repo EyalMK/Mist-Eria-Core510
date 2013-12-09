@@ -89,10 +89,10 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
 
     uint8 gap81_8, gap81_7 = 0;
 
-    uint16 dword18, dword14, dword16, dword1A = 1;
+    uint16 dword18 = 1, dword14 = 2, dword16 = 3, dword1A = 4;
     std::string name = "toto";
 
-    uint32 dword20, dword24, dword1C, dword28, dwordC = 1;
+    uint32 dword20 = 11, dword24 = 12, dword1C = 13, dword28 = 14, dwordC = 15;
     ObjectGuid guid, guid2 = 0;
 
     data->Initialize(SMSG_BATTLE_PET_JOURNAL);
@@ -100,6 +100,8 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
     data->WriteBit(0); // unk
 
     data->WriteBits(petList.size(), 20);
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE battlepet journal : petListSize : %u",petList.size());
 
     // bits part
     for (PetBattleDataList::iterator pet = petList.begin(); pet != petList.end(); ++pet) {
