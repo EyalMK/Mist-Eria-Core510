@@ -1228,7 +1228,10 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
 
     //cheat -> tried to socket same gem multiple times
     if ((gem_guids[0] && (gem_guids[0] == gem_guids[1] || gem_guids[0] == gem_guids[2])) ||
-        (gem_guids[1] && (gem_guids[1] == gem_guids[2])))
+        (gem_guids[1] && (gem_guids[1] == gem_guids[2] || gem_guids[1] == gem_guids[3])) ||
+		(gem_guids[2] && (gem_guids[2] == gem_guids[3] || gem_guids[2] == gem_guids[4])) ||
+		(gem_guids[3] && (gem_guids[3] == gem_guids[4] || gem_guids[3] == gem_guids[5])) ||
+		(gem_guids[4] && (gem_guids[4] == gem_guids[5])))
         return;
 
     Item* itemTarget = _player->GetItemByGuid(item_guid);
@@ -1274,7 +1277,27 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
             return;
 
         // tried to put meta gem in normal socket
-        if (itemProto->Socket[i].Color != SOCKET_COLOR_META && GemProps[i]->color == SOCKET_COLOR_META)
+        if (itemProto->Socket[i].Color != SOCKET_COLOR_SHA_TOUCHED && GemProps[i]->color == SOCKET_COLOR_META)
+            return;
+
+		// tried to put normal gem in sha touched socket
+        if (itemProto->Socket[i].Color == SOCKET_COLOR_SHA_TOUCHED && GemProps[i]->color != SOCKET_COLOR_SHA_TOUCHED)
+            return;
+
+        // tried to put meta gem in sha touched socket
+        if (itemProto->Socket[i].Color != SOCKET_COLOR_SHA_TOUCHED && GemProps[i]->color == SOCKET_COLOR_SHA_TOUCHED)
+            return;
+
+		// tried to put meta gem in prismatic socket
+        if (itemProto->Socket[i].Color == SOCKET_COLOR_PRISMATIC && GemProps[i]->color == SOCKET_COLOR_META)
+            return;
+
+		// tried to put sha touched gem in prismatic socket
+        if (itemProto->Socket[i].Color == SOCKET_COLOR_PRISMATIC && GemProps[i]->color == SOCKET_COLOR_SHA_TOUCHED)
+            return;
+
+		// tried to put cogwheel gem in prismatic socket
+        if (itemProto->Socket[i].Color == SOCKET_COLOR_PRISMATIC && GemProps[i]->color == SOCKET_COLOR_COGWHEEL)
             return;
 
         // tried to put normal gem in cogwheel socket
