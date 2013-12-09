@@ -107,7 +107,6 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
 
     // data part
     for (PetBattleDataList::iterator pet = petList.begin(); pet != petList.end(); ++pet) {
-    {
         *data << uint32((*pet).m_displayID);
         *data << uint32((*pet).m_summonSpellID); // Pet Entry
         *data << uint16(0); // xp
