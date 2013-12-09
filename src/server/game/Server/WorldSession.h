@@ -932,8 +932,10 @@ class WorldSession
 		void SendBlackMarketBidResult();
 
         // Battle Pet
-
         void HandleSummonBattlePet(WorldPacket& recvData);
+        void HandleTrapBattlePet(WorldPacket& recvData);
+        void HandleRenameBattlePet(WorldPacket& recvData);
+        void HandleToggleFavoriteBattlePet(WorldPacket& recvData);
 
         // Miscellaneous
         void HandleSpellClick(WorldPacket& recvData);

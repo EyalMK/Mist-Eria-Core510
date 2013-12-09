@@ -105,6 +105,8 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
 
     // bits part
     for (PetBattleDataList::iterator pet = petList.begin(); pet != petList.end(); ++pet) {
+        guid = (uint64)(*pet).m_summonSpellID;  //NOBODIE DAT HACKFIX in future send petGuid
+
         data->WriteBit(!quality);
         data->WriteBit(guid[0]);
         data->WriteBit(guid[7]);
@@ -131,15 +133,15 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
 
         data->WriteBits(name.size(), 7); // name lenght
 
-        guid = guid + 1;
     }
 
     data->WriteBits(0, 21); // unk counter, may be related to battle pet slot
 
 
-    guid = 0;
     // data part
     for (PetBattleDataList::iterator pet = petList.begin(); pet != petList.end(); ++pet) {
+        guid = (uint64)(*pet).m_summonSpellID; //NOBODIE DAT HACKFIX in future send petGuid
+
         data->WriteByteSeq(guid[3]);
         *data << uint32(petMaxHealth);                       // petMaxHealth
         *data << uint32((*pet).m_entry);                        // UNK
@@ -174,11 +176,6 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
         *data << uint32((*pet).m_displayID);
         *data << uint32(petHealth);                       // petHealth
         *data << uint16(petLevel);                       // petlevel
-
-        guid = guid + 1;
-        //word14 ++;
-        //word18 ++;
-        //word1A ++;
     }
 
 /*
@@ -223,10 +220,44 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
 void WorldSession::HandleSummonBattlePet(WorldPacket& recvData)
 {
     uint32 spellID = 0;
-    recvData >> spellID;
+    ObjectGuid petGuid;
+
+    petGuid[6] = recvData.ReadBit();
+    petGuid[7] = recvData.ReadBit();
+    petGuid[4] = recvData.ReadBit();
+    petGuid[5] = recvData.ReadBit();
+    petGuid[3] = recvData.ReadBit();
+    petGuid[2] = recvData.ReadBit();
+    petGuid[0] = recvData.ReadBit();
+    petGuid[1] = recvData.ReadBit();
+
+    recvData.ReadByteSeq(petGuid[1]);
+    recvData.ReadByteSeq(petGuid[6]);
+    recvData.ReadByteSeq(petGuid[3]);
+    recvData.ReadByteSeq(petGuid[2]);
+    recvData.ReadByteSeq(petGuid[5]);
+    recvData.ReadByteSeq(petGuid[0]);
+    recvData.ReadByteSeq(petGuid[4]);
+    recvData.ReadByteSeq(petGuid[7]);
+
+    spellID = (uint32)petGuid;  //NOBODIE DAT HACKFIX in future receive petGuid and summon him
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE pet summoning spell %u", spellID);
 
     if (!_player->HasSpell(spellID))
         return;
 
     _player->CastSpell(_player, spellID, true);
+}
+
+void WorldSession::HandleRenameBattlePet(WorldPacket& recvData)
+{
+}
+
+void WorldSession::HandleToggleFavoriteBattlePet(WorldPacket& recvData)
+{
+}
+
+void WorldSession::HandleTrapBattlePet(WorldPacket& recvData)
+{
 }
