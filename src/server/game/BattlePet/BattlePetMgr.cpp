@@ -96,7 +96,7 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
     data->WriteBits(0, 21); // unk counter, may be related to battle pet slot
 
     // bits part
-    for (PlayerSpell::iterator pet = petList.begin(); pet != petList.end(); ++pet) {
+    for (PetBattleDataList::iterator pet = petList.begin(); pet != petList.end(); ++pet) {
         data->WriteBit(true); // hasBreed, inverse
         data->WriteBit(true); // hasQuality, inverse
         data->WriteBit(true); // hasUnk, inverse
@@ -106,7 +106,7 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
     }
 
     // data part
-    for (PlayerSpell::iterator pet = petList.begin(); pet != petList.end(); ++pet) {
+    for (PetBattleDataList::iterator pet = petList.begin(); pet != petList.end(); ++pet) {
     {
         *data << uint32(pet.m_displayID);
         *data << uint32(pet.m_summonSpellID); // Pet Entry
