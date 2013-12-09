@@ -51,7 +51,7 @@ void BattlePetMgr::GetBattlePetList(PetBattleDataList &battlePetList) const
 {
     PlayerSpellMap spellMap = m_player->GetSpellMap();
 
-    for (PlayerSpell::iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr) {
+    for (PlayerSpellMap::iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr) {
         PlayerSpell* s = itr->second;
 
 
@@ -108,17 +108,17 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
     // data part
     for (PetBattleDataList::iterator pet = petList.begin(); pet != petList.end(); ++pet) {
     {
-        *data << uint32(pet.m_displayID);
-        *data << uint32(pet.m_summonSpellID); // Pet Entry
+        *data << uint32((*pet).m_displayID);
+        *data << uint32((*pet).m_summonSpellID); // Pet Entry
         *data << uint16(0); // xp
         *data << uint32(1); // health
         *data << uint16(1); // level
         // name
         *data << uint32(1); // speed
         *data << uint32(1); // max health
-        *data << uint32(pet.m_entry); // Creature ID
+        *data << uint32((*pet).m_entry); // Creature ID
         *data << uint32(1); // power
-        *data << uint32(pet.m_speciesID); // species
+        *data << uint32((*pet).m_speciesID); // species
     }
 
 /*
