@@ -1219,19 +1219,16 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
     uint64 item_guid;
     uint64 gem_guids[MAX_GEM_SOCKETS];
 
-    recvData >> item_guid;
-    if (!item_guid)
-        return;
-
 	for (int i = 0; i < MAX_GEM_SOCKETS; ++i)
         recvData >> gem_guids[i];
 
+	recvData >> item_guid;
+    if (!item_guid)
+        return;
+
     //cheat -> tried to socket same gem multiple times
     if ((gem_guids[0] && (gem_guids[0] == gem_guids[1] || gem_guids[0] == gem_guids[2])) ||
-        (gem_guids[1] && (gem_guids[1] == gem_guids[2] || gem_guids[1] == gem_guids[3])) ||
-		(gem_guids[2] && (gem_guids[2] == gem_guids[3] || gem_guids[2] == gem_guids[4])) ||
-		(gem_guids[3] && (gem_guids[3] == gem_guids[4] || gem_guids[3] == gem_guids[5])) ||
-		(gem_guids[4] && (gem_guids[4] == gem_guids[5])))
+        (gem_guids[1] && (gem_guids[1] == gem_guids[2])))
         return;
 
     Item* itemTarget = _player->GetItemByGuid(item_guid);
