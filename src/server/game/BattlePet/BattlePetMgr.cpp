@@ -131,7 +131,7 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
 
         data->WriteBits(name.size(), 7); // name lenght
 
-        guid += 1;
+        guid = guid + 1;
     }
 
     data->WriteBits(0, 21); // unk counter, may be related to battle pet slot
@@ -175,7 +175,7 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
         *data << uint32(petHealth);                       // petHealth
         *data << uint16(petLevel);                       // petlevel
 
-        guid += 1;
+        guid = guid + 1;
         //word14 ++;
         //word18 ++;
         //word1A ++;
