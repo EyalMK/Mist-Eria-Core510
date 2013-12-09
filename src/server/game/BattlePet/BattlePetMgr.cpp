@@ -87,12 +87,12 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
     PetBattleDataList petList;
     GetBattlePetList(petList);
 
-    uint8 gap81_8 = 1, gap81_7 = 2;
+    uint8 quality = 5, gap81_7 = 17;
 
-    uint16 dword18 = 1, dword14 = 2, petLevel = 1, dword1A = 4;
-    std::string name = "toto";
+    uint16 dword18 = 200, dword14 = 300, petLevel = 1, dword1A = 400;
+    std::string name = "Mascotte";
 
-    uint32 petHealth = 50, petMaxHealth = 100, petPower = 100, petSpeed = 100, dwordC = 15;
+    uint32 petHealth = 100, petMaxHealth = 100, petPower = 100, petSpeed = 100;
     ObjectGuid guid, guid2 = 0;
 
     data->Initialize(SMSG_BATTLE_PET_JOURNAL);
@@ -105,7 +105,7 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
 
     // bits part
     for (PetBattleDataList::iterator pet = petList.begin(); pet != petList.end(); ++pet) {
-        data->WriteBit(!gap81_8);
+        data->WriteBit(!quality);
         data->WriteBit(guid[0]);
         data->WriteBit(guid[7]);
         data->WriteBit(guid2!=0);
@@ -138,8 +138,8 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
     for (PetBattleDataList::iterator pet = petList.begin(); pet != petList.end(); ++pet) {
         data->WriteByteSeq(guid[3]);
         *data << uint32(petMaxHealth);                       // UNK
-        *data << uint32(dwordC);                        // UNK
-        if (gap81_8) *data << uint8(gap81_8);           // UNK
+        *data << uint32((*pet).m_entry);                        // UNK
+        if (quality) *data << uint8(quality);           // UNK
         data->WriteByteSeq(guid[5]);
         *data << uint32(petSpeed);                       // UNK
         if (dword18) *data << uint16(dword18);          // UNK
