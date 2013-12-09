@@ -85,39 +85,89 @@ void BattlePetMgr::GetBattlePetList(PetBattleDataList &battlePetList) const
 void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
 {
     PetBattleDataList petList;
+    GetBattlePetList(petList);
+
+    uint8 gap81_8, gap81_7 = 0;
+
+    uint16 dword18, dword14, dword16, dword1A = 1;
+    std::string name = "toto";
+
+    uint32 dword20, dword24, dword1C, dword28, dwordC = 1;
+    ObjectGuid guid, guid2 = 0;
 
     data->Initialize(SMSG_BATTLE_PET_JOURNAL);
     *data << uint16(0); // unk
-    data->WriteBit(1); // unk
+    data->WriteBit(0); // unk
 
-    GetBattlePetList(petList);
     data->WriteBits(petList.size(), 20);
-
-    data->WriteBits(0, 21); // unk counter, may be related to battle pet slot
 
     // bits part
     for (PetBattleDataList::iterator pet = petList.begin(); pet != petList.end(); ++pet) {
-        data->WriteBit(true); // hasBreed, inverse
-        data->WriteBit(true); // hasQuality, inverse
-        data->WriteBit(true); // hasUnk, inverse
-        data->WriteBits(0, 7); // name lenght
-        data->WriteBit(false); // unk bit
-        data->WriteBit(false); // has guid
+        data->WriteBit(!gap81_8);
+        data->WriteBit(guid[0]);
+        data->WriteBit(guid[7]);
+        data->WriteBit(guid2!=0);
+        if (guid2) {
+            data->WriteBit(guid2[0]);
+            data->WriteBit(guid2[5]);
+            data->WriteBit(guid2[2]);
+            data->WriteBit(guid2[1]);
+            data->WriteBit(guid2[7]);
+            data->WriteBit(guid2[3]);
+            data->WriteBit(guid2[4]);
+            data->WriteBit(guid2[6]);
+        }
+        data->WriteBit(guid[6]);
+        data->WriteBit(guid[2]);
+        data->WriteBit(gap81_7);
+        data->WriteBit(!dword14);
+        data->WriteBit(guid[4]);
+        data->WriteBit(guid[3]);
+        data->WriteBit(guid[5]);
+        data->WriteBit(!dword18);
+        data->WriteBit(guid[1]);
+
+        data->WriteBits(name.size(), 7); // name lenght
     }
+
+    data->WriteBits(0, 21); // unk counter, may be related to battle pet slot
 
     // data part
     for (PetBattleDataList::iterator pet = petList.begin(); pet != petList.end(); ++pet) {
+        data->WriteByteSeq(guid[3]);
+        *data << uint32(dword24);                       // UNK
+        *data << uint32(dwordC);                        // UNK
+        if (gap81_8) *data << uint8(gap81_8);           // UNK
+        data->WriteByteSeq(guid[5]);
+        *data << uint32(dword28);                       // UNK
+        if (dword18) *data << uint16(dword18);          // UNK
+
+        if (guid2) {
+            data->WriteByteSeq(guid2[0]);
+            data->WriteByteSeq(guid2[3]);
+            data->WriteByteSeq(guid2[2]);
+            data->WriteByteSeq(guid2[5]);
+            data->WriteByteSeq(guid2[4]);
+            *data << uint32(0);
+            data->WriteByteSeq(guid2[6]);
+            data->WriteByteSeq(guid2[7]);
+            data->WriteByteSeq(guid2[1]);
+        }
+
+        data->WriteByteSeq(guid[6]);
+        *data << uint16(dword1A);                             // UNK
+        data->WriteByteSeq(guid[7]);
+        data->WriteByteSeq(guid[1]);
+        *data << uint32(dword1C);                       // UNK
+        if (dword14) *data << uint16(dword14);          // UNK
+        data->WriteByteSeq(guid[4]);
+        data->WriteByteSeq(guid[2]);
+        data->WriteString(name);
+        data->WriteByteSeq(guid[0]);
+        *data << uint32((*pet).m_speciesID);
         *data << uint32((*pet).m_displayID);
-        *data << uint32((*pet).m_summonSpellID); // Pet Entry
-        *data << uint16(0); // xp
-        *data << uint32(1); // health
-        *data << uint16(1); // level
-        // name
-        *data << uint32(1); // speed
-        *data << uint32(1); // max health
-        *data << uint32((*pet).m_entry); // Creature ID
-        *data << uint32(1); // power
-        *data << uint32((*pet).m_speciesID); // species
+        *data << uint32(dword20);                       // UNK
+        *data << uint16(dword16);                       // UNK
     }
 
 /*
