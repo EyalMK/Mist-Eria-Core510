@@ -222,6 +222,7 @@ void WorldSession::HandleSummonBattlePet(WorldPacket& recvData)
     uint32 spellID = 0;
     ObjectGuid petGuid;
 
+    petGuid[1] = recvData.ReadBit();
     petGuid[6] = recvData.ReadBit();
     petGuid[7] = recvData.ReadBit();
     petGuid[4] = recvData.ReadBit();
@@ -229,7 +230,6 @@ void WorldSession::HandleSummonBattlePet(WorldPacket& recvData)
     petGuid[3] = recvData.ReadBit();
     petGuid[2] = recvData.ReadBit();
     petGuid[0] = recvData.ReadBit();
-    petGuid[1] = recvData.ReadBit();
 
     recvData.ReadByteSeq(petGuid[1]);
     recvData.ReadByteSeq(petGuid[6]);
@@ -241,6 +241,7 @@ void WorldSession::HandleSummonBattlePet(WorldPacket& recvData)
     recvData.ReadByteSeq(petGuid[7]);
 
     spellID = (uint32)petGuid;  //NOBODIE DAT HACKFIX in future receive petGuid and summon him
+
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE pet summoning spell %u", spellID);
 
