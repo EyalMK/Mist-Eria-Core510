@@ -1886,17 +1886,71 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
         // Search each faction is targeted
         switch (race)
         {
-            case RACE_ORC:
-            case RACE_TAUREN:
-            case RACE_UNDEAD_PLAYER:
-            case RACE_TROLL:
-            case RACE_BLOODELF:
-            case RACE_GOBLIN:
-                team = TEAM_HORDE;
-                break;
-            default:
-                break;
+        case RACE_ORC:
+        case RACE_TAUREN:
+        case RACE_UNDEAD_PLAYER:
+        case RACE_TROLL:
+        case RACE_BLOODELF:
+        case RACE_GOBLIN:
+        case RACE_PANDAREN_H:
+            team = TEAM_HORDE;
+            break;
+        case RACE_PANDAREN:
+            team = TEAM_NEUTRAL;
+            break;
+        default:
+            break;
         }
+
+        TeamId oldTeam = TEAM_ALLIANCE;
+
+        // Search each faction is targeted
+        switch (oldRace)
+        {
+        case RACE_ORC:
+        case RACE_TAUREN:
+        case RACE_UNDEAD_PLAYER:
+        case RACE_TROLL:
+        case RACE_BLOODELF:
+        case RACE_GOBLIN:
+        case RACE_PANDAREN_H:
+            oldTeam = TEAM_HORDE;
+            break;
+        case RACE_PANDAREN:
+            KickPlayer();
+            return;
+            break;
+        default:
+            break;
+        }
+
+
+        if (race == RACE_PANDAREN ||
+            race == RACE_PANDAREN_A ||
+            race == RACE_PANDAREN_H) {
+
+            switch (recvData.GetOpcode()) {
+            case CMSG_CHAR_RACE_CHANGE:
+                if (oldTeam == TEAM_HORDE) {
+                    team = TEAM_HORDE;
+                    race = RACE_PANDAREN_H;
+                } else {
+                    team = TEAM_ALLIANCE;
+                    race = RACE_PANDAREN_A;
+                }
+                break;
+            case CMSG_CHAR_FACTION_CHANGE:
+                if (oldTeam == TEAM_HORDE) {
+                    team = TEAM_ALLIANCE;
+                    race = RACE_PANDAREN_A;
+                } else {
+                    team = TEAM_HORDE;
+                    race = RACE_PANDAREN_H;
+                }
+                break;
+            }
+        }
+
 
         // Switch Languages
         // delete all languages first
