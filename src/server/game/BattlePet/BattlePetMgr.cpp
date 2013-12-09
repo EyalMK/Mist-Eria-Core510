@@ -89,7 +89,7 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
 
     uint8 quality = 5, gap81_7 = 17;
 
-    uint16 dword18 = 1, dword14 = 1, petLevel = 1, dword1A = 1;
+    uint16 word18 = 1, word14 = 1, petLevel = 1, word1A = 1;
     std::string name = "Mascotte";
 
     uint32 petHealth = 100, petMaxHealth = 100, petPower = 100, petSpeed = 100;
@@ -122,11 +122,11 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
         data->WriteBit(guid[6]);
         data->WriteBit(guid[2]);
         data->WriteBit(gap81_7);
-        data->WriteBit(!dword14);
+        data->WriteBit(!word14);
         data->WriteBit(guid[4]);
         data->WriteBit(guid[3]);
         data->WriteBit(guid[5]);
-        data->WriteBit(!dword18);
+        data->WriteBit(!word18);
         data->WriteBit(guid[1]);
 
         data->WriteBits(name.size(), 7); // name lenght
@@ -142,7 +142,7 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
         if (quality) *data << uint8(quality);           // UNK
         data->WriteByteSeq(guid[5]);
         *data << uint32(petSpeed);                       // UNK
-        if (dword18) *data << uint16(dword18);          // UNK
+        if (word18) *data << uint16(word18);          // UNK
 
         if (guid2) {
             data->WriteByteSeq(guid2[0]);
@@ -157,11 +157,11 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
         }
 
         data->WriteByteSeq(guid[6]);
-        *data << uint16(dword1A);                             // UNK
+        *data << uint16(word1A);                             // UNK
         data->WriteByteSeq(guid[7]);
         data->WriteByteSeq(guid[1]);
         *data << uint32(petPower);                       // UNK
-        if (dword14) *data << uint16(dword14);          // UNK
+        if (word14) *data << uint16(word14);          // UNK
         data->WriteByteSeq(guid[4]);
         data->WriteByteSeq(guid[2]);
         data->WriteString(name);
@@ -171,9 +171,9 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
         *data << uint32(petHealth);                       // UNK
         *data << uint16(petLevel);                       // petlevel
 
-        dword14 ++;
-        dword18 ++;
-        dword1C ++;
+        word14 ++;
+        word18 ++;
+        word1A ++;
     }
 
 /*
