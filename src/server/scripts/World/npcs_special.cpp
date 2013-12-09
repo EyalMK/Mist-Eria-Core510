@@ -3142,8 +3142,39 @@ public :
     }
 };
 
-#define NPC_IRE             60579
-#define NPC_SHA_OF_ANGER    61523
+class npc_remove_phase_auras : public CreatureScript
+{
+public:
+    npc_remove_phase_auras() : CreatureScript("npc_remove_phase_auras") { }
+
+    bool OnGossipHello(Player* player, Creature* creature)
+	{
+
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Je ne vois plus personne, aidez moi !" , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+		player->PlayerTalkClass->SendGossipMenu(724007, creature->GetGUID());
+
+		return true;
+
+	}
+
+	bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action)
+	{
+		player->PlayerTalkClass->ClearMenus();
+
+		switch (action)
+		{
+		case GOSSIP_ACTION_INFO_DEF + 1:
+		{
+			player->RemoveAurasByType(SPELL_AURA_PHASE);
+		}
+			break;
+		}
+
+		player->PlayerTalkClass->SendCloseGossip();
+		return true;
+	}
+};
 
 void AddSC_npcs_special()
 {
@@ -3182,4 +3213,5 @@ void AddSC_npcs_special()
     new npc_warrior_banner();
     new npc_transcendance();
 	new npc_winter_reveler();
+	new npc_remove_phase_auras();
 }

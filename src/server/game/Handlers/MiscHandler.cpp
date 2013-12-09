@@ -1104,13 +1104,13 @@ void WorldSession::HandleCompleteMovie(WorldPacket& /*recvData*/)
 	{
 		case 116: // Pandaren Faction Choice
 		{
+			GetPlayer()->RemoveAurasByType(SPELL_AURA_PHASE);
+			GetPlayer()->SetPhaseMask(1, true);
 			if(GetPlayer()->GetTeamId() == TEAM_ALLIANCE)
 				GetPlayer()->TeleportTo(0, -9065.f, 434.f, 93.f, 0.65f);
 			else
 				GetPlayer()->TeleportTo(1, 1365.f, -4370.f, 26.f, 0.07f);
 			break;
-			GetPlayer()->RemoveAllAuras();
-			GetPlayer()->SetPhaseMask(1, true);
 		}
 
 		default:
