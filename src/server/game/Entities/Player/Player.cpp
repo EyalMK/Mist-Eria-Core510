@@ -2403,9 +2403,9 @@ void Player::ProcessDelayedOperations()
         SetPower(POWER_CHI, 0);
         SetPower(POWER_HOLY_POWER, 0);
 		SetPower(POWER_CHAOS_ORB, 0);
-		SetPower(POWER_BURNING_EMBERS, 0);
-		SetPower(POWER_DEMONIC_FURY, 0);
-		SetPower(POWER_SOUL_SHARDS, 0);
+		SetPower(POWER_BURNING_EMBERS, 10);
+		SetPower(POWER_DEMONIC_FURY, 200);
+		SetPower(POWER_SOUL_SHARDS, 100);
         SetPower(POWER_RUNIC_POWER, 0);
         SetPower(POWER_FOCUS, GetMaxPower(POWER_FOCUS));
 
@@ -2543,11 +2543,33 @@ void Player::RegenerateAll()
     {
         if(getClass() == CLASS_PALADIN) Regenerate(POWER_HOLY_POWER);
         if(getClass() == CLASS_MONK) Regenerate(POWER_CHI);
-		if(getClass() == CLASS_PRIEST) Regenerate(POWER_CHAOS_ORB);
-		if(getClass() == CLASS_WARLOCK) Regenerate(POWER_BURNING_EMBERS);
 
         m_regenTimerTenSec -= 10000;
     }
+
+	if (m_regenTimerTenSec >= 100 && !isInCombat())
+	{
+		if(getClass() == CLASS_WARLOCK)
+			Regenerate(POWER_DEMONIC_FURY);
+
+		m_regenTimerTenSec -= 100;
+	}
+
+	if (m_regenTimerTenSec >= 2000 && !isInCombat())
+	{
+		if(getClass() == CLASS_WARLOCK)
+			Regenerate(POWER_BURNING_EMBERS);
+
+		m_regenTimerTenSec -= 2000;
+	}
+
+	if (m_regenTimerTenSec >= 20000 && !isInCombat())
+	{
+		if(getClass() == CLASS_WARLOCK)
+			Regenerate(POWER_SOUL_SHARDS);
+
+		m_regenTimerTenSec -= 20000;
+	}
 
     m_regenTimer = 0;
 }
@@ -2600,10 +2622,100 @@ void Player::Regenerate(Powers power)
         }
         case POWER_HOLY_POWER:                                            // Regenerate holy power (paladin)
 		case POWER_CHAOS_ORB:                                             // Regenerate shadow orbs (priest)
-		case POWER_BURNING_EMBERS:										  // Regenerate burning embers (warlock)
         case POWER_CHI:                                                   // Regenerate chi (monk)
         {
             addvalue += -1.0f;      // remove 1 each 10 sec
+            break;
+        }
+		// Regenerate Demonic Fury
+        case POWER_DEMONIC_FURY:
+        {
+            if (!isInCombat() && GetPower(POWER_DEMONIC_FURY) >= 300 && GetShapeshiftForm() != FORM_METAMORPHOSIS)
+                addvalue += -1.0f;    // remove 1 each 100ms
+            else if (!isInCombat() && GetPower(POWER_DEMONIC_FURY) < 200 && GetShapeshiftForm() != FORM_METAMORPHOSIS)
+                addvalue += 1.0f;     // give 1 each 100ms while player has less than 200 demonic fury
+
+            if (GetPower(POWER_DEMONIC_FURY) <= 40)
+            {
+                if (HasAura(103958))
+                    RemoveAura(103958);
+
+                if (HasAura(54879))
+                    RemoveAura(54879);
+            }
+
+            // Demonic Fury visuals
+            if (GetPower(POWER_DEMONIC_FURY) == 1000)
+                CastSpell(this, 131755, true);
+            else if (GetPower(POWER_DEMONIC_FURY) >= 500)
+            {
+                CastSpell(this, 122738, true);
+
+                if (HasAura(131755))
+                    RemoveAura(131755);
+            }
+            else
+            {
+                if (HasAura(122738))
+                    RemoveAura(122738);
+                if (HasAura(131755))
+                    RemoveAura(131755);
+            }
+
+            break;
+        }
+		// Regenerate Burning Embers
+        case POWER_BURNING_EMBERS:
+        {
+            // After 15s return to one embers if no one
+            // or return to one if more than one
+            if (!isInCombat() && GetPower(POWER_BURNING_EMBERS) < 10)
+                SetPower(POWER_BURNING_EMBERS, GetPower(POWER_BURNING_EMBERS) + 1);
+            else if (!isInCombat() && GetPower(POWER_BURNING_EMBERS) > 10)
+                SetPower(POWER_BURNING_EMBERS, GetPower(POWER_BURNING_EMBERS) - 1);
+
+            if (HasAura(56241))
+            {
+                if (GetPower(POWER_BURNING_EMBERS) < 20)
+                {
+                    RemoveAura(123730); // 2
+                    RemoveAura(123728); // 1
+                    RemoveAura(123731); // 3
+                }
+                else if (GetPower(POWER_BURNING_EMBERS) < 30)
+                {
+                    RemoveAura(123730); // 2 shards visual
+                    CastSpell(this, 123728, true); // 1 shard visual
+                }
+                else if (GetPower(POWER_BURNING_EMBERS) < 40)
+                {
+                    CastSpell(this, 123728, true); // 1 shard visual
+                    CastSpell(this, 123730, true); // 2 shards visual
+                    RemoveAura(123731); // 3 shards visual
+                }
+                else if (GetPower(POWER_BURNING_EMBERS) < 50)
+                {
+                    CastSpell(this, 123728, true); // 1 shard visual
+                    CastSpell(this, 123730, true); // 2 shards visual
+                    CastSpell(this, 123731, true); // 3 shards visual
+                }
+            }
+            else
+            {
+                if (GetPower(POWER_BURNING_EMBERS) < 20)
+                {
+                    RemoveAura(116855); // First visual
+                    RemoveAura(116920); // Second visual
+                }
+                if (GetPower(POWER_BURNING_EMBERS) < 30)
+                {
+                    CastSpell(this, 116855, true);  // First visual
+                    RemoveAura(116920);             // Second visual
+                }
+                else
+                    CastSpell(this, 116920, true);  // Second visual
+            }
+
             break;
         }
         case POWER_FOCUS:
@@ -2636,6 +2748,35 @@ void Player::Regenerate(Powers power)
             }
             break;
         }
+		// Regenerate Soul Shards
+        case POWER_SOUL_SHARDS:
+		{
+            // If isn't in combat, gain 1 shard every 20s
+            if (!isInCombat())
+                SetPower(POWER_SOUL_SHARDS, GetPower(POWER_SOUL_SHARDS) + 100);
+
+            if (HasAura(56241))
+            {
+                if (GetPower(POWER_SOUL_SHARDS) < 200 && GetPower(POWER_SOUL_SHARDS) >= 100)
+                {
+                    RemoveAura(123730); // 2 shards visual
+                    CastSpell(this, 123728, true); // 1 shard visual
+                }
+                else if (GetPower(POWER_SOUL_SHARDS) < 300)
+                {
+                    CastSpell(this, 123728, true); // 1 shard visual
+                    CastSpell(this, 123730, true); // 2 shards visual
+                    RemoveAura(123731); // 3 shards visual
+                }
+                else if (GetPower(POWER_SOUL_SHARDS) < 400)
+                {
+                    CastSpell(this, 123728, true); // 1 shard visual
+                    CastSpell(this, 123730, true); // 2 shards visual
+                    CastSpell(this, 123731, true); // 3 shards visual
+                }
+            }
+            break;
+		}
         case POWER_RUNES:
         case POWER_HEALTH:
         case POWER_HAPPINESS:
@@ -2769,13 +2910,13 @@ void Player::ResetAllPowers()
 			SetPower(POWER_CHAOS_ORB, 0);
 			break;
 		case POWER_BURNING_EMBERS:
-			SetPower(POWER_BURNING_EMBERS, 0);
+			SetPower(POWER_BURNING_EMBERS, 10);
 			break;
 		case POWER_DEMONIC_FURY:
-			SetPower(POWER_DEMONIC_FURY, 0);
+			SetPower(POWER_DEMONIC_FURY, 200);
 			break;
 		case POWER_SOUL_SHARDS:
-			SetPower(POWER_SOUL_SHARDS, 0);
+			SetPower(POWER_SOUL_SHARDS, 100);
 			break;
         case POWER_RUNIC_POWER:
             SetPower(POWER_RUNIC_POWER, 0);
@@ -3428,6 +3569,11 @@ void Player::InitStatsForLevel(bool reapplyMods)
     SetPower(POWER_RUNIC_POWER, 0);
     SetPower(POWER_CHI, 0);
     SetPower(POWER_RAGE, 0);
+    SetPower(POWER_SOUL_SHARDS, 100);
+    SetPower(POWER_DEMONIC_FURY, 200);
+    SetPower(POWER_BURNING_EMBERS, 10);
+    SetPower(POWER_CHAOS_ORB, 0);
+    SetPower(POWER_ECLIPSE, 0);
 
     // update level to hunter/summon pet
     if (Pet* pet = GetPet())
@@ -5152,9 +5298,9 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         SetPower(POWER_CHI, 0);
         SetPower(POWER_HOLY_POWER, 0);
 		SetPower(POWER_CHAOS_ORB, 0);
-		SetPower(POWER_BURNING_EMBERS, 0);
-		SetPower(POWER_DEMONIC_FURY, 0);
-		SetPower(POWER_SOUL_SHARDS, 0);
+		SetPower(POWER_BURNING_EMBERS, 10);
+		SetPower(POWER_DEMONIC_FURY, 200);
+		SetPower(POWER_SOUL_SHARDS, 100);
         SetPower(POWER_RUNIC_POWER, 0);
     }
 
@@ -23935,9 +24081,9 @@ void Player::ResurectUsingRequestData()
     SetPower(POWER_CHI, 0);
     SetPower(POWER_HOLY_POWER, 0);
 	SetPower(POWER_CHAOS_ORB, 0);
-	SetPower(POWER_BURNING_EMBERS, 0);
-	SetPower(POWER_DEMONIC_FURY, 0);
-	SetPower(POWER_SOUL_SHARDS, 0);
+	SetPower(POWER_BURNING_EMBERS, 10);
+	SetPower(POWER_DEMONIC_FURY, 200);
+	SetPower(POWER_SOUL_SHARDS, 100);
     SetPower(POWER_RUNIC_POWER, 0);
 
     if (uint32 aura = _resurrectionData->Aura)
@@ -26808,7 +26954,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
 {
     Pet* pet = new Pet(this, petType);
 
-    if (petType == DEMON_PET && pet->LoadPetFromDB(this, entry))
+    if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry))
     {
         // Remove Demonic Sacrifice auras (known pet)
         Unit::AuraEffectList const& auraClassScripts = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
@@ -26856,7 +27002,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     pet->SetCreatorGUID(GetGUID());
     pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, getFaction());
 
-    //pet->setPowerType(POWER_MANA);
+    //pet->setPowerType(POWER_MANA); // hmm not sure about this.
 
 
     pet->SetUInt32Value(UNIT_NPC_FLAGS, 0);
@@ -26887,7 +27033,6 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     switch (petType)
     {
         case SUMMON_PET:
-		case DEMON_PET:
             pet->InitPetCreateSpells();
             pet->InitTalentForLevel();
             pet->SavePetToDB(PET_SAVE_AS_CURRENT);
@@ -26897,7 +27042,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
             break;
     }
 
-    if (petType == DEMON_PET)
+    if (petType == SUMMON_PET)
     {
         // Remove Demonic Sacrifice auras (known pet)
         Unit::AuraEffectList const& auraClassScripts = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);

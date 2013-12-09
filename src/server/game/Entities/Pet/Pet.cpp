@@ -50,12 +50,6 @@ Pet::Pet(Player* owner, PetType type) : Guardian(NULL, owner, true),
         InitCharmInfo();
     }
 
-	if(owner->getClass() == CLASS_WARLOCK)
-	{
-		m_petType = DEMON_PET;
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "DEMONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
-	}
-
     m_name = "Pet";
     m_regenTimer = PET_FOCUS_REGEN_INTERVAL;
 }
@@ -217,14 +211,17 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
 
     switch (getPetType())
     {
-        case SUMMON_PET:
+		case SUMMON_PET:
             petlevel = owner->getLevel();
 
             SetUInt32Value(UNIT_FIELD_BYTES_0, 0x800); // class = mage
-			setPowerType(POWER_MANA);
-
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
                                                             // this enables popup window (pet dismiss, cancel)
+            if (owner && owner->getClass() == CLASS_WARLOCK)
+            {
+                SetUInt32Value(UNIT_FIELD_BYTES_0, 0x400); // class = rogue
+                setPowerType(POWER_ENERGY); // Warlock's pets have energy
+            }
             break;
         case HUNTER_PET:
             SetUInt32Value(UNIT_FIELD_BYTES_0, 0x02020100); // class = warrior, gender = none, power = focus
@@ -234,15 +231,6 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
                                                             // this enables popup window (pet abandon, cancel)
             setPowerType(POWER_FOCUS);
-            break;
-		case DEMON_PET:
-            SetUInt32Value(UNIT_FIELD_BYTES_0, 0x03020100); // class = warrior, gender = none, power = energy
-            SetSheath(SHEATH_STATE_MELEE);
-            SetByteFlag(UNIT_FIELD_BYTES_2, 2, fields[9].GetBool() ? 0 : UNIT_CAN_BE_RENAMED);
-
-            SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
-                                                            // this enables popup window (pet abandon, cancel)
-            setPowerType(POWER_ENERGY);
             break;
         default:
             if (!IsPetGhoul())
@@ -261,25 +249,24 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     SetReactState(ReactStates(fields[6].GetUInt8()));
     SetCanModifyStats(true);
 
-    if (getPetType() == SUMMON_PET && !current)              //all (?) summon pets come with full health when called, but not when they are current
+	if (getPetType() == SUMMON_PET && !current && owner && owner->getClass() != CLASS_WARLOCK)  //all (?) summon pets come with full health when called, but not when they are current
         SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
-	else if (getPetType() == DEMON_PET && !current)              //all (?) demon pets come with full health when called, but not when they are current
-        SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
     else
     {
         uint32 savedhealth = fields[10].GetUInt32();
         uint32 savedmana = fields[11].GetUInt32();
         if (!savedhealth && getPetType() == HUNTER_PET)
             setDeathState(JUST_DIED);
+        else if (owner && owner->getClass() != CLASS_WARLOCK)
+        {
+            SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
+            SetPower(POWER_MANA, savedmana > uint32(GetMaxPower(POWER_MANA)) ? GetMaxPower(POWER_MANA) : savedmana);
+        }
         else
         {
             SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
-
-			if (getPetType() == SUMMON_PET)
-				SetPower(POWER_MANA, savedmana > uint32(GetMaxPower(POWER_MANA)) ? GetMaxPower(POWER_MANA) : savedmana);
-			if (getPetType() == DEMON_PET)
-				SetPower(POWER_ENERGY, uint32(GetMaxPower(POWER_ENERGY)));
-
+            SetMaxPower(POWER_ENERGY, GetCreatePowers(POWER_ENERGY));
+            SetPower(POWER_ENERGY, GetCreatePowers(POWER_ENERGY));
         }
     }
 
@@ -374,7 +361,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     }
 
     //set last used pet number (for use in BG's)
-    if (owner->GetTypeId() == TYPEID_PLAYER && isControlled() && !isTemporarySummoned() && (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET ||getPetType() == DEMON_PET))
+    if (owner->GetTypeId() == TYPEID_PLAYER && isControlled() && !isTemporarySummoned() && (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET))
         owner->ToPlayer()->SetLastPetNumber(pet_number);
 
     m_loading = false;
@@ -1041,7 +1028,10 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
     SetFullHealth();
 
-    SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+    if (GetOwner() && GetOwner()->getClass() == CLASS_WARLOCK)
+        SetPower(POWER_ENERGY, GetCreatePowers(POWER_ENERGY));
+    else
+        SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
     return true;
 }
 

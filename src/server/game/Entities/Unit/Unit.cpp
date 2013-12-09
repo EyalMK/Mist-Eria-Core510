@@ -8403,12 +8403,9 @@ void Unit::SetMinion(Minion *minion, bool apply)
             for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
                 minion->SetSpeed(UnitMoveType(i), m_speed_rate[i], true);
 
-        // Ghoul pets have energy instead of mana (is anywhere better place for this code?)
-        if (minion->IsPetGhoul())
+        // Ghoul pets and Warlock's pets have energy instead of mana (is anywhere better place for this code?)
+        if (minion->IsPetGhoul() || (minion->GetOwner() && minion->GetOwner()->getClass() == CLASS_WARLOCK))
             minion->setPowerType(POWER_ENERGY);
-
-		if (minion->GetOwner()->getClass() == CLASS_WARLOCK)
-			minion->setPowerType(POWER_ENERGY);
 
         if (GetTypeId() == TYPEID_PLAYER)
         {
@@ -12293,6 +12290,16 @@ Powers Unit::GetPowerTypeByAuraGroup(UnitMods unitMod) const
         case UNIT_MOD_FOCUS:       return POWER_FOCUS;
         case UNIT_MOD_ENERGY:      return POWER_ENERGY;
         case UNIT_MOD_CHI:         return POWER_CHI;
+			case UNIT_MOD_HOLY_POWER:
+            return POWER_HOLY_POWER;
+        case UNIT_MOD_CHAOS_ORB:
+            return POWER_CHAOS_ORB;
+        case UNIT_MOD_BURNING_EMBERS:
+            return POWER_BURNING_EMBERS;
+        case UNIT_MOD_DEMONIC_FURY:
+            return POWER_DEMONIC_FURY;
+        case UNIT_MOD_SOUL_SHARDS:
+            return POWER_SOUL_SHARDS;
         case UNIT_MOD_RUNE:        return POWER_RUNES;
         case UNIT_MOD_RUNIC_POWER: return POWER_RUNIC_POWER;
         default:
@@ -12545,8 +12552,6 @@ int32 Unit::GetCreatePowers(Powers power) const
             return 1000;
         case POWER_RUNES:
             return 0;
-        case POWER_SOUL_SHARDS:
-            return 3;
         case POWER_ECLIPSE:
             return 100;
         case POWER_HOLY_POWER:
@@ -12556,9 +12561,11 @@ int32 Unit::GetCreatePowers(Powers power) const
 		case POWER_CHAOS_ORB:
 			return 3; // shadow priest orbs
 		case POWER_BURNING_EMBERS:
-			return 40; // destruction warlock embers
+			return 30; // destruction warlock embers
 		case POWER_DEMONIC_FURY:
 			return 1000; // demonology warlock fury
+		case POWER_SOUL_SHARDS:
+			return 300;
         case POWER_HEALTH:
             return 0;
         default:
