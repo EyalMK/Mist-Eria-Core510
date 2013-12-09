@@ -137,11 +137,11 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
     // data part
     for (PetBattleDataList::iterator pet = petList.begin(); pet != petList.end(); ++pet) {
         data->WriteByteSeq(guid[3]);
-        *data << uint32(petMaxHealth);                       // UNK
+        *data << uint32(petMaxHealth);                       // petMaxHealth
         *data << uint32((*pet).m_entry);                        // UNK
-        if (quality) *data << uint8(quality);           // UNK
+        if (quality) *data << uint8(quality);           // petQuality
         data->WriteByteSeq(guid[5]);
-        *data << uint32(petSpeed);                       // UNK
+        *data << uint32(petSpeed);                       // petSpeed
         if (word18) *data << uint16(word18);          // UNK
 
         if (guid2) {
@@ -160,7 +160,7 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
         *data << uint16(word1A);                             // UNK
         data->WriteByteSeq(guid[7]);
         data->WriteByteSeq(guid[1]);
-        *data << uint32(petPower);                       // UNK
+        *data << uint32(petPower);                       // petPower
         if (word14) *data << uint16(word14);          // UNK
         data->WriteByteSeq(guid[4]);
         data->WriteByteSeq(guid[2]);
@@ -168,12 +168,12 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
         data->WriteByteSeq(guid[0]);
         *data << uint32((*pet).m_speciesID);
         *data << uint32((*pet).m_displayID);
-        *data << uint32(petHealth);                       // UNK
+        *data << uint32(petHealth);                       // petHealth
         *data << uint16(petLevel);                       // petlevel
 
-        word14 ++;
-        word18 ++;
-        word1A ++;
+        //word14 ++;
+        //word18 ++;
+        //word1A ++;
     }
 
 /*
