@@ -12552,8 +12552,6 @@ int32 Unit::GetCreatePowers(Powers power) const
             return 1000;
         case POWER_RUNES:
             return 0;
-        case POWER_SOUL_SHARDS:
-            return 3;
         case POWER_ECLIPSE:
             return 100;
         case POWER_HOLY_POWER:
