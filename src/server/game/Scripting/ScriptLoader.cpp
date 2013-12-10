@@ -22,6 +22,7 @@ void AddSC_instance_mogushan_palace();
 
 // Pandaria zones
 void AddSC_vale_of_eternal_blossoms();
+void AddSC_boss_sha_of_anger();
 
 // Shado-Pan Monastery
 void AddSC_boss_gu_cloudstrike();
@@ -1310,6 +1311,7 @@ void AddPandariaScripts()
     AddSC_instance_mogushan_palace();
 
 	AddSC_vale_of_eternal_blossoms();
+    AddSC_boss_sha_of_anger();
 
     AddSC_boss_gu_cloudstrike();			//Shado-Pan Monastery
     AddSC_boss_master_snowdrift();
