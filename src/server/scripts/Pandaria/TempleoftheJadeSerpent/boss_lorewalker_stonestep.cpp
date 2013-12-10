@@ -266,12 +266,13 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 		bool oneHp;
+		bool corruptedScroll;
 
 		void Reset() 
 		{
 			oneHp = false;
+			corruptedScroll = false;
 			me->setActive(false);
-			me->CastSpell(me, SPELL_FLOOR_SCROLL);
 		}
 
 		void DamageTaken(Unit* who, uint32& damage)
@@ -293,6 +294,12 @@ public:
 		void UpdateAI(uint32 diff) 
 		{
 			events.Update(diff);
+
+			if (!corruptedScroll)
+			{
+				me->CastSpell(me, SPELL_FLOOR_SCROLL);
+				corruptedScroll = true;
+			}
 
 			while(uint32 eventId = events.ExecuteEvent())
 			{

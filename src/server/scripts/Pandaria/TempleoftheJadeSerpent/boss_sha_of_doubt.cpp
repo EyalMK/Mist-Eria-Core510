@@ -104,7 +104,7 @@ public:
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, NOT_STARTED);
 			}
 		}
-		
+
 		void JustDied(Unit *pWho)
 		{
 			if (instance)
@@ -157,6 +157,8 @@ public:
 
 				events.SetPhase(PHASE_NULL);
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, FAIL);
+
+				Talk(SAY_RESET);
 
 				me->CombatStop(true);
 				me->DeleteThreatList();
@@ -336,7 +338,7 @@ public:
 			me->CastSpell(me, SPELL_GATHERING_DOUBT);
 
 			events.ScheduleEvent(EVENT_ATTACK_PLAYERS, 4*IN_MILLISECONDS);
-			events.ScheduleEvent(EVENT_RELEASE_DOUBT, 30*IN_MILLISECONDS);
+			events.ScheduleEvent(EVENT_RELEASE_DOUBT, 34*IN_MILLISECONDS);
 
 			if (instance)
 			{
@@ -400,9 +402,9 @@ public:
 							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 							me->setFaction(14);
 							me->SetReactState(REACT_AGGRESSIVE);
-							me->Attack(player, true);
-							me->SetInCombatWithZone();
+							me->SetInCombatWith(player);
 							me->AddThreat(player, 99999.0f);
+							me->GetMotionMaster()->MoveChase(player);
 						
 							events.CancelEvent(EVENT_ATTACK_PLAYERS);
 							break;
