@@ -1862,23 +1862,6 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
         }
     }
 
-    CharacterDatabase.EscapeString(newname);
-    Player::Customize(guid, gender, skin, face, hairStyle, hairColor, facialHair);
-    SQLTransaction trans = CharacterDatabase.BeginTransaction();
-
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_FACTION_OR_RACE);
-    stmt->setString(0, newname);
-    stmt->setUInt8(1, race);
-    stmt->setUInt16(2, used_loginFlag);
-    stmt->setUInt32(3, lowGuid);
-    trans->Append(stmt);
-
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_DECLINED_NAME);
-    stmt->setUInt32(0, lowGuid);
-    trans->Append(stmt);
-
-    sWorld->UpdateCharacterNameData(GUID_LOPART(guid), newname, gender, race);
-
     if (oldRace != race)
     {
         TeamId team = TEAM_ALLIANCE;
@@ -1953,6 +1936,24 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
         }
 
         sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE %u %u %u %u", oldRace, oldTeam, race, team);
+
+        CharacterDatabase.EscapeString(newname);
+        Player::Customize(guid, gender, skin, face, hairStyle, hairColor, facialHair);
+        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_FACTION_OR_RACE);
+        stmt->setString(0, newname);
+        stmt->setUInt8(1, race);
+        stmt->setUInt16(2, used_loginFlag);
+        stmt->setUInt32(3, lowGuid);
+        trans->Append(stmt);
+
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_DECLINED_NAME);
+        stmt->setUInt32(0, lowGuid);
+        trans->Append(stmt);
+
+        sWorld->UpdateCharacterNameData(GUID_LOPART(guid), newname, gender, race);
+
 
 
         // Switch Languages
