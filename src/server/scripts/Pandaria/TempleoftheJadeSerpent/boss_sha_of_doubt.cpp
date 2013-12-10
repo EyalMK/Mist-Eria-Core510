@@ -136,8 +136,7 @@ public:
 					me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
 					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 					events.SetPhase(PHASE_COMBAT);
-					events.ScheduleEvent(EVENT_TOUCH_OF_NOTHINGNESS, 2*IN_MILLISECONDS, 0, PHASE_COMBAT);
-					events.ScheduleEvent(EVENT_WITHER_WILL, 7*IN_MILLISECONDS, 0, PHASE_COMBAT);
+					me->GetMotionMaster()->MoveChase(me->getVictim());
 					boundsOfReality = false;
 					break;
             }
@@ -401,7 +400,8 @@ public:
 							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 							me->setFaction(14);
 							me->SetReactState(REACT_AGGRESSIVE);
-							me->SetInCombatWith(player);
+							me->Attack(player, true);
+							me->SetInCombatWithZone();
 							me->AddThreat(player, 99999.0f);
 						
 							events.CancelEvent(EVENT_ATTACK_PLAYERS);
