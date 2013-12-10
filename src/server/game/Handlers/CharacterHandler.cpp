@@ -1862,6 +1862,8 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
         }
     }
 
+    SQLTransaction trans;
+
     if (oldRace != race)
     {
         TeamId team = TEAM_ALLIANCE;
@@ -1939,7 +1941,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
 
         CharacterDatabase.EscapeString(newname);
         Player::Customize(guid, gender, skin, face, hairStyle, hairColor, facialHair);
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        trans = CharacterDatabase.BeginTransaction();
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_FACTION_OR_RACE);
         stmt->setString(0, newname);
