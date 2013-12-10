@@ -136,6 +136,8 @@ public:
 					me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
 					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 					events.SetPhase(PHASE_COMBAT);
+					events.ScheduleEvent(EVENT_TOUCH_OF_NOTHINGNESS, 2*IN_MILLISECONDS, 0, PHASE_COMBAT);
+					events.ScheduleEvent(EVENT_WITHER_WILL, 7*IN_MILLISECONDS, 0, PHASE_COMBAT);
 					boundsOfReality = false;
 					break;
             }
@@ -196,7 +198,7 @@ public:
 		
 		void UpdateAI(uint32 diff)
 		{
-			if (!UpdateVictim() && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
+			if (!UpdateVictim())
 				return;
 
 			events.Update(diff);
