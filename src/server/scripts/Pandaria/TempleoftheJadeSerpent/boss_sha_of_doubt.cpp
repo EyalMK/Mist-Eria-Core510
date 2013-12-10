@@ -9,7 +9,7 @@
 
 enum Spells
 {
-	/* Sha Of Doubt */
+	/* Sha of Doubt */
 	SPELL_WITHER_WILL				= 106736,
 	SPELL_BOUNDS_OF_REALITY			= 117665,
 	SPELL_TOUCH_OF_NOTHINGNESS		= 106113,
@@ -24,7 +24,7 @@ enum Spells
 
 enum Events
 {
-	/* Sha Of Doubt */
+	/* Sha of Doubt */
 	EVENT_WITHER_WILL				= 1,
 	EVENT_TOUCH_OF_NOTHINGNESS		= 2,
 	EVENT_MOVE_TO_THE_CENTER		= 3,
@@ -53,6 +53,11 @@ enum Phases
 	PHASE_NULL				= 0,
 	PHASE_COMBAT			= 1,
 	PHASE_BOUNDS_OF_REALITY	= 2
+};
+
+enum Actions
+{
+	ACTION_SHA_OF_DOUBT_PHASE_COMBAT
 };
 
 enum Npcs
@@ -123,6 +128,20 @@ public:
 			Talk(SAY_DEATH);
 		}
 
+		void DoAction(int32 action)
+        {
+            switch (action)
+            {
+				case ACTION_SHA_OF_DOUBT_PHASE_COMBAT:
+					me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
+					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+					events.SetPhase(PHASE_COMBAT);
+					me->GetMotionMaster()->MoveChase(me->getVictim());
+					boundsOfReality = false;
+					break;
+            }
+        }
+
 		void KilledUnit(Unit *pWho)
 		{
 			Talk(irand(SAY_SLAY_1, SAY_SLAY_2));
@@ -178,7 +197,7 @@ public:
 		
 		void UpdateAI(uint32 diff)
 		{
-			if (!UpdateVictim() && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
+			if (!UpdateVictim())
 				return;
 
 			events.Update(diff);
@@ -202,14 +221,6 @@ public:
 			if (events.IsInPhase(PHASE_BOUNDS_OF_REALITY) && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
 				if (me->FindNearestCreature(NPC_SHA_TRIGGER, 0.1f, true))
 					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 0, 0, PHASE_BOUNDS_OF_REALITY);
-
-			if (!me->HasAura(SPELL_BOUNDS_OF_REALITY) && boundsOfReality)
-			{
-				me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
-				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-				events.SetPhase(PHASE_COMBAT);
-				boundsOfReality = false;
-			}
 
 			while (uint32 eventId = events.ExecuteEvent())
 			{
@@ -358,7 +369,7 @@ public:
 				{
 					if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 					{
-						sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, sha->GetGUID());
+						sha->AI()->DoAction(ACTION_SHA_OF_DOUBT_PHASE_COMBAT);
 						me->DespawnOrUnsummon();
 					}
 				}
@@ -389,7 +400,8 @@ public:
 							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 							me->setFaction(14);
 							me->SetReactState(REACT_AGGRESSIVE);
-							me->SetInCombatWith(player);
+							me->Attack(player, true);
+							me->SetInCombatWithZone();
 							me->AddThreat(player, 99999.0f);
 						
 							events.CancelEvent(EVENT_ATTACK_PLAYERS);

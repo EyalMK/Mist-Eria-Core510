@@ -1219,12 +1219,12 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
     uint64 item_guid;
     uint64 gem_guids[MAX_GEM_SOCKETS];
 
-	for (int i = 0; i < MAX_GEM_SOCKETS; ++i)
-        recvData >> gem_guids[i];
-
 	recvData >> item_guid;
     if (!item_guid)
         return;
+
+	for (int i = 0; i < MAX_GEM_SOCKETS; ++i)
+        recvData >> gem_guids[i];
 
     //cheat -> tried to socket same gem multiple times
     if ((gem_guids[0] && (gem_guids[0] == gem_guids[1] || gem_guids[0] == gem_guids[2])) ||
@@ -1431,7 +1431,6 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
 
     _player->ToggleMetaGemsActive(slot, true);              //turn on all metagems (except for target item)
 
-    _player->RemoveTradeableItem(itemTarget);
     itemTarget->ClearSoulboundTradeable(_player);           // clear tradeable flag
 }
 

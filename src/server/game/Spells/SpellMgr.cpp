@@ -3845,13 +3845,13 @@ void SpellMgr::LoadSpellInfoCorrections()
 					spellInfo->MaxAffectedTargets = 2;
 					break;
 				case 119586: // 10 Targets
-					spellInfo->MaxAffectedTargets = 1;
+					spellInfo->MaxAffectedTargets = 10;
 					break;
 				case 119622: // 3 Targets
-					spellInfo->MaxAffectedTargets = 1;
+					spellInfo->MaxAffectedTargets = 3;
 					break;
 				case 119488: // 10 Targets
-					spellInfo->MaxAffectedTargets = 1;
+					spellInfo->MaxAffectedTargets = 10;
 					break;
 				case 29838:
 					spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
