@@ -1,24 +1,3 @@
-/*
-Notes :
-Sha de la colère : Script 75%	=>	A faire : vérifier si les sorts fonctionnent.
-
-UPDATE creature_template SET ScriptName = 'boss_sha_of_anger' WHERE entry = 60491;
-INSERT INTO creature_text (entry, groupid, id, text, type, language, probability, emote, duration, sound, comment) VALUES
-(60491, 0, 0, "Oui ... Oui ! Laissez parler votre rage ! Frappez-moi !", 14, 0, 100, 0, 0, 28999, "Sha of anger - Aggro"),
-(60491, 1, 0, "", 14, 0, 100, 0, 0, 29000, "Sha of anger - Death"),
-(60491, 2, 0, "Ils sont éteinds !", 14, 0, 100, 0, 0, 29001, "Sha of anger - Slay 1"),
-(60491, 2, 1, "Est-ce que vous êtes en colère ?", 14, 0, 100, 0, 0, 29002, "Sha of anger - Slay 2"),
-(60491, 2, 2, "Ressentez votre rage !", 14, 0, 100, 0, 0, 29003, "Sha of anger - Slay 3"),
-(60491, 2, 3, "Laissez votre rage vous consumer !", 14, 0, 100, 0, 0, 29004, "Sha of anger - Slay 4"),
-(60491, 3, 0, "Cédez a votre colère !", 14, 0, 100, 0, 0, 29005, "Sha of anger - Spawn 1"),
-(60491, 3, 1, "Votre rage vous donne de la force !", 14, 0, 100, 0, 0, 29006, "Sha of anger - Spawn 2"),
-(60491, 3, 2, "Votre rage me porte !", 14, 0, 100, 0, 0, 29007, "Sha of anger - Spawn 3"),
-(60491, 3, 3, "Vous ne m'enterrerez pas à nouveau !", 14, 0, 100, 0, 0, 29008, "Sha of anger - Spawn 4"),
-(60491, 3, 4, "Laissez libre cours à mon courroux !", 14, 0, 100, 0, 0, 29009, "Sha of anger - Spawn 5"),
-(60491, 4, 0, "Nourissez-moi de votre COLÈRE !", 14,² 0, 100, 0, 0, 29010, "Sha of anger - Spell 1"),
-(60491, 5, 0, "MA FUREUR SE DÉCHAÎNE !", 14, 0, 100, 0, 0, 29011, "Sha of anger - Spell 2");
-*/
-
 #include "ScriptPCH.h"
 
 enum Spells
@@ -29,7 +8,8 @@ enum Spells
     SPELL_GROWING_ANGER			= 119622,
     SPELL_AGGRESSIVE_BEHAVIOUR	= 119626,
     SPELL_UNLEASHED_WRATH		= 119488,
-    SPELL_RAGE_OF_THE_SHA       = 117609
+    SPELL_RAGE_OF_THE_SHA       = 117609,
+    SPELL_BERSERK               = 47008
 };
 
 enum Events
@@ -38,7 +18,8 @@ enum Events
     EVENT_ENDLESS_RAGE			= 2,
     EVENT_GROWING_ANGER			= 3,
     EVENT_PHASE_GROWING_ANGER	= 4,
-    EVENT_PHASE_UNLEASHED_WRATH = 5
+    EVENT_UNLEASHED_WRATH       = 5,
+    EVENT_BERSERK               = 6
 };
 
 enum Phases
@@ -98,10 +79,11 @@ public:
         {
             Talk(SAY_AGGRO);
 
-			events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
-			events.ScheduleEvent(EVENT_ENDLESS_RAGE, 25*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
-			events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS), 0, PHASE_GROWING_ANGER);
-			events.ScheduleEvent(EVENT_PHASE_UNLEASHED_WRATH, 51*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_ENDLESS_RAGE, 20*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS), 0, PHASE_GROWING_ANGER);
+            events.ScheduleEvent(EVENT_UNLEASHED_WRATH, 50*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_BERSERK, 300*IN_MILLISECONDS);
 
             events.SetPhase(PHASE_GROWING_ANGER);
         }
@@ -137,29 +119,31 @@ public:
                     case EVENT_ENDLESS_RAGE:
                         me->CastSpell(me->getVictim(), SPELL_ENDLESS_RAGE);
                         Talk(SAY_ENDLESS_RAGE);
-
-                        events.ScheduleEvent(EVENT_ENDLESS_RAGE, 25*IN_MILLISECONDS);
+                       /* events.ScheduleEvent(EVENT_ENDLESS_RAGE, 25*IN_MILLISECONDS);*/
                         break;
 
                     case EVENT_GROWING_ANGER:
                         me->CastSpell(me, SPELL_GROWING_ANGER);
                         Talk(SAY_GROWING_ANGER);
-
-                        events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS));
+                       /* events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS));*/
                         break;
 
                     case EVENT_PHASE_GROWING_ANGER:
                         events.SetPhase(PHASE_GROWING_ANGER);
-
-						events.CancelEvent(EVENT_PHASE_GROWING_ANGER);
+                        events.ScheduleEvent(EVENT_ENDLESS_RAGE, 20*IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS));
+                        events.ScheduleEvent(EVENT_UNLEASHED_WRATH, 50*IN_MILLISECONDS);
                         break;
 
-                    case EVENT_PHASE_UNLEASHED_WRATH:
-						DoCast(SPELL_UNLEASHED_WRATH);
-						events.SetPhase(PHASE_UNLEASHED_WRATH);
-						events.ScheduleEvent(EVENT_PHASE_GROWING_ANGER, 25*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
-						
-						events.CancelEvent(EVENT_PHASE_UNLEASHED_WRATH);
+                    case EVENT_UNLEASHED_WRATH:
+                        DoCast(SPELL_UNLEASHED_WRATH);
+                        events.SetPhase(PHASE_UNLEASHED_WRATH);
+                        events.ScheduleEvent(EVENT_PHASE_GROWING_ANGER, 25*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
+                        events.ScheduleEvent(EVENT_ENDLESS_RAGE, 15*IN_MILLISECONDS);
+                        break;
+
+                    case EVENT_BERSERK:
+                        DoCast(SPELL_BERSERK);
                         break;
 
                     default:
