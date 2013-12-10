@@ -1929,6 +1929,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
             race == RACE_PANDAREN_A ||
             race == RACE_PANDAREN_H) {
 
+
             switch (recvData.GetOpcode()) {
             case CMSG_CHAR_RACE_CHANGE:
                 if (oldTeam == TEAM_HORDE) {
@@ -1950,6 +1951,8 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
                 break;
             }
         }
+
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE %u %u %u %u", oldRace, oldTeam, race, team);
 
 
         // Switch Languages
@@ -1976,6 +1979,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_SKILL_LANGUAGE);
             stmt->setUInt32(0, lowGuid);
 
+            bool raceError = false;
             switch (race)
             {
                 case RACE_DWARF:
@@ -2008,9 +2012,19 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
                 case RACE_GOBLIN:
                     stmt->setUInt16(1, 792);
                     break;
+                case RACE_PANDAREN_A:
+                    stmt->setUInt16(1, 906);
+                    break;
+                case RACE_PANDAREN_H:
+                    stmt->setUInt16(1, 907);
+                    break;
+                default:
+                    raceError = true;
+                    break;
             }
 
-            trans->Append(stmt);
+            if (!raceError)
+                trans->Append(stmt);
         }
 
         if (recvData.GetOpcode() == CMSG_CHAR_FACTION_CHANGE)
