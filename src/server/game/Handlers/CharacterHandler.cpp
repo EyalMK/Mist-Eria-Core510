@@ -1974,6 +1974,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
         else
             stmt->setUInt16(1, 98);
 
+
         trans->Append(stmt);
 
         // Race specific languages
@@ -2017,9 +2018,11 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
                     break;
                 case RACE_PANDAREN_A:
                     stmt->setUInt16(1, 906);
+                    GetPlayer()->player->learnSpell(668, false); // Common
                     break;
                 case RACE_PANDAREN_H:
                     stmt->setUInt16(1, 907);
+                    GetPlayer()->player->learnSpell(669, false); // Common
                     break;
                 default:
                     raceError = true;
