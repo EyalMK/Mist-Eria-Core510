@@ -26,7 +26,8 @@ enum Spells
 	SPELL_TRACK_ROTATE					= 74758, // For the Wash away
 
 	/* Corrupt living Water */
-	SPELL_SHA_RESIDUE					= 106653
+	SPELL_SHA_RESIDUE					= 106653,
+	SPELL_CORRUPTED_DROPLET				= 123983
 };
 
 enum Npcs
@@ -163,7 +164,7 @@ public:
 				Talk(irand(SAY_DEATH_1, SAY_DEATH_3));
 				instance->DoCastSpellOnPlayers(SPELL_BLESSING_OF_THE_WATERSPEAKER);
 
-				if (GameObject* go = me->FindNearestGameObject(GO_MARI_LOREWALKER_GATE, 9999.0f))
+				if (GameObject* go = me->FindNearestGameObject(GO_MARI_LOREWALKER_GATE, 99999.0f))
 					go->UseDoorOrButton();
 			}
 		}
@@ -615,16 +616,10 @@ public:
 
 		void JustDied(Unit *pWho) 
 		{
-			DoCast(SPELL_SHA_RESIDUE);
-
-			float x = me->GetPositionX();
-			float y = me->GetPositionY();
-			float z = me->GetPositionZ();
-			float o = me->GetOrientation();
-
-			me->SummonCreature(NPC_CORRUPT_DROPLET, (x + 2.0f), y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60*IN_MILLISECONDS);
-			me->SummonCreature(NPC_CORRUPT_DROPLET, (x - 2.0f), y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60*IN_MILLISECONDS);
-			me->SummonCreature(NPC_CORRUPT_DROPLET, x, (y - 2.0f), z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60*IN_MILLISECONDS);
+			me->CastSpell(me, SPELL_SHA_RESIDUE);
+			me->CastSpell(me, SPELL_CORRUPTED_DROPLET);
+			me->CastSpell(me, SPELL_CORRUPTED_DROPLET); // 3 droplets
+			me->CastSpell(me, SPELL_CORRUPTED_DROPLET);
 		}
 
 		void UpdateAI(uint32 diff) 
@@ -637,10 +632,44 @@ public:
 	};
 };
 
+class npc_corrupt_droplet : public CreatureScript 
+{
+public:
+	npc_corrupt_droplet() : CreatureScript("npc_corrupt_droplet") { }
+
+	CreatureAI* GetAI(Creature* creature) const 
+	{
+		return new npc_corrupt_dropletAI(creature);
+	}
+
+	struct npc_corrupt_dropletAI : public ScriptedAI
+	{
+		npc_corrupt_dropletAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
+
+		InstanceScript* instance;
+
+		void Reset() 
+		{
+			me->SetInCombatWithZone();
+		}
+
+		void UpdateAI(uint32 diff) 
+		{
+			if(!UpdateVictim())
+				return;
+
+			DoMeleeAttackIfReady();
+		}
+	};
+};
 
 void AddSC_boss_wise_mari()
 {
 	new boss_wise_mari();
 	new npc_corrupt_living_water();
+	new npc_corrupt_droplet();
 }
 
