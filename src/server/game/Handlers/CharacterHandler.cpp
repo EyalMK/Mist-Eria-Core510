@@ -2018,11 +2018,9 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
                     break;
                 case RACE_PANDAREN_A:
                     stmt->setUInt16(1, 906);
-                    GetPlayer()->learnSpell(668, false); // Common
                     break;
                 case RACE_PANDAREN_H:
                     stmt->setUInt16(1, 907);
-                    GetPlayer()->learnSpell(669, false); // Common
                     break;
                 default:
                     raceError = true;
