@@ -138,7 +138,7 @@ public:
                     case EVENT_UNLEASHED_WRATH:
                         DoCast(SPELL_UNLEASHED_WRATH);
                         events.SetPhase(PHASE_UNLEASHED_WRATH);
-                        events.ScheduleEvent(EVENT_PHASE_GROWING_ANGER, 25*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
+                        events.ScheduleEvent(EVENT_PHASE_GROWING_ANGER, 25*IN_MILLISECONDS);
                         events.ScheduleEvent(EVENT_ENDLESS_RAGE, 15*IN_MILLISECONDS);
                         break;
 
