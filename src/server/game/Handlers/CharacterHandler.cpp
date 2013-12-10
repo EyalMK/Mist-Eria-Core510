@@ -1974,8 +1974,12 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
         else
             stmt->setUInt16(1, 98);
 
-
         trans->Append(stmt);
+
+        if (race == RACE_PANDAREN_H)
+            trans->PAppend("INSERT IGNORE INTO `character_spell` VALUES ('%u', 669, 1, 0)", lowGuid);
+        else if (race == RACE_PANDAREN_A)
+            trans->PAppend("INSERT IGNORE INTO `character_spell` VALUES ('%u', 668, 1, 0)", lowGuid);
 
         // Race specific languages
         if (race != RACE_ORC && race != RACE_HUMAN)
