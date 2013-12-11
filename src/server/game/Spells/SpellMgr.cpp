@@ -3860,9 +3860,6 @@ void SpellMgr::LoadSpellInfoCorrections()
 				case 117665: // Bounds of Reality
 					spellInfo->Effects[EFFECT_0].Effect = 0;
 					break;
-				case 106112: // Release Doubt
-					spellInfo->Effects[EFFECT_1].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ALLY);
-					break;
 				default:
 					break;
 			}
