@@ -37,6 +37,9 @@ enum DeathKnightSpells
     SPELL_DK_DEATH_COIL_DAMAGE                  = 47632,
     SPELL_DK_DEATH_COIL_HEAL                    = 47633,
     SPELL_DK_DEATH_STRIKE_HEAL                  = 45470,
+	SPELL_DK_BLOOD_SHIELD						= 77535,
+	SPELL_DK_BLOOD_MASTERY						= 77513,
+	SPELL_DK_SCENT_OF_BLOOD						= 49509,
     SPELL_DK_GHOUL_EXPLODE                      = 47496,
     SPELL_DK_GLYPH_OF_ICEBOUND_FORTITUDE        = 58625,
     SPELL_DK_RUNIC_POWER_ENERGIZE               = 49088,
@@ -575,15 +578,41 @@ class spell_dk_death_strike : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-                Unit* caster = GetCaster();
-                if (Unit* target = GetHitUnit())
+                if(Player* caster = GetCaster()->ToPlayer())
                 {
-                    uint32 count = target->GetDiseasesByCaster(caster->GetGUID());
-                    int32 bp = int32(count * caster->CountPctFromMaxHealth(int32(GetSpellInfo()->Effects[EFFECT_0].DamageMultiplier)));
-                    // Improved Death Strike
-                    if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, DK_ICON_ID_IMPROVED_DEATH_STRIKE, 0))
-                        AddPct(bp, caster->CalculateSpellDamage(caster, aurEff->GetSpellInfo(), 2));
+                    int32 bp = (int32) (0.2f * caster->GetDamageTakenInPastSecs(5, false, true));
+					if(bp < (caster->GetHealth() * 0.07f))
+						bp = (int32)(caster->GetHealth() * 0.07f);
+
+					// Scent of Blood
+					if (Aura* scentOfBlood = caster->GetAura(SPELL_DK_SCENT_OF_BLOOD))
+                    {
+                        bp += bp * 0.2f * scentOfBlood->GetStackAmount();
+						caster->RemoveAura(SPELL_DK_SCENT_OF_BLOOD);
+                    }
+
                     caster->CastCustomSpell(caster, SPELL_DK_DEATH_STRIKE_HEAL, &bp, NULL, NULL, false);
+
+					// Blood Shield - Mastery (Blood)
+					if(caster->HasAura(SPELL_DK_BLOOD_MASTERY))
+					{
+						int32 mbp = 0.5f * bp;
+						if(caster->HasAura(SPELL_DK_BLOOD_SHIELD))
+						{
+							caster->CastCustomSpell(caster, SPELL_DK_BLOOD_SHIELD, &mbp, NULL, NULL, false);
+							
+							if (Aura* bloodShield = caster->GetAura(SPELL_DK_BLOOD_SHIELD))
+							{
+								bloodShield->SetDuration(bloodShield->GetMaxDuration());
+								bloodShield->GetEffect(0)->SetAmount(bloodShield->GetEffect(0)->GetAmount() + mbp);
+							}
+							
+						}
+						else
+							caster->CastCustomSpell(caster, SPELL_DK_BLOOD_SHIELD, &mbp, NULL, NULL, false);
+					}
+
+					
                 }
             }
 
