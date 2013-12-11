@@ -600,7 +600,7 @@ class spell_dk_death_strike : public SpellScriptLoader
 						int32 mbp = 0.5f * bp;
 						if(caster->HasAura(SPELL_DK_BLOOD_SHIELD))
 						{
-							caster->CastCustomSpell(caster, SPELL_DK_BLOOD_SHIELD, &mbp, NULL, NULL, false);
+							
 							
 							if (Aura* bloodShield = caster->GetAura(SPELL_DK_BLOOD_SHIELD))
 							{
@@ -609,9 +609,9 @@ class spell_dk_death_strike : public SpellScriptLoader
 									mbp = caster->GetMaxHealth();
 
 								bloodShield->GetEffect(0)->ChangeAmount(mbp);
-
-								sLog->outDebug(LOG_FILTER_NETWORKIO, "### DEBUG TERAH ### %d : %d", mbp, bloodShield->GetEffect(0)->GetAmount());
 							}
+							else
+								caster->CastCustomSpell(caster, SPELL_DK_BLOOD_SHIELD, &mbp, NULL, NULL, false);
 							
 						}
 						else
