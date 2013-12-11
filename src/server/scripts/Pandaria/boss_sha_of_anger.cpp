@@ -104,7 +104,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING))
+			if (me->HasUnitState(UNIT_STATE_CASTING) && !me->HasAura(SPELL_ENDLESS_RAGE))
                 return;
 
             while(uint32 eventId = events.ExecuteEvent())
@@ -197,22 +197,9 @@ public:
     {
         npc_sha_of_angerAI(Creature* creature) : ScriptedAI(creature) {}
 
-        uint32 uiBitterThoughtsTimer;
-
         void Reset()
         {
-            uiBitterThoughtsTimer = 1*IN_MILLISECONDS;
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (!UpdateVictim())
-            {
-                if (uiBitterThoughtsTimer <= diff)
-                {
-                    me->CastSpell(me, SPELL_BITTER_THOUGHTS);
-                } else uiBitterThoughtsTimer -= diff;
-            }
+			me->CastSpell(me, SPELL_BITTER_THOUGHTS);
         }
     };
 };
