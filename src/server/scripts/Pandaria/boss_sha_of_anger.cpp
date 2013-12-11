@@ -105,7 +105,7 @@ public:
         {
             Talk(SAY_AGGRO);
 
-            events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_SEETHE, 5*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_ENDLESS_RAGE, 20*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS), 0, PHASE_GROWING_ANGER);
             events.ScheduleEvent(EVENT_UNLEASHED_WRATH, 50*IN_MILLISECONDS);
@@ -135,7 +135,7 @@ public:
                         for (i = threatlist.begin(); i != threatlist.end(); ++i)
                         {
                             if (Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid()))
-                                if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && !me->IsWithinMeleeRange(me->getVictim()))
+								if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && !me->IsWithinMeleeRange(unit))
                                     me->CastSpell(me->getVictim(), SPELL_SEETHE);
                         }
 
@@ -146,7 +146,7 @@ public:
                         me->CastSpell(me, SPELL_ENDLESS_RAGE);
                         Talk(SAY_ENDLESS_RAGE);
 
-						events.ScheduleEvent(EVENT_ENDLESS_RAGE_TRIGGERED, 0);
+						events.ScheduleEvent(EVENT_ENDLESS_RAGE_TRIGGERED, 1);
 						events.CancelEvent(EVENT_ENDLESS_RAGE);
                         break;
 
