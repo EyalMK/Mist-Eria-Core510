@@ -105,7 +105,7 @@ public:
         {
             Talk(SAY_AGGRO);
 
-            events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_SEETHE, 5*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_ENDLESS_RAGE, 20*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS), 0, PHASE_GROWING_ANGER);
             events.ScheduleEvent(EVENT_UNLEASHED_WRATH, 50*IN_MILLISECONDS);
