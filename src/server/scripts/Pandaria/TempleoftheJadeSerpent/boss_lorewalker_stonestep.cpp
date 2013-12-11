@@ -222,8 +222,21 @@ public:
 							break;
 
 						case EVENT_SAY_END_1:
-							if (GameObject* go = me->FindNearestGameObject(GO_MARI_LOREWALKER_GATE, 9999.0f))
-								go->UseDoorOrButton();
+							if (Creature* trigger = me->FindNearestCreature(NPC_LOREWALKER_TRIGGER, 99999.0f, true))
+								trigger->Kill(trigger);
+
+							if (me->FindNearestCreature(BOSS_WISE_MARI, 99999.0f, false))
+							{
+								if (GameObject* lorewalkerDoor = me->FindNearestGameObject(GO_MARI_LOREWALKER_GATE, 99999.0f))
+									lorewalkerDoor->UseDoorOrButton();
+
+								if (Creature* wiseMari = me->FindNearestCreature(BOSS_WISE_MARI, 99999.0f, true))
+									if (GameObject* wiseMariDoor = wiseMari->FindNearestGameObject(GO_MARI_LOREWALKER_GATE, 99999.0f))
+										wiseMariDoor->UseDoorOrButton();
+
+								if (GameObject* go = me->FindNearestGameObject(GO_LIU_GATE, 99999.0f))
+									go->UseDoorOrButton();
+							}
 
 							Talk(SAY_END_1);
 

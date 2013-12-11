@@ -14,7 +14,6 @@ enum Spells
 	SPELL_BUBBLE_BURST					= 106612,
 	SPELL_CALL_WATER					= 106526,
 	SPELL_HYDROLANCE					= 106055,
-	SPELL_PURIFIED_WATER				= 118714,
 	SPELL_WATER_BUBBLE					= 106062,
 	SPELL_HYDROLANCE_PRECAST			= 115220,
 	SPELL_HYDROLANCE_PULSE_BIG			= 106267,
@@ -47,7 +46,8 @@ enum Npcs
 	NPC_HYDROTRIGGER_TWO_LEFT		= 400441,
 	NPC_HYDROTRIGGER_ONE_RIGHT		= 400442,
 	NPC_HYDROTRIGGER_TWO_RIGHT		= 400443,
-	NPC_WASH_AWAY_TRIGGER			= 400444
+	NPC_WASH_AWAY_TRIGGER			= 400444,
+	NPC_LOREWALKER_TRIGGER			= 400449
 };
 
 enum Events
@@ -166,10 +166,21 @@ public:
 			if (instance)
 			{
 				Talk(irand(SAY_DEATH_1, SAY_DEATH_3));
+
 				instance->DoCastSpellOnPlayers(SPELL_BLESSING_OF_THE_WATERSPEAKER);
 
-				if (GameObject* go = me->FindNearestGameObject(GO_MARI_LOREWALKER_GATE, 99999.0f))
-					go->UseDoorOrButton();
+				if (me->FindNearestCreature(NPC_LOREWALKER_TRIGGER, 99999.0f, false))
+				{
+					if (GameObject* wiseDoor = me->FindNearestGameObject(GO_MARI_LOREWALKER_GATE, 99999.0f))
+						wiseDoor->UseDoorOrButton();
+
+					if (Creature* lorewalker = me->FindNearestCreature(BOSS_LOREWALKER_STONESTEP, 99999.0f, true))
+						if (GameObject* lorewalkerDoor = lorewalker->FindNearestGameObject(GO_MARI_LOREWALKER_GATE, 99999.0f))
+							lorewalkerDoor->UseDoorOrButton();
+
+					if (GameObject* go = me->FindNearestGameObject(GO_LIU_GATE, 99999.0f))
+						go->UseDoorOrButton();
+				}
 			}
 		}
 
@@ -628,6 +639,11 @@ public:
 			}
 		}
 
+		void JustDied(Unit *pWho)
+		{
+			me->CastSpell(me, SPELL_SHA_RESIDUE);
+		}
+
 		void UpdateAI(uint32 diff) 
 		{
 			if(!UpdateVictim())
@@ -709,6 +725,11 @@ public:
 				damage = 0;
 				me->SetHealth(1);
 			}
+		}
+
+		void JustDied(Unit *pWho)
+		{
+			me->CastSpell(me, SPELL_SHA_RESIDUE);
 		}
 
 		void UpdateAI(uint32 diff) 
