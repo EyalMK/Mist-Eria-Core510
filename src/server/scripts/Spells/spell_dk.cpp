@@ -603,8 +603,13 @@ class spell_dk_death_strike : public SpellScriptLoader
 							
 							if (Aura* bloodShield = caster->GetAura(SPELL_DK_BLOOD_SHIELD))
 							{
-								bloodShield->SetDuration(bloodShield->GetMaxDuration());
-								bloodShield->GetEffect(0)->SetAmount(bloodShield->GetEffect(0)->GetAmount() + mbp);
+								//bloodShield->SetDuration(bloodShield->GetMaxDuration());
+
+								mbp = bloodShield->GetEffect(0)->GetAmount() + mbp;
+								if(mbp > caster->GetMaxHealth())
+									mbp = caster->GetMaxHealth();
+
+								bloodShield->GetEffect(0)->ChangeAmount(mbp);
 							}
 							
 						}
