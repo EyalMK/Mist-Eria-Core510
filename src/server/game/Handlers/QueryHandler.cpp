@@ -53,9 +53,9 @@ enum DBQueryType
     GameObjects                = 0x13C403A5,*/
     DB_QUERY_ITEM_SPARSE       = 0x919BE54E,
     DB_QUERY_ITEM              = 0x50238EC2,
-    /*ItemCurrencyCost           = 0x6FE05AE9,
-    ItemExtendedCost           = 0xBB858355,
-    ItemUpgrade                = 0x7006463B,
+    /*ItemCurrencyCost           = 0x6FE05AE9,*/
+    //ItemExtendedCost           = 0xBB858355,
+    /*ItemUpgrade                = 0x7006463B,
     KeyChain                   = 0x6D8A2694,
     Locale                     = 0x3F85ABB7,
     Location                   = 0x394C3727,
