@@ -1050,6 +1050,69 @@ class spell_dk_will_of_the_necropolis : public SpellScriptLoader
         }
 };
 
+// 73975 - Necrotic Strike
+class spell_dk_necrotic_strike : public SpellScriptLoader
+{
+    public:
+        spell_dk_necrotic_strike() : SpellScriptLoader("spell_dk_necrotic_strike") { }
+
+        class spell_dk_necrotic_strike_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_dk_necrotic_strike_AuraScript);
+
+            bool Validate(SpellInfo const* spellInfo)
+            {
+                return true;
+            }
+
+            void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool &canBeRecalculated)
+            {
+				if(Player* caster = GetCaster()->ToPlayer())
+				{
+					amount = caster->GetTotalAttackPowerValue(BASE_ATTACK);
+					canBeRecalculated = false;
+				}
+            }
+
+			void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+			{
+				if(Player* caster = GetCaster()->ToPlayer())
+				{
+					uint8 runes = caster->GetRunesState();
+					for(uint8 i = 4; i>=0; i-=2)
+					{
+						if(caster->GetCurrentRune(i) == RUNE_DEATH && caster->GetRuneCooldown(i) == 0)
+						{
+							caster->SetRuneCooldown(i, caster->GetRuneBaseCooldown(i));
+							caster->RestoreBaseRune(i);
+							return;
+						}
+					}
+					for(uint8 i = 5; i>=1; i-=2)
+					{
+						if(caster->GetCurrentRune(i) == RUNE_DEATH && caster->GetRuneCooldown(i) == 0)
+						{
+							caster->SetRuneCooldown(i, caster->GetRuneBaseCooldown(i));
+							caster->RestoreBaseRune(i);
+							return;
+						}
+					}
+				}
+			}
+
+            void Register()
+            {
+				DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_necrotic_strike_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_HEAL_ABSORB);
+                AfterEffectApply += AuraEffectApplyFn(spell_dk_necrotic_strike_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_SCHOOL_HEAL_ABSORB, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_dk_necrotic_strike_AuraScript();
+        }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_anti_magic_shell_raid();
@@ -1072,4 +1135,5 @@ void AddSC_deathknight_spell_scripts()
     new spell_dk_spell_deflection();
     new spell_dk_vampiric_blood();
     new spell_dk_will_of_the_necropolis();
+	new spell_dk_necrotic_strike();
 }
