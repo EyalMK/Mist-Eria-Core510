@@ -114,6 +114,9 @@ public:
 
 				map = me->GetMap();
 
+				if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
+					go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+
 				if (map && map->IsDungeon())
 				{
 					Map::PlayerList const &PlayerList = map->GetPlayers();
@@ -192,8 +195,8 @@ public:
 			events.ScheduleEvent(EVENT_WITHER_WILL, 2*IN_MILLISECONDS, 0, PHASE_COMBAT);
 			events.ScheduleEvent(EVENT_TOUCH_OF_NOTHINGNESS, 8*IN_MILLISECONDS, 0, PHASE_COMBAT);
 
-			/*if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
-					go->UseDoorOrButton(); Close door when combat starts*/
+			if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
+					go->SetGoState(GO_STATE_READY);
 
 			Talk(SAY_AGGRO);
 		}
