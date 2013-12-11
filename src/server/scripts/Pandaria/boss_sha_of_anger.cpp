@@ -126,7 +126,7 @@ public:
                         me->CastSpell(me, SPELL_ENDLESS_RAGE);
                         Talk(SAY_ENDLESS_RAGE);
 
-						events.ScheduleEvent(EVENT_ENDLESS_RAGE_TRIGGERED, 500);
+						events.ScheduleEvent(EVENT_ENDLESS_RAGE_TRIGGERED, 0);
 						events.CancelEvent(EVENT_ENDLESS_RAGE);
                         break;
 
@@ -135,13 +135,13 @@ public:
 							if (target && target->GetTypeId() == TYPEID_PLAYER)
 								target->CastSpell(target, SPELL_ENDLESS_RAGE_TRIGGERED);
 						
-						if (endlessRages < 6)
+						if (endlessRages < 11)
 						{
 							events.ScheduleEvent(EVENT_ENDLESS_RAGE_TRIGGERED, 500);
 							endlessRages++;
 						}
 
-						if (endlessRages >= 5)
+						if (endlessRages >= 10)
 						{
 							events.CancelEvent(EVENT_ENDLESS_RAGE_TRIGGERED);
 							endlessRages = 0;
