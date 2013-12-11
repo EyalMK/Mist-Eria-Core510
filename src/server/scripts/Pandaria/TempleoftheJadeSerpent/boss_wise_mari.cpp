@@ -623,6 +623,9 @@ public:
 		void Reset()
 		{
 			droplets = 0;
+
+			if (instance)
+				me->SetInCombatWithZone();
 		}
 
 		void EnterEvadeMode()
