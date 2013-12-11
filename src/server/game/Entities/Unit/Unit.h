@@ -1923,6 +1923,17 @@ class Unit : public WorldObject
         Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
         int32 GetCurrentSpellCastTime(uint32 spell_id) const;
 
+
+		uint32 m_heal_done[120];
+		uint32 m_damage_done[120];
+		uint32 m_damage_taken[120];
+		int32 DmgandHealDoneTimer;
+		uint32 GetHealingDoneInPastSecs(uint32 secs);
+		uint32 GetDamageDoneInPastSecs(uint32 secs);
+		uint32 GetDamageTakenInPastSecs(uint32 secs);
+		void ResetDamageDoneInPastSecs(uint32 secs);
+		void ResetHealingDoneInPastSecs(uint32 secs);
+
         uint32 m_addDmgOnce;
         uint64 m_SummonSlot[MAX_SUMMON_SLOT];
         uint64 m_ObjectSlot[MAX_GAMEOBJECT_SLOT];
