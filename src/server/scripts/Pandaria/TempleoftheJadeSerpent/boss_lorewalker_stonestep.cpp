@@ -328,6 +328,7 @@ public:
 							if (Creature* lorewalker = me->FindNearestCreature(NPC_LOREWALKER_STONESTEP, 99999.0f))
 							{
 								lorewalker->GetMotionMaster()->MovePoint(0, 824.674438f, -2453.281738f, 176.302979f);
+								lorewalker->RemoveAurasDueToSpell(SPELL_SPINNING_CRANE_KICK, lorewalker->GetGUID());
 								lorewalker->Say(SAY_OSONG_INTRO_1, 0, 0);
 							}
 
