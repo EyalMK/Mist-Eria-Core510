@@ -586,7 +586,7 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
 {
 	if (damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
     {
-		if(victim->GetTypeId = TYPEID_PLAYER)
+		if(victim->GetTypeId() = TYPEID_PLAYER)
 		{
 			m_damage_done_to_players[0] += damage;
 			victim->m_damage_taken_from_players[0] += damage;
@@ -17625,7 +17625,10 @@ void Unit::ResetDamageDoneInPastSecs(uint32 secs)
         secs = 120;
 
     for (uint32 i = 0; i < secs; i++)
-        m_damage_done[i] = 0;
+	{
+        m_damage_done_to_players[i] = 0;
+		m_damage_done_to_non_players[i] = 0;
+	}
 }
 
 void Unit::ResetHealingDoneInPastSecs(uint32 secs)
