@@ -39,6 +39,7 @@ enum DeathKnightSpells
     SPELL_DK_DEATH_STRIKE_HEAL                  = 45470,
 	SPELL_DK_BLOOD_SHIELD						= 77535,
 	SPELL_DK_BLOOD_MASTERY						= 77513,
+	SPELL_DK_BLOOD_RITES						= 50034,
 	SPELL_DK_SCENT_OF_BLOOD						= 49509,
     SPELL_DK_GHOUL_EXPLODE                      = 47496,
     SPELL_DK_GLYPH_OF_ICEBOUND_FORTITUDE        = 58625,
@@ -603,18 +604,25 @@ class spell_dk_death_strike : public SpellScriptLoader
 							
 							if (Aura* bloodShield = caster->GetAura(SPELL_DK_BLOOD_SHIELD))
 							{
-								//bloodShield->SetDuration(bloodShield->GetMaxDuration());
-
 								mbp = bloodShield->GetEffect(0)->GetAmount() + mbp;
 								if(mbp > caster->GetMaxHealth())
 									mbp = caster->GetMaxHealth();
 
 								bloodShield->GetEffect(0)->ChangeAmount(mbp);
+
+								sLog->outDebug(LOG_FILTER_NETWORKIO, "### DEBUG TERAH ### %d : %d", mbp, bloodShield->GetEffect(0)->GetAmount());
 							}
 							
 						}
 						else
 							caster->CastCustomSpell(caster, SPELL_DK_BLOOD_SHIELD, &mbp, NULL, NULL, false);
+					}
+
+					// Blood Rites
+					if(caster->HasAura(SPELL_DK_BLOOD_RITES))
+					{
+						for(uint8 i = 2; i<6; ++i)
+							caster->ConvertRune(i, RUNE_DEATH);
 					}
 
 					
