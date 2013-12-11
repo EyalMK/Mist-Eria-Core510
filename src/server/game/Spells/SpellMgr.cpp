@@ -3845,13 +3845,13 @@ void SpellMgr::LoadSpellInfoCorrections()
 					spellInfo->MaxAffectedTargets = 2;
 					break;
 				case 119586: // 10 Targets
-					spellInfo->MaxAffectedTargets = 1;
+					spellInfo->MaxAffectedTargets = 10;
 					break;
 				case 119622: // 3 Targets
-					spellInfo->MaxAffectedTargets = 1;
+					spellInfo->MaxAffectedTargets = 3;
 					break;
 				case 119488: // 10 Targets
-					spellInfo->MaxAffectedTargets = 1;
+					spellInfo->MaxAffectedTargets = 10;
 					break;
 				case 29838:
 					spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
@@ -3859,6 +3859,9 @@ void SpellMgr::LoadSpellInfoCorrections()
 					break;
 				case 117665: // Bounds of Reality
 					spellInfo->Effects[EFFECT_0].Effect = 0;
+					break;
+				case 106112: // Release Doubt
+					spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_500_YARDS);
 					break;
 				default:
 					break;

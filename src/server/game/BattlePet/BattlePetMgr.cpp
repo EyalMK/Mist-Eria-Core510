@@ -87,7 +87,7 @@ void BattlePetMgr::BuildBattlePetJournal(WorldPacket *data)
     PetBattleDataList petList;
     GetBattlePetList(petList);
 
-    uint8 quality = 5, gap81_7 = 17;
+    uint8 quality = 1, gap81_7 = 17;
 
     uint16 word18 = 1, word14 = 1, petLevel = 1, word1A = 1;
     std::string name = "Mascotte";

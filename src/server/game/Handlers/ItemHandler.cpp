@@ -1219,12 +1219,12 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
     uint64 item_guid;
     uint64 gem_guids[MAX_GEM_SOCKETS];
 
-	for (int i = 0; i < MAX_GEM_SOCKETS; ++i)
-        recvData >> gem_guids[i];
-
-    recvData >> item_guid;
+	recvData >> item_guid;
     if (!item_guid)
         return;
+
+	for (int i = 0; i < MAX_GEM_SOCKETS; ++i)
+        recvData >> gem_guids[i];
 
     //cheat -> tried to socket same gem multiple times
     if ((gem_guids[0] && (gem_guids[0] == gem_guids[1] || gem_guids[0] == gem_guids[2])) ||
@@ -1274,7 +1274,27 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
             return;
 
         // tried to put meta gem in normal socket
-        if (itemProto->Socket[i].Color != SOCKET_COLOR_META && GemProps[i]->color == SOCKET_COLOR_META)
+        if (itemProto->Socket[i].Color != SOCKET_COLOR_SHA_TOUCHED && GemProps[i]->color == SOCKET_COLOR_META)
+            return;
+
+		// tried to put normal gem in sha touched socket
+        if (itemProto->Socket[i].Color == SOCKET_COLOR_SHA_TOUCHED && GemProps[i]->color != SOCKET_COLOR_SHA_TOUCHED)
+            return;
+
+        // tried to put meta gem in sha touched socket
+        if (itemProto->Socket[i].Color != SOCKET_COLOR_SHA_TOUCHED && GemProps[i]->color == SOCKET_COLOR_SHA_TOUCHED)
+            return;
+
+		// tried to put meta gem in prismatic socket
+        if (itemProto->Socket[i].Color == SOCKET_COLOR_PRISMATIC && GemProps[i]->color == SOCKET_COLOR_META)
+            return;
+
+		// tried to put sha touched gem in prismatic socket
+        if (itemProto->Socket[i].Color == SOCKET_COLOR_PRISMATIC && GemProps[i]->color == SOCKET_COLOR_SHA_TOUCHED)
+            return;
+
+		// tried to put cogwheel gem in prismatic socket
+        if (itemProto->Socket[i].Color == SOCKET_COLOR_PRISMATIC && GemProps[i]->color == SOCKET_COLOR_COGWHEEL)
             return;
 
         // tried to put normal gem in cogwheel socket
@@ -1411,7 +1431,6 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
 
     _player->ToggleMetaGemsActive(slot, true);              //turn on all metagems (except for target item)
 
-    _player->RemoveTradeableItem(itemTarget);
     itemTarget->ClearSoulboundTradeable(_player);           // clear tradeable flag
 }
 

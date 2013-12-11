@@ -1,7 +1,7 @@
 /* # Script de Tydrheal & Sungis : Sha of Doubt # */
 
 /*
-	Notes : What is missing ? - Pending ...
+	Notes : What is missing ? - Release of Doubt (bad target heal)
 */
 
 #include "ScriptPCH.h"
@@ -9,7 +9,7 @@
 
 enum Spells
 {
-	/* Sha Of Doubt */
+	/* Sha of Doubt */
 	SPELL_WITHER_WILL				= 106736,
 	SPELL_BOUNDS_OF_REALITY			= 117665,
 	SPELL_TOUCH_OF_NOTHINGNESS		= 106113,
@@ -24,7 +24,7 @@ enum Spells
 
 enum Events
 {
-	/* Sha Of Doubt */
+	/* Sha of Doubt */
 	EVENT_WITHER_WILL				= 1,
 	EVENT_TOUCH_OF_NOTHINGNESS		= 2,
 	EVENT_MOVE_TO_THE_CENTER		= 3,
@@ -53,6 +53,12 @@ enum Phases
 	PHASE_NULL				= 0,
 	PHASE_COMBAT			= 1,
 	PHASE_BOUNDS_OF_REALITY	= 2
+};
+
+enum Actions
+{
+	ACTION_SHA_OF_DOUBT_PHASE_COMBAT,
+	ACTION_FIGMENT_ATTACK
 };
 
 enum Npcs
@@ -99,7 +105,7 @@ public:
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, NOT_STARTED);
 			}
 		}
-		
+
 		void JustDied(Unit *pWho)
 		{
 			if (instance)
@@ -123,6 +129,20 @@ public:
 			Talk(SAY_DEATH);
 		}
 
+		void DoAction(int32 action)
+        {
+            switch (action)
+            {
+				case ACTION_SHA_OF_DOUBT_PHASE_COMBAT:
+					me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
+					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+					events.SetPhase(PHASE_COMBAT);
+					me->GetMotionMaster()->MoveChase(me->getVictim());
+					boundsOfReality = false;
+					break;
+            }
+        }
+
 		void KilledUnit(Unit *pWho)
 		{
 			Talk(irand(SAY_SLAY_1, SAY_SLAY_2));
@@ -138,6 +158,8 @@ public:
 
 				events.SetPhase(PHASE_NULL);
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, FAIL);
+
+				Talk(SAY_RESET);
 
 				me->CombatStop(true);
 				me->DeleteThreatList();
@@ -178,7 +200,7 @@ public:
 		
 		void UpdateAI(uint32 diff)
 		{
-			if (!UpdateVictim() && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
+			if (!UpdateVictim())
 				return;
 
 			events.Update(diff);
@@ -201,15 +223,7 @@ public:
 
 			if (events.IsInPhase(PHASE_BOUNDS_OF_REALITY) && !me->HasAura(SPELL_BOUNDS_OF_REALITY))
 				if (me->FindNearestCreature(NPC_SHA_TRIGGER, 0.1f, true))
-					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 0, 0, PHASE_BOUNDS_OF_REALITY);
-
-			if (!me->HasAura(SPELL_BOUNDS_OF_REALITY) && boundsOfReality)
-			{
-				me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
-				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-				events.SetPhase(PHASE_COMBAT);
-				boundsOfReality = false;
-			}
+					events.ScheduleEvent(EVENT_BOUNDS_OF_REALITY, 2, 0, PHASE_BOUNDS_OF_REALITY);
 
 			while (uint32 eventId = events.ExecuteEvent())
 			{
@@ -239,6 +253,7 @@ public:
 							break;
 
 						case EVENT_BOUNDS_OF_REALITY:
+						{
 							if (Creature* trigger = me->FindNearestCreature(NPC_SHA_TRIGGER, 99999.0f, true))
 							{
 								me->CastSpell(me, SPELL_BOUNDS_OF_REALITY);
@@ -248,9 +263,18 @@ public:
 								me->GetMotionMaster()->Clear(true);
 							}
 
+							std::list<Creature*> figments;
+							me->GetCreatureListWithEntryInGrid(figments, NPC_FIGMENT_OF_DOUBT, 99999.0f);
+							if (!figments.empty())
+							{
+								for (std::list<Creature*>::iterator itr = figments.begin(); itr != figments.end(); ++itr)
+									(*itr)->AI()->DoAction(ACTION_FIGMENT_ATTACK);
+							}
+
 							events.ScheduleEvent(EVENT_BOUNDS_DONE, 1, 0, PHASE_BOUNDS_OF_REALITY);
 							events.CancelEvent(EVENT_BOUNDS_OF_REALITY);
 							break;
+						}
 
 						case EVENT_SUMMON_FIGMENT_OF_DOUBT:
 						{
@@ -322,10 +346,6 @@ public:
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 			me->CastSpell(me, SPELL_SHADOWFORM);
-			me->CastSpell(me, SPELL_GATHERING_DOUBT);
-
-			events.ScheduleEvent(EVENT_ATTACK_PLAYERS, 4*IN_MILLISECONDS);
-			events.ScheduleEvent(EVENT_RELEASE_DOUBT, 30*IN_MILLISECONDS);
 
 			if (instance)
 			{
@@ -344,6 +364,18 @@ public:
 			}
 		}
 
+		void DoAction(int32 action)
+        {
+            switch (action)
+            {
+				case ACTION_FIGMENT_ATTACK:
+					me->CastSpell(me, SPELL_GATHERING_DOUBT);
+					events.ScheduleEvent(EVENT_RELEASE_DOUBT, 30*IN_MILLISECONDS);
+					events.ScheduleEvent(EVENT_ATTACK_PLAYERS, 0);
+					break;
+            }
+        }
+
 		void EnterEvadeMode()
 		{
 			if (instance)
@@ -358,7 +390,7 @@ public:
 				{
 					if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 					{
-						sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, sha->GetGUID());
+						sha->AI()->DoAction(ACTION_SHA_OF_DOUBT_PHASE_COMBAT);
 						me->DespawnOrUnsummon();
 					}
 				}
@@ -391,6 +423,7 @@ public:
 							me->SetReactState(REACT_AGGRESSIVE);
 							me->SetInCombatWith(player);
 							me->AddThreat(player, 99999.0f);
+							me->GetMotionMaster()->MoveChase(player);
 						
 							events.CancelEvent(EVENT_ATTACK_PLAYERS);
 							break;
