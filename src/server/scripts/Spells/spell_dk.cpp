@@ -1079,7 +1079,7 @@ class spell_dk_necrotic_strike : public SpellScriptLoader
 				if(Player* caster = GetCaster()->ToPlayer())
 				{
 					uint8 runes = caster->GetRunesState();
-					for(uint8 i = 4; i>=0; i-=2)
+					for(int8 i = 4; i>=0; i-=2)
 					{
 						if(caster->GetCurrentRune(i) == RUNE_DEATH && caster->GetRuneCooldown(i) == 0)
 						{
@@ -1088,7 +1088,7 @@ class spell_dk_necrotic_strike : public SpellScriptLoader
 							return;
 						}
 					}
-					for(uint8 i = 5; i>=1; i-=2)
+					for(int8 i = 5; i>=1; i-=2)
 					{
 						if(caster->GetCurrentRune(i) == RUNE_DEATH && caster->GetRuneCooldown(i) == 0)
 						{
