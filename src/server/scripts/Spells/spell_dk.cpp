@@ -622,7 +622,10 @@ class spell_dk_death_strike : public SpellScriptLoader
 					if(caster->HasAura(SPELL_DK_BLOOD_RITES))
 					{
 						for(uint8 i = 2; i<6; ++i)
+						{
 							caster->ConvertRune(i, RUNE_DEATH);
+							caster->SetRuneConvertAura(i, NULL);
+						}
 					}
 
 					
