@@ -2,24 +2,26 @@
 
 enum Spells
 {
-    SPELL_SEETHE				= 119487,
-    SPELL_ENDLESS_RAGE			= 119586,
-    SPELL_BITTER_THOUGHTS		= 119601,
-    SPELL_GROWING_ANGER			= 119622,
-    SPELL_AGGRESSIVE_BEHAVIOUR	= 119626,
-    SPELL_UNLEASHED_WRATH		= 119488,
-    SPELL_RAGE_OF_THE_SHA       = 117609,
-    SPELL_BERSERK               = 47008
+    SPELL_SEETHE					= 119487,
+    SPELL_ENDLESS_RAGE				= 119586,
+    SPELL_BITTER_THOUGHTS			= 119601,
+    SPELL_GROWING_ANGER				= 119622,
+    SPELL_AGGRESSIVE_BEHAVIOUR		= 119626,
+    SPELL_UNLEASHED_WRATH			= 119488,
+	SPELL_ENDLESS_RAGE_TRIGGERED	= 119587,
+    SPELL_RAGE_OF_THE_SHA			= 117609,
+    SPELL_BERSERK					= 47008
 };
 
 enum Events
 {
-    EVENT_SEETHE				= 1,
-    EVENT_ENDLESS_RAGE			= 2,
-    EVENT_GROWING_ANGER			= 3,
-    EVENT_PHASE_GROWING_ANGER	= 4,
-    EVENT_UNLEASHED_WRATH       = 5,
-    EVENT_BERSERK               = 6
+    EVENT_SEETHE					= 1,
+    EVENT_ENDLESS_RAGE				= 2,
+	EVENT_ENDLESS_RAGE_TRIGGERED	= 3,
+    EVENT_GROWING_ANGER				= 4,
+    EVENT_PHASE_GROWING_ANGER		= 5,
+    EVENT_UNLEASHED_WRATH			= 6,
+    EVENT_BERSERK					= 7
 };
 
 enum Phases
@@ -58,10 +60,14 @@ public:
         }
 
         EventMap events;
+		int32 endlessRages;
 
         void Reset()
         {
             events.Reset();
+
+			endlessRages = 0;
+
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
         }
 
@@ -117,10 +123,31 @@ public:
                         break;
 
                     case EVENT_ENDLESS_RAGE:
-                        me->CastSpell(me->getVictim(), SPELL_ENDLESS_RAGE);
+                        me->CastSpell(me, SPELL_ENDLESS_RAGE);
                         Talk(SAY_ENDLESS_RAGE);
-                       /* events.ScheduleEvent(EVENT_ENDLESS_RAGE, 25*IN_MILLISECONDS);*/
+
+						events.ScheduleEvent(EVENT_ENDLESS_RAGE_TRIGGERED, 500);
+						events.CancelEvent(EVENT_ENDLESS_RAGE);
                         break;
+
+					case EVENT_ENDLESS_RAGE_TRIGGERED:
+						if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+							if (target && target->GetTypeId() == TYPEID_PLAYER)
+								target->CastSpell(target, SPELL_ENDLESS_RAGE_TRIGGERED);
+						
+						if (endlessRages < 6)
+						{
+							events.ScheduleEvent(EVENT_ENDLESS_RAGE_TRIGGERED, 500);
+							endlessRages++;
+						}
+
+						if (endlessRages >= 5)
+						{
+							events.CancelEvent(EVENT_ENDLESS_RAGE_TRIGGERED);
+							endlessRages = 0;
+						}
+
+						break;
 
                     case EVENT_GROWING_ANGER:
                         me->CastSpell(me, SPELL_GROWING_ANGER);
