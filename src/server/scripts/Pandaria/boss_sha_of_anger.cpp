@@ -135,7 +135,7 @@ public:
                         for (i = threatlist.begin(); i != threatlist.end(); ++i)
                         {
                             if (Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid()))
-                                if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && !me->IsWithinMeleeRange(me->getVictim()))
+								if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && !me->IsWithinMeleeRange(unit))
                                     me->CastSpell(me->getVictim(), SPELL_SEETHE);
                         }
 
@@ -146,7 +146,7 @@ public:
                         me->CastSpell(me, SPELL_ENDLESS_RAGE);
                         Talk(SAY_ENDLESS_RAGE);
 
-						events.ScheduleEvent(EVENT_ENDLESS_RAGE_TRIGGERED, 0);
+						events.ScheduleEvent(EVENT_ENDLESS_RAGE_TRIGGERED, 1);
 						events.CancelEvent(EVENT_ENDLESS_RAGE);
                         break;
 
