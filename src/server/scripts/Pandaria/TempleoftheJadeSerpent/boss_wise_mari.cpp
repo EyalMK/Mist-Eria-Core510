@@ -52,6 +52,7 @@ enum Npcs
 
 enum Events
 {
+	/* Wise Mari */
 	EVENT_HYDROLANCE				= 1,
 	EVENT_HYDROLANCE_FRONT			= 2,
 	EVENT_HYDROLANCE_LEFT			= 3,
@@ -73,7 +74,10 @@ enum Events
 	EVENT_HYDROTRIGGER_ONE_RIGHT	= 19,
 	EVENT_HYDROTRIGGER_TWO_RIGHT	= 20,
 	EVENT_SAY_TAUNT					= 21,
-	EVENT_WASH_AWAY_TURN			= 22
+	EVENT_WASH_AWAY_TURN			= 22,
+
+	/* Corrupt Living Water */
+	EVENT_SUMMON_CORRUPT_DROPLETS	= 1
 };
 
 enum Texts
@@ -584,7 +588,7 @@ public:
 	};
 };
 
-class npc_corrupt_living_water : public CreatureScript 
+class npc_corrupt_living_water : public CreatureScript // Trash
 {
 public:
 	npc_corrupt_living_water() : CreatureScript("npc_corrupt_living_water") { }
@@ -603,29 +607,152 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
+		int32 droplets;
 
-		void Reset() 
+		void Reset()
 		{
-			me->SetInCombatWithZone();
+			droplets = 0;
 		}
 
-		void EnterEvadeMode() 
+		void EnterEvadeMode()
 		{
 			me->DespawnOrUnsummon();
 		}
 
-		void JustDied(Unit *pWho) 
+		void DamageTaken(Unit* who, uint32& damage)
 		{
-			me->CastSpell(me, SPELL_SHA_RESIDUE);
-			me->CastSpell(me, SPELL_CORRUPTED_DROPLET);
-			me->CastSpell(me, SPELL_CORRUPTED_DROPLET); // 3 droplets
-			me->CastSpell(me, SPELL_CORRUPTED_DROPLET);
+			if (damage >= me->GetHealth())
+			{
+				damage = 0;
+				me->SetHealth(1);
+			}
 		}
 
 		void UpdateAI(uint32 diff) 
 		{
 			if(!UpdateVictim())
 				return;
+
+			if (me->GetHealth() == 1 && droplets == 0)
+			{
+				events.ScheduleEvent(EVENT_SUMMON_CORRUPT_DROPLETS, 0);
+			}
+
+			if (me->GetHealth() == 1 && droplets == 1)
+			{
+				events.ScheduleEvent(EVENT_SUMMON_CORRUPT_DROPLETS, 0);
+			}
+
+			if (me->GetHealth() == 1 && droplets == 2)
+			{
+				events.ScheduleEvent(EVENT_SUMMON_CORRUPT_DROPLETS, 0);
+			}
+
+			if (droplets >= 3)
+				me->Kill(me);
+
+			while (uint32 eventId = events.ExecuteEvent())
+			{
+				switch (eventId)
+				{
+					if (instance)
+					{
+						case EVENT_SUMMON_CORRUPT_DROPLETS:
+							if (droplets < 3)
+								me->CastSpell(me, SPELL_CORRUPTED_DROPLET);
+
+							droplets++;
+							events.CancelEvent(EVENT_SUMMON_CORRUPT_DROPLETS);
+							break;
+
+						default:
+							break;
+					}
+				}
+			}
+
+			DoMeleeAttackIfReady();
+		}
+	};
+};
+
+class mob_corrupt_living_water : public CreatureScript // Trash
+{
+public:
+	mob_corrupt_living_water() : CreatureScript("mob_corrupt_living_water") { }
+
+	CreatureAI* GetAI(Creature* creature) const 
+	{
+		return new mob_corrupt_living_waterAI(creature);
+	}
+
+	struct mob_corrupt_living_waterAI : public ScriptedAI
+	{
+		mob_corrupt_living_waterAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
+
+		InstanceScript* instance;
+		EventMap events;
+		int32 droplets;
+
+		void Reset()
+		{
+			droplets = 0;
+		}
+
+		void DamageTaken(Unit* who, uint32& damage)
+		{
+			if (damage >= me->GetHealth())
+			{
+				damage = 0;
+				me->SetHealth(1);
+			}
+		}
+
+		void UpdateAI(uint32 diff) 
+		{
+			if(!UpdateVictim())
+				return;
+
+			if (me->GetHealth() == 1 && droplets == 0)
+			{
+				events.ScheduleEvent(EVENT_SUMMON_CORRUPT_DROPLETS, 0);
+			}
+
+			if (me->GetHealth() == 1 && droplets == 1)
+			{
+				events.ScheduleEvent(EVENT_SUMMON_CORRUPT_DROPLETS, 0);
+			}
+
+			if (me->GetHealth() == 1 && droplets == 2)
+			{
+				events.ScheduleEvent(EVENT_SUMMON_CORRUPT_DROPLETS, 0);
+			}
+
+			if (droplets >= 3)
+				me->Kill(me);
+
+			while (uint32 eventId = events.ExecuteEvent())
+			{
+				switch (eventId)
+				{
+					if (instance)
+					{
+						case EVENT_SUMMON_CORRUPT_DROPLETS:
+							if (droplets < 3)
+								me->CastSpell(me, SPELL_CORRUPTED_DROPLET);
+
+							droplets++;
+							events.CancelEvent(EVENT_SUMMON_CORRUPT_DROPLETS);
+							break;
+
+						default:
+							break;
+					}
+				}
+			}
 
 			DoMeleeAttackIfReady();
 		}
@@ -670,6 +797,7 @@ void AddSC_boss_wise_mari()
 {
 	new boss_wise_mari();
 	new npc_corrupt_living_water();
+	new mob_corrupt_living_water();
 	new npc_corrupt_droplet();
 }
 
