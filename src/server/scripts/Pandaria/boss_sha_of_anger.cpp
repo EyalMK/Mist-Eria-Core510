@@ -81,6 +81,26 @@ public:
             Talk(SAY_SLAY);
         }
 
+		void EnterEvadeMode()
+		{
+			std::list<Creature*> ires;
+			std::list<Creature*> triggers;
+
+			me->GetCreatureListWithEntryInGrid(ires, NPC_IRE, 99999.0f);
+			if (!ires.empty())
+			{
+				for (std::list<Creature*>::iterator itr = ires.begin(); itr != ires.end(); ++itr)
+					(*itr)->DespawnOrUnsummon();
+			}
+
+			me->GetCreatureListWithEntryInGrid(triggers, NPC_SHA_OF_ANGER, 99999.0f);
+			if (!triggers.empty())
+			{
+				for (std::list<Creature*>::iterator itr = triggers.begin(); itr != triggers.end(); ++itr)
+					(*itr)->DespawnOrUnsummon();
+			}
+		}
+
         void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_AGGRO);
