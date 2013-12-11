@@ -618,6 +618,13 @@ class spell_dk_death_strike : public SpellScriptLoader
 							caster->CastCustomSpell(caster, SPELL_DK_BLOOD_SHIELD, &mbp, NULL, NULL, false);
 					}
 
+                }
+            }
+
+			void HandleAfterHit()
+			{
+				if(Player* caster = GetCaster()->ToPlayer())
+                {
 					// Blood Rites
 					if(caster->HasAura(SPELL_DK_BLOOD_RITES))
 					{
@@ -627,14 +634,13 @@ class spell_dk_death_strike : public SpellScriptLoader
 							caster->SetRuneConvertAura(i, NULL);
 						}
 					}
-
-					
-                }
-            }
+				}
+			}
 
             void Register()
             {
                 OnEffectHitTarget += SpellEffectFn(spell_dk_death_strike_SpellScript::HandleDummy, EFFECT_2, SPELL_EFFECT_DUMMY);
+				AfterHit += SpellHitFn(spell_dk_death_strike_SpellScript::HandleAfterHit);
             }
 
         };
@@ -1078,25 +1084,7 @@ class spell_dk_necrotic_strike : public SpellScriptLoader
 			{
 				if(Player* caster = GetCaster()->ToPlayer())
 				{
-					uint8 runes = caster->GetRunesState();
-					for(int8 i = 4; i>=0; i-=2)
-					{
-						if(caster->GetCurrentRune(i) == RUNE_DEATH && caster->GetRuneCooldown(i) == 0)
-						{
-							caster->SetRuneCooldown(i, caster->GetRuneBaseCooldown(i));
-							caster->RestoreBaseRune(i);
-							return;
-						}
-					}
-					for(int8 i = 5; i>=1; i-=2)
-					{
-						if(caster->GetCurrentRune(i) == RUNE_DEATH && caster->GetRuneCooldown(i) == 0)
-						{
-							caster->SetRuneCooldown(i, caster->GetRuneBaseCooldown(i));
-							caster->RestoreBaseRune(i);
-							return;
-						}
-					}
+					// Need to use 1 Death Rune
 				}
 			}
 
