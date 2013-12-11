@@ -580,7 +580,7 @@ class spell_dk_death_strike : public SpellScriptLoader
             {
                 if(Player* caster = GetCaster()->ToPlayer())
                 {
-                    int32 bp = (int32) (0.2f * caster->GetDamageTakenInPastSecs(5));
+                    int32 bp = (int32) (0.2f * caster->GetDamageTakenInPastSecs(5, false, true));
 					if(bp < (caster->GetHealth() * 0.07f))
 						bp = (int32)(caster->GetHealth() * 0.07f);
 
@@ -593,20 +593,20 @@ class spell_dk_death_strike : public SpellScriptLoader
 
                     caster->CastCustomSpell(caster, SPELL_DK_DEATH_STRIKE_HEAL, &bp, NULL, NULL, false);
 
-					// Blood Mastery
+					// Blood Shield - Mastery (Blood)
 					if(caster->HasAura(SPELL_DK_BLOOD_MASTERY))
 					{
 						int32 mbp = 0.5f * bp;
 						if(caster->HasAura(SPELL_DK_BLOOD_SHIELD))
 						{
 							caster->CastCustomSpell(caster, SPELL_DK_BLOOD_SHIELD, &mbp, NULL, NULL, false);
-							/*
+							
 							if (Aura* bloodShield = caster->GetAura(SPELL_DK_BLOOD_SHIELD))
 							{
 								bloodShield->SetDuration(bloodShield->GetMaxDuration());
-								bloodShield->Set
+								bloodShield->GetEffect(0)->SetAmount(bloodShield->GetEffect(0)->GetAmount() + mbp);
 							}
-							*/
+							
 						}
 						else
 							caster->CastCustomSpell(caster, SPELL_DK_BLOOD_SHIELD, &mbp, NULL, NULL, false);

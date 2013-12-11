@@ -1925,12 +1925,14 @@ class Unit : public WorldObject
 
 
 		uint32 m_heal_done[120];
-		uint32 m_damage_done[120];
-		uint32 m_damage_taken[120];
+		uint32 m_damage_done_to_non_players[120];
+		uint32 m_damage_done_to_players[120];
+		uint32 m_damage_taken_from_non_players[120];
+		uint32 m_damage_taken_from_players[120];
 		int32 DmgandHealDoneTimer;
 		uint32 GetHealingDoneInPastSecs(uint32 secs);
-		uint32 GetDamageDoneInPastSecs(uint32 secs);
-		uint32 GetDamageTakenInPastSecs(uint32 secs);
+		uint32 GetDamageDoneInPastSecs(uint32 secs, bool toPlayers = true, bool toNonPlayers = true);
+		uint32 GetDamageTakenInPastSecs(uint32 secs, bool fromPlayers = true, bool fromNonPlayers = true);
 		void ResetDamageDoneInPastSecs(uint32 secs);
 		void ResetHealingDoneInPastSecs(uint32 secs);
 
