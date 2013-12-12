@@ -134,7 +134,6 @@ class spell_monk_fists_of_fury_stun : public SpellScriptLoader
 };
 
 // Expel Harm - 115072
-/*
 class spell_monk_expel_harm : public SpellScriptLoader
 {
     public:
@@ -158,12 +157,12 @@ class spell_monk_expel_harm : public SpellScriptLoader
                     Trinity::UnitListSearcher<Trinity::NearestAttackableUnitInObjectRangeCheck> searcher(_player, targetList, u_check);
                     _player->VisitNearbyObject(radius, searcher);
 
-                    for (auto itr : targetList)
+					for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
                     {
-                        if (_player->IsValidAttackTarget(itr))
+                        if (_player->IsValidAttackTarget((*i)))
                         {
                             int32 bp = CalculatePct((-GetHitDamage()), 50);
-                            _player->CastCustomSpell(itr, 115129, &bp, NULL, NULL, true);
+                            _player->CastCustomSpell((*i), 115129, &bp, NULL, NULL, true);
                         }
                     }
                 }
@@ -180,7 +179,6 @@ class spell_monk_expel_harm : public SpellScriptLoader
             return new spell_monk_expel_harm_SpellScript();
         }
 };
-*/
 
 // Chi Wave (healing bolt) - 132464
 class spell_monk_chi_wave_healing_bolt : public SpellScriptLoader
@@ -460,7 +458,6 @@ class spell_monk_grapple_weapon : public SpellScriptLoader
 };
 
 // Serpent's Zeal - 127722
-/*
 class spell_monk_serpents_zeal : public SpellScriptLoader
 {
     public:
@@ -523,12 +520,12 @@ class spell_monk_serpents_zeal : public SpellScriptLoader
 
                     if (statueList.size() == 1)
                     {
-                        for (auto itrBis : statueList)
-                            statue = itrBis;
+						for (std::list<Creature*>::const_iterator ibis = statueList.begin(); ibis != statueList.end(); ++ibis)
+                            statue = (*ibis);
 
                         if (statue && (statue->isPet() || statue->isGuardian()))
                             if (statue->GetOwner() && statue->GetOwner()->GetGUID() == _player->GetGUID())
-                                statue->CastCustomSpell(statue, SPELL_MONK_EMINENCE_HEAL, &bp, NULL, NULL, true, 0, NULLAURA_EFFECT, _player->GetGUID()); // Eminence - statue
+                                statue->CastCustomSpell(statue, SPELL_MONK_EMINENCE_HEAL, &bp, NULL, NULL, true, 0, NULL, _player->GetGUID()); // Eminence - statue
                     }
                 }
             }
@@ -544,7 +541,6 @@ class spell_monk_serpents_zeal : public SpellScriptLoader
             return new spell_monk_serpents_zeal_AuraScript();
         }
 };
-*/
 
 // Dampen Harm - 122278
 class spell_monk_dampen_harm : public SpellScriptLoader
@@ -718,7 +714,6 @@ class spell_monk_diffuse_magic : public SpellScriptLoader
 };
 
 // Summon Black Ox Statue - 115315
-/*
 class spell_monk_black_ox_statue : public SpellScriptLoader
 {
     public:
@@ -740,8 +735,8 @@ class spell_monk_black_ox_statue : public SpellScriptLoader
 
                     player->GetCreatureListWithEntryInGrid(tempList, MONK_NPC_BLACK_OX_STATUE, 500.0f);
 
-                    for (auto itr : tempList)
-                        blackOxList.push_back(itr);
+					for (std::list<Creature*>::const_iterator i = tempList.begin(); i != tempList.end(); ++i)
+                        blackOxList.push_back((*i));
 
                     // Remove other players jade statue
                     for (std::list<Creature*>::iterator i = tempList.begin(); i != tempList.end(); ++i)
@@ -789,7 +784,7 @@ class spell_monk_black_ox_statue : public SpellScriptLoader
 
             uint32 damageDealed;
 
-            void OnApply(AuraEffect const* /*aurEff, AuraEffectHandleModes /*mode)
+            void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 damageDealed = 0;
             }
@@ -828,8 +823,8 @@ class spell_monk_black_ox_statue : public SpellScriptLoader
 
                         if (!statueList.empty() && statueList.size() == 1)
                         {
-                            for (auto itr : statueList)
-                                statue = itr;
+							for (std::list<Creature*>::const_iterator i = statueList.begin(); i != statueList.end(); ++i)
+                                statue = (*i);
 
                             if (statue && (statue->isPet() || statue->isGuardian()))
                             {
@@ -839,19 +834,19 @@ class spell_monk_black_ox_statue : public SpellScriptLoader
 
                                     _plr->GetPartyMembers(targets);
 
-                                    for (auto itr : targets)
+									for (std::list<Unit*>::const_iterator i = targets.begin(); i != targets.end(); ++i)
                                     {
-                                        if (itr->GetGUID() == statue->GetGUID() ||
-                                            itr->GetGUID() == _plr->GetGUID())
+                                        if ((*i)->GetGUID() == statue->GetGUID() ||
+                                            (*i)->GetGUID() == _plr->GetGUID())
                                             continue;
 
-                                        targets.push_back(itr);
+                                        targets.push_back((*i));
                                     }
 
                                     Trinity::Containers::RandomResizeList(targets, 1);
 
-                                    for (auto itr : targets)
-                                        statue->CastSpell(itr, SPELL_MONK_GUARD, true);
+									for (std::list<Unit*>::const_iterator i = targets.begin(); i != targets.end(); ++i)
+                                        statue->CastSpell((*i), SPELL_MONK_GUARD, true);
                                 }
                             }
                         }
@@ -870,7 +865,6 @@ class spell_monk_black_ox_statue : public SpellScriptLoader
             return new spell_monk_black_ox_statue_AuraScript();
         }
 };
-*/
 
 // Guard - 115295
 class spell_monk_guard : public SpellScriptLoader
@@ -1259,7 +1253,6 @@ class spell_monk_spinning_fire_blossom_damage : public SpellScriptLoader
 };
 
 // Spinning Fire Blossom - 115073
-/*
 class spell_monk_spinning_fire_blossom : public SpellScriptLoader
 {
     public:
@@ -1278,29 +1271,29 @@ class spell_monk_spinning_fire_blossom : public SpellScriptLoader
 
                     _player->GetAttackableUnitListInRange(tempList, 50.0f);
 
-                    for (auto itr : tempList)
+					for (std::list<Unit*>::const_iterator i = tempList.begin(); i != tempList.end(); ++i)
                     {
-                        if (!_player->IsValidAttackTarget(itr))
+                        if (!_player->IsValidAttackTarget((*i)))
                             continue;
 
-                        if (!_player->isInFront(itr))
+                        if (!_player->isInFront((*i)))
                             continue;
 
-                        if (!itr->IsWithinLOSInMap(_player))
+                        if (!(*i)->IsWithinLOSInMap(_player))
                             continue;
 
-                        if (itr->GetGUID() == _player->GetGUID())
+                        if ((*i)->GetGUID() == _player->GetGUID())
                             continue;
 
-                        targetList.push_back(itr);
+                        targetList.push_back((*i));
                     }
 
                     if (!targetList.empty())
                     {
                         Trinity::Containers::RandomResizeList(targetList, 1);
 
-                        for (auto itr : targetList)
-                            _player->CastSpell(itr, SPELL_MONK_SPINNING_FIRE_BLOSSOM_DAMAGE, true);
+						for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
+                            _player->CastSpell((*i), SPELL_MONK_SPINNING_FIRE_BLOSSOM_DAMAGE, true);
                     }
                     else
                         _player->CastSpell(_player, SPELL_MONK_SPINNING_FIRE_BLOSSOM_MISSILE, true);
@@ -1318,7 +1311,6 @@ class spell_monk_spinning_fire_blossom : public SpellScriptLoader
             return new spell_monk_spinning_fire_blossom_SpellScript();
         }
 };
-*/
 
 // Path of Blossom - 124336
 class spell_monk_path_of_blossom : public SpellScriptLoader
@@ -1350,7 +1342,6 @@ class spell_monk_path_of_blossom : public SpellScriptLoader
 
 // Called by Uplift - 116670 and Uplift - 130316
 // Thunder Focus Tea - 116680
-/*
 class spell_monk_thunder_focus_tea : public SpellScriptLoader
 {
     public:
@@ -1377,8 +1368,8 @@ class spell_monk_thunder_focus_tea : public SpellScriptLoader
 
                             _player->GetPartyMembers(groupList);
 
-                            for (auto itr : groupList)
-                                if (Aura* renewingMistGroup = itr->GetAura(SPELL_MONK_RENEWING_MIST_HOT, _player->GetGUID()))
+							for (std::list<Unit*>::const_iterator i = groupList.begin(); i != groupList.end(); ++i)
+                                if (Aura* renewingMistGroup = (*i)->GetAura(SPELL_MONK_RENEWING_MIST_HOT, _player->GetGUID()))
                                     renewingMistGroup->RefreshDuration();
 
                             _player->RemoveAura(SPELL_MONK_THUNDER_FOCUS_TEA);
@@ -1399,7 +1390,6 @@ class spell_monk_thunder_focus_tea : public SpellScriptLoader
             return new spell_monk_thunder_focus_tea_SpellScript();
         }
 };
-*/
 
 // Summon Jade Serpent Statue - 115313
 class spell_monk_jade_serpent_statue : public SpellScriptLoader
@@ -1805,7 +1795,6 @@ class spell_monk_zen_sphere_hot : public SpellScriptLoader
 };
 
 // Chi Burst - 123986
-/*
 class spell_monk_chi_burst : public SpellScriptLoader
 {
     public:
@@ -1833,16 +1822,16 @@ class spell_monk_chi_burst : public SpellScriptLoader
                         else
                             _player->CastSpell(target, SPELL_MONK_CHI_BURST_HEAL, true);
 
-                        for (auto itr : tempUnitMap)
+						for (std::list<Unit*>::const_iterator i = tempUnitMap.begin(); i != tempUnitMap.end(); ++i)
                         {
-                            if (itr->GetGUID() == _player->GetGUID())
+                            if ((*i)->GetGUID() == _player->GetGUID())
                                 continue;
 
-                            if (!itr->IsInBetween(_player, target, 3.0f))
+                            if (!(*i)->IsInBetween(_player, target, 3.0f))
                                 continue;
 
-                            uint32 spell = _player->IsValidAttackTarget(itr) ? SPELL_MONK_CHI_BURST_DAMAGE : SPELL_MONK_CHI_BURST_HEAL;
-                            _player->CastSpell(itr, spell, true);
+                            uint32 spell = _player->IsValidAttackTarget((*i)) ? SPELL_MONK_CHI_BURST_DAMAGE : SPELL_MONK_CHI_BURST_HEAL;
+                            _player->CastSpell((*i), spell, true);
                         }
                     }
                 }
@@ -1859,7 +1848,6 @@ class spell_monk_chi_burst : public SpellScriptLoader
             return new spell_monk_chi_burst_SpellScript();
         }
 };
-*/
 
 // Energizing Brew - 115288
 class spell_monk_energizing_brew : public SpellScriptLoader
@@ -2059,7 +2047,6 @@ class spell_monk_flying_serpent_kick : public SpellScriptLoader
 };
 
 // Chi Torpedo - 115008 or Chi Torpedo (3 charges) - 121828
-/*
 class spell_monk_chi_torpedo : public SpellScriptLoader
 {
     public:
@@ -2078,13 +2065,13 @@ class spell_monk_chi_torpedo : public SpellScriptLoader
                         std::list<Unit*> tempUnitMap;
                         _player->GetAttackableUnitListInRange(tempUnitMap, 20.0f);
 
-                        for (auto itr : tempUnitMap)
+						for (std::list<Unit*>::const_iterator i = tempUnitMap.begin(); i != tempUnitMap.end(); ++i)
                         {
-                            if (!itr->isInFront(_player, M_PI / 3) && itr->GetGUID() != _player->GetGUID())
+                            if (!(*i)->isInFront(_player, M_PI / 3) && (*i)->GetGUID() != _player->GetGUID())
                                 continue;
 
-                            uint32 spell = _player->IsValidAttackTarget(itr) ? SPELL_MONK_CHI_TORPEDO_DAMAGE : SPELL_MONK_CHI_TORPEDO_HEAL;
-                            _player->CastSpell(itr, spell, true);
+                            uint32 spell = _player->IsValidAttackTarget((*i)) ? SPELL_MONK_CHI_TORPEDO_DAMAGE : SPELL_MONK_CHI_TORPEDO_HEAL;
+                            _player->CastSpell((*i), spell, true);
                         }
 
                         if (caster->HasAura(SPELL_MONK_ITEM_PVP_GLOVES_BONUS))
@@ -2104,7 +2091,6 @@ class spell_monk_chi_torpedo : public SpellScriptLoader
             return new spell_monk_chi_torpedo_SpellScript();
         }
 };
-*/
 
 // Purifying Brew - 119582
 class spell_monk_purifying_brew : public SpellScriptLoader
@@ -2322,7 +2308,6 @@ class spell_monk_breath_of_fire : public SpellScriptLoader
 };
 
 // Soothing Mist - 115175
-/*
 class spell_monk_soothing_mist : public SpellScriptLoader
 {
     public:
@@ -2332,7 +2317,7 @@ class spell_monk_soothing_mist : public SpellScriptLoader
         {
             PrepareAuraScript(spell_monk_soothing_mist_AuraScript);
 
-            void OnApply(AuraEffect const* /*aurEff, AuraEffectHandleModes /*mode)
+            void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (!GetCaster())
                     return;
@@ -2371,23 +2356,23 @@ class spell_monk_soothing_mist : public SpellScriptLoader
                             statueList.remove((*i));
                         }
 
-                        for (auto itr : playerList)
+						for (std::list<Unit*>::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
                         {
                             if (statueList.size() == 1)
                             {
-                                for (auto itrBis : statueList)
-                                    statue = itrBis;
+								for (std::list<Creature*>::const_iterator ibis = statueList.begin(); ibis != statueList.end(); ++i)
+                                    statue = (*ibis);
 
                                 if (statue && (statue->isPet() || statue->isGuardian()))
                                     if (statue->GetOwner() && statue->GetOwner()->GetGUID() == _player->GetGUID())
-                                        statue->CastSpell(itr, GetSpellInfo()->Id, true);
+                                        statue->CastSpell((*i), GetSpellInfo()->Id, true);
                             }
                         }
                     }
                 }
             }
 
-            void HandleEffectPeriodic(AuraEffect const* /*aurEff)
+            void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
             {
                 if (Unit* caster = GetCaster())
                     if (Unit* target = GetTarget())
@@ -2396,7 +2381,7 @@ class spell_monk_soothing_mist : public SpellScriptLoader
                             caster->CastSpell(caster, SPELL_MONK_SOOTHING_MIST_ENERGIZE, true);
             }
 
-            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode)
+            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
                 if (Unit* caster = GetCaster())
                     if (Unit* target = GetTarget())
@@ -2417,7 +2402,6 @@ class spell_monk_soothing_mist : public SpellScriptLoader
             return new spell_monk_soothing_mist_AuraScript();
         }
 };
-*/
 
 // Zen Pilgrimage - 126892 and Zen Pilgrimage : Return - 126895
 class spell_monk_zen_pilgrimage : public SpellScriptLoader
@@ -3093,16 +3077,16 @@ class spell_monk_tigereye_brew_stacks : public SpellScriptLoader
 void AddSC_monk_spell_scripts()
 {
 	new spell_monk_fists_of_fury_stun();
-    //new spell_monk_expel_harm();
+    new spell_monk_expel_harm();
     new spell_monk_chi_wave_healing_bolt();
     //new spell_monk_chi_wave_bolt();
     new spell_monk_chi_wave();
     new spell_monk_grapple_weapon();
-    //new spell_monk_serpents_zeal();
+    new spell_monk_serpents_zeal();
     new spell_monk_dampen_harm();
     new spell_monk_item_s12_4p_mistweaver();
     new spell_monk_diffuse_magic();
-    //new spell_monk_black_ox_statue();
+    new spell_monk_black_ox_statue();
     new spell_monk_guard();
     new spell_monk_bear_hug();
     new spell_monk_zen_flight_check();
@@ -3111,9 +3095,9 @@ void AddSC_monk_spell_scripts()
     new spell_monk_crackling_jade_lightning();
     new spell_monk_touch_of_karma();
     new spell_monk_spinning_fire_blossom_damage();
-    //new spell_monk_spinning_fire_blossom();
+    new spell_monk_spinning_fire_blossom();
     new spell_monk_path_of_blossom();
-    //new spell_monk_thunder_focus_tea();
+    new spell_monk_thunder_focus_tea();
     new spell_monk_jade_serpent_statue();
     new spell_monk_teachings_of_the_monastery();
     new spell_monk_mana_tea();
@@ -3123,19 +3107,19 @@ void AddSC_monk_spell_scripts()
     new spell_monk_healing_elixirs();
     new spell_monk_zen_sphere();
     new spell_monk_zen_sphere_hot();
-    //new spell_monk_chi_burst();
+    new spell_monk_chi_burst();
     new spell_monk_energizing_brew();
     new spell_monk_spear_hand_strike();
     new spell_monk_tigereye_brew();
     new spell_monk_tigers_lust();
     new spell_monk_flying_serpent_kick();
-    //new spell_monk_chi_torpedo();
+    new spell_monk_chi_torpedo();
     new spell_monk_purifying_brew();
     new spell_monk_clash();
     new spell_monk_keg_smash();
     new spell_monk_elusive_brew();
     new spell_monk_breath_of_fire();
-    //new spell_monk_soothing_mist();
+    new spell_monk_soothing_mist();
     new spell_monk_zen_pilgrimage();
     new spell_monk_blackout_kick();
     new spell_monk_provoke();

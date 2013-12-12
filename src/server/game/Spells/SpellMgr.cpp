@@ -3863,6 +3863,12 @@ void SpellMgr::LoadSpellInfoCorrections()
 				case 106112: // Release Doubt
 					spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_500_YARDS);
 					break;
+				case 1752: // Sinister Strike
+					spellInfo->Effects[EFFECT_1].BasePoints = 1;
+					break;
+				case 49998: // Death Strike
+					spellInfo->Attributes &= SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK;
+					break;
 				default:
 					break;
 			}

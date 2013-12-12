@@ -81,6 +81,13 @@ enum HunterSpells
     HUNTER_SPELL_GLAIVE_TOSS_LEFT                   = 120756,
     HUNTER_SPELL_GLAIVE_TOSS_DAMAGE_AND_SNARE_LEFT  = 120761,
     HUNTER_SPELL_GLAIVE_TOSS_DAMAGE_AND_SNARE_RIGHT = 121414,
+	HUNTER_SPELL_BLINK_STRIKE                       = 130393,
+	HUNTER_SPELL_BINDING_SHOT_AREA                  = 109248,
+    HUNTER_SPELL_BINDING_SHOT_LINK                  = 117405,
+    HUNTER_SPELL_BINDING_SHOT_STUN                  = 117526,
+    HUNTER_SPELL_BINDING_SHOT_IMMUNE                = 117553,
+	HUNTER_SPELL_LYNX_RUSH_AURA                     = 120697,
+    HUNTER_SPELL_LYNX_CRUSH_DAMAGE                  = 120699,
 };
 
 // 13161 - Aspect of the Beast
@@ -298,7 +305,6 @@ class spell_hun_disengage : public SpellScriptLoader
                         _player->RemoveMovementImpairingAuras();
                         _player->CastSpell(_player, HUNTER_SPELL_POSTHASTE_INCREASE_SPEED, true);
                     }
-					/*
                     else if (_player->HasAura(HUNTER_SPELL_NARROW_ESCAPE))
                     {
                         std::list<Unit*> unitList;
@@ -306,16 +312,15 @@ class spell_hun_disengage : public SpellScriptLoader
 
                         _player->GetAttackableUnitListInRange(unitList, 8.0f);
 
-                        for (auto itr : unitList)
-                            if (_player->IsValidAttackTarget(itr))
-                                retsList.push_back(itr);
+						for (std::list<Unit*>::const_iterator i = unitList.begin(); i != unitList.end(); ++i)
+                            if (_player->IsValidAttackTarget((*i)))
+                                retsList.push_back((*i));
 
-                        for (auto itr : retsList)
-                            _player->CastSpell(itr, HUNTER_SPELL_NARROW_ESCAPE_RETS, true);
-                    }*/
+						for (std::list<Unit*>::const_iterator i = retsList.begin(); i != retsList.end(); ++i)
+                            _player->CastSpell((*i), HUNTER_SPELL_NARROW_ESCAPE_RETS, true);
+                    }
                 }
             }
-			
 
             void Register()
             {
@@ -1036,7 +1041,6 @@ class spell_hun_dire_beast : public SpellScriptLoader
 };
 
 // A Murder of Crows - 131894
-/*
 class spell_hun_a_murder_of_crows : public SpellScriptLoader
 {
     public:
@@ -1046,7 +1050,7 @@ class spell_hun_a_murder_of_crows : public SpellScriptLoader
         {
             PrepareAuraScript(spell_hun_a_murder_of_crows_AuraScript);
 
-            void OnTick(constAuraEffectPtr aurEff)
+            void OnTick(AuraEffect const* aurEff)
             {
                 if (Unit* target = GetTarget())
                 {
@@ -1065,8 +1069,8 @@ class spell_hun_a_murder_of_crows : public SpellScriptLoader
 
                         _player->GetCreatureListWithEntryInGrid(tempList, HUNTER_NPC_MURDER_OF_CROWS, 100.0f);
 
-                        for (auto itr : tempList)
-                            crowsList.push_back(itr);
+						for (std::list<Creature*>::const_iterator i = tempList.begin(); i != tempList.end(); ++i)
+                            crowsList.push_back((*i));
 
                         // Remove other players Crows
                         for (std::list<Creature*>::iterator i = tempList.begin(); i != tempList.end(); ++i)
@@ -1078,8 +1082,8 @@ class spell_hun_a_murder_of_crows : public SpellScriptLoader
                             crowsList.remove((*i));
                         }
 
-                        for (auto itr : crowsList)
-                            itr->AI()->AttackStart(target);
+						for (std::list<Creature*>::const_iterator i = crowsList.begin(); i != crowsList.end(); ++i)
+                            (*i)->AI()->AttackStart(target);
                     }
                 }
             }
@@ -1094,10 +1098,9 @@ class spell_hun_a_murder_of_crows : public SpellScriptLoader
         {
             return new spell_hun_a_murder_of_crows_AuraScript();
         }
-};*/
+};
 
 // Powershot - 109259
-/*
 class spell_hun_powershot : public SpellScriptLoader
 {
     public:
@@ -1116,33 +1119,33 @@ class spell_hun_powershot : public SpellScriptLoader
                         std::list<Unit*> tempUnitMap;
                         _player->GetAttackableUnitListInRange(tempUnitMap, _player->GetDistance(target));
 
-                        for (auto itr : tempUnitMap)
+						for (std::list<Unit*>::const_iterator i = tempUnitMap.begin(); i != tempUnitMap.end(); ++i)
                         {
-                            if (!itr->IsValidAttackTarget(_player))
+                            if (!(*i)->IsValidAttackTarget(_player))
                                 continue;
 
-                            if (itr->GetGUID() == _player->GetGUID())
+                            if ((*i)->GetGUID() == _player->GetGUID())
                                 continue;
 
-                            if (!itr->IsInBetween(_player, target, 1.0f))
+                            if (!(*i)->IsInBetween(_player, target, 1.0f))
                                 continue;
 
-                            SpellNonMeleeDamage damageInfo(_player, itr, GetSpellInfo()->Id, GetSpellInfo()->SchoolMask);
+                            SpellNonMeleeDamage damageInfo(_player, (*i), GetSpellInfo()->Id, GetSpellInfo()->SchoolMask);
                             damageInfo.damage = int32(GetHitDamage() / 2);
                             _player->SendSpellNonMeleeDamageLog(&damageInfo);
                             _player->DealSpellDamage(&damageInfo, true);
 
-                            if (Creature* creatureTarget = itr->ToCreature())
+                            if (Creature* creatureTarget = (*i)->ToCreature())
                                 if (creatureTarget->isWorldBoss() || creatureTarget->IsDungeonBoss())
                                     continue;
 
-                            if (itr->GetTypeId() == TYPEID_PLAYER)
-                                if (itr->ToPlayer()->GetKnockBackTime())
+                            if ((*i)->GetTypeId() == TYPEID_PLAYER)
+                                if ((*i)->ToPlayer()->GetKnockBackTime())
                                     continue;
 
                             // Instantly interrupt non melee spells being casted
-                            if (itr->IsNonMeleeSpellCasted(true))
-                                itr->InterruptNonMeleeSpells(true);
+                            if ((*i)->IsNonMeleeSpellCasted(true))
+                                (*i)->InterruptNonMeleeSpells(true);
 
                             float ratio = 0.1f;
                             float speedxy = float(GetSpellInfo()->Effects[EFFECT_1].MiscValue) * ratio;
@@ -1153,10 +1156,10 @@ class spell_hun_powershot : public SpellScriptLoader
                             float x, y;
                             _player->GetPosition(x, y);
 
-                            itr->KnockbackFrom(x, y, speedxy, speedz);
+                            (*i)->KnockbackFrom(x, y, speedxy, speedz);
 
-                            if (itr->GetTypeId() == TYPEID_PLAYER)
-                                itr->ToPlayer()->SetKnockBackTime(getMSTime());
+                            if ((*i)->GetTypeId() == TYPEID_PLAYER)
+                                (*i)->ToPlayer()->SetKnockBackTime(getMSTime());
                         }
                     }
                 }
@@ -1173,10 +1176,8 @@ class spell_hun_powershot : public SpellScriptLoader
             return new spell_hun_powershot_SpellScript();
         }
 };
-*/
 
 // Glaive Toss (damage) - 120761 and 121414
-/*
 class spell_hun_glaive_toss_damage : public SpellScriptLoader
 {
     public:
@@ -1205,11 +1206,11 @@ class spell_hun_glaive_toss_damage : public SpellScriptLoader
                 Trinity::UnitListSearcher<Trinity::NearestAttackableUnitInObjectRangeCheck> searcher(GetCaster(), targetList, u_check);
                 GetCaster()->VisitNearbyObject(radius, searcher);
 
-                for (auto itr : targetList)
+				for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
                 {
-                    if (itr->HasAura(HUNTER_SPELL_GLAIVE_TOSS_AURA))
+                    if ((*i)->HasAura(HUNTER_SPELL_GLAIVE_TOSS_AURA))
                     {
-                        mainTargetGUID = itr->GetGUID();
+                        mainTargetGUID = (*i)->GetGUID();
                         break;
                     }
                 }
@@ -1223,9 +1224,9 @@ class spell_hun_glaive_toss_damage : public SpellScriptLoader
 
                 targets.push_back(target);
 
-                for (auto itr : targetList)
-                    if (itr->IsInBetween(GetCaster(), target, 5.0f))
-                        targets.push_back(itr);
+                for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
+                    if ((*i)->IsInBetween(GetCaster(), target, 5.0f))
+                        targets.push_back((*i));
             }
 
             void CorrectSnareRange(std::list<WorldObject*>& targets)
@@ -1239,11 +1240,11 @@ class spell_hun_glaive_toss_damage : public SpellScriptLoader
                 Trinity::UnitListSearcher<Trinity::NearestAttackableUnitInObjectRangeCheck> searcher(GetCaster(), targetList, u_check);
                 GetCaster()->VisitNearbyObject(radius, searcher);
 
-                for (auto itr : targetList)
+                for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
                 {
-                    if (itr->HasAura(HUNTER_SPELL_GLAIVE_TOSS_AURA))
+                    if ((*i)->HasAura(HUNTER_SPELL_GLAIVE_TOSS_AURA))
                     {
-                        mainTargetGUID = itr->GetGUID();
+                        mainTargetGUID = (*i)->GetGUID();
                         break;
                     }
                 }
@@ -1260,9 +1261,9 @@ class spell_hun_glaive_toss_damage : public SpellScriptLoader
 
                 targets.push_back(target);
 
-                for (auto itr : targetList)
-                    if (itr->IsInBetween(GetCaster(), target, 5.0f))
-                        targets.push_back(itr);
+                for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
+                    if ((*i)->IsInBetween(GetCaster(), target, 5.0f))
+                        targets.push_back((*i));
             }
 
             void OnDamage()
@@ -1338,14 +1339,14 @@ class spell_hun_glaive_toss_missile : public SpellScriptLoader
                     if (Unit* caster = GetCaster())
                         if (Unit* target = GetHitUnit())
                             if (caster == GetOriginalCaster())
-                                target->CastSpell(caster, HUNTER_SPELL_GLAIVE_TOSS_LEFT, true, NULL, NULLAURA_EFFECT, caster->GetGUID());
+                                target->CastSpell(caster, HUNTER_SPELL_GLAIVE_TOSS_LEFT, true, NULL, NULL, caster->GetGUID());
                 }
                 else
                 {
                     if (Unit* caster = GetCaster())
                         if (Unit* target = GetHitUnit())
                             if (caster == GetOriginalCaster())
-                                target->CastSpell(caster, HUNTER_SPELL_GLAIVE_TOSS_RIGHT, true, NULL, NULLAURA_EFFECT, caster->GetGUID());
+                                target->CastSpell(caster, HUNTER_SPELL_GLAIVE_TOSS_RIGHT, true, NULL, NULL, caster->GetGUID());
                 }
             }
 
@@ -1361,7 +1362,318 @@ class spell_hun_glaive_toss_missile : public SpellScriptLoader
             return new spell_hun_glaive_toss_missile_SpellScript();
         }
 };
+
+// Blink Strike - 130392
+class spell_hun_blink_strike : public SpellScriptLoader
+{
+    public:
+        spell_hun_blink_strike() : SpellScriptLoader("spell_hun_blink_strike") { }
+
+        class spell_hun_blink_strike_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_hun_blink_strike_SpellScript);
+
+            SpellCastResult CheckPet()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                    if (!_player->GetPet())
+                        return SPELL_FAILED_NO_PET;
+
+                return SPELL_CAST_OK;
+            }
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                    if (Unit* target = GetHitUnit())
+                        if (Pet* pet = _player->GetPet())
+                            pet->CastSpell(target, HUNTER_SPELL_BLINK_STRIKE, true);
+            }
+
+            void Register()
+            {
+                OnCheckCast += SpellCheckCastFn(spell_hun_blink_strike_SpellScript::CheckPet);
+                OnHit += SpellHitFn(spell_hun_blink_strike_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_hun_blink_strike_SpellScript();
+        }
+};
+
+// Binding Shot - 117405
+/*
+class spell_hun_binding_shot : public SpellScriptLoader
+{
+    public:
+        spell_hun_binding_shot() : SpellScriptLoader("spell_hun_binding_shot") { }
+
+        class spell_hun_binding_shot_zone_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_hun_binding_shot_zone_AuraScript);
+
+            void OnUpdate(uint32 diff, AuraEffect* aurEff)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    DynamicObject* dynObj = caster->GetDynObject(HUNTER_SPELL_BINDING_SHOT_AREA);
+
+                    if (!dynObj)
+                        return;
+
+                    std::list<Unit*> bindedList;
+
+                    CellCoord p(Trinity::ComputeCellCoord(dynObj->GetPositionX(), dynObj->GetPositionY()));
+                    Cell cell(p);
+                    cell.SetNoCreate();
+
+                    Trinity::AnyUnitInObjectRangeCheck u_check(dynObj, 15.0f);
+                    Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(dynObj, bindedList, u_check);
+
+                    TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
+                    TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
+
+                    cell.Visit(p, world_unit_searcher, *dynObj->GetMap(), *dynObj, 15.0f);
+                    cell.Visit(p, grid_unit_searcher, *dynObj->GetMap(), *dynObj, 15.0f);
+
+                    bindedList.remove_if(Trinity::UnitAuraCheck(false, GetSpellInfo()->Id, caster->GetGUID()));
+
+					for (std::list<Unit*>::const_iterator i = bindedList.begin(); i != bindedList.end(); ++i)
+                    {
+                        Unit* target = (*i)->ToUnit();
+                        if (!target)
+                            continue;
+
+                        if (target->GetDistance(dynObj) > 5.0f)
+                        {
+                            if (!target->HasAura(HUNTER_SPELL_BINDING_SHOT_IMMUNE))
+                            {
+                                target->CastSpell(target, HUNTER_SPELL_BINDING_SHOT_STUN, true);
+                                target->CastSpell(target, HUNTER_SPELL_BINDING_SHOT_IMMUNE, true);
+                            }
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnEffectUpdate += AuraEffectUpdateFn(spell_hun_binding_shot_zone_AuraScript::OnUpdate, EFFECT_1, SPELL_AURA_MOD_DAMAGE_FROM_CASTER);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_hun_binding_shot_zone_AuraScript();
+        }
+};
 */
+
+// Binding Shot - 109248
+class spell_hun_binding_shot_zone : public SpellScriptLoader
+{
+    public:
+        spell_hun_binding_shot_zone() : SpellScriptLoader("spell_hun_binding_shot_zone") { }
+
+        class spell_hun_binding_shot_zone_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_hun_binding_shot_zone_AuraScript);
+
+            void OnTick(AuraEffect const* aurEff)
+            {
+                if (DynamicObject* dynObj = GetCaster()->GetDynObject(HUNTER_SPELL_BINDING_SHOT_AREA))
+                    GetCaster()->CastSpell(dynObj->GetPositionX(), dynObj->GetPositionY(), dynObj->GetPositionZ(), HUNTER_SPELL_BINDING_SHOT_LINK, true);
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_hun_binding_shot_zone_AuraScript::OnTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_hun_binding_shot_zone_AuraScript();
+        }
+};
+
+
+// Barrage damage - 120361
+class spell_hun_barrage : public SpellScriptLoader
+{
+    public:
+        spell_hun_barrage() : SpellScriptLoader("spell_hun_barrage") { }
+
+        class spell_hun_barrage_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_hun_barrage_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                    if (Unit* target = GetHitUnit())
+                        if (!target->HasAura(120360))
+                            SetHitDamage(GetHitDamage() / 2);
+            }
+
+            void Register()
+            {
+               OnHit += SpellHitFn(spell_hun_barrage_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_hun_barrage_SpellScript();
+        }
+};
+
+// Lynx Rush - 120697
+class spell_hun_lynx_rush : public SpellScriptLoader
+{
+    public:
+        spell_hun_lynx_rush() : SpellScriptLoader("spell_hun_lynx_rush") { }
+
+        class spell_hun_lynx_rush_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_hun_lynx_rush_AuraScript);
+
+            void OnTick(AuraEffect const* aurEff)
+            {
+                std::list<Unit*> tempList;
+                std::list<Unit*> targetList;
+                Unit* unitTarget = NULL;
+
+                GetTarget()->GetAttackableUnitListInRange(tempList, 10.0f);
+
+				for (std::list<Unit*>::const_iterator i = tempList.begin(); i != tempList.end(); ++i)
+                {
+                    if ((*i)->GetGUID() == GetTarget()->GetGUID())
+                        continue;
+
+                    if (GetTarget()->GetOwner() && GetTarget()->GetOwner()->GetGUID() == (*i)->GetGUID())
+                        continue;
+
+                    if (!GetTarget()->IsValidAttackTarget((*i)))
+                        continue;
+
+                    targetList.push_back((*i));
+                }
+
+                tempList.clear();
+
+                if (targetList.empty())
+                    return;
+
+                Trinity::Containers::RandomResizeList(targetList, 1);
+
+				for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
+                {
+                    unitTarget = (*i);
+                    break;
+                }
+
+                if (!unitTarget)
+                    return;
+
+                float angle = unitTarget->GetRelativeAngle(GetTarget());
+                Position pos;
+
+                unitTarget->GetContactPoint(GetTarget(), pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+                unitTarget->GetFirstCollisionPosition(pos, unitTarget->GetObjectSize(), angle);
+                GetTarget()->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + unitTarget->GetObjectSize());
+
+                GetTarget()->CastSpell(unitTarget, HUNTER_SPELL_LYNX_CRUSH_DAMAGE, true);
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_hun_lynx_rush_AuraScript::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_hun_lynx_rush_AuraScript();
+        }
+
+        class spell_hun_lynx_rush_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_hun_lynx_rush_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (GetHitUnit())
+                    {
+                        if (Pet* pet = _player->GetPet())
+                        {
+                            if (pet->GetGUID() == GetHitUnit()->GetGUID())
+                            {
+                                std::list<Unit*> tempList;
+                                std::list<Unit*> targetList;
+                                Unit* unitTarget = NULL;
+
+                                pet->GetAttackableUnitListInRange(tempList, 10.0f);
+
+								for (std::list<Unit*>::const_iterator i = tempList.begin(); i != tempList.end(); ++i)
+                                {
+                                    if ((*i)->GetGUID() == pet->GetGUID())
+                                        continue;
+
+                                    if (_player->GetGUID() == (*i)->GetGUID())
+                                        continue;
+
+                                    if (!pet->IsValidAttackTarget((*i)))
+                                        continue;
+
+                                    targetList.push_back((*i));
+                                }
+
+                                tempList.clear();
+
+                                if (targetList.empty())
+                                    return;
+
+                                Trinity::Containers::RandomResizeList(targetList, 1);
+
+								for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
+                                {
+                                    unitTarget = (*i);
+                                    break;
+                                }
+
+                                if (!unitTarget)
+                                    return;
+
+                                float angle = unitTarget->GetRelativeAngle(pet);
+                                Position pos;
+
+                                unitTarget->GetContactPoint(pet, pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+                                unitTarget->GetFirstCollisionPosition(pos, unitTarget->GetObjectSize(), angle);
+                                pet->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + unitTarget->GetObjectSize());
+
+                                pet->CastSpell(unitTarget, HUNTER_SPELL_LYNX_CRUSH_DAMAGE, true);
+                            }
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_hun_lynx_rush_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_hun_lynx_rush_SpellScript();
+        }
+};
 
 void AddSC_hunter_spell_scripts()
 {
@@ -1384,8 +1696,13 @@ void AddSC_hunter_spell_scripts()
 	new spell_hun_cobra_shot();
 	new spell_hun_steady_shot();
 	new spell_hun_dire_beast();
-    //new spell_hun_a_murder_of_crows();
-	//new spell_hun_powershot();
-	//new spell_hun_glaive_toss_damage();
-	//new spell_hun_glaive_toss_missile();
+    new spell_hun_a_murder_of_crows();
+	new spell_hun_powershot();
+	new spell_hun_glaive_toss_damage();
+	new spell_hun_glaive_toss_missile();
+	new spell_hun_blink_strike();
+	//new spell_hun_binding_shot();
+	new spell_hun_binding_shot_zone();
+	new spell_hun_barrage();
+	new spell_hun_lynx_rush();
 }
