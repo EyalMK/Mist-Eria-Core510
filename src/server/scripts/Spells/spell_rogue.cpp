@@ -812,6 +812,9 @@ class spell_rog_rentless_strike : public SpellScriptLoader
                 if (!GetOwner())
                     return;
 
+				if (eventInfo.GetDamageInfo()->GetSpellInfo()->Id == 1752)
+					return;
+
                 if (Player* player = GetOwner()->ToPlayer())
 					if(roll_chance_i(20 * player->GetComboPoints()))
 						player->CastSpell(player, 98440, true);
