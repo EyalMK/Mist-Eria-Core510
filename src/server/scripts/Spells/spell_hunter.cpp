@@ -1036,7 +1036,6 @@ class spell_hun_dire_beast : public SpellScriptLoader
 };
 
 // A Murder of Crows - 131894
-/*
 class spell_hun_a_murder_of_crows : public SpellScriptLoader
 {
     public:
@@ -1046,7 +1045,7 @@ class spell_hun_a_murder_of_crows : public SpellScriptLoader
         {
             PrepareAuraScript(spell_hun_a_murder_of_crows_AuraScript);
 
-            void OnTick(constAuraEffectPtr aurEff)
+            void OnTick(AuraEffect const* aurEff)
             {
                 if (Unit* target = GetTarget())
                 {
@@ -1065,8 +1064,8 @@ class spell_hun_a_murder_of_crows : public SpellScriptLoader
 
                         _player->GetCreatureListWithEntryInGrid(tempList, HUNTER_NPC_MURDER_OF_CROWS, 100.0f);
 
-                        for (auto itr : tempList)
-                            crowsList.push_back(itr);
+						for (std::list<Creature*>::const_iterator i = tempList.begin(); i != tempList.end(); ++i)
+                            crowsList.push_back((*i));
 
                         // Remove other players Crows
                         for (std::list<Creature*>::iterator i = tempList.begin(); i != tempList.end(); ++i)
@@ -1078,8 +1077,8 @@ class spell_hun_a_murder_of_crows : public SpellScriptLoader
                             crowsList.remove((*i));
                         }
 
-                        for (auto itr : crowsList)
-                            itr->AI()->AttackStart(target);
+						for (std::list<Creature*>::const_iterator i = crowsList.begin(); i != crowsList.end(); ++i)
+                            (*i)->AI()->AttackStart(target);
                     }
                 }
             }
@@ -1094,7 +1093,7 @@ class spell_hun_a_murder_of_crows : public SpellScriptLoader
         {
             return new spell_hun_a_murder_of_crows_AuraScript();
         }
-};*/
+};
 
 // Powershot - 109259
 class spell_hun_powershot : public SpellScriptLoader
@@ -1382,7 +1381,7 @@ void AddSC_hunter_spell_scripts()
 	new spell_hun_cobra_shot();
 	new spell_hun_steady_shot();
 	new spell_hun_dire_beast();
-    //new spell_hun_a_murder_of_crows();
+    new spell_hun_a_murder_of_crows();
 	new spell_hun_powershot();
 	//new spell_hun_glaive_toss_damage();
 	//new spell_hun_glaive_toss_missile();
