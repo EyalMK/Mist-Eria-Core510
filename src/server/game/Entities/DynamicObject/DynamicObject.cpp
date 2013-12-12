@@ -58,7 +58,7 @@ void DynamicObject::AddToWorld()
     }
 }
 
-/*void DynamicObject::RemoveFromWorld()
+void DynamicObject::RemoveFromWorld()
 {
     ///- Remove the dynamicObject from the accessor and from all lists of objects in world
     if (IsInWorld())
@@ -77,7 +77,7 @@ void DynamicObject::AddToWorld()
         WorldObject::RemoveFromWorld();
         sObjectAccessor->RemoveObject(this);
     }
-}*/
+}
 
 bool DynamicObject::CreateDynamicObject(uint32 guidlow, Unit* caster, SpellInfo const* spell, Position const& pos, float radius, DynamicObjectType type)
 {
@@ -139,7 +139,7 @@ void DynamicObject::Update(uint32 p_time)
         sScriptMgr->OnDynamicObjectUpdate(this, p_time);
 }
 
-/*void DynamicObject::Remove()
+void DynamicObject::Remove()
 {
     if (IsInWorld())
     {
@@ -147,7 +147,7 @@ void DynamicObject::Update(uint32 p_time)
         RemoveFromWorld();
         AddObjectToRemoveList();
     }
-}*/
+}
 
 int32 DynamicObject::GetDuration() const
 {
