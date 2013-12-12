@@ -114,7 +114,7 @@ public:
 
 				map = me->GetMap();
 
-				if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
+				if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 99999.0f))
 					go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
 
 				if (map && map->IsDungeon())
@@ -180,6 +180,9 @@ public:
 					for (std::list<Creature*>::iterator itr = figments.begin(); itr != figments.end(); ++itr)
 						(*itr)->DespawnOrUnsummon();
 				}
+
+				if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 99999.0f))
+					go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
 			}
 		}
 
