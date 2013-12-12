@@ -1174,7 +1174,6 @@ class spell_hun_powershot : public SpellScriptLoader
 };
 
 // Glaive Toss (damage) - 120761 and 121414
-/*
 class spell_hun_glaive_toss_damage : public SpellScriptLoader
 {
     public:
@@ -1203,11 +1202,11 @@ class spell_hun_glaive_toss_damage : public SpellScriptLoader
                 Trinity::UnitListSearcher<Trinity::NearestAttackableUnitInObjectRangeCheck> searcher(GetCaster(), targetList, u_check);
                 GetCaster()->VisitNearbyObject(radius, searcher);
 
-                for (auto itr : targetList)
+				for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
                 {
-                    if (itr->HasAura(HUNTER_SPELL_GLAIVE_TOSS_AURA))
+                    if ((*i)->HasAura(HUNTER_SPELL_GLAIVE_TOSS_AURA))
                     {
-                        mainTargetGUID = itr->GetGUID();
+                        mainTargetGUID = (*i)->GetGUID();
                         break;
                     }
                 }
@@ -1221,9 +1220,9 @@ class spell_hun_glaive_toss_damage : public SpellScriptLoader
 
                 targets.push_back(target);
 
-                for (auto itr : targetList)
-                    if (itr->IsInBetween(GetCaster(), target, 5.0f))
-                        targets.push_back(itr);
+                for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
+                    if ((*i)->IsInBetween(GetCaster(), target, 5.0f))
+                        targets.push_back((*i));
             }
 
             void CorrectSnareRange(std::list<WorldObject*>& targets)
@@ -1237,9 +1236,9 @@ class spell_hun_glaive_toss_damage : public SpellScriptLoader
                 Trinity::UnitListSearcher<Trinity::NearestAttackableUnitInObjectRangeCheck> searcher(GetCaster(), targetList, u_check);
                 GetCaster()->VisitNearbyObject(radius, searcher);
 
-                for (auto itr : targetList)
+                for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
                 {
-                    if (itr->HasAura(HUNTER_SPELL_GLAIVE_TOSS_AURA))
+                    if ((*i)->HasAura(HUNTER_SPELL_GLAIVE_TOSS_AURA))
                     {
                         mainTargetGUID = itr->GetGUID();
                         break;
@@ -1258,9 +1257,9 @@ class spell_hun_glaive_toss_damage : public SpellScriptLoader
 
                 targets.push_back(target);
 
-                for (auto itr : targetList)
-                    if (itr->IsInBetween(GetCaster(), target, 5.0f))
-                        targets.push_back(itr);
+                for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
+                    if ((*i)->IsInBetween(GetCaster(), target, 5.0f))
+                        targets.push_back((*i));
             }
 
             void OnDamage()
@@ -1336,14 +1335,14 @@ class spell_hun_glaive_toss_missile : public SpellScriptLoader
                     if (Unit* caster = GetCaster())
                         if (Unit* target = GetHitUnit())
                             if (caster == GetOriginalCaster())
-                                target->CastSpell(caster, HUNTER_SPELL_GLAIVE_TOSS_LEFT, true, NULL, NULLAURA_EFFECT, caster->GetGUID());
+                                target->CastSpell(caster, HUNTER_SPELL_GLAIVE_TOSS_LEFT, true, NULL, NULL, caster->GetGUID());
                 }
                 else
                 {
                     if (Unit* caster = GetCaster())
                         if (Unit* target = GetHitUnit())
                             if (caster == GetOriginalCaster())
-                                target->CastSpell(caster, HUNTER_SPELL_GLAIVE_TOSS_RIGHT, true, NULL, NULLAURA_EFFECT, caster->GetGUID());
+                                target->CastSpell(caster, HUNTER_SPELL_GLAIVE_TOSS_RIGHT, true, NULL, NULL, caster->GetGUID());
                 }
             }
 
@@ -1359,7 +1358,6 @@ class spell_hun_glaive_toss_missile : public SpellScriptLoader
             return new spell_hun_glaive_toss_missile_SpellScript();
         }
 };
-*/
 
 // Blink Strike - 130392
 class spell_hun_blink_strike : public SpellScriptLoader
@@ -1424,7 +1422,7 @@ void AddSC_hunter_spell_scripts()
 	new spell_hun_dire_beast();
     new spell_hun_a_murder_of_crows();
 	new spell_hun_powershot();
-	//new spell_hun_glaive_toss_damage();
-	//new spell_hun_glaive_toss_missile();
+	new spell_hun_glaive_toss_damage();
+	new spell_hun_glaive_toss_missile();
 	new spell_hun_blink_strike();
 }
