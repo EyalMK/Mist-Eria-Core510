@@ -1097,7 +1097,6 @@ class spell_hun_a_murder_of_crows : public SpellScriptLoader
 };*/
 
 // Powershot - 109259
-/*
 class spell_hun_powershot : public SpellScriptLoader
 {
     public:
@@ -1116,33 +1115,33 @@ class spell_hun_powershot : public SpellScriptLoader
                         std::list<Unit*> tempUnitMap;
                         _player->GetAttackableUnitListInRange(tempUnitMap, _player->GetDistance(target));
 
-                        for (auto itr : tempUnitMap)
+						for (std::list<Unit*>::const_iterator i = tempUnitMap.begin(); i != tempUnitMap.end(); ++i)
                         {
-                            if (!itr->IsValidAttackTarget(_player))
+                            if (!(*i)->IsValidAttackTarget(_player))
                                 continue;
 
-                            if (itr->GetGUID() == _player->GetGUID())
+                            if ((*i)->GetGUID() == _player->GetGUID())
                                 continue;
 
-                            if (!itr->IsInBetween(_player, target, 1.0f))
+                            if (!(*i)->IsInBetween(_player, target, 1.0f))
                                 continue;
 
-                            SpellNonMeleeDamage damageInfo(_player, itr, GetSpellInfo()->Id, GetSpellInfo()->SchoolMask);
+                            SpellNonMeleeDamage damageInfo(_player, (*i), GetSpellInfo()->Id, GetSpellInfo()->SchoolMask);
                             damageInfo.damage = int32(GetHitDamage() / 2);
                             _player->SendSpellNonMeleeDamageLog(&damageInfo);
                             _player->DealSpellDamage(&damageInfo, true);
 
-                            if (Creature* creatureTarget = itr->ToCreature())
+                            if (Creature* creatureTarget = (*i)->ToCreature())
                                 if (creatureTarget->isWorldBoss() || creatureTarget->IsDungeonBoss())
                                     continue;
 
-                            if (itr->GetTypeId() == TYPEID_PLAYER)
-                                if (itr->ToPlayer()->GetKnockBackTime())
+                            if ((*i)->GetTypeId() == TYPEID_PLAYER)
+                                if ((*i)->ToPlayer()->GetKnockBackTime())
                                     continue;
 
                             // Instantly interrupt non melee spells being casted
-                            if (itr->IsNonMeleeSpellCasted(true))
-                                itr->InterruptNonMeleeSpells(true);
+                            if ((*i)->IsNonMeleeSpellCasted(true))
+                                (*i)->InterruptNonMeleeSpells(true);
 
                             float ratio = 0.1f;
                             float speedxy = float(GetSpellInfo()->Effects[EFFECT_1].MiscValue) * ratio;
@@ -1153,10 +1152,10 @@ class spell_hun_powershot : public SpellScriptLoader
                             float x, y;
                             _player->GetPosition(x, y);
 
-                            itr->KnockbackFrom(x, y, speedxy, speedz);
+                            (*i)->KnockbackFrom(x, y, speedxy, speedz);
 
-                            if (itr->GetTypeId() == TYPEID_PLAYER)
-                                itr->ToPlayer()->SetKnockBackTime(getMSTime());
+                            if ((*i)->GetTypeId() == TYPEID_PLAYER)
+                                (*i)->ToPlayer()->SetKnockBackTime(getMSTime());
                         }
                     }
                 }
@@ -1173,7 +1172,6 @@ class spell_hun_powershot : public SpellScriptLoader
             return new spell_hun_powershot_SpellScript();
         }
 };
-*/
 
 // Glaive Toss (damage) - 120761 and 121414
 /*
@@ -1385,7 +1383,7 @@ void AddSC_hunter_spell_scripts()
 	new spell_hun_steady_shot();
 	new spell_hun_dire_beast();
     //new spell_hun_a_murder_of_crows();
-	//new spell_hun_powershot();
+	new spell_hun_powershot();
 	//new spell_hun_glaive_toss_damage();
 	//new spell_hun_glaive_toss_missile();
 }
