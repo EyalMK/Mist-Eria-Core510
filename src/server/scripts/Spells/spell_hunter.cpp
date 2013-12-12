@@ -86,6 +86,8 @@ enum HunterSpells
     HUNTER_SPELL_BINDING_SHOT_LINK                  = 117405,
     HUNTER_SPELL_BINDING_SHOT_STUN                  = 117526,
     HUNTER_SPELL_BINDING_SHOT_IMMUNE                = 117553,
+	HUNTER_SPELL_LYNX_RUSH_AURA                     = 120697,
+    HUNTER_SPELL_LYNX_CRUSH_DAMAGE                  = 120699,
 };
 
 // 13161 - Aspect of the Beast
@@ -1528,6 +1530,151 @@ class spell_hun_barrage : public SpellScriptLoader
         }
 };
 
+// Lynx Rush - 120697
+class spell_hun_lynx_rush : public SpellScriptLoader
+{
+    public:
+        spell_hun_lynx_rush() : SpellScriptLoader("spell_hun_lynx_rush") { }
+
+        class spell_hun_lynx_rush_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_hun_lynx_rush_AuraScript);
+
+            void OnTick(AuraEffect const* aurEff)
+            {
+                std::list<Unit*> tempList;
+                std::list<Unit*> targetList;
+                Unit* unitTarget = NULL;
+
+                GetTarget()->GetAttackableUnitListInRange(tempList, 10.0f);
+
+				for (std::list<Unit*>::const_iterator i = tempList.begin(); i != tempList.end(); ++i)
+                {
+                    if ((*i)->GetGUID() == GetTarget()->GetGUID())
+                        continue;
+
+                    if (GetTarget()->GetOwner() && GetTarget()->GetOwner()->GetGUID() == (*i)->GetGUID())
+                        continue;
+
+                    if (!GetTarget()->IsValidAttackTarget((*i)))
+                        continue;
+
+                    targetList.push_back((*i));
+                }
+
+                tempList.clear();
+
+                if (targetList.empty())
+                    return;
+
+                Trinity::Containers::RandomResizeList(targetList, 1);
+
+				for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
+                {
+                    unitTarget = (*i);
+                    break;
+                }
+
+                if (!unitTarget)
+                    return;
+
+                float angle = unitTarget->GetRelativeAngle(GetTarget());
+                Position pos;
+
+                unitTarget->GetContactPoint(GetTarget(), pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+                unitTarget->GetFirstCollisionPosition(pos, unitTarget->GetObjectSize(), angle);
+                GetTarget()->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + unitTarget->GetObjectSize());
+
+                GetTarget()->CastSpell(unitTarget, HUNTER_SPELL_LYNX_CRUSH_DAMAGE, true);
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_hun_lynx_rush_AuraScript::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_hun_lynx_rush_AuraScript();
+        }
+
+        class spell_hun_lynx_rush_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_hun_lynx_rush_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (GetHitUnit())
+                    {
+                        if (Pet* pet = _player->GetPet())
+                        {
+                            if (pet->GetGUID() == GetHitUnit()->GetGUID())
+                            {
+                                std::list<Unit*> tempList;
+                                std::list<Unit*> targetList;
+                                Unit* unitTarget = NULL;
+
+                                pet->GetAttackableUnitListInRange(tempList, 10.0f);
+
+								for (std::list<Unit*>::const_iterator i = tempList.begin(); i != tempList.end(); ++i)
+                                {
+                                    if ((*i)->GetGUID() == pet->GetGUID())
+                                        continue;
+
+                                    if (_player->GetGUID() == (*i)->GetGUID())
+                                        continue;
+
+                                    if (!pet->IsValidAttackTarget((*i)))
+                                        continue;
+
+                                    targetList.push_back((*i));
+                                }
+
+                                tempList.clear();
+
+                                if (targetList.empty())
+                                    return;
+
+                                Trinity::Containers::RandomResizeList(targetList, 1);
+
+								for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
+                                {
+                                    unitTarget = (*i);
+                                    break;
+                                }
+
+                                if (!unitTarget)
+                                    return;
+
+                                float angle = unitTarget->GetRelativeAngle(pet);
+                                Position pos;
+
+                                unitTarget->GetContactPoint(pet, pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+                                unitTarget->GetFirstCollisionPosition(pos, unitTarget->GetObjectSize(), angle);
+                                pet->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + unitTarget->GetObjectSize());
+
+                                pet->CastSpell(unitTarget, HUNTER_SPELL_LYNX_CRUSH_DAMAGE, true);
+                            }
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_hun_lynx_rush_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_hun_lynx_rush_SpellScript();
+        }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     new spell_hun_aspect_of_the_beast();
@@ -1557,4 +1704,5 @@ void AddSC_hunter_spell_scripts()
 	//new spell_hun_binding_shot();
 	new spell_hun_binding_shot_zone();
 	new spell_hun_barrage();
+	new spell_hun_lynx_rush();
 }
