@@ -693,8 +693,7 @@ void Player::UpdateManaRegen()
 	if(HasAura(111546)) // Chaos Energy
 		base_regen += 2.56f * GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_HASTE_SPELL);
 	if(HasAura(117957)) // Nether Attunement
-		base_regen *= 1.f + (GetRatingBonusValue(CR_HASTE_SPELL)/100.f);
-
+		base_regen *= 1.f + (GetRatingBonusValue(CR_HASTE_SPELL)/100.f) + this->GetTotalAuraModifier(SPELL_AURA_HASTE_SPELLS);
 
     // Set regen rate in cast state apply only on spirit based regen
     int32 modManaRegenInterrupt = GetTotalAuraModifier(SPELL_AURA_MOD_MANA_REGEN_INTERRUPT);

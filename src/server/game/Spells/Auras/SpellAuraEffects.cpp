@@ -4271,6 +4271,10 @@ void AuraEffect::HandleModCastingSpeed(AuraApplication const* aurApp, uint8 mode
     Unit* target = aurApp->GetTarget();
 
     target->ApplyCastTimePercentMod((float)GetAmount(), apply);
+
+	// Spell Haste modifies mana regen in some cases
+	if(target->ToPlayer())
+		target->ToPlayer()->UpdateManaRegen();
 }
 
 void AuraEffect::HandleModMeleeRangedSpeedPct(AuraApplication const* aurApp, uint8 mode, bool apply) const
