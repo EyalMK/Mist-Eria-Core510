@@ -2828,6 +2828,9 @@ public:
 		Creature* GetTranscendenceSpirit(Unit* unit){ if(unit->getClass() == CLASS_MONK) return transcendence_spirit; else return NULL; }
 		void SetTranscendenceSpirit(Creature* creature){transcendence_spirit = creature;}
 
+		void SetKnockBackTime(uint32 timer) { m_knockBackTimer = timer; }
+        uint32 GetKnockBackTime() const { return m_knockBackTimer; }
+
         SpyMgr &GetSpyMgr() {return m_spyMgr;}
 
         /*********************************************************/
@@ -3191,6 +3194,8 @@ public:
         uint32 m_timeSyncTimer;
         uint32 m_timeSyncClient;
         uint32 m_timeSyncServer;
+
+		uint32 m_knockBackTimer;
 
         InstanceTimeMap _instanceResetTimes;
         uint32 _pendingBindId;

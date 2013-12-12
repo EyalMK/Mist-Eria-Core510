@@ -81,6 +81,7 @@ enum HunterSpells
     HUNTER_SPELL_GLAIVE_TOSS_LEFT                   = 120756,
     HUNTER_SPELL_GLAIVE_TOSS_DAMAGE_AND_SNARE_LEFT  = 120761,
     HUNTER_SPELL_GLAIVE_TOSS_DAMAGE_AND_SNARE_RIGHT = 121414,
+	HUNTER_SPELL_BLINK_STRIKE                       = 130393,
 };
 
 // 13161 - Aspect of the Beast
@@ -1036,7 +1037,6 @@ class spell_hun_dire_beast : public SpellScriptLoader
 };
 
 // A Murder of Crows - 131894
-/*
 class spell_hun_a_murder_of_crows : public SpellScriptLoader
 {
     public:
@@ -1046,7 +1046,7 @@ class spell_hun_a_murder_of_crows : public SpellScriptLoader
         {
             PrepareAuraScript(spell_hun_a_murder_of_crows_AuraScript);
 
-            void OnTick(constAuraEffectPtr aurEff)
+            void OnTick(AuraEffect const* aurEff)
             {
                 if (Unit* target = GetTarget())
                 {
@@ -1065,8 +1065,8 @@ class spell_hun_a_murder_of_crows : public SpellScriptLoader
 
                         _player->GetCreatureListWithEntryInGrid(tempList, HUNTER_NPC_MURDER_OF_CROWS, 100.0f);
 
-                        for (auto itr : tempList)
-                            crowsList.push_back(itr);
+						for (std::list<Creature*>::const_iterator i = tempList.begin(); i != tempList.end(); ++i)
+                            crowsList.push_back((*i));
 
                         // Remove other players Crows
                         for (std::list<Creature*>::iterator i = tempList.begin(); i != tempList.end(); ++i)
@@ -1078,8 +1078,8 @@ class spell_hun_a_murder_of_crows : public SpellScriptLoader
                             crowsList.remove((*i));
                         }
 
-                        for (auto itr : crowsList)
-                            itr->AI()->AttackStart(target);
+						for (std::list<Creature*>::const_iterator i = crowsList.begin(); i != crowsList.end(); ++i)
+                            (*i)->AI()->AttackStart(target);
                     }
                 }
             }
@@ -1094,10 +1094,9 @@ class spell_hun_a_murder_of_crows : public SpellScriptLoader
         {
             return new spell_hun_a_murder_of_crows_AuraScript();
         }
-};*/
+};
 
 // Powershot - 109259
-/*
 class spell_hun_powershot : public SpellScriptLoader
 {
     public:
@@ -1116,33 +1115,33 @@ class spell_hun_powershot : public SpellScriptLoader
                         std::list<Unit*> tempUnitMap;
                         _player->GetAttackableUnitListInRange(tempUnitMap, _player->GetDistance(target));
 
-                        for (auto itr : tempUnitMap)
+						for (std::list<Unit*>::const_iterator i = tempUnitMap.begin(); i != tempUnitMap.end(); ++i)
                         {
-                            if (!itr->IsValidAttackTarget(_player))
+                            if (!(*i)->IsValidAttackTarget(_player))
                                 continue;
 
-                            if (itr->GetGUID() == _player->GetGUID())
+                            if ((*i)->GetGUID() == _player->GetGUID())
                                 continue;
 
-                            if (!itr->IsInBetween(_player, target, 1.0f))
+                            if (!(*i)->IsInBetween(_player, target, 1.0f))
                                 continue;
 
-                            SpellNonMeleeDamage damageInfo(_player, itr, GetSpellInfo()->Id, GetSpellInfo()->SchoolMask);
+                            SpellNonMeleeDamage damageInfo(_player, (*i), GetSpellInfo()->Id, GetSpellInfo()->SchoolMask);
                             damageInfo.damage = int32(GetHitDamage() / 2);
                             _player->SendSpellNonMeleeDamageLog(&damageInfo);
                             _player->DealSpellDamage(&damageInfo, true);
 
-                            if (Creature* creatureTarget = itr->ToCreature())
+                            if (Creature* creatureTarget = (*i)->ToCreature())
                                 if (creatureTarget->isWorldBoss() || creatureTarget->IsDungeonBoss())
                                     continue;
 
-                            if (itr->GetTypeId() == TYPEID_PLAYER)
-                                if (itr->ToPlayer()->GetKnockBackTime())
+                            if ((*i)->GetTypeId() == TYPEID_PLAYER)
+                                if ((*i)->ToPlayer()->GetKnockBackTime())
                                     continue;
 
                             // Instantly interrupt non melee spells being casted
-                            if (itr->IsNonMeleeSpellCasted(true))
-                                itr->InterruptNonMeleeSpells(true);
+                            if ((*i)->IsNonMeleeSpellCasted(true))
+                                (*i)->InterruptNonMeleeSpells(true);
 
                             float ratio = 0.1f;
                             float speedxy = float(GetSpellInfo()->Effects[EFFECT_1].MiscValue) * ratio;
@@ -1153,10 +1152,10 @@ class spell_hun_powershot : public SpellScriptLoader
                             float x, y;
                             _player->GetPosition(x, y);
 
-                            itr->KnockbackFrom(x, y, speedxy, speedz);
+                            (*i)->KnockbackFrom(x, y, speedxy, speedz);
 
-                            if (itr->GetTypeId() == TYPEID_PLAYER)
-                                itr->ToPlayer()->SetKnockBackTime(getMSTime());
+                            if ((*i)->GetTypeId() == TYPEID_PLAYER)
+                                (*i)->ToPlayer()->SetKnockBackTime(getMSTime());
                         }
                     }
                 }
@@ -1173,10 +1172,8 @@ class spell_hun_powershot : public SpellScriptLoader
             return new spell_hun_powershot_SpellScript();
         }
 };
-*/
 
 // Glaive Toss (damage) - 120761 and 121414
-/*
 class spell_hun_glaive_toss_damage : public SpellScriptLoader
 {
     public:
@@ -1205,11 +1202,11 @@ class spell_hun_glaive_toss_damage : public SpellScriptLoader
                 Trinity::UnitListSearcher<Trinity::NearestAttackableUnitInObjectRangeCheck> searcher(GetCaster(), targetList, u_check);
                 GetCaster()->VisitNearbyObject(radius, searcher);
 
-                for (auto itr : targetList)
+				for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
                 {
-                    if (itr->HasAura(HUNTER_SPELL_GLAIVE_TOSS_AURA))
+                    if ((*i)->HasAura(HUNTER_SPELL_GLAIVE_TOSS_AURA))
                     {
-                        mainTargetGUID = itr->GetGUID();
+                        mainTargetGUID = (*i)->GetGUID();
                         break;
                     }
                 }
@@ -1223,9 +1220,9 @@ class spell_hun_glaive_toss_damage : public SpellScriptLoader
 
                 targets.push_back(target);
 
-                for (auto itr : targetList)
-                    if (itr->IsInBetween(GetCaster(), target, 5.0f))
-                        targets.push_back(itr);
+                for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
+                    if ((*i)->IsInBetween(GetCaster(), target, 5.0f))
+                        targets.push_back((*i));
             }
 
             void CorrectSnareRange(std::list<WorldObject*>& targets)
@@ -1239,9 +1236,9 @@ class spell_hun_glaive_toss_damage : public SpellScriptLoader
                 Trinity::UnitListSearcher<Trinity::NearestAttackableUnitInObjectRangeCheck> searcher(GetCaster(), targetList, u_check);
                 GetCaster()->VisitNearbyObject(radius, searcher);
 
-                for (auto itr : targetList)
+                for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
                 {
-                    if (itr->HasAura(HUNTER_SPELL_GLAIVE_TOSS_AURA))
+                    if ((*i)->HasAura(HUNTER_SPELL_GLAIVE_TOSS_AURA))
                     {
                         mainTargetGUID = itr->GetGUID();
                         break;
@@ -1260,9 +1257,9 @@ class spell_hun_glaive_toss_damage : public SpellScriptLoader
 
                 targets.push_back(target);
 
-                for (auto itr : targetList)
-                    if (itr->IsInBetween(GetCaster(), target, 5.0f))
-                        targets.push_back(itr);
+                for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
+                    if ((*i)->IsInBetween(GetCaster(), target, 5.0f))
+                        targets.push_back((*i));
             }
 
             void OnDamage()
@@ -1338,14 +1335,14 @@ class spell_hun_glaive_toss_missile : public SpellScriptLoader
                     if (Unit* caster = GetCaster())
                         if (Unit* target = GetHitUnit())
                             if (caster == GetOriginalCaster())
-                                target->CastSpell(caster, HUNTER_SPELL_GLAIVE_TOSS_LEFT, true, NULL, NULLAURA_EFFECT, caster->GetGUID());
+                                target->CastSpell(caster, HUNTER_SPELL_GLAIVE_TOSS_LEFT, true, NULL, NULL, caster->GetGUID());
                 }
                 else
                 {
                     if (Unit* caster = GetCaster())
                         if (Unit* target = GetHitUnit())
                             if (caster == GetOriginalCaster())
-                                target->CastSpell(caster, HUNTER_SPELL_GLAIVE_TOSS_RIGHT, true, NULL, NULLAURA_EFFECT, caster->GetGUID());
+                                target->CastSpell(caster, HUNTER_SPELL_GLAIVE_TOSS_RIGHT, true, NULL, NULL, caster->GetGUID());
                 }
             }
 
@@ -1361,7 +1358,46 @@ class spell_hun_glaive_toss_missile : public SpellScriptLoader
             return new spell_hun_glaive_toss_missile_SpellScript();
         }
 };
-*/
+
+// Blink Strike - 130392
+class spell_hun_blink_strike : public SpellScriptLoader
+{
+    public:
+        spell_hun_blink_strike() : SpellScriptLoader("spell_hun_blink_strike") { }
+
+        class spell_hun_blink_strike_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_hun_blink_strike_SpellScript);
+
+            SpellCastResult CheckPet()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                    if (!_player->GetPet())
+                        return SPELL_FAILED_NO_PET;
+
+                return SPELL_CAST_OK;
+            }
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                    if (Unit* target = GetHitUnit())
+                        if (Pet* pet = _player->GetPet())
+                            pet->CastSpell(target, HUNTER_SPELL_BLINK_STRIKE, true);
+            }
+
+            void Register()
+            {
+                OnCheckCast += SpellCheckCastFn(spell_hun_blink_strike_SpellScript::CheckPet);
+                OnHit += SpellHitFn(spell_hun_blink_strike_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_hun_blink_strike_SpellScript();
+        }
+};
 
 void AddSC_hunter_spell_scripts()
 {
@@ -1384,8 +1420,9 @@ void AddSC_hunter_spell_scripts()
 	new spell_hun_cobra_shot();
 	new spell_hun_steady_shot();
 	new spell_hun_dire_beast();
-    //new spell_hun_a_murder_of_crows();
-	//new spell_hun_powershot();
-	//new spell_hun_glaive_toss_damage();
-	//new spell_hun_glaive_toss_missile();
+    new spell_hun_a_murder_of_crows();
+	new spell_hun_powershot();
+	new spell_hun_glaive_toss_damage();
+	new spell_hun_glaive_toss_missile();
+	new spell_hun_blink_strike();
 }
