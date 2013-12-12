@@ -647,8 +647,8 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
         case CHAT_MSG_BG_SYSTEM_NEUTRAL:
         case CHAT_MSG_BG_SYSTEM_ALLIANCE:
         case CHAT_MSG_BG_SYSTEM_HORDE:
-        /*case CHAT_MSG_BATTLEGROUND:
-        case CHAT_MSG_BATTLEGROUND_LEADER:*/
+		case CHAT_MSG_BATTLEGROUND:
+        case CHAT_MSG_BATTLEGROUND_LEADER:
             target_guid = session ? session->GetPlayer()->GetGUID() : 0;
             break;
         case CHAT_MSG_MONSTER_SAY:
@@ -662,17 +662,17 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
 		case CHAT_MSG_QUEST_BOSS_EMOTE:
         {
             *data << uint64(speaker->GetGUID());
-            *data << uint32(messageLength);                             // TEST SUNGIS
-            *data << uint32(speaker->GetName().size() + 1);
+            *data << uint32(0);                             // 2.1.0
+			*data << uint32(speaker->GetName().size() + 1);
             *data << speaker->GetName();
-			//uint64 listener_guid = 0;
-            *data << uint64(0); // listener_guid
-            //if (listener_guid && !IS_PLAYER_GUID(listener_guid))
-            //{
-            //    *data << uint32(1);                         // string listener_name_length
-            //    *data << uint8(0);                          // string listener_name
-            //}
-            *data << uint32(0);
+			uint64 listener_guid = 0;
+            *data << uint64(listener_guid);
+            if (listener_guid && !IS_PLAYER_GUID(listener_guid))
+            {
+                *data << uint32(1);                         // string listener_name_length
+                *data << uint8(0);                          // string listener_name
+            }
+            *data << uint32(messageLength);
             *data << message;
             *data << uint16(0);
 
