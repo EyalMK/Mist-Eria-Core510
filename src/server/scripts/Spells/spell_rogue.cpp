@@ -103,7 +103,7 @@ public:
     }
 };
 
-// 31228 - Cheat Death
+// 31230 - Cheat Death
 class spell_rog_cheat_death : public SpellScriptLoader
 {
 public:
