@@ -1242,7 +1242,7 @@ class spell_hun_glaive_toss_damage : public SpellScriptLoader
                 {
                     if ((*i)->HasAura(HUNTER_SPELL_GLAIVE_TOSS_AURA))
                     {
-                        mainTargetGUID = itr->GetGUID();
+                        mainTargetGUID = (*i)->GetGUID();
                         break;
                     }
                 }
