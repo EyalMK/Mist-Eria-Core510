@@ -1346,7 +1346,6 @@ class spell_warl_burning_embers : public SpellScriptLoader
                 if (Player* _player = GetOwner()->ToPlayer())
                 {
 					_player->ModifyPower(POWER_BURNING_EMBERS, embers);
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "### DEBUG TERAH ### \n### BURNING EMBERS : %d ###", _player->GetPower(POWER_BURNING_EMBERS));
                 }
             }
 
