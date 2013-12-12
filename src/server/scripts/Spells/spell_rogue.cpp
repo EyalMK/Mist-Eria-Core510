@@ -797,6 +797,39 @@ public:
     }
 };
 
+// 58423 - Rentless Strike
+class spell_rog_rentless_strike : public SpellScriptLoader
+{
+    public:
+        spell_rog_rentless_strike() : SpellScriptLoader("spell_rog_rentless_strike") { }
+
+        class spell_rog_rentless_strike_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_rog_rentless_strike_AuraScript);
+
+            void OnProcHandler(ProcEventInfo& eventInfo)
+            {
+                if (!GetOwner())
+                    return;
+
+                if (Player* player = GetOwner()->ToPlayer())
+					if(roll_chance_i(20 * player->GetComboPoints()))
+						player->CastSpell(player, 98440, true);
+
+            }
+
+            void Register()
+            {
+				OnProc += AuraProcFn(spell_rog_rentless_strike_AuraScript::OnProcHandler);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_rog_rentless_strike_AuraScript();
+        }
+};
+
 
 void AddSC_rogue_spell_scripts()
 {
@@ -816,4 +849,5 @@ void AddSC_rogue_spell_scripts()
     new spell_rog_poison_leeching();
     new spell_rog_poison_mind();
     new spell_rog_poison_paralytic();
+	new spell_rog_rentless_strike();
 }
