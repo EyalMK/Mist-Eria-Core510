@@ -481,6 +481,8 @@ uint32 SpellMgr::GetOverrideSpell(Player* player, uint32 id) const
 		return player->HasSpell(108853) ? 108853 : 2136; // Inferno Blast
 	case 12051: //Evocation
 		return player->HasSpell(116011) ? 116011 : 12051; // Rune of Power
+	case 45902: // Blood Strike
+		return player->HasSpell(49143) ? 49143 : 45902; // Frost Strike
 	default:
 		return id;
 	}
