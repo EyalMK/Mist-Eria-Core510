@@ -60,7 +60,12 @@ enum DruidSpells
     SPELL_DRUID_FUNGAL_GROWTH               = 81283,
     SPELL_DRUID_WILD_MUSHROOM_SUICIDE       = 92853,
     SPELL_DRUID_WILD_MUSHROOM_DAMAGE        = 78777,
-	DRUID_SURVIVAL_INSTINCTS                = 50322
+	DRUID_SURVIVAL_INSTINCTS                = 50322,
+	SPELL_DRUID_URSOLS_VORTEX_AREA_TRIGGER  = 102793,
+    SPELL_DRUID_URSOLS_VORTEX_SNARE         = 127797,
+    SPELL_DRUID_URSOLS_VORTEX_JUMP_DEST     = 118283,
+	SPELL_DRUID_SOUL_OF_THE_FOREST          = 114107,
+    SPELL_DRUID_SOUL_OF_THE_FOREST_HASTE    = 114108
 };
 
 enum DruidCreatures
@@ -1923,6 +1928,184 @@ public:
 	};
 };
 
+// Ursol's Vortex (snare) - 127797
+class spell_dru_ursols_vortex_snare : public SpellScriptLoader
+{
+    public:
+        spell_dru_ursols_vortex_snare() : SpellScriptLoader("spell_dru_ursols_vortex_snare") { }
+
+        class spell_dru_ursols_vortex_snare_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_dru_ursols_vortex_snare_AuraScript);
+
+            std::list<Unit*> targetList;
+
+            void OnUpdate(uint32 diff, AuraEffect* aurEff)
+            {
+                aurEff->GetTargetList(targetList);
+
+				for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
+                {
+                    if (Unit* caster = GetCaster())
+                        if (AreaTrigger* areaTrigger = caster->GetAreaTrigger(SPELL_DRUID_URSOLS_VORTEX_AREA_TRIGGER))
+                            if ((*i)->GetDistance(areaTrigger) > 8.0f && !(*i)->HasAura(SPELL_DRUID_URSOLS_VORTEX_JUMP_DEST))
+                                (*i)->CastSpell(areaTrigger->GetPositionX(), areaTrigger->GetPositionY(), areaTrigger->GetPositionZ(), SPELL_DRUID_URSOLS_VORTEX_JUMP_DEST, true);
+                }
+
+                targetList.clear();
+            }
+
+            void Register()
+            {
+                OnEffectUpdate += AuraEffectUpdateFn(spell_dru_ursols_vortex_snare_AuraScript::OnUpdate, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_dru_ursols_vortex_snare_AuraScript();
+        }
+};
+
+// Ursol's Vortex - 102793
+class spell_dru_ursols_vortex : public SpellScriptLoader
+{
+    public:
+        spell_dru_ursols_vortex() : SpellScriptLoader("spell_dru_ursols_vortex") { }
+
+        class spell_dru_ursols_vortex_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dru_ursols_vortex_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                    if (Unit* target = GetHitUnit())
+                        if (!target->HasAura(SPELL_DRUID_URSOLS_VORTEX_AREA_TRIGGER))
+                            _player->CastSpell(target, SPELL_DRUID_URSOLS_VORTEX_SNARE, true);
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_dru_ursols_vortex_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dru_ursols_vortex_SpellScript();
+        }
+
+        class spell_dru_ursols_vortex_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_dru_ursols_vortex_AuraScript);
+
+            std::list<Unit*> targetList;
+
+            void OnUpdate(uint32 diff, AuraEffectPtr aurEff)
+            {
+                aurEff->GetTargetList(targetList);
+
+				for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
+                {
+                    if (Unit* caster = GetCaster())
+                        if (DynamicObject* dynObj = caster->GetDynObject(SPELL_DRUID_URSOLS_VORTEX_AREA_TRIGGER))
+                            if ((*i)->GetDistance(dynObj) > 8.0f && !(*i)->HasAura(SPELL_DRUID_URSOLS_VORTEX_JUMP_DEST))
+                                (*i)->CastSpell(dynObj->GetPositionX(), dynObj->GetPositionY(), dynObj->GetPositionZ(), SPELL_DRUID_URSOLS_VORTEX_JUMP_DEST, true);
+                }
+
+                targetList.clear();
+            }
+
+            void Register()
+            {
+                OnEffectUpdate += AuraEffectUpdateFn(spell_dru_ursols_vortex_AuraScript::OnUpdate, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_dru_ursols_vortex_AuraScript();
+        }
+};
+
+// Called by Lunar Eclipse - 48518 and Solar Eclipse - 48517
+// Soul of the Forest - 114107
+class spell_dru_soul_of_the_forest_eclipse : public SpellScriptLoader
+{
+    public:
+        spell_dru_soul_of_the_forest_eclipse() : SpellScriptLoader("spell_dru_soul_of_the_forest_eclipse") { }
+
+        class spell_dru_soul_of_the_forest_eclipse_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_dru_soul_of_the_forest_eclipse_AuraScript);
+
+            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            {
+                if (!GetTarget())
+                    return;
+
+                if (Player* _player = GetTarget()->ToPlayer())
+                {
+                    if (_player->HasAura(SPELL_DRUID_SOUL_OF_THE_FOREST_HASTE))
+                    {
+                        if (aurEff->GetSpellInfo()->Id == SPELL_DRUID_SOLAR_ECLIPSE)
+                            _player->SetEclipsePower(int32(_player->GetEclipsePower() - 20));
+                        else if (aurEff->GetSpellInfo()->Id == SPELL_DRUID_LUNAR_ECLIPSE)
+                            _player->SetEclipsePower(int32(_player->GetEclipsePower() + 20));
+                    }
+                }
+            }
+
+            void Register()
+            {
+                AfterEffectRemove += AuraEffectRemoveFn(spell_dru_soul_of_the_forest_eclipse_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_dru_soul_of_the_forest_eclipse_AuraScript();
+        }
+};
+
+// Called by Swiftmend - 18562 and Mangle (Bear) - 33878
+// Soul of the Forest - 114107
+class spell_dru_soul_of_the_forest : public SpellScriptLoader
+{
+    public:
+        spell_dru_soul_of_the_forest() : SpellScriptLoader("spell_dru_soul_of_the_forest") { }
+
+        class spell_dru_soul_of_the_forest_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dru_soul_of_the_forest_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (_player->HasAura(SPELL_DRUID_SOUL_OF_THE_FOREST))
+                    {
+                        if (GetSpellInfo()->Id == 18562)
+                            _player->CastSpell(_player, SPELL_DRUID_SOUL_OF_THE_FOREST_HASTE, true);
+                        else
+                            _player->EnergizeBySpell(_player, SPELL_DRUID_SOUL_OF_THE_FOREST, 40, POWER_RAGE);
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_dru_soul_of_the_forest_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dru_soul_of_the_forest_SpellScript();
+        }
+};
+
 void AddSC_druid_spell_scripts()
 {
     new spell_dru_bear_cat();
@@ -1960,4 +2143,8 @@ void AddSC_druid_spell_scripts()
 	new spell_dru_displacer_beast();
 	new spell_dru_force_of_nature();
 	new npc_treant();
+	new spell_dru_ursols_vortex_snare();
+	new spell_dru_ursols_vortex();
+	new spell_dru_soul_of_the_forest_eclipse();
+	new spell_dru_soul_of_the_forest();
 }
