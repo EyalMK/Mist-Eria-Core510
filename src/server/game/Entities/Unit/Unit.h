@@ -1338,6 +1338,7 @@ class Unit : public WorldObject
         void CombatStop(bool includingCast = false);
         void CombatStopWithPets(bool includingCast = false);
         void StopAttackFaction(uint32 faction_id);
+		void GetAttackableUnitListInRange(std::list<Unit*> &list, float fMaxSearchRange) const;
         Unit* SelectNearbyTarget(Unit* exclude = NULL, float dist = NOMINAL_MELEE_RANGE) const;
         void SendMeleeAttackStop(Unit* victim = NULL);
         void SendMeleeAttackStart(Unit* victim);
@@ -1922,6 +1923,19 @@ class Unit : public WorldObject
         Spell* GetCurrentSpell(uint32 spellType) const { return m_currentSpells[spellType]; }
         Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
         int32 GetCurrentSpellCastTime(uint32 spell_id) const;
+
+
+		uint32 m_heal_done[120];
+		uint32 m_damage_done_to_non_players[120];
+		uint32 m_damage_done_to_players[120];
+		uint32 m_damage_taken_from_non_players[120];
+		uint32 m_damage_taken_from_players[120];
+		int32 DmgandHealDoneTimer;
+		uint32 GetHealingDoneInPastSecs(uint32 secs);
+		uint32 GetDamageDoneInPastSecs(uint32 secs, bool toPlayers = true, bool toNonPlayers = true);
+		uint32 GetDamageTakenInPastSecs(uint32 secs, bool fromPlayers = true, bool fromNonPlayers = true);
+		void ResetDamageDoneInPastSecs(uint32 secs);
+		void ResetHealingDoneInPastSecs(uint32 secs);
 
         uint32 m_addDmgOnce;
         uint64 m_SummonSlot[MAX_SUMMON_SLOT];

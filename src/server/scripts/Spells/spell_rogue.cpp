@@ -30,6 +30,7 @@ enum RogueSpells
 {
     SPELL_ROGUE_BLADE_FLURRY_EXTRA_ATTACK        = 22482,
     SPELL_ROGUE_CHEAT_DEATH_COOLDOWN             = 31231,
+	SPELL_ROGUE_CHEAT_DEATH_REDUCTION			 = 45182,
     SPELL_ROGUE_GLYPH_OF_PREPARATION             = 56819,
     SPELL_ROGUE_PREY_ON_THE_WEAK                 = 58670,
     SPELL_ROGUE_SHIV_TRIGGERED                   = 5940,
@@ -103,7 +104,7 @@ public:
     }
 };
 
-// 31228 - Cheat Death
+// 31230 - Cheat Death
 class spell_rog_cheat_death : public SpellScriptLoader
 {
 public:
@@ -137,11 +138,17 @@ public:
         void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
         {
             Player* target = GetTarget()->ToPlayer();
-            if (dmgInfo.GetDamage() < target->GetHealth() || target->HasSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN) ||  !roll_chance_i(absorbChance))
+
+			if(target->HasAura(SPELL_ROGUE_CHEAT_DEATH_REDUCTION))
+			{
+				absorbAmount = dmgInfo.GetDamage() * 0.85f;
+			}
+
+            if (dmgInfo.GetDamage() < target->GetHealth() || target->HasSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN))
                 return;
 
             target->CastSpell(target, SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, true);
-            target->AddSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, 0, time(NULL) + 60);
+            target->AddSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, 0, time(NULL) + 90);
 
             uint32 health10 = target->CountPctFromMaxHealth(10);
 
@@ -151,6 +158,9 @@ public:
             // hp lower than 10% - absorb everything
             else
                 absorbAmount = dmgInfo.GetDamage();
+
+			target->CastSpell(target, SPELL_ROGUE_CHEAT_DEATH_REDUCTION, true);
+
         }
 
         void Register()
@@ -787,6 +797,42 @@ public:
     }
 };
 
+// 58423 - Rentless Strike
+class spell_rog_rentless_strike : public SpellScriptLoader
+{
+    public:
+        spell_rog_rentless_strike() : SpellScriptLoader("spell_rog_rentless_strike") { }
+
+        class spell_rog_rentless_strike_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_rog_rentless_strike_AuraScript);
+
+            void OnProcHandler(ProcEventInfo& eventInfo)
+            {
+                if (!GetOwner())
+                    return;
+
+				if (eventInfo.GetDamageInfo()->GetSpellInfo()->Id == 1752)
+					return;
+
+                if (Player* player = GetOwner()->ToPlayer())
+					if(roll_chance_i(20 * player->GetComboPoints()))
+						player->CastSpell(player, 98440, true);
+
+            }
+
+            void Register()
+            {
+				OnProc += AuraProcFn(spell_rog_rentless_strike_AuraScript::OnProcHandler);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_rog_rentless_strike_AuraScript();
+        }
+};
+
 
 void AddSC_rogue_spell_scripts()
 {
@@ -806,4 +852,5 @@ void AddSC_rogue_spell_scripts()
     new spell_rog_poison_leeching();
     new spell_rog_poison_mind();
     new spell_rog_poison_paralytic();
+	new spell_rog_rentless_strike();
 }

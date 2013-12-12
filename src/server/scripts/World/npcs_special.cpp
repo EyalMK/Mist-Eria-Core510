@@ -3176,6 +3176,98 @@ public:
 	}
 };
 
+/*######
+# npc_murder_of_crows
+######*/
+
+class npc_murder_of_crows : public CreatureScript
+{
+    public:
+        npc_murder_of_crows() : CreatureScript("npc_murder_of_crows") { }
+
+        struct npc_murder_of_crowsAI : public ScriptedAI
+        {
+            npc_murder_of_crowsAI(Creature *creature) : ScriptedAI(creature)
+            {
+                me->SetReactState(REACT_DEFENSIVE);
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if (me->GetReactState() != REACT_DEFENSIVE)
+                    me->SetReactState(REACT_DEFENSIVE);
+
+                if (!UpdateVictim())
+                    return;
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                DoMeleeAttackIfReady();
+            }
+        };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_murder_of_crowsAI(creature);
+        }
+};
+
+/*######
+# npc_dire_beast
+######*/
+
+class npc_dire_beast : public CreatureScript
+{
+    public:
+        npc_dire_beast() : CreatureScript("npc_dire_beast") { }
+
+        struct npc_dire_beastAI : public ScriptedAI
+        {
+            npc_dire_beastAI(Creature *creature) : ScriptedAI(creature) {}
+
+            void Reset()
+            {
+                me->SetReactState(REACT_DEFENSIVE);
+
+                if (me->GetOwner())
+                    if (me->GetOwner()->getVictim() || me->GetOwner()->getAttackerForHelper())
+                        AttackStart(me->GetOwner()->getVictim() ? me->GetOwner()->getVictim() : me->GetOwner()->getAttackerForHelper());
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if (me->GetReactState() != REACT_DEFENSIVE)
+                    me->SetReactState(REACT_DEFENSIVE);
+
+                if (!UpdateVictim())
+                {
+                    if (Unit* owner = me->GetOwner())
+                        if (Unit* newVictim = owner->getAttackerForHelper())
+                            AttackStart(newVictim);
+
+                    return;
+                }
+
+                if (me->getVictim())
+                    if (Unit* owner = me->GetOwner())
+                        if (Unit* ownerVictim = owner->getAttackerForHelper())
+                            if (me->getVictim()->GetGUID() != ownerVictim->GetGUID())
+                                AttackStart(ownerVictim);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                DoMeleeAttackIfReady();
+            }
+        };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_dire_beastAI(creature);
+        }
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3214,4 +3306,6 @@ void AddSC_npcs_special()
     new npc_transcendance();
 	new npc_winter_reveler();
 	new npc_remove_phase_auras();
+	new npc_murder_of_crows();
+	new npc_dire_beast();
 }

@@ -37,6 +37,10 @@ enum DeathKnightSpells
     SPELL_DK_DEATH_COIL_DAMAGE                  = 47632,
     SPELL_DK_DEATH_COIL_HEAL                    = 47633,
     SPELL_DK_DEATH_STRIKE_HEAL                  = 45470,
+	SPELL_DK_BLOOD_SHIELD						= 77535,
+	SPELL_DK_BLOOD_MASTERY						= 77513,
+	SPELL_DK_BLOOD_RITES						= 50034,
+	SPELL_DK_SCENT_OF_BLOOD						= 49509,
     SPELL_DK_GHOUL_EXPLODE                      = 47496,
     SPELL_DK_GLYPH_OF_ICEBOUND_FORTITUDE        = 58625,
     SPELL_DK_RUNIC_POWER_ENERGIZE               = 49088,
@@ -575,21 +579,68 @@ class spell_dk_death_strike : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-                Unit* caster = GetCaster();
-                if (Unit* target = GetHitUnit())
+                if(Player* caster = GetCaster()->ToPlayer())
                 {
-                    uint32 count = target->GetDiseasesByCaster(caster->GetGUID());
-                    int32 bp = int32(count * caster->CountPctFromMaxHealth(int32(GetSpellInfo()->Effects[EFFECT_0].DamageMultiplier)));
-                    // Improved Death Strike
-                    if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, DK_ICON_ID_IMPROVED_DEATH_STRIKE, 0))
-                        AddPct(bp, caster->CalculateSpellDamage(caster, aurEff->GetSpellInfo(), 2));
+                    int32 bp = (int32) (0.2f * caster->GetDamageTakenInPastSecs(5, false, true));
+					if(bp < (caster->GetHealth() * 0.07f))
+						bp = (int32)(caster->GetHealth() * 0.07f);
+
+					// Scent of Blood
+					if (Aura* scentOfBlood = caster->GetAura(SPELL_DK_SCENT_OF_BLOOD))
+                    {
+                        bp += bp * 0.2f * scentOfBlood->GetStackAmount();
+						caster->RemoveAura(SPELL_DK_SCENT_OF_BLOOD);
+                    }
+
                     caster->CastCustomSpell(caster, SPELL_DK_DEATH_STRIKE_HEAL, &bp, NULL, NULL, false);
+
+					// Blood Shield - Mastery (Blood)
+					if(caster->HasAura(SPELL_DK_BLOOD_MASTERY))
+					{
+						int32 mbp = 0.5f * bp;
+						if(caster->HasAura(SPELL_DK_BLOOD_SHIELD))
+						{
+							
+							
+							if (Aura* bloodShield = caster->GetAura(SPELL_DK_BLOOD_SHIELD))
+							{
+								mbp = bloodShield->GetEffect(0)->GetAmount() + mbp;
+								if(mbp > caster->GetMaxHealth())
+									mbp = caster->GetMaxHealth();
+
+								bloodShield->GetEffect(0)->ChangeAmount(mbp);
+							}
+							else
+								caster->CastCustomSpell(caster, SPELL_DK_BLOOD_SHIELD, &mbp, NULL, NULL, false);
+							
+						}
+						else
+							caster->CastCustomSpell(caster, SPELL_DK_BLOOD_SHIELD, &mbp, NULL, NULL, false);
+					}
+
                 }
             }
+
+			void HandleAfterHit()
+			{
+				if(Player* caster = GetCaster()->ToPlayer())
+                {
+					// Blood Rites
+					if(caster->HasAura(SPELL_DK_BLOOD_RITES))
+					{
+						for(uint8 i = 2; i<6; ++i)
+						{
+							caster->ConvertRune(i, RUNE_DEATH);
+							caster->SetRuneConvertAura(i, NULL);
+						}
+					}
+				}
+			}
 
             void Register()
             {
                 OnEffectHitTarget += SpellEffectFn(spell_dk_death_strike_SpellScript::HandleDummy, EFFECT_2, SPELL_EFFECT_DUMMY);
+				AfterHit += SpellHitFn(spell_dk_death_strike_SpellScript::HandleAfterHit);
             }
 
         };
@@ -1005,6 +1056,51 @@ class spell_dk_will_of_the_necropolis : public SpellScriptLoader
         }
 };
 
+// 73975 - Necrotic Strike
+class spell_dk_necrotic_strike : public SpellScriptLoader
+{
+    public:
+        spell_dk_necrotic_strike() : SpellScriptLoader("spell_dk_necrotic_strike") { }
+
+        class spell_dk_necrotic_strike_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_dk_necrotic_strike_AuraScript);
+
+            bool Validate(SpellInfo const* spellInfo)
+            {
+                return true;
+            }
+
+            void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool &canBeRecalculated)
+            {
+				if(Player* caster = GetCaster()->ToPlayer())
+				{
+					amount = caster->GetTotalAttackPowerValue(BASE_ATTACK);
+					canBeRecalculated = false;
+				}
+            }
+
+			void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+			{
+				if(Player* caster = GetCaster()->ToPlayer())
+				{
+					// Need to use 1 Death Rune
+				}
+			}
+
+            void Register()
+            {
+				DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_necrotic_strike_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_HEAL_ABSORB);
+                AfterEffectApply += AuraEffectApplyFn(spell_dk_necrotic_strike_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_SCHOOL_HEAL_ABSORB, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_dk_necrotic_strike_AuraScript();
+        }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_anti_magic_shell_raid();
@@ -1027,4 +1123,5 @@ void AddSC_deathknight_spell_scripts()
     new spell_dk_spell_deflection();
     new spell_dk_vampiric_blood();
     new spell_dk_will_of_the_necropolis();
+	new spell_dk_necrotic_strike();
 }

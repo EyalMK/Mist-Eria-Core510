@@ -752,7 +752,6 @@ class spell_warr_rallying_cry : public SpellScriptLoader
 };
 
 // Heroic leap - 6544
-
 class spell_warr_heroic_leap : public SpellScriptLoader
 {
     public:

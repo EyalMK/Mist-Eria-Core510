@@ -157,11 +157,12 @@ public:
 						(*itr)->DespawnOrUnsummon();
 				}
 
-				if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
+				if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 99999.0f))
 					go->UseDoorOrButton();
 
-				if (GameObject* go = me->FindNearestGameObject(GO_LIU_GATE, 9999.0f))
-					go->UseDoorOrButton();
+				me->SummonCreature(NPC_MINION_OF_DOUBT, 924.604553f, -2597.958008f, 181.292480f, 1.256927f);
+				me->SummonCreature(NPC_MINION_OF_DOUBT, 918.139648f, -2595.859375f, 181.288773f, 1.256927f);
+				me->SummonCreature(NPC_MINION_OF_DOUBT, 911.711853, -2593.772705, 181.288895, 1.256927f);
 			}
 		}
 
