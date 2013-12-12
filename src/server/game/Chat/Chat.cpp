@@ -656,10 +656,9 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
         case CHAT_MSG_MONSTER_YELL:
         case CHAT_MSG_MONSTER_WHISPER:
         case CHAT_MSG_MONSTER_EMOTE:
+		case CHAT_MSG_RAID_BOSS_WHISPER:
 		case CHAT_MSG_RAID_BOSS_EMOTE:
-        case CHAT_MSG_RAID_BOSS_WHISPER:
         case CHAT_MSG_BATTLENET:
-		case CHAT_MSG_QUEST_BOSS_EMOTE:
         {
             *data << uint64(speaker->GetGUID());
             *data << uint32(0);                             // 2.1.0
@@ -676,7 +675,7 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
             *data << message;
             *data << uint16(0);
 
-            if (type == CHAT_MSG_RAID_BOSS_WHISPER || type == CHAT_MSG_RAID_BOSS_EMOTE || type == CHAT_MSG_QUEST_BOSS_EMOTE)
+            if (type == CHAT_MSG_RAID_BOSS_WHISPER || type == CHAT_MSG_RAID_BOSS_EMOTE)
             {
                 *data << float(0.0f);                       // Added in 4.2.0, unk
                 *data << uint8(0);                          // Added in 4.2.0, unk
@@ -704,25 +703,11 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
         ASSERT(addonPrefix);
         *data << addonPrefix;
     }
-    else if (type == CHAT_MSG_BG_SYSTEM_NEUTRAL ||
-             type == CHAT_MSG_BG_SYSTEM_ALLIANCE ||
-             type == CHAT_MSG_BG_SYSTEM_HORDE) {
-        *data << uint64(0);
-    }
     else
         *data << uint64(target_guid);
 
-    switch (type) {
-    case CHAT_MSG_PARTY:
-    case CHAT_MSG_PARTY_LEADER:
-    case CHAT_MSG_RAID:
-    case CHAT_MSG_RAID_LEADER:
-    case CHAT_MSG_RAID_WARNING:
+    if ( type == CHAT_MSG_PARTY || type == CHAT_MSG_PARTY_LEADER || type == CHAT_MSG_RAID || type == CHAT_MSG_RAID_LEADER || type == CHAT_MSG_RAID_WARNING )
         *data << uint64(target_guid);
-        break;
-    default:
-        break;
-    }
 
     *data << uint32(messageLength);
     *data << message;
