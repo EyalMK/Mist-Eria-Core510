@@ -83,7 +83,11 @@ enum PaladinSpells
     PALADIN_SPELL_HOLY_PRISM_DAMAGE_VISUAL       = 114862,
     PALADIN_SPELL_HOLY_PRISM_DAMAGE_VISUAL_2     = 114870,
     PALADIN_SPELL_HOLY_PRISM_HEAL_VISUAL         = 121551,
-    PALADIN_SPELL_HOLY_PRISM_HEAL_VISUAL_2       = 121552
+    PALADIN_SPELL_HOLY_PRISM_HEAL_VISUAL_2       = 121552,
+
+	PALADIN_SPELL_TOWER_OF_RADIANCE_ENERGIZE     = 88852,
+    PALADIN_SPELL_BEACON_OF_LIGHT                = 53563,
+    PALADIN_SPELL_SELFLESS_HEALER_STACK          = 114250
 };
 
 //24275 -- SPELL_HAMMER_OF_WRATH
@@ -1395,6 +1399,78 @@ class spell_pal_holy_prism : public SpellScriptLoader
         }
 };
 
+// Selfless healer - 85804
+// Called by flash of light - 19750
+class spell_pal_selfless_healer : public SpellScriptLoader
+{
+    public:
+        spell_pal_selfless_healer() : SpellScriptLoader("spell_pal_selfless_healer") { }
+
+        class spell_pal_selfless_healer_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pal_selfless_healer_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        if (_player->HasAura(PALADIN_SPELL_SELFLESS_HEALER_STACK))
+                        {
+                            int32 charges = _player->GetAura(PALADIN_SPELL_SELFLESS_HEALER_STACK)->GetStackAmount();
+
+                            if (_player->IsValidAssistTarget(target) && target != _player)
+                                SetHitHeal(int32(GetHitHeal() + ((GetHitHeal() * 0.35f) * charges)));
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_pal_selfless_healer_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pal_selfless_healer_SpellScript();
+        }
+};
+
+// Called by Flash of Light - 19750 and Divine Light - 82326
+// Tower of Radiance - 85512
+class spell_pal_tower_of_radiance : public SpellScriptLoader
+{
+    public:
+        spell_pal_tower_of_radiance() : SpellScriptLoader("spell_pal_tower_of_radiance") { }
+
+        class spell_pal_tower_of_radiance_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pal_tower_of_radiance_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                    if (Unit* target = GetHitUnit())
+                        if (_player->HasAura(PALADIN_SPELL_TOWER_OF_RADIANCE))
+                            if (target->HasAura(PALADIN_SPELL_BEACON_OF_LIGHT, _player->GetGUID()))
+                                _player->EnergizeBySpell(_player, PALADIN_SPELL_TOWER_OF_RADIANCE_ENERGIZE, 1, POWER_HOLY_POWER);
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_pal_tower_of_radiance_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pal_tower_of_radiance_SpellScript();
+        }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     //new spell_pal_ardent_defender();
@@ -1424,4 +1500,6 @@ void AddSC_paladin_spell_scripts()
 	new spell_pal_holy_prism();
 	new spell_pal_holy_prism_visual();
 	new spell_pal_holy_prism_effect();
+	new spell_pal_selfless_healer();
+	new spell_pal_tower_of_radiance();
 }
