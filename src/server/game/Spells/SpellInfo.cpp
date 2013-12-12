@@ -395,6 +395,15 @@ bool SpellEffectInfo::IsAPSPModified() const
         }
 		return false;
     }
+
+	switch(Effect)
+	{
+		case SPELL_EFFECT_ENERGIZE:
+			return false;
+		default:
+			break;
+	}
+
     return true;
 }
 
