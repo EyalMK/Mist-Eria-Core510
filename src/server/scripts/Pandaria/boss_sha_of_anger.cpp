@@ -1,27 +1,29 @@
 #include "ScriptPCH.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Spells
 {
-    SPELL_SEETHE					= 119487,
-    SPELL_ENDLESS_RAGE				= 119586,
-    SPELL_BITTER_THOUGHTS			= 119601,
-    SPELL_GROWING_ANGER				= 119622,
-    SPELL_AGGRESSIVE_BEHAVIOUR		= 119626,
-    SPELL_UNLEASHED_WRATH			= 119488,
-	SPELL_ENDLESS_RAGE_TRIGGERED	= 119587,
-    SPELL_RAGE_OF_THE_SHA			= 117609,
-    SPELL_BERSERK					= 47008
+    SPELL_SEETHE				= 119487,
+    SPELL_ENDLESS_RAGE			= 119586,
+    SPELL_BITTER_THOUGHTS		= 119601,
+    SPELL_GROWING_ANGER			= 119622,
+    SPELL_AGGRESSIVE_BEHAVIOUR	= 119626,
+    SPELL_UNLEASHED_WRATH		= 119488,
+    SPELL_RAGE_OF_THE_SHA       = 117609,
+    SPELL_BERSERK               = 47008
 };
 
 enum Events
 {
-    EVENT_SEETHE					= 1,
-    EVENT_ENDLESS_RAGE				= 2,
-	EVENT_ENDLESS_RAGE_TRIGGERED	= 3,
-    EVENT_GROWING_ANGER				= 4,
-    EVENT_PHASE_GROWING_ANGER		= 5,
-    EVENT_UNLEASHED_WRATH			= 6,
-    EVENT_BERSERK					= 7
+    EVENT_SEETHE				= 1,
+    EVENT_ENDLESS_RAGE			= 2,
+    EVENT_GROWING_ANGER			= 3,
+    EVENT_PHASE_GROWING_ANGER	= 4,
+    EVENT_UNLEASHED_WRATH       = 5,
+    EVENT_BERSERK               = 6
 };
 
 enum Phases
@@ -55,25 +57,29 @@ public:
 
     struct boss_sha_of_angerAI : public ScriptedAI
     {
-        boss_sha_of_angerAI(Creature *creature) : ScriptedAI(creature)
+        boss_sha_of_angerAI(Creature *creature) : ScriptedAI(creature), Summons(me)
         {
         }
 
         EventMap events;
-		int32 endlessRages;
+        SummonList Summons;
 
         void Reset()
         {
             events.Reset();
-
-			endlessRages = 0;
-
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            Summons.DespawnAll();
         }
 
         void JustDied(Unit* /*who*/)
         {
             Talk(SAY_DEATH);
+            Summons.DespawnAll();
+        }
+
+        void JustSummoned(Creature* Summoned)
+        {
+            Summons.Summon(Summoned);
         }
 
         void KilledUnit(Unit* /*who*/)
@@ -81,35 +87,15 @@ public:
             Talk(SAY_SLAY);
         }
 
-		void EnterEvadeMode()
-		{
-			std::list<Creature*> ires;
-			std::list<Creature*> triggers;
-
-			me->GetCreatureListWithEntryInGrid(ires, NPC_IRE, 99999.0f);
-			if (!ires.empty())
-			{
-				for (std::list<Creature*>::iterator itr = ires.begin(); itr != ires.end(); ++itr)
-					(*itr)->DespawnOrUnsummon();
-			}
-
-			me->GetCreatureListWithEntryInGrid(triggers, NPC_SHA_OF_ANGER, 99999.0f);
-			if (!triggers.empty())
-			{
-				for (std::list<Creature*>::iterator itr = triggers.begin(); itr != triggers.end(); ++itr)
-					(*itr)->DespawnOrUnsummon();
-			}
-		}
-
         void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_AGGRO);
 
-            events.ScheduleEvent(EVENT_SEETHE, 5*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_ENDLESS_RAGE, 20*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS), 0, PHASE_GROWING_ANGER);
             events.ScheduleEvent(EVENT_UNLEASHED_WRATH, 50*IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_BERSERK, 300*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_BERSERK, 900*IN_MILLISECONDS);
 
             events.SetPhase(PHASE_GROWING_ANGER);
         }
@@ -124,7 +110,7 @@ public:
 
             events.Update(diff);
 
-			if (me->HasUnitState(UNIT_STATE_CASTING) && !me->HasAura(SPELL_ENDLESS_RAGE))
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             while(uint32 eventId = events.ExecuteEvent())
@@ -135,7 +121,7 @@ public:
                         for (i = threatlist.begin(); i != threatlist.end(); ++i)
                         {
                             if (Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid()))
-								if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && !me->IsWithinMeleeRange(unit))
+                                if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && !me->IsWithinMeleeRange(me->getVictim()))
                                     me->CastSpell(me->getVictim(), SPELL_SEETHE);
                         }
 
@@ -143,36 +129,13 @@ public:
                         break;
 
                     case EVENT_ENDLESS_RAGE:
-                        me->CastSpell(me, SPELL_ENDLESS_RAGE);
+                        me->CastSpell(me->getVictim(), SPELL_ENDLESS_RAGE);
                         Talk(SAY_ENDLESS_RAGE);
-
-						events.ScheduleEvent(EVENT_ENDLESS_RAGE_TRIGGERED, 1);
-						events.CancelEvent(EVENT_ENDLESS_RAGE);
                         break;
-
-					case EVENT_ENDLESS_RAGE_TRIGGERED:
-						if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-							if (target && target->GetTypeId() == TYPEID_PLAYER)
-								target->CastSpell(target, SPELL_ENDLESS_RAGE_TRIGGERED);
-						
-						if (endlessRages < 11)
-						{
-							events.ScheduleEvent(EVENT_ENDLESS_RAGE_TRIGGERED, 500);
-							endlessRages++;
-						}
-
-						if (endlessRages >= 10)
-						{
-							events.CancelEvent(EVENT_ENDLESS_RAGE_TRIGGERED);
-							endlessRages = 0;
-						}
-
-						break;
 
                     case EVENT_GROWING_ANGER:
                         me->CastSpell(me, SPELL_GROWING_ANGER);
                         Talk(SAY_GROWING_ANGER);
-                       /* events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS));*/
                         break;
 
                     case EVENT_PHASE_GROWING_ANGER:
@@ -185,7 +148,7 @@ public:
                     case EVENT_UNLEASHED_WRATH:
                         DoCast(SPELL_UNLEASHED_WRATH);
                         events.SetPhase(PHASE_UNLEASHED_WRATH);
-                        events.ScheduleEvent(EVENT_PHASE_GROWING_ANGER, 25*IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_PHASE_GROWING_ANGER, 25*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
                         events.ScheduleEvent(EVENT_ENDLESS_RAGE, 15*IN_MILLISECONDS);
                         break;
 
@@ -215,17 +178,101 @@ public:
 
     struct npc_sha_of_angerAI : public ScriptedAI
     {
-        npc_sha_of_angerAI(Creature* creature) : ScriptedAI(creature) {}
+            npc_sha_of_angerAI(Creature* creature) : ScriptedAI(creature) {}
 
-        void Reset()
-        {
-			me->CastSpell(me, SPELL_BITTER_THOUGHTS);
-        }
+            void Reset()
+            {
+                me->CastSpell(me, SPELL_BITTER_THOUGHTS);
+            }
     };
+};
+
+class spell_growing_anger : public SpellScriptLoader
+{
+    public:
+        spell_growing_anger() : SpellScriptLoader("spell_growing_anger") { }
+
+        class spell_growing_anger_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_growing_anger_AuraScript);
+
+            void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (Unit* target = GetTarget())
+                {
+                    if (target->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        target->AddAura(SPELL_AGGRESSIVE_BEHAVIOUR, target);
+
+                        Map* map = target->GetMap();
+
+                        Map::PlayerList const& players = map->GetPlayers();
+
+                        for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+                        {
+                            Player* player = i->getSource();
+
+                            if (player && player->IsInRange(target, 0.0f, 5.0f, false))
+                            {
+                                 player->AddAura(SPELL_AGGRESSIVE_BEHAVIOUR, player);
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnEffectRemove += AuraEffectRemoveFn(spell_growing_anger_AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_growing_anger_AuraScript();
+        }
+};
+
+class spell_aggressive_behavior : public SpellScriptLoader
+{
+    public:
+        spell_aggressive_behavior() : SpellScriptLoader("spell_aggressive_behavior") { }
+
+        class spell_aggressive_behavior_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_aggressive_behavior_AuraScript);
+
+            void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+            {
+                if (Unit* target = GetTarget())
+                {
+                    if (target->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        if (target->HealthBelowPct(50))
+                        {
+                            target->RemoveAurasDueToSpell(SPELL_AGGRESSIVE_BEHAVIOUR);
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_aggressive_behavior_AuraScript::HandleEffectPeriodic, EFFECT_5, SPELL_AURA_PERIODIC_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_aggressive_behavior_AuraScript();
+        }
 };
 
 void AddSC_boss_sha_of_anger()
 {
     new boss_sha_of_anger();
     new npc_sha_of_anger();
+    new spell_growing_anger();
+    new spell_aggressive_behavior();
 };
