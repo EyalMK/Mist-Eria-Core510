@@ -30,6 +30,7 @@ enum RogueSpells
 {
     SPELL_ROGUE_BLADE_FLURRY_EXTRA_ATTACK        = 22482,
     SPELL_ROGUE_CHEAT_DEATH_COOLDOWN             = 31231,
+	SPELL_ROGUE_CHEAT_DEATH_REDUCTION			 = 45182,
     SPELL_ROGUE_GLYPH_OF_PREPARATION             = 56819,
     SPELL_ROGUE_PREY_ON_THE_WEAK                 = 58670,
     SPELL_ROGUE_SHIV_TRIGGERED                   = 5940,
@@ -137,11 +138,17 @@ public:
         void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
         {
             Player* target = GetTarget()->ToPlayer();
-            if (dmgInfo.GetDamage() < target->GetHealth() || target->HasSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN) ||  !roll_chance_i(absorbChance))
+
+			if(target->HasAura(SPELL_ROGUE_CHEAT_DEATH_REDUCTION))
+			{
+				absorbAmount = dmgInfo.GetDamage() * 0.85f;
+			}
+
+            if (dmgInfo.GetDamage() < target->GetHealth() || target->HasSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN))
                 return;
 
             target->CastSpell(target, SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, true);
-            target->AddSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, 0, time(NULL) + 60);
+            target->AddSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, 0, time(NULL) + 90);
 
             uint32 health10 = target->CountPctFromMaxHealth(10);
 
@@ -151,6 +158,9 @@ public:
             // hp lower than 10% - absorb everything
             else
                 absorbAmount = dmgInfo.GetDamage();
+
+			target->CastSpell(target, SPELL_ROGUE_CHEAT_DEATH_REDUCTION, true);
+
         }
 
         void Register()
