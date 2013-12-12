@@ -1929,6 +1929,7 @@ public:
 };
 
 // Ursol's Vortex (snare) - 127797
+/*
 class spell_dru_ursols_vortex_snare : public SpellScriptLoader
 {
     public:
@@ -2028,9 +2029,11 @@ class spell_dru_ursols_vortex : public SpellScriptLoader
             return new spell_dru_ursols_vortex_AuraScript();
         }
 };
+*/
 
 // Called by Lunar Eclipse - 48518 and Solar Eclipse - 48517
 // Soul of the Forest - 114107
+/*
 class spell_dru_soul_of_the_forest_eclipse : public SpellScriptLoader
 {
     public:
@@ -2040,7 +2043,7 @@ class spell_dru_soul_of_the_forest_eclipse : public SpellScriptLoader
         {
             PrepareAuraScript(spell_dru_soul_of_the_forest_eclipse_AuraScript);
 
-            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode)
             {
                 if (!GetTarget())
                     return;
@@ -2068,6 +2071,7 @@ class spell_dru_soul_of_the_forest_eclipse : public SpellScriptLoader
             return new spell_dru_soul_of_the_forest_eclipse_AuraScript();
         }
 };
+*/
 
 // Called by Swiftmend - 18562 and Mangle (Bear) - 33878
 // Soul of the Forest - 114107
@@ -2143,8 +2147,9 @@ void AddSC_druid_spell_scripts()
 	new spell_dru_displacer_beast();
 	new spell_dru_force_of_nature();
 	new npc_treant();
-	new spell_dru_ursols_vortex_snare();
+	/*new spell_dru_ursols_vortex_snare();
 	new spell_dru_ursols_vortex();
 	new spell_dru_soul_of_the_forest_eclipse();
+	*/
 	new spell_dru_soul_of_the_forest();
 }
