@@ -73,7 +73,10 @@ enum PaladinSpells
     SPELL_GENERIC_ARENA_DAMPENING                = 74410,
     SPELL_GENERIC_BATTLEGROUND_DAMPENING         = 74411,
 	SPELL_EXORCISM								 = 879,
-	SPELL_HAMMER_OF_WRATH						 = 24275
+	SPELL_HAMMER_OF_WRATH						 = 24275,
+
+	PALADIN_SPELL_EXECUTION_SENTENCE             = 114916,
+    PALADIN_SPELL_STAY_OF_EXECUTION              = 114917
 };
 
 //24275 -- SPELL_HAMMER_OF_WRATH
@@ -1223,6 +1226,44 @@ class spell_pal_inquisition : public SpellScriptLoader
         }
 };
 
+// Execution Sentence - 114157
+class spell_pal_execution_sentence : public SpellScriptLoader
+{
+    public:
+        spell_pal_execution_sentence() : SpellScriptLoader("spell_pal_execution_sentence") { }
+
+        class spell_pal_execution_sentence_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pal_execution_sentence_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        if (_player->IsValidAttackTarget(target))
+                            _player->CastSpell(target, PALADIN_SPELL_EXECUTION_SENTENCE, true);
+                        else if (_player->GetGUID() == target->GetGUID())
+                            _player->CastSpell(_player, PALADIN_SPELL_STAY_OF_EXECUTION, true);
+                        else
+                            _player->CastSpell(target, PALADIN_SPELL_STAY_OF_EXECUTION, true);
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_pal_execution_sentence_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pal_execution_sentence_SpellScript();
+        }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     //new spell_pal_ardent_defender();
@@ -1248,4 +1289,5 @@ void AddSC_paladin_spell_scripts()
 	new spell_pal_exorcism();
 	new spell_pal_hammer_of_wrath();
 	new spell_pal_inquisition();
+	new spell_pal_execution_sentence();
 }
