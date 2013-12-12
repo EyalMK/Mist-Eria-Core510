@@ -814,6 +814,8 @@ class spell_rog_rentless_strike : public SpellScriptLoader
 
                 if (Player* player = GetOwner()->ToPlayer())
                 {
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "#\n#DEBUG TERAH cp : %d\n#", player->GetComboPoints());
+
 					if(roll_chance_i(20 * player->GetComboPoints()))
 					{
 						player->ModifyPower(POWER_ENERGY, 25);
