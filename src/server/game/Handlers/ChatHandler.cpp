@@ -81,9 +81,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     case CMSG_MESSAGECHAT_RAID:
         type = CHAT_MSG_RAID;
         break;
-    /*case CMSG_MESSAGECHAT_BATTLEGROUND:
+    case CMSG_MESSAGECHAT_BATTLEGROUND:
         type = CHAT_MSG_BATTLEGROUND;
-        break;*/
+        break;
     case CMSG_MESSAGECHAT_RAID_WARNING:
         type = CHAT_MSG_RAID_WARNING;
         break;
@@ -433,7 +433,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         ChatHandler::FillMessageData(&data, this, CHAT_MSG_RAID_WARNING, lang, "", 0, msg.c_str(), NULL);
         group->BroadcastPacket(&data, false);
     } break;
-    /*case CHAT_MSG_BATTLEGROUND:
+    case CHAT_MSG_BATTLEGROUND:
     case CHAT_MSG_BATTLEGROUND_LEADER:
     {
         // battleground raid is always in Player->GetGroup(), never in GetOriginalGroup()
@@ -449,7 +449,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         WorldPacket data;
         ChatHandler::FillMessageData(&data, this, uint8(type), lang, "", 0, msg.c_str(), NULL);
         group->BroadcastPacket(&data, false);
-    } break;*/
+    } break;
     case CHAT_MSG_CHANNEL:
     {
         if (AccountMgr::IsPlayerAccount(GetSecurity()))
