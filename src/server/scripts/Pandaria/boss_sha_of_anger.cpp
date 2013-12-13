@@ -202,7 +202,7 @@ class spell_growing_anger : public SpellScriptLoader
 
                 if (target->GetTypeId() == TYPEID_PLAYER)
                 {
-                    target->AddAura(SPELL_AGGRESSIVE_BEHAVIOUR, target);
+                    target->CastSpell(target, SPELL_AGGRESSIVE_BEHAVIOUR);
 
                     Map* map = target->GetMap();
 
@@ -213,7 +213,7 @@ class spell_growing_anger : public SpellScriptLoader
                         Player* player = i->getSource();
 
                         if (player && player->IsInRange(target, 0.0f, 5.0f, false))
-                            player->AddAura(SPELL_AGGRESSIVE_BEHAVIOUR, player);
+                            player->CastSpell(player, SPELL_AGGRESSIVE_BEHAVIOUR);
                     }
                 }
             }
