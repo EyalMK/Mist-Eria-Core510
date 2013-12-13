@@ -61,6 +61,10 @@ enum ShamanSpells
     SPELL_SHA_CONDUCTIVITY_TALENT           = 108282,
     SPELL_SHA_CONDUCTIVITY_HEAL             = 118800,
 	SPELL_SHA_HEALING_RAIN                  = 73920,
+	SPELL_SHA_ELEMENTAL_BLAST               = 117014,
+    SPELL_SHA_ELEMENTAL_BLAST_RATING_BONUS  = 118522,
+    SPELL_SHA_ELEMENTAL_BLAST_NATURE_VISUAL = 118517,
+    SPELL_SHA_ELEMENTAL_BLAST_FROST_VISUAL  = 118515,
 };
 
 enum ShamanSpellIcons
@@ -1026,6 +1030,87 @@ class spell_sha_ancestral_guidance : public SpellScriptLoader
         }
 };
 
+// Elemental Blast - 117014
+class spell_sha_elemental_blast : public SpellScriptLoader
+{
+    public:
+        spell_sha_elemental_blast() : SpellScriptLoader("spell_sha_elemental_blast") { }
+
+        class spell_sha_elemental_blast_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_sha_elemental_blast_SpellScript);
+
+            bool Validate(SpellInfo const* /*spell*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_SHA_ELEMENTAL_BLAST))
+                    return false;
+                return true;
+            }
+
+            void HandleAfterCast()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (Unit* target = GetExplTargetUnit())
+                    {
+                        _player->CastSpell(target, SPELL_SHA_ELEMENTAL_BLAST_FROST_VISUAL, true);
+                        _player->CastSpell(target, SPELL_SHA_ELEMENTAL_BLAST_NATURE_VISUAL, true);
+                    }
+                }
+            }
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    int32 randomEffect = irand(0, 2);
+
+                    _player->CastSpell(_player, SPELL_SHA_ELEMENTAL_BLAST_RATING_BONUS, true);
+
+                    AuraApplication* aura = _player->GetAuraApplication(SPELL_SHA_ELEMENTAL_BLAST_RATING_BONUS, _player->GetGUID());
+
+                    if (aura)
+                    {
+                        switch (randomEffect)
+                        {
+                            case 0:
+                            {
+                                aura->GetBase()->GetEffect(1)->ChangeAmount(0);
+                                aura->GetBase()->GetEffect(2)->ChangeAmount(0);
+                                break;
+                            }
+                            case 1:
+                            {
+                                aura->GetBase()->GetEffect(0)->ChangeAmount(0);
+                                aura->GetBase()->GetEffect(2)->ChangeAmount(0);
+                                break;
+                            }
+                            case 2:
+                            {
+                                aura->GetBase()->GetEffect(0)->ChangeAmount(0);
+                                aura->GetBase()->GetEffect(1)->ChangeAmount(0);
+                                break;
+                            }
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                AfterCast += SpellCastFn(spell_sha_elemental_blast_SpellScript::HandleAfterCast);
+                OnHit += SpellHitFn(spell_sha_elemental_blast_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_sha_elemental_blast_SpellScript();
+        }
+};
+
 void AddSC_shaman_spell_scripts()
 {
     new spell_sha_ancestral_awakening_proc();
@@ -1048,4 +1133,5 @@ void AddSC_shaman_spell_scripts()
 	new spell_sha_frozen_power();
 	new spell_sha_conductivity();
     new spell_sha_ancestral_guidance();
+	new spell_sha_elemental_blast();
 }
