@@ -81,9 +81,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     case CMSG_MESSAGECHAT_RAID:
         type = CHAT_MSG_RAID;
         break;
-    case CMSG_MESSAGECHAT_BATTLEGROUND:
+    /*case CMSG_MESSAGECHAT_BATTLEGROUND:
         type = CHAT_MSG_BATTLEGROUND;
-        break;
+        break;*/
     case CMSG_MESSAGECHAT_RAID_WARNING:
         type = CHAT_MSG_RAID_WARNING;
         break;
