@@ -3771,7 +3771,7 @@ enum ChatMsg
     CHAT_MSG_INSTANCE_CHAT_LEADER             = 67,
 };
 
-#define MAX_CHAT_MSG_TYPE 52
+#define MAX_CHAT_MSG_TYPE 68
 
 enum ChatLinkColors
 {
