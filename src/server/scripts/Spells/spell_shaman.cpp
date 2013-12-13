@@ -57,6 +57,10 @@ enum ShamanSpells
 	SPELL_SHAMAN_LAVA_BURST						= 51505,
 	SPELL_SHA_FROZEN_POWER                  = 63374,
 	SPELL_SHA_FROST_SHOCK_FREEZE            = 63685,
+	SPELL_SHA_ANCESTRAL_GUIDANCE            = 114911,
+    SPELL_SHA_CONDUCTIVITY_TALENT           = 108282,
+    SPELL_SHA_CONDUCTIVITY_HEAL             = 118800,
+	SPELL_SHA_HEALING_RAIN                  = 73920,
 };
 
 enum ShamanSpellIcons
@@ -882,6 +886,146 @@ class spell_sha_frozen_power : public SpellScriptLoader
         }
 };
 
+// Called by Healing Wave - 331, Greater Healing Wave - 77472 and Healing Surge - 8004
+// Called by Lightning Bolt - 403, Chain Lightning - 421, Earth Shock - 8042 and Stormstrike - 17364
+// Called by Lightning Bolt - 45284, Chain Lightning - 45297
+// Conductivity - 108282
+class spell_sha_conductivity : public SpellScriptLoader
+{
+    public:
+        spell_sha_conductivity() : SpellScriptLoader("spell_sha_conductivity") { }
+
+        class spell_sha_conductivity_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_sha_conductivity_SpellScript);
+
+            void HandleAfterHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        if (_player->HasAura(SPELL_SHA_CONDUCTIVITY_TALENT))
+                        {
+                            if (DynamicObject* dynObj = _player->GetDynObject(SPELL_SHA_HEALING_RAIN))
+                            {
+                                std::list<Unit*> tempList;
+                                std::list<Unit*> memberList;
+
+                                _player->GetPartyMembers(tempList);
+
+								for (std::list<Unit*>::const_iterator i = tempList.begin(); i != tempList.end(); ++i)
+                                    if ((*i)->GetDistance(dynObj) <= 10.0f)
+                                        memberList.push_back((*i));
+
+                                if (memberList.empty())
+                                    return;
+
+                                memberList.sort(Trinity::DistanceCompareOrderPred(dynObj));
+                                memberList.resize(1);
+
+                                // When you cast Healing Wave, Greater Healing Wave, or Healing Surge
+                                // allies within your Healing Rain share healing equal to 30% of the initial healing done
+                                if (GetSpellInfo()->IsPositive())
+                                {
+                                    int32 bp = int32(GetHitHeal() * 0.30f) / memberList.size();
+
+									for (std::list<Unit*>::const_iterator i = memberList.begin(); i != memberList.end(); ++i)
+                                    {
+                                        _player->CastCustomSpell((*i), SPELL_SHA_CONDUCTIVITY_HEAL, &bp, NULL, NULL, true);
+                                        break;
+                                    }
+                                }
+                                // If your Lightning Bolt, Chain Lightning, Earth Shock, or Stormstrike damages an enemy
+                                // allies within your Healing Rain share healing equal to 50% of the initial damage done
+                                else
+                                {
+                                    int32 bp = int32(GetHitDamage() * 0.50f) / memberList.size();
+
+									for (std::list<Unit*>::const_iterator i = memberList.begin(); i != memberList.end(); ++i)
+                                    {
+                                        _player->CastCustomSpell((*i), SPELL_SHA_CONDUCTIVITY_HEAL, &bp, NULL, NULL, true);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                AfterHit += SpellHitFn(spell_sha_conductivity_SpellScript::HandleAfterHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_sha_conductivity_SpellScript();
+        }
+};
+
+// Ancestral Guidance - 108281
+class spell_sha_ancestral_guidance : public SpellScriptLoader
+{
+    public:
+        spell_sha_ancestral_guidance() : SpellScriptLoader("spell_sha_ancestral_guidance") { }
+
+        class spell_sha_ancestral_guidance_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_sha_ancestral_guidance_AuraScript);
+
+            void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            {
+                PreventDefaultAction();
+
+                if (!GetCaster())
+                    return;
+
+                Player* _player = GetCaster()->ToPlayer();
+                if (!_player)
+                    return;
+
+                if (eventInfo.GetActor()->GetGUID() != _player->GetGUID())
+                    return;
+
+                if (!eventInfo.GetDamageInfo()->GetSpellInfo())
+                    return;
+
+                if (eventInfo.GetDamageInfo()->GetSpellInfo()->Id == SPELL_SHA_ANCESTRAL_GUIDANCE)
+                    return;
+
+                if (!(eventInfo.GetDamageInfo()->GetDamage()) && !(eventInfo.GetHealInfo()->GetHeal()))
+                    return;
+
+                if (!(eventInfo.GetDamageInfo()->GetDamageType() == SPELL_DIRECT_DAMAGE) && !(eventInfo.GetDamageInfo()->GetDamageType() == HEAL))
+                    return;
+
+                if (Unit* target = eventInfo.GetActionTarget())
+                {
+                    int32 bp = eventInfo.GetDamageInfo()->GetDamage() > eventInfo.GetHealInfo()->GetHeal() ? eventInfo.GetDamageInfo()->GetDamage() : eventInfo.GetHealInfo()->GetHeal();
+                    if (!bp)
+                        return;
+
+                    bp = int32(bp * 0.40f);
+
+                    _player->CastCustomSpell(target, SPELL_SHA_ANCESTRAL_GUIDANCE, &bp, NULL, NULL, true);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectProc += AuraEffectProcFn(spell_sha_ancestral_guidance_AuraScript::OnProc, EFFECT_0, SPELL_AURA_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_sha_ancestral_guidance_AuraScript();
+        }
+};
+
 void AddSC_shaman_spell_scripts()
 {
     new spell_sha_ancestral_awakening_proc();
@@ -902,4 +1046,6 @@ void AddSC_shaman_spell_scripts()
 	new spell_sha_ascendance();
 	new spell_sha_ascendance_elemental();
 	new spell_sha_frozen_power();
+	new spell_sha_conductivity();
+    new spell_sha_ancestral_guidance();
 }
