@@ -65,6 +65,9 @@ enum ShamanSpells
     SPELL_SHA_ELEMENTAL_BLAST_RATING_BONUS  = 118522,
     SPELL_SHA_ELEMENTAL_BLAST_NATURE_VISUAL = 118517,
     SPELL_SHA_ELEMENTAL_BLAST_FROST_VISUAL  = 118515,
+	SPELL_SHA_EARTHQUAKE                    = 61882,
+    SPELL_SHA_EARTHQUAKE_TICK               = 77478,
+    SPELL_SHA_EARTHQUAKE_KNOCKING_DOWN      = 77505,
 };
 
 enum ShamanSpellIcons
@@ -1111,6 +1114,75 @@ class spell_sha_elemental_blast : public SpellScriptLoader
         }
 };
 
+// Earthquake : Ticks - 77478
+class spell_sha_earthquake_tick : public SpellScriptLoader
+{
+    public:
+        spell_sha_earthquake_tick() : SpellScriptLoader("spell_sha_earthquake_tick") { }
+
+        class spell_sha_earthquake_tick_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_sha_earthquake_tick_SpellScript);
+
+            bool Validate(SpellInfo const* /*spell*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_SHA_EARTHQUAKE_TICK))
+                    return false;
+                return true;
+            }
+
+            void HandleOnHit()
+            {
+                // With a 10% chance of knocking down affected targets
+                if (Player* _player = GetCaster()->ToPlayer())
+                    if (Unit* target = GetHitUnit())
+                        if (roll_chance_i(10))
+                            _player->CastSpell(target, SPELL_SHA_EARTHQUAKE_KNOCKING_DOWN, true);
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_sha_earthquake_tick_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_sha_earthquake_tick_SpellScript();
+        }
+};
+
+// Earthquake - 61882
+class spell_sha_earthquake : public SpellScriptLoader
+{
+    public:
+        spell_sha_earthquake() : SpellScriptLoader("spell_sha_earthquake") { }
+
+        class spell_sha_earthquake_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_sha_earthquake_AuraScript);
+
+            void OnTick(AuraEffect const* aurEff)
+            {
+                if (!GetCaster())
+                    return;
+
+                if (DynamicObject* dynObj = GetCaster()->GetDynObject(SPELL_SHA_EARTHQUAKE))
+                    GetCaster()->CastSpell(dynObj->GetPositionX(), dynObj->GetPositionY(), dynObj->GetPositionZ(), SPELL_SHA_EARTHQUAKE_TICK, true);
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_sha_earthquake_AuraScript::OnTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_sha_earthquake_AuraScript();
+        }
+};
+
 void AddSC_shaman_spell_scripts()
 {
     new spell_sha_ancestral_awakening_proc();
@@ -1134,4 +1206,6 @@ void AddSC_shaman_spell_scripts()
 	new spell_sha_conductivity();
     new spell_sha_ancestral_guidance();
 	new spell_sha_elemental_blast();
+	new spell_sha_earthquake_tick();
+	new spell_sha_earthquake();
 }
