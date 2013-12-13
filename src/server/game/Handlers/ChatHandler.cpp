@@ -406,19 +406,23 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         if (!group)
         {
             group = GetPlayer()->GetGroup();
-            if (!group || !group->isRaidGroup())
+            if (!group || !group->isRaidGroup() && !group->isBGGroup())
                 return;
         }
 
 		if (group->isBGGroup())
 		{
 			if (group->IsLeader(GetPlayer()->GetGUID()))
-				type = CHAT_MSG_INSTANCE_CHAT;
-			else type = CHAT_MSG_INSTANCE_CHAT_LEADER;
+				type = CHAT_MSG_INSTANCE_CHAT_LEADER;
+			else type = CHAT_MSG_INSTANCE_CHAT;
 		}
 
-		/*if (group->isRaidGroup() && group->IsLeader(GetPlayer()->GetGUID()))
-            type = CHAT_MSG_RAID_LEADER;*/
+		else if (!group->isBGGroup())
+		{
+			if (group->IsLeader(GetPlayer()->GetGUID()))
+				type = CHAT_MSG_RAID_LEADER;
+			else type = CHAT_MSG_RAID;
+		}
 
         sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
