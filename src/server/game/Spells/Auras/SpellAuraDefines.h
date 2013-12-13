@@ -468,7 +468,7 @@ enum AuraType
 	SPELL_AURA_409                                          = 409,
 	SPELL_AURA_410                                          = 410,
 	SPELL_AURA_411                                          = 411,
-	SPELL_AURA_412                                          = 412,
+	SPELL_AURA_MOD_MANA_REGEN_FROM_HASTE                    = 412,
     TOTAL_AURAS                                             = 413   // 5.1.0a
 };
 

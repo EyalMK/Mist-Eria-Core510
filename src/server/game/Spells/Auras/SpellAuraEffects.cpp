@@ -4271,6 +4271,10 @@ void AuraEffect::HandleModCastingSpeed(AuraApplication const* aurApp, uint8 mode
     Unit* target = aurApp->GetTarget();
 
     target->ApplyCastTimePercentMod((float)GetAmount(), apply);
+
+	// Spell Haste modifies mana regen in some cases
+	if(target->ToPlayer())
+		target->ToPlayer()->UpdateManaRegen();
 }
 
 void AuraEffect::HandleModMeleeRangedSpeedPct(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -4352,6 +4356,8 @@ void AuraEffect::HandleModRating(AuraApplication const* aurApp, uint8 mode, bool
             target->ToPlayer()->ApplyRatingMod(CombatRating(rating), GetAmount()/* / target->ToPlayer()->GetRatingMultiplier(CombatRating(rating))*/, apply);
     //PEXIRN : just commented this, seems totally incorrect, the rating must get that value, not necessary to devide this by the multiplier 
     //(it's acting like the value sent by the spell IS the final value ... non sense, it depends of multiple things)
+
+	target->ToPlayer()->UpdateAllStats();
 }
 
 void AuraEffect::HandleModRatingFromStat(AuraApplication const* aurApp, uint8 mode, bool apply) const

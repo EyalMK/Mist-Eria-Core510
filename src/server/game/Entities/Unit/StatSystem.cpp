@@ -687,6 +687,15 @@ void Player::UpdateManaRegen()
 
     // CombatRegen = 5% of Base Mana
     float base_regen = GetCreateMana() * 0.01f + GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_MANA) / 5.0f;
+	base_regen *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_MANA);
+
+	//Haste Auras that add mana regen
+	if(HasAura(111546)) // Chaos Energy
+		base_regen += 2.56f * GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_HASTE_SPELL);
+	if(HasAura(117957)) // Nether Attunement
+		base_regen *= 1.f + (GetRatingBonusValue(CR_HASTE_SPELL)/100.f) + GetTotalAuraModifier(SPELL_AURA_HASTE_SPELLS);
+
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "#\nratingbonus %f; auramod %d; auramult %f\#", GetRatingBonusValue(CR_HASTE_SPELL), GetTotalAuraModifier(SPELL_AURA_HASTE_SPELLS), GetTotalAuraMultiplier(SPELL_AURA_HASTE_SPELLS));
 
     // Set regen rate in cast state apply only on spirit based regen
     int32 modManaRegenInterrupt = GetTotalAuraModifier(SPELL_AURA_MOD_MANA_REGEN_INTERRUPT);
