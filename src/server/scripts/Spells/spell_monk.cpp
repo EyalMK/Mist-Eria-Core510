@@ -101,9 +101,9 @@ enum MonkSpells
 
 enum Monkspec
 {
-	SPEC_MONK_BREWMASTER						= 1,
-    SPEC_MONK_MISTWEAVER						= 2,
-    SPEC_MONK_WINDWALKER						= 3,
+	SPEC_MONK_BREWMASTER						= 268,
+    SPEC_MONK_MISTWEAVER						= 270,
+    SPEC_MONK_WINDWALKER						= 269,
 };
 
 // Fists of Fury (stun effect) - 120086
