@@ -55,6 +55,8 @@ enum ShamanSpells
 	SPELL_SHAMAN_ASCENDANCE_ENHANCEMENT			= 114051,
 	SPELL_SHAMAN_ASCENDANCE_RESTORATION			= 114052,
 	SPELL_SHAMAN_LAVA_BURST						= 51505,
+	SPELL_SHA_FROZEN_POWER                  = 63374,
+	SPELL_SHA_FROST_SHOCK_FREEZE            = 63685,
 };
 
 enum ShamanSpellIcons
@@ -843,6 +845,43 @@ public:
     }
 };
 
+// Frost Shock - 8056
+class spell_sha_frozen_power : public SpellScriptLoader
+{
+    public:
+        spell_sha_frozen_power() : SpellScriptLoader("spell_sha_frozen_power") { }
+
+        class spell_sha_frozen_power_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_sha_frozen_power_SpellScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(8056))
+                    return false;
+                return true;
+            }
+
+            void HandleAfterHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                    if (Unit* target = GetHitUnit())
+                        if (_player->HasAura(SPELL_SHA_FROZEN_POWER))
+                            _player->CastSpell(target, SPELL_SHA_FROST_SHOCK_FREEZE, true);
+            }
+
+            void Register()
+            {
+                AfterHit += SpellHitFn(spell_sha_frozen_power_SpellScript::HandleAfterHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_sha_frozen_power_SpellScript();
+        }
+};
+
 void AddSC_shaman_spell_scripts()
 {
     new spell_sha_ancestral_awakening_proc();
@@ -862,4 +901,5 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_unleash_elements();
 	new spell_sha_ascendance();
 	new spell_sha_ascendance_elemental();
+	new spell_sha_frozen_power();
 }
