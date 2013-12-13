@@ -402,16 +402,22 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     case CHAT_MSG_RAID:
     case CHAT_MSG_RAID_LEADER:
     {
-        // if player is in battleground, he cannot say to battleground members by /ra
         Group* group = GetPlayer()->GetOriginalGroup();
         if (!group)
         {
             group = GetPlayer()->GetGroup();
-            if (!group || group->isBGGroup() || !group->isRaidGroup())
+            if (!group || !group->isRaidGroup())
                 return;
         }
 
-        if (group->IsLeader(GetPlayer()->GetGUID()))
+		if (group->isBGGroup())
+		{
+			if (group->IsLeader(GetPlayer()->GetGUID()))
+				type = CHAT_MSG_INSTANCE_CHAT;
+			else type = CHAT_MSG_INSTANCE_CHAT_LEADER;
+		}
+
+		if (group->isRaidGroup() && group->IsLeader(GetPlayer()->GetGUID()))
             type = CHAT_MSG_RAID_LEADER;
 
         sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
@@ -433,16 +439,16 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         ChatHandler::FillMessageData(&data, this, CHAT_MSG_RAID_WARNING, lang, "", 0, msg.c_str(), NULL);
         group->BroadcastPacket(&data, false);
     } break;
-    case CHAT_MSG_BATTLEGROUND:
-    case CHAT_MSG_BATTLEGROUND_LEADER:
+    case CHAT_MSG_INSTANCE_CHAT:
+    case CHAT_MSG_INSTANCE_CHAT_LEADER:
     {
-        // battleground raid is always in Player->GetGroup(), never in GetOriginalGroup()
         Group* group = GetPlayer()->GetGroup();
-        if (!group || !group->isBGGroup())
+		if (!group && !group->isLFGGroup() && !group->isBGGroup())
             return;
 
         if (group->IsLeader(GetPlayer()->GetGUID()))
-            type = CHAT_MSG_BATTLEGROUND_LEADER;
+            type = CHAT_MSG_INSTANCE_CHAT_LEADER;
+		else type = CHAT_MSG_INSTANCE_CHAT;
 
         sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 

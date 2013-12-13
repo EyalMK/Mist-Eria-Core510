@@ -107,18 +107,18 @@ public:
                         player->GetName().c_str(), msg.c_str());
                 break;
 
-            case CHAT_MSG_BATTLEGROUND:
+            case CHAT_MSG_INSTANCE_CHAT:
                 if (lang != LANG_ADDON && sWorld->getBoolConfig(CONFIG_CHATLOG_BGROUND))
-                    sLog->outDebug(LOG_FILTER_PLAYER_CHATLOG, "[BATTLEGROUND] Player %s tells battleground with leader %s: %s",
+                    sLog->outDebug(LOG_FILTER_PLAYER_CHATLOG, "[INSTANCE] Player %s tells instance with leader %s: %s",
                         player->GetName().c_str(), group ? group->GetLeaderName() : "<unknown>", msg.c_str());
                 else if (lang == LANG_ADDON && sWorld->getBoolConfig(CONFIG_CHATLOG_ADDON))
-                    sLog->outDebug(LOG_FILTER_PLAYER_CHATLOG, "[ADDON] Player %s tells battleground with leader %s: %s",
+                    sLog->outDebug(LOG_FILTER_PLAYER_CHATLOG, "[ADDON] Player %s tells instance with leader %s: %s",
                         player->GetName().c_str(), group ? group->GetLeaderName() : "<unknown>", msg.c_str());
                 break;
 
-            case CHAT_MSG_BATTLEGROUND_LEADER:
+            case CHAT_MSG_INSTANCE_CHAT_LEADER:
                 if (sWorld->getBoolConfig(CONFIG_CHATLOG_BGROUND))
-                    sLog->outDebug(LOG_FILTER_PLAYER_CHATLOG, "[BATTLEGROUND] Leader player %s tells battleground: %s",
+                    sLog->outDebug(LOG_FILTER_PLAYER_CHATLOG, "[BATTLEGROUND] Leader player %s tells instance: %s",
                         player->GetName().c_str(), msg.c_str());
                 break;
         }
