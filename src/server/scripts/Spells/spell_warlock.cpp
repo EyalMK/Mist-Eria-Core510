@@ -63,7 +63,13 @@ enum WarlockSpells
 	 WARLOCK_KIL_JAEDENS_CUNNING_PASSIVE     = 108507,
 	 WARLOCK_HARVEST_LIFE_HEAL               = 125314,
 	 WARLOCK_SUPPLANT_DEMONIC_COMMAND        = 119904,
-	 WARLOCK_GRIMOIRE_OF_SACRIFICE           = 108503
+	 WARLOCK_GRIMOIRE_OF_SACRIFICE           = 108503,
+	 WARLOCK_DRAIN_LIFE_HEAL                 = 89653,
+	 WARLOCK_SOULBURN_AURA                   = 74434,
+	 WARLOCK_MOLTEN_CORE                     = 122355,
+    WARLOCK_MOLTEN_CORE_AURA                = 122351,
+	WARLOCK_DECIMATE_AURA                   = 108869,
+	WARLOCK_METAMORPHOSIS                   = 103958,
 };
 
 enum WarlockMisc
@@ -1361,6 +1367,251 @@ class spell_warl_burning_embers : public SpellScriptLoader
         }
 };
 
+// Drain Life - 689
+class spell_warl_drain_life : public SpellScriptLoader
+{
+    public:
+        spell_warl_drain_life() : SpellScriptLoader("spell_warl_drain_life") { }
+
+        class spell_warl_drain_life_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warl_drain_life_AuraScript);
+
+            void OnTick(AuraEffect const* aurEff)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    Player* _player = GetCaster()->ToPlayer();
+                    if (!_player)
+                        return;
+
+                    // Restoring 2% of the caster's total health every 1s
+                    int32 basepoints = _player->GetMaxHealth() / 50;
+
+                    // In Demonology spec : Generates 10 Demonic Fury per second
+                        _player->EnergizeBySpell(_player, 689, 10, POWER_DEMONIC_FURY);
+
+                    _player->CastCustomSpell(_player, WARLOCK_DRAIN_LIFE_HEAL, &basepoints, NULL, NULL, true);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_warl_drain_life_AuraScript::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_warl_drain_life_AuraScript();
+        }
+};
+
+// Soulburn : Drain Life - 89420
+class spell_warl_soulburn_drain_life : public SpellScriptLoader
+{
+    public:
+        spell_warl_soulburn_drain_life() : SpellScriptLoader("spell_warl_soulburn_drain_life") { }
+
+        class spell_warl_soulburn_drain_life_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warl_soulburn_drain_life_AuraScript);
+
+            void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (GetCaster())
+                    if (GetCaster()->HasAura(WARLOCK_SOULBURN_AURA))
+                        GetCaster()->RemoveAura(WARLOCK_SOULBURN_AURA);
+            }
+
+            void OnTick(AuraEffect const* aurEff)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    Player* _player = GetCaster()->ToPlayer();
+                    if (!_player)
+                        return;
+
+                    // Restoring 2% of the caster's total health every 1s
+                    int32 basepoints = _player->CountPctFromMaxHealth(3);
+
+                    // In Demonology spec : Generates 10 Demonic Fury per second
+                        _player->EnergizeBySpell(_player, 689, 10, POWER_DEMONIC_FURY);
+
+                    _player->CastCustomSpell(_player, WARLOCK_DRAIN_LIFE_HEAL, &basepoints, NULL, NULL, true);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectApply += AuraEffectApplyFn(spell_warl_soulburn_drain_life_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_warl_soulburn_drain_life_AuraScript::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_warl_soulburn_drain_life_AuraScript();
+        }
+};
+
+// Called by Shadowflame - 47960
+// Molten Core - 122351
+class spell_warl_molten_core_dot : public SpellScriptLoader
+{
+    public:
+        spell_warl_molten_core_dot() : SpellScriptLoader("spell_warl_molten_core_dot") { }
+
+        class spell_warl_molten_core_dot_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warl_molten_core_dot_AuraScript);
+
+            void OnTick(AuraEffect const* aurEff)
+            {
+                if (GetCaster())
+                {
+                    if (GetCaster()->HasAura(WARLOCK_MOLTEN_CORE_AURA) && GetCaster()->getLevel() >= 69)
+                        if (roll_chance_i(8))
+                            GetCaster()->CastSpell(GetCaster(), WARLOCK_MOLTEN_CORE, true);
+
+                    GetCaster()->EnergizeBySpell(GetCaster(), aurEff->GetSpellInfo()->Id, 2, POWER_DEMONIC_FURY);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_warl_molten_core_dot_AuraScript::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_warl_molten_core_dot_AuraScript();
+        }
+};
+
+// Called by Shadow Bolt - 686 and Soul Fire - 6353
+// Decimate - 108869
+class spell_warl_decimate : public SpellScriptLoader
+{
+    public:
+        spell_warl_decimate() : SpellScriptLoader("spell_warl_decimate") { }
+
+        class spell_warl_decimate_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warl_decimate_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (Unit* target = GetHitUnit())
+                        if (_player->HasAura(WARLOCK_DECIMATE_AURA) && _player->getLevel() >= 73)
+                            if (target->GetHealthPct() < 25.0f)
+                                _player->CastSpell(_player, WARLOCK_MOLTEN_CORE, true);
+
+                        _player->EnergizeBySpell(_player, GetSpellInfo()->Id, GetSpellInfo()->Id == 686 ? 25 : 30, POWER_DEMONIC_FURY);
+                }
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_warl_decimate_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warl_decimate_SpellScript();
+        }
+};
+
+// Metamorphosis - 103958
+class spell_warl_metamorphosis_cost : public SpellScriptLoader
+{
+    public:
+        spell_warl_metamorphosis_cost() : SpellScriptLoader("spell_warl_metamorphosis_cost") { }
+
+        class spell_warl_metamorphosis_cost_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warl_metamorphosis_cost_AuraScript);
+
+            void OnTick(AuraEffect const* aurEff)
+            {
+                if (GetCaster())
+                    GetCaster()->EnergizeBySpell(GetCaster(), WARLOCK_METAMORPHOSIS, -6, POWER_DEMONIC_FURY);
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_warl_metamorphosis_cost_AuraScript::OnTick, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_warl_metamorphosis_cost_AuraScript();
+        }
+};
+
+// Immolation Aura - 104025
+class spell_warl_immolation_aura : public SpellScriptLoader
+{
+    public:
+        spell_warl_immolation_aura() : SpellScriptLoader("spell_warl_immolation_aura") { }
+
+        class spell_warl_immolation_aura_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warl_immolation_aura_AuraScript);
+
+            void OnTick(AuraEffect const* aurEff)
+            {
+                if (GetCaster())
+                    GetCaster()->EnergizeBySpell(GetCaster(), GetSpellInfo()->Id, -25, POWER_DEMONIC_FURY);
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_warl_immolation_aura_AuraScript::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_warl_immolation_aura_AuraScript();
+        }
+};
+
+// Hellfire - 5857
+class spell_warl_hellfire : public SpellScriptLoader
+{
+    public:
+        spell_warl_hellfire() : SpellScriptLoader("spell_warl_hellfire") { }
+
+        class spell_warl_hellfire_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warl_hellfire_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                    if (Unit* target = GetHitUnit())
+                        _player->EnergizeBySpell(_player, GetSpellInfo()->Id, 4, POWER_DEMONIC_FURY);
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_warl_hellfire_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warl_hellfire_SpellScript();
+        }
+};
+
+
 void AddSC_warlock_spell_scripts()
 {
     new spell_warl_bane_of_doom();
@@ -1389,4 +1640,11 @@ void AddSC_warlock_spell_scripts()
 	new spell_warl_harvest_life();
 	new spell_warl_grimoire_of_sacrifice();
 	new spell_warl_burning_embers();
+	new spell_warl_drain_life();
+	new spell_warl_soulburn_drain_life();
+	new spell_warl_molten_core_dot();
+	new spell_warl_decimate();
+	new spell_warl_metamorphosis_cost();
+	new spell_warl_immolation_aura();
+	new spell_warl_hellfire();
 }
