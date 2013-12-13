@@ -417,8 +417,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 			else type = CHAT_MSG_INSTANCE_CHAT_LEADER;
 		}
 
-		if (group->isRaidGroup() && group->IsLeader(GetPlayer()->GetGUID()))
-            type = CHAT_MSG_RAID_LEADER;
+		/*if (group->isRaidGroup() && group->IsLeader(GetPlayer()->GetGUID()))
+            type = CHAT_MSG_RAID_LEADER;*/
 
         sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
