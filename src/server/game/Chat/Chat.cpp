@@ -672,6 +672,7 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
                 *data << uint8(0);                          // string listener_name
             }
             *data << uint32(messageLength);
+			*data << uint32(strlen(speaker->GetName().c_str()) + 1);
             *data << message;
             *data << uint16(0);
 
@@ -703,11 +704,6 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
         ASSERT(addonPrefix);
         *data << addonPrefix;
     }
-    else if (type == CHAT_MSG_BG_SYSTEM_NEUTRAL ||
-             type == CHAT_MSG_BG_SYSTEM_ALLIANCE ||
-             type == CHAT_MSG_BG_SYSTEM_HORDE) {
-        *data << uint64(0);
-    }
     else
         *data << uint64(target_guid);
 
@@ -717,7 +713,7 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
     case CHAT_MSG_RAID:
     case CHAT_MSG_RAID_LEADER:
     case CHAT_MSG_RAID_WARNING:
-        *data << uint64(target_guid);
+        *data << uint64(0);
         break;
     default:
         break;
