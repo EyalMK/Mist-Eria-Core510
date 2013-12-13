@@ -3753,7 +3753,7 @@ enum ChatMsg
     CHAT_MSG_GUILD_ACHIEVEMENT                = 49,
     CHAT_MSG_ARENA_POINTS                     = 50,
     CHAT_MSG_PARTY_LEADER                     = 51,
-    CHAT_MSG_TARGETICONS                      = 52,
+    /*CHAT_MSG_TARGETICONS                      = 52,
     CHAT_MSG_BN_WHISPER                       = 53,
     CHAT_MSG_BN_WHISPER_INFORM                = 54,
     CHAT_MSG_BN_CONVERSATION                  = 55,
@@ -3770,10 +3770,10 @@ enum ChatMsg
     CHAT_MSG_PET_BATTLE_COMBAT_LOG            = 66,
     CHAT_MSG_PET_BATTLE_INFO                  = 67,
     CHAT_MSG_INSTANCE_CHAT                    = 68,
-    CHAT_MSG_INSTANCE_CHAT_LEADER             = 69,
+    CHAT_MSG_INSTANCE_CHAT_LEADER             = 69,*/
 };
 
-#define MAX_CHAT_MSG_TYPE 68
+#define MAX_CHAT_MSG_TYPE 52
 
 enum ChatLinkColors
 {
