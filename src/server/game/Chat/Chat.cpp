@@ -663,9 +663,9 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
         {
             *data << uint64(speaker->GetGUID());
             *data << uint32(0);                             // 2.1.0
-			*data << uint32(strlen(speaker->GetName().c_str()) + 1);
+			*data << uint32(30);
             *data << speaker->GetName();
-			uint64 listener_guid = session ? session->GetPlayer()->GetGUID() : 0;;
+			uint64 listener_guid = 0;
             *data << uint64(listener_guid);
             if (listener_guid && !IS_PLAYER_GUID(listener_guid))
             {
