@@ -3859,9 +3859,9 @@ void SpellMgr::LoadSpellInfoCorrections()
 					spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
 					spellInfo->Effects[EFFECT_0].Amplitude = 1000;
 					break;
-				case 117665: // Bounds of Reality
+				/*case 117665: // Bounds of Reality
 					spellInfo->Effects[EFFECT_0].Effect = 0;
-					break;
+					break;*/
 				case 106112: // Release Doubt
 					spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_500_YARDS);
 					break;
