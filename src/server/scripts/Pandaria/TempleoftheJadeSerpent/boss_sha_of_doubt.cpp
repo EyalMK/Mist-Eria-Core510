@@ -388,7 +388,7 @@ public:
 				me->DespawnOrUnsummon();
 		}
 
-        /*void JustDied(Unit *pWho)
+        void JustDied(Unit *pWho)
         {
 			if (instance)
 			{
@@ -402,7 +402,7 @@ public:
 				}
 				else me->DespawnOrUnsummon();
 			}
-        }*/
+        }
 
         void UpdateAI(uint32 diff)
         {
@@ -444,7 +444,7 @@ public:
 							if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 							{
 								sha->AI()->DoAction(ACTION_SHA_OF_DOUBT_PHASE_COMBAT);
-								me->DespawnOrUnsummon();
+								me->Kill(me);
 							}
 
 							events.CancelEvent(EVENT_RELEASE_DOUBT);
