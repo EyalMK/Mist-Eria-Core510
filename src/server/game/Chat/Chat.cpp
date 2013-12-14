@@ -662,8 +662,8 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
 		case CHAT_MSG_QUEST_BOSS_EMOTE:
         {
             *data << uint64(speaker->GetGUID());
-			*data << uint32(strlen(speaker->GetName().c_str()) + 1);
             *data << uint32(0);                             // 2.1.0
+			*data << uint32(speaker->GetName().size() + 1);
             *data << speaker->GetName();
 			uint64 listener_guid = 0;
             *data << uint64(listener_guid);
