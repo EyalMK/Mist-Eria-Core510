@@ -77,9 +77,9 @@ public:
 		return new boss_sha_of_doubtAI(creature);
 	}
 
-	struct boss_sha_of_doubtAI : public ScriptedAI
+	struct boss_sha_of_doubtAI : public BossAI
 	{
-		boss_sha_of_doubtAI(Creature *creature) : ScriptedAI(creature)
+		boss_sha_of_doubtAI(Creature *creature) : BossAI(creature, DATA_BOSS_SHA_OF_DOUBT)
 		{
 			instance = creature->GetInstanceScript();
 		}
@@ -92,7 +92,9 @@ public:
 		bool fiftyPct;
 
 		void Reset()
-		{		
+		{
+			_Reset();
+
 			events.Reset();
 
 			if (instance)
@@ -108,6 +110,7 @@ public:
 
 		void JustDied(Unit *pWho)
 		{
+			_JustDied();
 			if (instance)
 			{
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, DONE);
@@ -137,6 +140,8 @@ public:
             switch (action)
             {
 				case ACTION_SHA_OF_DOUBT_PHASE_COMBAT:
+					if (me->HasAura(SPELL_BOUNDS_OF_REALITY))
+						me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
 					me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
 					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 					events.SetPhase(PHASE_COMBAT);
@@ -153,25 +158,30 @@ public:
 		
 		void EnterEvadeMode()
 		{
+			_EnterEvadeMode();
+
+			events.Reset();
+
+			boundsOfReality = false;
+			seventyFivePct = false;
+			fiftyPct = false;
+
+			events.SetPhase(PHASE_NULL);
+
+			Talk(SAY_RESET);
+
+			me->CombatStop(true);
+			me->DeleteThreatList();
+
+			if (me->HasAura(SPELL_BOUNDS_OF_REALITY))
+				me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
+
+			if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
+				go->UseDoorOrButton();
+
 			if (instance)
 			{
-				boundsOfReality = false;
-				seventyFivePct = false;
-				fiftyPct = false;
-
-				events.SetPhase(PHASE_NULL);
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, FAIL);
-
-				Talk(SAY_RESET);
-
-				me->CombatStop(true);
-				me->DeleteThreatList();
-
-				if (me->HasAura(SPELL_BOUNDS_OF_REALITY))
-					me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
-
-				if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
-					go->UseDoorOrButton();
 
 				std::list<Creature*> figments;
 				me->GetCreatureListWithEntryInGrid(figments, NPC_FIGMENT_OF_DOUBT, 99999.0f);
@@ -188,18 +198,20 @@ public:
 
 		void EnterCombat(Unit* /*who*/)
 		{
+			_EnterCombat();
+
 			if (instance)
 			{
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, IN_PROGRESS);
 				me->SetInCombatWithZone();
+
+				if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
+					go->SetGoState(GO_STATE_READY);
 			}
 
 			events.SetPhase(PHASE_COMBAT);
 			events.ScheduleEvent(EVENT_WITHER_WILL, 2*IN_MILLISECONDS, 0, PHASE_COMBAT);
 			events.ScheduleEvent(EVENT_TOUCH_OF_NOTHINGNESS, 8*IN_MILLISECONDS, 0, PHASE_COMBAT);
-
-			if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 9999.0f))
-					go->SetGoState(GO_STATE_READY);
 
 			Talk(SAY_AGGRO);
 		}
@@ -376,8 +388,8 @@ public:
             {
 				case ACTION_FIGMENT_ATTACK:
 					me->CastSpell(me, SPELL_GATHERING_DOUBT);
+					events.ScheduleEvent(EVENT_ATTACK_PLAYERS, 2*IN_MILLISECONDS);
 					events.ScheduleEvent(EVENT_RELEASE_DOUBT, 30*IN_MILLISECONDS);
-					events.ScheduleEvent(EVENT_ATTACK_PLAYERS, 0);
 					break;
             }
         }
@@ -443,6 +455,9 @@ public:
 							
 							if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 							{
+								if (sha->HasAura(SPELL_BOUNDS_OF_REALITY))
+									sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
+
 								sha->AI()->DoAction(ACTION_SHA_OF_DOUBT_PHASE_COMBAT);
 								me->Kill(me);
 							}
