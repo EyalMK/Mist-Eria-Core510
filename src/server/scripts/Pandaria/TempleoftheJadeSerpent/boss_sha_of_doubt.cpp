@@ -408,6 +408,9 @@ public:
 				{
 					if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 					{
+						if (sha->HasAura(SPELL_BOUNDS_OF_REALITY))
+							sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
+
 						sha->AI()->DoAction(ACTION_SHA_OF_DOUBT_PHASE_COMBAT);
 						me->DespawnOrUnsummon();
 					}
@@ -419,10 +422,6 @@ public:
         void UpdateAI(uint32 diff)
         {
             events.Update(diff);
-
-			if (!me->isAlive())
-				if (!me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
-					me->DespawnOrUnsummon();
 
 			if (!emote)
 			{
