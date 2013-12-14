@@ -153,13 +153,13 @@ public:
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, DONE);
 				Talk(SAY_DEATH);
 
-				std::list<Creature*> jadeFires;
+				/*std::list<Creature*> jadeFires;
 				me->GetCreatureListWithEntryInGrid(jadeFires, NPC_JADE_FIRE, 99999.0f);
 				if (!jadeFires.empty())
 				{
 					for (std::list<Creature*>::iterator itr = jadeFires.begin(); itr != jadeFires.end(); ++itr)
 						(*itr)->DespawnOrUnsummon();
-				}
+				}*/
 
 				if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 99999.0f))
 					go->UseDoorOrButton();
@@ -206,13 +206,13 @@ public:
 				me->CastSpell(me, SPELL_SHA_MASK);
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
-				std::list<Creature*> jadeFires;
+				/*std::list<Creature*> jadeFires;
 				me->GetCreatureListWithEntryInGrid(jadeFires, NPC_JADE_FIRE, 99999.0f);
 				if (!jadeFires.empty())
 				{
 					for (std::list<Creature*>::iterator itr = jadeFires.begin(); itr != jadeFires.end(); ++itr)
 						(*itr)->DespawnOrUnsummon();
-				}
+				}*/
 			}
 		}
 
@@ -251,9 +251,14 @@ public:
 		void UpdateAI(uint32 diff)
 		{
 			if	(!UpdateVictim())
+			{
 				if (!emote)
+				{
 					me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
+					emote = true;
+				}
 				else return;
+			}
 				
 			events.Update(diff);
 
@@ -744,6 +749,43 @@ public:
 	};
 };
 
+class npc_liu_trigger: public CreatureScript
+{
+public:
+	npc_liu_trigger() : CreatureScript("npc_liu_trigger") { }
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_liu_triggerAI(creature);
+	}
+
+	struct npc_liu_triggerAI : public ScriptedAI
+	{
+		npc_liu_triggerAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
+
+		InstanceScript* instance;
+		bool liuSummoned;
+
+		void Reset()
+		{
+			liuSummoned = false;
+		}
+
+		void UpdateAI(uint32 diff)
+		{
+			if (!liuSummoned)
+				if (!me->FindNearestCreature(NPC_MINION_OF_DOUBT, 99999.0f, true))
+				{
+					me->SummonCreature(NPC_LIU_FLAMEHEART, me->GetHomePosition(), TEMPSUMMON_MANUAL_DESPAWN);
+					liuSummoned = true;
+				}
+		}
+	};
+};
+
 class spell_yulon_jade_fire : public SpellScriptLoader
 {
     public:
@@ -778,5 +820,6 @@ void AddSC_boss_liu_flameheart()
 	new npc_jade_fire_trigger();
 	new npc_serpent_wave_trigger();
 	new npc_jade_serpent_wave_trigger();
+	new npc_liu_trigger();
 	new spell_yulon_jade_fire();
 }
