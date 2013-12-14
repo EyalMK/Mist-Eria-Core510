@@ -169,14 +169,13 @@ public:
 
 				instance->DoCastSpellOnPlayers(SPELL_BLESSING_OF_THE_WATERSPEAKER);
 
-				if (me->FindNearestCreature(NPC_LOREWALKER_TRIGGER, 99999.0f, false))
+				if (Creature* lorewalkerTrigger = me->FindNearestCreature(NPC_LOREWALKER_TRIGGER, 99999.0f, false))
 				{
 					if (GameObject* wiseDoor = me->FindNearestGameObject(GO_MARI_LOREWALKER_GATE, 99999.0f))
 						wiseDoor->UseDoorOrButton();
 
-					if (Creature* lorewalker = me->FindNearestCreature(BOSS_LOREWALKER_STONESTEP, 99999.0f, true))
-						if (GameObject* lorewalkerDoor = lorewalker->FindNearestGameObject(GO_MARI_LOREWALKER_GATE, 99999.0f))
-							lorewalkerDoor->UseDoorOrButton();
+					if (GameObject* lorewalkerDoor = lorewalkerTrigger->FindNearestGameObject(GO_MARI_LOREWALKER_GATE, 99999.0f))
+						lorewalkerDoor->UseDoorOrButton();
 
 					if (GameObject* go = me->FindNearestGameObject(GO_LIU_GATE, 99999.0f))
 						go->UseDoorOrButton();
