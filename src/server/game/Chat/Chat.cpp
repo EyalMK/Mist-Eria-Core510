@@ -663,16 +663,16 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
         {
             *data << uint64(speaker->GetGUID());
             *data << uint32(0);                             // 2.1.0
-			*data << uint32(messageLength);
+			*data << uint32(strlen(speaker->GetName().c_str()) + 1);
             *data << speaker->GetName();
 			uint64 listener_guid = 0;
-            *data << uint64(listener_guid);
-            if (listener_guid && !IS_PLAYER_GUID(listener_guid))
+            *data << uint64(target_guid);
+            if (target_guid && !IS_PLAYER_GUID(target_guid))
             {
                 *data << uint32(1);                         // string listener_name_length
                 *data << uint8(0);                          // string listener_name
             }
-			*data << uint32(strlen(speaker->GetName().c_str()) + 1);
+            *data << uint32(messageLength);
             *data << message;
             *data << uint16(0);
 
