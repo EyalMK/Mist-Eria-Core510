@@ -142,7 +142,6 @@ public:
 				case ACTION_SHA_OF_DOUBT_PHASE_COMBAT:
 					if (me->HasAura(SPELL_BOUNDS_OF_REALITY))
 						me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
-					me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
 					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 					events.SetPhase(PHASE_COMBAT);
 					me->GetMotionMaster()->MoveChase(me->getVictim());
@@ -415,7 +414,9 @@ public:
 						me->DespawnOrUnsummon();
 					}
 				}
-				else me->DespawnOrUnsummon();
+
+				if (me->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
+					me->DespawnOrUnsummon();
 			}
         }
 
