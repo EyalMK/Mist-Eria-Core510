@@ -96,9 +96,9 @@ public:
 		return new boss_liu_flameheartAI(creature);
 	}
 
-	struct boss_liu_flameheartAI : public ScriptedAI
+	struct boss_liu_flameheartAI : public BossAI
 	{
-		boss_liu_flameheartAI(Creature *creature) : ScriptedAI(creature)
+		boss_liu_flameheartAI(Creature *creature) : BossAI(creature, DATA_BOSS_LIU_FLAMEHEART)
 		{
 			instance = creature->GetInstanceScript();
 		}
@@ -117,6 +117,8 @@ public:
 
 		void Reset()
 		{
+			_Reset();
+
 			events.Reset();
 
 			if (instance)
@@ -144,6 +146,8 @@ public:
 
 		void JustDied(Unit *pWho)
 		{
+			_JustDied();
+
 			if (instance)
 			{
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, DONE);
@@ -174,6 +178,8 @@ public:
 		
 		void EnterEvadeMode()
 		{
+			_EnterEvadeMode();
+
 			if (instance)
 			{
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, FAIL);
@@ -227,6 +233,8 @@ public:
 
 		void EnterCombat(Unit* /*who*/)
 		{
+			_EnterCombat();
+
 			if (instance)
 			{
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, IN_PROGRESS);
