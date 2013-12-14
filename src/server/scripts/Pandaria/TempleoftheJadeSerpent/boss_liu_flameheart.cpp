@@ -153,13 +153,13 @@ public:
 				instance->SetBossState(DATA_BOSS_LIU_FLAMEHEART, DONE);
 				Talk(SAY_DEATH);
 
-				/*std::list<Creature*> jadeFires;
+				std::list<Creature*> jadeFires;
 				me->GetCreatureListWithEntryInGrid(jadeFires, NPC_JADE_FIRE, 99999.0f);
 				if (!jadeFires.empty())
 				{
 					for (std::list<Creature*>::iterator itr = jadeFires.begin(); itr != jadeFires.end(); ++itr)
 						(*itr)->DespawnOrUnsummon();
-				}*/
+				}
 
 				if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 99999.0f))
 					go->UseDoorOrButton();
@@ -206,13 +206,13 @@ public:
 				me->CastSpell(me, SPELL_SHA_MASK);
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
-				/*std::list<Creature*> jadeFires;
+				std::list<Creature*> jadeFires;
 				me->GetCreatureListWithEntryInGrid(jadeFires, NPC_JADE_FIRE, 99999.0f);
 				if (!jadeFires.empty())
 				{
 					for (std::list<Creature*>::iterator itr = jadeFires.begin(); itr != jadeFires.end(); ++itr)
 						(*itr)->DespawnOrUnsummon();
-				}*/
+				}
 			}
 		}
 
