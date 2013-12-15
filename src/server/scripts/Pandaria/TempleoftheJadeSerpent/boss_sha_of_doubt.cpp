@@ -456,13 +456,8 @@ public:
 							me->CastSpell(me, SPELL_RELEASE_DOUBT);
 							me->Kill(me);
 
-							/*if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
-							{
-								if (sha->HasAura(SPELL_BOUNDS_OF_REALITY))
-									sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
-
-								sha->AI()->DoAction(ACTION_SHA_OF_DOUBT_PHASE_COMBAT);
-							}*/
+							if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
+								sha->ModifyHealth(int32(me->GetMaxHealth() * 0.1f));
 
 							events.CancelEvent(EVENT_RELEASE_DOUBT);
 							break;
