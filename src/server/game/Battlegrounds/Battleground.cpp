@@ -478,18 +478,19 @@ inline void Battleground::_ProcessJoin(uint32 diff)
     }
 
     // Send packet every 10 seconds until the 2nd field reach 0
-    if (m_CountdownTimer >= 10000)
+    if (m_CountdownTimer >= 1)
     {
         uint32 countdownMaxForBGType = isArena() ? ARENA_COUNTDOWN_MAX : BATTLEGROUND_COUNTDOWN_MAX;
-
-        WorldPacket data(SMSG_START_TIMER, 4+4+4);
-        data << uint32(0); // unk
-        data << uint32(countdownMaxForBGType - (GetElapsedTime() / 1000));
-        data << uint32(countdownMaxForBGType);
-
-        for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+		for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(itr->first))
-                player->GetSession()->SendPacket(&data);
+			{
+				uint32 team = player->GetTeam();
+				WorldPacket data(SMSG_START_TIMER, 4+4+4);
+				data << uint32(team); // TEST
+				data << uint32(countdownMaxForBGType - (GetElapsedTime() / 1000));
+				data << uint32(countdownMaxForBGType);
+				player->GetSession()->SendPacket(&data);
+			}
 
         m_CountdownTimer = 0;
     }
