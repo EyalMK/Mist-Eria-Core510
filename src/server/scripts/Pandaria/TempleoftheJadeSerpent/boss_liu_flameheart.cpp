@@ -167,6 +167,9 @@ public:
 				me->SummonCreature(NPC_MINION_OF_DOUBT, 924.604553f, -2597.958008f, 181.292480f, 1.256927f);
 				me->SummonCreature(NPC_MINION_OF_DOUBT, 918.139648f, -2595.859375f, 181.288773f, 1.256927f);
 				me->SummonCreature(NPC_MINION_OF_DOUBT, 911.711853, -2593.772705, 181.288895, 1.256927f);
+
+				if (Creature* trigger = me->FindNearestCreature(NPC_LIU_TRIGGER, 99999.0f, true))
+					trigger->Kill(trigger);
 			}
 		}
 
@@ -779,6 +782,9 @@ public:
 
 		void UpdateAI(uint32 diff)
 		{
+			if (!me->isAlive())
+				return;
+
 			if (!liuSummoned)
 				if (!me->FindNearestCreature(NPC_MINION_OF_DOUBT, 99999.0f, true))
 				{
