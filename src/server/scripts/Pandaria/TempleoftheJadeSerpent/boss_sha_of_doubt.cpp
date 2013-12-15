@@ -144,6 +144,8 @@ public:
 						me->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
 					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 					events.SetPhase(PHASE_COMBAT);
+					events.CancelEvent(EVENT_WITHER_WILL);
+					events.CancelEvent(EVENT_TOUCH_OF_NOTHINGNESS);
 					events.ScheduleEvent(EVENT_WITHER_WILL, 7*IN_MILLISECONDS, 0, PHASE_COMBAT);
 					events.ScheduleEvent(EVENT_TOUCH_OF_NOTHINGNESS, 2*IN_MILLISECONDS, 0, PHASE_COMBAT);
 					me->GetMotionMaster()->MoveChase(me->getVictim());
