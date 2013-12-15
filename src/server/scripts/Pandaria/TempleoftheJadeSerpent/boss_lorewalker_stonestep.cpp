@@ -517,7 +517,7 @@ public:
 							case EVENT_AGONY:
 								me->CastSpell(me->getVictim(), SPELL_AGONY);
 
-								events.RescheduleEvent(EVENT_AGONY, 2*IN_MILLISECONDS);
+								events.RescheduleEvent(EVENT_AGONY, 2500);
 								break;
 
 							case EVENT_DISSIPATION:
@@ -704,7 +704,7 @@ public:
 			{
 				if (!eventAgony)
 				{
-					events.ScheduleEvent(EVENT_AGONY, 0);
+					events.ScheduleEvent(EVENT_AGONY, 1*IN_MILLISECONDS);
 					eventAgony = true;
 				}
 
@@ -717,7 +717,7 @@ public:
 							case EVENT_AGONY:
 								me->CastSpell(me->getVictim(), SPELL_AGONY);
 
-								events.RescheduleEvent(EVENT_AGONY, 2*IN_MILLISECONDS);
+								events.RescheduleEvent(EVENT_AGONY, 2500);
 								break;
 
 							case EVENT_DISSIPATION:
