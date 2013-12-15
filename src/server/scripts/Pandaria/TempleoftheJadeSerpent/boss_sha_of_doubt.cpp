@@ -460,10 +460,11 @@ public:
 
 						case EVENT_RELEASE_DOUBT:
 							me->CastSpell(me, SPELL_RELEASE_DOUBT);
-							me->Kill(me);
-
 							if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
+							{
 								sha->ModifyHealth(int32(me->GetMaxHealth() * 0.1f));
+								me->Kill(me);
+							}
 
 							events.CancelEvent(EVENT_RELEASE_DOUBT);
 							break;
