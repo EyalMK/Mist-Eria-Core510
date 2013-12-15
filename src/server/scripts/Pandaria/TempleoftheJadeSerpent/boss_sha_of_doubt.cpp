@@ -224,6 +224,12 @@ public:
 
 			events.Update(diff);
 
+			if (!HealthBelowPct(75) && seventyFivePct)
+				seventyFivePct = false;
+
+			if (!HealthBelowPct(50) && fiftyPct)
+				fiftyPct = false;
+
 			if (HealthBelowPct(75) && !seventyFivePct)
 			{
 				events.SetPhase(PHASE_BOUNDS_OF_REALITY);
