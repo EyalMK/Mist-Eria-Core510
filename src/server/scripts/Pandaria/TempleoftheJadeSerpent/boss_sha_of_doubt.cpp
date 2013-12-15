@@ -452,15 +452,15 @@ public:
 
 						case EVENT_RELEASE_DOUBT:
 							me->CastSpell(me, SPELL_RELEASE_DOUBT);
-							
-							if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
+							me->Kill(me);
+
+							/*if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 							{
 								if (sha->HasAura(SPELL_BOUNDS_OF_REALITY))
 									sha->RemoveAurasDueToSpell(SPELL_BOUNDS_OF_REALITY, me->GetGUID());
 
 								sha->AI()->DoAction(ACTION_SHA_OF_DOUBT_PHASE_COMBAT);
-								me->Kill(me);
-							}
+							}*/
 
 							events.CancelEvent(EVENT_RELEASE_DOUBT);
 							break;
