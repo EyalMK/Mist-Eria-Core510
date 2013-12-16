@@ -1224,7 +1224,9 @@ class spell_mage_ice_lance : public SpellScriptLoader
 
 		   void RecalculateDamage(SpellEffIndex /*effIndex*/)
            {
-				if(GetCaster()->HasAura(SPELL_MAGE_FINGERS_OF_FROST))
+				if (GetHitUnit() && (GetHitUnit()->HasAuraState(AURA_STATE_FROZEN)))
+					SetHitDamage(GetHitDamage()*(GetCaster()->HasAura(SPELL_MAGE_FINGERS_OF_FROST) ? 5 : 4));
+				else if(GetCaster()->HasAura(SPELL_MAGE_FINGERS_OF_FROST))
 				{
 					SetHitDamage(GetHitDamage()*5);
 
@@ -1242,8 +1244,6 @@ class spell_mage_ice_lance : public SpellScriptLoader
 						}
 					}
 				}
-				else if (GetHitUnit() && (GetHitUnit()->HasAuraState(AURA_STATE_FROZEN)))
-                   SetHitDamage(GetHitDamage()*4);
            }
 
 
@@ -1278,7 +1278,7 @@ class spell_mage_finger_of_frost : public SpellScriptLoader
                 {
 
 					uint32 spellId = eventInfo.GetDamageInfo()->GetSpellInfo()->Id;
-					int32 chance = 0;
+					uint32 chance = 0;
 
 					switch(spellId)
 					{
@@ -1291,11 +1291,10 @@ class spell_mage_finger_of_frost : public SpellScriptLoader
 						break;
 					case 2948:
 						chance = 10;
-					default:
-						return;
+						break;
 					}
 
-					if(roll_chance_i(chance))
+					if(chance > urand(0, 99))
 					{
 						player->CastSpell(player, SPELL_MAGE_FINGERS_OF_FROST, true);
 
