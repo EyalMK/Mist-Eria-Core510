@@ -210,7 +210,7 @@ class spell_growing_anger : public SpellScriptLoader
 
                         for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                         {
-                            Player* player = i->GetSource();
+                            Player* player = i->getSource();
 
                             if (player && player->IsInRange(target, 0.0f, 5.0f, false))
                             {
