@@ -1196,7 +1196,6 @@ class spell_mage_frostbolt : public SpellScriptLoader
            {
 			   OnCheckCast += SpellCheckCastFn(spell_mage_frostbolt_SpellScript::CheckRequirement);
 			   BeforeHit += SpellHitFn(spell_mage_frostbolt_SpellScript::HandleBeforeHit);
-			   OnEffectHitTarget += SpellEffectFn(spell_mage_frostbolt_SpellScript::RecalculateDamage, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
            }
        };
 
