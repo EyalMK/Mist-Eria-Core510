@@ -1186,7 +1186,7 @@ class spell_mage_frostbolt : public SpellScriptLoader
 					if(GetExplTargetUnit()->GetOwner() && GetExplTargetUnit()->GetOwner() == GetCaster())
 					{
 						PreventHitDamage();
-						PreventHitEffect(EFFECT_0);
+						PreventHitAura();
 						GetCaster()->CastSpell(GetExplTargetUnit(), SPELL_MAGE_FROSTBOLT_HEAL, true);
 					}
 				}	
