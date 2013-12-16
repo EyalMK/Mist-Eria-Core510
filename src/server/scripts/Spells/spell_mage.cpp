@@ -91,7 +91,9 @@ enum MageSpells
 
 	SPELL_MAGE_ICE_BLOCK                         = 45438,
     SPELL_MAGE_CONE_OF_COLD                      = 120,
-    SPELL_MAGE_FROST_NOVA                        = 122
+    SPELL_MAGE_FROST_NOVA                        = 122,
+
+	SPELL_MAGE_FROSTBOLT_HEAL					 = 126201
 };
 
 enum MageIcons
@@ -533,42 +535,6 @@ class spell_mage_focus_magic : public SpellScriptLoader
         {
             return new spell_mage_focus_magic_AuraScript();
         }
-};
-
-// 116 - Frostbolt
-/// Updated 4.3.4
-class spell_mage_frostbolt : public SpellScriptLoader
-{
-   public:
-       spell_mage_frostbolt() : SpellScriptLoader("spell_mage_frostbolt") { }
-
-       class spell_mage_frostbolt_SpellScript : public SpellScript
-       {
-           PrepareSpellScript(spell_mage_frostbolt_SpellScript);
-
-           void RecalculateDamage(SpellEffIndex /*effIndex*/)
-           {
-               if (GetHitUnit() && GetHitUnit()->HasAuraState(AURA_STATE_FROZEN, GetSpellInfo(), GetCaster()))
-               {
-                   if (AuraEffect* aurEff = GetCaster()->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_MAGE, ICON_MAGE_SHATTER, EFFECT_1))
-                   {
-                       int32 damage = GetHitDamage();
-                       AddPct(damage, aurEff->GetAmount());
-                       SetHitDamage(damage);
-                   }
-               }
-           }
-
-           void Register()
-           {
-               OnEffectHitTarget += SpellEffectFn(spell_mage_frostbolt_SpellScript::RecalculateDamage, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
-           }
-       };
-
-       SpellScript* GetSpellScript() const
-       {
-           return new spell_mage_frostbolt_SpellScript();
-       }
 };
 
 // 44457 - Living Bomb
@@ -1178,6 +1144,76 @@ class spell_mage_ring_of_frost_freeze : public SpellScriptLoader
         {
             return new spell_mage_ring_of_frost_freeze_AuraScript();
         }
+};
+
+// 116  - Frost Bolt
+class spell_mage_frostbolt : public SpellScriptLoader
+{
+   public:
+       spell_mage_frostbolt() : SpellScriptLoader("spell_mage_frostbolt") { }
+
+       class spell_mage_frostbolt_SpellScript : public SpellScript
+       {
+           PrepareSpellScript(spell_mage_frostbolt_SpellScript);
+
+           bool Validate(SpellInfo const* /*spellInfo*/)
+           {
+               if (!sSpellMgr->GetSpellInfo(SPELL_MAGE_IMPROVED_MANA_GEM_TRIGGERED))
+                   return false;
+               return true;
+           }
+
+		   SpellCastResult CheckRequirement()
+           {
+                if (!GetExplTargetUnit() || (GetExplTargetUnit() == GetCaster()))
+                    return SPELL_FAILED_BAD_TARGETS;
+
+				if(GetExplTargetUnit()->IsFriendlyTo(GetCaster()))
+				{
+					if(GetExplTargetUnit()->GetOwner() && GetExplTargetUnit()->GetOwner() == GetCaster())
+						return SPELL_CAST_OK;
+					else
+						return SPELL_FAILED_BAD_TARGETS;
+				}
+
+                return SPELL_CAST_OK;
+           }
+
+		   void HandleBeforeHit()
+           {
+                if(GetExplTargetUnit()->IsFriendlyTo(GetCaster()))
+					if(GetExplTargetUnit()->GetOwner() && GetExplTargetUnit()->GetOwner() == GetCaster())
+						PreventHitDamage();
+
+				GetCaster()->CastSpell(GetExplTargetUnit(), SPELL_MAGE_FROSTBOLT_HEAL, true);
+           }
+
+		   void RecalculateDamage(SpellEffIndex /*effIndex*/)
+           {
+               if (GetHitUnit() && GetHitUnit()->HasAuraState(AURA_STATE_FROZEN, GetSpellInfo(), GetCaster()))
+               {
+                   if (AuraEffect* aurEff = GetCaster()->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_MAGE, ICON_MAGE_SHATTER, EFFECT_1))
+                   {
+                       int32 damage = GetHitDamage();
+                       AddPct(damage, aurEff->GetAmount());
+                       SetHitDamage(damage);
+                   }
+               }
+           }
+
+
+           void Register()
+           {
+			   OnCheckCast += SpellCheckCastFn(spell_mage_frostbolt_SpellScript::CheckRequirement);
+			   BeforeHit += SpellHitFn(spell_mage_frostbolt_SpellScript::HandleBeforeHit);
+			   OnEffectHitTarget += SpellEffectFn(spell_mage_frostbolt_SpellScript::RecalculateDamage, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+           }
+       };
+
+       SpellScript* GetSpellScript() const
+       {
+           return new spell_mage_frostbolt_SpellScript();
+       }
 };
 
 void AddSC_mage_spell_scripts()
