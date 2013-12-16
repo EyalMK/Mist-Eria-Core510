@@ -81,8 +81,6 @@ enum MageSpells
     SPELL_MAGE_SHATTERED_BARRIER_FREEZE_R1       = 55080,
     SPELL_MAGE_SHATTERED_BARRIER_FREEZE_R2       = 83073,
 
-    SPELL_MAGE_IMPROVED_MANA_GEM_TRIGGERED       = 83098,
-
     SPELL_MAGE_FINGERS_OF_FROST                  = 44544,
 
 	SPELL_MAGE_RING_OF_FROST_SUMMON              = 113724,
@@ -1182,10 +1180,14 @@ class spell_mage_frostbolt : public SpellScriptLoader
 		   void HandleBeforeHit()
            {
                 if(GetExplTargetUnit()->IsFriendlyTo(GetCaster()))
+				{
 					if(GetExplTargetUnit()->GetOwner() && GetExplTargetUnit()->GetOwner() == GetCaster())
+					{
 						PreventHitDamage();
-
-				GetCaster()->CastSpell(GetExplTargetUnit(), SPELL_MAGE_FROSTBOLT_HEAL, true);
+						PreventHitEffect(EFFECT_0);
+						GetCaster()->CastSpell(GetExplTargetUnit(), SPELL_MAGE_FROSTBOLT_HEAL, true);
+					}
+				}	
            }
 
 		   void RecalculateDamage(SpellEffIndex /*effIndex*/)
