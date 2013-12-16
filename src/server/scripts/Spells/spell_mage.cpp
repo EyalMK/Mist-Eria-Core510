@@ -1242,7 +1242,7 @@ class spell_mage_ice_lance : public SpellScriptLoader
 						}
 					}
 				}
-				else if (GetHitUnit() && (GetHitUnit()->HasAuraState(AURA_STATE_FROZEN) || ))
+				else if (GetHitUnit() && (GetHitUnit()->HasAuraState(AURA_STATE_FROZEN)))
                    SetHitDamage(GetHitDamage()*4);
            }
 
