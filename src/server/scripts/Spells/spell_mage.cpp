@@ -1190,25 +1190,10 @@ class spell_mage_frostbolt : public SpellScriptLoader
 				}	
            }
 
-		   void RecalculateDamage(SpellEffIndex /*effIndex*/)
-           {
-               if (GetHitUnit() && GetHitUnit()->HasAuraState(AURA_STATE_FROZEN, GetSpellInfo(), GetCaster()))
-               {
-                   if (AuraEffect* aurEff = GetCaster()->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_MAGE, ICON_MAGE_SHATTER, EFFECT_1))
-                   {
-                       int32 damage = GetHitDamage();
-                       AddPct(damage, aurEff->GetAmount());
-                       SetHitDamage(damage);
-                   }
-               }
-           }
-
-
            void Register()
            {
 			   OnCheckCast += SpellCheckCastFn(spell_mage_frostbolt_SpellScript::CheckRequirement);
 			   BeforeHit += SpellHitFn(spell_mage_frostbolt_SpellScript::HandleBeforeHit);
-			   OnEffectHitTarget += SpellEffectFn(spell_mage_frostbolt_SpellScript::RecalculateDamage, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
            }
        };
 
