@@ -1205,6 +1205,42 @@ class spell_mage_frostbolt : public SpellScriptLoader
        }
 };
 
+// 30455  - Ice lance
+class spell_mage_ice_lance : public SpellScriptLoader
+{
+   public:
+       spell_mage_ice_lance() : SpellScriptLoader("spell_mage_ice_lance") { }
+
+       class spell_mage_ice_lance_SpellScript : public SpellScript
+       {
+           PrepareSpellScript(spell_mage_ice_lance_SpellScript);
+
+           bool Validate(SpellInfo const* /*spellInfo*/)
+           {
+               return true;
+           }
+
+		   void RecalculateDamage(SpellEffIndex /*effIndex*/)
+           {
+               if (GetHitUnit() && GetHitUnit()->HasAuraState(AURA_STATE_FROZEN))
+               {
+                       SetHitDamage(GetHitDamage()*4);
+               }
+           }
+
+
+           void Register()
+           {
+			   OnEffectHitTarget += SpellEffectFn(spell_mage_ice_lance_SpellScript::RecalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+           }
+       };
+
+       SpellScript* GetSpellScript() const
+       {
+           return new spell_mage_ice_lance_SpellScript();
+       }
+};
+
 void AddSC_mage_spell_scripts()
 {
     new spell_mage_blast_wave();
@@ -1228,4 +1264,5 @@ void AddSC_mage_spell_scripts()
     new spell_mage_water_elemental_freeze();
 	new spell_mage_ring_of_frost();
 	new spell_mage_ring_of_frost_freeze();
+	new spell_mage_ice_lance();
 }
