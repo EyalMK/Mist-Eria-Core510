@@ -196,31 +196,35 @@ class spell_growing_anger : public SpellScriptLoader
         {
             PrepareAuraScript(spell_growing_anger_AuraScript);
 
-            void HandleAfterEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-                Unit* target = GetTarget();
-
-                if (target->GetTypeId() == TYPEID_PLAYER)
+                if (Unit* target = GetTarget())
                 {
-                    target->CastSpell(target, SPELL_AGGRESSIVE_BEHAVIOUR);
-
-                    Map* map = target->GetMap();
-
-                    Map::PlayerList const& players = map->GetPlayers();
-
-                    for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+                    if (target->GetTypeId() == TYPEID_PLAYER)
                     {
-                        Player* player = i->getSource();
+                        target->AddAura(SPELL_AGGRESSIVE_BEHAVIOUR, target);
 
-                        if (player && player->IsInRange(target, 0.0f, 5.0f, false))
-                            player->CastSpell(player, SPELL_AGGRESSIVE_BEHAVIOUR);
+                        Map* map = target->GetMap();
+
+                        Map::PlayerList const& players = map->GetPlayers();
+
+                        for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+                        {
+                            Player* player = i->GetSource();
+
+                            if (player && player->IsInRange(target, 0.0f, 5.0f, false))
+                            {
+                                 player->AddAura(SPELL_AGGRESSIVE_BEHAVIOUR, player);
+                            }
+                        }
+
                     }
                 }
             }
 
             void Register()
             {
-                AfterEffectRemove += AuraEffectRemoveFn(spell_growing_anger_AuraScript::HandleAfterEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                OnEffectRemove += AuraEffectRemoveFn(spell_growing_anger_AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
