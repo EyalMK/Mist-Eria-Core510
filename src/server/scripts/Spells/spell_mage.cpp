@@ -1158,7 +1158,7 @@ class spell_mage_frostbolt : public SpellScriptLoader
 
            bool Validate(SpellInfo const* /*spellInfo*/)
            {
-               if (!sSpellMgr->GetSpellInfo(SPELL_MAGE_IMPROVED_MANA_GEM_TRIGGERED))
+               if (!sSpellMgr->GetSpellInfo(SPELL_MAGE_FROSTBOLT_HEAL))
                    return false;
                return true;
            }
