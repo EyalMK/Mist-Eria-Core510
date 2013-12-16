@@ -82,6 +82,7 @@ enum MageSpells
     SPELL_MAGE_SHATTERED_BARRIER_FREEZE_R2       = 83073,
 
     SPELL_MAGE_FINGERS_OF_FROST                  = 44544,
+	SPELL_MAGE_FINGERS_OF_FROST_2                = 126084,
 
 	SPELL_MAGE_RING_OF_FROST_SUMMON              = 113724,
 	SPELL_MAGE_RING_OF_FROST_FREEZE              = 82691,
@@ -1187,6 +1188,7 @@ class spell_mage_frostbolt : public SpellScriptLoader
 					{
 						PreventHitDamage();
 						PreventHitAura();
+						PreventHitDefaultEffect(EFFECT_1);
 						GetCaster()->CastSpell(GetExplTargetUnit(), SPELL_MAGE_FROSTBOLT_HEAL, true);
 					}
 				}	
@@ -1222,10 +1224,26 @@ class spell_mage_ice_lance : public SpellScriptLoader
 
 		   void RecalculateDamage(SpellEffIndex /*effIndex*/)
            {
-               if (GetHitUnit() && GetHitUnit()->HasAuraState(AURA_STATE_FROZEN))
-               {
-                       SetHitDamage(GetHitDamage()*4);
-               }
+				if(GetCaster()->HasAura(SPELL_MAGE_FINGERS_OF_FROST))
+				{
+					SetHitDamage(GetHitDamage()*5);
+
+					if (Player* player = GetCaster()->ToPlayer())
+					{
+						if (Aura* finger = player->GetAura(SPELL_MAGE_FINGERS_OF_FROST))
+						{
+							if(finger->GetStackAmount() == 2)
+							{
+								player->RemoveAura(SPELL_MAGE_FINGERS_OF_FROST_2);
+								finger->SetStackAmount(1);
+							}
+							else if(finger->GetStackAmount() == 1)
+								player->RemoveAura(SPELL_MAGE_FINGERS_OF_FROST);
+						}
+					}
+				}
+				else if (GetHitUnit() && (GetHitUnit()->HasAuraState(AURA_STATE_FROZEN) || ))
+                   SetHitDamage(GetHitDamage()*4);
            }
 
 
@@ -1238,6 +1256,110 @@ class spell_mage_ice_lance : public SpellScriptLoader
        SpellScript* GetSpellScript() const
        {
            return new spell_mage_ice_lance_SpellScript();
+       }
+};
+
+// Finger of Frost
+class spell_mage_finger_of_frost : public SpellScriptLoader
+{
+    public:
+        spell_mage_finger_of_frost() : SpellScriptLoader("spell_mage_finger_of_frost") { }
+
+        class spell_mage_finger_of_frost_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_mage_finger_of_frost_AuraScript);
+
+            void OnProcHandler(ProcEventInfo& eventInfo)
+            {
+                if (!GetOwner())
+                    return;
+
+				if (Player* player = GetOwner()->ToPlayer())
+                {
+
+					uint32 spellId = eventInfo.GetDamageInfo()->GetSpellInfo()->Id;
+					int32 chance = 0;
+
+					switch(spellId)
+					{
+					case 116:
+					case 44614:
+						chance = 15;
+						break;
+					case 10:
+						chance = 5;
+						break;
+					case 2948:
+						chance = 10;
+					default:
+						return;
+					}
+
+					if(roll_chance_i(chance))
+					{
+						player->CastSpell(player, SPELL_MAGE_FINGERS_OF_FROST, true);
+
+						if (Aura* finger = player->GetAura(SPELL_MAGE_FINGERS_OF_FROST))
+							if(finger->GetStackAmount() == 2)
+								player->CastSpell(player, SPELL_MAGE_FINGERS_OF_FROST_2, true);
+					}
+                }
+            }
+
+            void Register()
+            {
+				OnProc += AuraProcFn(spell_mage_finger_of_frost_AuraScript::OnProcHandler);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_mage_finger_of_frost_AuraScript();
+        }
+};
+
+
+// 44572  - Deep freeze
+class spell_mage_deep_freeze : public SpellScriptLoader
+{
+   public:
+       spell_mage_deep_freeze() : SpellScriptLoader("spell_mage_deep_freeze") { }
+
+       class spell_mage_deep_freeze_SpellScript : public SpellScript
+       {
+           PrepareSpellScript(spell_mage_deep_freeze_SpellScript);
+
+           bool Validate(SpellInfo const* /*spellInfo*/)
+           {
+               return true;
+           }
+
+		   void HandleFingerOfFrost(SpellEffIndex /*effIndex*/)
+           {
+				if (Player* player = GetCaster()->ToPlayer())
+                {
+					if (Aura* finger = player->GetAura(SPELL_MAGE_FINGERS_OF_FROST))
+					{
+						if(finger->GetStackAmount() == 2)
+						{
+							player->RemoveAura(SPELL_MAGE_FINGERS_OF_FROST_2);
+							finger->SetStackAmount(1);
+						}
+						else if(finger->GetStackAmount() == 1)
+							player->RemoveAura(SPELL_MAGE_FINGERS_OF_FROST);
+					}
+				}
+           }
+
+           void Register()
+           {
+			   OnEffectHitTarget += SpellEffectFn(spell_mage_deep_freeze_SpellScript::HandleFingerOfFrost, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+           }
+       };
+
+       SpellScript* GetSpellScript() const
+       {
+           return new spell_mage_deep_freeze_SpellScript();
        }
 };
 
@@ -1265,4 +1387,6 @@ void AddSC_mage_spell_scripts()
 	new spell_mage_ring_of_frost();
 	new spell_mage_ring_of_frost_freeze();
 	new spell_mage_ice_lance();
+	new spell_mage_finger_of_frost();
+	new spell_mage_deep_freeze();
 }
