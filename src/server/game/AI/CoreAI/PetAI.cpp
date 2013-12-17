@@ -528,6 +528,9 @@ bool PetAI::CanAttack(Unit* target)
     if (!target)
         return false;
 
+    if (!me->GetCharmInfo())
+        return false;
+
     if (!target->isAlive())
     {
         // Clear target to prevent getting stuck on dead targets
