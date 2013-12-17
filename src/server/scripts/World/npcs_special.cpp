@@ -3314,7 +3314,7 @@ public :
                 Map::PlayerList const& playerList = map->GetPlayers() ;
                 for(Map::PlayerList::const_iterator c_iter = playerList.begin() ; c_iter != playerList.end() ; ++c_iter)
                 {
-                    if(Player* p = iter->getSource())
+                    if(Player* p = c_iter->getSource())
                     {
                         if(p->IsGameMaster())
                             continue ;
