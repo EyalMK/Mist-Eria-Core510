@@ -76,7 +76,6 @@ enum Phases
 
 enum Npcs
 {
-	NPC_LIU_FLAMEHEART				= 56732,
 	NPC_MINION_OF_DOUBT				= 57109,
 	NPC_YU_LON						= 56762,
 	NPC_JADE_FIRE					= 56893,
@@ -540,7 +539,7 @@ public:
 
 			if (instance)
 			{
-				if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
+				if (Creature* liu = me->FindNearestCreature(BOSS_LIU_FLAMEHEART, 500, true))
 					if (!healthApplied)
 					{
 						me->SetHealth(liu->GetMaxHealth() * 0.3f);
@@ -557,7 +556,7 @@ public:
 		void JustDied(Unit *pWho)
 		{
 			if (instance)
-				if (Creature* liu = me->FindNearestCreature(NPC_LIU_FLAMEHEART, 500, true))
+				if (Creature* liu = me->FindNearestCreature(BOSS_LIU_FLAMEHEART, 500, true))
 					liu->DealDamage(liu, liu->GetHealth());
 
 			me->DespawnOrUnsummon();
@@ -788,7 +787,7 @@ public:
 			if (!liuSummoned)
 				if (!me->FindNearestCreature(NPC_MINION_OF_DOUBT, 99999.0f, true))
 				{
-					me->SummonCreature(NPC_LIU_FLAMEHEART, me->GetHomePosition(), TEMPSUMMON_MANUAL_DESPAWN);
+					me->SummonCreature(BOSS_LIU_FLAMEHEART, me->GetHomePosition(), TEMPSUMMON_MANUAL_DESPAWN);
 					liuSummoned = true;
 				}
 		}

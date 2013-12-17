@@ -1454,38 +1454,13 @@ void ObjectMgr::LoadCreatures()
 
     // Build single time for check spawnmask
     std::map<uint32, uint32> spawnMasks;
-    for (uint32 i = 0; i < sMapStore.GetNumRows(); ++i) {
-        if (sMapStore.LookupEntry(i)) {
-            for (int k = 1; k < MAX_DIFFICULTY+1; ++k) {
-                if (GetMapDifficultyData(i, Difficulty(k))) {
-                    int offset;
-                    switch (k) {
-                    case DUNGEON_DIFFICULTY_NORMAL:
-                    case DUNGEON_DIFFICULTY_HEROIC:
-                        offset = k-1;
-                        break;
-                    case RAID_DIFFICULTY_10MAN_NORMAL:
-                    case RAID_DIFFICULTY_25MAN_NORMAL:
-                    case RAID_DIFFICULTY_10MAN_HEROIC:
-                    case RAID_DIFFICULTY_25MAN_HEROIC:
-                        offset = k-3;
-                        break;
-                    case RAID_FINDER_DIFFICULTY:
-                    case DUNGEON_DIFFICULTY_CHALLENGE:
-                    case RAID_DIFFICULTY_40MAN_NORMAL:
-                    default:
-                        offset = 0;
-                        break;
-                    }
-                    spawnMasks[i] |= (1 << offset);
-                } else
-                    spawnMasks[i] |= 1;
-            }
-        }
-    }
+    for (uint32 i = 0; i < sMapStore.GetNumRows(); ++i)
+        if (sMapStore.LookupEntry(i))
+            for (int k = 1; k < MAX_DIFFICULTY; ++k)
+                if (GetMapDifficultyData(i, Difficulty(k)))
+                    spawnMasks[i] |= (1 << k);
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE spawnMask for sw prison : %u", spawnMasks[34]);
-
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS TESTING SPAWNMASK : TEMPLE OF THE JADE SERPENT", spawnMasks[960]);
 
     _creatureDataStore.rehash(result->GetRowCount());
     uint32 count = 0;

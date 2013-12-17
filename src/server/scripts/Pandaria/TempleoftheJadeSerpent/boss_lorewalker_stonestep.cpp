@@ -203,6 +203,9 @@ public:
 				end = true;
 			}
 
+			if (me->FindNearestCreature(NPC_LOREWALKER_TRIGGER, 99999.0f, false) && events.IsInPhase(PHASE_ATTACK_SCROLL))
+				events.SetPhase(PHASE_NULL);
+
 			while(uint32 eventId = events.ExecuteEvent())
 			{
 				switch(eventId)
