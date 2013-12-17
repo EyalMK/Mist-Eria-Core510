@@ -3316,7 +3316,7 @@ public :
                 {
                     if(Player* p = c_iter->getSource())
                     {
-                        if(p->IsGameMaster())
+                        if(p->isGameMaster())
                             continue ;
 
                         if(p->GetZoneId() != 5840)
