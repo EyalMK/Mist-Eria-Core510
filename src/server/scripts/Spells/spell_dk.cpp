@@ -40,7 +40,7 @@ enum DeathKnightSpells
 	SPELL_DK_BLOOD_SHIELD						= 77535,
 	SPELL_DK_BLOOD_MASTERY						= 77513,
 	SPELL_DK_BLOOD_RITES						= 50034,
-	SPELL_DK_SCENT_OF_BLOOD						= 49509,
+	SPELL_DK_SCENT_OF_BLOOD						= 50421,
     SPELL_DK_GHOUL_EXPLODE                      = 47496,
     SPELL_DK_GLYPH_OF_ICEBOUND_FORTITUDE        = 58625,
     SPELL_DK_RUNIC_POWER_ENERGIZE               = 49088,
@@ -625,7 +625,8 @@ class spell_dk_death_strike : public SpellScriptLoader
 			{
 				if(Player* caster = GetCaster()->ToPlayer())
                 {
-					// Blood Rites
+					// Blood Rite
+					/*
 					if(caster->HasAura(SPELL_DK_BLOOD_RITES))
 					{
 						for(uint8 i = 2; i<6; ++i)
@@ -634,6 +635,7 @@ class spell_dk_death_strike : public SpellScriptLoader
 							caster->SetRuneConvertAura(i, NULL);
 						}
 					}
+					*/
 				}
 			}
 
