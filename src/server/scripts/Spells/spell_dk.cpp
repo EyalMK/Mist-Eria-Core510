@@ -625,7 +625,8 @@ class spell_dk_death_strike : public SpellScriptLoader
 			{
 				if(Player* caster = GetCaster()->ToPlayer())
                 {
-					// Blood Rites
+					// Blood Rite
+					/*
 					if(caster->HasAura(SPELL_DK_BLOOD_RITES))
 					{
 						for(uint8 i = 2; i<6; ++i)
@@ -634,6 +635,7 @@ class spell_dk_death_strike : public SpellScriptLoader
 							caster->SetRuneConvertAura(i, NULL);
 						}
 					}
+					*/
 				}
 			}
 
