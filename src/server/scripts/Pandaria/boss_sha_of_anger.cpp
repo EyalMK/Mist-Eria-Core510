@@ -121,7 +121,7 @@ public:
                         for (i = threatlist.begin(); i != threatlist.end(); ++i)
                         {
                             if (Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid()))
-                                if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && !me->IsWithinMeleeRange(me->getVictim()))
+                                if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && !me->IsWithinMeleeRange(unit))
                                     me->CastSpell(me->getVictim(), SPELL_SEETHE);
                         }
 
@@ -196,35 +196,31 @@ class spell_growing_anger : public SpellScriptLoader
         {
             PrepareAuraScript(spell_growing_anger_AuraScript);
 
-            void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            void HandleAfterEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-                if (Unit* target = GetTarget())
+                Unit* target = GetTarget();
+
+                if (target->GetTypeId() == TYPEID_PLAYER)
                 {
-                    if (target->GetTypeId() == TYPEID_PLAYER)
+                    target->CastSpell(target, SPELL_AGGRESSIVE_BEHAVIOUR);
+
+                    Map* map = target->GetMap();
+
+                    Map::PlayerList const& players = map->GetPlayers();
+
+                    for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                     {
-                        target->AddAura(SPELL_AGGRESSIVE_BEHAVIOUR, target);
+                        Player* player = i->getSource();
 
-                        Map* map = target->GetMap();
-
-                        Map::PlayerList const& players = map->GetPlayers();
-
-                        for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
-                        {
-                            Player* player = i->getSource();
-
-                            if (player && player->IsInRange(target, 0.0f, 5.0f, false))
-                            {
-                                 player->AddAura(SPELL_AGGRESSIVE_BEHAVIOUR, player);
-                            }
-                        }
-
+                        if (player && player->IsInRange(target, 0.0f, 5.0f, false))
+                            player->CastSpell(player, SPELL_AGGRESSIVE_BEHAVIOUR);
                     }
                 }
             }
 
             void Register()
             {
-                OnEffectRemove += AuraEffectRemoveFn(spell_growing_anger_AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                AfterEffectRemove += AuraEffectRemoveFn(spell_growing_anger_AuraScript::HandleAfterEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
