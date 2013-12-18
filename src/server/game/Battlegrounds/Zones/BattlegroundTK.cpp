@@ -443,13 +443,11 @@ void BattlegroundTK::UpdateScore(uint16 team, int16 points)
 			m_IsInformedNearVictory = true;
 		}
 
-		if (m_Team_Scores[teamindex] > BG_TK_MAX_TEAM_SCORE)
+		if (m_Team_Scores[teamindex] >= BG_TK_MAX_TEAM_SCORE)
+		{
 			m_Team_Scores[teamindex] = BG_TK_MAX_TEAM_SCORE;
-
-		if (m_TeamScores[TEAM_ALLIANCE] == BG_TK_MAX_TEAM_SCORE)
-            EndBattleground(ALLIANCE);
-        if (m_TeamScores[TEAM_HORDE] == BG_TK_MAX_TEAM_SCORE)
-            EndBattleground(HORDE);
+			EndBattleground((teamindex == TEAM_ALLIANCE)?ALLIANCE:HORDE);
+		}
     }
 }
 
@@ -517,6 +515,7 @@ void BattlegroundTK::HandleKillPlayer(Player* player, Player* killer)
         return;
 	
 	UpdateScore(killer->GetTeam(), BG_TK_PLAYER_KILL_POINTS);
+	UpdatePlayerScore(killer, SCORE_POINTS_SCORED, BG_TK_PLAYER_KILL_POINTS);
 
 	if (m_orbOwners[0] == player->GetGUID())
         BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_BLUE);
