@@ -247,7 +247,8 @@ int32 Quest::GetRewOrReqMoney() const
 
 void Quest::BuildExtraQuestInfo(WorldPacket& data, Player* player) const
 {
-    data << uint32(GetRewChoiceItemsCount());
+    //data << uint32(GetRewChoiceItemsCount());
+    data << uint32(QUEST_REWARD_CHOICES_COUNT);
     for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
     {
         //NOBODIEQUESTREWARD
