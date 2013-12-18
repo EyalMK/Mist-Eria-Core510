@@ -418,9 +418,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 			else type = CHAT_MSG_INSTANCE_CHAT;
 		}
 
-		if (GetPlayer()->GetGroup()->isRaidGroup())
+		else if (!GetPlayer()->GetGroup()->isBGGroup())
 		{
-			if (GetPlayer()->GetGroup()->IsLeader(GetPlayer()->GetGUID()))
+			if (group->IsLeader(GetPlayer()->GetGUID()))
 				type = CHAT_MSG_RAID_LEADER;
 			else type = CHAT_MSG_RAID;
 		}
