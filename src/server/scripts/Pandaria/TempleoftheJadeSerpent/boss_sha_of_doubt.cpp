@@ -376,18 +376,8 @@ public:
 
 			if (instance)
 			{
-				map = me->GetMap();
-
-				if (map && map->IsDungeon())
-				{
-					Map::PlayerList const &PlayerList = map->GetPlayers();
-
-					if (!PlayerList.isEmpty())
-						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-							if (player = i->getSource()->ToPlayer())
-								if (Creature* figment = player->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
-									figment->SetDisplayId(player->GetDisplayId());
-				}
+				if (me->isSummon()) 
+					player = me->ToTempSummon()->GetSummoner();
 			}
 		}
 
