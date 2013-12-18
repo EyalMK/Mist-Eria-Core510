@@ -434,7 +434,7 @@ void BattlegroundTK::UpdateScore(uint16 team, int16 points)
 	{
 		if (!m_IsInformedNearVictory && m_Team_Scores[teamindex] > BG_TK_WARNING_NEAR_VICTORY_SCORE)
 		{
-			if (teamindex == TEAM_ALLIANCE)
+			if (team == ALLIANCE)
 				SendMessageToAll(LANG_BG_TK_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
 			else
 				SendMessageToAll(LANG_BG_TK_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
@@ -445,6 +445,11 @@ void BattlegroundTK::UpdateScore(uint16 team, int16 points)
 
 		if (m_Team_Scores[teamindex] > BG_TK_MAX_TEAM_SCORE)
 			m_Team_Scores[teamindex] = BG_TK_MAX_TEAM_SCORE;
+
+		if (m_TeamScores[TEAM_ALLIANCE] == BG_TK_MAX_TEAM_SCORE)
+            EndBattleground(ALLIANCE);
+        if (m_TeamScores[TEAM_HORDE] == BG_TK_MAX_TEAM_SCORE)
+            EndBattleground(HORDE);
     }
 }
 
