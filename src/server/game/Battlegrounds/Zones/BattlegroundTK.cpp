@@ -65,16 +65,16 @@ void BattlegroundTK::PostUpdateImpl(uint32 diff)
 		for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
 			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
 			{
-				if (player->GetGUID() == m_orbOwners[0] && player->IsMounted())
+				if (player->GetGUID() == m_orbOwners[0] && player->IsMounted() || !player->HasAura(BG_TK_AURA_ORB_BLUE))
 					BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_BLUE);
 
-				if (player->GetGUID() == m_orbOwners[1] && player->IsMounted())
+				if (player->GetGUID() == m_orbOwners[1] && player->IsMounted() || !player->HasAura(BG_TK_AURA_ORB_PURPLE))
 					BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_PURPLE);
 
-				if (player->GetGUID() == m_orbOwners[2] && player->IsMounted())
+				if (player->GetGUID() == m_orbOwners[2] && player->IsMounted() || !player->HasAura(BG_TK_AURA_ORB_GREEN))
 					BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_GREEN);
 
-				if (player->GetGUID() == m_orbOwners[3] && player->IsMounted())
+				if (player->GetGUID() == m_orbOwners[3] && player->IsMounted() || !player->HasAura(BG_TK_AURA_ORB_ORANGE))
 					BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_ORANGE);
 			}
     }
@@ -193,9 +193,6 @@ void BattlegroundTK::StartingEventCloseDoors()
 	SpawnBGObject(BG_TK_OBJECT_DOOR_H, RESPAWN_IMMEDIATELY);
     for (uint32 i = BG_TK_OBJECT_ORB_BLUE; i <= BG_TK_OBJECT_ORB_ORANGE; ++i)
         SpawnBGObject(i, RESPAWN_ONE_DAY);
-
-    //UpdateWorldState(BG_TK_STATE_TIMER_ACTIVE, 1);
-    //UpdateWorldState(BG_TK_STATE_TIMER, 25);
 }
 
 void BattlegroundTK::StartingEventOpenDoors()
