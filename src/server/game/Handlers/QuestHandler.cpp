@@ -294,8 +294,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
     if (!quest)
         return;
 
-    //reward = quest->GetRewardChoiceIdForEntry(rewardItem);
-    reward = rewardItem;
+    reward = quest->GetRewardChoiceIdForEntry(rewardItem);
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_QUESTGIVER_CHOOSE_REWARD npc = %u, quest = %u, item = %u, reward = %u", uint32(GUID_LOPART(guid)), questId, rewardItem, reward);
 

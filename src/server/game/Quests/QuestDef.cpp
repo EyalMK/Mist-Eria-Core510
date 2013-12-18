@@ -247,14 +247,9 @@ int32 Quest::GetRewOrReqMoney() const
 
 void Quest::BuildExtraQuestInfo(WorldPacket& data, Player* player) const
 {
-    //data << uint32(GetRewChoiceItemsCount());
-    data << uint32(QUEST_REWARD_CHOICES_COUNT);
+    data << uint32(GetRewChoiceItemsCount());
     for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
     {
-        //NOBODIEQUESTREWARD
-        //data << uint32(3);
-        //data << uint32(4);
-        //data << uint32(5);
         data << uint32(RewardChoiceItemId[i]);
         data << uint32(RewardChoiceItemCount[i]);
         if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(RewardChoiceItemId[i]))
@@ -348,4 +343,12 @@ uint32 Quest::CalculateHonorGain(uint8 level) const
     }*/
 
     return honor;
+}
+
+uint32 Quest::GetRewardChoiceIdForEntry(uint32 rewardEntry) {
+    for (int i=0 ; i<QUEST_REWARD_CHOICES_COUNT; ++i) {
+        if (rewardEntry == m_rewChoiceItemsCount[i])
+            return i;
+    }
+    return QUEST_REWARD_CHOICES_COUNT;
 }
