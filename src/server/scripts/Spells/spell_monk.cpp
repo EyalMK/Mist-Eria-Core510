@@ -2360,7 +2360,7 @@ class spell_monk_soothing_mist : public SpellScriptLoader
                         {
                             if (statueList.size() == 1)
                             {
-								for (std::list<Creature*>::const_iterator ibis = statueList.begin(); ibis != statueList.end(); ++i)
+                                for (std::list<Creature*>::const_iterator ibis = statueList.begin(); ibis != statueList.end(); ++ibis)
                                     statue = (*ibis);
 
                                 if (statue && (statue->isPet() || statue->isGuardian()))
