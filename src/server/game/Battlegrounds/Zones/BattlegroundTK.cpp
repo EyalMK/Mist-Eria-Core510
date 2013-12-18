@@ -65,17 +65,41 @@ void BattlegroundTK::PostUpdateImpl(uint32 diff)
 		for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
 			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
 			{
-				if (player->GetGUID() == m_orbOwners[0] && player->IsMounted() || !player->HasAura(BG_TK_AURA_ORB_BLUE))
-					BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_BLUE);
+				if (player->GetGUID() == m_orbOwners[0])
+				{
+					if (player->IsMounted())
+						BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_BLUE);
 
-				if (player->GetGUID() == m_orbOwners[1] && player->IsMounted() || !player->HasAura(BG_TK_AURA_ORB_PURPLE))
-					BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_PURPLE);
+					if (!player->HasAura(BG_TK_AURA_ORB_BLUE))
+						BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_BLUE);
+				}
 
-				if (player->GetGUID() == m_orbOwners[2] && player->IsMounted() || !player->HasAura(BG_TK_AURA_ORB_GREEN))
-					BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_GREEN);
+				if (player->GetGUID() == m_orbOwners[1])
+				{
+					if (player->IsMounted())
+						BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_PURPLE);
 
-				if (player->GetGUID() == m_orbOwners[3] && player->IsMounted() || !player->HasAura(BG_TK_AURA_ORB_ORANGE))
-					BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_ORANGE);
+					if (!player->HasAura(BG_TK_AURA_ORB_PURPLE))
+						BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_PURPLE);
+				}
+
+				if (player->GetGUID() == m_orbOwners[2])
+				{
+					if (player->IsMounted())
+						BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_GREEN);
+
+					if (!player->HasAura(BG_TK_AURA_ORB_GREEN))
+						BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_GREEN);
+				}
+
+				if (player->GetGUID() == m_orbOwners[3])
+				{
+					if (player->IsMounted())
+						BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_ORANGE);
+
+					if (!player->HasAura(BG_TK_AURA_ORB_ORANGE))
+						BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_ORANGE);
+				}
 			}
     }
 }
@@ -280,9 +304,9 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
 		}
 
         SpawnBGObject(BG_TK_OBJECT_ORB_BLUE, RESPAWN_ONE_DAY);
+		Source->CastSpell(Source, BG_TK_AURA_ORB_BLUE, true);
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_BLUE);
         _orbState[BG_TK_OBJECT_ORB_BLUE] = BG_TK_ORB_STATE_ON_PLAYER;
-        Source->CastSpell(Source, BG_TK_AURA_ORB_BLUE, true);
     }
 
     // Udapte orb purple picked up
@@ -304,9 +328,9 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
 		}
 
         SpawnBGObject(BG_TK_OBJECT_ORB_PURPLE, RESPAWN_ONE_DAY);
+		Source->CastSpell(Source, BG_TK_AURA_ORB_PURPLE, true);
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_PURPLE);
         _orbState[BG_TK_OBJECT_ORB_PURPLE] = BG_TK_ORB_STATE_ON_PLAYER;
-        Source->CastSpell(Source, BG_TK_AURA_ORB_PURPLE, true);
     }
 
 	// Udapte orb green picked up
@@ -327,9 +351,9 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
 		}
 
         SpawnBGObject(BG_TK_OBJECT_ORB_GREEN, RESPAWN_ONE_DAY);
+		Source->CastSpell(Source, BG_TK_AURA_ORB_GREEN, true);
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_GREEN);
         _orbState[BG_TK_OBJECT_ORB_GREEN] = BG_TK_ORB_STATE_ON_PLAYER;
-        Source->CastSpell(Source, BG_TK_AURA_ORB_GREEN, true);
     }
 
 	// Udapte orb orange picked up
@@ -351,9 +375,9 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
 		}
 
         SpawnBGObject(BG_TK_OBJECT_ORB_ORANGE, RESPAWN_ONE_DAY);
+		Source->CastSpell(Source, BG_TK_AURA_ORB_ORANGE, true);
         SetOrbPicker(Source->GetGUID(), BG_TK_OBJECT_ORB_ORANGE);
         _orbState[BG_TK_OBJECT_ORB_ORANGE] = BG_TK_ORB_STATE_ON_PLAYER;
-        Source->CastSpell(Source, BG_TK_AURA_ORB_ORANGE, true);
     }
 
     if (!message_id)
