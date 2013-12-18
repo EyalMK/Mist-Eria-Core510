@@ -377,7 +377,10 @@ public:
 			if (instance)
 			{
 				if (me->isSummon()) 
+				{
 					player = me->ToTempSummon()->GetSummoner();
+					me->SetDisplayId(player->GetDisplayId());
+				}
 			}
 		}
 
@@ -446,7 +449,7 @@ public:
 							me->SetInCombatWith(player);
 							me->AddThreat(player, 99999.0f);
 							me->GetMotionMaster()->MoveChase(player);
-						
+
 							events.CancelEvent(EVENT_ATTACK_PLAYERS);
 							break;
 
