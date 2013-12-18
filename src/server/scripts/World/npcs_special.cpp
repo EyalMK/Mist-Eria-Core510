@@ -3336,6 +3336,75 @@ public :
     }
 };
 
+class npc_flyingmount_aura_stalker : public CreatureScript
+{
+public :
+    npc_flyingmount_aura_stalker() : CreatureScript("npc_flying_aura_stalker")
+    {
+        
+    }
+    
+    struct npc_flyingmount_aura_stalker_AIScript : public ScriptedAI
+    {
+    public :
+        npc_flyingmount_aura_stalker_AIScript(Creature *creature) : ScriptedAI(creature)
+        {
+            
+        }
+        
+        void Reset()
+        {
+            m_uiCheckPlayersTimer = 1000 ;
+        }
+        
+        void UpdateAI(uint32 diff)
+        {
+            if(m_uiCheckPlayersTimer <= diff)
+            {
+                CheckPlayers();
+                m_uiCheckPlayersTimer = 1000 ;
+            }
+            else 
+                m_uiCheckPlayersTimer -= diff ;
+        }
+        
+		void CheckPlayers()
+        {
+            if(Map* map = me->GetMap())
+            {
+                if(map->GetId() != 870)
+                    return ;
+                
+                Map::PlayerList const& playerList = map->GetPlayers() ;
+                for(Map::PlayerList::const_iterator c_iter = playerList.begin() ; c_iter != playerList.end() ; ++c_iter)
+                {
+                    if(Player* p = c_iter->getSource())
+                    {
+                        if(p->isGameMaster())
+                            continue ;
+                        
+                        if(p->GetZoneId() != 5840)
+                            continue ;
+                        
+                        if(p->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+						{
+                            p->RemoveAurasByType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED);
+							p->CastSpell(p, 79404, true);
+						}
+                    }
+                }
+            }
+        }
+
+    private :
+        uint32 m_uiCheckPlayersTimer;
+    };
+    
+    CreatureAI* GetAI(Creature *creature) const
+    {
+        return new npc_flyingmount_aura_stalker_AIScript(creature);
+    }
+};
 
 void AddSC_npcs_special()
 {

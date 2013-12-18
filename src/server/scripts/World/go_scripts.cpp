@@ -48,6 +48,7 @@ go_hive_pod
 go_gjalerbron_cage
 go_large_gjalerbron_cage
 go_veil_skith_cage
+go_bell_of_thousand_whispers
 EndContentData */
 
 #include "ScriptMgr.h"
@@ -1366,6 +1367,44 @@ public:
     }
 };
 
+// 210116
+class go_bell_of_thousand_whispers : public GameObjectScript
+{
+public :
+    go_bell_of_thousand_whispers() : GameObjectScript("go_bell_of_thousand_whispers")
+    {
+
+    }
+
+    bool OnGossipHello(Player *p_sourcePlayer, GameObject *p_sourceGameObject)
+    {
+        // Pointers
+        if(!p_sourceGameObject || !p_sourcePlayer)
+            return false ;
+
+        // 1. If the player doesn't have the required quests, return
+        if(!p_sourcePlayer->hasQuest(30067) && !p_sourcePlayer->hasQuest(30006))
+            return false ;
+
+        // 2. If the quests are finished, return ;
+        if(p_sourcePlayer->GetQuestStatus(30067) == QUEST_STATUS_COMPLETE && p_sourcePlayer->GetQuestStatus(30006) == QUEST_STATUS_COMPLETE)
+            return false ;
+
+        // 3. Else, everything is okay
+        if(Creature *p_shadowOfDoubt = GetClosestCreatureWithEntry(p_sourceGameObject, 57389, 200.0f, true))
+        {
+            // The aura must not stack
+            if(!p_shadowOfDoubt->HasAura(118918))
+                p_sourceGameObject->CastSpell(p_shadowOfDoubt, 118918);
+
+            p_sourcePlayer->PlayerTalkClass->SendCloseGossip();
+            return true ;
+        }
+
+        return false ;
+    }
+};
+
 void AddSC_go_scripts()
 {
     new go_cat_figurine;
@@ -1408,4 +1447,5 @@ void AddSC_go_scripts()
     new go_veil_skith_cage;
     new go_frostblade_shrine;
     new go_midsummer_bonfire;
+	new go_bell_of_thousand_whispers();
 }

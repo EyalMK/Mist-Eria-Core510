@@ -66,40 +66,20 @@ void BattlegroundTK::PostUpdateImpl(uint32 diff)
 			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
 			{
 				if (player->GetGUID() == m_orbOwners[0])
-				{
-					if (player->IsMounted())
+					if (player->IsMounted() || !player->HasAura(BG_TK_AURA_ORB_BLUE))
 						BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_BLUE);
-
-					if (!player->HasAura(BG_TK_AURA_ORB_BLUE))
-						BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_BLUE);
-				}
 
 				if (player->GetGUID() == m_orbOwners[1])
-				{
-					if (player->IsMounted())
+					if (player->IsMounted() || !player->HasAura(BG_TK_AURA_ORB_PURPLE))
 						BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_PURPLE);
-
-					if (!player->HasAura(BG_TK_AURA_ORB_PURPLE))
-						BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_PURPLE);
-				}
 
 				if (player->GetGUID() == m_orbOwners[2])
-				{
-					if (player->IsMounted())
+					if (player->IsMounted() || !player->HasAura(BG_TK_AURA_ORB_GREEN))
 						BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_GREEN);
-
-					if (!player->HasAura(BG_TK_AURA_ORB_GREEN))
-						BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_GREEN);
-				}
 
 				if (player->GetGUID() == m_orbOwners[3])
-				{
-					if (player->IsMounted())
+					if (player->IsMounted() || !player->HasAura(BG_TK_AURA_ORB_ORANGE))
 						BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_ORANGE);
-
-					if (!player->HasAura(BG_TK_AURA_ORB_ORANGE))
-						BattlegroundTK::RespawnOrbAfterDrop(BG_TK_OBJECT_ORB_ORANGE);
-				}
 			}
     }
 }
@@ -205,8 +185,7 @@ void BattlegroundTK::Reset()
         m_HonorEndKills = 2;
     }
 
-    m_IsInformedNearVictory[0] = false;
-	m_IsInformedNearVictory[1] = false;
+	m_IsInformedNearVictory		= false;
 }
 
 void BattlegroundTK::StartingEventCloseDoors()
@@ -452,19 +431,20 @@ void BattlegroundTK::UpdateScore(uint16 team, int16 points)
     UpdateWorldState(((teamindex == TEAM_ALLIANCE)?BG_TK_RESOURCES_ALLIANCE:BG_TK_RESOURCES_HORDE), m_Team_Scores[teamindex]);
 
     if (points > 0)
-    {
-        if (!m_IsInformedNearVictory[team] && m_Team_Scores[teamindex] >= BG_TK_WARNING_NEAR_VICTORY_SCORE)
-        {
-            SendMessageToAll(teamindex == TEAM_HORDE?LANG_BG_TK_H_NEAR_VICTORY :LANG_BG_TK_A_NEAR_VICTORY, teamindex == TEAM_HORDE ? CHAT_MSG_BG_SYSTEM_HORDE : CHAT_MSG_BG_SYSTEM_ALLIANCE);
-            PlaySoundToAll(BG_TK_SOUND_NEAR_VICTORY);
-            m_IsInformedNearVictory[team] = true;
-        }
-		
-		if (m_Team_Scores[teamindex] >= BG_TK_MAX_TEAM_SCORE)
+	{
+		if (!m_IsInformedNearVictory && m_Team_Scores[teamindex] > BG_TK_WARNING_NEAR_VICTORY_SCORE)
 		{
-			m_Team_Scores[teamindex] = BG_TK_MAX_TEAM_SCORE;
-			EndBattleground((teamindex == TEAM_ALLIANCE)?ALLIANCE:HORDE);
+			if (teamindex == TEAM_ALLIANCE)
+				SendMessageToAll(LANG_BG_TK_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+			else
+				SendMessageToAll(LANG_BG_TK_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+
+			PlaySoundToAll(BG_TK_SOUND_NEAR_VICTORY);
+			m_IsInformedNearVictory = true;
 		}
+
+		if (m_Team_Scores[teamindex] > BG_TK_MAX_TEAM_SCORE)
+			m_Team_Scores[teamindex] = BG_TK_MAX_TEAM_SCORE;
     }
 }
 
@@ -588,14 +568,6 @@ void BattlegroundTK::FillInitialWorldStates(WorldPacket& data)
 {
 	data << uint32(BG_TK_RESOURCES_ALLIANCE) << uint32(m_Team_Scores[TEAM_ALLIANCE]);
     data << uint32(BG_TK_RESOURCES_HORDE) << uint32(m_Team_Scores[TEAM_HORDE]);
-
-    /*if (GetStatus() == STATUS_IN_PROGRESS)
-    {
-        data << uint32(BG_TK_STATE_TIMER_ACTIVE) << uint32(1);
-        data << uint32(BG_TK_STATE_TIMER) << uint32(25-_minutesElapsed);
-    }
-    else
-        data << uint32(BG_TK_STATE_TIMER_ACTIVE) << uint32(0);*/
 }
 
 uint32 BattlegroundTK::GetPrematureWinner()

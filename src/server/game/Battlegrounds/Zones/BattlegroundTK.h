@@ -137,7 +137,7 @@ class BattlegroundTK : public Battleground
         uint8 _orbState[4];                               // for checking orb state (on player, on base)
 
 		int32 m_Team_Scores[2];
-		bool m_IsInformedNearVictory[2];
+		bool m_IsInformedNearVictory;
 
 		int32 pointsTimer;
         uint32 m_HonorWinKills;
