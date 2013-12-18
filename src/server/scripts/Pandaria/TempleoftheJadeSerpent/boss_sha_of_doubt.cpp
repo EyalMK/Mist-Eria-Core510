@@ -460,7 +460,7 @@ public:
 							me->CastSpell(me, SPELL_RELEASE_DOUBT);
 							if (Creature* sha = me->FindNearestCreature(BOSS_SHA_OF_DOUBT, 99999.0f, true))
 							{
-								sha->ModifyHealth(int32(me->GetMaxHealth() * 0.1f));
+								sha->ModifyHealth(int32(sha->GetMaxHealth() * 0.1f));
 								me->Kill(me);
 							}
 
