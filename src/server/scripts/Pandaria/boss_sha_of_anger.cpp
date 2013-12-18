@@ -146,9 +146,8 @@ public:
                     case EVENT_SEETHE:
                         for (i = threatlist.begin(); i != threatlist.end(); ++i)
                         {
-                            if (Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid()))
-                                if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && !me->IsWithinMeleeRange(unit))
-                                    me->CastSpell(me->getVictim(), SPELL_SEETHE);
+							if (!me->IsWithinMeleeRange((*i)->getTarget()->ToPlayer()))
+								me->CastSpell(me->getVictim(), SPELL_SEETHE);
                         }
 
                         events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);

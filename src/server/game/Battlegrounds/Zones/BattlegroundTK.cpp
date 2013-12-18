@@ -425,21 +425,23 @@ void BattlegroundTK::UpdateScore(uint16 team, int16 points)
 {
     ASSERT(team == ALLIANCE || team == HORDE);
     uint8 teamindex = GetTeamIndexByTeamId(team); // 0 = Alliance 1 = Horde
-	m_Team_Scores[teamindex] += points;
-
-    UpdateWorldState(((teamindex == TEAM_ALLIANCE)?BG_TK_RESOURCES_ALLIANCE:BG_TK_RESOURCES_HORDE), m_Team_Scores[teamindex]);
 
     if (points > 0)
 	{
 		if (points + m_Team_Scores[teamindex] >= BG_TK_MAX_TEAM_SCORE)
 		{
-			m_Team_Scores[teamindex] = BG_TK_MAX_TEAM_SCORE;
-
-			if (m_Team_Scores[teamindex] == BG_TK_MAX_TEAM_SCORE && !bgEnd)
+			if (!bgEnd)
 			{
+				m_Team_Scores[teamindex] = BG_TK_MAX_TEAM_SCORE;
+				UpdateWorldState(((teamindex == TEAM_ALLIANCE)?BG_TK_RESOURCES_ALLIANCE:BG_TK_RESOURCES_HORDE), m_Team_Scores[teamindex]);
 				EndBattleground((teamindex == TEAM_ALLIANCE)?ALLIANCE:HORDE);
 				bgEnd = true; // Prevent from UpdateScore repeat EndBattleground
 			}
+		}
+		else
+		{
+			m_Team_Scores[teamindex] += points;
+			UpdateWorldState(((teamindex == TEAM_ALLIANCE)?BG_TK_RESOURCES_ALLIANCE:BG_TK_RESOURCES_HORDE), m_Team_Scores[teamindex]);
 		}
 
 		if (!m_IsInformedNearVictory && m_Team_Scores[teamindex] > BG_TK_WARNING_NEAR_VICTORY_SCORE)
