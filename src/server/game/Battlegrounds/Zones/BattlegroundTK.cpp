@@ -55,12 +55,9 @@ void BattlegroundTK::PostUpdateImpl(uint32 diff)
             else
                 EndBattleground(ALLIANCE);
         }
-        // first update needed after 1 minute of game already in progress
+
         else if (GetElapsedTime() > uint32(_minutesElapsed * MINUTE * IN_MILLISECONDS) +  3 * MINUTE * IN_MILLISECONDS)
-        {
             ++_minutesElapsed;
-            //UpdateWorldState(BG_TK_STATE_TIMER, 27 - _minutesElapsed);
-        }
 
 		for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
 			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
@@ -170,6 +167,7 @@ void BattlegroundTK::Reset()
     _orbState[1]        = BG_TK_ORB_STATE_ON_BASE;
 	_orbState[2]        = BG_TK_ORB_STATE_ON_BASE;
     _orbState[3]        = BG_TK_ORB_STATE_ON_BASE;
+
     m_Team_Scores[TEAM_ALLIANCE]      = 0;
     m_Team_Scores[TEAM_HORDE]         = 0;
 
@@ -186,6 +184,7 @@ void BattlegroundTK::Reset()
     }
 
 	m_IsInformedNearVictory		= false;
+	bgEnd = false;
 }
 
 void BattlegroundTK::StartingEventCloseDoors()
@@ -426,12 +425,23 @@ void BattlegroundTK::UpdateScore(uint16 team, int16 points)
 {
     ASSERT(team == ALLIANCE || team == HORDE);
     uint8 teamindex = GetTeamIndexByTeamId(team); // 0 = Alliance 1 = Horde
-    m_Team_Scores[teamindex] += points;
+	m_Team_Scores[teamindex] += points;
 
     UpdateWorldState(((teamindex == TEAM_ALLIANCE)?BG_TK_RESOURCES_ALLIANCE:BG_TK_RESOURCES_HORDE), m_Team_Scores[teamindex]);
 
     if (points > 0)
 	{
+		if (points + m_Team_Scores[teamindex] >= BG_TK_MAX_TEAM_SCORE)
+		{
+			m_Team_Scores[teamindex] = BG_TK_MAX_TEAM_SCORE;
+
+			if (m_Team_Scores[teamindex] == BG_TK_MAX_TEAM_SCORE && !bgEnd)
+			{
+				EndBattleground((teamindex == TEAM_ALLIANCE)?ALLIANCE:HORDE);
+				bgEnd = true; // Prevent from UpdateScore repeat EndBattleground
+			}
+		}
+
 		if (!m_IsInformedNearVictory && m_Team_Scores[teamindex] > BG_TK_WARNING_NEAR_VICTORY_SCORE)
 		{
 			if (team == ALLIANCE)
@@ -441,12 +451,6 @@ void BattlegroundTK::UpdateScore(uint16 team, int16 points)
 
 			PlaySoundToAll(BG_TK_SOUND_NEAR_VICTORY);
 			m_IsInformedNearVictory = true;
-		}
-
-		if (m_Team_Scores[teamindex] >= BG_TK_MAX_TEAM_SCORE)
-		{
-			m_Team_Scores[teamindex] = BG_TK_MAX_TEAM_SCORE;
-			EndBattleground((teamindex == TEAM_ALLIANCE)?ALLIANCE:HORDE);
 		}
     }
 }

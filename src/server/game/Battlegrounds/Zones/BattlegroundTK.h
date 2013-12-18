@@ -120,6 +120,7 @@ class BattlegroundTK : public Battleground
         void SetOrbPicker(uint64 guid, uint32 orb)     { m_orbOwners[orb] = guid; }
         bool IsAllianceOrbPickedup() const         { return m_orbOwners[TEAM_ALLIANCE] != 0; }
         bool IsHordeOrbPickedup() const            { return m_orbOwners[TEAM_HORDE] != 0; }
+		bool bgEnd;
         uint8 GetOrbState(uint32 orb)             { return _orbState[orb]; }
 		void RespawnOrbAfterDrop(uint32 orb);
 		bool HasAnOrb(Player* player);
