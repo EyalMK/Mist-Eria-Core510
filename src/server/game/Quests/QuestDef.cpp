@@ -345,7 +345,7 @@ uint32 Quest::CalculateHonorGain(uint8 level) const
     return honor;
 }
 
-uint32 Quest::GetRewardChoiceIdForEntry(uint32 rewardEntry) {
+uint32 Quest::GetRewardChoiceIdForEntry(uint32 rewardEntry) const {
     for (int i=0 ; i<QUEST_REWARD_CHOICES_COUNT; ++i) {
         if (rewardEntry == RewardChoiceItemId[i])
             return i;
