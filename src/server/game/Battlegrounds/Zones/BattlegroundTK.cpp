@@ -345,7 +345,7 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
         return;
 
 	UpdatePlayerScore(Source, SCORE_ORB_POSSESIONS, 1);
-	PSendMessageToAll(message_id, type, NULL, Source->GetName());
+	Battleground::PSendMessageToAll(message_id, type, NULL, Source->GetName().c_str());
     Source->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
 }
 
