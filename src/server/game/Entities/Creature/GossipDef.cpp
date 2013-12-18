@@ -469,8 +469,11 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
         }
         for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
         {
-            data << uint32(quest->RewardChoiceItemId[i]);
-            data << uint32(quest->RewardChoiceItemCount[i]);
+            //NOBODIEQUESTREWARD
+            //data << uint32(quest->RewardChoiceItemId[i]);
+            //data << uint32(quest->RewardChoiceItemCount[i]);
+            data << uint32(1);
+            data << uint32(2);
         }
     }
 
