@@ -1,3 +1,24 @@
+/*
+Notes :
+Sha de la colère : Script 75%	=>	A faire : vérifier si les sorts fonctionnent.
+
+UPDATE creature_template SET ScriptName = 'boss_sha_of_anger' WHERE entry = 60491;
+INSERT INTO creature_text (entry, groupid, id, text, type, language, probability, emote, duration, sound, comment) VALUES
+(60491, 0, 0, "Oui ... Oui ! Laissez parler votre rage ! Frappez-moi !", 14, 0, 100, 0, 0, 28999, "Sha of anger - Aggro"),
+(60491, 1, 0, "", 14, 0, 100, 0, 0, 29000, "Sha of anger - Death"),
+(60491, 2, 0, "Ils sont éteinds !", 14, 0, 100, 0, 0, 29001, "Sha of anger - Slay 1"),
+(60491, 2, 1, "Est-ce que vous êtes en colère ?", 14, 0, 100, 0, 0, 29002, "Sha of anger - Slay 2"),
+(60491, 2, 2, "Ressentez votre rage !", 14, 0, 100, 0, 0, 29003, "Sha of anger - Slay 3"),
+(60491, 2, 3, "Laissez votre rage vous consumer !", 14, 0, 100, 0, 0, 29004, "Sha of anger - Slay 4"),
+(60491, 3, 0, "Cédez a votre colère !", 14, 0, 100, 0, 0, 29005, "Sha of anger - Spawn 1"),
+(60491, 3, 1, "Votre rage vous donne de la force !", 14, 0, 100, 0, 0, 29006, "Sha of anger - Spawn 2"),
+(60491, 3, 2, "Votre rage me porte !", 14, 0, 100, 0, 0, 29007, "Sha of anger - Spawn 3"),
+(60491, 3, 3, "Vous ne m'enterrerez pas à nouveau !", 14, 0, 100, 0, 0, 29008, "Sha of anger - Spawn 4"),
+(60491, 3, 4, "Laissez libre cours à mon courroux !", 14, 0, 100, 0, 0, 29009, "Sha of anger - Spawn 5"),
+(60491, 4, 0, "Nourissez-moi de votre COLÈRE !", 14,² 0, 100, 0, 0, 29010, "Sha of anger - Spell 1"),
+(60491, 5, 0, "MA FUREUR SE DÉCHAÎNE !", 14, 0, 100, 0, 0, 29011, "Sha of anger - Spell 2");
+*/
+
 #include "ScriptPCH.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
@@ -42,8 +63,13 @@ enum Texts
     SAY_UNLEASHED_WRATH		= 5
 };
 
-#define NPC_IRE             60579
-#define NPC_SHA_OF_ANGER    61523
+enum Creatures
+{
+    NPC_SHA                 = 60491,
+    NPC_IRE                 = 60579,
+    NPC_SHA_OF_ANGER        = 61523
+};
+
 
 class boss_sha_of_anger : public CreatureScript
 {
@@ -120,9 +146,8 @@ public:
                     case EVENT_SEETHE:
                         for (i = threatlist.begin(); i != threatlist.end(); ++i)
                         {
-                            if (Unit* unit = Unit::GetUnit(*me, (*i)->getUnitGuid()))
-                                if (unit && (unit->GetTypeId() == TYPEID_PLAYER) && !me->IsWithinMeleeRange(unit))
-                                    me->CastSpell(me->getVictim(), SPELL_SEETHE);
+							if (!me->IsWithinMeleeRange((*i)->getTarget()->ToPlayer()))
+								me->CastSpell(me->getVictim(), SPELL_SEETHE);
                         }
 
                         events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
@@ -160,7 +185,6 @@ public:
                         break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -200,20 +224,23 @@ class spell_growing_anger : public SpellScriptLoader
             {
                 Unit* target = GetTarget();
 
-                if (target->GetTypeId() == TYPEID_PLAYER)
+                if(Creature* sha = target->FindNearestCreature(NPC_SHA, 100.0f))
                 {
-                    target->CastSpell(target, SPELL_AGGRESSIVE_BEHAVIOUR);
-
-                    Map* map = target->GetMap();
-
-                    Map::PlayerList const& players = map->GetPlayers();
-
-                    for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+                    if (target->GetTypeId() == TYPEID_PLAYER)
                     {
-                        Player* player = i->getSource();
+                        sha->CastSpell(target, SPELL_AGGRESSIVE_BEHAVIOUR);
 
-                        if (player && player->IsInRange(target, 0.0f, 5.0f, false))
-                            player->CastSpell(player, SPELL_AGGRESSIVE_BEHAVIOUR);
+                        Map* map = target->GetMap();
+
+                        Map::PlayerList const& players = map->GetPlayers();
+
+                        for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+                        {
+                            Player* player = i->getSource();
+
+                            if (player && player->IsInRange(target, 0.0f, 5.0f, false))
+                                sha->CastSpell(player, SPELL_AGGRESSIVE_BEHAVIOUR);
+                        }
                     }
                 }
             }

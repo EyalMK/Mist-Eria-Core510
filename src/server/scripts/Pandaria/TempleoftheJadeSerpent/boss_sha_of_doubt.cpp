@@ -63,7 +63,7 @@ enum Actions
 
 enum Npcs
 {
-	NPC_FIGMENT_OF_DOUBT	= 56792, // displayid = 15435
+	NPC_FIGMENT_OF_DOUBT	= 56792,
 	NPC_SHA_TRIGGER			= 400453,
 };
 
@@ -376,17 +376,10 @@ public:
 
 			if (instance)
 			{
-				map = me->GetMap();
-
-				if (map && map->IsDungeon())
+				if (me->isSummon()) 
 				{
-					Map::PlayerList const &PlayerList = map->GetPlayers();
-
-					if (!PlayerList.isEmpty())
-						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-							if (player = i->getSource()->ToPlayer())
-								if (Creature* figment = player->FindNearestCreature(NPC_FIGMENT_OF_DOUBT, 99999.0f, true))
-									figment->SetDisplayId(player->GetDisplayId());
+					player = me->ToTempSummon()->GetSummoner();
+					me->SetDisplayId(player->GetDisplayId());
 				}
 			}
 		}
@@ -453,10 +446,13 @@ public:
 							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 							me->setFaction(14);
 							me->SetReactState(REACT_AGGRESSIVE);
-							me->SetInCombatWith(player);
-							me->AddThreat(player, 99999.0f);
-							me->GetMotionMaster()->MoveChase(player);
-						
+							if (player)
+							{
+								me->SetInCombatWith(player);
+								me->AddThreat(player, 99999.0f);
+								me->GetMotionMaster()->MoveChase(player);
+							}
+
 							events.CancelEvent(EVENT_ATTACK_PLAYERS);
 							break;
 

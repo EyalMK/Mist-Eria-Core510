@@ -3846,8 +3846,8 @@ void SpellMgr::LoadSpellInfoCorrections()
 				case 106736: // Wither Will
 					spellInfo->MaxAffectedTargets = 2;
 					break;
-				case 119586: // 10 Targets
-					spellInfo->MaxAffectedTargets = 10;
+				case 119586: // 1 Target
+					spellInfo->MaxAffectedTargets = 1;
 					break;
 				case 119622: // 3 Targets
 					spellInfo->MaxAffectedTargets = 3;

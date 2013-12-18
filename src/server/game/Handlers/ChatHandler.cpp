@@ -411,14 +411,14 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
         }
 
-		if (group->isBGGroup())
+		if (GetPlayer()->GetGroup()->isBGGroup())
 		{
-			if (group->IsLeader(GetPlayer()->GetGUID()))
+			if (GetPlayer()->GetGroup()->IsLeader(GetPlayer()->GetGUID()))
 				type = CHAT_MSG_INSTANCE_CHAT_LEADER;
 			else type = CHAT_MSG_INSTANCE_CHAT;
 		}
 
-		else if (!group->isBGGroup())
+		else if (!GetPlayer()->GetGroup()->isBGGroup())
 		{
 			if (group->IsLeader(GetPlayer()->GetGUID()))
 				type = CHAT_MSG_RAID_LEADER;
