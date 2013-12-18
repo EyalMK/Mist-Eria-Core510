@@ -92,42 +92,60 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
 					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 50.0f)
+					{
 						UpdateScore(ALLIANCE, BG_TK_CENTER_POINTS);
+						UpdatePlayerScore(player, SCORE_POINTS_SCORED, BG_TK_CENTER_POINTS);
+					}
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
 					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 50.0f)
+					{
 						UpdateScore(HORDE, BG_TK_CENTER_POINTS);
+						UpdatePlayerScore(player, SCORE_POINTS_SCORED, BG_TK_CENTER_POINTS);
+					}
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
 					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 50.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
+					{
 						UpdateScore(ALLIANCE, BG_TK_INDOOR_POINTS);
+						UpdatePlayerScore(player, SCORE_POINTS_SCORED, BG_TK_CENTER_POINTS);
+					}
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
 					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 50.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
+					{
 						UpdateScore(HORDE, BG_TK_INDOOR_POINTS);
+						UpdatePlayerScore(player, SCORE_POINTS_SCORED, BG_TK_CENTER_POINTS);
+					}
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
 					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f)
+					{
 						UpdateScore(ALLIANCE, BG_TK_OUTDOOR_POINTS);
+						UpdatePlayerScore(player, SCORE_POINTS_SCORED, BG_TK_CENTER_POINTS);
+					}
 
 				if (player->GetGUID() == m_orbOwners[0] ||
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
 					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f)
+					{
 						UpdateScore(HORDE, BG_TK_OUTDOOR_POINTS);
+						UpdatePlayerScore(player, SCORE_POINTS_SCORED, BG_TK_CENTER_POINTS);
+					}
 
 					pointsTimer = 4000;
 			}
@@ -518,11 +536,11 @@ void BattlegroundTK::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
 
     switch (type)
     {
-        case SCORE_ORB_POSSESIONS : // Orbes possedees
+        case SCORE_ORB_POSSESIONS : // Orbs owned
             ((BattlegroundTKScore*)itr->second)->OrbPossesions += value;
             break;
 
-        case SCORE_POINTS_SCORED: // Points obtenus
+        case SCORE_POINTS_SCORED: // Points earned
             ((BattlegroundTKScore*)itr->second)->PointsScored += value;
             break;
 
