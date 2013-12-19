@@ -1285,49 +1285,130 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recvData)
         return;
     }
 
-	/*
 	// 7CE0D0
     WorldPacket data(SMSG_INSPECT_RESULTS_UPDATE, 150); // guess size ?
 
-	ObjectGuid guid;
-	ObjectGuid guid2;
 
-	guid2[7] = data.WriteBit();
-    guid2[4] = data.WriteBit();
-    guid2[2] = data.WriteBit();
-    guid2[6] = data.WriteBit();
-    guid2[1] = data.WriteBit();
-    guid2[0] = data.WriteBit();
-    guid[3] = data.WriteBit();
-    guid[5] = data.WriteBit();
-	guid[6] = data.WriteBit();
-    guid[4] = data.WriteBit();
-    guid[0] = data.WriteBit();
-    guid[2] = data.WriteBit();
-    guid[1] = data.WriteBit();
-    guid[7] = data.WriteBit();
-    guid2[5] = data.WriteBit();
-    guid2[3] = data.WriteBit();
+    //mainloop
+    uint32 counter3C = 0, counter4C = 0; //sending uint16 X counter for each one
+    uint32 dword58 = 0;
 
-	data.WriteByteSeq(guid2[6]);
-    data.WriteByteSeq(guid[2]);
-    data.WriteByteSeq(guid[0]);
-    data.WriteByteSeq(guid[4]);
+
+    //ifguidunk2
+    ObjectGuid guidunk2 = 0;
+
+    //for loop counter60 maybe battlepets ?
+    uint32 counter60 = 0;
+    ObjectGuid guidunk1 = 0;
+    uint8 unk = 0;
+    uint32 dword90_16;
+    uint32 counter90_32 = 0;
+    uint16 dword90_12 = 0;
+
+
+    data.WriteBits(counter3C, 25);
+    data.WriteBits(counter60, 22);
+
+    data.WriteBit(guid[7]);
+    data.WriteBit(guid[4]);
+
+    for (uint32 i = 0 ; i < counter60; ++i){
+        data.WriteBit(guidunk1[1]);
+        data.WriteBit(guidunk1[5]);
+        data.WriteBit(guidunk1[2]);
+        data.WriteBit(unk);
+        data.WriteBit(guidunk1[3]);
+        data.WriteBit(guidunk1[0]);
+        data.WriteBit(guidunk1[7]);
+        data.WriteBits(counter90_32, 23);
+        data.WriteBit(guidunk1[4]);
+        data.WriteBit(guidunk1[6]);
+        data.WriteBit(dword90_16!=0);
+        data.WriteBit(dword90_12!=0);
+    }
+
+    data.WriteBit(guid[2]);
+    data.WriteBits(counter4C, 25);
+    data.WriteBit(guid[6]);
+    data.WriteBit(guid[1]);
+    data.WriteBit(guidunk2 != 0);
+    data.WriteBit(guid[0]);
+
+    if (guidunk2) {
+        data.WriteBit(guidunk2[3]);
+        data.WriteBit(guidunk2[5]);
+        data.WriteBit(guidunk2[6]);
+        data.WriteBit(guidunk2[4]);
+        data.WriteBit(guidunk2[0]);
+        data.WriteBit(guidunk2[2]);
+        data.WriteBit(guidunk2[1]);
+        data.WriteBit(guidunk2[7]);
+    }
+
+    data.WriteBit(guid[5]);
+    data.WriteBit(guid[3]);
+
+    data << uint32(dword58);
+    data.WriteByteSeq(guid[6]);
+    if (guidunk2 != 0) {
+        data.WriteByteSeq(guidunk2[2]);
+        data.WriteByteSeq(guidunk2[0]);
+        data << uint32(0); //uint64 part 1
+        data << uint32(0); //uint64 part 2
+        data.WriteByteSeq(guidunk2[4]);
+        data.WriteByteSeq(guidunk2[7]);
+        data.WriteByteSeq(guidunk2[5]);
+        data << uint32(0); //dword2C
+        data.WriteByteSeq(guidunk2[3]);
+        data.WriteByteSeq(guidunk2[1]);
+        data << uint32(0); //dword26
+        data.WriteByteSeq(guidunk2[6]);
+
+    }
     data.WriteByteSeq(guid[7]);
-    data.WriteByteSeq(guid[5]);
-    data.WriteByteSeq(guid[3]);
+
+    for (uint32 i = 0 ; i < counter60; ++i){
+        data << uint32(0);
+        for ( uint32 j = 0; j < counter90_32; ++j) {
+            data << uint8(0);
+            data << uint32(0);
+        }
+        data.WriteByteSeq(guidunk1[3]);
+        data << uint8(0);
+        if (dword90_12) {
+            data << uint16(dword90_12);
+        }
+        data.WriteByteSeq(guidunk1[0]);
+        data.WriteByteSeq(guidunk1[2]);
+
+        uint32 width = 0;
+        data << uint32(width); //getdatainsitu size
+        for (uint32 i = 0 ; i< width; ++i) //getdatainsitu
+            data << uint8(0);
+        //some shit test we don't care
+        data.WriteByteSeq(guidunk1[1]);
+        data.WriteByteSeq(guidunk1[7]);
+        data.WriteByteSeq(guidunk1[5]);
+        if (dword90_16)
+            data << uint32(dword90_16);
+        data.WriteByteSeq(guidunk1[6]);
+        data.WriteByteSeq(guidunk1[4]);
+    }
+
+    data.WriteByteSeq(guid[2]);
+    for (uint32 i = 0; i< counter3C; ++i) {
+        data << uint16(0);
+    }
+    data.WriteByteSeq(guid[0]);
+    for (uint32 i = 0; i< counter4C; ++i) {
+        data << uint16(0);
+    }
     data.WriteByteSeq(guid[1]);
-	data.WriteByteSeq(guid[6]);
-    data.WriteByteSeq(guid2[7]);
-    data.WriteByteSeq(guid2[2]);
-    data.WriteByteSeq(guid2[0]);
-    data.WriteByteSeq(guid2[1]);
-    data.WriteByteSeq(guid2[4]);
-    data.WriteByteSeq(guid2[3]);
-    data.WriteByteSeq(guid2[5]);
+    data.WriteByteSeq(guid[4]);
+    data.WriteByteSeq(guid[3]);
+    data.WriteByteSeq(guid[5]);
 
     SendPacket(&data);
-	*/
 }
 
 void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recvData)
