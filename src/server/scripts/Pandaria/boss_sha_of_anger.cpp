@@ -1,24 +1,3 @@
-/*
-Notes :
-Sha de la colère : Script 75%	=>	A faire : vérifier si les sorts fonctionnent.
-
-UPDATE creature_template SET ScriptName = 'boss_sha_of_anger' WHERE entry = 60491;
-INSERT INTO creature_text (entry, groupid, id, text, type, language, probability, emote, duration, sound, comment) VALUES
-(60491, 0, 0, "Oui ... Oui ! Laissez parler votre rage ! Frappez-moi !", 14, 0, 100, 0, 0, 28999, "Sha of anger - Aggro"),
-(60491, 1, 0, "", 14, 0, 100, 0, 0, 29000, "Sha of anger - Death"),
-(60491, 2, 0, "Ils sont éteinds !", 14, 0, 100, 0, 0, 29001, "Sha of anger - Slay 1"),
-(60491, 2, 1, "Est-ce que vous êtes en colère ?", 14, 0, 100, 0, 0, 29002, "Sha of anger - Slay 2"),
-(60491, 2, 2, "Ressentez votre rage !", 14, 0, 100, 0, 0, 29003, "Sha of anger - Slay 3"),
-(60491, 2, 3, "Laissez votre rage vous consumer !", 14, 0, 100, 0, 0, 29004, "Sha of anger - Slay 4"),
-(60491, 3, 0, "Cédez a votre colère !", 14, 0, 100, 0, 0, 29005, "Sha of anger - Spawn 1"),
-(60491, 3, 1, "Votre rage vous donne de la force !", 14, 0, 100, 0, 0, 29006, "Sha of anger - Spawn 2"),
-(60491, 3, 2, "Votre rage me porte !", 14, 0, 100, 0, 0, 29007, "Sha of anger - Spawn 3"),
-(60491, 3, 3, "Vous ne m'enterrerez pas à nouveau !", 14, 0, 100, 0, 0, 29008, "Sha of anger - Spawn 4"),
-(60491, 3, 4, "Laissez libre cours à mon courroux !", 14, 0, 100, 0, 0, 29009, "Sha of anger - Spawn 5"),
-(60491, 4, 0, "Nourissez-moi de votre COLÈRE !", 14,² 0, 100, 0, 0, 29010, "Sha of anger - Spell 1"),
-(60491, 5, 0, "MA FUREUR SE DÉCHAÎNE !", 14, 0, 100, 0, 0, 29011, "Sha of anger - Spell 2");
-*/
-
 #include "ScriptPCH.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
@@ -44,7 +23,8 @@ enum Events
     EVENT_GROWING_ANGER			= 3,
     EVENT_PHASE_GROWING_ANGER	= 4,
     EVENT_UNLEASHED_WRATH       = 5,
-    EVENT_BERSERK               = 6
+    EVENT_BERSERK               = 6,
+    EVENT_DISTANCE              = 7
 };
 
 enum Phases
@@ -89,12 +69,14 @@ public:
 
         EventMap events;
         SummonList Summons;
+        bool distanceMelee;
 
         void Reset()
         {
             events.Reset();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             Summons.DespawnAll();
+            UpdateDistanceVisibility();
         }
 
         void JustDied(Unit* /*who*/)
@@ -116,8 +98,9 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_AGGRO);
+            UpdateDistanceVisibility();
 
-            events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_DISTANCE, 200);
             events.ScheduleEvent(EVENT_ENDLESS_RAGE, 20*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS), 0, PHASE_GROWING_ANGER);
             events.ScheduleEvent(EVENT_UNLEASHED_WRATH, 50*IN_MILLISECONDS);
@@ -142,15 +125,28 @@ public:
             while(uint32 eventId = events.ExecuteEvent())
             {
                 switch(eventId)
-                {
-                    case EVENT_SEETHE:
+                {    
+                    case EVENT_DISTANCE:
+                        distanceMelee = true;
                         for (i = threatlist.begin(); i != threatlist.end(); ++i)
                         {
-							if (!me->IsWithinMeleeRange((*i)->getTarget()->ToPlayer()))
-								me->CastSpell(me->getVictim(), SPELL_SEETHE);
+                            if (Unit* player = Unit::GetUnit(*me, (*i)->getUnitGuid()))
+                                if (player && (player->GetTypeId() == TYPEID_PLAYER) && me->IsWithinMeleeRange(player))
+                                {
+                                    distanceMelee = false;
+                                    break;
+                                }
                         }
 
-                        events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
+                        if (distanceMelee)
+                            events.ScheduleEvent(EVENT_SEETHE, 2*IN_MILLISECONDS);
+
+                        events.ScheduleEvent(EVENT_DISTANCE, 200);
+                        break;
+
+                    case EVENT_SEETHE:
+                        me->CastSpell(me->getVictim(), SPELL_SEETHE);
+                        distanceMelee = false;
                         break;
 
                     case EVENT_ENDLESS_RAGE:
@@ -187,6 +183,32 @@ public:
             }
             DoMeleeAttackIfReady();
         }
+
+        void UpdateDistanceVisibility()
+        {
+            Map *map = me->GetMap();
+
+            if(map)
+            {
+                Map::PlayerList const &pList = map->GetPlayers();
+                for(Map::PlayerList::const_iterator i = pList.begin() ; i != pList.end() ; ++i)
+                {
+                    Player *player = i->getSource();
+
+                    bool rangeOfUpdate = player->GetExactDist2d(me->GetPositionX(),me->GetPositionY()) < 1000;
+
+                    if(player)
+                    {
+                        if(rangeOfUpdate)
+                        {
+                            player->UpdateVisibilityOf(me);
+                            player->UpdateVisibilityForPlayer();
+
+                        }
+                    }
+                }
+            }
+        }
     };
 };
 
@@ -207,7 +229,7 @@ public:
             void Reset()
             {
                 me->CastSpell(me, SPELL_BITTER_THOUGHTS);
-            }
+            }                  
     };
 };
 
