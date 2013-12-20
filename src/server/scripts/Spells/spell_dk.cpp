@@ -582,8 +582,8 @@ class spell_dk_death_strike : public SpellScriptLoader
                 if(Player* caster = GetCaster()->ToPlayer())
                 {
                     int32 bp = (int32) (0.2f * caster->GetDamageTakenInPastSecs(5, false, true));
-					if(bp < (caster->GetHealth() * 0.07f))
-						bp = (int32)(caster->GetHealth() * 0.07f);
+					if(bp < (caster->GetMaxHealth() * 0.07f))
+						bp = (int32)(caster->GetMaxHealth() * 0.07f);
 
 					// Scent of Blood
 					if (Aura* scentOfBlood = caster->GetAura(SPELL_DK_SCENT_OF_BLOOD))
