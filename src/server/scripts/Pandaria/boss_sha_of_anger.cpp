@@ -75,6 +75,7 @@ public:
         {
             events.Reset();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 10);
             Summons.DespawnAll();
             UpdateDistanceVisibility();
         }
@@ -131,7 +132,7 @@ public:
                         for (i = threatlist.begin(); i != threatlist.end(); ++i)
                         {
                             if (Unit* player = Unit::GetUnit(*me, (*i)->getUnitGuid()))
-                                if (player && (player->GetTypeId() == TYPEID_PLAYER) && me->IsWithinMeleeRange(player))
+                                if (player && (player->GetTypeId() == TYPEID_PLAYER) && me->IsWithinMeleeRange(player, 10.0f))
                                 {
                                     distanceMelee = false;
                                     break;
