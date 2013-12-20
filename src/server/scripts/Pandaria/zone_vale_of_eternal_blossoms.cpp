@@ -43,7 +43,7 @@ public:
 			if (!who || !who->IsInWorld())
                 return;
 
-			if (who && who->GetTypeId() == TYPEID_PLAYER && !who->HasAura(SPELL_CYCLONIC_INSPIRATION) && !me->IsValidAttackTarget(who) && me->HasAura(SPELL_SPINNING_CRANE_KICK))
+			if (who && who->ToPlayer() && !who->ToPlayer()->isGameMaster() && !who->HasAura(SPELL_CYCLONIC_INSPIRATION) && !me->IsValidAttackTarget(who) && me->HasAura(SPELL_SPINNING_CRANE_KICK))
                     who->CastSpell(who, SPELL_CYCLONIC_INSPIRATION);
         }
 

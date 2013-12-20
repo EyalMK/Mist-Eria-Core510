@@ -3299,31 +3299,40 @@ public :
             else 
                 m_uiCheckPlayersTimer -= diff ;
         }
+
+		bool checkZone(Player *p)
+		{
+			switch(p->GetZoneId())
+			{
+			case 5840: //Val
+			case 6141: //Deux lunes
+			case 6553:
+				return true;
+			default:
+				break;
+			}
+			return false;
+		}
         
 		void CheckPlayers()
         {
-            if(Map* map = me->GetMap())
+
+            Map::PlayerList const& playerList = me->GetMap()->GetPlayers() ;
+            for(Map::PlayerList::const_iterator c_iter = playerList.begin() ; c_iter != playerList.end() ; ++c_iter)
             {
-                if(map->GetId() != 870)
-                    return ;
-                
-                Map::PlayerList const& playerList = map->GetPlayers() ;
-                for(Map::PlayerList::const_iterator c_iter = playerList.begin() ; c_iter != playerList.end() ; ++c_iter)
+                if(Player* p = c_iter->getSource())
                 {
-                    if(Player* p = c_iter->getSource())
-                    {
-                        if(p->isGameMaster())
-                            continue ;
+                    if(p->isGameMaster())
+                        continue ;
                         
-                        if(p->GetZoneId() != 5840)
-                            continue ;
+                    if(!checkZone(p))
+                        continue;
                         
-                        if(p->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
-						{
-                            p->RemoveAurasByType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED);
-							p->CastSpell(p, 79404, true);
-						}
-                    }
+                    if(p->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+					{
+                        p->RemoveAurasByType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED);
+						p->CastSpell(p, 79404, true);
+					}
                 }
             }
         }
