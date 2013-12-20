@@ -3874,6 +3874,9 @@ void SpellMgr::LoadSpellInfoCorrections()
 				case 49998: // Death Strike
 					spellInfo->Attributes &= SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK;
 					break;
+				case 63106: // Siphon Life
+					spellInfo->Attributes &= SPELL_ATTR0_PASSIVE;
+					break;
 				default:
 					break;
 			}
