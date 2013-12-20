@@ -358,7 +358,7 @@ public:
 
 		InstanceScript* instance;
         EventMap events;
-		Unit* player;
+		Player* player;
 		Map* map;
 		bool emote;
 
@@ -376,9 +376,9 @@ public:
 
 			if (instance)
 			{
-				if (me->isSummon()) 
+				if (me->isSummon())
 				{
-					player = me->ToTempSummon()->GetSummoner();
+					player = me->ToTempSummon()->GetSummoner()->ToPlayer();
 					me->SetDisplayId(player->GetDisplayId());
 				}
 			}
@@ -448,9 +448,9 @@ public:
 							me->SetReactState(REACT_AGGRESSIVE);
 							if (player)
 							{
-								me->SetInCombatWith(player);
+								me->AI()->AttackStart(player);
 								me->AddThreat(player, 99999.0f);
-								me->GetMotionMaster()->MoveChase(player);
+								me->SetInCombatWithZone();
 							}
 
 							events.CancelEvent(EVENT_ATTACK_PLAYERS);
