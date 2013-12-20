@@ -10193,6 +10193,16 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             if (bg && bg->GetTypeID(true) == BATTLEGROUND_TK)
                 bg->FillInitialWorldStates(data);
             break;
+		// Tol'Viron Arena
+		case 6296:
+            if (bg && bg->GetTypeID(true) == BATTLEGROUND_TA)
+                bg->FillInitialWorldStates(data);
+            else
+            {
+                data << uint32(0xe10) << uint32(0x0);           // 7 gold
+                data << uint32(0xe11) << uint32(0x0);           // 8 green
+            }
+            break;
         // Wintergrasp
         case 4197:
             if (bf && bf->GetTypeId() == BATTLEFIELD_WG)
