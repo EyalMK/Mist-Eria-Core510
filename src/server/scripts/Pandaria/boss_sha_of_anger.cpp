@@ -132,7 +132,7 @@ public:
                         for (i = threatlist.begin(); i != threatlist.end(); ++i)
                         {
                             if (Unit* player = Unit::GetUnit(*me, (*i)->getUnitGuid()))
-                                if (player && (player->GetTypeId() == TYPEID_PLAYER) && me->IsWithinMeleeRange(player, 10.0f))
+                                if (player && (player->GetTypeId() == TYPEID_PLAYER) && me->IsWithinMeleeRange(player, 5.0f))
                                 {
                                     distanceMelee = false;
                                     break;
