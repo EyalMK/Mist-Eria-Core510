@@ -1717,6 +1717,18 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
 
         int32 addhealth = damage;
 
+		switch (m_spellInfo->Id)
+		{
+		case 596:
+		case 2061:
+		case 2060:
+			if(caster->HasAura(89485)) // Inner Focus
+				caster->RemoveAura(89485);
+			break;
+		default:
+			break;
+		}
+
         // Vessel of the Naaru (Vial of the Sunwell trinket)
         if (m_spellInfo->Id == 45064)
         {
