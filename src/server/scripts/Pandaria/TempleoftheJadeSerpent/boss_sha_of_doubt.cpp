@@ -20,6 +20,7 @@ enum Spells
 	SPELL_SHADOWFORM				= 107903,
 	SPELL_RELEASE_DOUBT				= 106112,
 	SPELL_GATHERING_DOUBT			= 117570,
+	SPELL_DRAW_DOUBT				= 106290,
 };
 
 enum Events
@@ -361,12 +362,14 @@ public:
 		Player* player;
 		Map* map;
 		bool emote;
+		bool aggro;
 
         void Reset()
 		{
 			events.Reset();
 
 			emote = false;
+			aggro = false;
 
 			me->SetReactState(REACT_PASSIVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -432,6 +435,10 @@ public:
 				me->HandleEmoteCommand(EMOTE_STATE_DROWNED);
 				emote = true;
 			}
+			
+			if (aggro)
+				if (me->getVictim() != player)
+					me->AI()->AttackStart(player);
 
 			while(uint32 eventId = events.ExecuteEvent())
 			{
@@ -451,6 +458,8 @@ public:
 								me->AI()->AttackStart(player);
 								me->AddThreat(player, 99999.0f);
 								me->SetInCombatWithZone();
+								me->CastSpell(player, SPELL_DRAW_DOUBT, true);
+								aggro = true;
 							}
 
 							events.CancelEvent(EVENT_ATTACK_PLAYERS);

@@ -75,6 +75,8 @@ public:
         {
             events.Reset();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 10);
+			me->SetFloatValue(UNIT_FIELD_COMBATREACH, 10);
             Summons.DespawnAll();
             UpdateDistanceVisibility();
         }
@@ -100,7 +102,7 @@ public:
             Talk(SAY_AGGRO);
             UpdateDistanceVisibility();
 
-            events.ScheduleEvent(EVENT_DISTANCE, 200);
+            events.ScheduleEvent(EVENT_DISTANCE, 2*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_ENDLESS_RAGE, 20*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS), 0, PHASE_GROWING_ANGER);
             events.ScheduleEvent(EVENT_UNLEASHED_WRATH, 50*IN_MILLISECONDS);
@@ -131,7 +133,7 @@ public:
                         for (i = threatlist.begin(); i != threatlist.end(); ++i)
                         {
                             if (Unit* player = Unit::GetUnit(*me, (*i)->getUnitGuid()))
-                                if (player && (player->GetTypeId() == TYPEID_PLAYER) && me->IsWithinMeleeRange(player))
+                                if (player && (player->GetTypeId() == TYPEID_PLAYER) && me->IsWithinMeleeRange(player, 5.0f))
                                 {
                                     distanceMelee = false;
                                     break;
