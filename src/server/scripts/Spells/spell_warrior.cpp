@@ -1613,7 +1613,6 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_enrage();
 	new spell_warr_second_wind();
 	new spell_warr_second_wind_aura();
-	new spell_warr_deep_wounds();
 	new spell_warr_thunder_clap();
 	new spell_warr_mortal_strike();
 	new spell_warr_sword_and_board();
