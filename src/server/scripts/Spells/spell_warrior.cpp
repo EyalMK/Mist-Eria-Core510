@@ -1292,7 +1292,7 @@ class spell_warr_second_wind_aura : public SpellScriptLoader
 
 // Called By Thunder Clap - 6343, Mortal Strike - 12294, Bloodthirst - 23881 and Devastate - 20243
 // Deep Wounds - 115767
-class spell_warr_deep_wounds : public SpellScriptLoader
+/*class spell_warr_deep_wounds : public SpellScriptLoader
 {
     public:
         spell_warr_deep_wounds() : SpellScriptLoader("spell_warr_deep_wounds") { }
@@ -1328,7 +1328,7 @@ class spell_warr_deep_wounds : public SpellScriptLoader
         {
             return new spell_warr_deep_wounds_SpellScript();
         }
-};
+};*/
 
 // Thunder Clap - 6343
 class spell_warr_thunder_clap : public SpellScriptLoader
@@ -1589,7 +1589,7 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_bloodthirst();
     new spell_warr_charge();
     new spell_warr_concussion_blow();
-    new spell_warr_deep_wounds();
+    //new spell_warr_deep_wounds();
     new spell_warr_execute();
     new spell_warr_improved_spell_reflection();
     new spell_warr_intimidating_shout();
