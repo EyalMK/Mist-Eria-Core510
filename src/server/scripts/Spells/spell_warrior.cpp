@@ -32,10 +32,6 @@ enum WarriorSpells
     SPELL_WARRIOR_CHARGE                            = 7922,
 	SPELL_WARRIOR_CHARGE_TALENT						= 105771,
 	SPELL_WARRIOR_CHARGE_TALENT_PASSIVE				= 103828,
-    SPELL_WARRIOR_DEEP_WOUNDS_RANK_1                = 12162,
-    SPELL_WARRIOR_DEEP_WOUNDS_RANK_2                = 12850,
-    SPELL_WARRIOR_DEEP_WOUNDS_RANK_3                = 12868,
-    SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC         = 12721,
     SPELL_WARRIOR_EXECUTE                           = 5308,
     SPELL_WARRIOR_GLYPH_OF_EXECUTION                = 58367,
     SPELL_WARRIOR_GLYPH_OF_VIGILANCE                = 63326,
@@ -71,6 +67,22 @@ enum WarriorSpells
 	SPELL_WARRIOR_SECOND_WIND_REGEN					= 16491,
 	SPELL_WARRIOR_SECOND_WIND_ICON					= 125667,
 	SPELL_WARRIOR_BLOODTHIRDT_HEAL					= 117313,
+	SPELL_WARRIOR_THUNDER_CLAP                      = 6343,
+	SPELL_WARRIOR_DEEP_WOUNDS                       = 115767,
+	SPELL_WARRIOR_BLOOD_AND_THUNDER                 = 84615,
+	SPELL_WARRIOR_WEAKENED_BLOWS                    = 115798,
+	SPELL_WARRIOR_GLYPH_OF_MORTAL_STRIKE            = 58368,
+	SPELL_WARRIOR_MORTAL_STRIKE_AURA                = 12294,
+	SPELL_WARRIOR_TASTE_FOR_BLOOD                   = 56638,
+	SPELL_WARRIOR_ALLOW_OVERPOWER                   = 119962,
+	SPELL_WARRIOR_SWORD_AND_BOARD                   = 50227,
+	SPELL_WARRIOR_SHIELD_SLAM                       = 23922,
+	SPELL_WARRIOR_COLOSSUS_SMASH                    = 86346,
+	SPELL_WARRIOR_TASTE_FOR_BLOOD_DAMAGE_DONE       = 125831,
+	SPELL_WARRIOR_DRAGON_ROAR_KNOCK_BACK            = 118895,
+	SPELL_WARRIOR_MEAT_CLEAVER_PROC                 = 85739,
+	SPELL_WARRIOR_GLYPH_OF_HINDERING_STRIKES        = 58366,
+	SPELL_WARRIOR_SLUGGISH                          = 129923,
 };
 
 enum WarriorSpellIcons
@@ -185,61 +197,6 @@ class spell_warr_concussion_blow : public SpellScriptLoader
         SpellScript* GetSpellScript() const
         {
             return new spell_warr_concussion_blow_SpellScript();
-        }
-};
-
-/// Updated 4.3.4
-class spell_warr_deep_wounds : public SpellScriptLoader
-{
-    public:
-        spell_warr_deep_wounds() : SpellScriptLoader("spell_warr_deep_wounds") { }
-
-        class spell_warr_deep_wounds_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_warr_deep_wounds_SpellScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_DEEP_WOUNDS_RANK_1) || !sSpellMgr->GetSpellInfo(SPELL_WARRIOR_DEEP_WOUNDS_RANK_2) || !sSpellMgr->GetSpellInfo(SPELL_WARRIOR_DEEP_WOUNDS_RANK_3))
-                    return false;
-                return true;
-            }
-
-            void HandleDummy(SpellEffIndex /*effIndex*/)
-            {
-                int32 damage = GetEffectValue();
-                Unit* caster = GetCaster();
-                if (Unit* target = GetHitUnit())
-                {
-                    // apply percent damage mods
-                    damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
-
-                    ApplyPct(damage, 16 * sSpellMgr->GetSpellRank(GetSpellInfo()->Id));
-
-                    damage = target->SpellDamageBonusTaken(caster, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
-
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC);
-                    uint32 ticks = spellInfo->GetDuration() / spellInfo->Effects[EFFECT_0].Amplitude;
-
-                    // Add remaining ticks to damage done
-                    if (AuraEffect const* aurEff = target->GetAuraEffect(SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC, EFFECT_0, caster->GetGUID()))
-                        damage += aurEff->GetAmount() * (ticks - aurEff->GetTickNumber());
-
-                    damage /= ticks;
-
-                    caster->CastCustomSpell(target, SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC, &damage, NULL, NULL, true);
-                }
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_warr_deep_wounds_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_warr_deep_wounds_SpellScript();
         }
 };
 
@@ -1166,6 +1123,7 @@ class spell_warr_raging_blow_off : public SpellScriptLoader
         }
 };
 
+// Enrage : 12880
 class spell_warr_enrage : public SpellScriptLoader
 {
     public:
@@ -1195,11 +1153,8 @@ class spell_warr_enrage : public SpellScriptLoader
             {   
 				Player* caster = GetCaster()->ToPlayer();
 
-				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY)
-				{
-					caster->CastSpell(caster, SPELL_RAGING_BLOW_STACKS);
-					caster->CastSpell(caster, SPELL_RAGING_BLOW_STACKS); // Double stacks
-				}
+				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY && caster->getLevel() >= 30)
+					caster->SetAuraStack(SPELL_RAGING_BLOW_STACKS, caster, 2);
             }
 
             void Register()
@@ -1214,47 +1169,48 @@ class spell_warr_enrage : public SpellScriptLoader
         }
 };
 
-/*class spell_warr_storm_bolt : public SpellScriptLoader
+// Mortal strike - 12294
+class spell_warr_mortal_strike : public SpellScriptLoader
 {
     public:
-        spell_warr_storm_bolt() : SpellScriptLoader("spell_warr_storm_bolt") { }
+        spell_warr_mortal_strike() : SpellScriptLoader("spell_warr_mortal_strike") { }
 
-        class spell_warr_storm_bolt_SpellScript : public SpellScript
+        class spell_warr_mortal_strike_SpellScript : public SpellScript
         {
-            PrepareSpellScript(spell_warr_storm_bolt_SpellScript);
+            PrepareSpellScript(spell_warr_mortal_strike_SpellScript);
 
-            bool Validate (SpellInfo const*)
+            void HandleOnHit()
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_STORM_BOLT))
-                    return false;
+                // Fix Apply Mortal strike buff on player only if he has the correct glyph
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        if (_player->HasAura(SPELL_WARRIOR_MORTAL_STRIKE_AURA))
+                            if (!_player->HasAura(SPELL_WARRIOR_GLYPH_OF_MORTAL_STRIKE))
+                                _player->RemoveAura(SPELL_WARRIOR_MORTAL_STRIKE_AURA);
 
-                return true;
-            }
-
-            bool Load()
-            {
-                if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
-                    return false;
-
-                return true;
-            }
-
-            void HandleEffect(SpellEffIndex)
-            {
-				Unit* target = GetHitUnit()->ToCreature();
+                        if (_player->HasAura(SPELL_WARRIOR_TASTE_FOR_BLOOD))
+                        {
+                            _player->AddComboPoints(target, 1);
+                            _player->StartReactiveTimer(REACTIVE_OVERPOWER);
+                            _player->CastSpell(_player, SPELL_WARRIOR_ALLOW_OVERPOWER, true);
+                        }
+                    }
+                }
             }
 
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_warr_storm_bolt_SpellScript::HandleEffect, EFFECT_1, SPELL_EFFECT_DUMMY);
+                OnHit += SpellHitFn(spell_warr_mortal_strike_SpellScript::HandleOnHit);
             }
         };
 
         SpellScript* GetSpellScript() const
         {
-            return new spell_warr_storm_bolt_SpellScript();
+            return new spell_warr_mortal_strike_SpellScript();
         }
-};*/
+};
 
 // 29838 - Second Wind
 class spell_warr_second_wind : public SpellScriptLoader
@@ -1334,6 +1290,300 @@ class spell_warr_second_wind_aura : public SpellScriptLoader
         }
 };
 
+// Called By Thunder Clap - 6343, Mortal Strike - 12294, Bloodthirst - 23881 and Devastate - 20243
+// Deep Wounds - 115767
+class spell_warr_deep_wounds : public SpellScriptLoader
+{
+    public:
+        spell_warr_deep_wounds() : SpellScriptLoader("spell_warr_deep_wounds") { }
+
+        class spell_warr_deep_wounds_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_deep_wounds_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        if (_player->getLevel() >= 32)
+                        {
+                            if (GetSpellInfo()->Id == SPELL_WARRIOR_THUNDER_CLAP && _player->HasAura(SPELL_WARRIOR_BLOOD_AND_THUNDER))
+                                _player->CastSpell(target, SPELL_WARRIOR_DEEP_WOUNDS, true);
+                            else
+                                _player->CastSpell(target, SPELL_WARRIOR_DEEP_WOUNDS, true);
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_warr_deep_wounds_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_deep_wounds_SpellScript();
+        }
+};
+
+// Thunder Clap - 6343
+class spell_warr_thunder_clap : public SpellScriptLoader
+{
+    public:
+        spell_warr_thunder_clap() : SpellScriptLoader("spell_warr_thunder_clap") { }
+
+        class spell_warr_thunder_clap_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_thunder_clap_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                    if (Unit* target = GetHitUnit())
+                        _player->CastSpell(target, SPELL_WARRIOR_WEAKENED_BLOWS, true);
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_warr_thunder_clap_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_thunder_clap_SpellScript();
+        }
+};
+
+// Called by Devastate - 20243
+// Sword and Board - 46953
+class spell_warr_sword_and_board : public SpellScriptLoader
+{
+    public:
+        spell_warr_sword_and_board() : SpellScriptLoader("spell_warr_sword_and_board") { }
+
+        class spell_warr_sword_and_board_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_sword_and_board_SpellScript);
+
+            void HandleOnHit()
+            {
+                // Fix Sword and Board
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        if (roll_chance_i(30))
+                        {
+                            _player->CastSpell(_player, SPELL_WARRIOR_SWORD_AND_BOARD, true);
+                            _player->RemoveSpellCooldown(SPELL_WARRIOR_SHIELD_SLAM, true);
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_warr_sword_and_board_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_sword_and_board_SpellScript();
+        }
+};
+
+// Sudden Death - 52437
+class spell_warr_sudden_death : public SpellScriptLoader
+{
+    public:
+        spell_warr_sudden_death() : SpellScriptLoader("spell_warr_sudden_death") { }
+
+        class spell_warr_sudden_death_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_sudden_death_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                    if (_player->HasSpellCooldown(SPELL_WARRIOR_COLOSSUS_SMASH))
+                        _player->RemoveSpellCooldown(SPELL_WARRIOR_COLOSSUS_SMASH, true);
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_warr_sudden_death_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_sudden_death_SpellScript();
+        }
+};
+
+// Called by Overpower - 7384
+// Taste for Blood - 56638
+class spell_warr_taste_for_blood : public SpellScriptLoader
+{
+    public:
+        spell_warr_taste_for_blood() : SpellScriptLoader("spell_warr_taste_for_blood") { }
+
+        class spell_warr_taste_for_blood_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_taste_for_blood_SpellScript);
+
+            bool rolled;
+
+            void HandleOnHit()
+            {
+                rolled = false;
+
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        if (_player->HasAura(SPELL_WARRIOR_TASTE_FOR_BLOOD))
+                        {
+                            if (roll_chance_i(30))
+                            {
+                                rolled = true;
+                                // Increase damage of next Heroic Strike or Slam
+                                _player->CastSpell(_player, SPELL_WARRIOR_TASTE_FOR_BLOOD_DAMAGE_DONE, true);
+                            }
+                        }
+                    }
+                }
+            }
+
+            void HandleAfterHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        if (_player->HasAura(SPELL_WARRIOR_TASTE_FOR_BLOOD))
+                        {
+                            if (rolled)
+                            {
+                                // Second chance to allow overpower !
+                                _player->AddComboPoints(target, 1);
+                                _player->StartReactiveTimer(REACTIVE_OVERPOWER);
+                                _player->CastSpell(_player, SPELL_WARRIOR_ALLOW_OVERPOWER, true);
+                            }
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_warr_taste_for_blood_SpellScript::HandleOnHit);
+                AfterHit += SpellHitFn(spell_warr_taste_for_blood_SpellScript::HandleAfterHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_taste_for_blood_SpellScript();
+        }
+};
+
+// Dragon Roar - 118000
+class spell_warr_dragon_roar : public SpellScriptLoader
+{
+    public:
+        spell_warr_dragon_roar() : SpellScriptLoader("spell_warr_dragon_roar") { }
+
+        class spell_warr_dragon_roar_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_dragon_roar_SpellScript);
+
+            void HandleAfterHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                    if (Unit* target = GetHitUnit())
+                        _player->CastSpell(target, SPELL_WARRIOR_DRAGON_ROAR_KNOCK_BACK, true);
+            }
+
+            void Register()
+            {
+                AfterHit += SpellHitFn(spell_warr_dragon_roar_SpellScript::HandleAfterHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_dragon_roar_SpellScript();
+        }
+};
+
+// Called by Raging Blow - 85288
+// Meat Cleaver - 85739
+class spell_warr_meat_cleaver : public SpellScriptLoader
+{
+    public:
+        spell_warr_meat_cleaver() : SpellScriptLoader("spell_warr_meat_cleaver") { }
+
+        class spell_warr_meat_cleaver_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_meat_cleaver_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                    if (_player->HasAura(SPELL_WARRIOR_MEAT_CLEAVER_PROC))
+                        _player->RemoveAura(SPELL_WARRIOR_MEAT_CLEAVER_PROC);
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_warr_meat_cleaver_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_meat_cleaver_SpellScript();
+        }
+};
+
+// Called by Heroic Strike - 78 and Cleave - 845
+// Glyph of Hindering Strikes - 58366
+class spell_warr_glyph_of_hindering_strikes : public SpellScriptLoader
+{
+    public:
+        spell_warr_glyph_of_hindering_strikes() : SpellScriptLoader("spell_warr_glyph_of_hindering_strikes") { }
+
+        class spell_warr_glyph_of_hindering_strikes_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_glyph_of_hindering_strikes_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                    if (Unit* target = GetHitUnit())
+                        if (_player->HasAura(SPELL_WARRIOR_GLYPH_OF_HINDERING_STRIKES))
+                            _player->CastSpell(target, SPELL_WARRIOR_SLUGGISH, true);
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_warr_glyph_of_hindering_strikes_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_glyph_of_hindering_strikes_SpellScript();
+        }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_bloodthirst();
@@ -1361,7 +1611,15 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_raging_blow_main();
 	new spell_warr_raging_blow_off();
 	new spell_warr_enrage();
-	//new spell_warr_storm_bolt();
 	new spell_warr_second_wind();
 	new spell_warr_second_wind_aura();
+	new spell_warr_deep_wounds();
+	new spell_warr_thunder_clap();
+	new spell_warr_mortal_strike();
+	new spell_warr_sword_and_board();
+	new spell_warr_sudden_death();
+	new spell_warr_taste_for_blood();
+	new spell_warr_dragon_roar();
+	new spell_warr_meat_cleaver();
+	new spell_warr_glyph_of_hindering_strikes();
 }
