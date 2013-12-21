@@ -57,6 +57,7 @@ enum DeathKnightSpells
 	SPELL_DK_SOUL_REAPER						= 130735,
     SPELL_DK_SOUL_REAPER_HASTE                  = 114868,
     SPELL_DK_SOUL_REAPER_DAMAGE                 = 114867,
+	SPELL_DK_DEATH_AND_DECAY					= 52212,
 };
 
 enum DeathKnightSpellIcons
@@ -1249,6 +1250,42 @@ class spell_dk_soul_reaper_damage : public SpellScriptLoader
         }
 };
 
+// 52212 : Death and Decay
+class spell_dk_death_and_decay : public SpellScriptLoader
+{
+    public:
+        spell_dk_death_and_decay() : SpellScriptLoader("spell_dk_death_and_decay") { }
+
+        class spell_dk_death_and_decay_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dk_death_and_decay_SpellScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_DK_SOUL_REAPER_DAMAGE))
+                    return false;
+                return true;
+            }
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+				Unit* caster = GetCaster()->ToPlayer();
+
+				SetHitDamage(GetHitDamage() + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.064f));
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_dk_death_and_decay_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dk_death_and_decay_SpellScript();
+        }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_anti_magic_shell_raid();
@@ -1276,4 +1313,5 @@ void AddSC_deathknight_spell_scripts()
 	new spell_dk_howling_blast();
 	new spell_dk_soul_reaper();
 	new spell_dk_soul_reaper_damage();
+	new spell_dk_death_and_decay();
 }
