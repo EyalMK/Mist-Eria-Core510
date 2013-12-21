@@ -2057,26 +2057,25 @@ void Spell::EffectCreateRandomItem(SpellEffIndex /*effIndex*/)
 
 void Spell::EffectPersistentAA(SpellEffIndex effIndex)
 {
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
+        return;
+
     if (!m_spellAura)
     {
-        float radius = m_spellInfo->Effects[effIndex].CalcRadius();
-        if (Player* modOwner = m_originalCaster->GetSpellModOwner())
-            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_RADIUS, radius);
+        Unit* caster = m_caster->GetEntry() == WORLD_TRIGGER ? m_originalCaster : m_caster;
+        float radius = m_spellInfo->Effects[effIndex].CalcRadius(caster);
 
-        Unit *caster = m_caster->GetEntry() == WORLD_TRIGGER ? m_originalCaster : m_caster;
         // Caster not in world, might be spell triggered from aura removal
         if (!caster->IsInWorld())
             return;
-
-        DynamicObject* dynObj = new DynamicObject;
-        if (!dynObj->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_DYNAMICOBJECT), caster, m_spellInfo->Id, *destTarget, radius, false))
+        DynamicObject* dynObj = new DynamicObject(false);
+        if (!dynObj->CreateDynamicObject(sObjectMgr->GenerateLowGuid(HIGHGUID_DYNAMICOBJECT), caster, m_spellInfo->Id, *destTarget, radius, DYNAMIC_OBJECT_AREA_SPELL))
         {
             delete dynObj;
             return;
         }
-        dynObj->GetMap()->AddWorldObject(dynObj);
 
-        if (Aura * aura = Aura::TryCreate(m_spellInfo, MAX_EFFECT_MASK, dynObj, caster, &m_spellValue->EffectBasePoints[0]))
+        if (Aura* aura = Aura::TryCreate(m_spellInfo, MAX_EFFECT_MASK, dynObj, caster, &m_spellValue->EffectBasePoints[0]))
         {
             m_spellAura = aura;
             m_spellAura->_RegisterForTargets();
@@ -2084,6 +2083,7 @@ void Spell::EffectPersistentAA(SpellEffIndex effIndex)
         else
             return;
     }
+
     ASSERT(m_spellAura->GetDynobjOwner());
     m_spellAura->_ApplyEffectForTargets(effIndex);
 }
