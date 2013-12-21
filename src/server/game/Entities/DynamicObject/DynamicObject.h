@@ -10,7 +10,7 @@ struct SpellEntry;
 class DynamicObject : public WorldObject, public GridObject<DynamicObject>
 {
 public:
-    explicit DynamicObject();
+    explicit DynamicObject(bool isWorldObject);
     ~DynamicObject();
  
     void AddToWorld();
