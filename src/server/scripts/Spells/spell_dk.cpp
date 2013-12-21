@@ -385,6 +385,17 @@ class spell_dk_death_coil : public SpellScriptLoader
                 return true;
             }
 
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                Unit* caster = GetCaster();
+                if (Unit* target = GetHitUnit())
+                {
+                    if (caster->IsFriendlyTo(target))
+						caster->CastSpell(target, SPELL_DK_DEATH_COIL_HEAL);
+                    else caster->CastSpell(target, SPELL_DK_DEATH_COIL_DAMAGE);
+                }
+            }
+
             SpellCastResult CheckCast()
             {
                 Unit* caster = GetCaster();
@@ -405,6 +416,7 @@ class spell_dk_death_coil : public SpellScriptLoader
             void Register()
             {
                 OnCheckCast += SpellCheckCastFn(spell_dk_death_coil_SpellScript::CheckCast);
+                OnEffectHitTarget += SpellEffectFn(spell_dk_death_coil_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
         };
 
