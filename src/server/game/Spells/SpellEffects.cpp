@@ -1869,8 +1869,14 @@ void Spell::EffectHealthLeech(SpellEffIndex effIndex)
     float healMultiplier = m_spellInfo->Effects[effIndex].CalcValueMultiplier(m_originalCaster, this);
 
     m_damage += damage;
+	uint32 healthGain;
     // get max possible damage, don't count overkill for heal
-    uint32 healthGain = uint32(-unitTarget->GetHealthGain(-damage) * healMultiplier);
+	if (healMultiplier <= 0.0f)
+	{
+		healMultiplier = 1.0f;
+		healthGain = uint32(-unitTarget->GetHealthGain(-damage) * healMultiplier);
+	}
+	else healthGain = uint32(-unitTarget->GetHealthGain(-damage) * healMultiplier);
 
     if (m_caster->isAlive())
     {
