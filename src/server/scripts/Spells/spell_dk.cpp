@@ -34,6 +34,7 @@ enum DeathKnightSpells
     SPELL_DK_BLOOD_GORGED_HEAL                  = 50454,
     SPELL_DK_CORPSE_EXPLOSION_TRIGGERED         = 43999,
     SPELL_DK_CORPSE_EXPLOSION_VISUAL            = 51270,
+	SPELL_DK_DEATH_COIL							= 47541,
     SPELL_DK_DEATH_COIL_DAMAGE                  = 47632,
     SPELL_DK_DEATH_COIL_HEAL                    = 47633,
     SPELL_DK_DEATH_STRIKE_HEAL                  = 45470,
@@ -367,7 +368,7 @@ class spell_dk_corpse_explosion : public SpellScriptLoader
         }
 };
 
-// -47541, 52375, 59134, -62900 - Death Coil
+// 47541 - Death Coil
 class spell_dk_death_coil : public SpellScriptLoader
 {
     public:
@@ -379,28 +380,19 @@ class spell_dk_death_coil : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spell*/)
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_DK_DEATH_COIL_DAMAGE) || !sSpellMgr->GetSpellInfo(SPELL_DK_DEATH_COIL_HEAL))
+                if (!sSpellMgr->GetSpellInfo(SPELL_DK_DEATH_COIL))
                     return false;
                 return true;
             }
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-                int32 damage = GetEffectValue();
                 Unit* caster = GetCaster();
                 if (Unit* target = GetHitUnit())
                 {
                     if (caster->IsFriendlyTo(target))
-                    {
-                        int32 bp = int32(damage * 1.5f);
-                        caster->CastCustomSpell(target, SPELL_DK_DEATH_COIL_HEAL, &bp, NULL, NULL, true);
-                    }
-                    else
-                    {
-                        if (AuraEffect const* auraEffect = caster->GetAuraEffect(SPELL_DK_ITEM_SIGIL_VENGEFUL_HEART, EFFECT_1))
-                            damage += auraEffect->GetBaseAmount();
-                        caster->CastCustomSpell(target, SPELL_DK_DEATH_COIL_DAMAGE, &damage, NULL, NULL, true);
-                    }
+						caster->CastSpell(target, SPELL_DK_DEATH_COIL_HEAL);
+                    else caster->CastSpell(target, SPELL_DK_DEATH_COIL_DAMAGE);
                 }
             }
 
@@ -431,6 +423,80 @@ class spell_dk_death_coil : public SpellScriptLoader
         SpellScript* GetSpellScript() const
         {
             return new spell_dk_death_coil_SpellScript();
+        }
+};
+
+// 47632 - Death Coil damage
+class spell_dk_death_coil_damage : public SpellScriptLoader
+{
+    public:
+        spell_dk_death_coil_damage() : SpellScriptLoader("spell_dk_death_coil_damage") { }
+
+        class spell_dk_death_coil_damage_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dk_death_coil_damage_SpellScript);
+
+            bool Validate(SpellInfo const* /*spell*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_DK_DEATH_COIL_DAMAGE))
+                    return false;
+                return true;
+            }
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+				Unit* caster = GetCaster()->ToPlayer();
+				uint32 damage = GetHitDamage();
+                
+				SetHitDamage(damage + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_dk_death_coil_damage_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dk_death_coil_damage_SpellScript();
+        }
+};
+
+// 47633 - Death Coil heal
+class spell_dk_death_coil_heal : public SpellScriptLoader
+{
+    public:
+        spell_dk_death_coil_heal() : SpellScriptLoader("spell_dk_death_coil_heal") { }
+
+        class spell_dk_death_coil_heal_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dk_death_coil_heal_SpellScript);
+
+            bool Validate(SpellInfo const* /*spell*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_DK_DEATH_COIL_HEAL))
+                    return false;
+                return true;
+            }
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+				Unit* caster = GetCaster()->ToPlayer();
+				uint32 healAmount = GetHitHeal();
+                
+				SetHitHeal(healAmount + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 1.8f);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_dk_death_coil_heal_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_HEAL);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dk_death_coil_heal_SpellScript();
         }
 };
 
@@ -1128,7 +1194,9 @@ class spell_dk_icy_touch : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
 				Unit* caster = GetCaster()->ToPlayer();
-				SetHitDamage(GetHitDamage() + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.319f));
+				uint32 damage = GetHitDamage();
+
+				SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.319f));
             }
 
             void Register()
@@ -1163,8 +1231,9 @@ class spell_dk_howling_blast : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
 				Unit* caster = GetCaster()->ToPlayer();
+				uint32 damage = GetHitDamage();
 
-				SetHitDamage(GetHitDamage() + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.681f));
+				SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.681f));
             }
 
             void Register()
@@ -1234,8 +1303,9 @@ class spell_dk_soul_reaper_damage : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
 				Unit* caster = GetCaster()->ToPlayer();
+				uint32 damage = GetHitDamage();
 
-				SetHitDamage(GetHitDamage() + caster->GetTotalAttackPowerValue(BASE_ATTACK));
+				SetHitDamage(damage + caster->GetTotalAttackPowerValue(BASE_ATTACK));
             }
 
             void Register()
@@ -1270,8 +1340,9 @@ class spell_dk_death_and_decay : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
 				Unit* caster = GetCaster()->ToPlayer();
+				uint32 damage = GetHitDamage();
 
-				SetHitDamage(GetHitDamage() + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.064f));
+				SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.064f));
             }
 
             void Register()
@@ -1295,6 +1366,8 @@ void AddSC_deathknight_spell_scripts()
     new spell_dk_blood_gorged();
     new spell_dk_corpse_explosion();
     new spell_dk_death_coil();
+	new spell_dk_death_coil_damage();
+	new spell_dk_death_coil_heal();
     new spell_dk_death_gate();
     new spell_dk_death_grip();
     new spell_dk_death_pact();
