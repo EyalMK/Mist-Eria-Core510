@@ -1862,27 +1862,18 @@ void Spell::EffectHealthLeech(SpellEffIndex effIndex)
         return;
 
     damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
-    damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
 
     sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "HealthLeech :%i", damage);
 
     float healMultiplier = m_spellInfo->Effects[effIndex].CalcValueMultiplier(m_originalCaster, this);
 
     m_damage += damage;
-	uint32 healthGain;
     // get max possible damage, don't count overkill for heal
-	if (healMultiplier <= 0.0f)
-	{
-		healMultiplier = 1.0f;
-		healthGain = uint32(-unitTarget->GetHealthGain(-damage) * healMultiplier);
-	}
-	else healthGain = uint32(-unitTarget->GetHealthGain(-damage) * healMultiplier);
+    uint32 healthGain = uint32(-unitTarget->GetHealthGain(-damage) * healMultiplier);
 
     if (m_caster->isAlive())
     {
         healthGain = m_caster->SpellHealingBonusDone(m_caster, m_spellInfo, healthGain, HEAL);
-        healthGain = m_caster->SpellHealingBonusTaken(m_caster, m_spellInfo, healthGain, HEAL);
-
         m_caster->HealBySpell(m_caster, m_spellInfo, uint32(healthGain));
     }
 }

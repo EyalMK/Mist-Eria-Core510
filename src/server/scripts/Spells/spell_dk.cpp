@@ -52,7 +52,8 @@ enum DeathKnightSpells
     SPELL_DK_UNHOLY_PRESENCE                    = 48265,
     SPELL_DK_IMPROVED_UNHOLY_PRESENCE_TRIGGERED = 63622,
     SPELL_DK_ITEM_SIGIL_VENGEFUL_HEART          = 64962,
-    SPELL_DK_ITEM_T8_MELEE_4P_BONUS             = 64736
+    SPELL_DK_ITEM_T8_MELEE_4P_BONUS             = 64736,
+	SPELL_DK_ICY_TOUCH							= 45477,
 };
 
 enum DeathKnightSpellIcons
@@ -1103,6 +1104,80 @@ class spell_dk_necrotic_strike : public SpellScriptLoader
         }
 };
 
+// 45477 : Icy Touch
+class spell_dk_icy_touch : public SpellScriptLoader
+{
+    public:
+        spell_dk_icy_touch() : SpellScriptLoader("spell_dk_icy_touch") { }
+
+        class spell_dk_icy_touch_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dk_icy_touch_SpellScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_DK_ICY_TOUCH))
+                    return false;
+                return true;
+            }
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+				Unit* caster = GetCaster()->ToPlayer();
+				SetHitDamage(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.319f);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_dk_icy_touch_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dk_icy_touch_SpellScript();
+        }
+};
+
+// 49184 : Howling Blast
+class spell_dk_howling_blast : public SpellScriptLoader
+{
+    public:
+        spell_dk_howling_blast() : SpellScriptLoader("spell_dk_howling_blast") { }
+
+        class spell_dk_howling_blast_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dk_howling_blast_SpellScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_DK_ICY_TOUCH))
+                    return false;
+                return true;
+            }
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+				Unit* caster = GetCaster()->ToPlayer();
+				Unit* target = GetHitUnit();
+
+				if (caster->getVictim() == GetHitUnit())
+					SetHitDamage(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.856f);
+				else SetHitDamage(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.428f);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_dk_howling_blast_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dk_howling_blast_SpellScript();
+        }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_anti_magic_shell_raid();
@@ -1126,4 +1201,6 @@ void AddSC_deathknight_spell_scripts()
     new spell_dk_vampiric_blood();
     new spell_dk_will_of_the_necropolis();
 	new spell_dk_necrotic_strike();
+	new spell_dk_icy_touch();
+	new spell_dk_howling_blast();
 }
