@@ -10,7 +10,7 @@
 #include "GridNotifiersImpl.h"
 #include "ScriptMgr.h"
  
-DynamicObject::DynamicObject() : WorldObject()
+DynamicObject::DynamicObject() : WorldObject(IsWorldObject)
 {
     m_objectType |= TYPEMASK_DYNAMICOBJECT;
     m_objectTypeId = TYPEID_DYNAMICOBJECT;
