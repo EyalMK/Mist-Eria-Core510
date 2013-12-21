@@ -83,6 +83,7 @@ enum WarriorSpells
 	SPELL_WARRIOR_MEAT_CLEAVER_PROC                 = 85739,
 	SPELL_WARRIOR_GLYPH_OF_HINDERING_STRIKES        = 58366,
 	SPELL_WARRIOR_SLUGGISH                          = 129923,
+	SPELL_WARRIOR_SHOCKWAVE							= 46968,
 };
 
 enum WarriorSpellIcons
@@ -90,7 +91,7 @@ enum WarriorSpellIcons
     WARRIOR_ICON_ID_SUDDEN_DEATH                    = 1989,
 };
 
-/// Updated 5.1.0 : Bloodthirst
+/// Updated 5.1.0 : Bloodthirst - 23881
 class spell_warr_bloodthirst : public SpellScriptLoader
 {
     public:
@@ -119,9 +120,9 @@ class spell_warr_bloodthirst : public SpellScriptLoader
             void HandleDamage(SpellEffIndex /*effIndex*/)
             {                
                 Unit* caster = GetCaster();
+				int32 damage = GetHitDamage();
 
-				int32 damage = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.9f;
-				SetHitDamage(damage);
+				SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.9f));
 				caster->CastSpell(caster, SPELL_WARRIOR_BLOODTHIRDT_HEAL);
             }
 
@@ -820,9 +821,10 @@ class spell_warr_colossus_smash : public SpellScriptLoader
             {
 				if (Unit* caster = GetCaster())
 				{
+					int32 damage = GetHitDamage();
+
+					SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 1.75f));
 					caster->CastSpell(GetHitUnit(), SPELL_WARRIOR_PHYSICAL_VULNERABILITY, true);
-					int32 damage = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 1.75f;
-					SetHitDamage(damage);
 				}
             }
 
@@ -851,26 +853,14 @@ class spell_warr_impending_victory : public SpellScriptLoader
             void HandleDamage(SpellEffIndex /*effIndex*/)
             {
 				Player* caster = GetCaster()->ToPlayer();
-				int32 baseDamageArms = 1558;
-				int32 baseDamage = 1246;
+				int32 damage = GetHitDamage();
 
 				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_ARMS)
-				{
-					int32 damage = baseDamageArms + 0.7f * GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK);
-					SetHitDamage(damage);
-				}
-
-				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY ||
+					SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.7f));
+				else if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY ||
 					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_PROTECTION)
-				{
-					int32 damage = baseDamage + 0.56f * GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK);
-					SetHitDamage(damage);
-				}
-
-				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_WARRIOR_ARMS &&
-					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_WARRIOR_FURY &&
-					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_WARRIOR_PROTECTION)
-					SetHitDamage(baseDamage);
+					SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.56f));
+				else SetHitDamage(damage);
 
 				caster->CastSpell(caster, SPELL_WARRIOR_IMPENDING_VICTORY);
             }
@@ -963,8 +953,8 @@ class spell_warr_wild_strike : public SpellScriptLoader
             {                
                 Unit* caster = GetCaster();
 
-				int32 damage = 1003 + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 2.3f;
-                SetHitDamage(damage);
+				int32 damage = GetHitDamage();
+                SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 2.3f));
             }
 
             void Register()
@@ -1342,9 +1332,19 @@ class spell_warr_thunder_clap : public SpellScriptLoader
 
             void HandleOnHit()
             {
-                if (Player* _player = GetCaster()->ToPlayer())
-                    if (Unit* target = GetHitUnit())
-                        _player->CastSpell(target, SPELL_WARRIOR_WEAKENED_BLOWS, true);
+				Player* caster = GetCaster()->ToPlayer();
+
+				uint32 damage = GetHitDamage();
+
+				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_ARMS)
+					SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.54f));
+				else if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY ||
+					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_PROTECTION)
+					SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.45f));
+				else SetHitDamage(damage);
+
+				if (Unit* target = GetHitUnit())
+					caster->CastSpell(target, SPELL_WARRIOR_WEAKENED_BLOWS, true);
             }
 
             void Register()
@@ -1584,6 +1584,44 @@ class spell_warr_glyph_of_hindering_strikes : public SpellScriptLoader
         }
 };
 
+// Schockwave - 46968
+class spell_warr_shockwave : public SpellScriptLoader
+{
+    public:
+        spell_warr_shockwave() : SpellScriptLoader("spell_warr_shockwave") { }
+
+        class spell_warr_shockwave_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_shockwave_SpellScript);
+
+            bool Validate (SpellInfo const* /*spellEntry*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_SHOCKWAVE))
+                    return false;
+
+                return true;
+            }
+
+            void HandleDamage(SpellEffIndex /*effIndex*/)
+            {                
+                Unit* caster = GetCaster()->ToPlayer();
+				int32 damage = GetHitDamage();
+
+				SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.75f));
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_warr_shockwave_SpellScript::HandleDamage, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_shockwave_SpellScript();
+        }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_bloodthirst();
@@ -1621,4 +1659,5 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_dragon_roar();
 	new spell_warr_meat_cleaver();
 	new spell_warr_glyph_of_hindering_strikes();
+	new spell_warr_shockwave();
 }
