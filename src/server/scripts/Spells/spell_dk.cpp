@@ -1124,7 +1124,7 @@ class spell_dk_icy_touch : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
 				Unit* caster = GetCaster()->ToPlayer();
-				SetHitDamage(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.319f);
+				SetHitDamage(GetHitDamage() + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.319f));
             }
 
             void Register()
@@ -1159,11 +1159,8 @@ class spell_dk_howling_blast : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
 				Unit* caster = GetCaster()->ToPlayer();
-				Unit* target = GetHitUnit();
 
-				if (caster->getVictim() == GetHitUnit())
-					SetHitDamage(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.856f);
-				else SetHitDamage(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.428f);
+				SetHitDamage(GetHitDamage() + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.681f));
             }
 
             void Register()
