@@ -1,7 +1,7 @@
 /* # Script de Tydrheal & Sungis : Sha of Doubt # */
 
 /*
-	Notes : What is missing ? - Release of Doubt (bad target heal)
+	Notes : What is missing ? - Figment beam visual
 */
 
 #include "ScriptPCH.h"
@@ -437,8 +437,13 @@ public:
 			}
 			
 			if (aggro)
+			{
 				if (me->getVictim() != player)
 					me->AI()->AttackStart(player);
+
+				if (!player->isAlive())
+					me->DespawnOrUnsummon();
+			}
 
 			while(uint32 eventId = events.ExecuteEvent())
 			{
