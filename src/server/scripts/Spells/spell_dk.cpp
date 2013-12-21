@@ -54,6 +54,9 @@ enum DeathKnightSpells
     SPELL_DK_ITEM_SIGIL_VENGEFUL_HEART          = 64962,
     SPELL_DK_ITEM_T8_MELEE_4P_BONUS             = 64736,
 	SPELL_DK_ICY_TOUCH							= 45477,
+	SPELL_DK_SOUL_REAPER						= 130735,
+    SPELL_DK_SOUL_REAPER_HASTE                  = 114868,
+    SPELL_DK_SOUL_REAPER_DAMAGE                 = 114867,
 };
 
 enum DeathKnightSpellIcons
@@ -1175,6 +1178,77 @@ class spell_dk_howling_blast : public SpellScriptLoader
         }
 };
 
+// Soul Reaper - 130736 (unholy) or 130735 (frost) or 114866 (blood)
+class spell_dk_soul_reaper : public SpellScriptLoader
+{
+    public:
+        spell_dk_soul_reaper() : SpellScriptLoader("spell_dk_soul_reaper") { }
+
+        class spell_dk_soul_reaper_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_dk_soul_reaper_AuraScript);
+
+            void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (GetCaster())
+                {
+                    AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
+
+                    if (removeMode == AURA_REMOVE_BY_DEATH)
+                        GetCaster()->CastSpell(GetCaster(), SPELL_DK_SOUL_REAPER_HASTE, true);
+                    else if (removeMode == AURA_REMOVE_BY_EXPIRE && GetTarget()->GetHealthPct() < 35.0f)
+                        GetCaster()->CastSpell(GetTarget(), SPELL_DK_SOUL_REAPER_DAMAGE, true);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectRemove += AuraEffectApplyFn(spell_dk_soul_reaper_AuraScript::HandleRemove, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_dk_soul_reaper_AuraScript();
+        }
+};
+
+// 114867 : Soul Reaper damage (triggered)
+class spell_dk_soul_reaper_damage : public SpellScriptLoader
+{
+    public:
+        spell_dk_soul_reaper_damage() : SpellScriptLoader("spell_dk_soul_reaper_damage") { }
+
+        class spell_dk_soul_reaper_damage_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dk_soul_reaper_damage_SpellScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_DK_SOUL_REAPER_DAMAGE))
+                    return false;
+                return true;
+            }
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+				Unit* caster = GetCaster()->ToPlayer();
+
+				SetHitDamage(GetHitDamage() + caster->GetTotalAttackPowerValue(BASE_ATTACK));
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_dk_soul_reaper_damage_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dk_soul_reaper_damage_SpellScript();
+        }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_anti_magic_shell_raid();
@@ -1200,4 +1274,6 @@ void AddSC_deathknight_spell_scripts()
 	new spell_dk_necrotic_strike();
 	new spell_dk_icy_touch();
 	new spell_dk_howling_blast();
+	new spell_dk_soul_reaper();
+	new spell_dk_soul_reaper_damage();
 }
