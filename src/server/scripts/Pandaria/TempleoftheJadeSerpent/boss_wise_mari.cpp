@@ -740,19 +740,13 @@ public:
 				return;
 
 			if (me->GetHealth() == 1 && droplets == 0)
-			{
 				events.ScheduleEvent(EVENT_SUMMON_CORRUPT_DROPLETS, 0);
-			}
 
 			if (me->GetHealth() == 1 && droplets == 1)
-			{
 				events.ScheduleEvent(EVENT_SUMMON_CORRUPT_DROPLETS, 0);
-			}
 
 			if (me->GetHealth() == 1 && droplets == 2)
-			{
 				events.ScheduleEvent(EVENT_SUMMON_CORRUPT_DROPLETS, 0);
-			}
 
 			if (droplets >= 3)
 				me->Kill(me);
@@ -801,9 +795,14 @@ public:
 
 		InstanceScript* instance;
 
-		void Reset() 
+		void Reset()
 		{
 			me->SetInCombatWithZone();
+		}
+
+		void EnterEvadeMode()
+		{
+			me->DespawnOrUnsummon();
 		}
 
 		void UpdateAI(uint32 diff) 
