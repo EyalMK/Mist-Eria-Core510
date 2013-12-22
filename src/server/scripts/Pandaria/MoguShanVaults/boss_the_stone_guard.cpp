@@ -106,6 +106,10 @@ class boss_amethyst_guardian : public CreatureScript
 				events.Reset();
 
 				resetAnim = false;
+
+				me->CombatStop();
+				me->DeleteThreatList();
+				me->Relocate(me->GetHomePosition());
 			}
 
             void EnterCombat(Unit* /*who*/)
@@ -205,6 +209,10 @@ class boss_cobalt_guardian : public CreatureScript
 				events.Reset();
 
 				resetAnim = false;
+
+				me->CombatStop();
+				me->DeleteThreatList();
+				me->Relocate(me->GetHomePosition());
 			}
 
             void EnterCombat(Unit* /*who*/)
@@ -304,6 +312,10 @@ class boss_jade_guardian : public CreatureScript
 				events.Reset();
 
 				resetAnim = false;
+
+				me->CombatStop();
+				me->DeleteThreatList();
+				me->Relocate(me->GetHomePosition());
 			}
 
             void EnterCombat(Unit* /*who*/)
@@ -403,6 +415,10 @@ class boss_jasper_guardian : public CreatureScript
 				events.Reset();
 
 				resetAnim = false;
+
+				me->CombatStop();
+				me->DeleteThreatList();
+				me->Relocate(me->GetHomePosition());
 			}
 
             void EnterCombat(Unit* /*who*/)
