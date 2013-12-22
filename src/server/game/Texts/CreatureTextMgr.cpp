@@ -53,7 +53,7 @@ class CreatureTextBuilder
             *data << uint32(text.length() + 1);
             *data << text;
             *data << uint16(0);                                       // ChatTag
-            if (_msgType == CHAT_MSG_RAID_BOSS_EMOTE || _msgType == CHAT_MSG_RAID_BOSS_WHISPER || CHAT_MSG_QUEST_BOSS_EMOTE)
+            if (_msgType == CHAT_MSG_RAID_BOSS_EMOTE || _msgType == CHAT_MSG_RAID_BOSS_WHISPER)
             {
                 *data << float(0);
                 *data << uint8(0);
@@ -86,7 +86,11 @@ class PlayerTextBuilder
             *data << uint32(_language);
             *data << uint64(_talker->GetGUID());
             *data << uint32(0);                                      // 2.1.0
+<<<<<<< HEAD
 			*data << uint32(strlen(_talker->GetName().c_str()) + 1);
+=======
+            *data << uint32(strlen(_talker->GetName().c_str()) + 1);
+>>>>>>> parent of 4c17c33... Adding Msg quest boss emote
             *data << _talker->GetName();
             size_t whisperGUIDpos = data->wpos();
             *data << uint64(_targetGUID);                           // Unit Target
@@ -98,7 +102,7 @@ class PlayerTextBuilder
             *data << uint32(text.length() + 1);
             *data << text;
             *data << uint16(0);                                       // ChatTag
-            if (_msgType == CHAT_MSG_RAID_BOSS_EMOTE || _msgType == CHAT_MSG_RAID_BOSS_WHISPER || CHAT_MSG_QUEST_BOSS_EMOTE)
+            if (_msgType == CHAT_MSG_RAID_BOSS_EMOTE || _msgType == CHAT_MSG_RAID_BOSS_WHISPER)
             {
                 *data << float(0);
                 *data << uint8(0);
