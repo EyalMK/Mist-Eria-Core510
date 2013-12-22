@@ -82,6 +82,9 @@ class boss_amethyst_guardian : public CreatureScript
 
 			InstanceScript* instance;
 			EventMap events;
+			Creature* cobalt;
+			Creature* jade;
+			Creature* jasper;
 
             void Reset()
             {
@@ -91,6 +94,16 @@ class boss_amethyst_guardian : public CreatureScript
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
+
+				if (instance)
+				{
+					if(me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 99999.0f, true))
+						cobalt = me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 99999.0f, true);
+					if (me->FindNearestCreature(BOSS_JADE_GUARDIAN, 99999.0f, true))
+						jade = me->FindNearestCreature(BOSS_JADE_GUARDIAN, 99999.0f, true);
+					if (me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 99999.0f, true))
+						jasper = me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 99999.0f, true);
+				}
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -99,6 +112,15 @@ class boss_amethyst_guardian : public CreatureScript
 
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
 				me->RemoveAurasDueToSpell(SPELL_ANIM_SIT, me->GetGUID());
+				
+				if (!me->isInCombat())
+					me->SetInCombatWithZone();
+				if (cobalt && !cobalt->isInCombat())
+					cobalt->SetInCombatWithZone();
+				if (jade && !jade->isInCombat())
+					jade->SetInCombatWithZone();
+				if (jasper && !jasper->isInCombat())
+					jasper->SetInCombatWithZone();
             }
 
             void JustDied(Unit* /*killer*/)
@@ -149,6 +171,9 @@ class boss_cobalt_guardian : public CreatureScript
 
 			InstanceScript* instance;
 			EventMap events;
+			Creature* amethyst;
+			Creature* jade;
+			Creature* jasper;
 
             void Reset()
             {
@@ -158,6 +183,16 @@ class boss_cobalt_guardian : public CreatureScript
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
+
+				if (instance)
+				{
+					if(me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 99999.0f, true))
+						amethyst = me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 99999.0f, true);
+					if (me->FindNearestCreature(BOSS_JADE_GUARDIAN, 99999.0f, true))
+						jade = me->FindNearestCreature(BOSS_JADE_GUARDIAN, 99999.0f, true);
+					if (me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 99999.0f, true))
+						jasper = me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 99999.0f, true);
+				}
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -166,6 +201,15 @@ class boss_cobalt_guardian : public CreatureScript
 
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
 				me->RemoveAurasDueToSpell(SPELL_ANIM_SIT, me->GetGUID());
+				
+				if (!me->isInCombat())
+					me->SetInCombatWithZone();
+				if (amethyst && !amethyst->isInCombat())
+					amethyst->SetInCombatWithZone();
+				if (jade && !jade->isInCombat())
+					jade->SetInCombatWithZone();
+				if (jasper && !jasper->isInCombat())
+					jasper->SetInCombatWithZone();
             }
 
             void JustDied(Unit* /*killer*/)
@@ -216,6 +260,9 @@ class boss_jade_guardian : public CreatureScript
 
 			InstanceScript* instance;
 			EventMap events;
+			Creature* amethyst;
+			Creature* cobalt;
+			Creature* jasper;
 
             void Reset()
             {
@@ -225,6 +272,16 @@ class boss_jade_guardian : public CreatureScript
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
+
+				if (instance)
+				{
+					if(me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 99999.0f, true))
+						amethyst = me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 99999.0f, true);
+					if (me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 99999.0f, true))
+						cobalt = me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 99999.0f, true);
+					if (me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 99999.0f, true))
+						jasper = me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 99999.0f, true);
+				}
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -233,6 +290,15 @@ class boss_jade_guardian : public CreatureScript
 
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
 				me->RemoveAurasDueToSpell(SPELL_ANIM_SIT, me->GetGUID());
+				
+				if (!me->isInCombat())
+					me->SetInCombatWithZone();
+				if (amethyst && !amethyst->isInCombat())
+					amethyst->SetInCombatWithZone();
+				if (cobalt && !cobalt->isInCombat())
+					cobalt->SetInCombatWithZone();
+				if (jasper && !jasper->isInCombat())
+					jasper->SetInCombatWithZone();
             }
 
             void JustDied(Unit* /*killer*/)
@@ -283,6 +349,9 @@ class boss_jasper_guardian : public CreatureScript
 
 			InstanceScript* instance;
 			EventMap events;
+			Creature* amethyst;
+			Creature* cobalt;
+			Creature* jade;
 
             void Reset()
             {
@@ -292,6 +361,16 @@ class boss_jasper_guardian : public CreatureScript
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
+
+				if (instance)
+				{
+					if(me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 99999.0f, true))
+						amethyst = me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 99999.0f, true);
+					if (me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 99999.0f, true))
+						cobalt = me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 99999.0f, true);
+					if (me->FindNearestCreature(BOSS_JADE_GUARDIAN, 99999.0f, true))
+						jade = me->FindNearestCreature(BOSS_JADE_GUARDIAN, 99999.0f, true);
+				}
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -300,6 +379,15 @@ class boss_jasper_guardian : public CreatureScript
 
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
 				me->RemoveAurasDueToSpell(SPELL_ANIM_SIT, me->GetGUID());
+				
+				if (!me->isInCombat())
+					me->SetInCombatWithZone();
+				if (amethyst && !amethyst->isInCombat())
+					amethyst->SetInCombatWithZone();
+				if (cobalt && !cobalt->isInCombat())
+					cobalt->SetInCombatWithZone();
+				if (jade && !jade->isInCombat())
+					jade->SetInCombatWithZone();
             }
 
             void JustDied(Unit* /*killer*/)
