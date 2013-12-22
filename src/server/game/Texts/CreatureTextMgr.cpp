@@ -41,7 +41,7 @@ class CreatureTextBuilder
             *data << uint32(_language);
             *data << uint64(_source->GetGUID());
             *data << uint32(0);                                      // 2.1.0
-			*data << uint32(localizedName.size() + 1);
+			*data << uint32(strlen(localizedName.c_str()) + 1);
             *data << localizedName;
             size_t whisperGUIDpos = data->wpos();
             *data << uint64(_targetGUID);                           // Unit Target
@@ -86,15 +86,8 @@ class PlayerTextBuilder
             *data << uint32(_language);
             *data << uint64(_talker->GetGUID());
             *data << uint32(0);                                      // 2.1.0
-<<<<<<< HEAD
-<<<<<<< HEAD
 			*data << uint32(strlen(_talker->GetName().c_str()) + 1);
-=======
-            *data << uint32(strlen(_talker->GetName().c_str()) + 1);
->>>>>>> parent of 4c17c33... Adding Msg quest boss emote
-=======
 			*data << uint32(_talker->GetName().size() + 1);
->>>>>>> parent of 7a5c3df... Chat strlen needed
             *data << _talker->GetName();
             size_t whisperGUIDpos = data->wpos();
             *data << uint64(_targetGUID);                           // Unit Target
