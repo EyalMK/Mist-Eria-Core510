@@ -21,7 +21,7 @@ set(sources
   Pandaria/MoguShanVaults/boss_feng_the_accursed.cpp
   Pandaria/MoguShanVaults/boss_garajal_the_spiritbinder.cpp
   Pandaria/MoguShanVaults/boss_the_spirit_kings.cpp
-  Pandaria/MoguShanVaults/boss_the_stone_guards.cpp
+  Pandaria/MoguShanVaults/boss_the_stone_guard.cpp
   Pandaria/MoguShanVaults/boss_will_of_the_emperor.cpp
   Pandaria/MoguShanVaults/instance_mogushan_vaults.cpp
   Pandaria/MoguShanVaults/mogushan_vaults.h
