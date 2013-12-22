@@ -16,7 +16,10 @@
  */
 
 #include "ScriptLoader.h"
+// Mogushan Vaults
+void AddSC_boss_the_stone_guard();
 
+// Mogushan Palace
 void AddSC_boss_gekkan();
 void AddSC_instance_mogushan_palace();
 
@@ -36,7 +39,7 @@ void AddSC_boss_hoptallus();
 void AddSC_boss_ook_ook();
 void AddSC_boss_yan_zhu();
 
-// Temple du serpent de jade
+// Temple of the Jade Serpent
 void AddSC_boss_wise_mari();
 void AddSC_boss_lorewalker_stonestep();
 void AddSC_boss_liu_flameheart();
@@ -1307,13 +1310,18 @@ void AddPandariaScripts()
 #ifdef SCRIPTS
 	AddSC_wandering_isle();
 
+	// Mogushan Vaults
+	AddSC_boss_the_stone_guard();
+
+	// Mogushan Palace
     AddSC_boss_gekkan();
     AddSC_instance_mogushan_palace();
 
 	AddSC_vale_of_eternal_blossoms();
     AddSC_boss_sha_of_anger();
 
-    AddSC_boss_gu_cloudstrike();			//Shado-Pan Monastery
+	//Shado-Pan Monastery
+    AddSC_boss_gu_cloudstrike();
     AddSC_boss_master_snowdrift();
     AddSC_boss_sha_of_violence();
     AddSC_boss_taran_zhu();
@@ -1324,8 +1332,8 @@ void AddPandariaScripts()
     AddSC_boss_ook_ook();
     AddSC_boss_yan_zhu();
 
-
-    AddSC_boss_wise_mari();                 //Temple of the Jade Serpent
+	//Temple of the Jade Serpent
+    AddSC_boss_wise_mari();
     AddSC_boss_lorewalker_stonestep();
     AddSC_boss_liu_flameheart();
     AddSC_boss_sha_of_doubt();
