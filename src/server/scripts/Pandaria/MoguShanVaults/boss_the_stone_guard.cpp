@@ -96,11 +96,6 @@ class boss_amethyst_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_ANIM_SIT);
             }
 
-			void EnterEvadeMode()
-			{
-				_EnterEvadeMode();
-			}
-
             void EnterCombat(Unit* /*who*/)
             {
 				_EnterCombat();
@@ -179,11 +174,6 @@ class boss_cobalt_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
             }
-
-			void EnterEvadeMode()
-			{
-				_EnterEvadeMode();
-			}
 
             void EnterCombat(Unit* /*who*/)
             {
@@ -264,11 +254,6 @@ class boss_jade_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_ANIM_SIT);
             }
 
-			void EnterEvadeMode()
-			{
-				_EnterEvadeMode();
-			}
-
             void EnterCombat(Unit* /*who*/)
             {
 				_EnterCombat();
@@ -347,11 +332,6 @@ class boss_jasper_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
             }
-
-			void EnterEvadeMode()
-			{
-				_EnterEvadeMode();
-			}
 
             void EnterCombat(Unit* /*who*/)
             {
