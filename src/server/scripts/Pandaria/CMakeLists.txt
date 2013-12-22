@@ -17,6 +17,14 @@ set(sources
   Pandaria/MoguShanPalace/boss_xin_the_weaponmaster.cpp
   Pandaria/MoguShanPalace/instance_mogushan_palace.cpp
   Pandaria/MoguShanPalace/mogushan_palace.h
+  Pandaria/MoguShanVaults/boss_elegon.cpp
+  Pandaria/MoguShanVaults/boss_feng_the_accursed.cpp
+  Pandaria/MoguShanVaults/boss_garajal_the_spiritbinder.cpp
+  Pandaria/MoguShanVaults/boss_the_spirit_kings.cpp
+  Pandaria/MoguShanVaults/boss_the_stone_guards.cpp
+  Pandaria/MoguShanVaults/boss_will_of_the_emperor.cpp
+  Pandaria/MoguShanVaults/instance_mogushan_vaults.cpp
+  Pandaria/MoguShanVaults/mogushan_vaults.h
   Pandaria/ShadoPanMonastery/shadopan_monastery.h
   Pandaria/ShadoPanMonastery/instance_shadopan_monastery.cpp
   Pandaria/ShadoPanMonastery/boss_gu_cloudstrike.cpp

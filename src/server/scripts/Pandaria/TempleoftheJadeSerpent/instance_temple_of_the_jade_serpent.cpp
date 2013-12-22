@@ -4,7 +4,7 @@
 #include "InstanceScript.h"
 #include "temple_of_the_jade_serpent.h"
 
-/* Notes : What is missing ? : - ...
+/* Notes : What is missing ? : - Some visuals and texts
 */
 
 

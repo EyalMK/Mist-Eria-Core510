@@ -1,3 +1,5 @@
+/* # Script de Sungis : Mogu'shan Vaults # */
+
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "mogushan_vaults.h"
@@ -6,7 +8,7 @@
 class instance_mogushan_vaults : public InstanceMapScript
 {
     public:
-        instance_mogushan_vaults() : InstanceMapScript("instance_mogushan_vaults", 859) { }
+        instance_mogushan_vaults() : InstanceMapScript("instance_mogushan_vaults", 1008) { }
 
         struct instance_mogushan_vaults_InstanceMapScript : public InstanceScript
         {
