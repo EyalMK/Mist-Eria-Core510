@@ -1607,7 +1607,7 @@ class spell_warr_shockwave : public SpellScriptLoader
                 Unit* caster = GetCaster()->ToPlayer();
 				int32 damage = GetHitDamage();
 
-				SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.75f));
+				SetHitDamage(damage);
             }
 
             void Register()
