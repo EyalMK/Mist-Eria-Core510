@@ -907,8 +907,8 @@ class spell_warr_heroic_throw : public SpellScriptLoader
             {                
                 Unit* caster = GetCaster();
 
-				int32 damage = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f;
-                SetHitDamage(damage);
+				int32 damage = GetHitDamage();
+                SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f));
             }
 
             void Register()
