@@ -135,13 +135,14 @@ class boss_amethyst_guardian : public CreatureScript
 
             void UpdateAI(uint32 const diff)
             {
-                if (!UpdateVictim() && resetAnim)
-                    return;
-
-				if (!resetAnim && me->IsInHomePosition(me))
+                if (!UpdateVictim())
 				{
-					me->CastSpell(me, SPELL_ANIM_SIT);
-					resetAnim = true;
+					if (!resetAnim && me->IsInHomePosition(me))
+					{
+						me->CastSpell(me, SPELL_ANIM_SIT);
+						resetAnim = true;
+					}
+					else return;
 				}
 
                 events.Update(diff);
@@ -233,13 +234,14 @@ class boss_cobalt_guardian : public CreatureScript
 
             void UpdateAI(uint32 const diff)
             {
-                if (!UpdateVictim() && resetAnim)
-                    return;
-
-				if (!resetAnim && me->IsInHomePosition(me))
+                if (!UpdateVictim())
 				{
-					me->CastSpell(me, SPELL_ANIM_SIT);
-					resetAnim = true;
+					if (!resetAnim && me->IsInHomePosition(me))
+					{
+						me->CastSpell(me, SPELL_ANIM_SIT);
+						resetAnim = true;
+					}
+					else return;
 				}
 
                 events.Update(diff);
@@ -331,13 +333,14 @@ class boss_jade_guardian : public CreatureScript
 
             void UpdateAI(uint32 const diff)
             {
-                if (!UpdateVictim() && resetAnim)
-                    return;
-
-				if (!resetAnim && me->IsInHomePosition(me))
+                if (!UpdateVictim())
 				{
-					me->CastSpell(me, SPELL_ANIM_SIT);
-					resetAnim = true;
+					if (!resetAnim && me->IsInHomePosition(me))
+					{
+						me->CastSpell(me, SPELL_ANIM_SIT);
+						resetAnim = true;
+					}
+					else return;
 				}
 
                 events.Update(diff);
@@ -429,13 +432,14 @@ class boss_jasper_guardian : public CreatureScript
 
             void UpdateAI(uint32 const diff)
             {
-                if (!UpdateVictim() && resetAnim)
-                    return;
-
-				if (!resetAnim && me->IsInHomePosition(me))
+                if (!UpdateVictim())
 				{
-					me->CastSpell(me, SPELL_ANIM_SIT);
-					resetAnim = true;
+					if (!resetAnim && me->IsInHomePosition(me))
+					{
+						me->CastSpell(me, SPELL_ANIM_SIT);
+						resetAnim = true;
+					}
+					else return;
 				}
 
                 events.Update(diff);
