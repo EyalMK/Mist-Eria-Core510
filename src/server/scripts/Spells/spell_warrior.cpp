@@ -1336,12 +1336,7 @@ class spell_warr_thunder_clap : public SpellScriptLoader
 
 				uint32 damage = GetHitDamage();
 
-				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_ARMS)
-					SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.54f));
-				else if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY ||
-					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_PROTECTION)
-					SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.45f));
-				else SetHitDamage(damage);
+				SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f));
 
 				if (Unit* target = GetHitUnit())
 					caster->CastSpell(target, SPELL_WARRIOR_WEAKENED_BLOWS, true);
@@ -1605,8 +1600,9 @@ class spell_warr_shockwave : public SpellScriptLoader
             void HandleDamage(SpellEffIndex /*effIndex*/)
             {                
                 Unit* caster = GetCaster()->ToPlayer();
+				uint32 damage = GetHitDamage();
 
-				SetHitDamage(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.75f);
+				SetHitDamage(damage + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.22f);
             }
 
             void Register()
