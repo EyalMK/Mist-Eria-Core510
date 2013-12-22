@@ -511,6 +511,7 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
         }
 
         bool IsDungeonBoss() const;
+		bool IsInHomePosition(Creature const* creature) const;
 
         uint8 getLevelForTarget(WorldObject const* target) const; // overwrite Unit::getLevelForTarget for boss level support
 

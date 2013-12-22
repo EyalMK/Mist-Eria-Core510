@@ -2536,6 +2536,19 @@ bool Creature::IsDungeonBoss() const
     return cinfo && (cinfo->flags_extra & CREATURE_FLAG_EXTRA_DUNGEON_BOSS);
 }
 
+bool Creature::IsInHomePosition(Creature const* creature) const
+{
+	float xpos, ypos, zpos, ori;
+	creature->GetHomePosition(xpos, ypos, zpos, ori);
+
+	if (xpos == creature->GetPositionX() &&
+		ypos == creature->GetPositionY() &&
+		zpos == creature->GetPositionZ() &&
+		ori == creature->GetOrientation())
+		return true;
+	else return false;
+}
+
 bool Creature::SetWalk(bool enable)
 {
     if (!Unit::SetWalk(enable))

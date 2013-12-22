@@ -85,6 +85,7 @@ class boss_amethyst_guardian : public CreatureScript
 			Creature* cobalt;
 			Creature* jade;
 			Creature* jasper;
+			bool resetAnim;
 
             void Reset()
             {
@@ -92,9 +93,20 @@ class boss_amethyst_guardian : public CreatureScript
 
 				events.Reset();
 
+				resetAnim = false;
+
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
             }
+
+			void EnterEvadeMode()
+			{
+				_EnterEvadeMode();
+
+				events.Reset();
+
+				resetAnim = false;
+			}
 
             void EnterCombat(Unit* /*who*/)
             {
@@ -123,8 +135,14 @@ class boss_amethyst_guardian : public CreatureScript
 
             void UpdateAI(uint32 const diff)
             {
-                if (!UpdateVictim())
+                if (!UpdateVictim() && resetAnim)
                     return;
+
+				if (!resetAnim && me->IsInHomePosition(me))
+				{
+					me->CastSpell(me, SPELL_ANIM_SIT);
+					resetAnim = true;
+				}
 
                 events.Update(diff);
 
@@ -167,6 +185,7 @@ class boss_cobalt_guardian : public CreatureScript
 			Creature* amethyst;
 			Creature* jade;
 			Creature* jasper;
+			bool resetAnim;
 
             void Reset()
             {
@@ -177,6 +196,15 @@ class boss_cobalt_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
             }
+
+			void EnterEvadeMode()
+			{
+				_EnterEvadeMode();
+
+				events.Reset();
+
+				resetAnim = false;
+			}
 
             void EnterCombat(Unit* /*who*/)
             {
@@ -205,8 +233,14 @@ class boss_cobalt_guardian : public CreatureScript
 
             void UpdateAI(uint32 const diff)
             {
-                if (!UpdateVictim())
+                if (!UpdateVictim() && resetAnim)
                     return;
+
+				if (!resetAnim && me->IsInHomePosition(me))
+				{
+					me->CastSpell(me, SPELL_ANIM_SIT);
+					resetAnim = true;
+				}
 
                 events.Update(diff);
 
@@ -249,6 +283,7 @@ class boss_jade_guardian : public CreatureScript
 			Creature* amethyst;
 			Creature* cobalt;
 			Creature* jasper;
+			bool resetAnim;
 
             void Reset()
             {
@@ -259,6 +294,15 @@ class boss_jade_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
             }
+
+			void EnterEvadeMode()
+			{
+				_EnterEvadeMode();
+
+				events.Reset();
+
+				resetAnim = false;
+			}
 
             void EnterCombat(Unit* /*who*/)
             {
@@ -287,8 +331,14 @@ class boss_jade_guardian : public CreatureScript
 
             void UpdateAI(uint32 const diff)
             {
-                if (!UpdateVictim())
+                if (!UpdateVictim() && resetAnim)
                     return;
+
+				if (!resetAnim && me->IsInHomePosition(me))
+				{
+					me->CastSpell(me, SPELL_ANIM_SIT);
+					resetAnim = true;
+				}
 
                 events.Update(diff);
 
@@ -331,6 +381,7 @@ class boss_jasper_guardian : public CreatureScript
 			Creature* amethyst;
 			Creature* cobalt;
 			Creature* jade;
+			bool resetAnim;
 
             void Reset()
             {
@@ -341,6 +392,15 @@ class boss_jasper_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
             }
+
+			void EnterEvadeMode()
+			{
+				_EnterEvadeMode();
+
+				events.Reset();
+
+				resetAnim = false;
+			}
 
             void EnterCombat(Unit* /*who*/)
             {
@@ -369,8 +429,14 @@ class boss_jasper_guardian : public CreatureScript
 
             void UpdateAI(uint32 const diff)
             {
-                if (!UpdateVictim())
+                if (!UpdateVictim() && resetAnim)
                     return;
+
+				if (!resetAnim && me->IsInHomePosition(me))
+				{
+					me->CastSpell(me, SPELL_ANIM_SIT);
+					resetAnim = true;
+				}
 
                 events.Update(diff);
 
