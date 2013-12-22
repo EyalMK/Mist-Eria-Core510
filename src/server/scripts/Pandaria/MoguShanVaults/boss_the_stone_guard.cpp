@@ -99,12 +99,6 @@ class boss_amethyst_guardian : public CreatureScript
 			void EnterEvadeMode()
 			{
 				_EnterEvadeMode();
-
-				events.Reset();
-
-				me->CombatStop();
-				me->DeleteThreatList();
-				me->Relocate(me->GetHomePosition());
 			}
 
             void EnterCombat(Unit* /*who*/)
@@ -138,9 +132,6 @@ class boss_amethyst_guardian : public CreatureScript
 					return;
 
                 events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
                 
                 while (uint32 eventId = events.ExecuteEvent())
                 {
@@ -192,12 +183,6 @@ class boss_cobalt_guardian : public CreatureScript
 			void EnterEvadeMode()
 			{
 				_EnterEvadeMode();
-
-				events.Reset();
-
-				me->CombatStop();
-				me->DeleteThreatList();
-				me->Relocate(me->GetHomePosition());
 			}
 
             void EnterCombat(Unit* /*who*/)
@@ -231,9 +216,6 @@ class boss_cobalt_guardian : public CreatureScript
 					return;
 
                 events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
                 
                 while (uint32 eventId = events.ExecuteEvent())
                 {
@@ -285,12 +267,6 @@ class boss_jade_guardian : public CreatureScript
 			void EnterEvadeMode()
 			{
 				_EnterEvadeMode();
-
-				events.Reset();
-
-				me->CombatStop();
-				me->DeleteThreatList();
-				me->Relocate(me->GetHomePosition());
 			}
 
             void EnterCombat(Unit* /*who*/)
@@ -324,9 +300,6 @@ class boss_jade_guardian : public CreatureScript
 					return;
 
                 events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
                 
                 while (uint32 eventId = events.ExecuteEvent())
                 {
@@ -378,12 +351,6 @@ class boss_jasper_guardian : public CreatureScript
 			void EnterEvadeMode()
 			{
 				_EnterEvadeMode();
-
-				events.Reset();
-
-				me->CombatStop();
-				me->DeleteThreatList();
-				me->Relocate(me->GetHomePosition());
 			}
 
             void EnterCombat(Unit* /*who*/)
@@ -417,9 +384,6 @@ class boss_jasper_guardian : public CreatureScript
 					return;
 
                 events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
                 
                 while (uint32 eventId = events.ExecuteEvent())
                 {
