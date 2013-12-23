@@ -22962,7 +22962,7 @@ void Player::SavePlayerOnAlterTimeApply()
 
 void Player::ResetPlayerOnAlterTimeExpire()
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "Sylmir Alter Time : remove aura on player %s [guid %u]", GetName(), GetGUIDLow());
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "Sylmir Alter Time : remove aura on player %s [guid %u]", GetName().c_str(), GetGUIDLow());
 	if(GetAlterTimeAuraApplicationMap().empty())
 		return ;
 
@@ -22972,7 +22972,7 @@ void Player::ResetPlayerOnAlterTimeExpire()
 	for(AlterTimeAuraApplicationMap::iterator iter = GetAlterTimeAuraApplicationMap().begin() ; iter != GetAlterTimeAuraApplicationMap().end() ; ++iter)
 	{
 		AuraApplication auraApp = iter->second ;
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "Sylmir Alter Time : Inserting an aura : %s (id : %u) on player %s [guid %u]", auraApp.GetBase()->GetSpellInfo()->SpellName, auraApp.GetBase()->GetId(), GetName(), GetGUIDLow());
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "Sylmir Alter Time : Inserting an aura : %s (id : %u) on player %s [guid %u]", auraApp.GetBase()->GetSpellInfo()->SpellName, auraApp.GetBase()->GetId(), GetName().c_str(), GetGUIDLow());
 		GetAppliedAuras().insert(std::pair<uint32, AuraApplication*>(iter->first, &(iter->second)));
 	}
 }
