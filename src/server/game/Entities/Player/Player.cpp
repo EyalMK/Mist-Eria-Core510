@@ -22932,6 +22932,37 @@ void Player::InitPrimaryProfessions()
     SetFreePrimaryProfessions(sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL));
 }
 
+void Player::SavePlayerOnAlterTimeApply()
+{
+	Unit::AuraApplicationMap appliedAuras = GetAppliedAuras();
+	
+	if(appliedAuras.empty())
+		return ;
+	
+	if(!m_alterTimeAuraApplicationMap.empty())
+		m_alterTimeAuraApplicationMap.clear();
+
+	for(Unit::AuraApplicationMap::iterator iter = appliedAuras.begin() ; iter != appliedAuras.end() ; ++iter)
+	{
+		if(iter->second)
+		{
+			AuraApplication auraApp = *(iter->second);
+			m_alterTimeAuraApplicationMap.insert(std::pair<uint32, AuraApplication>(iter->first, auraApp)) ;
+		}
+	}
+}
+
+void Player::ResetPlayerOnAlterTimeExpire()
+{
+	if(GetAlterTimeAuraApplicationMap().empty())
+		return ;
+
+	RemoveAllAuras();
+
+	for(AlterTimeAuraApplicationMap::iterator iter = GetAlterTimeAuraApplicationMap().begin() ; iter != GetAlterTimeAuraApplicationMap().end() ; ++iter)
+		GetAppliedAuras().insert(std::pair<uint32, AuraApplication*>(iter->first, &(iter->second)));
+}
+
 bool Player::ModifyMoney(int64 amount, bool sendError /*= true*/)
 {
     if (!amount)

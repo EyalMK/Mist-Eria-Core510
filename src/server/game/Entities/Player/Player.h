@@ -1926,6 +1926,29 @@ class Player : public Unit, public GridObject<Player>
 
         PlayerSpellMap const& GetSpellMap() const { return m_spells; }
         PlayerSpellMap      & GetSpellMap()       { return m_spells; }
+		
+		/******* Alter Time System *******/
+		typedef std::multimap<uint32, AuraApplication> AlterTimeAuraApplicationMap ;
+		
+		AlterTimeAuraApplicationMap const& GetAlterTimeAuraApplicationMap() const
+		{
+			return m_alterTimeAuraApplicationMap ;
+		}
+
+		AlterTimeAuraApplicationMap &GetAlterTimeAuraApplicationMap()
+		{
+			return m_alterTimeAuraApplicationMap ;
+		}
+
+		void SavePlayerOnAlterTimeApply();
+
+		void ResetPlayerOnAlterTimeExpire();
+
+		private :
+			AlterTimeAuraApplicationMap m_alterTimeAuraApplicationMap ;
+		
+		/******* End of Alter Time System *******/
+		public :
 
         SpellCooldowns const& GetSpellCooldownMap() const { return m_spellCooldowns; }
 
