@@ -94,7 +94,16 @@ enum MageSpells
 
 	SPELL_MAGE_FROSTBOLT_HEAL					 = 126201,
 
-	SPELL_MAGE_IMPROVED_MANA_GEM_TRIGGERED		 = 119313
+	SPELL_MAGE_IMPROVED_MANA_GEM_TRIGGERED		 = 119313,
+
+    SPELL_MAGE_ALTER_TIME_BASE                   = 108978,
+    SPELL_MAGE_ALTER_TIME_AURA                   = 110909,
+    SPELL_MAGE_ALTER_TIME_RESET                  = 127140,
+
+	SPELL_MAGE_COMBUSTION_BASE					 = 11129,
+	SPELL_MAGE_COMBUSTION_DOT					 = 83853,
+	SPELL_MAGE_COMBUSTION_IMPACT				 = 118271,
+	SPELL_MAGE_INFERNO_BLAST					 = 108853
 };
 
 enum MageIcons
@@ -1362,6 +1371,222 @@ class spell_mage_deep_freeze : public SpellScriptLoader
        }
 };
 
+class spell_mage_alter_time : public SpellScriptLoader
+{
+public :
+    spell_mage_alter_time() : SpellScriptLoader("spell_mage_alter_time")
+    {
+
+    }
+
+    class spell_mage_alter_time_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_mage_alter_time_AuraScript)
+
+        bool Validate(const SpellInfo *spellInfo)
+        {
+            if(!sSpellMgr->GetSpellInfo(SPELL_MAGE_ALTER_TIME_AURA)
+                    || !sSpellMgr->GetSpellInfo(SPELL_MAGE_ALTER_TIME_RESET)
+                    || !sSpellMgr->GetSpellInfo(SPELL_MAGE_ALTER_TIME_BASE))
+                return false ;
+
+            return true ;
+        }
+
+        bool Load()
+        {
+            if(GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER)
+            {
+                p_caster = GetCaster()->ToPlayer() ;
+                return true ;
+            }
+
+            return false ;
+        }
+
+        void handleSavePlayerOnEffectApply(AuraEffect const* auraEff, AuraEffectHandleModes mode)
+        {
+			if(!p_caster)
+			{
+				if(GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER)
+					p_caster = GetCaster()->ToPlayer();
+				else
+					return ;
+			}
+
+			if(p_caster)
+			{
+				m_uiHealth = p_caster->GetHealth() ;
+				m_uiMana = p_caster->GetPower(POWER_MANA);
+				WorldLocation temp(p_caster->GetMapId(), p_caster->GetPositionX(), p_caster->GetPositionY(), p_caster->GetPositionZ() + 1, p_caster->GetOrientation());
+				m_savedPos = temp ;
+				
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Applying Alter Time ; saving player");
+				p_caster->SavePlayerOnAlterTimeApply();
+			}
+		}
+
+		void handleResetPlayerOnEffectRemove(AuraEffect const* auraEff, AuraEffectHandleModes mode)
+		{
+			if(!p_caster)
+				return ;
+
+			if(p_caster)
+			{
+				p_caster->SetHealth(m_uiHealth);
+				p_caster->SetPower(POWER_MANA, int32(m_uiMana));
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Removing Alter Time ; player teleporting");
+				p_caster->TeleportTo(m_savedPos, 0);
+				
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Removing Alter Time ; auras resetting");
+				if(GetCaster())
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Caster as Unit is not null");
+					if(GetCaster()->ToPlayer())
+					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Caster as player is not null ; resetting !");
+						GetCaster()->ToPlayer()->ResetPlayerOnAlterTimeExpire();
+					}
+				}
+			}
+		}
+
+		void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_mage_alter_time_AuraScript::handleSavePlayerOnEffectApply, EFFECT_0, SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_mage_alter_time_AuraScript::handleResetPlayerOnEffectRemove, EFFECT_0, SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS, AURA_EFFECT_HANDLE_REAL);
+        }
+
+        Player* p_caster ;
+        uint32 m_uiHealth, m_uiMana ;
+        WorldLocation m_savedPos ;
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_mage_alter_time_AuraScript();
+    }
+};
+
+class spell_mage_alter_time_triggerer : public SpellScriptLoader
+{
+public :
+	spell_mage_alter_time_triggerer() : SpellScriptLoader("spell_mage_alter_time_triggerer")
+	{
+
+	}
+
+	class spell_mage_alter_time_triggerer_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_mage_alter_time_triggerer_SpellScript);
+
+		bool Validate(SpellInfo const* spellInfo)
+		{
+			return true ;
+		}
+
+		bool Load()
+		{
+			return true ;
+		}
+
+		void handleRemoveAuraOnEffectDummy(SpellEffIndex effectIndex)
+		{
+			if(GetCaster() && GetCaster()->ToPlayer() && GetCaster()->HasAura(SPELL_MAGE_ALTER_TIME_AURA))
+				GetCaster()->RemoveAura(SPELL_MAGE_ALTER_TIME_AURA);
+		}
+
+		void Register()
+		{
+			OnEffectHitTarget += SpellEffectFn(spell_mage_alter_time_triggerer_SpellScript::handleRemoveAuraOnEffectDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+		}
+	};
+
+	SpellScript* GetSpellScript() const
+	{
+		return new spell_mage_alter_time_triggerer_SpellScript();
+	}
+};
+
+class spell_mage_combustion : public SpellScriptLoader
+{
+public :
+	spell_mage_combustion() : SpellScriptLoader("spell_mage_combustion")
+	{
+
+	}
+
+	class spell_mage_combustion_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_mage_combustion_SpellScript);
+
+		bool Validate(SpellInfo const* spellInfo)
+		{
+			return true ;
+		}
+
+		bool Load()
+		{
+			return true ;
+		}
+
+		void handleResetInfernoBlastCooldownOnCast()
+		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Entering Combusion OnCast Handler");
+			if(GetCaster())
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Combustion's Caster as unit is not null");
+				if(Player* p = GetCaster()->ToPlayer())
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Combustion's Caster as player is not null ; resetting cooldown");
+					p->RemoveSpellCooldown(SPELL_MAGE_INFERNO_BLAST);
+				}
+			}
+		}
+
+		void handleMiscOnEffectScriptEffect(SpellEffIndex effectIndex)
+		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Entering Combusion OnEffectHitTarget Handler");
+			if(Unit* target = GetExplTargetUnit())
+			{
+				// Combusion impact = stun
+				if(GetCaster())
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Combustion's Target not null ; ready to impact");
+					GetCaster()->CastSpell(target, SPELL_MAGE_COMBUSTION_IMPACT);
+				}
+
+				// Periodic damages
+				if(Aura* ignite = target->GetAura(SPELL_MAGE_IGNITE))
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Combustion's Target has Ignite aura ; ready to apply the dot");
+					if(GetCaster() && target)
+					{
+						GetCaster()->CastSpell(target, SPELL_MAGE_COMBUSTION_DOT) ;
+						Aura* combustionDot = target->GetAura(SPELL_MAGE_COMBUSTION_DOT) ;
+						if(combustionDot && ignite)
+						{
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Applying the dot on Combusion target");
+							combustionDot->GetEffect(0)->SetAmount(ignite->GetEffect(0)->GetAmount()) ;
+						}
+					}
+				}
+			}
+		}
+
+		void Register()
+		{
+			OnCast += SpellCastFn(spell_mage_combustion_SpellScript::handleResetInfernoBlastCooldownOnCast);
+			OnEffectHitTarget += SpellEffectFn(spell_mage_combustion_SpellScript::handleMiscOnEffectScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+		}
+	};
+
+	SpellScript* GetSpellScript() const
+	{
+		return new spell_mage_combustion_SpellScript();
+	}
+};
+
 void AddSC_mage_spell_scripts()
 {
     new spell_mage_blast_wave();
@@ -1388,4 +1613,7 @@ void AddSC_mage_spell_scripts()
 	new spell_mage_ice_lance();
 	new spell_mage_finger_of_frost();
 	new spell_mage_deep_freeze();
+	new spell_mage_alter_time();
+	new spell_mage_alter_time_triggerer();
+	new spell_mage_combustion();
 }
