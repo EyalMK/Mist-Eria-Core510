@@ -253,6 +253,7 @@ public:
 
 						case EVENT_SAY_END_2:
 							Talk(SAY_END_2);
+							me->SetFacingTo(1.261891f);
 							me->CastSpell(me, SPELL_MEDITATE);
 
 							events.CancelEvent(EVENT_SAY_END_2); // End of the script
