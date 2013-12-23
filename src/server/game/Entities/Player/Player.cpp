@@ -22954,6 +22954,8 @@ void Player::SavePlayerOnAlterTimeApply()
 		if(iter->second)
 		{
 			AuraApplication auraApp = *(iter->second);
+			if(auraApp.GetBase() && auraApp.GetBase()->GetId() == 110909)
+				continue ;
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Sylmir SavePlayerOnAlterTime ; Recuperation d'une auraApp %u %s", auraApp.GetBase()->GetId(), auraApp.GetBase()->GetSpellInfo()->SpellName);
 			m_alterTimeAuraApplicationMap.insert(std::pair<uint32, AuraApplication>(iter->first, auraApp)) ;
 		}
