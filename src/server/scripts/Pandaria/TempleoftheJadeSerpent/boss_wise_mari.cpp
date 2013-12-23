@@ -196,7 +196,7 @@ public:
 				if (me->HasAura(SPELL_WATER_BUBBLE))
 					me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE);
 				if (me->HasAura(SPELL_WASH_AWAY))
-					me->RemoveAurasDueToSpell(SPELL_WASH_AWAY_TRIGGERED);
+					me->RemoveAurasDueToSpell(SPELL_WASH_AWAY);
 				if (me->HasAura(SPELL_WASH_AWAY_VISUAL))
 					me->RemoveAurasDueToSpell(SPELL_WASH_AWAY_VISUAL);
 
@@ -573,7 +573,7 @@ public:
 	
 							case EVENT_WASH_AWAY:
 								me->RemoveAurasDueToSpell(SPELL_WATER_BUBBLE, me->GetGUID());
-								DoCast(SPELL_WASH_AWAY_VISUAL);
+								me->CastSpell(me, SPELL_WASH_AWAY_VISUAL, true);
 								DoCast(SPELL_WASH_AWAY);
 								
 								events.ScheduleEvent(EVENT_SAY_TAUNT, 18*IN_MILLISECONDS, 0, PHASE_WASH_AWAY);

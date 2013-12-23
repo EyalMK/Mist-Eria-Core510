@@ -1,8 +1,6 @@
 /* # Script de Sungis : The Stone Guard # */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
+#include "ScriptPCH.h"
 #include "mogushan_vaults.h"
 
 enum Spells
