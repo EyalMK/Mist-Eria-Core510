@@ -1522,44 +1522,53 @@ public :
 
 		bool Validate(SpellInfo const* spellInfo)
 		{
-			if(!sSpellMgr->GetSpellInfo(SPELL_MAGE_COMBUSTION_BASE)
-				|| !sSpellMgr->GetSpellInfo(SPELL_MAGE_COMBUSTION_DOT)
-				|| !sSpellMgr->GetSpellInfo(SPELL_MAGE_IGNITE)
-				|| !sSpellMgr->GetSpellInfo(SPELL_MAGE_COMBUSTION_IMPACT))
-				return false ;
-
 			return true ;
 		}
 
 		bool Load()
 		{
-			return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER ;
+			return true ;
 		}
 
 		void handleResetInfernoBlastCooldownOnCast()
 		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Entering Combusion OnCast Handler");
 			if(GetCaster())
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Combustion's Caster as unit is not null");
 				if(Player* p = GetCaster()->ToPlayer())
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Combustion's Caster as player is not null ; resetting cooldown");
 					p->RemoveSpellCooldown(SPELL_MAGE_INFERNO_BLAST);
+				}
+			}
 		}
 
 		void handleMiscOnEffectScriptEffect(SpellEffIndex effectIndex)
 		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Entering Combusion OnEffectHitTarget Handler");
 			if(Unit* target = GetExplTargetUnit())
 			{
 				// Combusion impact = stun
 				if(GetCaster())
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Combustion's Target not null ; ready to impact");
 					GetCaster()->CastSpell(target, SPELL_MAGE_COMBUSTION_IMPACT);
+				}
 
 				// Periodic damages
 				if(Aura* ignite = target->GetAura(SPELL_MAGE_IGNITE))
 				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Combustion's Target has Ignite aura ; ready to apply the dot");
 					if(GetCaster() && target)
 					{
 						GetCaster()->CastSpell(target, SPELL_MAGE_COMBUSTION_DOT) ;
 						Aura* combustionDot = target->GetAura(SPELL_MAGE_COMBUSTION_DOT) ;
 						if(combustionDot && ignite)
+						{
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Applying the dot on Combusion target");
 							combustionDot->GetEffect(0)->SetAmount(ignite->GetEffect(0)->GetAmount()) ;
+						}
 					}
 				}
 			}
@@ -1568,7 +1577,7 @@ public :
 		void Register()
 		{
 			OnCast += SpellCastFn(spell_mage_combustion_SpellScript::handleResetInfernoBlastCooldownOnCast);
-			OnEffectHitTarget += SpellEffectFn(spell_mage_combustion_SpellScript::handleMiscOnEffectScriptEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+			OnEffectHitTarget += SpellEffectFn(spell_mage_combustion_SpellScript::handleMiscOnEffectScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
 		}
 	};
 
