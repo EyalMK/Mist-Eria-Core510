@@ -776,14 +776,9 @@ public:
 		void Reset()
 		{
 			events.Reset();
-			events.ScheduleEvent(EVENT_ATTACK_PERIL, 3*IN_MILLISECONDS);
-		}
 
-		void JustSummoned(Creature* summoned)
-        {
-			events.Reset();
-			events.ScheduleEvent(EVENT_ATTACK_PERIL, 3*IN_MILLISECONDS);
-        }
+			events.ScheduleEvent(EVENT_AGGRO, 5500);
+		}
 
 		void EnterEvadeMode()
 		{
@@ -809,8 +804,8 @@ public:
 						case EVENT_ATTACK_STRIFE:
 							if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 99999.0f))
 							{
-								me->AddThreat(strife, 999.0f);
-								me->Attack(strife, true);
+								me->AI()->AttackStart(strife);
+								me->AddThreat(strife, 99999.0f);
 							}
 
 							events.ScheduleEvent(EVENT_ATTACK_PERIL, 8*IN_MILLISECONDS);
@@ -820,8 +815,8 @@ public:
 						case EVENT_ATTACK_PERIL:
 							if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 99999.0f))
 							{
-								me->AddThreat(peril, 999.0f);
-								me->Attack(peril, true);
+								me->AI()->AttackStart(peril);
+								me->AddThreat(peril, 99999.0f);
 							}
 
 							events.ScheduleEvent(EVENT_ATTACK_STRIFE, 8*IN_MILLISECONDS);
