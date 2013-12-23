@@ -22975,7 +22975,30 @@ void Player::ResetPlayerOnAlterTimeExpire()
 	{
 		AuraApplication auraApp = iter->second ;
 		sLog->outDebug(LOG_FILTER_NETWORKIO, "Sylmir Alter Time : Inserting an aura : %s (id : %u) on player %s [guid %u]", auraApp.GetBase()->GetSpellInfo()->SpellName, auraApp.GetBase()->GetId(), GetName().c_str(), GetGUIDLow());
-		GetAppliedAuras().insert(std::pair<uint32, AuraApplication*>(iter->first, &(iter->second)));
+		
+		Aura* aura = AddAura(auraApp.GetBase()->GetSpellInfo(), auraApp.GetBase()->GetStackAmount(), this);
+		if(!aura)
+			continue ;
+
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "Setting timer for aura %s (id : %u) on player %s (guid : %u)", aura->GetSpellInfo()->SpellName, aura->GetId(), GetName().c_str(), GetGUIDLow());
+		aura->SetDuration(auraApp.GetBase()->GetDuration()) ;
+
+		for(uint8 i = 0 ; i < MAX_SPELL_EFFECTS ; ++i)
+		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Looping on effect %u", i);
+			if(aura->GetEffect(i) && auraApp.GetBase()->GetEffect(i))
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Initializing effect");
+				AuraEffect* auraEff = aura->GetEffect(i);
+				if(auraEff)
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Setting amount");
+					auraEff->SetAmount(auraApp.GetBase()->GetEffect(i)->GetAmount());
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Setting periodic timer");
+					auraEff->SetPeriodicTimer(auraApp.GetBase()->GetEffect(i)->GetPeriodicTimer());
+				}
+			}
+		}
 	}
 }
 
