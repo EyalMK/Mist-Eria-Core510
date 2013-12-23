@@ -101,8 +101,7 @@ class boss_amethyst_guardian : public CreatureScript
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
 				me->RemoveAurasDueToSpell(SPELL_ANIM_SIT, me->GetGUID());
 				
-				if (!me->isInCombat())
-					me->SetInCombatWithZone();
+				me->SetInCombatWithZone();
 				if (cobalt = me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 99999.0f, true))
 					if (!cobalt->isInCombat())
 						cobalt->SetInCombatWithZone();
@@ -180,8 +179,7 @@ class boss_cobalt_guardian : public CreatureScript
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
 				me->RemoveAurasDueToSpell(SPELL_ANIM_SIT, me->GetGUID());
 				
-				if (!me->isInCombat())
-					me->SetInCombatWithZone();
+				me->SetInCombatWithZone();
 				if (amethyst = me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 99999.0f, true))
 					if (!amethyst->isInCombat())
 						amethyst->SetInCombatWithZone();
@@ -259,8 +257,7 @@ class boss_jade_guardian : public CreatureScript
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
 				me->RemoveAurasDueToSpell(SPELL_ANIM_SIT, me->GetGUID());
 				
-				if (!me->isInCombat())
-					me->SetInCombatWithZone();
+				me->SetInCombatWithZone();
 				if (amethyst = me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 99999.0f, true))
 					if (!amethyst->isInCombat())
 						amethyst->SetInCombatWithZone();
@@ -338,8 +335,7 @@ class boss_jasper_guardian : public CreatureScript
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
 				me->RemoveAurasDueToSpell(SPELL_ANIM_SIT, me->GetGUID());
 				
-				if (!me->isInCombat())
-					me->SetInCombatWithZone();
+				me->SetInCombatWithZone();
 				if (amethyst = me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 99999.0f, true))
 					if (!amethyst->isInCombat())
 						amethyst->SetInCombatWithZone();
