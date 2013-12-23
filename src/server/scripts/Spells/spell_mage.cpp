@@ -98,7 +98,12 @@ enum MageSpells
 
     SPELL_MAGE_ALTER_TIME_BASE                   = 108978,
     SPELL_MAGE_ALTER_TIME_AURA                   = 110909,
-    SPELL_MAGE_ALTER_TIME_RESET                  = 127140
+    SPELL_MAGE_ALTER_TIME_RESET                  = 127140,
+
+	SPELL_MAGE_COMBUSTION_BASE					 = 11129,
+	SPELL_MAGE_COMBUSTION_DOT					 = 83853,
+	SPELL_MAGE_COMBUSTION_IMPACT				 = 118271,
+	SPELL_MAGE_INFERNO_BLAST					 = 108853
 };
 
 enum MageIcons
@@ -1503,6 +1508,76 @@ public :
 	}
 };
 
+class spell_mage_combustion : public SpellScriptLoader
+{
+public :
+	spell_mage_combustion() : SpellScriptLoader("spell_mage_combustion")
+	{
+
+	}
+
+	class spell_mage_combustion_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_mage_combustion_SpellScript);
+
+		bool Validate(SpellInfo const* spellInfo)
+		{
+			if(!sSpellMgr->GetSpellInfo(SPELL_MAGE_COMBUSTION_BASE)
+				|| !sSpellMgr->GetSpellInfo(SPELL_MAGE_COMBUSTION_DOT)
+				|| !sSpellMgr->GetSpellInfo(SPELL_MAGE_IGNITE)
+				|| !sSpellMgr->GetSpellInfo(SPELL_MAGE_COMBUSTION_IMPACT))
+				return false ;
+
+			return true ;
+		}
+
+		bool Load()
+		{
+			return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER ;
+		}
+
+		void handleResetInfernoBlastCooldownOnCast()
+		{
+			if(GetCaster())
+				if(Player* p = GetCaster()->ToPlayer())
+					p->RemoveSpellCooldown(SPELL_MAGE_INFERNO_BLAST);
+		}
+
+		void handleMiscOnEffectScriptEffect(SpellEffIndex effectIndex)
+		{
+			if(Unit* target = GetExplTargetUnit())
+			{
+				// Combusion impact = stun
+				if(GetCaster())
+					GetCaster()->CastSpell(target, SPELL_MAGE_COMBUSTION_IMPACT);
+
+				// Periodic damages
+				if(Aura* ignite = target->GetAura(SPELL_MAGE_IGNITE))
+				{
+					if(GetCaster() && target)
+					{
+						GetCaster()->CastSpell(target, SPELL_MAGE_COMBUSTION_DOT) ;
+						Aura* combustionDot = target->GetAura(SPELL_MAGE_COMBUSTION_DOT) ;
+						if(combustionDot && ignite)
+							combustionDot->GetEffect(0)->SetAmount(ignite->GetEffect(0)->GetAmount()) ;
+					}
+				}
+			}
+		}
+
+		void Register()
+		{
+			OnCast += SpellCastFn(spell_mage_combustion_SpellScript::handleResetInfernoBlastCooldownOnCast);
+			OnEffectHitTarget += SpellEffectFn(spell_mage_combustion_SpellScript::handleMiscOnEffectScriptEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+		}
+	};
+
+	SpellScript* GetSpellScript() const
+	{
+		return new spell_mage_combustion_SpellScript();
+	}
+};
+
 void AddSC_mage_spell_scripts()
 {
     new spell_mage_blast_wave();
@@ -1531,4 +1606,5 @@ void AddSC_mage_spell_scripts()
 	new spell_mage_deep_freeze();
 	new spell_mage_alter_time();
 	new spell_mage_alter_time_triggerer();
+	new spell_mage_combustion();
 }
