@@ -22934,19 +22934,27 @@ void Player::InitPrimaryProfessions()
 
 void Player::SavePlayerOnAlterTimeApply()
 {
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "Sylmir Alter Time Test ; Entree SavePlayerOnAlterTime, player %s [guid %u]", GetName().c_str(), GetGUIDLow());
 	Unit::AuraApplicationMap appliedAuras = GetAppliedAuras();
 	
 	if(appliedAuras.empty())
+	{
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "Sylmir Alter Time ; SavePlayerOnAlterTime resetting map, no auras found on player");
+		m_alterTimeAuraApplicationMap.clear();
 		return ;
+	}
 	
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "Sylmir Alter Time ; SavePlayerOnAlterTime resetting map");
 	if(!m_alterTimeAuraApplicationMap.empty())
 		m_alterTimeAuraApplicationMap.clear();
-
+	
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "Sylmir Alter Time ; SavePlayerOnAlterTime avant le for");
 	for(Unit::AuraApplicationMap::iterator iter = appliedAuras.begin() ; iter != appliedAuras.end() ; ++iter)
 	{
 		if(iter->second)
 		{
 			AuraApplication auraApp = *(iter->second);
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Sylmir SavePlayerOnAlterTime ; Recuperation d'une auraApp %u %s", auraApp.GetBase()->GetId(), auraApp.GetBase()->GetSpellInfo()->SpellName);
 			m_alterTimeAuraApplicationMap.insert(std::pair<uint32, AuraApplication>(iter->first, auraApp)) ;
 		}
 	}
@@ -22954,13 +22962,19 @@ void Player::SavePlayerOnAlterTimeApply()
 
 void Player::ResetPlayerOnAlterTimeExpire()
 {
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "Sylmir Alter Time : remove aura on player %s [guid %u]", GetName(), GetGUIDLow());
 	if(GetAlterTimeAuraApplicationMap().empty())
 		return ;
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "Sylmir Alter Time Remove : removing auras");
 	RemoveAllAuras();
 
 	for(AlterTimeAuraApplicationMap::iterator iter = GetAlterTimeAuraApplicationMap().begin() ; iter != GetAlterTimeAuraApplicationMap().end() ; ++iter)
+	{
+		AuraApplication auraApp = iter->second ;
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "Sylmir Alter Time : Inserting an aura : %s (id : %u) on player %s [guid %u]", auraApp.GetBase()->GetSpellInfo()->SpellName, auraApp.GetBase()->GetId(), GetName(), GetGUIDLow());
 		GetAppliedAuras().insert(std::pair<uint32, AuraApplication*>(iter->first, &(iter->second)));
+	}
 }
 
 bool Player::ModifyMoney(int64 amount, bool sendError /*= true*/)

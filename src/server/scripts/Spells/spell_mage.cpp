@@ -1415,7 +1415,8 @@ public :
 				m_uiMana = p_caster->GetPower(POWER_MANA);
 				WorldLocation temp(p_caster->GetMapId(), p_caster->GetPositionX(), p_caster->GetPositionY(), p_caster->GetPositionZ() + 1, p_caster->GetOrientation());
 				m_savedPos = temp ;
-
+				
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Applying Alter Time ; saving player");
 				p_caster->SavePlayerOnAlterTimeApply();
 			}
 		}
@@ -1429,8 +1430,10 @@ public :
 			{
 				p_caster->SetHealth(m_uiHealth);
 				p_caster->SetPower(POWER_MANA, int32(m_uiMana));
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Removing Alter Time ; player teleporting");
 				p_caster->TeleportTo(m_savedPos, 0);
-
+				
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Removing Alter Time ; auras resetting");
 				p_caster->ResetPlayerOnAlterTimeExpire();
 			}
 		}
