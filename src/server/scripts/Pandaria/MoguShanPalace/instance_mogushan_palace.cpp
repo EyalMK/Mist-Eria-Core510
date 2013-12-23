@@ -1,19 +1,16 @@
-/* # Script de Sungis : Palais Mogu'Shan. # */
+/* # Script de Sungis : Mogu'shan Palace # */
 
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "mogushan_palace.h"
 
-/* A faire : - Ajouter le MapID */
-
-/* Notes :
-Instance : Script 35%
+/* Notes : What is missing ? : - ...
 */
 
 class instance_mogushan_palace : public InstanceMapScript
 {
 	public:
-		instance_mogushan_palace() : InstanceMapScript("instance_mogushan_palace", 939) { }
+		instance_mogushan_palace() : InstanceMapScript("instance_mogushan_palace", 994) { }
 
 		struct instance_mogushan_palace_InstanceMapScript : public InstanceScript
 		{
