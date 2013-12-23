@@ -13,6 +13,7 @@ enum Spells
 	/* Lorewalker Stonestep */
 	SPELL_LOREWALKER_S_ALACRITY	= 122714,
 	SPELL_SPINNING_CRANE_KICK	= 129003,
+	SPELL_MEDITATE				= 121801,
 
 	/* Corrupted Scroll */
 	SPELL_FLOOR_SCROLL			= 107350,
@@ -128,7 +129,8 @@ public:
 		{
 			events.Reset();
 
-			instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, NOT_STARTED);
+			if (instance)
+				instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, NOT_STARTED);
 
 			emote = false;
 			intro = false;
@@ -138,7 +140,7 @@ public:
 			events.ScheduleEvent(EVENT_SPINNING_CRANE_KICK, 0, 0, PHASE_ATTACK_SCROLL);
 		}
 
-		void EnterEvadeMode() 
+		void EnterEvadeMode()
 		{
 			if (instance)
 			{
@@ -168,13 +170,13 @@ public:
 			}
 		}
 
-		void EnterCombat(Unit* /*who*/) 
+		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
 				instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, IN_PROGRESS);
 		}
 
-		void UpdateAI(uint32 diff) 
+		void UpdateAI(uint32 diff)
 		{
 			events.Update(diff);
 
@@ -186,16 +188,16 @@ public:
 
 			if (Creature* trigger = me->FindNearestCreature(NPC_LOREWALKER_TRIGGER, 0.1f, true))
 				if (!events.IsInPhase(PHASE_BOSSES))
-					{
-						me->Relocate(824.674438f, -2453.281738f, 176.302979f, 5.957958f);
-						me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-						me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
-						me->HandleEmoteCommand(EMOTE_ONESHOT_NONE);
-						me->SetFacingTo(5.957958f);
-						events.CancelEvent(EVENT_SPINNING_CRANE_KICK);
-						events.CancelEvent(EVENT_SAY_INTRO_2_3_4_5);
-						events.SetPhase(PHASE_BOSSES);
-					}
+				{
+					me->Relocate(824.674438f, -2453.281738f, 176.302979f, 5.957958f);
+					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+					me->HandleEmoteCommand(EMOTE_ONESHOT_NONE);
+					me->SetFacingTo(5.957958f);
+					events.CancelEvent(EVENT_SPINNING_CRANE_KICK);
+					events.CancelEvent(EVENT_SAY_INTRO_2_3_4_5);
+					events.SetPhase(PHASE_BOSSES);
+				}
 
 			if (me->FindNearestCreature(NPC_STRIFE, 99999.0f, false) && me->FindNearestCreature(NPC_PERIL, 99999.0f, false) && !end)
 			{
@@ -242,12 +244,16 @@ public:
 
 							Talk(SAY_END_1);
 
+							me->SetWalk(true);
+							me->GetMotionMaster()->MovePoint(0, me->GetHomePosition());
+							
 							events.ScheduleEvent(EVENT_SAY_END_2, 9*IN_MILLISECONDS, 0, PHASE_BOSSES);
 							events.CancelEvent(EVENT_SAY_END_1);
 							break;
 
 						case EVENT_SAY_END_2:
 							Talk(SAY_END_2);
+							me->CastSpell(me, SPELL_MEDITATE);
 
 							events.CancelEvent(EVENT_SAY_END_2); // End of the script
 							break;
