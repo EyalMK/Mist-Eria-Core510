@@ -43,7 +43,6 @@ enum Spells
     SPELL_ZERO_ENERGY					= 72242,
     SPELL_TOTALY_PETRIFIED				= 115877,
 	SPELL_BERSERK						= 26662,
-	
 };
 
 enum Events
@@ -71,9 +70,14 @@ class boss_amethyst_guardian : public CreatureScript
     public:
         boss_amethyst_guardian() : CreatureScript("boss_amethyst_guardian") { }
 
-        struct boss_amethyst_guardianAI : public BossAI
+		CreatureAI* GetAI(Creature* creature) const
         {
-            boss_amethyst_guardianAI(Creature* creature) : BossAI(creature, DATA_THE_STONE_GUARD)
+            return new boss_amethyst_guardianAI(creature);
+        }
+
+        struct boss_amethyst_guardianAI : public ScriptedAI
+        {
+            boss_amethyst_guardianAI(Creature* creature) : ScriptedAI(creature)
             {
 				instance = creature->GetInstanceScript();
             }
@@ -86,36 +90,38 @@ class boss_amethyst_guardian : public CreatureScript
 
             void Reset()
             {
-				_Reset();
-
 				events.Reset();
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
+
+				if (instance)
+					instance->SetData(DATA_THE_STONE_GUARD, NOT_STARTED);
             }
 
             void EnterCombat(Unit* /*who*/)
             {
-				_EnterCombat();
-
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
 				me->RemoveAurasDueToSpell(SPELL_ANIM_SIT, me->GetGUID());
 				
-				me->SetInCombatWithZone();
-				if (cobalt = me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 99999.0f, true))
-					if (!cobalt->isInCombat())
-						cobalt->SetInCombatWithZone();
-				if (jade = me->FindNearestCreature(BOSS_JADE_GUARDIAN, 99999.0f, true))
-					if (!jade->isInCombat())
-						jade->SetInCombatWithZone();
-				if (jasper = me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 99999.0f, true))
-					if (!jasper->isInCombat())
-						jasper->SetInCombatWithZone();
+				if (instance)
+				{
+					me->SetInCombatWithZone();
+					if (cobalt = me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 99999.0f, true))
+						if (!cobalt->isInCombat())
+							cobalt->SetInCombatWithZone();
+					if (jade = me->FindNearestCreature(BOSS_JADE_GUARDIAN, 99999.0f, true))
+						if (!jade->isInCombat())
+							jade->SetInCombatWithZone();
+					if (jasper = me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 99999.0f, true))
+						if (!jasper->isInCombat())
+							jasper->SetInCombatWithZone();
+				}
             }
 
             void JustDied(Unit* /*killer*/)
             {
-				_JustDied();
+
             }
 
             void UpdateAI(uint32 const diff)
@@ -137,11 +143,6 @@ class boss_amethyst_guardian : public CreatureScript
                 DoMeleeAttackIfReady();
             }
         };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_amethyst_guardianAI(creature);
-        }
 };
 
 class boss_cobalt_guardian : public CreatureScript
@@ -149,9 +150,14 @@ class boss_cobalt_guardian : public CreatureScript
     public:
         boss_cobalt_guardian() : CreatureScript("boss_cobalt_guardian") { }
 
-        struct boss_cobalt_guardianAI : public BossAI
+		CreatureAI* GetAI(Creature* creature) const
         {
-            boss_cobalt_guardianAI(Creature* creature) : BossAI(creature, DATA_THE_STONE_GUARD)
+            return new boss_cobalt_guardianAI(creature);
+        }
+
+        struct boss_cobalt_guardianAI : public ScriptedAI
+        {
+            boss_cobalt_guardianAI(Creature* creature) : ScriptedAI(creature)
             {
 				instance = creature->GetInstanceScript();
             }
@@ -164,36 +170,38 @@ class boss_cobalt_guardian : public CreatureScript
 
             void Reset()
             {
-				_Reset();
-
 				events.Reset();
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
+
+				if (instance)
+					instance->SetData(DATA_THE_STONE_GUARD, NOT_STARTED);
             }
 
             void EnterCombat(Unit* /*who*/)
             {
-				_EnterCombat();
-
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
 				me->RemoveAurasDueToSpell(SPELL_ANIM_SIT, me->GetGUID());
 				
-				me->SetInCombatWithZone();
-				if (amethyst = me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 99999.0f, true))
-					if (!amethyst->isInCombat())
-						amethyst->SetInCombatWithZone();
-				if (jade = me->FindNearestCreature(BOSS_JADE_GUARDIAN, 99999.0f, true))
-					if (!jade->isInCombat())
-						jade->SetInCombatWithZone();
-				if (jasper = me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 99999.0f, true))
-					if (!jasper->isInCombat())
-						jasper->SetInCombatWithZone();
+				if (instance)
+				{
+					me->SetInCombatWithZone();
+					if (amethyst = me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 99999.0f, true))
+						if (!amethyst->isInCombat())
+							amethyst->SetInCombatWithZone();
+					if (jade = me->FindNearestCreature(BOSS_JADE_GUARDIAN, 99999.0f, true))
+						if (!jade->isInCombat())
+							jade->SetInCombatWithZone();
+					if (jasper = me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 99999.0f, true))
+						if (!jasper->isInCombat())
+							jasper->SetInCombatWithZone();
+				}
             }
 
             void JustDied(Unit* /*killer*/)
             {
-				_JustDied();
+
             }
 
             void UpdateAI(uint32 const diff)
@@ -215,11 +223,6 @@ class boss_cobalt_guardian : public CreatureScript
                 DoMeleeAttackIfReady();
             }
         };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_cobalt_guardianAI(creature);
-        }
 };
 
 class boss_jade_guardian : public CreatureScript
@@ -227,9 +230,14 @@ class boss_jade_guardian : public CreatureScript
     public:
         boss_jade_guardian() : CreatureScript("boss_jade_guardian") { }
 
-        struct boss_jade_guardianAI : public BossAI
+		CreatureAI* GetAI(Creature* creature) const
         {
-            boss_jade_guardianAI(Creature* creature) : BossAI(creature, DATA_THE_STONE_GUARD)
+            return new boss_jade_guardianAI(creature);
+        }
+
+        struct boss_jade_guardianAI : public ScriptedAI
+        {
+            boss_jade_guardianAI(Creature* creature) : ScriptedAI(creature)
             {
 				instance = creature->GetInstanceScript();
             }
@@ -242,36 +250,38 @@ class boss_jade_guardian : public CreatureScript
 
             void Reset()
             {
-				_Reset();
-
 				events.Reset();
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
+
+				if (instance)
+					instance->SetData(DATA_THE_STONE_GUARD, NOT_STARTED);
             }
 
             void EnterCombat(Unit* /*who*/)
             {
-				_EnterCombat();
-
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
 				me->RemoveAurasDueToSpell(SPELL_ANIM_SIT, me->GetGUID());
 				
-				me->SetInCombatWithZone();
-				if (amethyst = me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 99999.0f, true))
-					if (!amethyst->isInCombat())
-						amethyst->SetInCombatWithZone();
-				if (cobalt = me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 99999.0f, true))
-					if (!cobalt->isInCombat())
-						cobalt->SetInCombatWithZone();
-				if (jasper = me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 99999.0f, true))
-					if (!jasper->isInCombat())
-						jasper->SetInCombatWithZone();
+				if (instance)
+				{
+					me->SetInCombatWithZone();
+					if (amethyst = me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 99999.0f, true))
+						if (!amethyst->isInCombat())
+							amethyst->SetInCombatWithZone();
+					if (cobalt = me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 99999.0f, true))
+						if (!cobalt->isInCombat())
+							cobalt->SetInCombatWithZone();
+					if (jasper = me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 99999.0f, true))
+						if (!jasper->isInCombat())
+							jasper->SetInCombatWithZone();
+				}
             }
 
             void JustDied(Unit* /*killer*/)
             {
-				_JustDied();
+
             }
 
             void UpdateAI(uint32 const diff)
@@ -293,11 +303,6 @@ class boss_jade_guardian : public CreatureScript
                 DoMeleeAttackIfReady();
             }
         };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_jade_guardianAI(creature);
-        }
 };
 
 class boss_jasper_guardian : public CreatureScript
@@ -305,9 +310,14 @@ class boss_jasper_guardian : public CreatureScript
     public:
         boss_jasper_guardian() : CreatureScript("boss_jasper_guardian") { }
 
-        struct boss_jasper_guardianAI : public BossAI
+		CreatureAI* GetAI(Creature* creature) const
         {
-            boss_jasper_guardianAI(Creature* creature) : BossAI(creature, DATA_THE_STONE_GUARD)
+            return new boss_jasper_guardianAI(creature);
+        }
+
+        struct boss_jasper_guardianAI : public ScriptedAI
+        {
+            boss_jasper_guardianAI(Creature* creature) : ScriptedAI(creature)
             {
 				instance = creature->GetInstanceScript();
             }
@@ -320,36 +330,38 @@ class boss_jasper_guardian : public CreatureScript
 
             void Reset()
             {
-				_Reset();
-
 				events.Reset();
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
+
+				if (instance)
+					instance->SetData(DATA_THE_STONE_GUARD, NOT_STARTED);
             }
 
             void EnterCombat(Unit* /*who*/)
             {
-				_EnterCombat();
-
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
 				me->RemoveAurasDueToSpell(SPELL_ANIM_SIT, me->GetGUID());
 				
-				me->SetInCombatWithZone();
-				if (amethyst = me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 99999.0f, true))
-					if (!amethyst->isInCombat())
-						amethyst->SetInCombatWithZone();
-				if (cobalt = me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 99999.0f, true))
-					if (!cobalt->isInCombat())
-						cobalt->SetInCombatWithZone();
-				if (jade = me->FindNearestCreature(BOSS_JADE_GUARDIAN, 99999.0f, true))
-					if (!jade->isInCombat())
-						jade->SetInCombatWithZone();
+				if (instance)
+				{
+					me->SetInCombatWithZone();
+					if (amethyst = me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 99999.0f, true))
+						if (!amethyst->isInCombat())
+							amethyst->SetInCombatWithZone();
+					if (cobalt = me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 99999.0f, true))
+						if (!cobalt->isInCombat())
+							cobalt->SetInCombatWithZone();
+					if (jade = me->FindNearestCreature(BOSS_JADE_GUARDIAN, 99999.0f, true))
+						if (!jade->isInCombat())
+							jade->SetInCombatWithZone();
+				}
             }
 
             void JustDied(Unit* /*killer*/)
             {
-				_JustDied();
+
             }
 
             void UpdateAI(uint32 const diff)
@@ -371,11 +383,6 @@ class boss_jasper_guardian : public CreatureScript
                 DoMeleeAttackIfReady();
             }
         };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_jasper_guardianAI(creature);
-        }
 };
 
 void AddSC_boss_the_stone_guard()
