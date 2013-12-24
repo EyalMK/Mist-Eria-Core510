@@ -74,8 +74,6 @@ enum Achievements
 {
 // Defeat the Sha of Doubt in Temple of the Jade Serpent while under the effects of Purified Water.
 	ACHI_CLEANING_UP						= 6475,
-// Defeat Wise Mari without being hit by Corrupted Water, Hydrolance, or Wash Away in Temple of the Jade Serpent on Heroic Difficulty.
-	ACHI_HYDROPHOBIA						= 6460,
 // Defeat the Sha of Doubt in Temple of the Jade Serpent while under the effect of 4 Seeds of Doubt on Heroic difficulty.
 	ACHI_SEEDS_OF_DOUBT						= 6671,
 // Defeat the Sha of Doubt in Temple of the Jade Serpent.
