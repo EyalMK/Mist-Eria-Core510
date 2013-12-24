@@ -1087,15 +1087,10 @@ public:
 
 		void Reset()
 		{
+			events.Reset();
+
 			isWithinMeleeRange = false;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-			events.Reset();
-		}
-
-		void JustDied(Unit *pWho)
-		{
-			if (instance)
-				instance->SetBossState(DATA_MOB_GLINTROK_HEXXER, DONE);
 		}
 
 		void EnterCombat(Unit* /*who*/)
@@ -1114,7 +1109,7 @@ public:
 			if (me->HasUnitState(UNIT_STATE_CASTING))
 				return;
 
-			if (me->IsWithinMeleeRange(me->getVictim(), 2.5f) && isWithinMeleeRange == false)
+			if (me->IsWithinMeleeRange(me->getVictim(), 2.5f) && !isWithinMeleeRange)
 			{
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				isWithinMeleeRange = true;
