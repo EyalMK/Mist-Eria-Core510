@@ -61,30 +61,30 @@ class spell_mastery_unshackled_fury : public SpellScriptLoader
     public:
         spell_mastery_unshackled_fury() : SpellScriptLoader("spell_mastery_unshackled_fury") { }
 
-        class spell_mastery_unshackled_fury_AuraScript : public AuraScript
+        class spell_mastery_unshackled_fury_SpellScript : public SpellScript
         {
-            PrepareAuraScript(spell_mastery_unshackled_fury_AuraScript);
+            PrepareSpellScript(spell_mastery_unshackled_fury_SpellScript);
 
-            void CalculateAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void HandleOnHit()
             {
-                if (Unit* caster = GetCaster()->ToPlayer())
-                {
-                    if (caster->HasAura(MASTERY_WARRIOR_FURY) && caster->getLevel() >= 80)
-                        amount = caster->GetFloatValue(PLAYER_MASTERY);
+				Player* player = GetCaster()->ToPlayer();
+				int32 bp = GetEffectValue();
+				float Mastery = player->GetFloatValue(PLAYER_MASTERY);
 
-					caster->CastCustomSpell(caster, SPELL_WARR_ENRAGE, NULL, &amount, NULL, true, 0, aurEff);
-                }
+				if (player->HasAura(MASTERY_WARRIOR_FURY) && player->getLevel() >= 80)
+					if (!player->HasAura(SPELL_WARR_ENRAGE))
+						player->CastCustomSpell(player, SPELL_WARR_ENRAGE, &bp, NULL, NULL, true);
             }
 
             void Register()
             {
-                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mastery_unshackled_fury_AuraScript::CalculateAmount, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+                OnHit += SpellHitFn(spell_mastery_unshackled_fury_SpellScript::HandleOnHit);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        SpellScript* GetSpellScript() const
         {
-            return new spell_mastery_unshackled_fury_AuraScript();
+            return new spell_mastery_unshackled_fury_SpellScript();
         }
 };
 
