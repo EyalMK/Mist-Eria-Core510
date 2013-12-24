@@ -53,6 +53,7 @@ enum MasterySpells
 enum WarriorSpells
 {
 	SPELL_WARR_ENRAGE		= 12880,
+	SPELL_WARR_ENRAGE_TEST	= 115430,
 };
 
 // Warrior spell : Enrage 12880
@@ -72,8 +73,7 @@ class spell_mastery_unshackled_fury : public SpellScriptLoader
 				int32 bp = int32(Mastery);
 
 				if (player->HasAura(MASTERY_WARRIOR_FURY) && player->getLevel() >= 80)
-					if (!player->HasAura(SPELL_WARR_ENRAGE))
-						player->CastCustomSpell(player, SPELL_WARR_ENRAGE, &bp, NULL, NULL, true);
+					player->CastCustomSpell(player, SPELL_WARR_ENRAGE_TEST, &bp, NULL, NULL, true);
             }
 
             void Register()

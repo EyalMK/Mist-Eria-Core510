@@ -522,8 +522,6 @@ void ObjectMgr::LoadCreatureTemplates()
             uint8 l_Difficulty			= l_DiffFields[1].GetUInt32() - 1;
             uint32 l_DifficultyEntry	= l_DiffFields[2].GetUInt32();
 
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIEDiff loadCreature 1 %u %u %u", l_Entry, l_Difficulty, l_DifficultyEntry);
-
             CreatureTemplate& creatureTemplate = _creatureTemplateStore[l_Entry];
 
             if (_creatureTemplateStore.find(l_Entry) == _creatureTemplateStore.end()) {
@@ -1582,11 +1580,6 @@ void ObjectMgr::LoadCreatures()
 void ObjectMgr::AddCreatureToGrid(uint32 guid, CreatureData const* data)
 {
     uint8 mask = data->spawnMask;
-
-    //NOBODIE
-    if (guid == 15116769) {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE addcretogrid map %u mask %u ", data->mapid, mask);
-    }
 
     for (uint16 i = 0; mask != 0; i++, mask >>= 1)
     {

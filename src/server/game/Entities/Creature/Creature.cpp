@@ -273,18 +273,10 @@ bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data
     CreatureTemplate const* cinfo = normalInfo;
     for (uint8 diff = uint8(GetMap()->GetSpawnMode()); diff > 0;)
     {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIEDiff initEntry 1 %s %u %u", cinfo->Name.c_str(), GetMap()->GetSpawnMode(), diff);
-
         // we already have valid Map pointer for current creature!
         if (normalInfo->DifficultyEntry[diff - 1])
         {
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIEDiff initEntry hasEntry");
-
             cinfo = sObjectMgr->GetCreatureTemplate(normalInfo->DifficultyEntry[diff - 1]);
-            if (cinfo) {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIEDiff initEntry 1 %s %u", cinfo->Name.c_str(), diff-1);
-                break;                                      // template found
-            }
             // check and reported at startup, so just ignore (restore normalInfo)
             cinfo = normalInfo;
         }
@@ -294,8 +286,6 @@ bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data
             diff -= 2;                                      // to normal raid difficulty cases
         else
             --diff;
-
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIEDiff initEntry 2 %u", diff);
     }
 
     SetEntry(Entry);                                        // normal entry always
