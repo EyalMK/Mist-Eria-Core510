@@ -5,12 +5,14 @@
 */
 
 #include "ScriptPCH.h"
+#include "AchievementMgr.h"
 #include "temple_of_the_jade_serpent.h"
 
 enum Spells
 {
 	/* Wise Mari */
 	SPELL_BLESSING_OF_THE_WATERSPEAKER	= 121483,
+	SPELL_PURIFIED_WATER				= 118714,
 	SPELL_BUBBLE_BURST					= 106612,
 	SPELL_CALL_WATER					= 106526,
 	SPELL_HYDROLANCE					= 106055,
@@ -19,6 +21,7 @@ enum Spells
 	SPELL_HYDROLANCE_PULSE_BIG			= 106267,
 	SPELL_HYDROLANCE_PULSE_SMALL		= 106319,
 	SPELL_CORRUPTED_WATERS				= 115165,
+	SPELL_CORRUPTED_WATERS_TRIGGERED	= 115167,
 	SPELL_WASH_AWAY						= 106329,
 	SPELL_WASH_AWAY_TRIGGERED			= 106331,
 	SPELL_WASH_AWAY_VISUAL				= 115575,
@@ -106,6 +109,14 @@ enum Phases
 	PHASE_WASH_AWAY,
 };
 
+enum Achievements
+{
+// Defeat Wise Mari without being hit by Corrupted Water, Hydrolance, or Wash Away in Temple of the Jade Serpent on Heroic Difficulty.
+	ACHI_HYDROPHOBIA	= 6460,
+};
+
+#define ACTION_HYDROPHOBIA 0
+
 class boss_wise_mari : public CreatureScript
 {
 public:
@@ -130,6 +141,7 @@ public:
 		int32 corruptWaterCount;
 		bool washAway;
 		bool intro;
+		bool hydrophobia;
 
 		void Reset()
 		{
@@ -145,6 +157,7 @@ public:
 				corruptWaterCount = 0; // 0 = first corrupt living water | 1 = second | 2 = third | 3 = fourth & phase 2
 				washAway = false;
 				intro = false;
+				hydrophobia = true;
 
 				std::list<Creature*> droplets;
 				me->GetCreatureListWithEntryInGrid(droplets, NPC_CORRUPT_DROPLET, 99999.0f);
@@ -169,6 +182,20 @@ public:
 
 				instance->DoCastSpellOnPlayers(SPELL_BLESSING_OF_THE_WATERSPEAKER);
 
+				Map* map = me->GetMap();
+				if (me->GetMap()->IsHeroic())
+				{
+					me->CastSpell(me, SPELL_PURIFIED_WATER);
+
+					Map::PlayerList const &PlayerList = map->GetPlayers();
+
+					if (hydrophobia)
+						if (!PlayerList.isEmpty())
+							for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+								if (Player* player = i->getSource())
+									player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_HYDROPHOBIA));
+				}
+
 				if (Creature* lorewalkerTrigger = me->FindNearestCreature(NPC_LOREWALKER_TRIGGER, 99999.0f, false))
 				{
 					if (GameObject* wiseDoor = me->FindNearestGameObject(GO_MARI_LOREWALKER_GATE, 99999.0f))
@@ -180,6 +207,16 @@ public:
 					if (GameObject* go = me->FindNearestGameObject(GO_LIU_GATE, 99999.0f))
 						go->UseDoorOrButton();
 				}
+			}
+		}
+
+		void DoAction(int32 action)
+        {
+            switch (action)
+            {
+				case ACTION_HYDROPHOBIA:
+					hydrophobia = false;
+					break;
 			}
 		}
 
@@ -815,11 +852,52 @@ public:
 	};
 };
 
+class spell_wise_mari_achi_spells : public SpellScriptLoader
+{
+    public:
+        spell_wise_mari_achi_spells() : SpellScriptLoader("spell_wise_mari_achi_spells") { }
+
+        class spell_wise_mari_achi_spells_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_wise_mari_achi_spells_SpellScript);
+
+			bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_HYDROLANCE_PULSE_SMALL) ||
+					!sSpellMgr->GetSpellInfo(SPELL_HYDROLANCE_PULSE_BIG) ||
+					!sSpellMgr->GetSpellInfo(SPELL_CORRUPTED_WATERS_TRIGGERED) ||
+					!sSpellMgr->GetSpellInfo(106334)) // Wash away trigger damage
+                    return false;
+                return true;
+            }
+
+            void HandleOnHit()
+            {
+				Unit* caster = GetCaster()->ToCreature();
+
+				if (caster)
+					if (Creature* wiseMari = caster->FindNearestCreature(BOSS_WISE_MARI, 99999.0f, true))
+						wiseMari->AI()->DoAction(ACTION_HYDROPHOBIA);
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_wise_mari_achi_spells_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_wise_mari_achi_spells_SpellScript();
+        }
+};
+
 void AddSC_boss_wise_mari()
 {
 	new boss_wise_mari();
 	new npc_corrupt_living_water();
 	new mob_corrupt_living_water();
 	new npc_corrupt_droplet();
+	new spell_wise_mari_achi_spells();
 }
 

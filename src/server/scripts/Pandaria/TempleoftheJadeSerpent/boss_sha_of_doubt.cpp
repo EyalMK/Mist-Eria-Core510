@@ -5,6 +5,7 @@
 */
 
 #include "ScriptPCH.h"
+#include "AchievementMgr.h"
 #include "temple_of_the_jade_serpent.h"
 
 enum Spells
@@ -15,6 +16,7 @@ enum Spells
 	SPELL_TOUCH_OF_NOTHINGNESS		= 106113,
 	SPELL_FIGMENT_OF_DOUBT_CLONE	= 106935,
 	SPELL_FIGMENT_OF_DOUBT			= 106936,
+	SPELL_SEED_OF_DOUBT				= 123916,
 
 	/* Figment of Doubt */
 	SPELL_SHADOWFORM				= 107903,
@@ -68,6 +70,18 @@ enum Npcs
 	NPC_SHA_TRIGGER			= 400453,
 };
 
+enum Achievements
+{
+// Defeat the Sha of Doubt in Temple of the Jade Serpent while under the effects of Purified Water.
+	ACHI_CLEANING_UP						= 6475,
+// Defeat the Sha of Doubt in Temple of the Jade Serpent while under the effect of 4 Seeds of Doubt on Heroic difficulty.
+	ACHI_SEEDS_OF_DOUBT						= 6671,
+// Defeat the Sha of Doubt in Temple of the Jade Serpent.
+	ACHI_TEMPLE_OF_THE_JADE_SERPENT			= 6757,
+// Defeat the Sha of Doubt in Temple of the Jade Serpent on Heroic difficulty.
+	ACHI_TEMPLE_OF_THE_JADE_SERPENT_HEROIC	= 6758
+};
+
 class boss_sha_of_doubt : public CreatureScript
 {
 public:
@@ -112,6 +126,7 @@ public:
 		void JustDied(Unit *pWho)
 		{
 			_JustDied();
+
 			if (instance)
 			{
 				instance->SetBossState(DATA_BOSS_SHA_OF_DOUBT, DONE);
@@ -127,9 +142,24 @@ public:
 
 					if (!PlayerList.isEmpty())
 						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-							if (Unit* player = i->getSource()->ToPlayer())
+							if (Player* player = i->getSource())
+							{
 								if (player->HasAura(SPELL_TOUCH_OF_NOTHINGNESS))
 									player->RemoveAurasDueToSpell(SPELL_TOUCH_OF_NOTHINGNESS, player->GetGUID());
+
+								if (map->IsHeroic())
+								{
+									if (player->HasAura(118714)) // Spell Purified Water
+										player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_CLEANING_UP));
+
+									if (Aura* seed = player->GetAura(SPELL_SEED_OF_DOUBT))
+										if (seed->GetStackAmount() == 4)
+											player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_SEEDS_OF_DOUBT));
+
+									player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_TEMPLE_OF_THE_JADE_SERPENT_HEROIC));
+								}
+								else player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_TEMPLE_OF_THE_JADE_SERPENT));
+							}
 				}
 			}
 
@@ -492,8 +522,30 @@ public:
     };
 };
 
+class go_seed_of_doubt : public GameObjectScript
+{
+public:
+    go_seed_of_doubt() : GameObjectScript("go_seed_of_doubt") { }
+
+	InstanceScript* instance;
+
+    bool OnGossipHello(Player* player, GameObject* go)
+    {
+		instance = go->GetInstanceScript();
+
+		if (instance)
+		{
+			instance->DoCastSpellOnPlayers(SPELL_SEED_OF_DOUBT);
+			go->Delete();
+		}
+		
+        return true;
+    }
+};
+
 void AddSC_boss_sha_of_doubt()
 {
 	new boss_sha_of_doubt();
 	new npc_figment_of_doubt();
+	new go_seed_of_doubt();
 }

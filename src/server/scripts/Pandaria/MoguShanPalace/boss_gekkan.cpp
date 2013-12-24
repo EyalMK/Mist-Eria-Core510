@@ -1,12 +1,6 @@
 /* # Script de Sungis : Gekkan # */
 
-/* Notes :
-Gekkan : Script 90%					A faire : vérifier si les sorts fonctionnent.
-Glintrok Oracle : Script 95%		A faire : vérifier si les sorts fonctionnent.
-Glintrok Hexxer : Script 95%		A faire : vérifier si les sorts fonctionnent.
-Glintrok Hexxer (mob) : Script 95%	A faire : vérifier si les sorts fonctionnent.
-Glintrok Skulker : Script 95%		A faire : vérifier si les sorts fonctionnent.
-Glintrok Ironhide : Script 95%		A faire : vérifier si les sorts fonctionnent.
+/* Notes : What is missing ? : - ...
 
 UPDATE creature_template SET ScriptName = 'boss_gekkan' WHERE entry = 61243;
 UPDATE creature_template SET ScriptName = 'npc_glintrok_oracle' WHERE entry = 61339;
@@ -29,23 +23,23 @@ INSERT INTO creature_text (entry, groupid, id, text, type, language, probability
 enum Spells
 {
 	/* Gekkan */
-	SPELL_RECKLESS_INSPIRATION			= /*118988*/88325,
-	SPELL_RECKLESS_INSPIRATION_INSTANT	= /*129262*/34971,
+	SPELL_RECKLESS_INSPIRATION			= 118988,
+	SPELL_RECKLESS_INSPIRATION_INSTANT	= 129262,
 
 	/* Glintrok Oracle */
-	SPELL_CLEANSING_FLAME				= /*118940*/77066,
-	SPELL_FIRE_BOLT						= /*118936*/83794,
+	SPELL_CLEANSING_FLAME				= 118940,
+	SPELL_FIRE_BOLT						= 118936,
 
 	/* Glintrok Hexxer */
-	SPELL_HEX_OF_LETHARGY				= /*118903*/86582,
-	SPELL_DARK_BOLT						= /*118917*/90668,
+	SPELL_HEX_OF_LETHARGY				= 118903,
+	SPELL_DARK_BOLT						= 118917,
 	
 	/* Glintrok Skulker */
-	SPELL_SHANK							= /*118963*/91998,
-	SPELL_STEALTH						= /*118963*/102921,
+	SPELL_SHANK							= 118963,
+	SPELL_STEALTH						= 118969,
 
 	/* Glintrok Ironhide */
-	SPELL_IRON_PROTECTOR				= /*118958*/465
+	SPELL_IRON_PROTECTOR				= 118958
 };
 
 enum Events
@@ -68,11 +62,12 @@ enum Events
 
 enum Phases
 {
-	PHASE_NO_RECKLESS_INSPIRATION_DONE		= 1,
-	PHASE_FIRST_RECKLESS_INSPIRATION_DONE	= 2,
-	PHASE_SECOND_RECKLESS_INSPIRATION_DONE	= 3,
-	PHASE_THIRD_RECKLESS_INSPIRATION_DONE	= 4,
-	PHASE_LAST_RECKLESS_INSPIRATION_DONE	= 5
+	PHASE_NULL,
+	PHASE_NO_RECKLESS_INSPIRATION_DONE,
+	PHASE_FIRST_RECKLESS_INSPIRATION_DONE,
+	PHASE_SECOND_RECKLESS_INSPIRATION_DONE,
+	PHASE_THIRD_RECKLESS_INSPIRATION_DONE,
+	PHASE_LAST_RECKLESS_INSPIRATION_DONE,
 };
 
 enum Actions
@@ -124,64 +119,67 @@ public:
 		bool checkGlintrokSkulkerAlive;
 		bool checkGlintrokIronhideAlive;
 		bool lastPhase;
+		bool intro;
 
 		void Reset()
 		{
-			checkGekkanAlive = true;
-			checkGekkanAlive = me->isAlive();
-
-			checkGlintrokOracleAlive = true;
-            if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
-				checkGlintrokOracleAlive = oracle->isAlive();
-
-			checkGlintrokHexxerAlive = true;
-            if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
-				checkGlintrokHexxerAlive = hexxer->isAlive();
-
-			checkGlintrokSkulkerAlive = true;
-            if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
-				checkGlintrokSkulkerAlive = skulker->isAlive();
-
-			checkGlintrokIronhideAlive = true;
-            if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
-				checkGlintrokIronhideAlive = ironhide->isAlive();
-
-			if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
-				if (!oracle->isAlive())
-				{
-					oracle->RemoveCorpse();
-					oracle->Respawn();
-				}
-
-			if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
-				if (!hexxer->isAlive())
-				{
-					hexxer->RemoveCorpse();
-					hexxer->Respawn();
-				}
-
-			if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
-				if (!skulker->isAlive())
-				{
-					skulker->RemoveCorpse();
-					skulker->Respawn();
-				}
-
-			if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
-				if (!ironhide->isAlive())
-				{
-					ironhide->RemoveCorpse();
-					ironhide->Respawn();
-				}
-
-			if (me->HasAura(SPELL_RECKLESS_INSPIRATION_INSTANT))
-				me->RemoveAurasDueToSpell(SPELL_RECKLESS_INSPIRATION_INSTANT);
-
 			events.Reset();
 
 			if (instance)
 			{
+				checkGekkanAlive = true;
+				checkGekkanAlive = me->isAlive();
+
+				checkGlintrokOracleAlive = true;
+				if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
+					checkGlintrokOracleAlive = oracle->isAlive();
+
+				checkGlintrokHexxerAlive = true;
+				if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
+					checkGlintrokHexxerAlive = hexxer->isAlive();
+
+				checkGlintrokSkulkerAlive = true;
+				if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
+					checkGlintrokSkulkerAlive = skulker->isAlive();
+
+				checkGlintrokIronhideAlive = true;
+				if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
+					checkGlintrokIronhideAlive = ironhide->isAlive();
+
+				if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
+					if (!oracle->isAlive())
+					{
+						oracle->RemoveCorpse();
+						oracle->Respawn();
+					}
+
+				if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
+					if (!hexxer->isAlive())
+					{
+						hexxer->RemoveCorpse();
+						hexxer->Respawn();
+					}
+
+				if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
+					if (!skulker->isAlive())
+					{
+						skulker->RemoveCorpse();
+						skulker->Respawn();
+					}
+
+				if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
+					if (!ironhide->isAlive())
+					{
+						ironhide->RemoveCorpse();
+						ironhide->Respawn();
+					}
+
+				if (me->HasAura(SPELL_RECKLESS_INSPIRATION_INSTANT))
+					me->RemoveAurasDueToSpell(SPELL_RECKLESS_INSPIRATION_INSTANT);
+
+				events.SetPhase(PHASE_NULL);
 				lastPhase = false;
+				intro = false;
 				instance->SetBossState(DATA_GEKKAN, NOT_STARTED);
 				me->AI()->DoAction(ACTION_GEKKAN_RESET);
 			}
@@ -266,28 +264,41 @@ public:
 			if (instance)
 				instance->SetBossState(DATA_GEKKAN, FAIL);
 		}
-		
-		void CheckIfMobHexxerKilled()
+
+		void MoveInLineOfSight(Unit* who)
 		{
-			if (instance->GetBossState(DATA_MOB_GLINTROK_HEXXER) == DONE)
+			if (!me->IsWithinDistInMap(who, 100.0f) || intro)
+				return;
+
+			if (!who || !who->IsInWorld())
+				return;
+
+			if (who && who->GetTypeId() == TYPEID_PLAYER && !intro && !me->IsValidAttackTarget(who))
+			{
 				Talk(SAY_INTRO);
+				intro = true;
+			}
 		}
 
 		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
+			{
 				instance->SetBossState(DATA_GEKKAN, IN_PROGRESS);
 
-			if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
-				oracle->SetInCombatWithZone();
-			if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
-				hexxer->SetInCombatWithZone();
-			if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
-				skulker->SetInCombatWithZone();
-			if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
-				ironhide->SetInCombatWithZone();
+				if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
+					oracle->SetInCombatWithZone();
+				if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
+					hexxer->SetInCombatWithZone();
+				if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
+					skulker->SetInCombatWithZone();
+				if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
+					ironhide->SetInCombatWithZone();
 
-			me->SetInCombatWithZone();
+				if (!me->isInCombat())
+					me->SetInCombatWithZone();
+			}
+
 			Talk(SAY_AGGRO);
 
 			events.SetPhase(PHASE_NO_RECKLESS_INSPIRATION_DONE);
@@ -316,7 +327,7 @@ public:
 							me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)),
 							me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)),
 							me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE))))
-								DoCast(glintrok, SPELL_RECKLESS_INSPIRATION);
+								me->CastSpell(glintrok, SPELL_RECKLESS_INSPIRATION);
 
 							Talk(SAY_RECKLESS_INSPIRATION);
 							events.DelayEvents(2*IN_MILLISECONDS);
@@ -333,56 +344,56 @@ public:
 			{
 				if (!checkGlintrokOracleAlive)
 				{
-					DoCast(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
+					me->CastSpell(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
 
 					if (Creature* glintrok = RAND(
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)),
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)),
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE))))
 					{
-						DoCast(glintrok, SPELL_RECKLESS_INSPIRATION);
+						me->CastSpell(glintrok, SPELL_RECKLESS_INSPIRATION);
 						events.SetPhase(PHASE_SECOND_RECKLESS_INSPIRATION_DONE);
 					}
 				}
 
 				if (!checkGlintrokHexxerAlive)
 				{
-					DoCast(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
+					me->CastSpell(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
 
 					if (Creature* glintrok = RAND(
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)),
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)),
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE))))
 					{
-						DoCast(glintrok, SPELL_RECKLESS_INSPIRATION);
+						me->CastSpell(glintrok, SPELL_RECKLESS_INSPIRATION);
 						events.SetPhase(PHASE_SECOND_RECKLESS_INSPIRATION_DONE);
 					}
 				}
 
 				if (!checkGlintrokSkulkerAlive)
 				{
-					DoCast(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
+					me->CastSpell(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
 
 					if (Creature* glintrok = RAND(
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)),
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)),
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE))))
 					{
-						DoCast(glintrok, SPELL_RECKLESS_INSPIRATION);
+						me->CastSpell(glintrok, SPELL_RECKLESS_INSPIRATION);
 						events.SetPhase(PHASE_SECOND_RECKLESS_INSPIRATION_DONE);
 					}
 				}
 
 				if (!checkGlintrokIronhideAlive)
 				{
-					DoCast(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
+					me->CastSpell(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
 
 					if (Creature* glintrok = RAND(
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)),
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)),
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER))))
 					{
-						DoCast(glintrok, SPELL_RECKLESS_INSPIRATION);
+						me->CastSpell(glintrok, SPELL_RECKLESS_INSPIRATION);
 						events.SetPhase(PHASE_SECOND_RECKLESS_INSPIRATION_DONE);
 					}
 				}
@@ -392,77 +403,77 @@ public:
 			{
 				if (!checkGlintrokOracleAlive && !checkGlintrokHexxerAlive)
 				{
-					DoCast(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
+					me->CastSpell(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
 
 					if (Creature* glintrok = RAND(
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)),
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE))))
 					{
-						DoCast(glintrok, SPELL_RECKLESS_INSPIRATION);
+						me->CastSpell(glintrok, SPELL_RECKLESS_INSPIRATION);
 						events.SetPhase(PHASE_THIRD_RECKLESS_INSPIRATION_DONE);
 					}
 				}
 
 				if (!checkGlintrokOracleAlive && !checkGlintrokSkulkerAlive)
 				{
-					DoCast(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
+					me->CastSpell(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
 
 					if (Creature* glintrok = RAND(
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)),
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE))))
 					{
-						DoCast(glintrok, SPELL_RECKLESS_INSPIRATION);
+						me->CastSpell(glintrok, SPELL_RECKLESS_INSPIRATION);
 						events.SetPhase(PHASE_THIRD_RECKLESS_INSPIRATION_DONE);
 					}
 				}
 				if (!checkGlintrokOracleAlive && !checkGlintrokIronhideAlive)
 				{
-					DoCast(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
+					me->CastSpell(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
 
 					if (Creature* glintrok = RAND(
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)),
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER))))
 					{
-						DoCast(glintrok, SPELL_RECKLESS_INSPIRATION);
+						me->CastSpell(glintrok, SPELL_RECKLESS_INSPIRATION);
 						events.SetPhase(PHASE_THIRD_RECKLESS_INSPIRATION_DONE);
 					}
 				}
 
 				if (!checkGlintrokHexxerAlive && !checkGlintrokSkulkerAlive)
 				{
-					DoCast(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
+					me->CastSpell(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
 
 					if (Creature* glintrok = RAND(
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)),
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE))))
 					{
-						DoCast(glintrok, SPELL_RECKLESS_INSPIRATION);
+						me->CastSpell(glintrok, SPELL_RECKLESS_INSPIRATION);
 						events.SetPhase(PHASE_THIRD_RECKLESS_INSPIRATION_DONE);
 					}
 				}
 
 				if (!checkGlintrokHexxerAlive && !checkGlintrokIronhideAlive)
 				{
-					DoCast(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
+					me->CastSpell(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
 
 					if (Creature* glintrok = RAND(
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)),
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER))))
 					{
-						DoCast(glintrok, SPELL_RECKLESS_INSPIRATION);
+						me->CastSpell(glintrok, SPELL_RECKLESS_INSPIRATION);
 						events.SetPhase(PHASE_THIRD_RECKLESS_INSPIRATION_DONE);
 					}
 				}
 
 				if (!checkGlintrokSkulkerAlive && !checkGlintrokIronhideAlive)
 				{
-					DoCast(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
+					me->CastSpell(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
 
 					if (Creature* glintrok = RAND(
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)),
 					me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER))))
 					{
-						DoCast(glintrok, SPELL_RECKLESS_INSPIRATION);
+						me->CastSpell(glintrok, SPELL_RECKLESS_INSPIRATION);
 						events.SetPhase(PHASE_THIRD_RECKLESS_INSPIRATION_DONE);
 					}
 				}
@@ -472,44 +483,44 @@ public:
 			{
 				if (!checkGlintrokOracleAlive && !checkGlintrokHexxerAlive && !checkGlintrokSkulkerAlive)
 				{
-					DoCast(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
+					me->CastSpell(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
 
 					if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
 					{
-						DoCast(ironhide, SPELL_RECKLESS_INSPIRATION);
+						me->CastSpell(ironhide, SPELL_RECKLESS_INSPIRATION);
 						events.SetPhase(PHASE_LAST_RECKLESS_INSPIRATION_DONE);
 					}
 				}
 
 				if (!checkGlintrokOracleAlive && !checkGlintrokHexxerAlive && !checkGlintrokIronhideAlive)
 				{
-					DoCast(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
+					me->CastSpell(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
 
 					if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
 					{
-						DoCast(skulker, SPELL_RECKLESS_INSPIRATION);
+						me->CastSpell(skulker, SPELL_RECKLESS_INSPIRATION);
 						events.SetPhase(PHASE_LAST_RECKLESS_INSPIRATION_DONE);
 					}
 				}
 
 				if (!checkGlintrokOracleAlive && !checkGlintrokSkulkerAlive && !checkGlintrokIronhideAlive)
 				{
-					DoCast(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
+					me->CastSpell(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
 
 					if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
 					{
-						DoCast(hexxer, SPELL_RECKLESS_INSPIRATION);
+						me->CastSpell(hexxer, SPELL_RECKLESS_INSPIRATION);
 						events.SetPhase(PHASE_LAST_RECKLESS_INSPIRATION_DONE);
 					}
 				}
 
 				if (!checkGlintrokHexxerAlive && !checkGlintrokSkulkerAlive && !checkGlintrokIronhideAlive)
 				{
-					DoCast(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
+					me->CastSpell(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
 
 					if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
 					{
-						DoCast(oracle, SPELL_RECKLESS_INSPIRATION);
+						me->CastSpell(oracle, SPELL_RECKLESS_INSPIRATION);
 						events.SetPhase(PHASE_LAST_RECKLESS_INSPIRATION_DONE);
 					}
 				}
@@ -517,7 +528,7 @@ public:
 
 			if (events.IsInPhase(PHASE_LAST_RECKLESS_INSPIRATION_DONE) && !checkGlintrokOracleAlive && !checkGlintrokHexxerAlive && !checkGlintrokSkulkerAlive && !checkGlintrokIronhideAlive && lastPhase == false)
 			{
-				DoCast(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
+				me->CastSpell(me, SPELL_RECKLESS_INSPIRATION_INSTANT);
 				lastPhase = true;
 			}
 
@@ -550,50 +561,53 @@ public:
 
 		void Reset()
 		{
+			events.Reset();
+
 			if (instance)
+			{
 				if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
 					if (gekkan->AI())
 					    gekkan->AI()->DoAction(ACTION_ORACLE_RESET);
 
-			if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
-				if (!gekkan->isAlive())
-				{
-					gekkan->RemoveCorpse();
-					gekkan->Respawn();
-					gekkan->AI()->EnterEvadeMode();
-				}
+				if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
+					if (!gekkan->isAlive())
+					{
+						gekkan->RemoveCorpse();
+						gekkan->Respawn();
+						gekkan->AI()->EnterEvadeMode();
+					}
 
-			if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
-				if (!hexxer->isAlive())
-				{
-					hexxer->RemoveCorpse();
-					hexxer->Respawn();
-					hexxer->AI()->EnterEvadeMode();
-				}
+				if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
+					if (!hexxer->isAlive())
+					{
+						hexxer->RemoveCorpse();
+						hexxer->Respawn();
+						hexxer->AI()->EnterEvadeMode();
+					}
 
-			if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
-				if (!skulker->isAlive())
-				{
-					skulker->RemoveCorpse();
-					skulker->Respawn();
-					skulker->AI()->EnterEvadeMode();
-				}
+				if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
+					if (!skulker->isAlive())
+					{
+						skulker->RemoveCorpse();
+						skulker->Respawn();
+						skulker->AI()->EnterEvadeMode();
+					}
 
-			if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
-				if (!ironhide->isAlive())
-				{
-					ironhide->RemoveCorpse();
-					ironhide->Respawn();
-					ironhide->AI()->EnterEvadeMode();
-				}
+				if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
+					if (!ironhide->isAlive())
+					{
+						ironhide->RemoveCorpse();
+						ironhide->Respawn();
+						ironhide->AI()->EnterEvadeMode();
+					}
 
-			if (me->HasAura(SPELL_RECKLESS_INSPIRATION))
-				me->RemoveAurasDueToSpell(SPELL_RECKLESS_INSPIRATION);
+				if (me->HasAura(SPELL_RECKLESS_INSPIRATION))
+					me->RemoveAurasDueToSpell(SPELL_RECKLESS_INSPIRATION);
 
-			if (me->HasAura(SPELL_RECKLESS_INSPIRATION_INSTANT))
-				me->RemoveAurasDueToSpell(SPELL_RECKLESS_INSPIRATION_INSTANT);
-
-			events.Reset();
+				if (me->HasAura(SPELL_RECKLESS_INSPIRATION_INSTANT))
+					me->RemoveAurasDueToSpell(SPELL_RECKLESS_INSPIRATION_INSTANT);
+			}
+			
 			isWithinMeleeRange = false;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 		}
@@ -608,20 +622,24 @@ public:
 
 		void EnterCombat(Unit* /*who*/)
 		{
-			if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
-				if (!gekkan->isAlive())
-					gekkan->SetInCombatWithZone();
-			if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
-				if (!hexxer->isAlive())
-					hexxer->SetInCombatWithZone();
-			if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
-				if (!skulker->isAlive())
-					skulker->SetInCombatWithZone();
-			if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
-				if (!ironhide->isAlive())
-					ironhide->SetInCombatWithZone();
+			if (instance)
+			{
+				if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
+					if (!gekkan->isAlive())
+						gekkan->SetInCombatWithZone();
+				if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
+					if (!hexxer->isAlive())
+						hexxer->SetInCombatWithZone();
+				if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
+					if (!skulker->isAlive())
+						skulker->SetInCombatWithZone();
+				if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
+					if (!ironhide->isAlive())
+						ironhide->SetInCombatWithZone();
 
-			me->SetInCombatWithZone();
+				if (!me->isInCombat())
+					me->SetInCombatWithZone();
+			}
 
 			events.ScheduleEvent(EVENT_CLEANSING_FLAME, 8*IN_MILLISECONDS);
 			events.ScheduleEvent(EVENT_FIRE_BOLT, 2*IN_MILLISECONDS);
@@ -637,7 +655,7 @@ public:
 			if (me->HasUnitState(UNIT_STATE_CASTING))
 				return;
 
-			if (me->IsWithinMeleeRange(me->getVictim(), 2.5f) && isWithinMeleeRange == false)
+			if (me->IsWithinMeleeRange(me->getVictim(), 2.5f) && !isWithinMeleeRange)
 			{
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				isWithinMeleeRange = true;
@@ -651,13 +669,13 @@ public:
 					{
 						case EVENT_CLEANSING_FLAME:
 							if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
-								DoCast(gekkan, SPELL_CLEANSING_FLAME);
+								me->CastSpell(gekkan, SPELL_CLEANSING_FLAME);
 
 							events.ScheduleEvent(EVENT_CLEANSING_FLAME, 8*IN_MILLISECONDS);
 							break;
 
 						case EVENT_FIRE_BOLT:
-							DoCast(me->getVictim(), SPELL_FIRE_BOLT);
+							me->CastSpell(me->getVictim(), SPELL_FIRE_BOLT);
 
 							events.ScheduleEvent(EVENT_FIRE_BOLT, 3*IN_MILLISECONDS);
 							break;
@@ -697,52 +715,55 @@ public:
 
 		void Reset()
 		{
+			events.Reset();
+
 			if (instance)
+			{
 				if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
 					if (gekkan->AI())
-					    gekkan->AI()->DoAction(ACTION_HEXXER_RESET);
+						gekkan->AI()->DoAction(ACTION_HEXXER_RESET);
 
-			if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
-				if (!gekkan->isAlive())
-				{
-					gekkan->RemoveCorpse();
-					gekkan->Respawn();
-					gekkan->AI()->EnterEvadeMode();
-				}
+				if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
+					if (!gekkan->isAlive())
+					{
+						gekkan->RemoveCorpse();
+						gekkan->Respawn();
+						gekkan->AI()->EnterEvadeMode();
+					}
 
-			if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
-				if (!oracle->isAlive())
-				{
-					oracle->RemoveCorpse();
-					oracle->Respawn();
-					oracle->AI()->EnterEvadeMode();
-				}
+				if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
+					if (!oracle->isAlive())
+					{
+						oracle->RemoveCorpse();
+						oracle->Respawn();
+						oracle->AI()->EnterEvadeMode();
+					}
 
-			if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
-				if (!skulker->isAlive())
-				{
-					skulker->RemoveCorpse();
-					skulker->Respawn();
-					skulker->AI()->EnterEvadeMode();
-				}
+				if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
+					if (!skulker->isAlive())
+					{
+						skulker->RemoveCorpse();
+						skulker->Respawn();
+						skulker->AI()->EnterEvadeMode();
+					}
 
-			if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
-				if (!ironhide->isAlive())
-				{
-					ironhide->RemoveCorpse();
-					ironhide->Respawn();
-					ironhide->AI()->EnterEvadeMode();
-				}
+				if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
+					if (!ironhide->isAlive())
+					{
+						ironhide->RemoveCorpse();
+						ironhide->Respawn();
+						ironhide->AI()->EnterEvadeMode();
+					}
 
-			if (me->HasAura(SPELL_RECKLESS_INSPIRATION))
-				me->RemoveAurasDueToSpell(SPELL_RECKLESS_INSPIRATION);
+				if (me->HasAura(SPELL_RECKLESS_INSPIRATION))
+					me->RemoveAurasDueToSpell(SPELL_RECKLESS_INSPIRATION);
 
-			if (me->HasAura(SPELL_RECKLESS_INSPIRATION_INSTANT))
-				me->RemoveAurasDueToSpell(SPELL_RECKLESS_INSPIRATION_INSTANT);
+				if (me->HasAura(SPELL_RECKLESS_INSPIRATION_INSTANT))
+					me->RemoveAurasDueToSpell(SPELL_RECKLESS_INSPIRATION_INSTANT);
+			}
 
 			isWithinMeleeRange = false;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-			events.Reset();
 		}
 
 		void JustDied(Unit *pWho)
@@ -755,17 +776,21 @@ public:
 
 		void EnterCombat(Unit* /*who*/)
 		{
-			if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
-				gekkan->SetInCombatWithZone();
-			if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
-				oracle->SetInCombatWithZone();
-			if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
-				skulker->SetInCombatWithZone();
-			if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
-				ironhide->SetInCombatWithZone();
+			if (instance)
+			{
+				if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
+					gekkan->SetInCombatWithZone();
+				if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
+					oracle->SetInCombatWithZone();
+				if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
+					skulker->SetInCombatWithZone();
+				if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
+					ironhide->SetInCombatWithZone();
 
-			me->SetInCombatWithZone();
-			
+				if (!me->isInCombat())
+					me->SetInCombatWithZone();
+			}
+
 			events.ScheduleEvent(EVENT_HEX_OF_LETHARGY, 3*IN_MILLISECONDS, 0);
 			events.ScheduleEvent(EVENT_DARK_BOLT, 2*IN_MILLISECONDS, 0);
 		}
@@ -780,7 +805,7 @@ public:
 			if (me->HasUnitState(UNIT_STATE_CASTING))
 				return;
 
-			if (me->IsWithinMeleeRange(me->getVictim(), 2.5f) && isWithinMeleeRange == false)
+			if (me->IsWithinMeleeRange(me->getVictim(), 2.5f) && !isWithinMeleeRange)
 			{
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				isWithinMeleeRange = true;
@@ -793,13 +818,13 @@ public:
 					if (instance)
 					{
 						case EVENT_HEX_OF_LETHARGY:
-							DoCast(me->getVictim(), SPELL_HEX_OF_LETHARGY);
+							me->CastSpell(me->getVictim(), SPELL_HEX_OF_LETHARGY);
 
 							events.ScheduleEvent(EVENT_HEX_OF_LETHARGY, 10*IN_MILLISECONDS, 0);
 							break;
 
 						case EVENT_DARK_BOLT:
-							DoCast(me->getVictim(), SPELL_DARK_BOLT);
+							me->CastSpell(me->getVictim(), SPELL_DARK_BOLT);
 
 							events.ScheduleEvent(EVENT_DARK_BOLT, 3*IN_MILLISECONDS, 0);
 							break;
@@ -837,42 +862,46 @@ public:
 
 		void Reset()
 		{
+			events.Reset();
+
 			if (instance)
+			{
 				if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
 					if (gekkan->AI())
 					    gekkan->AI()->DoAction(ACTION_SKULKER_RESET);
 
-			if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
-				if (!gekkan->isAlive())
-				{
-					gekkan->RemoveCorpse();
-					gekkan->Respawn();
-					gekkan->AI()->EnterEvadeMode();
-				}
+				if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
+					if (!gekkan->isAlive())
+					{
+						gekkan->RemoveCorpse();
+						gekkan->Respawn();
+						gekkan->AI()->EnterEvadeMode();
+					}
 
-			if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
-				if (!oracle->isAlive())
-				{
-					oracle->RemoveCorpse();
-					oracle->Respawn();
-					oracle->AI()->EnterEvadeMode();
-				}
+				if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
+					if (!oracle->isAlive())
+					{
+						oracle->RemoveCorpse();
+						oracle->Respawn();
+						oracle->AI()->EnterEvadeMode();
+					}
 
-			if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
-				if (!hexxer->isAlive())
-				{
-					hexxer->RemoveCorpse();
-					hexxer->Respawn();
-					hexxer->AI()->EnterEvadeMode();
-				}
+				if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
+					if (!hexxer->isAlive())
+					{
+						hexxer->RemoveCorpse();
+						hexxer->Respawn();
+						hexxer->AI()->EnterEvadeMode();
+					}
 
-			if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
-				if (!ironhide->isAlive())
-				{
-					ironhide->RemoveCorpse();
-					ironhide->Respawn();
-					ironhide->AI()->EnterEvadeMode();
-				}
+				if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
+					if (!ironhide->isAlive())
+					{
+						ironhide->RemoveCorpse();
+						ironhide->Respawn();
+						ironhide->AI()->EnterEvadeMode();
+					}
+			}
 
 			if (me->HasAura(SPELL_RECKLESS_INSPIRATION))
 				me->RemoveAurasDueToSpell(SPELL_RECKLESS_INSPIRATION);
@@ -880,8 +909,7 @@ public:
 			if (me->HasAura(SPELL_RECKLESS_INSPIRATION_INSTANT))
 				me->RemoveAurasDueToSpell(SPELL_RECKLESS_INSPIRATION_INSTANT);
 
-			DoCast(me, SPELL_STEALTH);
-			events.Reset();
+			me->CastSpell(me, SPELL_STEALTH);
 		}
 
 		void JustDied(Unit *pWho)
@@ -894,16 +922,20 @@ public:
 
 		void EnterCombat(Unit* /*who*/)
 		{
-			if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
-				gekkan->SetInCombatWithZone();
-			if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
-				oracle->SetInCombatWithZone();
-			if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
-				hexxer->SetInCombatWithZone();
-			if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
-				ironhide->SetInCombatWithZone();
+			if (instance)
+			{
+				if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
+					gekkan->SetInCombatWithZone();
+				if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
+					oracle->SetInCombatWithZone();
+				if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
+					hexxer->SetInCombatWithZone();
+				if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
+					ironhide->SetInCombatWithZone();
 
-			me->SetInCombatWithZone();
+				if (!me->isInCombat())
+					me->SetInCombatWithZone();
+			}
 
 			events.ScheduleEvent(EVENT_SHANK, 3*IN_MILLISECONDS, 0);
 		}
@@ -917,7 +949,7 @@ public:
 
 			if (events.ExecuteEvent() == EVENT_SHANK)
 			{
-				DoCast(me->getVictim(), SPELL_SHANK);
+				me->CastSpell(me->getVictim(), SPELL_SHANK);
 				events.ScheduleEvent(EVENT_SHANK, 11*IN_MILLISECONDS, 0);
 			}
 
@@ -948,41 +980,43 @@ public:
 		void Reset()
 		{
 			if (instance)
+			{
 				if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
 					if (gekkan->AI())
 					    gekkan->AI()->DoAction(ACTION_IRONHIDE_RESET);
 
-			if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
-				if (!gekkan->isAlive())
-				{
-					gekkan->RemoveCorpse();
-					gekkan->Respawn();
-					gekkan->AI()->EnterEvadeMode();
-				}
+				if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
+					if (!gekkan->isAlive())
+					{
+						gekkan->RemoveCorpse();
+						gekkan->Respawn();
+						gekkan->AI()->EnterEvadeMode();
+					}
 
-			if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
-				if (!oracle->isAlive())
-				{
-					oracle->RemoveCorpse();
-					oracle->Respawn();
-					oracle->AI()->EnterEvadeMode();
-				}
+				if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
+					if (!oracle->isAlive())
+					{
+						oracle->RemoveCorpse();
+						oracle->Respawn();
+						oracle->AI()->EnterEvadeMode();
+					}
 
-			if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
-				if (!hexxer->isAlive())
-				{
-					hexxer->RemoveCorpse();
-					hexxer->Respawn();
-					hexxer->AI()->EnterEvadeMode();
-				}
+				if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
+					if (!hexxer->isAlive())
+					{
+						hexxer->RemoveCorpse();
+						hexxer->Respawn();
+						hexxer->AI()->EnterEvadeMode();
+					}
 
-			if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
-				if (!skulker->isAlive())
-				{
-					skulker->RemoveCorpse();
-					skulker->Respawn();
-					skulker->AI()->EnterEvadeMode();
-				}
+				if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
+					if (!skulker->isAlive())
+					{
+						skulker->RemoveCorpse();
+						skulker->Respawn();
+						skulker->AI()->EnterEvadeMode();
+					}
+			}
 
 			if (me->HasAura(SPELL_RECKLESS_INSPIRATION))
 				me->RemoveAurasDueToSpell(SPELL_RECKLESS_INSPIRATION);
@@ -990,7 +1024,7 @@ public:
 			if (me->HasAura(SPELL_RECKLESS_INSPIRATION_INSTANT))
 				me->RemoveAurasDueToSpell(SPELL_RECKLESS_INSPIRATION_INSTANT);
 
-			DoCast(me, SPELL_IRON_PROTECTOR);
+			me->CastSpell(me, SPELL_IRON_PROTECTOR);
 		}
 
 		void JustDied(Unit *pWho)
@@ -1003,16 +1037,20 @@ public:
 
 		void EnterCombat(Unit* /*who*/)
 		{
-			if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
-				gekkan->SetInCombatWithZone();
-			if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
-				oracle->SetInCombatWithZone();
-			if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
-				hexxer->SetInCombatWithZone();
-			if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
-				skulker->SetInCombatWithZone();
+			if (instance)
+			{
+				if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
+					gekkan->SetInCombatWithZone();
+				if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
+					oracle->SetInCombatWithZone();
+				if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
+					hexxer->SetInCombatWithZone();
+				if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
+					skulker->SetInCombatWithZone();
 
-			me->SetInCombatWithZone();
+				if (!me->isInCombat())
+					me->SetInCombatWithZone();
+			}
 		}
 
 		void UpdateAI(uint32 diff)
@@ -1049,15 +1087,10 @@ public:
 
 		void Reset()
 		{
+			events.Reset();
+
 			isWithinMeleeRange = false;
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-			events.Reset();
-		}
-
-		void JustDied(Unit *pWho)
-		{
-			if (instance)
-				instance->SetBossState(DATA_MOB_GLINTROK_HEXXER, DONE);
 		}
 
 		void EnterCombat(Unit* /*who*/)
@@ -1076,7 +1109,7 @@ public:
 			if (me->HasUnitState(UNIT_STATE_CASTING))
 				return;
 
-			if (me->IsWithinMeleeRange(me->getVictim(), 2.5f) && isWithinMeleeRange == false)
+			if (me->IsWithinMeleeRange(me->getVictim(), 2.5f) && !isWithinMeleeRange)
 			{
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				isWithinMeleeRange = true;
@@ -1089,13 +1122,13 @@ public:
 					if (instance)
 					{
 						case EVENT_HEX_OF_LETHARGY:
-							DoCast(me->getVictim(), SPELL_HEX_OF_LETHARGY);
+							me->CastSpell(me->getVictim(), SPELL_HEX_OF_LETHARGY);
 
 							events.ScheduleEvent(EVENT_HEX_OF_LETHARGY, 10*IN_MILLISECONDS, 0);
 							break;
 
 						case EVENT_DARK_BOLT:
-							DoCast(me->getVictim(), SPELL_DARK_BOLT);
+							me->CastSpell(me->getVictim(), SPELL_DARK_BOLT);
 
 							events.ScheduleEvent(EVENT_DARK_BOLT, 3*IN_MILLISECONDS, 0);
 							break;
