@@ -35,8 +35,10 @@ enum HunterSpells
     SPELL_HUNTER_ASPECT_OF_THE_BEAST_PET            = 61669,
     SPELL_HUNTER_ASPECT_OF_THE_VIPER_ENERGIZE       = 34075,
     SPELL_HUNTER_BESTIAL_WRATH                      = 19574,
-    SPELL_HUNTER_CHIMERA_SHOT_SERPENT               = 53353,
-    SPELL_HUNTER_CHIMERA_SHOT_VIPER                 = 53358,
+    SPELL_HUNTER_CHIMERA_SHOT                       = 53209,
+    SPELL_HUNTER_CHIMERA_SHOT_HEAL                  = 53353,
+    /*SPELL_HUNTER_CHIMERA_SHOT_SERPENT               = 53353,*/    
+	SPELL_HUNTER_CHIMERA_SHOT_VIPER                 = 53358,
     SPELL_HUNTER_CHIMERA_SHOT_SCORPID               = 53359,
     SPELL_HUNTER_GLYPH_OF_ASPECT_OF_THE_VIPER       = 56851,
     SPELL_HUNTER_INVIGORATION_TRIGGERED             = 53398,
@@ -184,7 +186,7 @@ class spell_hun_ascpect_of_the_viper : public SpellScriptLoader
 };
 
 // 53209 - Chimera Shot
-class spell_hun_chimera_shot : public SpellScriptLoader
+/*class spell_hun_chimera_shot : public SpellScriptLoader (deprecated, wrong script)
 {
     public:
         spell_hun_chimera_shot() : SpellScriptLoader("spell_hun_chimera_shot") { }
@@ -193,14 +195,14 @@ class spell_hun_chimera_shot : public SpellScriptLoader
         {
             PrepareSpellScript(spell_hun_chimera_shot_SpellScript);
 
-            bool Validate(SpellInfo const* /*spellInfo*/)
+            bool Validate(SpellInfo const* /*spellInfo)
             {
                 if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_CHIMERA_SHOT_SERPENT) || !sSpellMgr->GetSpellInfo(SPELL_HUNTER_CHIMERA_SHOT_VIPER) || !sSpellMgr->GetSpellInfo(SPELL_HUNTER_CHIMERA_SHOT_SCORPID))
                     return false;
                 return true;
             }
 
-            void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+            void HandleScriptEffect(SpellEffIndex /*effIndex)
             {
                 Unit* caster = GetCaster();
                 if (Unit* unitTarget = GetHitUnit())
@@ -274,6 +276,75 @@ class spell_hun_chimera_shot : public SpellScriptLoader
         {
             return new spell_hun_chimera_shot_SpellScript();
         }
+};*/
+
+class spell_hun_chimera_shot : public SpellScriptLoader
+{
+public :
+    spell_hun_chimera_shot() : SpellScriptLoader("spell_hun_chimera_shot")
+    {
+
+    }
+
+    class spell_hun_chimera_shot_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hun_chimera_shot_SpellScript);
+
+        bool Validate(const SpellInfo *spellInfo)
+        {
+            return true ;
+        }
+
+        bool Load()
+        {
+            return true ;
+        }
+
+        void handleMiscOnEffectScriptEffect(SpellEffIndex effIndex)
+        {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "Chimera Shot : handleMiscOnEffectScriptEffect");
+            if(GetCaster())
+            {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Chimera Shot : caster as unit is not null");
+                if(Player* caster = GetCaster()->ToPlayer())
+                {
+                    // Reset Serpent Sting duration && apply Mark of the Hunter
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Chimera Shot : caster as player is not null");
+                    if(Unit* target = GetExplTargetUnit())
+                    {
+                        sLog->outDebug(LOG_FILTER_NETWORKIO, "Chimera Shot : target is not null");
+                        if(Aura* serpentSting = target->GetAura(SPELL_HUNTER_SERPENT_STING))
+                        {
+                            sLog->outDebug(LOG_FILTER_NETWORKIO, "Chimera Shot : target has aura serpent sting ; refreshing it");
+                            serpentSting->RefreshDuration();
+                        }
+
+                        sLog->outDebug(LOG_FILTER_NETWORKIO, "Chimera Shot : casting mark of the hunter");
+                        // Mark of the Hunter
+                        caster->CastSpell(target, 1130);
+                    }
+
+                    // Heal the caster
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Chimera Shot : calculating hp");
+                    float healthToRestore = caster->GetMaxHealth();
+                    healthToRestore = healthToRestore / 100 * caster->HasAura(119447) ? 5 : 3 ;
+
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Chimera Shot : amount set to %f", healthToRestore);
+                    caster->SetHealth(caster->GetHealth() + healthToRestore);
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_hun_chimera_shot_SpellScript::handleMiscOnEffectScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_hun_chimera_shot_SpellScript();
+    }
 };
 
 // 781 - Disengage
