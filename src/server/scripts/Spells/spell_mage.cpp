@@ -1547,9 +1547,8 @@ public :
                             continue ;
                         sLog->outDebug(LOG_FILTER_NETWORKIO, "Player %s (guid : %u) has spell cooldown on spell %s (id : %u)", p->GetName().c_str(), p->GetGUIDLow(), spell->SpellName, spell->Id);
                     }
-					/*p->RemoveSpellCooldown(118280, true);
-					p->RemoveSpellCooldown(108853, true);*/
-					p->RemoveAllSpellCooldown();
+					p->RemoveSpellCooldown(108853, true);
+					/*p->RemoveAllSpellCooldown();*/ // This test has proved that event this way, the cooldown is not reset => WHY ? 
 				}
 			}
 		}
@@ -1676,7 +1675,7 @@ public :
                 Position pos ;
                 caster->GetPosition(&pos);
 
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : real target found (name %s, guid %u) ; position set ; checking glyph", realTarget->GetName().c_str(), realTarget->GetGUID());
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : real target found (name %s, guid %u) ; position set ; checking glyph", realTarget->GetName().c_str(), realTarget->GetGUID());
                 // Glyph of Discret Magic : target is valid only if less than 5 yards away from the PRIMARY TARGET
                 if(caster->HasAura(134580))
                 {
@@ -1714,11 +1713,16 @@ public :
                     return ;
 
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : guids corrects (realTarget : %u ; otherTarget : %u)", realTarget->GetGUID(), otherTarget->GetGUID());
-                Unit::AuraList auras = realTarget->GetSingleCastAuras(); // To find the auras to duplicate
-                for(Unit::AuraList::iterator iter = auras.begin() ; iter != auras.end() ; ++iter)
+				Unit::AuraApplicationMap auras = realTarget->GetAppliedAuras(); // To find the auras to duplicate
+                for(Unit::AuraApplicationMap::iterator iter = auras.begin() ; iter != auras.end() ; ++iter)
                 {
-                    if(Aura* actualAura = *iter)
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : looping");
+					if(!iter->second)
+						continue;
+
+					if(Aura* actualAura = iter->second->GetBase())
                     {
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : found an aura (%s, %u) ; casterGUID = %u", actualAura->GetSpellInfo()->SpellName, actualAura->GetId(), actualAura->GetCasterGUID());
                         if(actualAura->GetCaster() == caster)
                         {
                             sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : aura (%s, %u) found on realTarget", actualAura->GetSpellInfo()->SpellName, actualAura->GetId());
