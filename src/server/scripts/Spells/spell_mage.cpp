@@ -1539,6 +1539,14 @@ public :
 				if(Player* p = GetCaster()->ToPlayer())
 				{
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "Combustion's Caster as player is not null ; resetting cooldown");
+					SpellCooldowns cooldowns = p->GetSpellCooldownMap();
+                    for(SpellCooldowns::iterator iter = cooldowns.begin() ; iter != cooldowns.end() ; ++iter)
+                    {
+                        SpellInfo const* spell = sSpellMgr->GetSpellInfo(iter->first);
+                        if(!spell)
+                            continue ;
+                        sLog->outDebug(LOG_FILTER_NETWORKIO, "Player %s (guid : %u) has spell cooldown on spell %s (id : %u)", p->GetName().c_str(), p->GetGUIDLow(), spell->SpellName, spell->Id);
+                    }
 					p->RemoveSpellCooldown(SPELL_MAGE_INFERNO_BLAST, true);
 				}
 			}
