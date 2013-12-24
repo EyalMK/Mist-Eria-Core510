@@ -11,6 +11,7 @@ enum Spells
 {
 	/* Wise Mari */
 	SPELL_BLESSING_OF_THE_WATERSPEAKER	= 121483,
+	SPELL_PURIFIED_WATER				= 118714,
 	SPELL_BUBBLE_BURST					= 106612,
 	SPELL_CALL_WATER					= 106526,
 	SPELL_HYDROLANCE					= 106055,
@@ -168,6 +169,9 @@ public:
 				Talk(irand(SAY_DEATH_1, SAY_DEATH_3));
 
 				instance->DoCastSpellOnPlayers(SPELL_BLESSING_OF_THE_WATERSPEAKER);
+
+				if (me->GetMap()->IsHeroic())
+					instance->DoCastSpellOnPlayers(SPELL_PURIFIED_WATER);
 
 				if (Creature* lorewalkerTrigger = me->FindNearestCreature(NPC_LOREWALKER_TRIGGER, 99999.0f, false))
 				{
