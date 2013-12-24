@@ -171,7 +171,7 @@ public:
 				instance->DoCastSpellOnPlayers(SPELL_BLESSING_OF_THE_WATERSPEAKER);
 
 				if (me->GetMap()->IsHeroic())
-					instance->DoCastSpellOnPlayers(SPELL_PURIFIED_WATER);
+					me->CastSpell(me, SPELL_PURIFIED_WATER);
 
 				if (Creature* lorewalkerTrigger = me->FindNearestCreature(NPC_LOREWALKER_TRIGGER, 99999.0f, false))
 				{
