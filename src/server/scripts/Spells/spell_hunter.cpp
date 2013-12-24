@@ -313,7 +313,7 @@ public :
                     if(Unit* target = GetExplTargetUnit())
                     {
                         sLog->outDebug(LOG_FILTER_NETWORKIO, "Chimera Shot : target is not null");
-                        if(Aura* serpentSting = target->GetAura(SPELL_HUNTER_SERPENT_STING))
+                        if(Aura* serpentSting = target->GetAura(118253))
                         {
                             sLog->outDebug(LOG_FILTER_NETWORKIO, "Chimera Shot : target has aura serpent sting ; refreshing it");
                             serpentSting->RefreshDuration();
@@ -321,16 +321,21 @@ public :
 
                         sLog->outDebug(LOG_FILTER_NETWORKIO, "Chimera Shot : casting mark of the hunter");
                         // Mark of the Hunter
-                        caster->CastSpell(target, 1130);
+                        caster->CastSpell(target, 1130, TRIGGERED_FULL_MASK);
                     }
 
                     // Heal the caster
                     sLog->outDebug(LOG_FILTER_NETWORKIO, "Chimera Shot : calculating hp");
                     float healthToRestore = caster->GetMaxHealth();
-                    healthToRestore = healthToRestore / 100 * caster->HasAura(119447) ? 5 : 3 ;
+                    if(caster->HasAura(119447))
+						healthToRestore = (healthToRestore / 100 * 5);
+					else
+						healthToRestore = (healthToRestore / 100 * 3);
 
-                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Chimera Shot : amount set to %f", healthToRestore);
-                    caster->SetHealth(caster->GetHealth() + healthToRestore);
+					healthToRestore += caster->GetHealth();
+
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Chimera Shot : life going to be set to %f", healthToRestore);
+                    caster->SetHealth((uint32)healthToRestore);
                 }
             }
         }
