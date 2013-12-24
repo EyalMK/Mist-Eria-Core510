@@ -1547,6 +1547,7 @@ public :
                             continue ;
                         sLog->outDebug(LOG_FILTER_NETWORKIO, "Player %s (guid : %u) has spell cooldown on spell %s (id : %u)", p->GetName().c_str(), p->GetGUIDLow(), spell->SpellName, spell->Id);
                     }
+					p->RemoveSpellCooldown(118280, true);
 					p->RemoveSpellCooldown(108853, true);
 				}
 			}
