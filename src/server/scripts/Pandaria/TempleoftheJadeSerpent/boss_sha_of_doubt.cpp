@@ -533,9 +533,14 @@ public:
 
     bool OnGossipHello(Player* player, GameObject* go)
     {
-        instance->DoCastSpellOnPlayers(SPELL_SEED_OF_DOUBT);
+		instance = go->GetInstanceScript();
 
-		go->Delete();
+		if (instance)
+		{
+			instance->DoCastSpellOnPlayers(SPELL_SEED_OF_DOUBT);
+			go->Delete();
+		}
+		
         return true;
     }
 };
