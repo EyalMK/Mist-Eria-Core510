@@ -1733,6 +1733,7 @@ public :
                                 // Well, thanks Pexirn. A LOT !
                                 sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : good aura (%s, %u) found on realTarget", actualAura->GetSpellInfo()->SpellName, actualAura->GetId());
                                 copy = Aura::TryCreate(actualAura->GetSpellInfo(), actualAura->GetEffectMask(), otherTarget, caster, NULL, NULL, actualAura->GetCasterGUID());
+								break ;
                             default :
                                 break ;
                             }
@@ -1761,7 +1762,7 @@ public :
         void Register()
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mage_inferno_blast_spreader_SpellScript::handleTargetSelect, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_mage_inferno_blast_spreader_SpellScript::handleSpreadAurasOnEffectScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            OnEffectHit += SpellEffectFn(spell_mage_inferno_blast_spreader_SpellScript::handleSpreadAurasOnEffectScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
