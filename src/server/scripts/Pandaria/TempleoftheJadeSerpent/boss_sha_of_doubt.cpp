@@ -73,13 +73,15 @@ enum Npcs
 enum Achievements
 {
 // Defeat the Sha of Doubt in Temple of the Jade Serpent while under the effects of Purified Water.
-	ACHIEVEMENT_CLEANING_UP					= 6475,
+	ACHI_CLEANING_UP						= 6475,
 // Defeat Wise Mari without being hit by Corrupted Water, Hydrolance, or Wash Away in Temple of the Jade Serpent on Heroic Difficulty.
-	ACHIEVEMENT_HYDROPHOBIA					= 6460,
+	ACHI_HYDROPHOBIA						= 6460,
 // Defeat the Sha of Doubt in Temple of the Jade Serpent while under the effect of 4 Seeds of Doubt on Heroic difficulty.
-	ACHIEVEMENT_SEEDS_OF_DOUBT				= 6671,
+	ACHI_SEEDS_OF_DOUBT						= 6671,
 // Defeat the Sha of Doubt in Temple of the Jade Serpent.
-	ACHIEVEMENT_TEMPLE_OF_THE_JADE_SERPENT	= 6757
+	ACHI_TEMPLE_OF_THE_JADE_SERPENT			= 6757,
+// Defeat the Sha of Doubt in Temple of the Jade Serpent on Heroic difficulty.
+	ACHI_TEMPLE_OF_THE_JADE_SERPENT_HEROIC	= 6758
 };
 
 class boss_sha_of_doubt : public CreatureScript
@@ -150,14 +152,15 @@ public:
 								if (map->IsHeroic())
 								{
 									if (player->HasAura(118714)) // Spell Purified Water
-										player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHIEVEMENT_CLEANING_UP));
+										player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_CLEANING_UP));
 
 									if (Aura* seed = player->GetAura(SPELL_SEED_OF_DOUBT))
 										if (seed->GetStackAmount() == 4)
-											player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHIEVEMENT_SEEDS_OF_DOUBT));
-								}
+											player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_SEEDS_OF_DOUBT));
 
-								player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHIEVEMENT_TEMPLE_OF_THE_JADE_SERPENT));
+									player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_TEMPLE_OF_THE_JADE_SERPENT_HEROIC));
+								}
+								else player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_TEMPLE_OF_THE_JADE_SERPENT));
 							}
 				}
 			}
