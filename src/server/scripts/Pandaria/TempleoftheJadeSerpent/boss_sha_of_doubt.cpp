@@ -158,7 +158,8 @@ public:
 
 									player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_TEMPLE_OF_THE_JADE_SERPENT_HEROIC));
 								}
-								else player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_TEMPLE_OF_THE_JADE_SERPENT));
+								
+								player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_TEMPLE_OF_THE_JADE_SERPENT));
 							}
 				}
 			}

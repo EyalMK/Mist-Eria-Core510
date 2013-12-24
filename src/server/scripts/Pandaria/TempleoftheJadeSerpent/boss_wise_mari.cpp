@@ -194,6 +194,7 @@ public:
 									player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_HYDROPHOBIA));
 									player->RemoveAurasDueToSpell(SPELL_PREVENTION_HYDROPHOBIA, player->GetGUID());
 								}
+								else player->RemoveAurasDueToSpell(SPELL_PREVENTION_HYDROPHOBIA, player->GetGUID());
 				}
 
 				if (Creature* lorewalkerTrigger = me->FindNearestCreature(NPC_LOREWALKER_TRIGGER, 99999.0f, false))
