@@ -1741,7 +1741,7 @@ public :
                             if(copy)
                             {
                                 // Thanks Pexirn. Again.
-                                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : copy aura jas been created ; setting target in combat if it wasn't");
+                                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : copy aura has been created ; setting target in combat if it wasn't");
                                 if(!otherTarget->isInCombat())
                                     otherTarget->SetInCombatWith(caster);
 
@@ -1762,7 +1762,7 @@ public :
         void Register()
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mage_inferno_blast_spreader_SpellScript::handleTargetSelect, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
-            OnEffectHit += SpellEffectFn(spell_mage_inferno_blast_spreader_SpellScript::handleSpreadAurasOnEffectScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            OnEffectHitTarget += SpellEffectFn(spell_mage_inferno_blast_spreader_SpellScript::handleSpreadAurasOnEffectScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
