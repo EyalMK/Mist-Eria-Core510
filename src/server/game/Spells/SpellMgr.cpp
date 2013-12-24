@@ -3876,6 +3876,7 @@ void SpellMgr::LoadSpellInfoCorrections()
 					break;
 				case 12880: // Enrage
 					spellInfo->Effects[EFFECT_1].Effect = 0;
+					spellInfo->Effects[EFFECT_2].Effect = 0;
 					break;
 				default:
 					break;
