@@ -65,12 +65,14 @@ class spell_mastery_unshackled_fury : public SpellScriptLoader
         {
             PrepareAuraScript(spell_mastery_unshackled_fury_AuraScript);
 
-            void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 if (Unit* caster = GetCaster()->ToPlayer())
                 {
                     if (caster->HasAura(MASTERY_WARRIOR_FURY) && caster->getLevel() >= 80)
                         amount = int32(caster->GetFloatValue(PLAYER_MASTERY) + caster->ToPlayer()->GetRatingBonusValue(CR_MASTERY));
+
+					caster->CastCustomSpell(caster, SPELL_WARR_ENRAGE, NULL, &amount, NULL, true, 0, aurEff);
                 }
             }
 
