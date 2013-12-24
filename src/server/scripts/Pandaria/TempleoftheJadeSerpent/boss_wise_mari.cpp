@@ -26,6 +26,7 @@ enum Spells
 	SPELL_WASH_AWAY_TRIGGERED			= 106331,
 	SPELL_WASH_AWAY_VISUAL				= 115575,
 	SPELL_TRACK_ROTATE					= 74758, // For the Wash away
+	SPELL_PREVENTION_HYDROPHOBIA		= 135846,
 
 	/* Corrupt living Water */
 	SPELL_SHA_RESIDUE					= 106653,
@@ -115,8 +116,6 @@ enum Achievements
 	ACHI_HYDROPHOBIA	= 6460,
 };
 
-#define ACTION_HYDROPHOBIA 0
-
 class boss_wise_mari : public CreatureScript
 {
 public:
@@ -141,7 +140,6 @@ public:
 		int32 corruptWaterCount;
 		bool washAway;
 		bool intro;
-		bool hydrophobia;
 
 		void Reset()
 		{
@@ -157,7 +155,6 @@ public:
 				corruptWaterCount = 0; // 0 = first corrupt living water | 1 = second | 2 = third | 3 = fourth & phase 2
 				washAway = false;
 				intro = false;
-				hydrophobia = true;
 
 				std::list<Creature*> droplets;
 				me->GetCreatureListWithEntryInGrid(droplets, NPC_CORRUPT_DROPLET, 99999.0f);
@@ -189,11 +186,15 @@ public:
 
 					Map::PlayerList const &PlayerList = map->GetPlayers();
 
-					if (hydrophobia)
-						if (!PlayerList.isEmpty())
-							for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-								if (Player* player = i->getSource())
+					if (!PlayerList.isEmpty())
+						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+							if (Player* player = i->getSource())
+								if (!player->HasAura(SPELL_PREVENTION_HYDROPHOBIA))
+								{
 									player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_HYDROPHOBIA));
+									player->RemoveAurasDueToSpell(SPELL_PREVENTION_HYDROPHOBIA, player->GetGUID());
+								}
+								else player->RemoveAurasDueToSpell(SPELL_PREVENTION_HYDROPHOBIA, player->GetGUID());
 				}
 
 				if (Creature* lorewalkerTrigger = me->FindNearestCreature(NPC_LOREWALKER_TRIGGER, 99999.0f, false))
@@ -207,16 +208,6 @@ public:
 					if (GameObject* go = me->FindNearestGameObject(GO_LIU_GATE, 99999.0f))
 						go->UseDoorOrButton();
 				}
-			}
-		}
-
-		void DoAction(int32 action)
-        {
-            switch (action)
-            {
-				case ACTION_HYDROPHOBIA:
-					hydrophobia = false;
-					break;
 			}
 		}
 
@@ -242,6 +233,7 @@ public:
 				me->CombatStop();
 				me->DeleteThreatList();
 				instance->SetBossState(DATA_BOSS_WISE_MARI, FAIL);
+				instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_PREVENTION_HYDROPHOBIA);
 
 				hydrolanceCount = 0; // 0 = front | 1 = left | 2 = right
 				hydrolanceWaterCount = 0; // Number of hydrolances casted before the new Corrupt living Water appears (5)
@@ -873,11 +865,10 @@ class spell_wise_mari_achi_spells : public SpellScriptLoader
 
             void HandleOnHit()
             {
-				Unit* caster = GetCaster()->ToCreature();
+				Unit* target = GetHitUnit()->ToPlayer();
 
-				if (caster)
-					if (Creature* wiseMari = caster->FindNearestCreature(BOSS_WISE_MARI, 99999.0f, true))
-						wiseMari->AI()->DoAction(ACTION_HYDROPHOBIA);
+				if (target)
+					target->CastSpell(target, SPELL_PREVENTION_HYDROPHOBIA, true);
             }
 
             void Register()
