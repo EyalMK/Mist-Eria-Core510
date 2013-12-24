@@ -64,7 +64,10 @@ enum DruidSpells
     SPELL_DRUID_URSOLS_VORTEX_SNARE         = 127797,
     SPELL_DRUID_URSOLS_VORTEX_JUMP_DEST     = 118283,
 	SPELL_DRUID_SOUL_OF_THE_FOREST          = 114107,
-    SPELL_DRUID_SOUL_OF_THE_FOREST_HASTE    = 114108
+    SPELL_DRUID_SOUL_OF_THE_FOREST_HASTE    = 114108,
+	
+	SPELL_DRUID_FRENZIED_REGENERAION        = 22842,
+    SPELL_DRUID_FRENZIED_REGENERATION_HEAL  = 122307
 };
 
 enum DruidCreatures
@@ -2109,6 +2112,100 @@ class spell_dru_soul_of_the_forest : public SpellScriptLoader
         }
 };
 
+class spell_dru_frenzied_regeneration : public SpellScriptLoader
+{
+public :
+    spell_dru_frenzied_regeneration() : SpellScriptLoader("spell_dru_frenzied_regeneration")
+    {
+
+    }
+
+    class spell_dru_frenzied_regeneration_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dru_frenzied_regeneration_SpellScript)
+
+        bool Validate(const SpellInfo *spellInfo)
+        {
+            return true ;
+        }
+
+        bool Load()
+        {
+            return true ;
+        }
+
+        void handleHealOnEffectDummy(SpellEffIndex effectIndex)
+        {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "Frenzied Regeneration : handleHealOnEffectDummy");
+            if(Unit* caster = GetCaster())
+            {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Frenzied Regeneration : caster as unit is not null");
+                if(Player* p = GetCaster()->ToPlayer())
+                {
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Frenzied Regeneration : caster as player is not null");
+                    if(p->HasAura(54810))
+                        return ;
+
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Frenzied Regeneration : caster has not the glyph, calculating amounts");
+                    float maxHp = std::max((p->GetUInt32Value(UNIT_FIELD_ATTACK_POWER) - 2 * p->GetStat(STAT_AGILITY)) * 220 / 100,
+                                        p->GetStat(STAT_STAMINA) * 250 / 100) ;
+
+                    int32 maxRage = 0 ;
+                    if(p->GetPower(POWER_RAGE) >= 60)
+                        maxRage = 60 ;
+                    else
+                    {
+                        maxRage = p->GetPower(POWER_RAGE);
+                        maxHp = CalculatePct(maxHp, maxRage);
+                    }
+
+                    p->SetHealth(p->GetHealth() + maxHp);
+                    p->ModifyPower(POWER_RAGE, -maxRage);
+                }
+            }
+        }
+
+        void handleModHealingDoneOnEffectDummy(SpellEffIndex effectIndex)
+        {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "Frenzied Regeneration : handleModHealingDoneOnEffectDummy");
+            if(GetCaster())
+            {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Frenzied Regeneration : caster as unit not null");
+                if(Player* caster = GetCaster()->ToPlayer())
+                {
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Frenzied Regeneration : caster as player not null ; casting the heal");
+
+                    caster->CastSpell(caster, SPELL_DRUID_FRENZIED_REGENERATION_HEAL);
+
+                    if(Aura* heal = caster->GetAura(SPELL_DRUID_FRENZIED_REGENERATION_HEAL))
+                    {
+                        sLog->outDebug(LOG_FILTER_NETWORKIO, "Frenzied Regeneration : caster has the aura ; checking glyph");
+                        if(caster->HasAura(54810))
+                        {
+                            sLog->outDebug(LOG_FILTER_NETWORKIO,
+                                           "Frenzied Regeneration : glyph found ; setting amount of the aura (actually : %f ; supposed to become %f)",
+                                           heal->GetEffect(0)->GetAmount(), 1.4 * heal->GetEffect(0)->GetAmount());
+                            heal->GetEffect(0)->SetAmount(1.4 * heal->GetEffect(0)->GetAmount());
+                        }
+                    }
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_dru_frenzied_regeneration_SpellScript::handleHealOnEffectDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+            OnEffectHitTarget += SpellEffectFn(spell_dru_frenzied_regeneration_SpellScript::handleModHealingDoneOnEffectDummy, EFFECT_2, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dru_frenzied_regeneration_SpellScript();
+    }
+};
+
+
 void AddSC_druid_spell_scripts()
 {
     new spell_dru_bear_cat();
@@ -2151,4 +2248,5 @@ void AddSC_druid_spell_scripts()
 	new spell_dru_soul_of_the_forest_eclipse();
 	*/
 	new spell_dru_soul_of_the_forest();
+    new spell_dru_frenzied_regeneration();
 }
