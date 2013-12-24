@@ -50,7 +50,43 @@ enum MasterySpells
     MASTERY_DRUID_RESTORATION           = 77495
 };
 
+enum WarriorSpells
+{
+	SPELL_WARR_ENRAGE		= 12880,
+};
+
+// Warrior spell : Enrage 12880
+class spell_mastery_unshackled_fury : public SpellScriptLoader
+{
+    public:
+        spell_mastery_unshackled_fury() : SpellScriptLoader("spell_mastery_unshackled_fury") { }
+
+        class spell_mastery_unshackled_fury_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_mastery_unshackled_fury_AuraScript);
+
+            void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
+            {
+                if (Unit* caster = GetCaster()->ToPlayer())
+                {
+                    if (caster->HasAura(MASTERY_WARRIOR_FURY) && caster->getLevel() >= 80)
+                        amount = caster->GetFloatValue(PLAYER_MASTERY);
+                }
+            }
+
+            void Register()
+            {
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mastery_unshackled_fury_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_mastery_unshackled_fury_AuraScript();
+        }
+};
+
 void AddSC_masteries_spell_scripts()
 {
-
+	new spell_mastery_unshackled_fury();
 }

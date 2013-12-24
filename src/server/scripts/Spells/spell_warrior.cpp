@@ -1113,52 +1113,6 @@ class spell_warr_raging_blow_off : public SpellScriptLoader
         }
 };
 
-// Enrage : 12880
-class spell_warr_enrage : public SpellScriptLoader
-{
-    public:
-        spell_warr_enrage() : SpellScriptLoader("spell_warr_enrage") { }
-
-        class spell_warr_enrage_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_warr_enrage_SpellScript);
-
-            bool Validate (SpellInfo const* /*spellEntry*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_ENRAGE))
-                    return false;
-
-                return true;
-            }
-
-            bool Load()
-            {
-                if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
-                    return false;
-
-                return true;
-            }
-
-            void HandleEffect(SpellEffIndex /*effIndex*/)
-            {   
-				Player* caster = GetCaster()->ToPlayer();
-
-				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY && caster->getLevel() >= 30)
-					caster->SetAuraStack(SPELL_RAGING_BLOW_STACKS, caster, 2);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_warr_enrage_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_ENERGIZE);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_warr_enrage_SpellScript();
-        }
-};
-
 // Mortal strike - 12294
 class spell_warr_mortal_strike : public SpellScriptLoader
 {
@@ -1643,7 +1597,6 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_heroic_strike();
 	new spell_warr_raging_blow_main();
 	new spell_warr_raging_blow_off();
-	new spell_warr_enrage();
 	new spell_warr_second_wind();
 	new spell_warr_second_wind_aura();
 	new spell_warr_thunder_clap();
