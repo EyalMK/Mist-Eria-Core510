@@ -70,7 +70,7 @@ class spell_mastery_unshackled_fury : public SpellScriptLoader
                 if (Unit* caster = GetCaster()->ToPlayer())
                 {
                     if (caster->HasAura(MASTERY_WARRIOR_FURY) && caster->getLevel() >= 80)
-                        amount = int32(caster->GetFloatValue(PLAYER_MASTERY) + caster->ToPlayer()->GetRatingBonusValue(CR_MASTERY));
+                        amount = caster->GetFloatValue(PLAYER_MASTERY);
 
 					caster->CastCustomSpell(caster, SPELL_WARR_ENRAGE, NULL, &amount, NULL, true, 0, aurEff);
                 }
