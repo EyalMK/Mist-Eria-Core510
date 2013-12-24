@@ -68,8 +68,8 @@ class spell_mastery_unshackled_fury : public SpellScriptLoader
             void HandleOnHit()
             {
 				Player* player = GetCaster()->ToPlayer();
-				int32 bp = GetEffectValue();
 				float Mastery = player->GetFloatValue(PLAYER_MASTERY);
+				int32 bp = int32(Mastery);
 
 				if (player->HasAura(MASTERY_WARRIOR_FURY) && player->getLevel() >= 80)
 					if (!player->HasAura(SPELL_WARR_ENRAGE))
