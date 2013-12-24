@@ -1547,8 +1547,9 @@ public :
                             continue ;
                         sLog->outDebug(LOG_FILTER_NETWORKIO, "Player %s (guid : %u) has spell cooldown on spell %s (id : %u)", p->GetName().c_str(), p->GetGUIDLow(), spell->SpellName, spell->Id);
                     }
-					p->RemoveSpellCooldown(118280, true);
-					p->RemoveSpellCooldown(108853, true);
+					/*p->RemoveSpellCooldown(118280, true);
+					p->RemoveSpellCooldown(108853, true);*/
+					p->RemoveAllSpellCooldown();
 				}
 			}
 		}
@@ -1596,6 +1597,177 @@ public :
 	}
 };
 
+class spell_mage_inferno_blast : public SpellScriptLoader
+{
+public :
+    spell_mage_inferno_blast() : SpellScriptLoader("spell_mage_inferno_blast")
+    {
+
+    }
+
+    class spell_mage_inferno_blast_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_mage_inferno_blast_SpellScript)
+
+        bool Validate(const SpellInfo *spellInfo)
+        {
+            return true ;
+        }
+
+        bool Load()
+        {
+            return true ;
+        }
+
+        void handleSpreadOnHit()
+        {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast : OnHit Handler");
+            if(GetExplTargetUnit() && GetCaster() && GetCaster()->ToPlayer())
+            {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast : ExplicitTarget found (name %s, guid %u) ; casting Inferno Blast !", GetExplTargetUnit()->GetName().c_str(), GetExplTargetUnit()->GetGUID());
+                GetCaster()->CastSpell(GetExplTargetUnit(), 118280, TRIGGERED_FULL_MASK);
+            }
+        }
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_mage_inferno_blast_SpellScript::handleSpreadOnHit);
+        }
+    };
+
+	SpellScript* GetSpellScript() const
+	{
+		return new spell_mage_inferno_blast_SpellScript();
+	}
+};
+
+class spell_mage_inferno_blast_spreader : public SpellScriptLoader
+{
+public :
+    spell_mage_inferno_blast_spreader() : SpellScriptLoader("spell_mage_inferno_blast_spreader")
+    {
+
+    }
+
+    class spell_mage_inferno_blast_spreader_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_mage_inferno_blast_spreader_SpellScript);
+
+        bool Validate(const SpellInfo *spellInfo)
+        {
+            return true ;
+        }
+
+        bool Load()
+        {
+            return true ;
+        }
+
+        void handleTargetSelect(std::list<WorldObject*>& targets)
+        {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : OnObjectAreaTargetSelect Handler");
+            if(Unit* caster = GetCaster())
+            {
+                Unit* realTarget = GetExplTargetUnit();
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Checking real target");
+                if(!realTarget)
+                    return ;
+
+                Position pos ;
+                caster->GetPosition(&pos);
+
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : real target found (name %s, guid %u) ; position set ; checking glyph", realTarget->GetName().c_str(), realTarget->GetGUID());
+                // Glyph of Discret Magic : target is valid only if less than 5 yards away from the PRIMARY TARGET
+                if(caster->HasAura(134580))
+                {
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : caster has glyph ; checking availables targets");
+                    for(std::list<WorldObject*>::iterator iter = targets.begin() ; iter != targets.end() ; ++iter)
+                    {
+                        Position targetPos ;
+                        if(*iter)
+                            (*iter)->GetPosition(&targetPos);
+                        else
+                            continue ;
+
+                        if(pos.GetExactDist2d(&targetPos) > 5)
+                            targets.remove(*iter);
+                    }
+                }
+
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : glyph test done ; resizing list (actual size : %u)", (uint32)targets.size());
+                // And we resize. Even if there is already nothing.
+                Trinity::Containers::RandomResizeList(targets, caster->HasAura(89926) ? 4 : 3);
+            }
+        }
+
+        void handleSpreadAurasOnEffectScriptEffect(SpellEffIndex effectIndex)
+        {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : OnEffectHitTarget Handler");
+            Unit* caster = GetCaster(); // Pure caster of the spell
+            Unit* realTarget = GetExplTargetUnit(); // The target the mage is selecting
+            Unit* otherTarget = GetHitUnit(); // The target on which the effects will be spread (this is shit)
+
+            if(caster && realTarget && otherTarget)
+            {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : pointers corrects");
+                if(realTarget->GetGUID() == otherTarget->GetGUID()) // This would be tricky
+                    return ;
+
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : guids corrects (realTarget : %u ; otherTarget : %u)", realTarget->GetGUID(), otherTarget->GetGUID());
+                Unit::AuraList auras = realTarget->GetSingleCastAuras(); // To find the auras to duplicate
+                for(Unit::AuraList::iterator iter = auras.begin() ; iter != auras.end() ; ++iter)
+                {
+                    if(Aura* actualAura = *iter)
+                    {
+                        if(actualAura->GetCaster() == caster)
+                        {
+                            sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : aura (%s, %u) found on realTarget", actualAura->GetSpellInfo()->SpellName, actualAura->GetId());
+                            Aura* copy ;
+                            switch(actualAura->GetId())
+                            {
+                            case 12654 : case 11366 : case 44457 : case 118271 :
+                                // Well, thanks Pexirn. A LOT !
+                                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : good aura (%s, %u) found on realTarget", actualAura->GetSpellInfo()->SpellName, actualAura->GetId());
+                                copy = Aura::TryCreate(actualAura->GetSpellInfo(), actualAura->GetEffectMask(), realTarget, caster, NULL, NULL, actualAura->GetCasterGUID());
+                            default :
+                                break ;
+                            }
+
+                            if(copy)
+                            {
+                                // Thanks Pexirn. Again.
+                                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : copy aura jas been created ; setting target in combat if it wasn't");
+                                if(!otherTarget->isInCombat())
+                                    otherTarget->SetInCombatWith(caster);
+
+                                // One last time : THANKS PEXIRN ! (not fot the headache you bitch)
+                                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : enterring the twisted part (well, i hope not in fact)");
+                                if(AuraApplication* auraApp = copy->GetApplicationOfTarget(caster->GetGUID()))
+                                {
+                                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : we entered the twisted part. Good Lord, please, HEEEEEEEEEELP ME !");
+                                    copy->_ApplyForTarget(otherTarget, caster, auraApp);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mage_inferno_blast_spreader_SpellScript::handleTargetSelect, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+            OnEffectHitTarget += SpellEffectFn(spell_mage_inferno_blast_spreader_SpellScript::handleSpreadAurasOnEffectScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_mage_inferno_blast_spreader_SpellScript();
+    }
+};
+
+
 void AddSC_mage_spell_scripts()
 {
     new spell_mage_blast_wave();
@@ -1625,4 +1797,6 @@ void AddSC_mage_spell_scripts()
 	new spell_mage_alter_time();
 	new spell_mage_alter_time_triggerer();
 	new spell_mage_combustion();
+	new spell_mage_inferno_blast();
+	new spell_mage_inferno_blast_spreader();
 }
