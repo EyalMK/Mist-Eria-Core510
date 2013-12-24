@@ -65,6 +65,13 @@ class spell_mastery_unshackled_fury : public SpellScriptLoader
         {
             PrepareSpellScript(spell_mastery_unshackled_fury_SpellScript);
 
+			bool Validate(SpellInfo const* /*spellInfo*/)
+			{
+				if (GetCaster()->HasAura(SPELL_WARR_ENRAGE))
+					return false;
+				return true;
+			}
+
             void HandleOnHit()
             {
 				Player* player = GetCaster()->ToPlayer();
