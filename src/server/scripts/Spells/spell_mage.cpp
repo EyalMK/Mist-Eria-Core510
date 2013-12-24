@@ -1539,7 +1539,7 @@ public :
 				if(Player* p = GetCaster()->ToPlayer())
 				{
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "Combustion's Caster as player is not null ; resetting cooldown");
-					p->RemoveSpellCooldown(SPELL_MAGE_INFERNO_BLAST);
+					p->RemoveSpellCooldown(SPELL_MAGE_INFERNO_BLAST, true);
 				}
 			}
 		}
