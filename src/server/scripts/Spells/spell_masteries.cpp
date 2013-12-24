@@ -61,37 +61,28 @@ class spell_mastery_unshackled_fury : public SpellScriptLoader
     public:
         spell_mastery_unshackled_fury() : SpellScriptLoader("spell_mastery_unshackled_fury") { }
 
-        class spell_mastery_unshackled_fury_SpellScript : public SpellScript
+        class spell_mastery_unshackled_fury_AuraScript : public AuraScript
         {
-            PrepareSpellScript(spell_mastery_unshackled_fury_SpellScript);
+            PrepareAuraScript(spell_mastery_unshackled_fury_AuraScript);
 
-			bool Validate(SpellInfo const* /*spellInfo*/)
-			{
-				if (GetCaster()->HasAura(SPELL_WARR_ENRAGE))
-					return false;
-				return true;
-			}
-
-            void HandleOnHit()
+            void CalculateAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				Player* player = GetCaster()->ToPlayer();
-				float Mastery = (player->GetFloatValue(PLAYER_MASTERY) + player->GetRatingBonusValue(CR_MASTERY));
-				int32 bp = int32(Mastery);
-
-				if (player->HasAura(MASTERY_WARRIOR_FURY) && player->getLevel() >= 80)
-					player->CastCustomSpell(player, SPELL_WARR_ENRAGE, &bp, NULL, NULL, true);
-				else player->CastSpell(player, SPELL_WARR_ENRAGE, true);
+                if (Unit* caster = GetCaster()->ToPlayer())
+                {
+                    if (caster->HasAura(MASTERY_WARRIOR_FURY) && caster->getLevel() >= 80)
+                        amount = caster->GetFloatValue(PLAYER_MASTERY) + caster->ToPlayer()->GetRatingBonusValue(CR_MASTERY);
+                }
             }
 
             void Register()
             {
-                OnHit += SpellHitFn(spell_mastery_unshackled_fury_SpellScript::HandleOnHit);
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mastery_unshackled_fury_AuraScript::CalculateAmount, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        AuraScript* GetAuraScript() const
         {
-            return new spell_mastery_unshackled_fury_SpellScript();
+            return new spell_mastery_unshackled_fury_AuraScript();
         }
 };
 

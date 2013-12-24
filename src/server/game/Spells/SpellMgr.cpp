@@ -3874,10 +3874,6 @@ void SpellMgr::LoadSpellInfoCorrections()
 				case 49998: // Death Strike
 					spellInfo->Attributes &= SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK;
 					break;
-				case 12880: // Enrage
-					spellInfo->Effects[EFFECT_1].Effect = 0;
-					spellInfo->Effects[EFFECT_2].Effect = 0;
-					break;
 				default:
 					break;
 			}
