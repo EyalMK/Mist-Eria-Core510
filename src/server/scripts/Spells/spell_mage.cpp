@@ -1688,14 +1688,14 @@ public :
                         else
                             continue ;
 
-                        if(pos.GetExactDist2d(&targetPos) > 5)
+                        if(pos.GetExactDist2d(&targetPos) > 5.0f)
                             targets.remove(*iter);
                     }
                 }
 
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : glyph test done ; resizing list (actual size : %u)", (uint32)targets.size());
                 // And we resize. Even if there is already nothing.
-                Trinity::Containers::RandomResizeList(targets, caster->HasAura(89926) ? 4 : 3);
+                Trinity::Containers::RandomResizeList(targets, caster->HasAura(89926) ? 5 : 4);
             }
         }
 
@@ -1732,7 +1732,7 @@ public :
                             case 12654 : case 11366 : case 44457 : case 118271 :
                                 // Well, thanks Pexirn. A LOT !
                                 sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : good aura (%s, %u) found on realTarget", actualAura->GetSpellInfo()->SpellName, actualAura->GetId());
-                                copy = Aura::TryCreate(actualAura->GetSpellInfo(), actualAura->GetEffectMask(), realTarget, caster, NULL, NULL, actualAura->GetCasterGUID());
+                                copy = Aura::TryCreate(actualAura->GetSpellInfo(), actualAura->GetEffectMask(), otherTarget, caster, NULL, NULL, actualAura->GetCasterGUID());
                             default :
                                 break ;
                             }
