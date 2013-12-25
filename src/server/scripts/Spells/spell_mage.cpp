@@ -1780,7 +1780,7 @@ public :
 
 	}
 
-	class spell_mage_evocation_SpellScript : public SpellScript
+	/*class spell_mage_evocation_SpellScript : public SpellScript
 	{
 		PrepareSpellScript(spell_mage_evocation_SpellScript);
 
@@ -1809,30 +1809,55 @@ public :
 			}
 		}
 
-		void handleHealOnEffectApplyAura(SpellEffIndex effectIndex)
+		void Register()
 		{
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Evocation : Entering OnEffectHitTarget (effectIndex = 1) Handler");
+			OnEffectHitTarget += SpellEffectFn(spell_mage_evocation_SpellScript::handleHealOnEffectApplyAura, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
+		}
+	};*/
+
+	class spell_mage_evocation_AuraScript : public AuraScript
+	{
+		PrepareAuraScript(spell_mage_evocation_AuraScript);
+		
+		bool Validate(const SpellInfo* spellInfo)
+		{
+			return true ;
+		}
+
+		bool Load()
+		{
+			return true ;
+		}
+
+		void handleHealOnEffectApplyAura(AuraEffect const* auraEff)
+		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Evocation (Aura) : Entering OnEffectHitTarget (effectIndex = 1) Handler");
 			// Do not apply heal if player hasn't the glyph
 			if(GetCaster() && GetCaster()->ToPlayer())
 			{
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "Evocation : caster is not null and is a player");
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Evocation (Aura) : caster is not null and is a player");
 				if(!GetCaster()->HasAura(56380))
 				{
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "Evocation : caster doesn't have the glyph ; preventing default effect (apply aura : heal)");
-					PreventHitDefaultEffect(effectIndex);
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Evocation (Aura) : caster doesn't have the glyph ; preventing default effect (apply aura : heal)");
+					PreventDefaultAction();
 				}
 			}
 		}
 
 		void Register()
 		{
-			OnEffectHitTarget += SpellEffectFn(spell_mage_evocation_SpellScript::handleHealOnEffectApplyAura, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
+			OnEffectPeriodic += AuraEffectPeriodicFn(spell_mage_evocation_AuraScript::handleHealOnEffectApplyAura, EFFECT_1, SPELL_AURA_OBS_MOD_HEALTH);
 		}
 	};
 
-	SpellScript* GetSpellScript() const
+	/*SpellScript* GetSpellScript() const
 	{
 		return new spell_mage_evocation_SpellScript();
+	}*/
+
+	AuraScript* GetAuraScript() const
+	{
+		return new spell_mage_evocation_AuraScript();
 	}
 };
 
