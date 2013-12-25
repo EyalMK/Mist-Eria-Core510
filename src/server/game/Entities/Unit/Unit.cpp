@@ -9427,6 +9427,12 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                             if (victim->HasAuraWithMechanic((1<<MECHANIC_STUN) | (1<<MECHANIC_KNOCKOUT)))
                                 if (AuraEffect const* aurEff = GetAuraEffect(56369, EFFECT_0))
                                     crit_chance += aurEff->GetAmount();
+
+						if(spellProto->Id == 108853)
+						{
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "IsSpellCrit on Inferno Blast !") ;
+							return true ;
+						}
                         break;
                     case SPELLFAMILY_DRUID:
                         // Improved Faerie Fire

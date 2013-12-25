@@ -67,6 +67,7 @@
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "ReputationMgr.h"
+#include "MasteryMgr.h"
 
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
 {
@@ -620,7 +621,29 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 if (m_spellInfo->Id == 71757)
                     if (unitTarget->GetTypeId() != TYPEID_UNIT || !(unitTarget->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(44572), 0)))
                         return;
-                break;
+				//Masteries
+
+				switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
+				{
+					case TALENT_TREE_MAGE_FROST: 
+					{
+						if(!m_caster->HasAura(76613)) // Frost burn
+							break;
+						if(unitTarget->HasAuraState(AURA_STATE_FROZEN))
+							damage *= 1.f + (m_caster->ToPlayer()->GetPourcentOfMastery()/100.f);
+						break;
+					}
+					case TALENT_TREE_MAGE_ARCANE: 
+					{	
+						if(!m_caster->HasAura(76547)) // Mana Adept
+							break;
+						damage *= (1.f + ((m_caster->ToPlayer()->GetPourcentOfMastery()/100.f) * (((float)m_caster->GetPower(POWER_MANA))/((float)m_caster->GetMaxPower(POWER_MANA)))));
+						break;
+					}
+					default:
+						break;
+				}
+				break;
             }
             case SPELLFAMILY_MONK:
             {

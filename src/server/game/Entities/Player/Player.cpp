@@ -22020,6 +22020,20 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         return false;
     }
 
+	/* Handle custom vendor */
+
+	switch(creature->GetEntry())
+	{
+	case 1000056:
+	case 1000090:
+	case 1000091:
+        return BuyItemFromCustomVendorSlot(vendorguid, vendorslot, item, count, bag, slot);
+	default:
+		break;
+	}
+
+    /* -------------------- */
+
     VendorItemData const* vItems = creature->GetVendorItems();
     if (!vItems || vItems->Empty())
     {
@@ -22165,6 +22179,117 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
     }
 
     return false;
+}
+
+// Return true is the bought item has a max count to force refresh of window by caller
+bool Player::BuyItemFromCustomVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot)
+{
+    // cheating attempt
+    if (count < 1) count = 1;
+
+    // cheating attempt
+    if (slot > MAX_BAG_SIZE && slot !=NULL_SLOT)
+        return false;
+
+    if (!isAlive())
+        return false;
+
+    ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(item);
+    if (!pProto)
+    {
+        SendBuyError(BUY_ERR_CANT_FIND_ITEM, NULL, item, 0);
+        return false;
+    }
+
+    Creature *creature = GetNPCIfCanInteractWith(vendorguid,UNIT_NPC_FLAG_VENDOR);
+    if (!creature)
+    {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: BuyItemFromVendor - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(vendorguid)));
+        SendBuyError(BUY_ERR_DISTANCE_TOO_FAR, NULL, item, 0);
+        return false;
+    }
+
+    VendorItemData const* vItems = creature->GetVendorItems();
+    if (!vItems || vItems->Empty())
+    {
+        SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, item, 0);
+        return false;
+    }
+
+    if (vendorslot >= vItems->GetItemCount())
+    {
+        SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, item, 0);
+        return false;
+    }
+
+    VendorItem const* crItem = vItems->GetItem(vendorslot);
+    // store diff item (cheating)
+    if (!crItem || crItem->item != item)
+    {
+        SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, item, 0);
+        return false;
+    }
+
+    if(count == pProto->BuyCount)
+        count = 1;
+
+    // check current item amount if it limited
+    if (crItem->maxcount != 0)
+    {
+        if (creature->GetVendorItemCurrentCount(crItem) < pProto->BuyCount * count)
+        {
+            SendBuyError(BUY_ERR_ITEM_ALREADY_SOLD, creature, item, 0);
+            return false;
+        }
+    }
+
+    uint32 price  = crItem->IsGoldRequired(pProto) ? pProto->BuyPrice * count : 0;
+	price /= 10000.f; //Convert po to unit
+    uint32 trocItem = 0;
+
+    switch(creature->GetEntry())
+    {
+        case 1000056:
+		case 1000090:
+		case 1000091:
+            trocItem = 1000000;
+        default:
+            break;
+    }
+
+    if (!price || !trocItem)
+        return false;
+
+    if(!HasItemCount(trocItem, price))
+    {
+        SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, creature, item, 0);
+        return false;
+    }
+
+    if ((bag == NULL_BAG && slot == NULL_SLOT) || IsInventoryPos(bag, slot))
+    {
+        if (!_StoreOrEquipNewItem(vendorslot, item, count, bag, slot, price, pProto, creature, crItem, true))
+            return false;
+    }
+    else if (IsEquipmentPos(bag, slot))
+    {
+        if (count != 1)
+        {
+            SendEquipError(EQUIP_ERR_NOT_EQUIPPABLE, NULL, NULL);
+            return false;
+        }
+        if (!_StoreOrEquipNewItem(vendorslot, item, count, bag, slot, price, pProto, creature, crItem, false))
+            return false;
+    }
+    else
+    {
+        SendEquipError(EQUIP_ERR_WRONG_SLOT, NULL, NULL);
+        return false;
+    }
+
+    DestroyItemCount(trocItem, price, true);
+
+    return crItem->maxcount != 0;
 }
 
 uint32 Player::GetMaxPersonalArenaRatingRequirement(uint32 minarenaslot) const
@@ -23660,6 +23785,17 @@ bool Player::GetBGAccessByLevel(BattlegroundTypeId bgTypeId) const
 
 float Player::GetReputationPriceDiscount(Creature const* creature) const
 {
+	//Hard fix Custom Vendor
+    switch(creature->GetEntry())
+    {
+        case 1000056:
+		case 1000090:
+		case 1000091:
+            return 1.0f;
+        default:
+            break;
+    }    
+
     FactionTemplateEntry const* vendor_faction = creature->getFactionTemplateEntry();
     if (!vendor_faction || !vendor_faction->faction)
         return 1.0f;
