@@ -543,7 +543,7 @@ class spell_pri_power_word_shield : public SpellScriptLoader
                     amount *= caster->GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
 
 
-					GetTarget()->CastSpell(GetTarget(), 6788, true);
+					/*GetTarget()->CastSpell(GetTarget(), 6788, true);*/	
                 }
             }
 
@@ -584,7 +584,7 @@ class spell_pri_power_word_shield : public SpellScriptLoader
 				return true ;
 			}
 
-			void handleApplyDebuffOnEffectApplyAuraHitTarget(SpellEffIndex effectIndex)
+			/*void handleApplyDebuffOnEffectApplyAuraHitTarget(SpellEffIndex effectIndex)
 			{
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "PW Shield : Entering OnEffectHitTarget Handler");
 				if(GetHitUnit())
@@ -602,7 +602,7 @@ class spell_pri_power_word_shield : public SpellScriptLoader
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "PW Shield : GetHitUnit() not null, applying debuff");
 					GetHitUnit()->CastSpell(GetHitUnit(), 6788, TRIGGERED_FULL_MASK);
 				}
-			}
+			}*/
 
 			void handleBeforeHitPhase()
 			{
@@ -614,7 +614,7 @@ class spell_pri_power_word_shield : public SpellScriptLoader
 				}
 			}
 
-			void handleOnHitPhase()
+			/*void handleOnHitPhase()
 			{
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "PW Shield : Entering OnHit Handler");
 				if(GetHitUnit())
@@ -652,19 +652,19 @@ class spell_pri_power_word_shield : public SpellScriptLoader
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "PW Shield : GetHitUnit() not null, applying debuff");
 					GetHitUnit()->CastSpell(GetHitUnit(), 6788, TRIGGERED_FULL_MASK);
 				}
-			}
+			}*/
 
 			void Register()
 			{
-				OnCast += SpellCastFn(spell_pri_power_word_shield_SpellScript::handleOnCastPhase);
+				/*OnCast += SpellCastFn(spell_pri_power_word_shield_SpellScript::handleOnCastPhase);
 				AfterCast += SpellCastFn(spell_pri_power_word_shield_SpellScript::handleAfterCast);
 
 				OnEffectHit += SpellEffectFn(spell_pri_power_word_shield_SpellScript::handleOnEffectHit, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
-				OnEffectHitTarget += SpellEffectFn(spell_pri_power_word_shield_SpellScript::handleApplyDebuffOnEffectApplyAuraHitTarget, EFFECT_0, SPELL_EFFECT_APPLY_AURA) ;
+				OnEffectHitTarget += SpellEffectFn(spell_pri_power_word_shield_SpellScript::handleApplyDebuffOnEffectApplyAuraHitTarget, EFFECT_0, SPELL_EFFECT_APPLY_AURA) ;*/
 
 				BeforeHit += SpellHitFn(spell_pri_power_word_shield_SpellScript::handleBeforeHitPhase);
-				OnHit += SpellHitFn(spell_pri_power_word_shield_SpellScript::handleOnHitPhase);
-				AfterHit += SpellHitFn(spell_pri_power_word_shield_SpellScript::handleAfterHitPhase);
+				/*OnHit += SpellHitFn(spell_pri_power_word_shield_SpellScript::handleOnHitPhase);
+				AfterHit += SpellHitFn(spell_pri_power_word_shield_SpellScript::handleAfterHitPhase);*/
 			}
 		};
 
