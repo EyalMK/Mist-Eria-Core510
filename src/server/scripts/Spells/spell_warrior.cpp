@@ -214,9 +214,8 @@ class spell_warr_execute : public SpellScriptLoader
             void HandleEffect(SpellEffIndex /*effIndex*/)
             {
                 Player* player = GetCaster()->ToPlayer();
-				int32 damage = GetHitDamage();
 
-				SetHitDamage((damage + (player->GetTotalAttackPowerValue(BASE_ATTACK) * 3.6f)) / 2);
+				SetHitDamage(CalculatePct(player->GetTotalAttackPowerValue(BASE_ATTACK) * 3.6f, GetEffectValue()));
             }
 
             void Register()
@@ -1561,26 +1560,26 @@ class spell_warr_berserker_rage : public SpellScriptLoader
     public:
         spell_warr_berserker_rage() : SpellScriptLoader("spell_warr_berserker_rage") { }
 
-        class spell_warr_berserker_rage_SpellScript : public SpellScript
+        class spell_warr_berserker_rage_AuraScript : public AuraScript
         {
-            PrepareSpellScript(spell_warr_berserker_rage_SpellScript);
+            PrepareAuraScript(spell_warr_berserker_rage_AuraScript);
 
-            void HandleEffect(SpellEffIndex /*effIndex*/)
-            {
-                Player* player = GetCaster()->ToPlayer();
+            void EffectApply (AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+			{
+				Player* player = GetCaster()->ToPlayer();
 
 				player->CastSpell(player, SPELL_WARRIOR_ENRAGE, true);
-            }
+			}
 
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_warr_berserker_rage_SpellScript::HandleEffect, EFFECT_3, SPELL_EFFECT_TRIGGER_SPELL);
+                 OnEffectApply += AuraEffectApplyFn(spell_warr_berserker_rage_AuraScript::EffectApply, EFFECT_0, SPELL_AURA_MECHANIC_IMMUNITY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        AuraScript* GetAuraScript() const
         {
-            return new spell_warr_berserker_rage_SpellScript();
+            return new spell_warr_berserker_rage_AuraScript();
         }
 };
 
