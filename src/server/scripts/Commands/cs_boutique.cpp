@@ -844,6 +844,11 @@ public:
             sacId = 21841;
             moneyToAdd = 12000 * GOLD;
         }
+		else if(level == 90)
+		{
+			sacId = 22679;
+			moneyToAdd = 15000 * GOLD;
+		}
         else
         {
             sacId = 30744;

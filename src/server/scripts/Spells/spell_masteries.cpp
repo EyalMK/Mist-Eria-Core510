@@ -53,6 +53,7 @@ enum MasterySpells
 enum WarriorSpells
 {
 	SPELL_WARR_ENRAGE		= 12880,
+	SPELL_WARR_RAGING_BLOW	= 131116,
 };
 
 // Warrior spell : Enrage 12880
@@ -65,6 +66,14 @@ class spell_mastery_unshackled_fury : public SpellScriptLoader
         {
             PrepareAuraScript(spell_mastery_unshackled_fury_AuraScript);
 
+			void EffectApply (AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+			{
+				Player* player = GetCaster()->ToPlayer();
+
+				if (player->GetPrimaryTalentTree(player->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY)
+					player->CastSpell(player, SPELL_WARR_RAGING_BLOW, true);
+			}
+
             void CalculateAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 if (Unit* caster = GetCaster()->ToPlayer())
@@ -74,6 +83,7 @@ class spell_mastery_unshackled_fury : public SpellScriptLoader
 
             void Register()
             {
+				OnEffectApply += AuraEffectApplyFn(spell_mastery_unshackled_fury_AuraScript::EffectApply, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mastery_unshackled_fury_AuraScript::CalculateAmount, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
             }
         };
