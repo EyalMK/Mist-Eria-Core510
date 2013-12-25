@@ -71,14 +71,14 @@ class spell_mastery_unshackled_fury : public SpellScriptLoader
 				Player* player = GetCaster()->ToPlayer();
 
 				if (player->GetPrimaryTalentTree(player->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY)
-					player->CastSpell(player, SPELL_WARR_RAGING_BLOW, true);
+					player->SetAuraStack(SPELL_WARR_RAGING_BLOW, player, 2);
 			}
 
             void CalculateAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-                if (Unit* caster = GetCaster()->ToPlayer())
-                    if (caster->HasAura(MASTERY_WARRIOR_FURY) && caster->getLevel() >= 80)
-                        amount = caster->GetFloatValue(PLAYER_MASTERY) + caster->ToPlayer()->GetRatingBonusValue(CR_MASTERY);
+                if (Player* player = GetCaster()->ToPlayer())
+                    if (player->HasAura(MASTERY_WARRIOR_FURY) && player->getLevel() >= 80)
+                        amount = player->GetFloatValue(PLAYER_MASTERY) + player->GetRatingBonusValue(CR_MASTERY);
             }
 
             void Register()

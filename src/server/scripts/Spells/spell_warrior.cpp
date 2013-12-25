@@ -1540,7 +1540,7 @@ class spell_warr_shockwave : public SpellScriptLoader
                 Unit* caster = GetCaster()->ToPlayer();
 				uint32 damage = GetHitDamage();
 
-				SetHitDamage(damage + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.22f);
+				SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.22f));
             }
 
             void Register()
@@ -1552,6 +1552,35 @@ class spell_warr_shockwave : public SpellScriptLoader
         SpellScript* GetSpellScript() const
         {
             return new spell_warr_shockwave_SpellScript();
+        }
+};
+
+// Berserker rage : 18499
+class spell_warr_berserker_rage : public SpellScriptLoader
+{
+    public:
+        spell_warr_berserker_rage() : SpellScriptLoader("spell_warr_berserker_rage") { }
+
+        class spell_warr_berserker_rage_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_berserker_rage_SpellScript);
+
+            void HandleEffect(SpellEffIndex /*effIndex*/)
+            {
+                Player* player = GetCaster()->ToPlayer();
+
+				player->CastSpell(player, SPELL_WARRIOR_ENRAGE, true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_warr_berserker_rage_SpellScript::HandleEffect, EFFECT_3, SPELL_EFFECT_TRIGGER_SPELL);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_berserker_rage_SpellScript();
         }
 };
 
@@ -1592,4 +1621,5 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_meat_cleaver();
 	new spell_warr_glyph_of_hindering_strikes();
 	new spell_warr_shockwave();
+	new spell_warr_berserker_rage();
 }
