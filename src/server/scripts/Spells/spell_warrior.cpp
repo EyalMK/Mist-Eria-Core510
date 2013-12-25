@@ -1607,5 +1607,4 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_meat_cleaver();
 	new spell_warr_glyph_of_hindering_strikes();
 	new spell_warr_shockwave();
-	new spell_warr_blood_surge();
 }
