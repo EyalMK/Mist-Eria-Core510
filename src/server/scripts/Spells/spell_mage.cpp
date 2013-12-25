@@ -1900,6 +1900,9 @@ public :
 
 		void Register()
 		{
+			OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mage_time_warp_SpellScript::filterTargets, EFFECT_0, TARGET_UNIT_CASTER_AREA_RAID);
+			OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mage_time_warp_SpellScript::filterTargets, EFFECT_1, TARGET_UNIT_CASTER_AREA_RAID);
+			OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mage_time_warp_SpellScript::filterTargets, EFFECT_2, TARGET_UNIT_CASTER_AREA_RAID);
 			AfterHit += SpellHitFn(spell_mage_time_warp_SpellScript::handleApplyAuraAfterHit);
 		}
 	};
