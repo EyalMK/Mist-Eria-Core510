@@ -1772,6 +1772,69 @@ public :
     }
 };
 
+class spell_mage_evocation : public SpellScriptLoader
+{
+public :
+	spell_mage_evocation() : SpellScriptLoader("spell_mage_evocation")
+	{
+
+	}
+
+	class spell_mage_evocation_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_mage_evocation_SpellScript);
+
+		bool Validate(const SpellInfo* spellInfo)
+		{
+			return true ;
+		}
+
+		bool Load()
+		{
+			return true ;
+		}
+
+		void handleInstantManaRegenOnEffectApplyAura(SpellEffIndex effectIndex)
+		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Evocation : Entering OnEffectHitTarget (effectIndex = 2) Handler");
+			if(GetCaster() && GetCaster()->ToPlayer())
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Evocation : Caster is not null and is a player ; calculating 15% of totalMana ; totalMana = %u", GetCaster()->GetMaxPower(POWER_MANA));
+				int32 totalMana = GetCaster()->GetMaxPower(POWER_MANA);
+				totalMana /= 100 ;
+				totalMana *= 15 ;
+				
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Evocation : amount calculated : expecting %u mana points", totalMana);
+				GetCaster()->ModifyPower(POWER_MANA, totalMana);
+			}
+		}
+
+		void handleHealOnEffectApplyAura(SpellEffIndex effectIndex)
+		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Evocation : Entering OnEffectHitTarget (effectIndex = 1) Handler");
+			// Do not apply heal if player hasn't the glyph
+			if(GetCaster() && GetCaster()->ToPlayer())
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Evocation : caster is not null and is a player");
+				if(!GetCaster()->HasAura(56380))
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Evocation : caster doesn't have the glyph ; preventing default effect (apply aura : heal)");
+					PreventHitDefaultEffect(effectIndex);
+				}
+			}
+		}
+
+		void Register()
+		{
+			OnEffectHitTarget += SpellEffectFn(spell_mage_evocation_SpellScript::handleHealOnEffectApplyAura, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
+		}
+	};
+
+	SpellScript* GetSpellScript() const
+	{
+		return new spell_mage_evocation_SpellScript();
+	}
+};
 
 void AddSC_mage_spell_scripts()
 {
@@ -1804,4 +1867,5 @@ void AddSC_mage_spell_scripts()
 	new spell_mage_combustion();
 	new spell_mage_inferno_blast();
 	new spell_mage_inferno_blast_spreader();
+	new spell_mage_evocation();
 }
