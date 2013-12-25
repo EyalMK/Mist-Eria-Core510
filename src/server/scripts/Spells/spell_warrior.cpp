@@ -214,8 +214,9 @@ class spell_warr_execute : public SpellScriptLoader
             void HandleEffect(SpellEffIndex /*effIndex*/)
             {
                 Player* player = GetCaster()->ToPlayer();
+				int32 damage = GetHitDamage();
 
-				SetHitDamage(player->GetTotalAttackPowerValue(BASE_ATTACK) * 3.6f);
+				SetHitDamage(damage + player->GetTotalAttackPowerValue(BASE_ATTACK) * 3.5f);
             }
 
             void Register()
