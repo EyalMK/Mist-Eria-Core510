@@ -555,18 +555,48 @@ class spell_pri_power_word_shield : public SpellScriptLoader
                     }
             }
 
-			void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes mode)
-			{
-				GetTarget()->CastSpell(GetTarget(), 6788, true);
-			}
-
             void Register()
             {
                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_power_word_shield_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
                 AfterEffectAbsorb += AuraEffectAbsorbFn(spell_pri_power_word_shield_AuraScript::ReflectDamage, EFFECT_0);
-				OnEffectApply += AuraEffectApplyFn(spell_pri_power_word_shield_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
+				/*OnEffectApply += AuraEffectApplyFn(spell_pri_power_word_shield_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);*/
             }
         };
+
+		class spell_pri_power_word_shield_SpellScript : public SpellScript
+		{
+			PrepareSpellScript(spell_pri_power_word_shield_SpellScript);
+
+			bool Validate(const SpellInfo* spellInfo)
+			{
+				return true ;
+			}
+
+			bool Load()
+			{
+				return true ;
+			}
+
+			void handleApplyDebuffOnEffectApplyAuraHitTarget()
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "PW Shield : Entering OnHit Handler");
+				if(GetHitUnit())
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "PW Shield : GetHitUnit() not null, applying debuff");
+					GetHitUnit()->CastSpell(GetHitUnit(), 6788, TRIGGERED_FULL_MASK);
+				}
+			}
+
+			void Register()
+			{
+				AfterHit += SpellHitFn(spell_pri_power_word_shield_SpellScript::handleApplyDebuffOnEffectApplyAuraHitTarget) ;
+			}
+		};
+
+		SpellScript* GetSpellScript() const
+		{
+			return new spell_pri_power_word_shield_SpellScript();
+		}
 
         AuraScript* GetAuraScript() const
         {
