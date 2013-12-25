@@ -149,9 +149,6 @@ public:
 
 								if (map->IsHeroic())
 								{
-									if (player->HasAura(118714)) // Spell Purified Water
-										player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_CLEANING_UP));
-
 									if (Aura* seed = player->GetAura(SPELL_SEED_OF_DOUBT))
 										if (seed->GetStackAmount() == 4)
 											player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_SEEDS_OF_DOUBT));
@@ -159,6 +156,9 @@ public:
 									player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_TEMPLE_OF_THE_JADE_SERPENT_HEROIC));
 								}
 								
+								if (player->HasAura(118714)) // Spell Purified Water
+										player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_CLEANING_UP));
+
 								player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_TEMPLE_OF_THE_JADE_SERPENT));
 							}
 				}
