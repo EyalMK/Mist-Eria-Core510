@@ -1458,8 +1458,6 @@ void ObjectMgr::LoadCreatures()
                 if (GetMapDifficultyData(i, Difficulty(k)))
                     spawnMasks[i] |= (1 << k);
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS TESTING SPAWNMASK : TEMPLE OF THE JADE SERPENT", spawnMasks[960]);
-
     _creatureDataStore.rehash(result->GetRowCount());
     uint32 count = 0;
     do
