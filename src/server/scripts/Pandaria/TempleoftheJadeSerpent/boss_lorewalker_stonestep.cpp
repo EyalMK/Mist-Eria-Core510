@@ -247,6 +247,15 @@ public:
 							me->SetWalk(true);
 							me->GetMotionMaster()->MovePoint(0, me->GetHomePosition());
 							
+							Map* map;
+							Map::PlayerList const &PlayerList = map->GetPlayers();
+
+							if (!PlayerList.isEmpty())
+								for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+									if (Player* player = i->getSource())
+										if (player->hasQuest(31355))
+											player->KilledMonsterCredit(56843, player->GetGUID());
+
 							events.ScheduleEvent(EVENT_SAY_END_2, 9*IN_MILLISECONDS, 0, PHASE_BOSSES);
 							events.CancelEvent(EVENT_SAY_END_1);
 							break;
