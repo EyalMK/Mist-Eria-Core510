@@ -221,7 +221,7 @@ class spell_warr_execute : public SpellScriptLoader
                 Player* player = GetCaster()->ToPlayer();
 				uint8 level = player->getLevel();
 
-				int32 damage = int32((level*(21 + 0.817*(level-7))) + player->GetTotalAttackPowerValue(BASE_ATTACK) * 2.5f);
+				int32 damage = int32((level*(21 + 0.817*(level-7))) + player->GetTotalAttackPowerValue(BASE_ATTACK) * 3);
 
 				SetHitDamage(damage);
             }
