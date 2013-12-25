@@ -923,7 +923,7 @@ class spell_warr_heroic_throw : public SpellScriptLoader
         }
 };
 
-/// Updated 5.1.0 : 100130 - Wild strike
+// 100130 - Wild strike
 class spell_warr_wild_strike : public SpellScriptLoader
 {
     public:
@@ -937,7 +937,6 @@ class spell_warr_wild_strike : public SpellScriptLoader
             {
                 if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_WILD_STRIKE))
                     return false;
-
                 return true;
             }
 
@@ -951,10 +950,10 @@ class spell_warr_wild_strike : public SpellScriptLoader
 
             void HandleDamage(SpellEffIndex /*effIndex*/)
             {                
-                Unit* caster = GetCaster();
+				Player* player = GetCaster()->ToPlayer();
 
 				int32 damage = GetHitDamage();
-                SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 2.3f));
+                SetHitDamage(damage + (player->GetTotalAttackPowerValue(BASE_ATTACK) * 2.3f));
             }
 
             void Register()
@@ -1608,4 +1607,5 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_meat_cleaver();
 	new spell_warr_glyph_of_hindering_strikes();
 	new spell_warr_shockwave();
+	new spell_warr_blood_surge();
 }

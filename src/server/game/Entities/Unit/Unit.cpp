@@ -7019,6 +7019,12 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 /*damage*/, Aura* triggeredByAura
                         CastSpell(this, 16491, true);
                     break;
                 }
+				case 12880:
+				{
+					if (ToPlayer()->GetPrimaryTalentTree(ToPlayer()->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY)
+						CastSpell(this, 131116, true);
+					break;
+				}
                 default:
                     break;
             }
