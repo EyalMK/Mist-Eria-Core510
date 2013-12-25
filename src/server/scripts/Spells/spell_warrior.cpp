@@ -201,7 +201,7 @@ class spell_warr_concussion_blow : public SpellScriptLoader
         }
 };
 
-/// Updated 5.1.0
+// Updated 5.1.0
 class spell_warr_execute : public SpellScriptLoader
 {
     public:
@@ -211,19 +211,19 @@ class spell_warr_execute : public SpellScriptLoader
         {
             PrepareSpellScript(spell_warr_execute_SpellScript);
 
-			int32 damage;
-
 			bool Validate (SpellInfo const* /*spellEntry*/)
             {
-				damage = GetHitDamage();
 				return true;
 			}
 
             void HandleEffect(SpellEffIndex /*effIndex*/)
             {
                 Player* player = GetCaster()->ToPlayer();
+				uint8 level = player->getLevel();
 
-				SetHitDamage(damage + player->GetTotalAttackPowerValue(BASE_ATTACK) * 3.6f);
+				int32 damage = int32((level*(21 + 0.817*(level-7))) + player->GetTotalAttackPowerValue(BASE_ATTACK) * 3.6f);
+
+				SetHitDamage(damage);
             }
 
             void Register()
