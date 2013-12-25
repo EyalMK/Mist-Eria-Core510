@@ -277,6 +277,8 @@ bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data
         if (normalInfo->DifficultyEntry[diff - 1])
         {
             cinfo = sObjectMgr->GetCreatureTemplate(normalInfo->DifficultyEntry[diff - 1]);
+			if (cinfo)
+				break; // template found
             // check and reported at startup, so just ignore (restore normalInfo)
             cinfo = normalInfo;
         }
