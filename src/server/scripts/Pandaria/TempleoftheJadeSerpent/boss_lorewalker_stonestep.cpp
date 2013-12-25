@@ -227,6 +227,7 @@ public:
 							break;
 
 						case EVENT_SAY_END_1:
+						{
 							if (Creature* trigger = me->FindNearestCreature(NPC_LOREWALKER_TRIGGER, 99999.0f, true))
 								trigger->Kill(trigger);
 
@@ -259,6 +260,7 @@ public:
 							events.ScheduleEvent(EVENT_SAY_END_2, 9*IN_MILLISECONDS, 0, PHASE_BOSSES);
 							events.CancelEvent(EVENT_SAY_END_1);
 							break;
+						}
 
 						case EVENT_SAY_END_2:
 							Talk(SAY_END_2);
