@@ -631,15 +631,13 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 							break;
 						if(unitTarget->HasAuraState(AURA_STATE_FROZEN))
 							damage *= 1.f + (m_caster->ToPlayer()->GetPourcentOfMastery()/100.f);
-						sLog->outDebug(LOG_FILTER_NETWORKIO, "\n\n\nTERAH : Mastery  %f\n", m_caster->ToPlayer()->GetPourcentOfMastery());
 						break;
 					}
 					case TALENT_TREE_MAGE_ARCANE: 
 					{	
 						if(!m_caster->HasAura(76547)) // Mana Adept
 							break;
-						damage *= (1.f + ((m_caster->ToPlayer()->GetPourcentOfMastery()/100.f) * (m_caster->GetPower(POWER_MANA)/m_caster->GetMaxPower(POWER_MANA))));
-						sLog->outDebug(LOG_FILTER_NETWORKIO, "\n\n\nTERAH : Mastery  %f\n", m_caster->ToPlayer()->GetPourcentOfMastery());
+						damage *= (1.f + ((m_caster->ToPlayer()->GetPourcentOfMastery()/100.f) * (((float)m_caster->GetPower(POWER_MANA))/((float)m_caster->GetMaxPower(POWER_MANA)))));
 						break;
 					}
 					default:
