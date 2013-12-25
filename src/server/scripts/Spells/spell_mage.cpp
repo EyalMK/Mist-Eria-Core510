@@ -81,8 +81,12 @@ enum MageSpells
     SPELL_MAGE_SHATTERED_BARRIER_FREEZE_R1       = 55080,
     SPELL_MAGE_SHATTERED_BARRIER_FREEZE_R2       = 83073,
 
+	SPELL_MAGE_FINGERS_OF_FROST_PASSIVE          = 112965,
     SPELL_MAGE_FINGERS_OF_FROST                  = 44544,
 	SPELL_MAGE_FINGERS_OF_FROST_2                = 126084,
+
+	SPELL_MAGE_BRAIN_FREEZE_BUFF				 = 57761,
+	SPELL_MAGE_BRAIN_FREEZE						 = 44549,
 
 	SPELL_MAGE_RING_OF_FROST_SUMMON              = 113724,
 	SPELL_MAGE_RING_OF_FROST_FREEZE              = 82691,
@@ -970,7 +974,7 @@ class spell_mage_water_elemental_freeze : public SpellScriptLoader
 
            void CountTargets(std::list<WorldObject*>& targetList)
            {
-               _didHit = !targetList.empty();
+               _didHit = targetList.size();
            }
 
            void HandleImprovedFreeze()
@@ -982,11 +986,23 @@ class spell_mage_water_elemental_freeze : public SpellScriptLoader
                if (!owner)
                    return;
 
-               if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_MAGE, ICON_MAGE_IMPROVED_FREEZE, EFFECT_0))
-               {
-                   if (roll_chance_i(aurEff->GetAmount()))
-                       owner->CastCustomSpell(SPELL_MAGE_FINGERS_OF_FROST, SPELLVALUE_AURA_STACK, 2, owner, true);
-               }
+				Player* player = owner->ToPlayer();
+				if(!player)
+				   return;
+
+				if(_didHit == 1)
+				{
+					player->CastSpell(player, SPELL_MAGE_FINGERS_OF_FROST, true);
+
+					if (Aura* finger = player->GetAura(SPELL_MAGE_FINGERS_OF_FROST))
+						if(finger->GetStackAmount() == 2)
+							player->CastSpell(player, SPELL_MAGE_FINGERS_OF_FROST_2, true);
+				}
+				else
+				{
+					player->CastSpell(player, SPELL_MAGE_FINGERS_OF_FROST, true);
+					player->CastSpell(player, SPELL_MAGE_FINGERS_OF_FROST_2, true);
+				}
            }
 
            void Register()
@@ -996,7 +1012,7 @@ class spell_mage_water_elemental_freeze : public SpellScriptLoader
            }
 
        private:
-           bool _didHit;
+           int32 _didHit;
        };
 
        SpellScript* GetSpellScript() const
@@ -1286,6 +1302,9 @@ class spell_mage_finger_of_frost : public SpellScriptLoader
 				if (Player* player = GetOwner()->ToPlayer())
                 {
 
+					if(!player->HasSpell(SPELL_MAGE_FINGERS_OF_FROST_PASSIVE))
+						return;
+
 					uint32 spellId = eventInfo.GetDamageInfo()->GetSpellInfo()->Id;
 					uint32 chance = 0;
 
@@ -1326,6 +1345,36 @@ class spell_mage_finger_of_frost : public SpellScriptLoader
         }
 };
 
+// Brain Freeze
+class spell_mage_brain_freeze : public SpellScriptLoader
+{
+    public:
+        spell_mage_brain_freeze() : SpellScriptLoader("spell_mage_brain_freeze") { }
+
+        class spell_mage_brain_freeze_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_mage_brain_freeze_AuraScript);
+
+            void OnProcHandler(ProcEventInfo& eventInfo)
+            {
+                if (!GetOwner())
+                    return;
+
+				if (Player* player = GetOwner()->ToPlayer())
+					player->CastSpell(player, SPELL_MAGE_BRAIN_FREEZE_BUFF, true);
+            }
+
+            void Register()
+            {
+				OnProc += AuraProcFn(spell_mage_brain_freeze_AuraScript::OnProcHandler);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_mage_brain_freeze_AuraScript();
+        }
+};
 
 // 44572  - Deep freeze
 class spell_mage_deep_freeze : public SpellScriptLoader
@@ -1950,4 +1999,5 @@ void AddSC_mage_spell_scripts()
 	new spell_mage_inferno_blast_spreader();
 	new spell_mage_evocation();
 	new spell_mage_time_warp();
+	new spell_mage_brain_freeze();
 }
