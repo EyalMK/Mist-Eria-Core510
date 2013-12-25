@@ -81,7 +81,7 @@ class spell_mastery_unshackled_fury : public SpellScriptLoader
             {
                 if (Player* player = GetCaster()->ToPlayer())
                     if (player->HasAura(MASTERY_WARRIOR_FURY) && player->getLevel() >= 80)
-                        amount = player->GetFloatValue(PLAYER_MASTERY) + player->GetRatingBonusValue(CR_MASTERY);
+                        amount = player->GetRatingBonusValue(CR_MASTERY);
             }
 
             void Register()

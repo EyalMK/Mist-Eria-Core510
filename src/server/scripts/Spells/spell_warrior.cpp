@@ -215,7 +215,7 @@ class spell_warr_execute : public SpellScriptLoader
             {
                 Player* player = GetCaster()->ToPlayer();
 
-				SetHitDamage(CalculatePct((GetHitDamage()), 73.77f));
+				SetHitDamage(player->GetTotalAttackPowerValue(BASE_ATTACK) * 3.6f);
             }
 
             void Register()

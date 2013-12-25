@@ -242,6 +242,12 @@ public:
 									go->UseDoorOrButton();
 							}
 
+							if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 99999.0f, false))
+								peril->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+
+							if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 99999.0f, false))
+								strife->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+
 							Talk(SAY_END_1);
 
 							me->SetWalk(true);
@@ -404,6 +410,8 @@ public:
 
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
+
+			me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
 
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
 		}
@@ -604,6 +612,8 @@ public:
 
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
+
+			me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
 
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
 		}
