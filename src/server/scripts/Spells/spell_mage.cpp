@@ -1001,6 +1001,7 @@ class spell_mage_water_elemental_freeze : public SpellScriptLoader
 				else
 				{
 					player->CastSpell(player, SPELL_MAGE_FINGERS_OF_FROST, true);
+					player->CastSpell(player, SPELL_MAGE_FINGERS_OF_FROST, true);
 					player->CastSpell(player, SPELL_MAGE_FINGERS_OF_FROST_2, true);
 				}
            }
