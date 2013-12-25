@@ -1887,26 +1887,9 @@ public :
 		{
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Time Warp : Entering OnObjectAreaTargetSelect handler ; number of targets : %u", uint32(targets.size()));
 
-			if(targets.empty())
-				return ;
-
-			for(std::list<WorldObject*>::iterator iter = targets.begin() ; iter != targets.end() ; ++iter)
-			{
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "Time Warp : Looping");
-				if((*iter))
-				{
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "Time Warp : *iter is not null");
-					if((*iter)->ToUnit())
-					{
-						sLog->outDebug(LOG_FILTER_NETWORKIO, "Time Warp : iter is an unit ");
-						if((*iter)->ToUnit()->HasAura(57723) || (*iter)->ToUnit()->HasAura(57724) || (*iter)->ToUnit()->HasAura(80354))
-						{
-							sLog->outDebug(LOG_FILTER_NETWORKIO, "Time Warp : iter had an aura preventing Time Warp ; removing targets");
-							targets.remove(*iter);
-						}
-					}
-				}
-			}
+			targets.remove_if(Trinity::UnitAuraCheck(true, 57723));
+			targets.remove_if(Trinity::UnitAuraCheck(true, 57724));
+			targets.remove_if(Trinity::UnitAuraCheck(true, 80354));
 		}
 
 		void handleApplyAuraAfterHit()
