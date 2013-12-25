@@ -211,12 +211,19 @@ class spell_warr_execute : public SpellScriptLoader
         {
             PrepareSpellScript(spell_warr_execute_SpellScript);
 
+			int32 damage;
+
+			bool Validate (SpellInfo const* /*spellEntry*/)
+            {
+				damage = GetHitDamage();
+				return true;
+			}
+
             void HandleEffect(SpellEffIndex /*effIndex*/)
             {
                 Player* player = GetCaster()->ToPlayer();
-				int32 damage = GetHitDamage();
 
-				SetHitDamage(damage + player->GetTotalAttackPowerValue(BASE_ATTACK) * 3.5f);
+				SetHitDamage(damage + player->GetTotalAttackPowerValue(BASE_ATTACK) * 3.6f);
             }
 
             void Register()
