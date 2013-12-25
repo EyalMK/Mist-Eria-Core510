@@ -1861,6 +1861,55 @@ public :
 	}
 };
 
+class spell_mage_time_warp : public SpellScriptLoader
+{
+public :
+	spell_mage_time_warp() : SpellScriptLoader("spell_mage_time_warp")
+	{
+
+	}
+
+	class spell_mage_time_warp_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_mage_time_warp_SpellScript);
+
+		bool Validate(const SpellInfo* spellInfo)
+		{
+			return true ;
+		}
+
+		bool Load()
+		{
+			return true ;
+		}
+
+		void filterTargets(std::list<WorldObject*>& targets)
+		{
+			for(std::list<WorldObject*>::iterator iter = targets.begin() ; iter != targets.end() ; ++iter)
+				if((*iter)->ToUnit()->HasAura(57723)
+					|| (*iter)->ToUnit()->HasAura(57724)
+					|| (*iter)->ToUnit()->HasAura(80354))
+					targets.remove(*iter);
+		}
+
+		void handleApplyAuraAfterHit()
+		{
+			if(GetHitUnit())
+				GetHitUnit()->CastSpell(GetHitUnit(), 80354, TRIGGERED_FULL_MASK);
+		}
+
+		void Register()
+		{
+			AfterHit += SpellHitFn(spell_mage_time_warp_SpellScript::handleApplyAuraAfterHit);
+		}
+	};
+
+	SpellScript* GetSpellScript() const
+	{
+		return new spell_mage_time_warp_SpellScript();
+	}
+};
+
 void AddSC_mage_spell_scripts()
 {
     new spell_mage_blast_wave();
@@ -1893,4 +1942,5 @@ void AddSC_mage_spell_scripts()
 	new spell_mage_inferno_blast();
 	new spell_mage_inferno_blast_spreader();
 	new spell_mage_evocation();
+	new spell_mage_time_warp();
 }
