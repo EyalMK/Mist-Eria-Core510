@@ -621,8 +621,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 if (m_spellInfo->Id == 71757)
                     if (unitTarget->GetTypeId() != TYPEID_UNIT || !(unitTarget->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(44572), 0)))
                         return;
-                break;
-
 				//Masteries
 
 				switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
@@ -647,6 +645,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 					default:
 						break;
 				}
+				break;
             }
             case SPELLFAMILY_MONK:
             {
