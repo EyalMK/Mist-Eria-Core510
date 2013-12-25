@@ -22244,6 +22244,7 @@ bool Player::BuyItemFromCustomVendorSlot(uint64 vendorguid, uint32 vendorslot, u
     }
 
     uint32 price  = crItem->IsGoldRequired(pProto) ? pProto->BuyPrice * count : 0;
+	price /= 10000.f; //Convert po to unit
     uint32 trocItem = 0;
 
     switch(creature->GetEntry())
