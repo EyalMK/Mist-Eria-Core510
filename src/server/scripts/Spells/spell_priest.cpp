@@ -577,9 +577,9 @@ class spell_pri_power_word_shield : public SpellScriptLoader
 				return true ;
 			}
 
-			void handleApplyDebuffOnEffectApplyAuraHitTarget()
+			void handleApplyDebuffOnEffectApplyAuraHitTarget(SpellEffIndex effectIndex)
 			{
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "PW Shield : Entering OnHit Handler");
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "PW Shield : Entering OnEffectHitTarget Handler");
 				if(GetHitUnit())
 				{
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "PW Shield : GetHitUnit() not null, applying debuff");
@@ -589,7 +589,7 @@ class spell_pri_power_word_shield : public SpellScriptLoader
 
 			void Register()
 			{
-				AfterHit += SpellHitFn(spell_pri_power_word_shield_SpellScript::handleApplyDebuffOnEffectApplyAuraHitTarget) ;
+				OnEffectHitTarget += SpellEffectFn(spell_pri_power_word_shield_SpellScript::handleApplyDebuffOnEffectApplyAuraHitTarget, EFFECT_0, SPELL_EFFECT_APPLY_AURA) ;
 			}
 		};
 
