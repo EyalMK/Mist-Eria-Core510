@@ -1885,17 +1885,38 @@ public :
 
 		void filterTargets(std::list<WorldObject*>& targets)
 		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Time Warp : Entering OnObjectAreaTargetSelect handler ; number of targets : %u", uint32(targets.size()));
+
+			if(targets.empty())
+				return ;
+
 			for(std::list<WorldObject*>::iterator iter = targets.begin() ; iter != targets.end() ; ++iter)
-				if((*iter)->ToUnit()->HasAura(57723)
-					|| (*iter)->ToUnit()->HasAura(57724)
-					|| (*iter)->ToUnit()->HasAura(80354))
-					targets.remove(*iter);
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Time Warp : Looping");
+				if((*iter))
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Time Warp : *iter is not null");
+					if((*iter)->ToUnit())
+					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Time Warp : iter is an unit ");
+						if((*iter)->ToUnit()->HasAura(57723) || (*iter)->ToUnit()->HasAura(57724) || (*iter)->ToUnit()->HasAura(80354))
+						{
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Time Warp : iter had an aura preventing Time Warp ; removing targets");
+							targets.remove(*iter);
+						}
+					}
+				}
+			}
 		}
 
 		void handleApplyAuraAfterHit()
 		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Time Warp : Entering AfterHit Handler");
 			if(GetHitUnit())
-				GetHitUnit()->CastSpell(GetHitUnit(), 80354, TRIGGERED_FULL_MASK);
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Time Warp : GetHitUnit() not null ; applying aura");
+				GetHitUnit()->CastSpell(GetHitUnit(), 80354, true);
+			}
 		}
 
 		void Register()
