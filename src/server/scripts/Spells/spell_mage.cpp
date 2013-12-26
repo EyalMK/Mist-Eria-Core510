@@ -1968,6 +1968,50 @@ public :
 	}
 };
 
+class spell_mage_ice_block : public SpellScriptLoader
+{
+public :
+	spell_mage_ice_block() : SpellScriptLoader("spell_mage_iceblock")
+	{
+
+	}
+
+	class spell_mage_ice_block_SpellScript : public SpellScript
+	{
+		PrepareSpellScript(spell_mage_ice_block_SpellScript);
+
+		bool Validate(const SpellInfo* spellInfo)
+		{
+			return true ;
+		}
+
+		bool Load()
+		{
+			return true ;
+		}
+
+		void handleApplyAuraAfterHit()
+		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Ice Block : Entering AfterHit Handler");
+			if(GetHitUnit())
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Ice Block : GetHitUnit() not null ; applying aura");
+				GetHitUnit()->CastSpell(GetHitUnit(), 41425, TRIGGERED_FULL_MASK);
+			}
+		}
+
+		void Register()
+		{
+			AfterHit += SpellHitFn(spell_mage_ice_block_SpellScript::handleApplyAuraAfterHit);
+		}
+	};
+
+	SpellScript* GetSpellScript() const
+	{
+		return new spell_mage_ice_block_SpellScript();
+	}
+};
+
 void AddSC_mage_spell_scripts()
 {
     new spell_mage_blast_wave();
@@ -2002,4 +2046,5 @@ void AddSC_mage_spell_scripts()
 	new spell_mage_evocation();
 	new spell_mage_time_warp();
 	new spell_mage_brain_freeze();
+	new spell_mage_ice_block();
 }
