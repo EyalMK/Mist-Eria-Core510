@@ -43,6 +43,7 @@ INSERT INTO `spell_target_position` (`id`, `target_map`, `target_position_x`, `t
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "Pet.h"
+#include "GridNotifiers.h"
 
 enum MageSpells
 {
