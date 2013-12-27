@@ -1544,7 +1544,7 @@ class spell_warr_shockwave : public SpellScriptLoader
 
             void HandleDamage(SpellEffIndex /*effIndex*/)
             {                
-                Unit* caster = GetCaster()->ToPlayer();
+                Unit* caster = GetCaster();
 				uint32 damage = GetHitDamage();
 
 				SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.22f));
@@ -1575,6 +1575,9 @@ class spell_warr_berserker_rage : public SpellScriptLoader
             void EffectApply (AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
 			{
 				Player* player = GetCaster()->ToPlayer();
+
+                if(!player)
+                    return;
 
 				player->CastSpell(player, SPELL_WARRIOR_ENRAGE, true);
 			}
