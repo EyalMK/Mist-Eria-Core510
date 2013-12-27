@@ -652,7 +652,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 				if(m_spellInfo->Id == 8042 && m_caster->HasAura(88766))
 				{
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "Earth Shock : Fulmination : Entering damage calculation");
-					Aura* shield = m_caster->GetAura(88766);
+					Aura* shield = m_caster->GetAura(324);
 					if(shield && shield->GetCharges() > 1)
 					{
 						sLog->outDebug(LOG_FILTER_NETWORKIO, "Earth Shock : Fulmination : Lightning shield found, and stack amount higher than 1 !");
