@@ -647,6 +647,34 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             }
             break;
         }
+		case SPELLFAMILY_SHAMAN :
+			{
+				if(m_spellInfo->Id == 8042 && m_caster->HasAura(88766))
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Earth Shock : Fulmination : Entering damage calculation");
+					Aura* shield = m_caster->GetAura(88766);
+					if(shield && shield->GetCharges() > 1)
+					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Earth Shock : Fulmination : Lightning shield found, and stack amount higher than 1 !");
+						uint8 count = shield->GetCharges() - 1 ;
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Earth Shock : Fulmination : count calculated, set to %u", uint32(count));
+						SpellInfo const* triggerer = sSpellMgr->GetSpellInfo(26364);
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Earth Shock : Fulmination : pointer to damage spell created ; checking it");
+						int32 spellDamage = 0 ;
+						if(triggerer && unitTarget)
+						{
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Earth Shock : Fulmination : pointer checked");
+							spellDamage = m_caster->CalculateSpellDamage(unitTarget, triggerer, 0, NULL);
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Earth Shock : Fulmination : spellDamage calculated : %u", spellDamage);
+							spellDamage *= count ;
+						}
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Earth Shock : Fulmination : spellDamage set to %u", spellDamage);
+						damage += spellDamage ;
+						shield->SetCharges(1);
+					}
+				}
+				break ;
+			}
         case SPELLFAMILY_MONK:
         {
             switch(m_spellInfo->Id)
