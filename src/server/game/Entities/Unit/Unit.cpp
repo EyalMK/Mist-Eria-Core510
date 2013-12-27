@@ -13354,6 +13354,12 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "ProcDamageAndSpell: casting spell id %u (triggered by %s dummy aura of spell %u)", spellInfo->Id, (isVictim?"a victim's":"an attacker's"), triggeredByAura->GetId());
                         if (HandleDummyAuraProc(target, damage, triggeredByAura, procSpell, procFlag, procExtra, cooldown))
                             takeCharges = true;
+
+						if(Id == 324)
+						{
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Lightning shield : Just proc ! Do not remove aura");
+							takeCharges = false ;
+						}
                         break;
                     }
                     case SPELL_AURA_PROC_ON_POWER_AMOUNT:
