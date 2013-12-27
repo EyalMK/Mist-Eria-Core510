@@ -2577,7 +2577,6 @@ void Player::RegenerateAll()
 void Player::Regenerate(Powers power)
 {
     uint32 maxValue = GetMaxPower(power);
-
     if (!maxValue)
         return;
 
@@ -2587,44 +2586,49 @@ void Player::Regenerate(Powers power)
     if (HasAuraTypeWithValue(SPELL_AURA_PREVENT_REGENERATE_POWER, power))
         return;
 
-    float addvalue = 0.0f;
+    // Skip regeneration for power type we cannot have
+    uint32 powerIndex = GetPowerIndex(power);
+    if (powerIndex == MAX_POWERS)
+        return;
 
-    //powers now benefit from haste.
-    // 1) Hunter's focus
-    float rangedHaste = GetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE);
-    // 2) Rogue's Energy
-    float meleeHaste = GetFloatValue(CR_HASTE_MELEE);
-    // 3) Mana regen
-    float spellHaste = GetFloatValue(UNIT_MOD_CAST_SPEED);
+    float addvalue = 0.0f;
 
     switch (power)
     {
-        case POWER_MANA: // Regenerate mana
+        case POWER_MANA:
         {
-            if (HasAuraType(SPELL_AURA_PREVENT_REGENERATE_POWER))
-                break;
-
             float ManaIncreaseRate = sWorld->getRate(RATE_POWER_MANA);
 
             if (getLevel() < 15)
                 ManaIncreaseRate = sWorld->getRate(RATE_POWER_MANA) * (2.066f - (getLevel() * 0.066f));
 
-            if (isInCombat()) // SkyFire Updates Mana in intervals of 2s, which is correct
-                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1) *  ((0.001f * m_regenTimer) + CalculatePct(0.001f, spellHaste)) * ManaIncreaseRate;
-            else
-                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1) *  ((0.001f * m_regenTimer) + CalculatePct(0.001f, spellHaste)) * ManaIncreaseRate;
+            uint16 index = isInCombat() ? UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1+POWER_MANA : UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1+POWER_MANA;
+            float time = 0.001f * m_regenTimer;
+
+            addvalue += GetFloatValue(index) *  ManaIncreaseRate * time;
             break;
         }
-        case POWER_RAGE: // Regenerate rage
+        case POWER_RAGE:                                                // Regenerate rage
         {
             if (!isInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
             {
                 float RageDecreaseRate = sWorld->getRate(RATE_POWER_RAGE_LOSS);
-                addvalue += -20 * RageDecreaseRate / meleeHaste;               // 2 rage by tick (= 2 seconds => 1 rage/sec)
+
+                float time = 0.001f * m_regenTimer;
+
+                addvalue -= 10.0f * time * RageDecreaseRate;               // (1 rage/sec)
             }
             break;
         }
-        case POWER_DEMONIC_FURY: // Regenerate Demonic Fury
+        case POWER_HOLY_POWER:                                            // Regenerate holy power (paladin)
+		case POWER_CHAOS_ORB:                                             // Regenerate shadow orbs (priest)
+        case POWER_CHI:                                                   // Regenerate chi (monk)
+        {
+            addvalue += -1.0f;      // remove 1 each 10 sec
+            break;
+        }
+		// Regenerate Demonic Fury
+        case POWER_DEMONIC_FURY:
         {
             if (!isInCombat() && GetPower(POWER_DEMONIC_FURY) >= 300 && GetShapeshiftForm() != FORM_METAMORPHOSIS)
                 addvalue += -1.0f;    // remove 1 each 100ms
@@ -2660,7 +2664,8 @@ void Player::Regenerate(Powers power)
 
             break;
         }
-        case POWER_BURNING_EMBERS: // Regenerate Burning Embers
+		// Regenerate Burning Embers
+        case POWER_BURNING_EMBERS:
         {
             // After 15s return to one embers if no one
             // or return to one if more than one
@@ -2714,29 +2719,37 @@ void Player::Regenerate(Powers power)
             break;
         }
         case POWER_FOCUS:
-            addvalue += (6.0f + CalculatePct(6.0f, rangedHaste)) * sWorld->getRate(RATE_POWER_FOCUS);
-            break;
-        case POWER_HOLY_POWER: // Regenerate holy power (paladin)
-		case POWER_CHAOS_ORB: // Regenerate shadow orbs (priest)
-        case POWER_CHI: // Regenerate chi (monk)
         {
-            if (!isInCombat())
-                addvalue += -1.0f;                                       // remove 1 each 10 sec
+            float focusIncreaseRate = sWorld->getRate(RATE_POWER_FOCUS);
+            float time = 0.001f * m_regenTimer;
+
+            float value = 5.0f + (0.04f * GetRatingBonusValue(CR_HASTE_RANGED));
+            addvalue += value * time * focusIncreaseRate;
             break;
         }
-        case POWER_ENERGY:                                               // Regenerate energy (rogue)
-            addvalue += ((0.01f * m_regenTimer) + CalculatePct(0.01f, meleeHaste)) * sWorld->getRate(RATE_POWER_ENERGY);
+        case POWER_ENERGY:                                              // Regenerate energy (rogue)
+        {
+            float energyIncreaseRate = sWorld->getRate(RATE_POWER_ENERGY);
+            float time = 0.001f * m_regenTimer;
+
+            float value = 10.0f + (0.01f * GetRatingBonusValue(CR_HASTE_MELEE));
+            addvalue += value * time * energyIncreaseRate;
             break;
+        }
         case POWER_RUNIC_POWER:
         {
             if (!isInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
             {
                 float RunicPowerDecreaseRate = sWorld->getRate(RATE_POWER_RUNICPOWER_LOSS);
-                addvalue += -30 * RunicPowerDecreaseRate;                // 3 RunicPower by tick
+
+                float time = 0.001f * m_regenTimer;
+
+                addvalue -= 15.0f * time * RunicPowerDecreaseRate;         // 1.5 RunicPower by tick
             }
             break;
         }
-		case POWER_SOUL_SHARDS: // Regenerate Soul Shards
+		// Regenerate Soul Shards
+        case POWER_SOUL_SHARDS:
 		{
             // If isn't in combat, gain 1 shard every 20s
             if (!isInCombat())
@@ -2765,8 +2778,8 @@ void Player::Regenerate(Powers power)
             break;
 		}
         case POWER_RUNES:
-        case POWER_HAPPINESS:
         case POWER_HEALTH:
+        case POWER_HAPPINESS:
             break;
         default:
             break;
@@ -2775,30 +2788,18 @@ void Player::Regenerate(Powers power)
     // Mana regen calculated in Player::UpdateManaRegen()
     if (power != POWER_MANA)
     {
-        AuraEffectList const& ModPowerRegenPCTAuras = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
-        for (AuraEffectList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
-            if (Powers((*i)->GetMiscValue()) == power)
-                AddPct(addvalue, (*i)->GetAmount());
+        AddPct(addvalue, GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, power));
 
         // Butchery requires combat for this effect
         if (power != POWER_RUNIC_POWER || isInCombat())
-            addvalue += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, power) * ((power != POWER_ENERGY) ? m_regenTimerCount : m_regenTimer) / (5 * IN_MILLISECONDS);
+            addvalue += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, power) * (m_regenTimer) / (5 * IN_MILLISECONDS);
     }
 
-    if (addvalue < 0.0f)
-    {
-        if (curValue == 0)
-            return;
-    }
-    else if (addvalue > 0.0f)
-    {
-        if (curValue == maxValue)
-            return;
-    }
-    else
+    //no use to modify in those cases
+    if((addvalue == 0.0f) || (curValue == 0 && addvalue < 0.0f) || (curValue == maxValue && addvalue > 0.0f))
         return;
 
-    addvalue += m_powerFraction[power];
+    addvalue += m_powerFraction[powerIndex];
     uint32 integerValue = uint32(fabs(addvalue));
 
     if (addvalue < 0.0f)
@@ -2806,12 +2807,12 @@ void Player::Regenerate(Powers power)
         if (curValue > integerValue)
         {
             curValue -= integerValue;
-            m_powerFraction[power] = addvalue + integerValue;
+            m_powerFraction[powerIndex] = addvalue + integerValue;
         }
         else
         {
             curValue = 0;
-            m_powerFraction[power] = 0;
+            m_powerFraction[powerIndex] = 0;
         }
     }
     else
@@ -2821,15 +2822,14 @@ void Player::Regenerate(Powers power)
         if (curValue > maxValue)
         {
             curValue = maxValue;
-            m_powerFraction[power] = 0;
+            m_powerFraction[powerIndex] = 0;
         }
         else
-            m_powerFraction[power] = addvalue - integerValue;
+            m_powerFraction[powerIndex] = addvalue - integerValue;
     }
-    if (m_regenTimerCount >= 2000)
-        SetPower(power, curValue);
-    else
-        UpdateUInt32Value(UNIT_FIELD_POWER1 + power, curValue);
+
+    SetPower(power, curValue);
+    UpdateUInt32Value(UNIT_FIELD_POWER1 + powerIndex, curValue);
 }
 
 void Player::RegenerateHealth()
