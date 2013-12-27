@@ -505,12 +505,12 @@ bool BattlegroundTK::SetupBattleground()
 void BattlegroundTK::EndBattleground(uint32 winner)
 {
     if (winner == ALLIANCE)
-        RewardHonorToTeam(GetBonusHonorFromKill(1), ALLIANCE);
+        RewardHonorToTeam(GetBonusHonorFromKill(sBattlegroundMgr->IsBGWeekend(GetTypeID()) ? 3 : 1), ALLIANCE);
     if (winner == HORDE)
-        RewardHonorToTeam(GetBonusHonorFromKill(1), HORDE);
+        RewardHonorToTeam(GetBonusHonorFromKill(sBattlegroundMgr->IsBGWeekend(GetTypeID()) ? 3 : 1), HORDE);
 
-    RewardHonorToTeam(GetBonusHonorFromKill(1), HORDE);
-    RewardHonorToTeam(GetBonusHonorFromKill(1), ALLIANCE);
+    RewardHonorToTeam(GetBonusHonorFromKill(sBattlegroundMgr->IsBGWeekend(GetTypeID()) ? 4 : 2), HORDE);
+    RewardHonorToTeam(GetBonusHonorFromKill(sBattlegroundMgr->IsBGWeekend(GetTypeID()) ? 4 : 2), ALLIANCE);
 
     Battleground::EndBattleground(winner);
 }

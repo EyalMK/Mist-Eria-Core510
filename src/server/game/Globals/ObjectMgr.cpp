@@ -3895,6 +3895,7 @@ void ObjectMgr::LoadQuests()
             }
         }
 
+		// SUNGIS WORK ON QUEST REWARD SYSTEM
         for (uint8 j = 0; j < QUEST_REWARD_CHOICES_COUNT; ++j)
         {
             uint32 id = qinfo->RewardChoiceItemId[j];

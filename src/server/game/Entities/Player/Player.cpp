@@ -15565,6 +15565,7 @@ void Player::IncompleteQuest(uint32 quest_id)
     }
 }
 
+// SUNGIS WORK ON QUEST REWARD SYSTEM
 void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, bool announce)
 {
     //this THING should be here to protect code from quest, which cast on player far teleport as a reward
