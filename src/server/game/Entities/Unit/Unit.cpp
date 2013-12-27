@@ -7715,6 +7715,21 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
             else
                 return false;
         }
+		case 88765 :
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Lightning Shield : Rolling Thunder has just proc !");
+				// Remember : this = owner of the aura
+				if(Aura* lightningShield = GetAura(324))
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Lightning Shield : Rolling Thunder : Aura found");
+					if(lightningShield->GetCharges() < 7)
+					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Lightning Shield : Rolling Thunder : Charges < 7 ; setting charges !");
+						lightningShield->SetCharges(lightningShield->GetCharges() + 1) ;
+					}
+				}
+				break ;
+			}
     }
 
     if (cooldown && GetTypeId() == TYPEID_PLAYER && ToPlayer()->HasSpellCooldown(trigger_spell_id))
