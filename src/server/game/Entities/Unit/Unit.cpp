@@ -661,12 +661,14 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
     if (cleanDamage && damagetype == DIRECT_DAMAGE && this != victim && getPowerType() == POWER_RAGE)
     {
         uint32 weaponSpeedHitFactor;
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "%s DAMAGE VALUE = %u", GetName().c_str(), damage);
         uint32 rage_damage = damage + cleanDamage->absorbed_damage;
 
         switch (cleanDamage->attackType)
         {
             case BASE_ATTACK:
             {
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "%s BASE ATTACK DAMAGE = %u", GetName().c_str(), damage);
                 weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType) / 1000.0f * 3.5f);
                 if (cleanDamage->hitOutCome == MELEE_HIT_CRIT)
                     weaponSpeedHitFactor *= 2;
@@ -677,6 +679,7 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
             }
             case OFF_ATTACK:
             {
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "%s OFF ATTACK DAMAGE = %u", GetName().c_str(), damage);
                 weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType) / 1000.0f * 1.75f);
                 if (cleanDamage->hitOutCome == MELEE_HIT_CRIT)
                     weaponSpeedHitFactor *= 2;

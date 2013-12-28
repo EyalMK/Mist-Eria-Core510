@@ -19032,7 +19032,7 @@ void Player::SendRaidInfo()
     WorldPacket data(SMSG_RAID_INSTANCE_INFO, 4);
 
     size_t p_counter = data.wpos();
-    data << uint32(counter);                                // placeholder
+    /*data << uint32(counter);                                // placeholder
 
     time_t now = time(NULL);
 
@@ -19063,6 +19063,30 @@ void Player::SendRaidInfo()
     }
 
     data.put<uint32>(p_counter, counter);
+	*/
+
+	data << uint8(1);
+	data << uint8(2);
+	data << uint8(3);
+	data << uint8(4);
+	data << uint8(5);
+	data << uint8(6);
+	data << uint8(7);
+	data << uint8(8);
+	data << uint8(9);
+	data << uint8(10);
+	data << uint8(11);
+	data << uint8(12);
+	data << uint32(13);
+	data << uint8(14);
+	data << uint8(15);
+	data << uint8(16);
+	data << uint8(17);
+	data << uint8(18);
+	data << uint8(19);
+	data << uint32(20);
+	data << uint32(21);
+	data << uint32(22);
     GetSession()->SendPacket(&data);
 }
 
