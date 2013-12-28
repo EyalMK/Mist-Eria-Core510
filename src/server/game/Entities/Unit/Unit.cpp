@@ -7233,6 +7233,17 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                         }
                         break;
                     }
+					// Shooting Stars resets the cooldown of Starsurge
+					case 93399:
+					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Shooting Stars : Just Proc");
+						if(ToPlayer() && ToPlayer()->HasSpellCooldown(78674))
+						{
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Shooting Stars : Cooldown on Starsurge ; resetting it");
+							ToPlayer()->RemoveSpellCooldown(78674, true);
+						}
+						break ;
+					}
                     default:
                         break;
                 }
