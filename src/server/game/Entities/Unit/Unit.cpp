@@ -17238,16 +17238,16 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
 
     if (attacker)
     {
-        addRage = (damage / rageconversion * 7.5f + weaponSpeedHitFactor) / 2;
+        addRage = (/*damage*/irand(10000, 13000)  / rageconversion * 7.5f + weaponSpeedHitFactor) / 2;
 
         // talent who gave more rage on attack
         AddPct(addRage, GetTotalAuraModifier(SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT));
     }
-    else addRage = damage / rageconversion * 2.5f;
+    else addRage = /*damage*/irand(10000, 13000) / rageconversion * 2.5f;
 
     addRage *= sWorld->getRate(RATE_POWER_RAGE_INCOME);
 
-    ModifyPower(POWER_RAGE, uint32(addRage * 100));
+    ModifyPower(POWER_RAGE, uint32(addRage * 10));
 }
 
 void Unit::StopAttackFaction(uint32 faction_id)
