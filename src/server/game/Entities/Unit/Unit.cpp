@@ -13930,12 +13930,12 @@ void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply
         if (GetTypeId() == TYPEID_PLAYER && att == BASE_ATTACK)
         {
             ApplyPercentModFloatValue(PLAYER_FIELD_MOD_HASTE, val, !apply);
-			SetFloatValue(UNIT_MOD_HASTE, val);
+			SetFloatValue(UNIT_MOD_HASTE, GetFloatValue(PLAYER_FIELD_MOD_HASTE));
         }
         else if (GetTypeId() == TYPEID_PLAYER && att == RANGED_ATTACK)
         {
             ApplyPercentModFloatValue(PLAYER_FIELD_MOD_HASTE, val, !apply);
-			SetFloatValue(UNIT_MOD_HASTE, val);
+			SetFloatValue(UNIT_MOD_HASTE, GetFloatValue(PLAYER_FIELD_MOD_HASTE));
         }
     }
     else
@@ -13946,12 +13946,12 @@ void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply
         if (GetTypeId() == TYPEID_PLAYER && att == BASE_ATTACK)
         {
             ApplyPercentModFloatValue(PLAYER_FIELD_MOD_HASTE, -val, apply);
-			SetFloatValue(UNIT_MOD_HASTE, val);
+			SetFloatValue(UNIT_MOD_HASTE, GetFloatValue(PLAYER_FIELD_MOD_HASTE));
         }
         else if (GetTypeId() == TYPEID_PLAYER && att == RANGED_ATTACK)
         {
             ApplyPercentModFloatValue(PLAYER_FIELD_MOD_HASTE, -val, apply);
-			SetFloatValue(UNIT_MOD_HASTE, val);
+			SetFloatValue(UNIT_MOD_HASTE, GetFloatValue(PLAYER_FIELD_MOD_HASTE));
         }
     }
     m_attackTimer[att] = uint32(GetAttackTime(att) * m_modAttackSpeedPct[att] * remainingTimePct);
