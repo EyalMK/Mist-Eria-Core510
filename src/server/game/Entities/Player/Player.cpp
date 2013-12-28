@@ -6051,43 +6051,40 @@ float Player::GetPourcentOfMastery()
 void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
 {
     m_baseRatingValue[cr] +=(apply ? value : -value);
+	float RatingChange;
 
     // explicit affected values
     switch (cr)
     {
         case CR_HASTE_MELEE:
         {
-            float RatingChange = value * GetRatingMultiplier(cr);
+			RatingChange = value * GetRatingMultiplier(cr);
             ApplyAttackTimePercentMod(BASE_ATTACK, RatingChange, apply);
             ApplyAttackTimePercentMod(OFF_ATTACK, RatingChange, apply);
             if (getClass() == CLASS_DEATH_KNIGHT)
                 UpdateAllRunesRegen();
 			if (getClass() == CLASS_ROGUE)
 			    UpdateEnergyRegen();
-
-			ApplyHastePercentMod(value * GetRatingMultiplier(cr), apply);
             break;
         }
         case CR_HASTE_RANGED:
         {
-			float RatingChange = value * GetRatingMultiplier(cr);
+			RatingChange = value * GetRatingMultiplier(cr);
             ApplyAttackTimePercentMod(RANGED_ATTACK, RatingChange, apply);
             UpdateFocusRegen();
-
-			ApplyHastePercentMod(value * GetRatingMultiplier(cr), apply);
             break;
         }
         case CR_HASTE_SPELL:
         {
-			float RatingChange = value * GetRatingMultiplier(cr);
+			RatingChange = value * GetRatingMultiplier(cr);
             ApplyCastTimePercentMod(RatingChange, apply);
-			ApplyHastePercentMod(value * GetRatingMultiplier(cr), apply);
             break;
         }
         default:
             break;
     }
 
+	ApplyHastePercentMod(RatingChange, apply);
     UpdateRating(cr);
 }
 
