@@ -2595,7 +2595,7 @@ void Player::Regenerate(Powers power)
     float addvalue = 0.0f;
 
     // Powers now benefit from haste.
-    float haste = GetFloatValue(UNIT_MOD_HASTE);
+    float haste = GetFloatValue(PLAYER_FIELD_MOD_HASTE);
 
     switch (power)
     {
@@ -3417,7 +3417,6 @@ void Player::InitStatsForLevel(bool reapplyMods)
     // set default cast time multiplier
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
     SetFloatValue(UNIT_MOD_CAST_HASTE, 1.0f);
-	SetFloatValue(UNIT_MOD_HASTE, 1.0f);
     SetFloatValue(PLAYER_FIELD_MOD_HASTE, 1.0f);
     // SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, 1.0f); Does not exists anymore => PLAYER_FIELD_MOD_HASTE
 
