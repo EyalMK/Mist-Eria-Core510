@@ -6086,8 +6086,8 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
             break;
     }
 
-	if (cr == CR_HASTE_MELEE && CR_HASTE_RANGED)
-		ApplyHastePercentMod(value * GetRatingMultiplier(cr), apply);
+	/*if (cr == CR_HASTE_MELEE && CR_HASTE_RANGED)
+		ApplyHastePercentMod(value * GetRatingMultiplier(cr), apply);*/
 
     UpdateRating(cr);
 }
