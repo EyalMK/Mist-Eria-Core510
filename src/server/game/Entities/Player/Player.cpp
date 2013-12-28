@@ -2507,8 +2507,6 @@ void Player::RegenerateAll()
     if(getClass() == CLASS_PALADIN || getClass() == CLASS_MONK)
         m_regenTimerTenSec += m_regenTimer;
 
-
-    RegenerateHealth();
     Regenerate(POWER_ENERGY);
     Regenerate(POWER_MANA);
     Regenerate(POWER_RAGE);
@@ -2537,6 +2535,14 @@ void Player::RegenerateAll()
             if (cd)
                 SetRuneCooldown(runeToRegen, (cd > m_regenTimer) ? cd - m_regenTimer : 0);
         }
+    }
+
+	// Not in combat or they have regeneration
+    if (!isInCombat() || IsPolymorphed() || m_baseHealthRegen ||
+        HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT) ||
+        HasAuraType(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT))
+    {
+        RegenerateHealth();
     }
 
     if (m_regenTimerTenSec >= 10000 && !isInCombat())

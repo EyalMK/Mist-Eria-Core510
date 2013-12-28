@@ -598,7 +598,7 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
 		}
     }
 
-    if (victim->IsAIEnabled)
+	if (victim->IsAIEnabled)
         victim->GetAI()->DamageTaken(this, damage);
 
     if (IsAIEnabled)
@@ -651,13 +651,13 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
 
             uint32 share = CalculatePct(damage, (*i)->GetAmount());
 
-            // TODO: check packets if damage is done by victim, or by attacker of victim
+            /// @todo check packets if damage is done by victim, or by attacker of victim
             DealDamageMods(shareDamageTarget, share, NULL);
             DealDamage(shareDamageTarget, share, NULL, NODAMAGE, spell->GetSchoolMask(), spell, false);
         }
     }
 
-    // Rage from Damage made (only from direct weapon damage) : New formula
+    // Rage from Damage made (only from direct weapon damage)
     if (cleanDamage && damagetype == DIRECT_DAMAGE && this != victim && getPowerType() == POWER_RAGE)
     {
         uint32 weaponSpeedHitFactor;
@@ -17295,13 +17295,13 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
 
     if (attacker)
     {
-        addRage = (damage  / rageconversion * 7.5f + weaponSpeedHitFactor) / 2;
+        addRage = (damage / rageconversion * 7.5f + weaponSpeedHitFactor) / 2;
 
         // talent who gave more rage on attack
         AddPct(addRage, GetTotalAuraModifier(SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT));
     }
     else addRage = damage / rageconversion * 2.5f;
-
+    
     addRage *= sWorld->getRate(RATE_POWER_RAGE_INCOME);
 
     ModifyPower(POWER_RAGE, uint32(addRage * 10));
