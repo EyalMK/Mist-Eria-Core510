@@ -377,6 +377,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, uint64 npcGUID, 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_QUESTGIVER_QUEST_DETAILS NPCGuid=%u, questid=%u", GUID_LOPART(npcGUID), quest->GetQuestId());
 }
 
+// SUNGIS WORK ON QUEST REWARD SYSTEM
 void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
 {
     std::string questTitle = quest->GetTitle();

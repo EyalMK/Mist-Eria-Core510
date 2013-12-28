@@ -1418,8 +1418,8 @@ class Unit : public WorldObject
         void SetAttackTime(WeaponAttackType att, uint32 val) { SetFloatValue(UNIT_FIELD_BASEATTACKTIME+att, val*m_modAttackSpeedPct[att]); }
         void ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply);
         void ApplyCastTimePercentMod(float val, bool apply);
-        void ApplyMeleeHastePercentMod(float val, bool apply);
-        void ApplyRangedHastePercentMod(float val, bool apply);
+		void ApplyMeleeHastePercentMod(float val, bool apply);
+		void ApplyRangedHastePercentMod(float val, bool apply);
 
         SheathState GetSheath() const { return SheathState(GetByteValue(UNIT_FIELD_BYTES_2, 0)); }
         virtual void SetSheath(SheathState sheathed) { SetByteValue(UNIT_FIELD_BYTES_2, 0, sheathed); }
@@ -2245,7 +2245,7 @@ class Unit : public WorldObject
         bool IsFlying() const   { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY); }
         void SetCanFly(bool apply);
 
-        void RewardRage(uint32 baseRage, bool attacker);
+        void RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker);
 
         virtual float GetFollowAngle() const { return static_cast<float>(M_PI/2); }
 

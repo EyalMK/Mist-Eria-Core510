@@ -657,16 +657,35 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
         }
     }
 
-    // Rage from Damage made (only from direct weapon damage)
+    // Rage from Damage made (only from direct weapon damage) : New formula
     if (cleanDamage && damagetype == DIRECT_DAMAGE && this != victim && getPowerType() == POWER_RAGE)
     {
-        uint32 rage = uint32(GetAttackTime(cleanDamage->attackType) / 1000 * 21.66f);
+        uint32 weaponSpeedHitFactor;
+        uint32 rage_damage = damage + cleanDamage->absorbed_damage;
+
         switch (cleanDamage->attackType)
         {
-            case OFF_ATTACK:
-                rage /= 2;
             case BASE_ATTACK:
-                RewardRage(rage, true);
+            {
+                weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType) / 1000.0f * 3.5f);
+                if (cleanDamage->hitOutCome == MELEE_HIT_CRIT)
+                    weaponSpeedHitFactor *= 2;
+
+                RewardRage(rage_damage, weaponSpeedHitFactor, true);
+
+                break;
+            }
+            case OFF_ATTACK:
+            {
+                weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType) / 1000.0f * 1.75f);
+                if (cleanDamage->hitOutCome == MELEE_HIT_CRIT)
+                    weaponSpeedHitFactor *= 2;
+
+                RewardRage(rage_damage, weaponSpeedHitFactor, true);
+
+                break;
+            }
+            case RANGED_ATTACK:
                 break;
             default:
                 break;
@@ -677,7 +696,7 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
     {
         // Rage from absorbed damage
         if (cleanDamage && cleanDamage->absorbed_damage && victim->getPowerType() == POWER_RAGE)
-            victim->RewardRage(cleanDamage->absorbed_damage, false);
+            victim->RewardRage(cleanDamage->absorbed_damage, 0, false);
 
         return 0;
     }
@@ -774,7 +793,7 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
         if (this != victim && victim->getPowerType() == POWER_RAGE)
         {
             uint32 rage_damage = damage + (cleanDamage ? cleanDamage->absorbed_damage : 0);
-            victim->RewardRage(rage_damage, false);
+            victim->RewardRage(rage_damage, 0, false);
         }
 
         if (GetTypeId() == TYPEID_PLAYER)
@@ -6511,6 +6530,20 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // if not found Flame Shock
                     return false;
                 }
+				// Lava Surge
+				case 77756 :
+					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Lava Surge : Aura just proced ! HandleDummyAuraProc !");
+						if(ToPlayer() && ToPlayer()->HasSpellCooldown(51505))
+						{
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Lava Surge : player has cooldown on Lava Burst ! Removing it");
+							ToPlayer()->RemoveSpellCooldown(51505, true);
+						}
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Lava Surge : Applying Aura !");
+						ToPlayer()->CastSpell(ToPlayer(), 77762, TRIGGERED_FULL_MASK);
+
+						break ;
+					}
                 break;
             }
             // Frozen Power
@@ -7696,6 +7729,21 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
             else
                 return false;
         }
+		case 88765 :
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Lightning Shield : Rolling Thunder has just proc !");
+				// Remember : this = owner of the aura
+				if(Aura* lightningShield = GetAura(324))
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Lightning Shield : Rolling Thunder : Aura found");
+					if(lightningShield->GetCharges() < 7)
+					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Lightning Shield : Rolling Thunder : Charges < 7 ; setting charges !");
+						lightningShield->SetCharges(lightningShield->GetCharges() + 1) ;
+					}
+				}
+				break ;
+			}
     }
 
     if (cooldown && GetTypeId() == TYPEID_PLAYER && ToPlayer()->HasSpellCooldown(trigger_spell_id))
@@ -12527,6 +12575,29 @@ void Unit::SetPower(Powers power, int32 val)
         SendMessageToSet(&data, GetTypeId() == TYPEID_PLAYER ? true : false);
     }
 
+	// Custom MoP Script
+    // Pursuit of Justice - 26023
+    if (Player* _player = ToPlayer())
+    {
+        if (_player->HasAura(26023))
+        {
+            Aura* aura = _player->GetAura(26023);
+            if (aura)
+            {
+                int32 holyPower = _player->GetPower(POWER_HOLY_POWER) >= 3 ? 3 : _player->GetPower(POWER_HOLY_POWER);
+                int32 AddValue = 5 * holyPower;
+
+                aura->GetEffect(0)->ChangeAmount(15 + AddValue);
+
+                Aura* aura2 = _player->AddAura(114695, _player);
+                if (aura2)
+                    aura2->GetEffect(0)->ChangeAmount(AddValue);
+            }
+        }
+        else if (_player->HasAura(114695))
+            _player->RemoveAura(114695);
+    }
+
     // group update
     if (Player* player = ToPlayer())
     {
@@ -13335,6 +13406,12 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "ProcDamageAndSpell: casting spell id %u (triggered by %s dummy aura of spell %u)", spellInfo->Id, (isVictim?"a victim's":"an attacker's"), triggeredByAura->GetId());
                         if (HandleDummyAuraProc(target, damage, triggeredByAura, procSpell, procFlag, procExtra, cooldown))
                             takeCharges = true;
+
+						if(Id == 324)
+						{
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Lightning shield : Just proc ! Do not remove aura");
+							takeCharges = false ;
+						}
                         break;
                     }
                     case SPELL_AURA_PROC_ON_POWER_AMOUNT:
@@ -13850,26 +13927,20 @@ void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply
         ApplyPercentModFloatVar(m_modAttackSpeedPct[att], val, !apply);
         ApplyPercentModFloatValue(UNIT_FIELD_BASEATTACKTIME+att, val, !apply);
 
-        //if (GetTypeId() == TYPEID_PLAYER)
-        //{
-            //if (att == BASE_ATTACK)
-                //ApplyPercentModFloatValue(PLAYER_FIELD_MOD_HASTE, val, !apply);
-            //else if (att == RANGED_ATTACK)
-                //ApplyPercentModFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, val, !apply);
-        //} //MOP disable it
+        /*if (GetTypeId() == TYPEID_PLAYER && att == BASE_ATTACK)
+            ApplyPercentModFloatValue(UNIT_MOD_HASTE, val, !apply);
+        else if (GetTypeId() == TYPEID_PLAYER && att == RANGED_ATTACK)
+            ApplyPercentModFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, val, !apply);*/
     }
     else
     {
         ApplyPercentModFloatVar(m_modAttackSpeedPct[att], -val, apply);
         ApplyPercentModFloatValue(UNIT_FIELD_BASEATTACKTIME+att, -val, apply);
 
-        //if (GetTypeId() == TYPEID_PLAYER)
-        //{
-            //if (att == BASE_ATTACK)
-               // ApplyPercentModFloatValue(PLAYER_FIELD_MOD_HASTE, -val, apply);
-            //else if (att == RANGED_ATTACK)
-                //ApplyPercentModFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, -val, apply);
-        //}//MOP disable it
+        /*if (GetTypeId() == TYPEID_PLAYER && att == BASE_ATTACK)
+            ApplyPercentModFloatValue(UNIT_MOD_HASTE, -val, apply);
+        else if (GetTypeId() == TYPEID_PLAYER && att == RANGED_ATTACK)
+            ApplyPercentModFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, -val, apply);*/
     }
     m_attackTimer[att] = uint32(GetAttackTime(att) * m_modAttackSpeedPct[att] * remainingTimePct);
 }
@@ -13890,10 +13961,10 @@ void Unit::ApplyCastTimePercentMod(float val, bool apply)
 
 void Unit::ApplyMeleeHastePercentMod(float val, bool apply)
 {
-    if (val > 0)
-        ApplyPercentModFloatValue(UNIT_MOD_HASTE, val, !apply);
-    else
-        ApplyPercentModFloatValue(UNIT_MOD_HASTE, -val, apply);
+	if (val > 0)
+		ApplyPercentModFloatValue(UNIT_MOD_HASTE, val, !apply);
+	else
+		ApplyPercentModFloatValue(UNIT_MOD_HASTE, -val, apply);
 }
 
 void Unit::ApplyRangedHastePercentMod(float val, bool apply)
@@ -17211,30 +17282,29 @@ void Unit::SendRemoveFromThreatListOpcode(HostileReference* pHostileReference)
     SendMessageToSet(&data, false);
 }
 
-// baseRage means damage taken when attacker = false
-void Unit::RewardRage(uint32 baseRage, bool attacker)
+/// Updated 5.1.0
+void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
 {
     float addRage;
 
+    float rageconversion = ((0.0091107836f * getLevel() * getLevel()) + 3.225598133f * getLevel()) + 4.2652911f;
+
+    // Unknown if correct, but lineary adjust rage conversion above level 70
+    if (getLevel() > 70)
+        rageconversion += 13.27f * (getLevel() - 70);
+
     if (attacker)
     {
-        addRage = baseRage;
+        addRage = (damage  / rageconversion * 7.5f + weaponSpeedHitFactor) / 2;
+
         // talent who gave more rage on attack
         AddPct(addRage, GetTotalAuraModifier(SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT));
     }
-    else
-    {
-        // Calculate rage from health and damage taken
-        //! ToDo: Check formula
-        addRage = floor(0.5f + (25.7f * baseRage / GetMaxHealth()));
-        // Berserker Rage effect
-        if (HasAura(18499))
-            addRage *= 2.0f;
-    }
+    else addRage = damage / rageconversion * 2.5f;
 
     addRage *= sWorld->getRate(RATE_POWER_RAGE_INCOME);
 
-    ModifyPower(POWER_RAGE, uint32(addRage));
+    ModifyPower(POWER_RAGE, uint32(addRage * 10));
 }
 
 void Unit::StopAttackFaction(uint32 faction_id)
