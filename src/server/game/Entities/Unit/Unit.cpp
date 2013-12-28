@@ -13890,26 +13890,16 @@ void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply
         ApplyPercentModFloatVar(m_modAttackSpeedPct[att], val, !apply);
         ApplyPercentModFloatValue(UNIT_FIELD_BASEATTACKTIME+att, val, !apply);
 
-        //if (GetTypeId() == TYPEID_PLAYER)
-        //{
-            //if (att == BASE_ATTACK)
-                //ApplyPercentModFloatValue(PLAYER_FIELD_MOD_HASTE, val, !apply);
-            //else if (att == RANGED_ATTACK)
-                //ApplyPercentModFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, val, !apply);
-        //} //MOP disable it
+        if (GetTypeId() == TYPEID_PLAYER)
+            ApplyPercentModFloatValue(PLAYER_FIELD_MOD_HASTE, val, !apply); // Updated 5.1.0
     }
     else
     {
         ApplyPercentModFloatVar(m_modAttackSpeedPct[att], -val, apply);
         ApplyPercentModFloatValue(UNIT_FIELD_BASEATTACKTIME+att, -val, apply);
 
-        //if (GetTypeId() == TYPEID_PLAYER)
-        //{
-            //if (att == BASE_ATTACK)
-               // ApplyPercentModFloatValue(PLAYER_FIELD_MOD_HASTE, -val, apply);
-            //else if (att == RANGED_ATTACK)
-                //ApplyPercentModFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, -val, apply);
-        //}//MOP disable it
+        if (GetTypeId() == TYPEID_PLAYER)
+            ApplyPercentModFloatValue(PLAYER_FIELD_MOD_HASTE, -val, apply);
     }
     m_attackTimer[att] = uint32(GetAttackTime(att) * m_modAttackSpeedPct[att] * remainingTimePct);
 }
@@ -13926,22 +13916,6 @@ void Unit::ApplyCastTimePercentMod(float val, bool apply)
         ApplyPercentModFloatValue(UNIT_MOD_CAST_SPEED, -val, apply);
         ApplyPercentModFloatValue(UNIT_MOD_CAST_HASTE, -val, apply);
     }
-}
-
-void Unit::ApplyMeleeHastePercentMod(float val, bool apply)
-{
-    if (val > 0)
-        ApplyPercentModFloatValue(UNIT_MOD_HASTE, val, !apply);
-    else
-        ApplyPercentModFloatValue(UNIT_MOD_HASTE, -val, apply);
-}
-
-void Unit::ApplyRangedHastePercentMod(float val, bool apply)
-{
-    if (val > 0)
-        ApplyPercentModFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, val, !apply);
-    else
-        ApplyPercentModFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, -val, apply);
 }
 
 uint32 Unit::GetCastingTimeForBonus(SpellInfo const* spellProto, DamageEffectType damagetype, uint32 CastingTime) const

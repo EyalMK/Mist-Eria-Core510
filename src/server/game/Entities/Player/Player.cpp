@@ -2594,13 +2594,8 @@ void Player::Regenerate(Powers power)
 
     float addvalue = 0.0f;
 
-    //powers now benefit from haste.
-    // 1) Hunter's focus
-    float rangedHaste = GetFloatValue(CR_HASTE_RANGED);
-    // 2) Rogue's Energy
-    float meleeHaste = GetFloatValue(CR_HASTE_MELEE);
-    // 3) Mana regen
-    float spellHaste = GetFloatValue(UNIT_MOD_CAST_SPEED);
+    // Powers now benefit from haste.
+    float haste = GetFloatValue(PLAYER_FIELD_MOD_HASTE);
 
     switch (power)
     {
@@ -2615,9 +2610,9 @@ void Player::Regenerate(Powers power)
                 ManaIncreaseRate = sWorld->getRate(RATE_POWER_MANA) * (2.066f - (getLevel() * 0.066f));
 
             if (isInCombat())
-                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1) *  ((0.001f * m_regenTimer) + CalculatePct(0.001f, spellHaste)) * ManaIncreaseRate;
+                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1) *  ((0.001f * m_regenTimer) + CalculatePct(0.001f, haste)) * ManaIncreaseRate;
             else
-                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1) *  ((0.001f * m_regenTimer) + CalculatePct(0.001f, spellHaste)) * ManaIncreaseRate;
+                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1) *  ((0.001f * m_regenTimer) + CalculatePct(0.001f, haste)) * ManaIncreaseRate;
             break;
         }
         case POWER_RAGE:                                                  // Regenerate rage
@@ -2625,12 +2620,12 @@ void Player::Regenerate(Powers power)
             if (!isInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
             {
                 float RageDecreaseRate = sWorld->getRate(RATE_POWER_RAGE_LOSS);
-                addvalue += -10 * RageDecreaseRate / meleeHaste;               // 2 rage by tick (= 2 seconds => 1 rage/sec)
+                addvalue += -20 * RageDecreaseRate / haste;               // 2 rage by tick (= 2 seconds => 1 rage/sec)
             }
             break;
         }
         case POWER_FOCUS:
-            addvalue += (6.0f + CalculatePct(6.0f, rangedHaste)) * sWorld->getRate(RATE_POWER_FOCUS);
+            addvalue += (6.0f + CalculatePct(6.0f, haste)) * sWorld->getRate(RATE_POWER_FOCUS);
             break;
         case POWER_HOLY_POWER:                                            // Regenerate holy power (paladin)
 		case POWER_CHAOS_ORB:                                             // Regenerate shadow orbs (priest)
@@ -2641,7 +2636,7 @@ void Player::Regenerate(Powers power)
             break;
         }
         case POWER_ENERGY:                                               // Regenerate energy (rogue)
-            addvalue += ((0.01f * m_regenTimer) + CalculatePct(0.01f, meleeHaste)) * sWorld->getRate(RATE_POWER_ENERGY);
+            addvalue += ((0.01f * m_regenTimer) + CalculatePct(0.01f, haste)) * sWorld->getRate(RATE_POWER_ENERGY);
             break;
         case POWER_RUNIC_POWER:
         {
@@ -2829,7 +2824,7 @@ void Player::Regenerate(Powers power)
     }
 
 	SetPower(power, curValue);
-	UpdateUInt32Value(UNIT_FIELD_POWER1 + power, curValue);
+	UpdateUInt32Value(UNIT_FIELD_POWER1 + powerIndex, curValue);
 }
 
 void Player::RegenerateHealth()
@@ -3421,9 +3416,9 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
     // set default cast time multiplier
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
-    SetFloatValue(UNIT_MOD_CAST_HASTE, 1.0f);
-    SetFloatValue(UNIT_MOD_HASTE, 1.0f); //MOP changes, not sure
-    SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, 1.0f);
+    //SetFloatValue(UNIT_MOD_CAST_HASTE, 1.0f);
+    SetFloatValue(PLAYER_FIELD_MOD_HASTE, 1.0f); //MOP changes, not sure
+    // SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, 1.0f); Does not exists anymore => UNIT_MOD_HASTE
 
     // reset size before reapply auras
     SetObjectScale(1.0f);
@@ -6067,20 +6062,20 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
             if (getClass() == CLASS_DEATH_KNIGHT)
                 UpdateAllRunesRegen();
 
-            ApplyMeleeHastePercentMod(value * GetRatingMultiplier(cr), apply);
             UpdateEnergyRegen();
             break;
         }
         case CR_HASTE_RANGED:
         {
-            ApplyAttackTimePercentMod(RANGED_ATTACK, value * GetRatingMultiplier(cr), apply);
-            ApplyRangedHastePercentMod(value * GetRatingMultiplier(cr), apply);
+			float RatingChange = value * GetRatingMultiplier(cr);
+            ApplyAttackTimePercentMod(RANGED_ATTACK, RatingChange, apply);
             UpdateFocusRegen();
             break;
         }
         case CR_HASTE_SPELL:
         {
-            ApplyCastTimePercentMod(value * GetRatingMultiplier(cr), apply);
+			float RatingChange = value * GetRatingMultiplier(cr);
+            ApplyCastTimePercentMod(RatingChange, apply);
             break;
         }
         default:

@@ -344,13 +344,13 @@ enum EPlayerFields
     PLAYER_FIELD_UI_HIT_MODIFIER                     = UNIT_END + 0x0713, // Size: 1, Type: FLOAT, Flags: PRIVATE
     PLAYER_FIELD_UI_SPELL_HIT_MODIFIER               = UNIT_END + 0x0714, // Size: 1, Type: FLOAT, Flags: PRIVATE
     PLAYER_FIELD_HOME_REALM_TIME_OFFSET              = UNIT_END + 0x0715, // Size: 1, Type: INT, Flags: PRIVATE
-    PLAYER_FIELD_MOD_RANGED_HASTE                    = UNIT_END + 0x0716, // Size: 1, Type: FLOAT, Flags: PRIVATE
+    PLAYER_FIELD_MOD_HASTE                           = UNIT_END + 0x0716, // Size: 1, Type: FLOAT, Flags: PRIVATE
     PLAYER_FIELD_MOD_PET_HASTE                       = UNIT_END + 0x0717, // Size: 1, Type: FLOAT, Flags: PRIVATE
     PLAYER_FIELD_SUMMONED_BATTLE_PET_GUID            = UNIT_END + 0x0718,
     PLAYER_FIELD_OVERRIDE_SPELLS_ID                  = UNIT_END + 0x071A,
 
     //PLAYER_FIELD_DAILY_QUESTS_1                    = UNIT_END + 0x0489, // (Should not in MOP anymore, just temp for compile)
-    //PLAYER_FIELD_MOD_HASTE                         = UNIT_END + 0x04D2, // (Should not in MOP anymore, just temp for compile)
+    //PLAYER_FIELD_MOD_HASTE                         = UNIT_END + 0x04D2, // The haste is now the same for all classes
     //PLAYER_FIELD_BYTES                             = UNIT_END + 0x0439, // (Should not in MOP anymore, just temp for compile)
     //PLAYER_FIELD_BYTES2                            = UNIT_END + 0x0456, // (Should not in MOP anymore, just temp for compile)
 
