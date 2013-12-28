@@ -2595,7 +2595,12 @@ void Player::Regenerate(Powers power)
     float addvalue = 0.0f;
 
     // Powers now benefit from haste.
-    float haste = GetFloatValue(PLAYER_FIELD_MOD_HASTE);
+	// Melee
+    float meleeHaste = GetFloatValue(UNIT_MOD_HASTE);
+	// Ranged
+	float rangedHaste = GetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE);
+	// Spells
+	float spellHaste = GetFloatValue(UNIT_MOD_CAST_HASTE);
 
     switch (power)
     {
@@ -2610,9 +2615,9 @@ void Player::Regenerate(Powers power)
                 ManaIncreaseRate = sWorld->getRate(RATE_POWER_MANA) * (2.066f - (getLevel() * 0.066f));
 
             if (isInCombat())
-                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1) *  ((0.001f * m_regenTimer) + CalculatePct(0.001f, haste)) * ManaIncreaseRate;
+                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER1) *  ((0.001f * m_regenTimer) + CalculatePct(0.001f, spellHaste)) * ManaIncreaseRate;
             else
-                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1) *  ((0.001f * m_regenTimer) + CalculatePct(0.001f, haste)) * ManaIncreaseRate;
+                addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER1) *  ((0.001f * m_regenTimer) + CalculatePct(0.001f, spellHaste)) * ManaIncreaseRate;
             break;
         }
         case POWER_RAGE:                                                  // Regenerate rage
@@ -2620,12 +2625,12 @@ void Player::Regenerate(Powers power)
             if (!isInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
             {
                 float RageDecreaseRate = sWorld->getRate(RATE_POWER_RAGE_LOSS);
-                addvalue += -10 * RageDecreaseRate / haste;               // -1 rage by tick
+                addvalue += -10 * RageDecreaseRate / meleeHaste;               // -1 rage by tick
             }
             break;
         }
         case POWER_FOCUS:
-            addvalue += ((0.01f * m_regenTimer) + CalculatePct(0.01f, haste)) * sWorld->getRate(RATE_POWER_FOCUS);
+            addvalue += ((0.01f * m_regenTimer) + CalculatePct(0.01f, rangedHaste)) * sWorld->getRate(RATE_POWER_FOCUS);
             break;
         case POWER_HOLY_POWER:                                            // Regenerate holy power (paladin)
 		case POWER_CHAOS_ORB:                                             // Regenerate shadow orbs (priest)
@@ -2636,7 +2641,7 @@ void Player::Regenerate(Powers power)
             break;
         }
         case POWER_ENERGY:                                               // Regenerate energy (rogue)
-            addvalue += ((0.01f * m_regenTimer) + CalculatePct(0.01f, haste)) * sWorld->getRate(RATE_POWER_ENERGY);
+            addvalue += ((0.01f * m_regenTimer) + CalculatePct(0.01f, meleeHaste)) * sWorld->getRate(RATE_POWER_ENERGY);
             break;
         case POWER_RUNIC_POWER:
         {
@@ -3417,9 +3422,8 @@ void Player::InitStatsForLevel(bool reapplyMods)
     // set default cast time multiplier
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
     SetFloatValue(UNIT_MOD_CAST_HASTE, 1.0f);
-	SetFloatValue(UNIT_MOD_HASTE, 1.0f);
-    SetFloatValue(PLAYER_FIELD_MOD_HASTE, 1.0f);
-    // SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, 1.0f); Does not exists anymore => PLAYER_FIELD_MOD_HASTE
+    SetFloatValue(UNIT_MOD_HASTE, 1.0f); //MOP changes, not sure
+    SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, 1.0f);
 
     // reset size before reapply auras
     SetObjectScale(1.0f);
@@ -3544,10 +3548,6 @@ void Player::InitStatsForLevel(bool reapplyMods)
     SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);   // must be set
 
     SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);// must be set
-	SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
-    SetFloatValue(UNIT_MOD_CAST_HASTE, 1.0f);
-	SetFloatValue(UNIT_MOD_HASTE, 1.0f);
-    SetFloatValue(PLAYER_FIELD_MOD_HASTE, 1.0f);
 
     // cleanup player flags (will be re-applied if need at aura load), to avoid have ghost flag without ghost aura, for example.
     RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK | PLAYER_FLAGS_DND | PLAYER_FLAGS_GM | PLAYER_FLAGS_GHOST | PLAYER_ALLOW_ONLY_ABILITY);
@@ -6065,6 +6065,7 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
 			RatingChange = value * GetRatingMultiplier(cr);
             ApplyAttackTimePercentMod(BASE_ATTACK, RatingChange, apply);
             ApplyAttackTimePercentMod(OFF_ATTACK, RatingChange, apply);
+			ApplyMeleeHastePercentMod(RatingChange, apply);
             if (getClass() == CLASS_DEATH_KNIGHT)
                 UpdateAllRunesRegen();
 			if (getClass() == CLASS_ROGUE)
@@ -6075,6 +6076,7 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
         {
 			RatingChange = value * GetRatingMultiplier(cr);
             ApplyAttackTimePercentMod(RANGED_ATTACK, RatingChange, apply);
+			ApplyRangedHastePercentMod(RatingChange, apply);
             UpdateFocusRegen();
             break;
         }
@@ -6087,9 +6089,6 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
         default:
             break;
     }
-
-	if (cr == CR_HASTE_MELEE && cr == CR_HASTE_RANGED)
-		ApplyHastePercentMod(RatingChange, apply);
 
     UpdateRating(cr);
 }
