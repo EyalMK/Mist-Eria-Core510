@@ -6530,6 +6530,20 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // if not found Flame Shock
                     return false;
                 }
+				// Lava Surge
+				case 77756 :
+					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Lava Surge : Aura just proced ! HandleDummyAuraProc !");
+						if(ToPlayer() && ToPlayer()->HasSpellCooldown(51505))
+						{
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Lava Surge : player has cooldown on Lava Burst ! Removing it");
+							ToPlayer()->RemoveSpellCooldown(51505, true);
+						}
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Lava Surge : Applying Aura !");
+						ToPlayer()->CastSpell(ToPlayer(), 77762, TRIGGERED_FULL_MASK);
+
+						break ;
+					}
                 break;
             }
             // Frozen Power
