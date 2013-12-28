@@ -3417,6 +3417,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
     // set default cast time multiplier
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
     SetFloatValue(UNIT_MOD_CAST_HASTE, 1.0f);
+	SetFloatValue(UNIT_MOD_HASTE, 1.0f);
     SetFloatValue(PLAYER_FIELD_MOD_HASTE, 1.0f);
     // SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, 1.0f); Does not exists anymore => PLAYER_FIELD_MOD_HASTE
 
@@ -3545,6 +3546,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
     SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);// must be set
 	SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
     SetFloatValue(UNIT_MOD_CAST_HASTE, 1.0f);
+	SetFloatValue(UNIT_MOD_HASTE, 1.0f);
     SetFloatValue(PLAYER_FIELD_MOD_HASTE, 1.0f);
 
     // cleanup player flags (will be re-applied if need at aura load), to avoid have ghost flag without ghost aura, for example.
@@ -6090,7 +6092,7 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
 
 	/*if (cr == CR_HASTE_MELEE && CR_HASTE_RANGED)
 		ApplyHastePercentMod(value * GetRatingMultiplier(cr), apply);*/
-
+	SetFloatValue(UNIT_MOD_HASTE, RatingChange);
     UpdateRating(cr);
 }
 
