@@ -3417,8 +3417,9 @@ void Player::InitStatsForLevel(bool reapplyMods)
     // set default cast time multiplier
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
     SetFloatValue(UNIT_MOD_CAST_HASTE, 1.0f);
+	SetFloatValue(UNIT_MOD_HASTE, 1.0f);
     SetFloatValue(PLAYER_FIELD_MOD_HASTE, 1.0f);
-    // SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, 1.0f); Does not exists anymore => UNIT_MOD_HASTE
+    // SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, 1.0f); Does not exists anymore => PLAYER_FIELD_MOD_HASTE
 
     // reset size before reapply auras
     SetObjectScale(1.0f);
@@ -6063,7 +6064,8 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
                 UpdateAllRunesRegen();
 			if (getClass() == CLASS_ROGUE)
 			    UpdateEnergyRegen();
-			
+
+			ApplyHastePercentMod(value * GetRatingMultiplier(cr), apply);
             break;
         }
         case CR_HASTE_RANGED:
@@ -6071,12 +6073,15 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
 			float RatingChange = value * GetRatingMultiplier(cr);
             ApplyAttackTimePercentMod(RANGED_ATTACK, RatingChange, apply);
             UpdateFocusRegen();
+
+			ApplyHastePercentMod(value * GetRatingMultiplier(cr), apply);
             break;
         }
         case CR_HASTE_SPELL:
         {
 			float RatingChange = value * GetRatingMultiplier(cr);
             ApplyCastTimePercentMod(RatingChange, apply);
+			ApplyHastePercentMod(value * GetRatingMultiplier(cr), apply);
             break;
         }
         default:

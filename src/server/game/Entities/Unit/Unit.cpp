@@ -13890,16 +13890,16 @@ void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply
         ApplyPercentModFloatVar(m_modAttackSpeedPct[att], val, !apply);
         ApplyPercentModFloatValue(UNIT_FIELD_BASEATTACKTIME+att, val, !apply);
 
-        if (GetTypeId() == TYPEID_PLAYER)
-            ApplyPercentModFloatValue(PLAYER_FIELD_MOD_HASTE, val, !apply); // Updated 5.1.0
+        //if (GetTypeId() == TYPEID_PLAYER)
+            //ApplyPercentModFloatValue(PLAYER_FIELD_MOD_HASTE, val, !apply);
     }
     else
     {
         ApplyPercentModFloatVar(m_modAttackSpeedPct[att], -val, apply);
         ApplyPercentModFloatValue(UNIT_FIELD_BASEATTACKTIME+att, -val, apply);
 
-        if (GetTypeId() == TYPEID_PLAYER)
-            ApplyPercentModFloatValue(PLAYER_FIELD_MOD_HASTE, -val, apply);
+        //if (GetTypeId() == TYPEID_PLAYER)
+            //ApplyPercentModFloatValue(PLAYER_FIELD_MOD_HASTE, -val, apply);
     }
     m_attackTimer[att] = uint32(GetAttackTime(att) * m_modAttackSpeedPct[att] * remainingTimePct);
 }
@@ -13916,6 +13916,14 @@ void Unit::ApplyCastTimePercentMod(float val, bool apply)
         ApplyPercentModFloatValue(UNIT_MOD_CAST_SPEED, -val, apply);
         ApplyPercentModFloatValue(UNIT_MOD_CAST_HASTE, -val, apply);
     }
+}
+
+void Unit::ApplyHastePercentMod(float val, bool apply)
+{
+	if (val > 0)
+		ApplyPercentModFloatValue(UNIT_MOD_HASTE, val, !apply);
+	else
+		ApplyPercentModFloatValue(UNIT_MOD_HASTE, -val, apply);
 }
 
 uint32 Unit::GetCastingTimeForBonus(SpellInfo const* spellProto, DamageEffectType damagetype, uint32 CastingTime) const
@@ -17238,12 +17246,12 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
 
     if (attacker)
     {
-        addRage = (/*damage*/irand(10000, 13000)  / rageconversion * 7.5f + weaponSpeedHitFactor) / 2;
+        addRage = (damage  / rageconversion * 7.5f + weaponSpeedHitFactor) / 2;
 
         // talent who gave more rage on attack
         AddPct(addRage, GetTotalAuraModifier(SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT));
     }
-    else addRage = /*damage*/irand(10000, 13000) / rageconversion * 2.5f;
+    else addRage = damage / rageconversion * 2.5f;
 
     addRage *= sWorld->getRate(RATE_POWER_RAGE_INCOME);
 
