@@ -13929,7 +13929,10 @@ void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply
 
         if (GetTypeId() == TYPEID_PLAYER)
 			if (att == BASE_ATTACK && att == RANGED_ATTACK)
+			{
                 ApplyPercentModFloatValue(UNIT_MOD_HASTE, val, !apply);
+				ApplyPercentModFloatValue(PLAYER_FIELD_MOD_HASTE, val, !apply);
+			}
     }
     else
     {
@@ -13938,7 +13941,10 @@ void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply
 
         if (GetTypeId() == TYPEID_PLAYER)
 			if (att == BASE_ATTACK && att == RANGED_ATTACK)
-                ApplyPercentModFloatValue(UNIT_MOD_HASTE, -val, apply);
+            {
+                ApplyPercentModFloatValue(UNIT_MOD_HASTE, val, !apply);
+				ApplyPercentModFloatValue(PLAYER_FIELD_MOD_HASTE, val, !apply);
+			}
     }
     m_attackTimer[att] = uint32(GetAttackTime(att) * m_modAttackSpeedPct[att] * remainingTimePct);
 }
