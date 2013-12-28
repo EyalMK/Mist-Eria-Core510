@@ -2625,7 +2625,7 @@ void Player::Regenerate(Powers power)
             break;
         }
         case POWER_FOCUS:
-            addvalue += (6.0f + CalculatePct(6.0f, haste)) * sWorld->getRate(RATE_POWER_FOCUS);
+            addvalue += ((0.01f * m_regenTimer) + CalculatePct(0.01f, haste)) * sWorld->getRate(RATE_POWER_FOCUS);
             break;
         case POWER_HOLY_POWER:                                            // Regenerate holy power (paladin)
 		case POWER_CHAOS_ORB:                                             // Regenerate shadow orbs (priest)
@@ -6085,6 +6085,9 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
         default:
             break;
     }
+
+	if (cr == CR_HASTE_MELEE && CR_HASTE_RANGED)
+		ApplyHastePercentMod(value * GetRatingMultiplier(cr), apply);
 
     UpdateRating(cr);
 }
