@@ -1691,6 +1691,32 @@ public :
 	}
 };
 
+class InfernoBlastTargetsCheck
+{
+public :
+	InfernoBlastTargetsCheck(float x, float y, float z)
+	{
+		casterPos.Relocate(x, y ,z);
+	}
+
+	bool operator()(WorldObject* source)
+	{
+		if(!source)
+			return false ;
+
+		Position pos ;
+		source->GetPosition(&pos);
+
+		if(casterPos.GetExactDist(&pos) <= 5.0f)
+			return false ;
+
+		return true ;
+	}
+
+private :
+	Position casterPos ;
+};
+
 class spell_mage_inferno_blast_spreader : public SpellScriptLoader
 {
 public :
@@ -1710,6 +1736,9 @@ public :
 
         bool Load()
         {
+			m_ignite = NULL ;
+			m_combustion = NULL ;
+			m_pyroblast = NULL ;
             return true ;
         }
 
@@ -1723,98 +1752,134 @@ public :
                 if(!realTarget)
                     return ;
 
-                Position pos ;
-                caster->GetPosition(&pos);
-
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : real target found (name %s, guid %u) ; position set ; checking glyph", realTarget->GetName().c_str(), realTarget->GetGUID());
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : real target found (guid %u) ; position set ; checking glyph", realTarget->GetGUID());
                 // Glyph of Discret Magic : target is valid only if less than 5 yards away from the PRIMARY TARGET
                 if(caster->HasAura(134580))
                 {
                     sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : caster has glyph ; checking availables targets");
-                    for(std::list<WorldObject*>::iterator iter = targets.begin() ; iter != targets.end() ; ++iter)
-                    {
-                        Position targetPos ;
-                        if(*iter)
-                            (*iter)->GetPosition(&targetPos);
-                        else
-                            continue ;
-
-                        if(pos.GetExactDist2d(&targetPos) > 5.0f)
-                            targets.remove(*iter);
-                    }
+					targets.remove_if(InfernoBlastTargetsCheck(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ()));
                 }
 
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : glyph test done ; resizing list (actual size : %u)", (uint32)targets.size());
-                // And we resize. Even if there is already nothing.
+                // Do not resize if the target's list's size is too low ;
+				if(targets.size() < caster->HasAura(89926) ? 5 : 4)
+					return ;
+
+				// Else resize it ;
                 Trinity::Containers::RandomResizeList(targets, caster->HasAura(89926) ? 5 : 4);
             }
         }
 
+		void handleInitPointersOnCast()
+		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Entering OnCast Handler");
+			Unit* caster = GetCaster();
+			Unit* explicitTarget = GetExplTargetUnit();
+
+			if(caster && explicitTarget)
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : caster && explicitTarget weren't null ; continue");
+				if(Aura* ignite = explicitTarget->GetAura(12654))
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : ignite aura found on target %u", explicitTarget->GetGUID());
+					m_ignite = ignite ;
+				}
+
+				if(Aura* combustion = explicitTarget->GetAura(83853))
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : combustion aura found on target %u", explicitTarget->GetGUID());
+					m_combustion = combustion ;
+				}
+
+				if(Aura* pyroblast = explicitTarget->GetAura(11366))
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Pyroblast aura found on target %u", explicitTarget->GetGUID());
+					m_pyroblast = pyroblast ;
+				}
+			}
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Leaving OnCast Handler successfully !");
+		}
+
         void handleSpreadAurasOnEffectScriptEffect(SpellEffIndex effectIndex)
         {
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : OnEffectHitTarget Handler");
-            Unit* caster = GetCaster(); // Pure caster of the spell
-            Unit* realTarget = GetExplTargetUnit(); // The target the mage is selecting
-            Unit* otherTarget = GetHitUnit(); // The target on which the effects will be spread (this is shit)
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Entering OnEffectHitTarget Handler");
 
-            if(caster && realTarget && otherTarget)
-            {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : pointers corrects");
-                if(realTarget->GetGUID() == otherTarget->GetGUID()) // This would be tricky
-                    return ;
+            Unit* caster = GetCaster();
+			if(!caster)
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Unable to find a caster ; returning !");
+				return ;
+			}
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Caster found ; checking explicit target");
 
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : guids corrects (realTarget : %u ; otherTarget : %u)", realTarget->GetGUID(), otherTarget->GetGUID());
-				Unit::AuraApplicationMap auras = realTarget->GetAppliedAuras(); // To find the auras to duplicate
-                for(Unit::AuraApplicationMap::iterator iter = auras.begin() ; iter != auras.end() ; ++iter)
-                {
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : looping");
-					if(!iter->second)
-						continue;
 
-					if(Aura* actualAura = iter->second->GetBase())
-                    {
-						sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : found an aura (%s, %u) ; casterGUID = %u", actualAura->GetSpellInfo()->SpellName, actualAura->GetId(), actualAura->GetCasterGUID());
-                        if(actualAura->GetCaster() == caster)
-                        {
-                            sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : aura (%s, %u) found on realTarget", actualAura->GetSpellInfo()->SpellName, actualAura->GetId());
-                            Aura* copy ;
-                            switch(actualAura->GetId())
-                            {
-                            case 12654 : case 11366 : case 44457 : case 118271 :
-                                // Well, thanks Pexirn. A LOT !
-                                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : good aura (%s, %u) found on realTarget", actualAura->GetSpellInfo()->SpellName, actualAura->GetId());
-                                copy = Aura::TryCreate(actualAura->GetSpellInfo(), actualAura->GetEffectMask(), otherTarget, caster, NULL, NULL, actualAura->GetCasterGUID());
-								break ;
-                            default :
-                                break ;
-                            }
+			Unit* explicitTarget = GetExplTargetUnit();
+			if(!explicitTarget || explicitTarget->isDead())
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Unable to find explicit target or explicit target is dead !");
+				return ;
+			}
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Explicit target found ; checking hit unit");
 
-                            if(copy)
-                            {
-                                // Thanks Pexirn. Again.
-                                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : copy aura has been created ; setting target in combat if it wasn't");
-                                if(!otherTarget->isInCombat())
-                                    otherTarget->SetInCombatWith(caster);
 
-                                // One last time : THANKS PEXIRN ! (not fot the headache you bitch)
-                                sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : enterring the twisted part (well, i hope not in fact)");
-                                if(AuraApplication* auraApp = copy->GetApplicationOfTarget(caster->GetGUID()))
-                                {
-                                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : we entered the twisted part. Good Lord, please, HEEEEEEEEEELP ME !");
-                                    copy->_ApplyForTarget(otherTarget, caster, auraApp);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+			Unit* hitTarget = GetHitUnit();
+			if(!hitTarget)
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : unable to find a hit unit !");
+				return ;
+			}
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Hit Unit found !");
+
+
+			// 1. HitTarget and ExplicitTarget must not be the same
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Checking guids");
+			if(hitTarget->GetGUID() == explicitTarget->GetGUID())
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Guids of Hit Unit and Explicit Target were the same ; returning !");
+				return ;
+			}
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Guids were differents ; ready to apply auras");
+			
+
+			// 2. Apply the auras
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Try to apply ignite aura");
+			if(m_ignite && !m_ignite->IsExpired() && !hitTarget->HasAura(m_ignite->GetId()) && m_ignite->GetCaster() && hitTarget)
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Everything was okay ; trying to create the ignite aura on target %u", hitTarget->GetGUID());
+				Aura::TryCreate(m_ignite->GetSpellInfo(), m_ignite->GetEffectMask(), hitTarget, m_ignite->GetCaster(), NULL, NULL, m_ignite->GetCasterGUID()) ;
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Ignite aura created !");
+			}
+			
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Try to apply pyroblast aura");
+			if(m_pyroblast && !m_pyroblast->IsExpired() && !hitTarget->HasAura(m_pyroblast->GetId()) && m_pyroblast->GetCaster() && hitTarget)
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Everything was okay ; trying to create the pyroblast aura on target %u", hitTarget->GetGUID());
+				Aura::TryCreate(m_pyroblast->GetSpellInfo(), m_pyroblast->GetEffectMask(), hitTarget, m_pyroblast->GetCaster(), NULL, NULL, m_pyroblast->GetCasterGUID());
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Pyroblast aura created");
+			}
+
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Try to apply combustion aura");
+			if(m_combustion && !m_combustion->IsExpired() && m_combustion->GetCaster() && !hitTarget->HasAura(m_combustion->GetId()) && hitTarget)
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Everything was okay ; trying to create the combustion aura on target %u", hitTarget->GetGUID());
+				Aura::TryCreate(m_combustion->GetSpellInfo(), m_combustion->GetEffectMask(), hitTarget, m_combustion->GetCaster(), NULL, NULL, m_combustion->GetCasterGUID());
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Combustion aura created");
+			}
+
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : Leaving OnEffectHitTarget Handler successfully");
         }
 
         void Register()
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mage_inferno_blast_spreader_SpellScript::handleTargetSelect, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+			OnCast += SpellCastFn(spell_mage_inferno_blast_spreader_SpellScript::handleInitPointersOnCast);
             OnEffectHitTarget += SpellEffectFn(spell_mage_inferno_blast_spreader_SpellScript::handleSpreadAurasOnEffectScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
+
+	private :
+		Aura* m_ignite;
+		Aura* m_pyroblast ;
+		Aura* m_combustion ;
     };
 
     SpellScript* GetSpellScript() const
