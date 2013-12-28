@@ -2596,11 +2596,11 @@ void Player::Regenerate(Powers power)
 
     // Powers now benefit from haste.
 	// Melee
-    float meleeHaste = GetFloatValue(UNIT_MOD_HASTE);
+    float meleeHaste = GetRatingBonusValue(CR_HASTE_MELEE);
 	// Ranged
-	float rangedHaste = GetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE);
+	float rangedHaste = GetRatingBonusValue(CR_HASTE_RANGED);
 	// Spells
-	float spellHaste = GetFloatValue(UNIT_MOD_CAST_HASTE);
+	float spellHaste = GetRatingBonusValue(CR_HASTE_SPELL);
 
     switch (power)
     {

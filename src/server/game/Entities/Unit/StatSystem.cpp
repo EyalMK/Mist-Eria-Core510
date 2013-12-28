@@ -707,9 +707,12 @@ void Player::UpdateManaRegen()
 void Player::UpdateEnergyRegen()
 {
     int index = GetPowerIndex(POWER_ENERGY);
-    if(index == MAX_POWERS) return;
+	float meleeHaste = GetFloatValue(UNIT_MOD_HASTE);
 
-    float value = 10.0f + (0.01f * GetRatingBonusValue(CR_HASTE_MELEE));
+    if(index == MAX_POWERS)
+		return;
+
+    float value = ((0.01f * m_regenTimer) + CalculatePct(0.01f, meleeHaste));
 
     AddPct(value, GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_ENERGY));
     value += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_ENERGY) / 5.0f;
@@ -722,9 +725,12 @@ void Player::UpdateEnergyRegen()
 void Player::UpdateFocusRegen()
 {
     int index = GetPowerIndex(POWER_FOCUS);
-    if(index == MAX_POWERS) return;
+	float rangedHaste = GetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE);
 
-    float value = 5.0f + (0.04f * GetRatingBonusValue(CR_HASTE_RANGED));
+    if(index == MAX_POWERS)
+		return;
+
+    float value = ((0.01f * m_regenTimer) + CalculatePct(0.01f, rangedHaste));
 
     AddPct(value, GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_FOCUS));
     value += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_FOCUS) / 5.0f;
