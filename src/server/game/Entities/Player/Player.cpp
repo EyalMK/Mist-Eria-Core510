@@ -3417,8 +3417,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
     // set default cast time multiplier
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
     SetFloatValue(UNIT_MOD_CAST_HASTE, 1.0f);
-	SetFloatValue(UNIT_MOD_HASTE, 1.0f);
-    SetFloatValue(PLAYER_FIELD_MOD_HASTE, 1.0f); //MOP changes, not sure
+    SetFloatValue(PLAYER_FIELD_MOD_HASTE, 1.0f);
     // SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, 1.0f); Does not exists anymore => UNIT_MOD_HASTE
 
     // reset size before reapply auras
@@ -6062,8 +6061,9 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
             ApplyAttackTimePercentMod(OFF_ATTACK, RatingChange, apply);
             if (getClass() == CLASS_DEATH_KNIGHT)
                 UpdateAllRunesRegen();
-
-            UpdateEnergyRegen();
+			if (getClass() == CLASS_ROGUE)
+			    UpdateEnergyRegen();
+			
             break;
         }
         case CR_HASTE_RANGED:
