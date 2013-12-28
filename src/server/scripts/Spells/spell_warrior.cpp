@@ -28,14 +28,18 @@
 
 enum WarriorSpells
 {
+	WARRIOR_SPELL_STORM_BOLT_STUN					= 132169,
     SPELL_WARRIOR_BLOODTHIRST						= 23881,
     SPELL_WARRIOR_CHARGE                            = 7922,
 	SPELL_WARRIOR_CHARGE_TALENT						= 105771,
 	SPELL_WARRIOR_CHARGE_TALENT_PASSIVE				= 103828,
+	SPELL_WARRIOR_DEEP_WOUNDS_RANK_1                = 12162,
+    SPELL_WARRIOR_DEEP_WOUNDS_RANK_2                = 12850,
+    SPELL_WARRIOR_DEEP_WOUNDS_RANK_3                = 12868,
+    SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC         = 12721,
     SPELL_WARRIOR_EXECUTE                           = 5308,
     SPELL_WARRIOR_GLYPH_OF_EXECUTION                = 58367,
     SPELL_WARRIOR_GLYPH_OF_VIGILANCE                = 63326,
-    SPELL_WARRIOR_LAST_STAND_TRIGGERED              = 12976,
     SPELL_WARRIOR_SLAM                              = 50782,
     SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK     = 26654,
     SPELL_WARRIOR_TAUNT                             = 355,
@@ -84,6 +88,7 @@ enum WarriorSpells
 	SPELL_WARRIOR_GLYPH_OF_HINDERING_STRIKES        = 58366,
 	SPELL_WARRIOR_SLUGGISH                          = 129923,
 	SPELL_WARRIOR_SHOCKWAVE							= 46968,
+	SPELL_WARRIOR_SHIELD_BLOCK_TRIGGERED			= 132404,
 };
 
 enum WarriorSpellIcons
@@ -291,45 +296,6 @@ class spell_warr_intimidating_shout : public SpellScriptLoader
         SpellScript* GetSpellScript() const
         {
             return new spell_warr_intimidating_shout_SpellScript();
-        }
-};
-
-/// Updated 4.3.4
-class spell_warr_last_stand : public SpellScriptLoader
-{
-    public:
-        spell_warr_last_stand() : SpellScriptLoader("spell_warr_last_stand") { }
-
-        class spell_warr_last_stand_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_warr_last_stand_SpellScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_LAST_STAND_TRIGGERED))
-                    return false;
-                return true;
-            }
-
-            void HandleDummy(SpellEffIndex /*effIndex*/)
-            {
-                if (Unit* caster = GetCaster())
-                {
-                    int32 healthModSpellBasePoints0 = int32(caster->CountPctFromMaxHealth(GetEffectValue()));
-                    caster->CastCustomSpell(caster, SPELL_WARRIOR_LAST_STAND_TRIGGERED, &healthModSpellBasePoints0, NULL, NULL, true, NULL);
-                }
-            }
-
-            void Register()
-            {
-                // add dummy effect spell handler to Last Stand
-                OnEffectHit += SpellEffectFn(spell_warr_last_stand_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_warr_last_stand_SpellScript();
         }
 };
 
@@ -748,26 +714,6 @@ class spell_warr_heroic_leap : public SpellScriptLoader
             return new spell_warr_heroic_leap_SpellScript();
         }
 
-        class spell_warr_heroic_leap_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_warr_heroic_leap_AuraScript);
-
-            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-            {
-                if (Unit* caster = GetCaster())
-                    caster->CastSpell(caster, SPELL_WARRIOR_HEROIC_LEAP_DAMAGE, true);
-            }
-
-            void Register()
-            {
-                OnEffectRemove += AuraEffectRemoveFn(spell_warr_heroic_leap_AuraScript::OnRemove, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_warr_heroic_leap_AuraScript();
-        }
 };
 
 // Heroic Leap (damage) - 52174
@@ -1227,7 +1173,8 @@ class spell_warr_second_wind_aura : public SpellScriptLoader
 
 // Called By Thunder Clap - 6343, Mortal Strike - 12294, Bloodthirst - 23881 and Devastate - 20243
 // Deep Wounds - 115767
-/*class spell_warr_deep_wounds : public SpellScriptLoader
+/// Updated 4.3.4
+class spell_warr_deep_wounds : public SpellScriptLoader
 {
     public:
         spell_warr_deep_wounds() : SpellScriptLoader("spell_warr_deep_wounds") { }
@@ -1236,26 +1183,42 @@ class spell_warr_second_wind_aura : public SpellScriptLoader
         {
             PrepareSpellScript(spell_warr_deep_wounds_SpellScript);
 
-            void HandleOnHit()
+            bool Validate(SpellInfo const* /*spellInfo*/)
             {
-                if (Player* _player = GetCaster()->ToPlayer())
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_DEEP_WOUNDS_RANK_1) || !sSpellMgr->GetSpellInfo(SPELL_WARRIOR_DEEP_WOUNDS_RANK_2) || !sSpellMgr->GetSpellInfo(SPELL_WARRIOR_DEEP_WOUNDS_RANK_3))
+                    return false;
+                return true;
+            }
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                int32 damage = GetEffectValue();
+                Unit* caster = GetCaster();
+                if (Unit* target = GetHitUnit())
                 {
-                    if (Unit* target = GetHitUnit())
-                    {
-                        if (_player->getLevel() >= 32)
-                        {
-                            if (GetSpellInfo()->Id == SPELL_WARRIOR_THUNDER_CLAP && _player->HasAura(SPELL_WARRIOR_BLOOD_AND_THUNDER))
-                                _player->CastSpell(target, SPELL_WARRIOR_DEEP_WOUNDS, true);
-                            else
-                                _player->CastSpell(target, SPELL_WARRIOR_DEEP_WOUNDS, true);
-                        }
-                    }
+                    // apply percent damage mods
+                    damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
+
+                    ApplyPct(damage, 16 * sSpellMgr->GetSpellRank(GetSpellInfo()->Id));
+
+                    damage = target->SpellDamageBonusTaken(caster, GetSpellInfo(), damage, SPELL_DIRECT_DAMAGE);
+
+                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC);
+                    uint32 ticks = spellInfo->GetDuration() / spellInfo->Effects[EFFECT_0].Amplitude;
+
+                    // Add remaining ticks to damage done
+                    if (AuraEffect const* aurEff = target->GetAuraEffect(SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC, EFFECT_0, caster->GetGUID()))
+                        damage += aurEff->GetAmount() * (ticks - aurEff->GetTickNumber());
+
+                    damage /= ticks;
+
+                    caster->CastCustomSpell(target, SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC, &damage, NULL, NULL, true);
                 }
             }
 
             void Register()
             {
-                OnHit += SpellHitFn(spell_warr_deep_wounds_SpellScript::HandleOnHit);
+                OnEffectHitTarget += SpellEffectFn(spell_warr_deep_wounds_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
         };
 
@@ -1263,7 +1226,7 @@ class spell_warr_second_wind_aura : public SpellScriptLoader
         {
             return new spell_warr_deep_wounds_SpellScript();
         }
-};*/
+};
 
 // Thunder Clap - 6343
 class spell_warr_thunder_clap : public SpellScriptLoader
@@ -1594,16 +1557,134 @@ class spell_warr_berserker_rage : public SpellScriptLoader
         }
 };
 
+uint64 summonerGUID;
+bool cast;
+
+class npc_heroic_leap_damage : public CreatureScript
+{
+public :
+    npc_heroic_leap_damage() : CreatureScript("npc_heroic_leap_damage")
+    {}
+
+    struct npc_heroic_leap_damage_AIScript : public ScriptedAI
+    {
+    public :
+        npc_heroic_leap_damage_AIScript(Creature *creature) : ScriptedAI(creature)
+        {
+            summonerGUID = 0;
+            cast = false;
+        }
+
+        void IsSummonedBy(Unit* summoner)
+        {
+            if(summoner->GetTypeId() == TYPEID_PLAYER)
+                summonerGUID = summoner->GetGUID();
+        }
+
+        void MoveInLineOfSight(Unit* who)
+        {
+            if(summonerGUID == who->GetGUID())
+                if(who->IsWithinDist(me, 0.5, true) && !cast)
+                    who->CastSpell(who, SPELL_WARRIOR_HEROIC_LEAP_DAMAGE, true);
+        }
+    };
+
+
+
+    CreatureAI* GetAI(Creature *creature) const
+    {
+        return new npc_heroic_leap_damage_AIScript(creature);
+    }
+};
+
+class spell_warr_storm_bolt : public SpellScriptLoader
+{
+public:
+    spell_warr_storm_bolt() : SpellScriptLoader("spell_warr_storm_bolt") { }
+
+    class spell_warr_storm_bolt_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_warr_storm_bolt_SpellScript);
+
+        bool Validate (SpellInfo const*)
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_STORM_BOLT))
+                return false;
+
+            return true;
+        }
+
+        bool Load()
+        {
+            if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+
+            return true;
+        }
+
+        void HandleOnHit()
+        {
+            if (Player* _player = GetCaster()->ToPlayer())
+            {
+                if (Unit* unitTarget = GetHitUnit())
+                {
+                    if (unitTarget->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(WARRIOR_SPELL_STORM_BOLT_STUN), 0))
+                        SetHitDamage(GetHitDamage() * 4);
+
+                    _player->CastSpell(unitTarget, WARRIOR_SPELL_STORM_BOLT_STUN, true);
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_warr_storm_bolt_SpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_warr_storm_bolt_SpellScript();
+    }
+};
+
+// Shield Block - 2565
+class spell_warr_shield_block : public SpellScriptLoader
+{
+    public:
+        spell_warr_shield_block() : SpellScriptLoader("spell_warr_shield_block") { }
+
+        class spell_warr_shield_block_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warr_shield_block_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                    _player->CastSpell(_player, SPELL_WARRIOR_SHIELD_BLOCK_TRIGGERED, true);
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_warr_shield_block_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warr_shield_block_SpellScript();
+        }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_bloodthirst();
     new spell_warr_charge();
     new spell_warr_concussion_blow();
-    //new spell_warr_deep_wounds();
+    new spell_warr_deep_wounds();
     new spell_warr_execute();
     new spell_warr_improved_spell_reflection();
     new spell_warr_intimidating_shout();
-    new spell_warr_last_stand();
     new spell_warr_overpower();
     new spell_warr_rend();
     new spell_warr_shattering_throw();
@@ -1631,5 +1712,8 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_meat_cleaver();
 	new spell_warr_glyph_of_hindering_strikes();
 	new spell_warr_shockwave();
+	new npc_heroic_leap_damage();
+	new spell_warr_storm_bolt();
+	new spell_warr_shield_block();
 	new spell_warr_berserker_rage();
 }

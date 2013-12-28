@@ -6530,6 +6530,20 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // if not found Flame Shock
                     return false;
                 }
+				// Lava Surge
+				case 77756 :
+					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Lava Surge : Aura just proced ! HandleDummyAuraProc !");
+						if(ToPlayer() && ToPlayer()->HasSpellCooldown(51505))
+						{
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Lava Surge : player has cooldown on Lava Burst ! Removing it");
+							ToPlayer()->RemoveSpellCooldown(51505, true);
+						}
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Lava Surge : Applying Aura !");
+						ToPlayer()->CastSpell(ToPlayer(), 77762, TRIGGERED_FULL_MASK);
+
+						break ;
+					}
                 break;
             }
             // Frozen Power
@@ -12559,6 +12573,29 @@ void Unit::SetPower(Powers power, int32 val)
         data << uint8(powerIndex);
         data << int32(val);
         SendMessageToSet(&data, GetTypeId() == TYPEID_PLAYER ? true : false);
+    }
+
+	// Custom MoP Script
+    // Pursuit of Justice - 26023
+    if (Player* _player = ToPlayer())
+    {
+        if (_player->HasAura(26023))
+        {
+            Aura* aura = _player->GetAura(26023);
+            if (aura)
+            {
+                int32 holyPower = _player->GetPower(POWER_HOLY_POWER) >= 3 ? 3 : _player->GetPower(POWER_HOLY_POWER);
+                int32 AddValue = 5 * holyPower;
+
+                aura->GetEffect(0)->ChangeAmount(15 + AddValue);
+
+                Aura* aura2 = _player->AddAura(114695, _player);
+                if (aura2)
+                    aura2->GetEffect(0)->ChangeAmount(AddValue);
+            }
+        }
+        else if (_player->HasAura(114695))
+            _player->RemoveAura(114695);
     }
 
     // group update
