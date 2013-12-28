@@ -12561,6 +12561,29 @@ void Unit::SetPower(Powers power, int32 val)
         SendMessageToSet(&data, GetTypeId() == TYPEID_PLAYER ? true : false);
     }
 
+	// Custom MoP Script
+    // Pursuit of Justice - 26023
+    if (Player* _player = ToPlayer())
+    {
+        if (_player->HasAura(26023))
+        {
+            Aura* aura = _player->GetAura(26023);
+            if (aura)
+            {
+                int32 holyPower = _player->GetPower(POWER_HOLY_POWER) >= 3 ? 3 : _player->GetPower(POWER_HOLY_POWER);
+                int32 AddValue = 5 * holyPower;
+
+                aura->GetEffect(0)->ChangeAmount(15 + AddValue);
+
+                Aura* aura2 = _player->AddAura(114695, _player);
+                if (aura2)
+                    aura2->GetEffect(0)->ChangeAmount(AddValue);
+            }
+        }
+        else if (_player->HasAura(114695))
+            _player->RemoveAura(114695);
+    }
+
     // group update
     if (Player* player = ToPlayer())
     {
