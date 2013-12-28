@@ -2620,7 +2620,7 @@ void Player::Regenerate(Powers power)
             if (!isInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
             {
                 float RageDecreaseRate = sWorld->getRate(RATE_POWER_RAGE_LOSS);
-                addvalue += -20 * RageDecreaseRate / haste;               // 2 rage by tick (= 2 seconds => 1 rage/sec)
+                addvalue += -10 * RageDecreaseRate / haste;               // -1 rage by tick
             }
             break;
         }
@@ -3416,7 +3416,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
     // set default cast time multiplier
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
-    //SetFloatValue(UNIT_MOD_CAST_HASTE, 1.0f);
+    SetFloatValue(UNIT_MOD_CAST_HASTE, 1.0f);
     SetFloatValue(PLAYER_FIELD_MOD_HASTE, 1.0f); //MOP changes, not sure
     // SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, 1.0f); Does not exists anymore => UNIT_MOD_HASTE
 
