@@ -6061,6 +6061,7 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
 			RatingChange = value * GetRatingMultiplier(cr);
             ApplyAttackTimePercentMod(BASE_ATTACK, RatingChange, apply);
             ApplyAttackTimePercentMod(OFF_ATTACK, RatingChange, apply);
+			ApplyHastePercentMod(RatingChange, apply);
             if (getClass() == CLASS_DEATH_KNIGHT)
                 UpdateAllRunesRegen();
 			if (getClass() == CLASS_ROGUE)
@@ -6071,6 +6072,7 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
         {
 			RatingChange = value * GetRatingMultiplier(cr);
             ApplyAttackTimePercentMod(RANGED_ATTACK, RatingChange, apply);
+			ApplyHastePercentMod(RatingChange, apply);
             UpdateFocusRegen();
             break;
         }
@@ -6084,7 +6086,6 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
             break;
     }
 
-	ApplyHastePercentMod(RatingChange, apply);
     UpdateRating(cr);
 }
 
