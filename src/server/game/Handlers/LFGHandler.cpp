@@ -55,29 +55,25 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
         return;
     }
 
+	uint32 numDungeons;
     uint32 dungeon;
     uint32 roles;
-    uint32 unk[3];
-	uint8 unkbit;
-    uint8 unkbit1;
+	uint8 unk8 = 0;
+	uint8 length = 0;
     std::string comment;
 
-    recvData >> unkbit; // i think it's unk
+    for (int i = 0; i < 3; i++)
+        recvData.read_skip<uint32>();
 
-    for (int8 i = 0; i < 3; ++i)
-    {
-        recvData >> unk[i]; // Unknown.
-    }
-
+	recvData >> unk8;
 	recvData >> roles;
 
-    uint32 count = recvData.ReadBits(24);
-    
-    recvData >> unkbit1;
-    
-    uint32 length = recvData.ReadBits(9);
+	length = recvData.ReadBits(9);
+    numDungeons = recvData.ReadBits(24);
 
-    if (!count) // numDungeons.
+	recvData.FlushBits();
+
+    if (!numDungeons) // numDungeons.
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LFG_JOIN [" UI64FMTD "] no dungeons selected", GetPlayer()->GetGUID());
         recvData.rfinish();
@@ -85,20 +81,14 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
     }
 
     LfgDungeonSet newDungeons; // numfields
-    for (uint32 i = 0; i < count; ++i)
+    for (uint32 i = 0; i < numDungeons; ++i)
     {
-        recvData >> dungeon; // dungeonentry
-        newDungeons.insert((dungeon & 0x00FFFFFF));       // remove the type from the dungeon entry
+        recvData >> dungeon;
+        dungeon &= 0xFFFFFF;
+        newDungeons.insert(dungeon);       // remove the type from the dungeon entry
     }
     
     comment = recvData.ReadString(length);
-    
-    for(uint32 i=0 ; i< recvData.size() ; ++i) 
-	{
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LFG_JOIN packet: %u", recvData.read<uint8>());
-	}
-    
-    recvData.rpos(0);
 
     sLog->outDebug(LOG_FILTER_LFG, "CMSG_LFG_JOIN %s roles: %u, Dungeons: %u, Comment: %s",
         GetPlayerInfo().c_str(), roles, uint8(newDungeons.size()), comment.c_str());
