@@ -406,6 +406,20 @@ void MotionMaster::MoveFall(uint32 id /*=0*/)
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);
 }
 
+void MotionMaster::MoveBackward(uint32 id, float x, float y, float z, float speed)
+{
+    if (_owner->GetTypeId() == TYPEID_PLAYER)
+        _owner->AddUnitMovementFlag(MOVEMENTFLAG_BACKWARD);
+
+    Movement::MoveSplineInit init(_owner);
+    init.MoveTo(x, y, z);
+    init.SetOrientationInversed();
+    init.Launch();
+    if (speed > 0.0f)
+        init.SetVelocity(speed);
+    Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);
+}
+
 void MotionMaster::MoveCharge(float x, float y, float z, float speed, uint32 id, bool generatePath)
 {
     if (Impl[MOTION_SLOT_CONTROLLED] && Impl[MOTION_SLOT_CONTROLLED]->GetMovementGeneratorType() != DISTRACT_MOTION_TYPE)
