@@ -767,6 +767,7 @@ class World
         void   ResetEventSeasonalQuests(uint16 event_id);
 
         void UpdatePhaseDefinitions();
+        void LoadCharacterNameData();
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
@@ -860,8 +861,7 @@ class World
 
         std::list<std::string> m_Autobroadcasts;
 
-        std::map<uint32, CharacterNameData> _characterNameDataMap;
-        void LoadCharacterNameData();
+        std::map<uint32, CharacterNameData> _characterNameDataMap;        
 
         void ProcessQueryCallbacks();
         ACE_Future_Set<PreparedQueryResult> m_realmCharCallbacks;
