@@ -34,6 +34,14 @@ void AddSC_boss_sha_of_violence();
 void AddSC_boss_taran_zhu();
 void AddSC_instance_shado_pan_monastery();
 
+// Gate of The Setting Sun
+void AddSC_instance_gate_setting_sun();
+void AddSC_gate_setting_sun();
+void AddSC_boss_striker_gadok();
+void AddSC_boss_saboteur_kiptilak();
+void AddSC_boss_raigonn();
+void AddSC_boss_commander_rimok();
+
 // Include : Stormstout Brewery
 void AddSC_boss_hoptallus();
 void AddSC_boss_ook_ook();
@@ -1326,6 +1334,14 @@ void AddPandariaScripts()
     AddSC_boss_sha_of_violence();
     AddSC_boss_taran_zhu();
     AddSC_instance_shado_pan_monastery();
+
+	// Gate of The Setting Sun
+	 AddSC_instance_gate_setting_sun();
+	 AddSC_gate_setting_sun();
+	 AddSC_boss_striker_gadok();
+	 AddSC_boss_saboteur_kiptilak();
+	 AddSC_boss_raigonn();
+	 AddSC_boss_commander_rimok();
 
     // Stormstout Brewery
     AddSC_boss_hoptallus();

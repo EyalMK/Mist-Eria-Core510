@@ -467,6 +467,27 @@ void InstanceScript::UpdateEncounterState(EncounterCreditType type, uint32 credi
     }
 }
 
+bool InstanceScript::IsWipe()
+{
+    Map::PlayerList const& PlayerList = instance->GetPlayers();
+
+    if (PlayerList.isEmpty())
+        return true;
+
+    for (Map::PlayerList::const_iterator Itr = PlayerList.begin(); Itr != PlayerList.end(); ++Itr)
+    {
+        Player* player = Itr->getSource();
+
+        if (!player)
+            continue;
+
+        if (player->isAlive() && !player->isGameMaster())
+            return false;
+    }
+
+    return true;
+}
+
 void InstanceScript::UpdatePhasing()
 {
     PhaseUpdateData phaseUdateData;

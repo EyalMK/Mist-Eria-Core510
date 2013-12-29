@@ -35,6 +35,13 @@ set(sources
   Pandaria/StormstoutBrewery/boss_ook_ook.cpp
   Pandaria/StormstoutBrewery/boss_yan_zhu.cpp
   Pandaria/TempleoftheJadeSerpent/temple_of_the_jade_serpent.h
+  Pandaria/GateoftheSettingSun/boss_commander_rimok.cpp
+  Pandaria/GateoftheSettingSun/boss_raigonn.cpp
+  Pandaria/GateoftheSettingSun/boss_saboteur_kiptilak.cpp
+  Pandaria/GateoftheSettingSun/boss_striker_gadok.cpp
+  Pandaria/GateoftheSettingSun/gate_setting_sun.cpp
+  Pandaria/GateoftheSettingSun/gate_setting_sun.h
+  Pandaria/GateoftheSettingSun/instance_gate_setting_sun.cpp
   Pandaria/TempleoftheJadeSerpent/instance_temple_of_the_jade_serpent.cpp
   Pandaria/TempleoftheJadeSerpent/boss_wise_mari.cpp
   Pandaria/TempleoftheJadeSerpent/boss_lorewalker_stonestep.cpp
