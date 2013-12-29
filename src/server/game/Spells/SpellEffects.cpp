@@ -1874,6 +1874,7 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
 		{
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Word of Glory : Entering EffectHeal Handler");
 			uint8 count = m_caster->GetPower(POWER_HOLY_POWER);
+			count = count > 3 ? 3 : count ;
 			if(m_caster->HasAura(112859))
 			{
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "Word of Glory : Caster has aura Clairvoyance Sacree");
@@ -1886,7 +1887,9 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
 			}
 
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Word of Glory : Final calculation ; count = %u", int32(count));
-			addhealth *= count ;
+
+			if(count > 0)
+				addhealth *= count ;
 		}
         else
             addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
