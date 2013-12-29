@@ -2631,7 +2631,7 @@ void Player::Regenerate(Powers power)
             if (!isInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
             {
                 float RageDecreaseRate = sWorld->getRate(RATE_POWER_RAGE_LOSS);
-                addvalue += -10 * RageDecreaseRate / meleeHaste;               // -1 rage by tick
+                addvalue += -20 * RageDecreaseRate;               // -1 rage by tick
             }
             break;
         }
