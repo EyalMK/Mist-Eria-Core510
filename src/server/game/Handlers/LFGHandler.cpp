@@ -62,14 +62,15 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
 	uint8 length = 0;
     std::string comment;
 
+	recvData >> unk8;
+
     for (int i = 0; i < 3; i++)
         recvData.read_skip<uint32>();
 
-	recvData >> unk8;
 	recvData >> roles;
 
+	numDungeons = recvData.ReadBits(24);
 	length = recvData.ReadBits(9);
-    numDungeons = recvData.ReadBits(24);
 
 	recvData.FlushBits();
 
@@ -80,6 +81,8 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
         return;
     }
 
+	comment = recvData.ReadString(length);
+
     LfgDungeonSet newDungeons; // numfields
     for (uint32 i = 0; i < numDungeons; ++i)
     {
@@ -87,8 +90,6 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
         dungeon &= 0xFFFFFF;
         newDungeons.insert(dungeon);       // remove the type from the dungeon entry
     }
-    
-    comment = recvData.ReadString(length);
 
     sLog->outDebug(LOG_FILTER_LFG, "CMSG_LFG_JOIN %s roles: %u, Dungeons: %u, Comment: %s",
         GetPlayerInfo().c_str(), roles, uint8(newDungeons.size()), comment.c_str());
