@@ -584,6 +584,9 @@ void Unit::DealDamageMods(Unit* victim, uint32 &damage, uint32* absorb)
 
 uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss)
 {
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "%s FIRST DAMAGE VALUE = %u", GetName().c_str(), &damage);
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "%s LAST DAMAGE VALUE = %u", GetName().c_str(), damage);
+
 	if (damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
     {
 		if(victim->GetTypeId() == TYPEID_PLAYER)
@@ -1366,7 +1369,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
     // Call default DealDamage
     CleanDamage cleanDamage(damageInfo->cleanDamage, damageInfo->absorb, damageInfo->attackType, damageInfo->hitOutCome);
     DealDamage(victim, damageInfo->damage, &cleanDamage, DIRECT_DAMAGE, SpellSchoolMask(damageInfo->damageSchoolMask), NULL, durabilityLoss);
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "%n DEAL DAMAGE WHAT IS THE VALUE ? = %u", GetName().c_str(), damageInfo->damage);
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "%s DEAL DAMAGE WHAT IS THE VALUE ? = %u", GetName().c_str(), damageInfo->damage);
 
     // If this is a creature and it attacks from behind it has a probability to daze it's victim
     if ((damageInfo->hitOutCome == MELEE_HIT_CRIT || damageInfo->hitOutCome == MELEE_HIT_CRUSHING || damageInfo->hitOutCome == MELEE_HIT_NORMAL || damageInfo->hitOutCome == MELEE_HIT_GLANCING) &&
