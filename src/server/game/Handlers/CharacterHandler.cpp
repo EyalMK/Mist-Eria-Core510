@@ -646,6 +646,7 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
 
             Player newChar(this);
             newChar.GetMotionMaster()->Initialize();
+            sObjectMgr->SetHighestGuids(); //Transfert from cata guid
             if (!newChar.Create(sObjectMgr->GenerateLowGuid(HIGHGUID_PLAYER), createInfo))
             {
                 // Player not create (race/class/etc problem?)
