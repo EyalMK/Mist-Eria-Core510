@@ -4702,6 +4702,9 @@ void Spell::HandleHolyPower(Player* caster)
     Player* modOwner = caster->GetSpellModOwner();
 
     m_powerCost = caster->GetPower(POWER_HOLY_POWER); // Always use all the holy power we have
+	// HACK : Word of Glory is special, never uses more than 3 charges of HP
+	if(m_spellInfo->Id == 85673)
+		m_powerCost = caster->GetPower(POWER_HOLY_POWER) > 3 ? 3 : caster->GetPower(POWER_HOLY_POWER);
 
     if (!m_powerCost || !modOwner)
         return;
