@@ -501,16 +501,17 @@ void ObjectMgr::LoadCreatureTemplates()
         creatureTemplate.RegenHealth        = fields[80].GetBool();
         creatureTemplate.equipmentId        = fields[81].GetUInt32();
 
-		if (creatureTemplate.rank == 3)
+		if (fields[82].GetUInt32() == CREATURE_ELITE_WORLDBOSS)
+		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS TESTING RANKS : %u", fields[82].GetUInt32());
 			creatureTemplate.MechanicImmuneMask = IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK;
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS TESTING MECHANICIMMUNEMASK : %u", creatureTemplate.MechanicImmuneMask);
+		}
 		else
 			creatureTemplate.MechanicImmuneMask = fields[82].GetUInt32();
 
         creatureTemplate.flags_extra        = fields[83].GetUInt32();
         creatureTemplate.ScriptID           = GetScriptId(fields[84].GetCString());
-
-		if (creatureTemplate.rank == 3)
-			creatureTemplate.MechanicImmuneMask = IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK;
 
         ++count;
     }
