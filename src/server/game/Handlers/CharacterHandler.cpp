@@ -261,6 +261,8 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
         data.append(dataBuffer);
 
     SendPacket(&data);
+
+    sWorld->LoadCharacterNameData();
 }
 
 void WorldSession::HandleCharEnumOpcode(WorldPacket & /*recvData*/)
