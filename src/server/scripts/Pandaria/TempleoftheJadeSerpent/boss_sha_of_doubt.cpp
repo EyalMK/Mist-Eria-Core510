@@ -157,7 +157,7 @@ public:
 								}
 								
 								if (player->HasAura(118714)) // Spell Purified Water
-										player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_CLEANING_UP));
+									player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_CLEANING_UP));
 
 								player->CompletedAchievement(sAchievementMgr->GetAchievement(ACHI_TEMPLE_OF_THE_JADE_SERPENT));
 							}

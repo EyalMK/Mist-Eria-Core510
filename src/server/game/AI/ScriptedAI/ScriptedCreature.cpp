@@ -686,3 +686,17 @@ void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& list, WorldObject*
 {
     source->GetGameObjectListWithEntryInGrid(list, entry, maxSearchRange);
 }
+
+void GetPositionWithDistInOrientation(Unit* pUnit, float dist, float orientation, float& x, float& y)
+{
+    x = pUnit->GetPositionX() + (dist * cos(orientation));
+    y = pUnit->GetPositionY() + (dist * sin(orientation));
+}
+
+void GetRandPosFromCenterInDist(float centerX, float centerY, float dist, float& x, float& y)
+{
+    float randOrientation = frand(0, 2*M_PI);
+
+    x = centerX + (dist * cos(randOrientation));
+    y = centerY + (dist * sin(randOrientation));
+}

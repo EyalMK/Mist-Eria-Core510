@@ -1903,6 +1903,17 @@ Player* Creature::SelectNearestPlayer(float distance) const
     return target;
 }
 
+Player* Creature::SelectNearestPlayerNotGM(float distance) const
+{
+    Player* target = NULL;
+
+    Trinity::NearestPlayerNotGMInObjectRangeCheck checker(this, distance);
+    Trinity::PlayerLastSearcher<Trinity::NearestPlayerNotGMInObjectRangeCheck> searcher(this, target, checker);
+    VisitNearbyObject(distance, searcher);
+
+    return target;
+}
+
 void Creature::SendAIReaction(AiReaction reactionType)
 {
     WorldPacket data(SMSG_AI_REACTION, 12);

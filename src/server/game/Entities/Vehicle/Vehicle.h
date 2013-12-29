@@ -58,6 +58,12 @@ class Vehicle : public TransportBase
         void TeleportVehicle(float x, float y, float z, float ang);
         bool IsVehicleInUse() { return Seats.begin() != Seats.end(); }
 
+		inline bool ArePassengersSpawnedByAI() const { return _passengersSpawnedByAI; }
+        void SetPassengersSpawnedByAI(bool passengersSpawnedByAI) { _passengersSpawnedByAI = passengersSpawnedByAI; }
+
+        inline bool CanBeCastedByPassengers() const { return _canBeCastedByPassengers; }
+        void SetCanBeCastedByPassengers(bool canBeCastedByPassengers) { _canBeCastedByPassengers = canBeCastedByPassengers; }
+
         void SetLastShootPos(Position const& pos) { m_lastShootPos.Relocate(pos); }
         Position GetLastShootPos() { return m_lastShootPos; }
 
@@ -95,5 +101,7 @@ class Vehicle : public TransportBase
         uint32 _creatureEntry;         // Can be different than me->GetBase()->GetEntry() in case of players
         Status _status;
         Position m_lastShootPos;
+		bool _passengersSpawnedByAI;
+        bool _canBeCastedByPassengers;
 };
 #endif

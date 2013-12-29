@@ -584,6 +584,9 @@ void Unit::DealDamageMods(Unit* victim, uint32 &damage, uint32* absorb)
 
 uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss)
 {
+	uint32 baseRageDamage = damage;
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "%s RAGE DAMAGE VALUE = %u", GetName().c_str(), baseRageDamage);
+
 	if (damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
     {
 		if(victim->GetTypeId() == TYPEID_PLAYER)
@@ -661,12 +664,13 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
     if (cleanDamage && damagetype == DIRECT_DAMAGE && this != victim && getPowerType() == POWER_RAGE)
     {
         uint32 weaponSpeedHitFactor;
-        uint32 rage_damage = damage + cleanDamage->absorbed_damage;
+        uint32 rage_damage = baseRageDamage + cleanDamage->absorbed_damage;
 
         switch (cleanDamage->attackType)
         {
             case BASE_ATTACK:
             {
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "%s BASE ATTACK DAMAGE = %u", GetName().c_str(), baseRageDamage);
                 weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType) / 1000.0f * 3.5f);
                 if (cleanDamage->hitOutCome == MELEE_HIT_CRIT)
                     weaponSpeedHitFactor *= 2;
@@ -677,6 +681,7 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
             }
             case OFF_ATTACK:
             {
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "%s OFF ATTACK DAMAGE = %u", GetName().c_str(), baseRageDamage);
                 weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType) / 1000.0f * 1.75f);
                 if (cleanDamage->hitOutCome == MELEE_HIT_CRIT)
                     weaponSpeedHitFactor *= 2;
