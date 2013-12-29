@@ -668,8 +668,6 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
         {
             case BASE_ATTACK:
             {
-				CalcDamageInfo* damageInfo;
-				damageInfo->damage;
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "%s BASE ATTACK DAMAGE = %u", GetName().c_str(), damage);
                 weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType) / 1000.0f * 3.5f);
                 if (cleanDamage->hitOutCome == MELEE_HIT_CRIT)
