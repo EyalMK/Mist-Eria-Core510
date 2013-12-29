@@ -928,6 +928,13 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         case SPELLFAMILY_PALADIN:
             switch (m_spellInfo->Id)
             {
+				// Word of Glory
+				case 85673:
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Word of Glory : Entering EffectDummy Handler");
+					m_caster->InterruptNonMeleeSpells(false);
+					m_caster->CastSpell(unitTarget, 130551, true);
+				}
                 case 115750:
                 {
                     m_caster->CastSpell(unitTarget, 105421, true);
@@ -1863,6 +1870,24 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         // Death Pact - return pct of max health to caster
         else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && m_spellInfo->SpellFamilyFlags[0] & 0x00080000)
             addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, int32(caster->CountPctFromMaxHealth(damage)), HEAL);
+		else if(m_spellInfo->Id == 130551)
+		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Word of Glory : Entering EffectHeal Handler");
+			uint8 count = m_caster->GetPower(POWER_HOLY_POWER);
+			if(m_caster->HasAura(112859))
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Word of Glory : Caster has aura Clairvoyance Sacree");
+				addhealth += addhealth/2 ;
+			}
+			if(m_caster->HasAura(53503))
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Word of Glory : Caster has aura Epee de Lumiere");
+				addhealth += addhealth/3 ;
+			}
+
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Word of Glory : Final calculation ; count = %u", int32(count));
+			addhealth *= count ;
+		}
         else
             addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
 
