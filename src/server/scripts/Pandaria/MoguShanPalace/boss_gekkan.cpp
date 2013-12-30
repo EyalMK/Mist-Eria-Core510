@@ -220,7 +220,9 @@ public:
 				if (!checkGlintrokOracleAlive && !checkGlintrokHexxerAlive && !checkGlintrokSkulkerAlive && !checkGlintrokIronhideAlive)
 				{
 					instance->SetBossState(DATA_GEKKAN, DONE);
-					me->SummonGameObject(GO_ANCIENT_MOGU_TREASURE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), 0, 0, 0, 0, 90000000);
+
+					if (GameObject* go = me->SummonGameObject(GO_ANCIENT_MOGU_TREASURE, 4397.974609f, -2562.928955f, -50.988354f, 4.706186f, 0, 0, 0, 0, 90000000))
+						go->setActive(true);
 				}
 
 				if (checkGlintrokOracleAlive)
