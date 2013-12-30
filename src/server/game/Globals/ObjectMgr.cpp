@@ -502,11 +502,7 @@ void ObjectMgr::LoadCreatureTemplates()
         creatureTemplate.equipmentId        = fields[81].GetUInt32();
 
 		if (fields[82].GetUInt32() == CREATURE_ELITE_WORLDBOSS)
-		{
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS TESTING RANKS : %u", fields[82].GetUInt32());
-			creatureTemplate.MechanicImmuneMask = IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK;
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS TESTING MECHANICIMMUNEMASK : %u", creatureTemplate.MechanicImmuneMask);
-		}
+			creatureTemplate.MechanicImmuneMask = uint32(IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK);
 		else
 			creatureTemplate.MechanicImmuneMask = fields[82].GetUInt32();
 

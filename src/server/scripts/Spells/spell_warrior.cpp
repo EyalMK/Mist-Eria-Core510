@@ -60,7 +60,7 @@ enum WarriorSpells
 	SPELL_WARRIOR_RAGING_BLOW_OFF					= 85384,
 	SPELL_WARRIOR_ENRAGE							= 12880,
 	SPELL_WARRIOR_STORM_BOLT						= 107570,
-	SPELL_RAGING_BLOW_STACKS						= 131116,
+	SPELL_WARRIOR_RAGING_BLOW_STACKS				= 131116,
     SPELL_PALADIN_BLESSING_OF_SANCTUARY             = 20911,
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
     SPELL_PRIEST_RENEWED_HOPE                       = 63944,
@@ -872,18 +872,10 @@ class spell_warr_wild_strike : public SpellScriptLoader
         {
             PrepareSpellScript(spell_warr_wild_strike_SpellScript);
 
-            bool Validate (SpellInfo const* /*spellEntry*/)
+            bool Validate(SpellInfo const* /*spellEntry*/)
             {
                 if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_WILD_STRIKE))
                     return false;
-                return true;
-            }
-
-            bool Load()
-            {
-                if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
-                    return false;
-
                 return true;
             }
 
@@ -992,6 +984,14 @@ class spell_warr_raging_blow_main : public SpellScriptLoader
 
 				int32 damage = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 1.9f;
 				SetHitDamage(damage);
+
+				if (Aura* ragingBlow = caster->GetAura(SPELL_WARRIOR_RAGING_BLOW_STACKS, caster->GetGUID()))
+				{
+					if (ragingBlow->GetStackAmount() == 2)
+						ragingBlow->SetStackAmount(1);
+					else
+						caster->RemoveAurasDueToSpell(SPELL_WARRIOR_RAGING_BLOW_STACKS);
+				}
             }
 
             void Register()
@@ -1424,36 +1424,6 @@ class spell_warr_dragon_roar : public SpellScriptLoader
         SpellScript* GetSpellScript() const
         {
             return new spell_warr_dragon_roar_SpellScript();
-        }
-};
-
-// Called by Raging Blow - 85288
-// Meat Cleaver - 85739
-class spell_warr_meat_cleaver : public SpellScriptLoader
-{
-    public:
-        spell_warr_meat_cleaver() : SpellScriptLoader("spell_warr_meat_cleaver") { }
-
-        class spell_warr_meat_cleaver_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_warr_meat_cleaver_SpellScript);
-
-            void HandleOnHit()
-            {
-                if (Player* _player = GetCaster()->ToPlayer())
-                    if (_player->HasAura(SPELL_WARRIOR_MEAT_CLEAVER_PROC))
-                        _player->RemoveAura(SPELL_WARRIOR_MEAT_CLEAVER_PROC);
-            }
-
-            void Register()
-            {
-                OnHit += SpellHitFn(spell_warr_meat_cleaver_SpellScript::HandleOnHit);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_warr_meat_cleaver_SpellScript();
         }
 };
 
