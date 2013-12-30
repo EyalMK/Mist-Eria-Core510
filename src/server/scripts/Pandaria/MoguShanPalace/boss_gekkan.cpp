@@ -645,9 +645,11 @@ public:
 			if (me->IsWithinMeleeRange(me->getVictim(), 2.5f) && !isWithinMeleeRange)
 			{
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-				me->GetMotionMaster()->MoveChase(me->getVictim());
 				isWithinMeleeRange = true;
 			}
+
+			if (isWithinMeleeRange)
+				me->GetMotionMaster()->MoveChase(me->getVictim());
 
 			while(uint32 eventId = events.ExecuteEvent())
 			{
@@ -796,9 +798,11 @@ public:
 			if (me->IsWithinMeleeRange(me->getVictim(), 2.5f) && !isWithinMeleeRange)
 			{
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-				me->GetMotionMaster()->MoveChase(me->getVictim());
 				isWithinMeleeRange = true;
 			}
+
+			if (isWithinMeleeRange)
+				me->GetMotionMaster()->MoveChase(me->getVictim());
 
 			while(uint32 eventId = events.ExecuteEvent())
 			{
@@ -1109,9 +1113,11 @@ public:
 			if (me->IsWithinMeleeRange(me->getVictim(), 2.5f) && !isWithinMeleeRange)
 			{
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-				me->GetMotionMaster()->MoveChase(me->getVictim());
 				isWithinMeleeRange = true;
 			}
+
+			if (isWithinMeleeRange)
+				me->GetMotionMaster()->MoveChase(me->getVictim());
 
 			while(uint32 eventId = events.ExecuteEvent())
 			{
@@ -1172,7 +1178,7 @@ public:
 									if (me->FindNearestCreature(NPC_GLINTROK_IRONHIDE, 99999.0f, false))
 									{
 										instance->SetBossState(DATA_GEKKAN, DONE);
-										me->SummonGameObject(GO_ANCIENT_MOGU_TREASURE, 4397.974609f, -2562.928955f, -50.988354f, 4.706186f, 0, 0, 0, 0, 90000000);
+										me->SummonGameObject(GO_ANCIENT_MOGU_TREASURE, -4397.974609f, -2562.928955f, -50.988354f, 4.706186f, 0, 0, 0, 0, 90000000);
 										me->Kill(me);
 									}
 		}
