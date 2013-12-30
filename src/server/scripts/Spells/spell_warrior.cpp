@@ -1680,7 +1680,6 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_sudden_death();
 	new spell_warr_taste_for_blood();
 	new spell_warr_dragon_roar();
-	new spell_warr_meat_cleaver();
 	new spell_warr_glyph_of_hindering_strikes();
 	new spell_warr_shockwave();
 	new npc_heroic_leap_damage();
