@@ -66,7 +66,8 @@ enum Actions
 	ACTION_SKULKER_RESET,
 	ACTION_SKULKER_DIED,
 	ACTION_IRONHIDE_RESET,
-	ACTION_IRONHIDE_DIED
+	ACTION_IRONHIDE_DIED,
+	ACTION_GEKKAN_TRIGGER,
 };
 
 enum Texts
@@ -216,14 +217,6 @@ public:
 			if (instance)
 			{
 				me->AI()->DoAction(ACTION_GEKKAN_DIED);
-
-				if (!checkGlintrokOracleAlive && !checkGlintrokHexxerAlive && !checkGlintrokSkulkerAlive && !checkGlintrokIronhideAlive)
-				{
-					instance->SetBossState(DATA_GEKKAN, DONE);
-
-					if (GameObject* go = me->SummonGameObject(GO_ANCIENT_MOGU_TREASURE, 4397.974609f, -2562.928955f, -50.988354f, 4.706186f, 0, 0, 0, 0, 90000000))
-						go->setActive(true);
-				}
 
 				if (checkGlintrokOracleAlive)
 					if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
@@ -652,6 +645,7 @@ public:
 			if (me->IsWithinMeleeRange(me->getVictim(), 2.5f) && !isWithinMeleeRange)
 			{
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+				me->GetMotionMaster()->MoveChase(me->getVictim());
 				isWithinMeleeRange = true;
 			}
 
@@ -802,6 +796,7 @@ public:
 			if (me->IsWithinMeleeRange(me->getVictim(), 2.5f) && !isWithinMeleeRange)
 			{
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+				me->GetMotionMaster()->MoveChase(me->getVictim());
 				isWithinMeleeRange = true;
 			}
 
@@ -1114,6 +1109,7 @@ public:
 			if (me->IsWithinMeleeRange(me->getVictim(), 2.5f) && !isWithinMeleeRange)
 			{
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+				me->GetMotionMaster()->MoveChase(me->getVictim());
 				isWithinMeleeRange = true;
 			}
 
@@ -1146,6 +1142,43 @@ public:
 	};
 };
 
+class npc_gekkan_trigger : public CreatureScript
+{
+public:
+	npc_gekkan_trigger() : CreatureScript("npc_gekkan_trigger") { }
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_gekkan_triggerAI(creature);
+	}
+
+	struct npc_gekkan_triggerAI : public ScriptedAI
+	{
+		npc_gekkan_triggerAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
+
+		InstanceScript* instance;
+
+		void UpdateAI(uint32 diff)
+		{
+			if (instance)
+				if (me->isAlive())
+					if (me->FindNearestCreature(BOSS_GEKKAN, 99999.0f, false))
+						if (me->FindNearestCreature(NPC_GLINTROK_ORACLE, 99999.0f, false))
+							if (me->FindNearestCreature(NPC_GLINTROK_HEXXER, 99999.0f, false))
+								if (me->FindNearestCreature(NPC_GLINTROK_SKULKER, 99999.0f, false))
+									if (me->FindNearestCreature(NPC_GLINTROK_IRONHIDE, 99999.0f, false))
+									{
+										instance->SetBossState(DATA_GEKKAN, DONE);
+										me->SummonGameObject(GO_ANCIENT_MOGU_TREASURE, 4397.974609f, -2562.928955f, -50.988354f, 4.706186f, 0, 0, 0, 0, 90000000);
+										me->Kill(me);
+									}
+		}
+	};
+};
+
 void AddSC_boss_gekkan()
 {
 	new boss_gekkan();
@@ -1154,4 +1187,5 @@ void AddSC_boss_gekkan()
 	new npc_glintrok_skulker();
 	new npc_glintrok_ironhide();
 	new mob_glintrok_hexxer();
+	new npc_gekkan_trigger();
 }
