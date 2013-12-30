@@ -1,4 +1,4 @@
- # Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+# Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -143,11 +143,18 @@ set(sources
   EasternKingdoms/Deadmines/boss_mr_smite.cpp
   EasternKingdoms/Deadmines/instance_deadmines.cpp
   EasternKingdoms/zone_duskwood.cpp
-  EasternKingdoms/ScarletMonastery/scarlet_monastery.h
-  EasternKingdoms/ScarletMonastery/boss_brother_korloff.cpp
-  EasternKingdoms/ScarletMonastery/boss_high_inquisitor_whitemane.cpp
-  EasternKingdoms/ScarletMonastery/boss_thalnos_the_soulrender.cpp
+  EasternKingdoms/ScarletMonastery/boss_azshir_the_sleepless.cpp
+  EasternKingdoms/ScarletMonastery/boss_mograine_and_whitemane.cpp
+  EasternKingdoms/ScarletMonastery/boss_bloodmage_thalnos.cpp
+  EasternKingdoms/ScarletMonastery/boss_interrogator_vishas.cpp
+  EasternKingdoms/ScarletMonastery/boss_headless_horseman.cpp
   EasternKingdoms/ScarletMonastery/instance_scarlet_monastery.cpp
+  EasternKingdoms/ScarletMonastery/boss_houndmaster_loksey.cpp
+  EasternKingdoms/ScarletMonastery/scarlet_monastery.h
+  EasternKingdoms/ScarletMonastery/boss_high_inquisitor_fairbanks.cpp
+  EasternKingdoms/ScarletMonastery/boss_arcanist_doan.cpp
+  EasternKingdoms/ScarletMonastery/boss_herod.cpp
+  EasternKingdoms/ScarletMonastery/boss_scorn.cpp
   EasternKingdoms/zone_undercity.cpp
   EasternKingdoms/zone_silvermoon_city.cpp
   EasternKingdoms/zone_loch_modan.cpp
