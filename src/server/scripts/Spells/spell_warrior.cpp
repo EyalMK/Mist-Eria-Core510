@@ -971,7 +971,7 @@ class spell_warr_raging_blow : public SpellScriptLoader
 				return true;
 			}
 
-			void HandleOnCast()
+			void HandleEffect(SpellEffIndex)
 			{
 				Unit* caster = GetCaster()->ToPlayer();
 
@@ -982,11 +982,20 @@ class spell_warr_raging_blow : public SpellScriptLoader
 					else
 						caster->RemoveAurasDueToSpell(SPELL_WARRIOR_RAGING_BLOW_STACKS);
 				}
+
+				if (Aura* meatCleaver = caster->GetAura(SPELL_WARRIOR_MEAT_CLEAVER_PROC, caster->GetGUID()))
+				{
+					if (meatCleaver->GetStackAmount() == 3)
+						meatCleaver->SetStackAmount(2);
+					else if (meatCleaver->GetStackAmount() == 2)
+						meatCleaver->SetStackAmount(1);
+					else caster->RemoveAurasDueToSpell(SPELL_WARRIOR_MEAT_CLEAVER_PROC);
+				}
 			}
 
 			void Register()
 			{
-				OnCast += SpellCastFn(spell_warr_raging_blow_SpellScript::HandleOnCast);
+				OnEffectHitTarget += SpellEffectFn(spell_warr_raging_blow_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_TRIGGER_SPELL);
 			}
 		};
 
@@ -1721,4 +1730,5 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_storm_bolt();
 	new spell_warr_shield_block();
 	new spell_warr_berserker_rage();
+	new spell_warr_raging_blow();
 }
