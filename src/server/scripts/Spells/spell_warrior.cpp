@@ -958,7 +958,7 @@ class spell_warr_heroic_strike : public SpellScriptLoader
 class spell_warr_raging_blow : public SpellScriptLoader
 {
 	public:
-		spell_warr_raging_blow() : SpellScriptLoader("spell_warrraging_blow") {	}
+		spell_warr_raging_blow() : SpellScriptLoader("spell_warr_raging_blow") {	}
 
 		class spell_warr_raging_blow_SpellScript : public SpellScript
 		{
