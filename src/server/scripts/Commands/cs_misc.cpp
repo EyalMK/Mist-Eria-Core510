@@ -80,7 +80,7 @@ public:
         {
             { "dev",                SEC_ADMINISTRATOR,      false, &HandleDevCommand,                   "", NULL },
             { "gps",                SEC_ADMINISTRATOR,      false, &HandleGPSCommand,                   "", NULL },
-            { "aura",               SEC_ADMINISTRATOR,      false, NULL,                    "", auraCommandTable },
+            { "aura",               SEC_ADMINISTRATOR,      false, &HandleAuraCommand,                  "", NULL },
             { "unaura",             SEC_ADMINISTRATOR,      false, &HandleUnAuraCommand,                "", NULL },
             { "appear",             SEC_MODERATOR,          false, &HandleAppearCommand,                "", NULL },
             { "summon",             SEC_MODERATOR,          false, &HandleSummonCommand,                "", NULL },

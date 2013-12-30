@@ -305,12 +305,11 @@ void AuraApplication::SendFakeAuraUpdate(uint32 auraId, bool remove)
     _target->SendMessageToSet(&data, true);
 }
 
-uint8 Aura::BuildEffectMaskForOwner(SpellInfo const* spellProto, uint32 availableEffectMask, WorldObject* owner)
+uint32 Aura::BuildEffectMaskForOwner(SpellInfo const* spellProto, uint32 availableEffectMask, WorldObject* owner)
 {
     ASSERT(spellProto);
     ASSERT(owner);
     uint32 effMask = 0;
-
     switch (owner->GetTypeId())
     {
         case TYPEID_UNIT:
@@ -326,12 +325,13 @@ uint8 Aura::BuildEffectMaskForOwner(SpellInfo const* spellProto, uint32 availabl
             {
                 if (spellProto->Effects[i].Effect == SPELL_EFFECT_PERSISTENT_AREA_AURA)
                     effMask |= 1 << i;
+                else if (spellProto->Effects[i].Effect == SPELL_EFFECT_CREATE_AREATRIGGER)
+                    effMask |= 1 << i;
             }
             break;
         default:
             break;
     }
-
     return effMask & availableEffectMask;
 }
 
@@ -346,11 +346,17 @@ Aura* Aura::TryRefreshStackOrCreate(SpellInfo const* spellproto, uint32 tryEffMa
     uint32 effMask = Aura::BuildEffectMaskForOwner(spellproto, tryEffMask, owner);
     if (!effMask)
         return NULL;
-    if (Aura* foundAura = owner->ToUnit()->_TryStackingOrRefreshingExistingAura(spellproto, effMask, caster, baseAmount, castItem, casterGUID))
+
+    Aura* foundAura = owner->ToUnit()->_TryStackingOrRefreshingExistingAura(spellproto, effMask, caster, baseAmount, castItem, casterGUID);
+    if (foundAura != NULL)
     {
         // we've here aura, which script triggered removal after modding stack amount
         // check the state here, so we won't create new Aura object
         if (foundAura->IsRemoved())
+            return NULL;
+
+        // Earthgrab Totem : Don't refresh root
+        if (foundAura->GetId() == 64695)
             return NULL;
 
         if (refresh)
@@ -381,7 +387,6 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint32 effMask, WorldObject* own
     ASSERT(caster || casterGUID);
     ASSERT(effMask <= MAX_EFFECT_MASK);
     // try to get caster of aura
-
     if (casterGUID)
     {
         if (owner->GetGUID() == casterGUID)
@@ -391,7 +396,6 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint32 effMask, WorldObject* own
     }
     else
         casterGUID = caster->GetGUID();
-
 
     // check if aura can be owned by owner
     if (owner->isType(TYPEMASK_UNIT))
@@ -406,9 +410,19 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint32 effMask, WorldObject* own
         case TYPEID_UNIT:
         case TYPEID_PLAYER:
             aura = new UnitAura(spellproto, effMask, owner, caster, baseAmount, castItem, casterGUID);
+            aura->GetUnitOwner()->_AddAura(((UnitAura*)aura), caster);
+            aura->LoadScripts();
+            aura->_InitEffects(effMask, caster, baseAmount);
             break;
         case TYPEID_DYNAMICOBJECT:
             aura = new DynObjAura(spellproto, effMask, owner, caster, baseAmount, castItem, casterGUID);
+            aura->GetDynobjOwner()->SetAura(aura);
+            aura->_InitEffects(effMask, caster, baseAmount);
+            
+            aura->LoadScripts();
+            ASSERT(aura->GetDynobjOwner());
+            ASSERT(aura->GetDynobjOwner()->IsInWorld());
+            ASSERT(aura->GetDynobjOwner()->GetMap() == aura->GetCaster()->GetMap());
             break;
         default:
             ASSERT(false);
