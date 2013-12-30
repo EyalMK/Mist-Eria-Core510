@@ -56,11 +56,12 @@ enum WarriorSpells
 	SPELL_WARRIOR_HEROIC_THROW						= 57755,
 	SPELL_WARRIOR_WILD_STRIKE						= 100130,
 	SPELL_WARRIOR_HEROIC_STRIKE						= 78,
+	SPELL_WARRIOR_RAGING_BLOW						= 85288,
 	SPELL_WARRIOR_RAGING_BLOW_MAIN					= 96103,
 	SPELL_WARRIOR_RAGING_BLOW_OFF					= 85384,
+	SPELL_WARRIOR_RAGING_BLOW_STACKS				= 131116,
 	SPELL_WARRIOR_ENRAGE							= 12880,
 	SPELL_WARRIOR_STORM_BOLT						= 107570,
-	SPELL_WARRIOR_RAGING_BLOW_STACKS				= 131116,
     SPELL_PALADIN_BLESSING_OF_SANCTUARY             = 20911,
     SPELL_PALADIN_GREATER_BLESSING_OF_SANCTUARY     = 25899,
     SPELL_PRIEST_RENEWED_HOPE                       = 63944,
@@ -953,6 +954,48 @@ class spell_warr_heroic_strike : public SpellScriptLoader
         }
 };
 
+// Raging Blow : 85288
+class spell_warr_raging_blow : public SpellScriptLoader
+{
+	public:
+		spell_warr_raging_blow() : SpellScriptLoader("spell_warrraging_blow") {	}
+
+		class spell_warr_raging_blow_SpellScript : public SpellScript
+		{
+			PrepareSpellScript(spell_warr_raging_blow_SpellScript);
+
+			bool Validate (SpellInfo const*)
+			{
+				if (!sSpellMgr->GetSpellInfo(SPELL_WARRIOR_RAGING_BLOW))
+					return false;
+				return true;
+			}
+
+			void HandleOnCast()
+			{
+				Unit* caster = GetCaster()->ToPlayer();
+
+				if (Aura* ragingBlow = caster->GetAura(SPELL_WARRIOR_RAGING_BLOW_STACKS, caster->GetGUID()))
+				{
+					if (ragingBlow->GetStackAmount() == 2)
+						ragingBlow->SetStackAmount(1);
+					else
+						caster->RemoveAurasDueToSpell(SPELL_WARRIOR_RAGING_BLOW_STACKS);
+				}
+			}
+
+			void Register()
+			{
+				OnCast += SpellCastFn(spell_warr_raging_blow_SpellScript::HandleOnCast);
+			}
+		};
+
+		SpellScript* GetSpellScript() const
+		{
+			return new spell_warr_raging_blow_SpellScript();
+		}
+};
+
 class spell_warr_raging_blow_main : public SpellScriptLoader
 {
     public:
@@ -984,14 +1027,6 @@ class spell_warr_raging_blow_main : public SpellScriptLoader
 
 				int32 damage = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 1.9f;
 				SetHitDamage(damage);
-
-				if (Aura* ragingBlow = caster->GetAura(SPELL_WARRIOR_RAGING_BLOW_STACKS, caster->GetGUID()))
-				{
-					if (ragingBlow->GetStackAmount() == 2)
-						ragingBlow->SetStackAmount(1);
-					else
-						caster->RemoveAurasDueToSpell(SPELL_WARRIOR_RAGING_BLOW_STACKS);
-				}
             }
 
             void Register()
