@@ -135,28 +135,32 @@ public:
 					if (!oracle->isAlive())
 					{
 						oracle->RemoveCorpse();
-						oracle->Respawn();
+						oracle->Relocate(oracle->GetHomePosition());
+						oracle->Respawn(true);
 					}
 
 				if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
 					if (!hexxer->isAlive())
 					{
 						hexxer->RemoveCorpse();
-						hexxer->Respawn();
+						hexxer->Relocate(hexxer->GetHomePosition());
+						hexxer->Respawn(true);
 					}
 
 				if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
 					if (!skulker->isAlive())
 					{
 						skulker->RemoveCorpse();
-						skulker->Respawn();
+						skulker->Relocate(skulker->GetHomePosition());
+						skulker->Respawn(true);
 					}
 
 				if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
 					if (!ironhide->isAlive())
 					{
 						ironhide->RemoveCorpse();
-						ironhide->Respawn();
+						ironhide->Relocate(ironhide->GetHomePosition());
+						ironhide->Respawn(true);
 					}
 
 				if (me->HasAura(SPELL_RECKLESS_INSPIRATION_INSTANT))
@@ -248,6 +252,9 @@ public:
 		{
 			if (instance)
 				instance->SetBossState(DATA_GEKKAN, FAIL);
+
+			me->CombatStop();
+			me->DeleteThreatList();
 		}
 
 		void MoveInLineOfSight(Unit* who)
@@ -558,32 +565,32 @@ public:
 					if (!gekkan->isAlive())
 					{
 						gekkan->RemoveCorpse();
-						gekkan->Respawn();
-						gekkan->AI()->EnterEvadeMode();
+						gekkan->Relocate(gekkan->GetHomePosition());
+						gekkan->Respawn(true);
 					}
 
 				if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
 					if (!hexxer->isAlive())
 					{
 						hexxer->RemoveCorpse();
-						hexxer->Respawn();
-						hexxer->AI()->EnterEvadeMode();
+						hexxer->Relocate(hexxer->GetHomePosition());
+						hexxer->Respawn(true);
 					}
 
 				if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
 					if (!skulker->isAlive())
 					{
 						skulker->RemoveCorpse();
-						skulker->Respawn();
-						skulker->AI()->EnterEvadeMode();
+						skulker->Relocate(skulker->GetHomePosition());
+						skulker->Respawn(true);
 					}
 
 				if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
 					if (!ironhide->isAlive())
 					{
 						ironhide->RemoveCorpse();
-						ironhide->Respawn();
-						ironhide->AI()->EnterEvadeMode();
+						ironhide->Relocate(ironhide->GetHomePosition());
+						ironhide->Respawn(true);
 					}
 
 				if (me->HasAura(SPELL_RECKLESS_INSPIRATION))
@@ -712,32 +719,32 @@ public:
 					if (!gekkan->isAlive())
 					{
 						gekkan->RemoveCorpse();
-						gekkan->Respawn();
-						gekkan->AI()->EnterEvadeMode();
+						gekkan->Relocate(gekkan->GetHomePosition());
+						gekkan->Respawn(true);
 					}
 
 				if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
 					if (!oracle->isAlive())
 					{
 						oracle->RemoveCorpse();
-						oracle->Respawn();
-						oracle->AI()->EnterEvadeMode();
+						oracle->Relocate(oracle->GetHomePosition());
+						oracle->Respawn(true);
 					}
 
 				if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
 					if (!skulker->isAlive())
 					{
 						skulker->RemoveCorpse();
-						skulker->Respawn();
-						skulker->AI()->EnterEvadeMode();
+						skulker->Relocate(skulker->GetHomePosition());
+						skulker->Respawn(true);
 					}
 
 				if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
 					if (!ironhide->isAlive())
 					{
 						ironhide->RemoveCorpse();
-						ironhide->Respawn();
-						ironhide->AI()->EnterEvadeMode();
+						ironhide->Relocate(ironhide->GetHomePosition());
+						ironhide->Respawn(true);
 					}
 
 				if (me->HasAura(SPELL_RECKLESS_INSPIRATION))
@@ -859,32 +866,32 @@ public:
 					if (!gekkan->isAlive())
 					{
 						gekkan->RemoveCorpse();
-						gekkan->Respawn();
-						gekkan->AI()->EnterEvadeMode();
+						gekkan->Relocate(gekkan->GetHomePosition());
+						gekkan->Respawn(true);
 					}
 
 				if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
 					if (!oracle->isAlive())
 					{
 						oracle->RemoveCorpse();
-						oracle->Respawn();
-						oracle->AI()->EnterEvadeMode();
+						oracle->Relocate(oracle->GetHomePosition());
+						oracle->Respawn(true);
 					}
 
 				if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
 					if (!hexxer->isAlive())
 					{
 						hexxer->RemoveCorpse();
-						hexxer->Respawn();
-						hexxer->AI()->EnterEvadeMode();
+						hexxer->Relocate(hexxer->GetHomePosition());
+						hexxer->Respawn(true);
 					}
 
 				if (Creature* ironhide = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_IRONHIDE)))
 					if (!ironhide->isAlive())
 					{
 						ironhide->RemoveCorpse();
-						ironhide->Respawn();
-						ironhide->AI()->EnterEvadeMode();
+						ironhide->Relocate(ironhide->GetHomePosition());
+						ironhide->Respawn(true);
 					}
 			}
 
@@ -974,32 +981,32 @@ public:
 					if (!gekkan->isAlive())
 					{
 						gekkan->RemoveCorpse();
-						gekkan->Respawn();
-						gekkan->AI()->EnterEvadeMode();
+						gekkan->Relocate(gekkan->GetHomePosition());
+						gekkan->Respawn(true);
 					}
 
 				if (Creature* oracle = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_ORACLE)))
 					if (!oracle->isAlive())
 					{
 						oracle->RemoveCorpse();
-						oracle->Respawn();
-						oracle->AI()->EnterEvadeMode();
+						oracle->Relocate(oracle->GetHomePosition());
+						oracle->Respawn(true);
 					}
 
 				if (Creature* hexxer = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_HEXXER)))
 					if (!hexxer->isAlive())
 					{
 						hexxer->RemoveCorpse();
-						hexxer->Respawn();
-						hexxer->AI()->EnterEvadeMode();
+						hexxer->Relocate(hexxer->GetHomePosition());
+						hexxer->Respawn(true);
 					}
 
 				if (Creature* skulker = me->GetCreature(*me, instance->GetData64(DATA_GLINTROK_SKULKER)))
 					if (!skulker->isAlive())
 					{
 						skulker->RemoveCorpse();
-						skulker->Respawn();
-						skulker->AI()->EnterEvadeMode();
+						skulker->Relocate(skulker->GetHomePosition());
+						skulker->Respawn(true);
 					}
 			}
 
@@ -1018,6 +1025,12 @@ public:
 				if (Creature* gekkan = me->GetCreature(*me, instance->GetData64(DATA_GEKKAN)))
 					if (gekkan->AI())
 					    gekkan->AI()->DoAction(ACTION_IRONHIDE_DIED);
+		}
+
+		void EnterEvadeMode()
+		{
+			me->CombatStop();
+			me->DeleteThreatList();
 		}
 
 		void EnterCombat(Unit* /*who*/)
