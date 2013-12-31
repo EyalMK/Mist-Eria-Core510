@@ -213,7 +213,8 @@ void AddSC_the_scarlet_enclave();            //Scarlet Enclave
 void AddSC_the_scarlet_enclave_c1();
 void AddSC_the_scarlet_enclave_c2();
 void AddSC_the_scarlet_enclave_c5();
-void AddSC_boss_arcanist_doan();             //Scarlet Monastery
+/*Scarlet Monastery OLD
+void AddSC_boss_arcanist_doan();             
 void AddSC_boss_azshir_the_sleepless();
 void AddSC_boss_bloodmage_thalnos();
 void AddSC_boss_headless_horseman();
@@ -223,7 +224,11 @@ void AddSC_boss_houndmaster_loksey();
 void AddSC_boss_interrogator_vishas();
 void AddSC_boss_scorn();
 void AddSC_instance_scarlet_monastery();
-void AddSC_boss_mograine_and_whitemane();
+void AddSC_boss_mograine_and_whitemane();*/
+void AddSC_boss_thalnos_the_soulrender();    //Scarlet Monastery
+void AddSC_boss_high_inquisitor_whitemane();
+void AddSC_boss_brother_korloff();
+void AddSC_instance_scarlet_monastery();
 void AddSC_boss_darkmaster_gandling();       //Scholomance
 void AddSC_boss_death_knight_darkreaver();
 void AddSC_boss_theolenkrastinov();
@@ -859,7 +864,8 @@ void AddEasternKingdomsScripts()
     AddSC_the_scarlet_enclave_c1();
     AddSC_the_scarlet_enclave_c2();
     AddSC_the_scarlet_enclave_c5();
-    AddSC_boss_arcanist_doan();             //Scarlet Monastery
+	/*Scarlet Monastery
+    AddSC_boss_arcanist_doan();             
     AddSC_boss_azshir_the_sleepless();
     AddSC_boss_bloodmage_thalnos();
     AddSC_boss_headless_horseman();
@@ -869,7 +875,11 @@ void AddEasternKingdomsScripts()
     AddSC_boss_interrogator_vishas();
     AddSC_boss_scorn();
     AddSC_instance_scarlet_monastery();
-    AddSC_boss_mograine_and_whitemane();
+    AddSC_boss_mograine_and_whitemane();*/
+	AddSC_boss_thalnos_the_soulrender();    //Scarlet Monastery
+	AddSC_boss_high_inquisitor_whitemane();
+	AddSC_boss_brother_korloff();
+	AddSC_instance_scarlet_monastery();
     AddSC_boss_darkmaster_gandling();       //Scholomance
     AddSC_boss_death_knight_darkreaver();
     AddSC_boss_theolenkrastinov();

@@ -37,14 +37,14 @@ public:
 
         void MoveInLineOfSight(Unit* who)
         {
-            if (!me->IsWithinDistInMap(who, 40.0f))
+            if (!me->IsWithinDistInMap(who, 40.0f) || who->ToPlayer()->isGameMaster() || who->HasAura(SPELL_CYCLONIC_INSPIRATION))
                 return;
 
-			if (!who || !who->IsInWorld())
+			if (!who || !who->IsInWorld() || !me->HasAura(SPELL_SPINNING_CRANE_KICK))
                 return;
 
-			if (who && who->ToPlayer() && !who->ToPlayer()->isGameMaster() && !who->HasAura(SPELL_CYCLONIC_INSPIRATION) && !me->IsValidAttackTarget(who) && me->HasAura(SPELL_SPINNING_CRANE_KICK))
-                    who->CastSpell(who, SPELL_CYCLONIC_INSPIRATION);
+			if (who && who->ToPlayer() && !me->IsValidAttackTarget(who))
+                who->CastSpell(who, SPELL_CYCLONIC_INSPIRATION);
         }
 
         void UpdateAI(uint32 diff)

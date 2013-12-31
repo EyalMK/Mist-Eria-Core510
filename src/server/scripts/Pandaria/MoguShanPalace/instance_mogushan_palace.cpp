@@ -26,6 +26,7 @@ class instance_mogushan_palace : public InstanceMapScript
 				GlintrokHexxerGUID			= 0;
 				GlintrokSkulkerGUID			= 0;
 				GlintrokIronhideGUID		= 0;
+				GekkanTriggerGUID			= 0;
 				BossXinTheWeaponmasterGUID	= 0;
 			}
 
@@ -63,6 +64,9 @@ class instance_mogushan_palace : public InstanceMapScript
 					case NPC_GLINTROK_IRONHIDE:
 						GlintrokIronhideGUID = creature->GetGUID();
 						break;
+					case NPC_GEKKAN_TRIGGER:
+						GekkanTriggerGUID = creature->GetGUID();
+						break;
 					case BOSS_XIN_THE_WEAPONMASTER:
 						BossXinTheWeaponmasterGUID = creature->GetGUID();
 						break;
@@ -95,6 +99,8 @@ class instance_mogushan_palace : public InstanceMapScript
 						return GlintrokSkulkerGUID;
 					case DATA_GLINTROK_IRONHIDE:
 						return GlintrokIronhideGUID;
+					case DATA_GEKKAN_TRIGGER:
+						return GekkanTriggerGUID;
 					case DATA_BOSS_XIN_THE_WEAPONMASTER:
 						return BossXinTheWeaponmasterGUID;
 					default:
@@ -115,6 +121,7 @@ class instance_mogushan_palace : public InstanceMapScript
 				uint64 GlintrokHexxerGUID;
 				uint64 GlintrokSkulkerGUID;
 				uint64 GlintrokIronhideGUID;
+				uint64 GekkanTriggerGUID;
 				uint64 BossXinTheWeaponmasterGUID;
 		};
 

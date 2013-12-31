@@ -2631,7 +2631,7 @@ void Player::Regenerate(Powers power)
             if (!isInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
             {
                 float RageDecreaseRate = sWorld->getRate(RATE_POWER_RAGE_LOSS);
-                addvalue += -10 * RageDecreaseRate / meleeHaste;               // -1 rage by tick
+                addvalue += -20 * RageDecreaseRate;               // -1 rage by tick
             }
             break;
         }
@@ -19032,7 +19032,7 @@ void Player::SendRaidInfo()
     WorldPacket data(SMSG_RAID_INSTANCE_INFO, 4);
 
     size_t p_counter = data.wpos();
-    /*data << uint32(counter);                                // placeholder
+    data << uint32(counter);                                // placeholder
 
     time_t now = time(NULL);
 
@@ -19063,30 +19063,6 @@ void Player::SendRaidInfo()
     }
 
     data.put<uint32>(p_counter, counter);
-	*/
-
-	data << uint8(1);
-	data << uint8(2);
-	data << uint8(3);
-	data << uint8(4);
-	data << uint8(5);
-	data << uint8(6);
-	data << uint8(7);
-	data << uint8(8);
-	data << uint8(9);
-	data << uint8(10);
-	data << uint8(11);
-	data << uint8(12);
-	data << uint32(13);
-	data << uint8(14);
-	data << uint8(15);
-	data << uint8(16);
-	data << uint8(17);
-	data << uint8(18);
-	data << uint8(19);
-	data << uint32(20);
-	data << uint32(21);
-	data << uint32(22);
     GetSession()->SendPacket(&data);
 }
 
@@ -27362,11 +27338,14 @@ void Player::ReportSpeedHack(float vitesse)
     {
         if(m_speedHackTimer > 5000)
         {
-            float pourcent = vitesse / GetSpeed(MOVE_RUN) * 100;
-            std::stringstream ss;
-            ss << "[Anti-hack] Speed hack pour " << GetName() << " (" << pourcent << "%)";
-            ChatHandler(NULL).SendGlobalGMSysMessage(ss.str().c_str());
-            ResetSpeedHackReport();
+			if (!isGameMaster())
+			{
+				float pourcent = vitesse / GetSpeed(MOVE_RUN) * 100;
+				std::stringstream ss;
+				ss << "[Anti-hack] Speed hack pour " << GetName() << " (" << pourcent << "%)";
+				ChatHandler(NULL).SendGlobalGMSysMessage(ss.str().c_str());
+				ResetSpeedHackReport();
+			}
         }
     }
 }
@@ -27380,10 +27359,13 @@ void Player::ReportFlyHack()
     {
         if(m_flyHackTimer > 5000)
         {
-            std::stringstream ss;
-            ss<< "[Anti-hack] Fly hack pour " << GetName();
-            ChatHandler(NULL).SendGlobalGMSysMessage(ss.str().c_str());
-            ResetFlyHackReport();
+			if (!isGameMaster())
+			{
+				std::stringstream ss;
+				ss<< "[Anti-hack] Fly hack pour " << GetName();
+				ChatHandler(NULL).SendGlobalGMSysMessage(ss.str().c_str());
+				ResetFlyHackReport();
+			}
         }
     }
 }
@@ -27396,10 +27378,13 @@ void Player::ReportWWHack()
     {
         if(m_wwHackTimer > 5000)
         {
-            std::stringstream ss;
-            ss << "[Anti-hack] Water walk hack pour " << GetName();
-            ChatHandler(NULL).SendGlobalGMSysMessage(ss.str().c_str());
-            ResetWWHackReport();
+			if (!isGameMaster())
+			{
+				std::stringstream ss;
+				ss << "[Anti-hack] Water walk hack pour " << GetName();
+				ChatHandler(NULL).SendGlobalGMSysMessage(ss.str().c_str());
+				ResetWWHackReport();
+			}
         }
     }
 }

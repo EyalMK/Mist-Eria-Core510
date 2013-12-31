@@ -420,7 +420,6 @@ void ObjectMgr::LoadCreatureTemplates()
 
         uint32 entry = fields[0].GetUInt32();
 
-
         CreatureTemplate& creatureTemplate = _creatureTemplateStore[entry];
 
         creatureTemplate.Entry = entry;
@@ -501,7 +500,12 @@ void ObjectMgr::LoadCreatureTemplates()
         creatureTemplate.movementId         = fields[79].GetUInt32();
         creatureTemplate.RegenHealth        = fields[80].GetBool();
         creatureTemplate.equipmentId        = fields[81].GetUInt32();
-        creatureTemplate.MechanicImmuneMask = fields[82].GetUInt32();
+
+		if (fields[82].GetUInt32() == CREATURE_ELITE_WORLDBOSS)
+			creatureTemplate.MechanicImmuneMask = uint32(IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK);
+		else
+			creatureTemplate.MechanicImmuneMask = fields[82].GetUInt32();
+
         creatureTemplate.flags_extra        = fields[83].GetUInt32();
         creatureTemplate.ScriptID           = GetScriptId(fields[84].GetCString());
 

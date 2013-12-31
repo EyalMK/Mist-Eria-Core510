@@ -16,29 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef DEF_SCARLET_M
+#define DEF_SCARLET_M
 
-#ifndef DEF_SCARLET_MONASTERY_H
-#define DEF_SCARLET_MONASTERY_H
-
-enum Data64
+enum eEnums
 {
-    DATA_BOSS_THALNOS_THE_SOULRENDER,
-    DATA_BOSS_BROTHER_KORLOFF,
-    DATA_BOSS_HIGH_INQUISITOR_WHITEMANE
-};
+    TYPE_MOGRAINE_AND_WHITE_EVENT   = 1,
 
-enum CreatureIds
-{
-    BOSS_THALNOS_THE_SOULRENDER         = 59789,
-    BOSS_BROTHER_KORLOFF                = 59223,
-    BOSS_HIGH_INQUISITOR_WHITEMANE		= 3977
-};
+    DATA_MOGRAINE                   = 2,
+    DATA_WHITEMANE                  = 3,
+    DATA_DOOR_WHITEMANE             = 4,
 
-enum GameObjects
-{
-    GO_THALNOS_THE_SOULRENDER_GATE      = 211844,
-    GO_BROTHER_KORLOFF_GATE             = 104591,
-    GO_HIGH_INQUISITOR_WHITEMANE_GATE	= 210563
-};
+    DATA_HORSEMAN_EVENT             = 5,
+    GAMEOBJECT_PUMPKIN_SHRINE       = 6,
 
+    DATA_VORREL                     = 7
+};
 #endif

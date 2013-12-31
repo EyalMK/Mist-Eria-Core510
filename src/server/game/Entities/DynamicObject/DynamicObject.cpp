@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2011-2013 Project SkyFire <http://www.projectskyfire.org/>
  * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2013 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
+ * Free Software Foundation; either version 2 of the License, or (at your
  * option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -28,7 +27,8 @@
 #include "GridNotifiersImpl.h"
 #include "ScriptMgr.h"
 
-DynamicObject::DynamicObject(bool isWorldObject) : WorldObject(isWorldObject), _aura(NULL), _removedAura(NULL), _caster(NULL), _duration(0), _isViewpoint(false)
+DynamicObject::DynamicObject(bool isWorldObject) : WorldObject(isWorldObject),
+    _aura(NULL), _removedAura(NULL), _caster(NULL), _duration(0), _isViewpoint(false)
 {
     m_objectType |= TYPEMASK_DYNAMICOBJECT;
     m_objectTypeId = TYPEID_DYNAMICOBJECT;
@@ -44,7 +44,6 @@ DynamicObject::~DynamicObject()
     ASSERT(!_aura);
     ASSERT(!_caster);
     ASSERT(!_isViewpoint);
-    delete _removedAura;
 }
 
 void DynamicObject::AddToWorld()
@@ -92,7 +91,7 @@ bool DynamicObject::CreateDynamicObject(uint32 guidlow, Unit* caster, uint32 spe
     WorldObject::_Create(guidlow, HIGHGUID_DYNAMICOBJECT, caster->GetPhaseMask());
 
     SetEntry(spellId);
-    SetFloatValue(OBJECT_FIELD_SCALE, 1);
+    SetObjectScale(1.0f);
     SetUInt64Value(DYNAMICOBJECT_CASTER, caster->GetGUID());
 
     // The lower word of DYNAMICOBJECT_BYTES must be 0x0001. This value means that the visual radius will be overriden
@@ -100,7 +99,15 @@ bool DynamicObject::CreateDynamicObject(uint32 guidlow, Unit* caster, uint32 spe
     // If any other value is used, the client will _always_ use the radius provided in DYNAMICOBJECT_RADIUS, but
     // precompensation is necessary (eg radius *= 2) for many spells. Anyway, blizz sends 0x0001 for all the spells
     // I saw sniffed...
-    SetByteValue(DYNAMICOBJECT_BYTES, 0, type);
+
+    // Blizz set visual spell Id in 3 first byte of DYNAMICOBJECT_BYTES after 5.X
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    if (spellInfo)
+    {
+        uint32 visual = spellInfo->SpellVisual[0] ? spellInfo->SpellVisual[0] : spellInfo->SpellVisual[1];
+        SetUInt32Value(DYNAMICOBJECT_BYTES, 0x10000000 | visual);
+    }
+
     SetUInt32Value(DYNAMICOBJECT_SPELLID, spellId);
     SetFloatValue(DYNAMICOBJECT_RADIUS, radius);
     SetUInt32Value(DYNAMICOBJECT_CASTTIME, getMSTime());
@@ -116,7 +123,7 @@ bool DynamicObject::CreateDynamicObject(uint32 guidlow, Unit* caster, uint32 spe
 
 void DynamicObject::Update(uint32 p_time)
 {
-    // caster has to be always avalible and in the same map
+    // caster has to be always available and in the same map
     ASSERT(_caster);
     ASSERT(_caster->GetMap() == GetMap());
 
@@ -127,7 +134,7 @@ void DynamicObject::Update(uint32 p_time)
         if (!_aura->IsRemoved())
             _aura->UpdateOwner(p_time, this);
 
-        // m_aura may be set to null in Aura::UpdateOwner call
+        // _aura may be set to null in Aura::UpdateOwner call
         if (_aura && (_aura->IsRemoved() || _aura->IsExpired()))
             expired = true;
     }
@@ -211,16 +218,17 @@ void DynamicObject::RemoveCasterViewpoint()
 
 void DynamicObject::BindToCaster()
 {
-    ASSERT(!_caster);
+    //ASSERT(!_caster);
     _caster = ObjectAccessor::GetUnit(*this, GetCasterGUID());
-    ASSERT(_caster);
-    ASSERT(_caster->GetMap() == GetMap());
-    _caster->_RegisterDynObject(this);
+    //ASSERT(_caster);
+    //ASSERT(_caster->GetMap() == GetMap());
+    if (_caster)
+        _caster->_RegisterDynObject(this);
 }
 
 void DynamicObject::UnbindFromCaster()
 {
-    ASSERT(_caster);
+    //ASSERT(_caster);
     _caster->_UnregisterDynObject(this);
     _caster = NULL;
 }
