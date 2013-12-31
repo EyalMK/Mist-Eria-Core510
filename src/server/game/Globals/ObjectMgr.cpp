@@ -6108,7 +6108,8 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             QueryResult ai = CharacterDatabase.Query("SELECT * FROM item_instance_auto_increment");
             if(!ai)
                 ASSERT(false);
-            uint32 auto_increment = (*ai)[0].GetUInt32();
+            Field *f = ai->Fetch();
+            uint32 auto_increment = f[0].GetUInt32();
             sLog->outError(LOG_FILTER_NETWORKIO, "New guid %u\n", auto_increment);
             CharacterDatabase.PQuery("ALTER TABLE item_instance auto_increment=%u", auto_increment+1);
             return auto_increment;
@@ -6133,7 +6134,8 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             QueryResult ai = CharacterDatabase.Query("SELECT * FROM characters_auto_increment");
             if(!ai)
                 ASSERT(false);
-            uint32 auto_increment = (*ai)[0].GetUInt32();
+            Field *f = ai->Fetch();
+            uint32 auto_increment = f[0].GetUInt32();
             ASSERT(auto_increment != 0);
             sLog->outError(LOG_FILTER_NETWORKIO, "New guid %u\n", auto_increment);
             CharacterDatabase.PQuery("ALTER TABLE characters auto_increment=%u", auto_increment+1);
