@@ -1473,7 +1473,7 @@ public :
 				m_savedPos = temp ;
 				
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "Applying Alter Time ; saving player");
-				p_caster->SavePlayerOnAlterTimeApply();
+				/*p_caster->SavePlayerOnAlterTimeApply();*/
 			}
 		}
 
@@ -1489,7 +1489,7 @@ public :
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "Removing Alter Time ; player teleporting");
 				p_caster->TeleportTo(m_savedPos, 0);
 				
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "Removing Alter Time ; auras resetting");
+				/*sLog->outDebug(LOG_FILTER_NETWORKIO, "Removing Alter Time ; auras resetting");
 				if(GetCaster())
 				{
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "Caster as Unit is not null");
@@ -1498,7 +1498,7 @@ public :
 						sLog->outDebug(LOG_FILTER_NETWORKIO, "Caster as player is not null ; resetting !");
 						GetCaster()->ToPlayer()->ResetPlayerOnAlterTimeExpire();
 					}
-				}
+				}*/
 			}
 		}
 
