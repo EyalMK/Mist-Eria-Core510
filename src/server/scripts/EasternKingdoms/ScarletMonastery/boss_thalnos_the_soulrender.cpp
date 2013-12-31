@@ -98,6 +98,8 @@ public:
         {
             if (instance)
                 instance->SetBossState(DATA_BOSS_THALNOS_THE_SOULRENDER, FAIL);
+			
+			ScriptedAI::EnterEvadeMode();
         }
 
 
