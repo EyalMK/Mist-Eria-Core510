@@ -2077,6 +2077,109 @@ public :
 	}
 };
 
+class spell_mage_arcane_missiles_proc : public SpellScriptLoader
+{
+public :
+    spell_mage_arcane_missiles_proc() : SpellScriptLoader("spell_mage_arcane_missiles_proc")
+    {
+
+    }
+
+    class spell_mage_arcane_missiles_proc_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_mage_arcane_missiles_proc_AuraScript)
+
+        bool Validate(const SpellInfo* spellInfo)
+        {
+            return true ;
+        }
+
+        bool Load()
+        {
+            return true ;
+        }
+
+        void handleProc(ProcEventInfo & info)
+        {
+            if(WorldObject* owner = GetOwner())
+            {
+                if(Player* p = owner->ToPlayer())
+                {
+                    if(p->HasAura(79683) && !p->HasAura(79808))
+                        p->CastSpell(p, 79808, TRIGGERED_FULL_MASK);
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnProc += AuraProcFn(spell_mage_arcane_missiles_proc_AuraScript::handleProc);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_mage_arcane_missiles_proc_AuraScript();
+    }
+};
+
+class spell_mage_arcane_missiles : public SpellScriptLoader
+{
+public :
+    spell_mage_arcane_missiles() : SpellScriptLoader("spell_mage_arcane_missiles")
+    {
+
+    }
+
+    class spell_mage_arcane_missiles_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_mage_arcane_missiles_SpellScript)
+
+        bool Validate(const SpellInfo* spellInfo)
+        {
+            return true ;
+        }
+
+        bool Load()
+        {
+            return true ;
+        }
+
+        void handleGenerateArcaneChargeOnCast()
+        {
+            if(GetCaster() && GetCaster()->ToPlayer())
+            {
+                if(Aura* arcaneCharge = GetCaster()->ToPlayer()->GetAura(36032))
+                {
+                    if(arcaneCharge->GetStackAmount() < 6)
+                    {
+                        GetCaster()->ToPlayer()->CastSpell(GetCaster()->ToPlayer(), 36032, TRIGGERED_FULL_MASK);
+                    }
+                }
+                else
+                {
+                    GetCaster()->ToPlayer()->CastSpell(GetCaster()->ToPlayer(), 36032, TRIGGERED_FULL_MASK);
+                }
+
+                if(GetCaster()->ToPlayer()->HasAura(79808))
+                {
+                    GetCaster()->ToPlayer()->RemoveAura(79808);
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnCast += SpellCastFn(spell_mage_arcane_missiles_SpellScript::handleGenerateArcaneChargeOnCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_mage_arcane_missiles_SpellScript();
+    }
+};
+
 void AddSC_mage_spell_scripts()
 {
     new spell_mage_blast_wave();
@@ -2112,4 +2215,6 @@ void AddSC_mage_spell_scripts()
 	new spell_mage_time_warp();
 	new spell_mage_brain_freeze();
 	new spell_mage_ice_block();
+	new spell_mage_arcane_missiles_proc();
+	new spell_mage_arcane_missiles();
 }
