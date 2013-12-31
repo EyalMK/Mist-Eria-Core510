@@ -6133,6 +6133,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(!ai)
                 ASSERT(false);
             uint32 auto_increment = (*ai)[0].GetUInt32();
+            sLog->outError(LOG_FILTER_NETWORKIO, "New guid %u\n", auto_increment);
             CharacterDatabase.PQuery("ALTER TABLE characters auto_increment=%u", auto_increment+1);
             return auto_increment;
         }
