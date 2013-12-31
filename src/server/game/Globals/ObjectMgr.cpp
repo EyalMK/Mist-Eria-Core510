@@ -6109,10 +6109,10 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(!ai)
                 ASSERT(false);
             Field *f = ai->Fetch();
-            uint32 auto_increment = f[0].GetUInt32();
+            uint32 auto_increment = f[0].GetUInt64();
             sLog->outError(LOG_FILTER_NETWORKIO, "New guid %u\n", auto_increment);
             CharacterDatabase.PQuery("ALTER TABLE item_instance auto_increment=%u", auto_increment+1);
-            return auto_increment;
+            return (uint32)auto_increment;
         }
         case HIGHGUID_UNIT:
         {
@@ -6135,11 +6135,11 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             if(!ai)
                 ASSERT(false);
             Field *f = ai->Fetch();
-            uint32 auto_increment = f[0].GetUInt32();
+            uint32 auto_increment = f[0].GetUInt64();
             ASSERT(auto_increment != 0);
             sLog->outError(LOG_FILTER_NETWORKIO, "New guid %u\n", auto_increment);
             CharacterDatabase.PQuery("ALTER TABLE characters auto_increment=%u", auto_increment+1);
-            return auto_increment;
+            return (uint32)auto_increment;
         }
         case HIGHGUID_GAMEOBJECT:
         {
