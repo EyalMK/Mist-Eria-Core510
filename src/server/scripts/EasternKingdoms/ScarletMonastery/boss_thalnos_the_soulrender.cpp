@@ -93,7 +93,11 @@ public:
             events.ScheduleEvent(EVENT_SUMMON_EMPOWERING_SPIRITS, 50*IN_MILLISECONDS);
         }
 
-
+		void JustSummoned(Creature* Summoned)
+        {
+            Summons.Summon(Summoned);
+        }
+		
         void EnterEvadeMode()
         {
             if (instance)
@@ -109,6 +113,8 @@ public:
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_THALNOS_THE_SOULRENDER, DONE);
+				
+			Summons.DespawnAll();
         }
 
 
