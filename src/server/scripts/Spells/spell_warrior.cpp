@@ -891,6 +891,9 @@ class spell_warr_wild_strike : public SpellScriptLoader
             {                
 				Player* player = GetCaster()->ToPlayer();
 
+                if(!player)
+                    return;
+
 				int32 damage = GetHitDamage();
                 SetHitDamage(damage + (player->GetTotalAttackPowerValue(BASE_ATTACK) * 2.3f));
             }
@@ -935,6 +938,8 @@ class spell_warr_heroic_strike : public SpellScriptLoader
             void HandleDamage(SpellEffIndex /*effIndex*/)
             {                
                 Unit* caster = GetCaster();
+                if(!caster)
+                    return;
 
 				if (!caster->haveOffhandWeapon())
 				{
@@ -989,6 +994,8 @@ class spell_warr_raging_blow_main : public SpellScriptLoader
             void HandleDamage(SpellEffIndex /*effIndex*/)
             {                
                 Unit* caster = GetCaster();
+                if(!caster)
+                    return;
 
 				int32 damage = caster->GetTotalAttackPowerValue(BASE_ATTACK) * 1.9f;
 				SetHitDamage(damage);
@@ -1034,6 +1041,8 @@ class spell_warr_raging_blow_off : public SpellScriptLoader
             void HandleDamage(SpellEffIndex /*effIndex*/)
             {                
                 Unit* caster = GetCaster();
+                if(!caster)
+                    return;
 
 				int32 damage = caster->GetTotalAttackPowerValue(OFF_ATTACK) * 1.9f;
 				SetHitDamage(damage);
@@ -1195,6 +1204,8 @@ class spell_warr_deep_wounds : public SpellScriptLoader
             {
                 int32 damage = GetEffectValue();
                 Unit* caster = GetCaster();
+                if(!caster)
+                    return;
                 if (Unit* target = GetHitUnit())
                 {
                     // apply percent damage mods
@@ -1242,6 +1253,8 @@ class spell_warr_thunder_clap : public SpellScriptLoader
             void HandleOnHit()
             {
 				Player* caster = GetCaster()->ToPlayer();
+                if(!caster)
+                    return;
 
 				uint32 damage = GetHitDamage();
 
@@ -1510,6 +1523,9 @@ class spell_warr_shockwave : public SpellScriptLoader
             {                
                 Unit* caster = GetCaster();
 				uint32 damage = GetHitDamage();
+
+                if(!caster)
+                    return;
 
 				SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.22f));
             }

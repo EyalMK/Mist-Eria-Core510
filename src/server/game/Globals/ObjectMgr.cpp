@@ -6101,8 +6101,12 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
     {
         case HIGHGUID_ITEM:
         {
-            ASSERT(_hiItemGuid < 0xFFFFFFFE && "Item guid overflow!");
-            return _hiItemGuid++;
+            QueryResult ai = CharacterDatabase.Query("SELECT * FROM item_instance_auto_increment");
+            if(!ai)
+                ASSERT(false);
+            uint32 auto_increment = (*ai)[0].GetUInt32();
+            CharacterDatabase.PQuery("ALTER TABLE item_instance auto_increment=%u", auto_increment+1);
+            return auto_increment;
         }
         case HIGHGUID_UNIT:
         {
@@ -6121,8 +6125,12 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
         }
         case HIGHGUID_PLAYER:
         {
-            ASSERT(_hiCharGuid < 0xFFFFFFFE && "Player guid overflow!");
-            return _hiCharGuid++;
+            QueryResult ai = CharacterDatabase.Query("SELECT * FROM characters_auto_increment");
+            if(!ai)
+                ASSERT(false);
+            uint32 auto_increment = (*ai)[0].GetUInt32();
+            CharacterDatabase.PQuery("ALTER TABLE characters auto_increment=%u", auto_increment+1);
+            return auto_increment;
         }
         case HIGHGUID_GAMEOBJECT:
         {
