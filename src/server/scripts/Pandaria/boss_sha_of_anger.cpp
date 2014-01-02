@@ -27,12 +27,6 @@ enum Events
     EVENT_DISTANCE              = 7
 };
 
-enum Phases
-{
-    PHASE_GROWING_ANGER		= 1,
-    PHASE_UNLEASHED_WRATH	= 2
-};
-
 enum Texts
 {
     SAY_AGGRO				= 0,
@@ -76,9 +70,8 @@ public:
             events.Reset();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 10);
-			me->SetFloatValue(UNIT_FIELD_COMBATREACH, 10);
+            me->SetFloatValue(UNIT_FIELD_COMBATREACH, 10);
             Summons.DespawnAll();
-            UpdateDistanceVisibility();
         }
 
         void JustDied(Unit* /*who*/)
@@ -100,15 +93,12 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_AGGRO);
-            UpdateDistanceVisibility();
 
             events.ScheduleEvent(EVENT_DISTANCE, 2*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_ENDLESS_RAGE, 20*IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS), 0, PHASE_GROWING_ANGER);
+            events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS));
             events.ScheduleEvent(EVENT_UNLEASHED_WRATH, 50*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_BERSERK, 900*IN_MILLISECONDS);
-
-            events.SetPhase(PHASE_GROWING_ANGER);
         }
 
         void UpdateAI(uint32 diff)
@@ -162,7 +152,6 @@ public:
                         break;
 
                     case EVENT_PHASE_GROWING_ANGER:
-                        events.SetPhase(PHASE_GROWING_ANGER);
                         events.ScheduleEvent(EVENT_ENDLESS_RAGE, 20*IN_MILLISECONDS);
                         events.ScheduleEvent(EVENT_GROWING_ANGER, urand(30*IN_MILLISECONDS, 35*IN_MILLISECONDS));
                         events.ScheduleEvent(EVENT_UNLEASHED_WRATH, 50*IN_MILLISECONDS);
@@ -170,8 +159,7 @@ public:
 
                     case EVENT_UNLEASHED_WRATH:
                         DoCast(SPELL_UNLEASHED_WRATH);
-                        events.SetPhase(PHASE_UNLEASHED_WRATH);
-                        events.ScheduleEvent(EVENT_PHASE_GROWING_ANGER, 25*IN_MILLISECONDS, 0, PHASE_GROWING_ANGER);
+                        events.ScheduleEvent(EVENT_PHASE_GROWING_ANGER, 25*IN_MILLISECONDS);
                         events.ScheduleEvent(EVENT_ENDLESS_RAGE, 15*IN_MILLISECONDS);
                         break;
 
@@ -184,32 +172,6 @@ public:
                 }
             }
             DoMeleeAttackIfReady();
-        }
-
-        void UpdateDistanceVisibility()
-        {
-            Map *map = me->GetMap();
-
-            if(map)
-            {
-                Map::PlayerList const &pList = map->GetPlayers();
-                for(Map::PlayerList::const_iterator i = pList.begin() ; i != pList.end() ; ++i)
-                {
-                    Player *player = i->getSource();
-
-                    bool rangeOfUpdate = player->GetExactDist2d(me->GetPositionX(),me->GetPositionY()) < 1000;
-
-                    if(player)
-                    {
-                        if(rangeOfUpdate)
-                        {
-                            player->UpdateVisibilityOf(me);
-                            player->UpdateVisibilityForPlayer();
-
-                        }
-                    }
-                }
-            }
         }
     };
 };

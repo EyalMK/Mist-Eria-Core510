@@ -23,10 +23,19 @@
 
 enum Spells
 {
+    /* Thalnos */
     SPELL_RAISE_FALLEN_CRUSADER     = 115139,
     SPELL_SPIRIT_GALE               = 115289,
     SPELL_EVICT_SOUL                = 115297,
-    SPELL_SUMMON_EMPOWERING_SPIRITS = 115147
+    SPELL_SUMMON_EMPOWERING_SPIRITS = 115147,
+    SPELL_COSMETIC_VISUAL           = 126653,
+
+    /* Autres */
+    SPELL_MIND_ROT                  = 115143,
+    SPELL_EVICTED_SOUL              = 115309,
+    SPELL_EVICT_SOUL_NPC            = 115304,
+    SPELL_EMPOWERING_SPIRIT         = 115157,
+    SPELL_SIPHON_ESSENCE            = 40291
 };
 
 
@@ -41,11 +50,12 @@ enum Events
 
 enum Texts
 {
-    SAY_AGGRO                       = 1, // Vous allez partager mon agonie sans fin !
-    SAY_DEATH                       = 2, // Je vois le bout du tunnel enfin…
-    SAY_RAISE_FALLEN_CRUSADER       = 3, // Pas de repos... pour les morts en colère !
-    SAY_EVICT_SOUL                  = 4, // Cherchez un réceptacle… et revenez !
-    SAY_SUMMON_EMPOWERING_SPIRITS   = 5  // Revendiquez un corps et exercez votre terrible vengeance !
+    SAY_AGGRO                       = 0,
+    SAY_DEATH                       = 1,
+    SAY_KILL                        = 2,
+    SAY_RAISE_FALLEN_CRUSADER       = 3,
+    SAY_EVICT_SOUL                  = 4,
+    SAY_SUMMON_EMPOWERING_SPIRITS   = 5
 };
 
 
@@ -74,6 +84,7 @@ public:
         {
             events.Reset();
             Summons.DespawnAll();
+            me->CastSpell(me, SPELL_COSMETIC_VISUAL);
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_THALNOS_THE_SOULRENDER, NOT_STARTED);
@@ -89,32 +100,37 @@ public:
 
             events.ScheduleEvent(EVENT_RAISE_FALLEN_CRUSADER, 5*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_SPIRIT_GALE, 12*IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_EVICT_SOUL, 30*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_EVICT_SOUL, 32*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_SUMMON_EMPOWERING_SPIRITS, 50*IN_MILLISECONDS);
         }
 
-		void JustSummoned(Creature* Summoned)
-        {
-            Summons.Summon(Summoned);
-        }
-		
+
         void EnterEvadeMode()
         {
             if (instance)
                 instance->SetBossState(DATA_BOSS_THALNOS_THE_SOULRENDER, FAIL);
-			
-			ScriptedAI::EnterEvadeMode();
+
+            ScriptedAI::EnterEvadeMode();
+        }
+
+        void KilledUnit(Unit* /*pWho*/)
+        {
+            Talk(SAY_KILL);
         }
 
 
         void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_DEATH);
+            Summons.DespawnAll();
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_THALNOS_THE_SOULRENDER, DONE);
-				
-			Summons.DespawnAll();
+        }
+
+        void JustSummoned(Creature* Summoned)
+        {
+            Summons.Summon(Summoned);
         }
 
 
@@ -176,7 +192,109 @@ public:
 };
 
 
+class npc_fallen_crusader : public CreatureScript
+{
+public:
+    npc_fallen_crusader() : CreatureScript("npc_fallen_crusader") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_fallen_crusaderAI(creature);
+    }
+
+    struct npc_fallen_crusaderAI : public ScriptedAI
+    {
+            npc_fallen_crusaderAI(Creature* creature) : ScriptedAI(creature) {}
+
+            void Reset()
+            {
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+                me->CastSpell(me, SPELL_MIND_ROT);
+            }
+    };
+};
+
+
+class npc_evicted_soul : public CreatureScript
+{
+public:
+    npc_evicted_soul() : CreatureScript("npc_evicted_soul") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_evicted_soulAI(creature);
+    }
+
+    struct npc_evicted_soulAI : public ScriptedAI
+    {
+            npc_evicted_soulAI(Creature* creature) : ScriptedAI(creature) {}
+
+            uint32 SiphonEssence_Timer;
+
+            void Reset()
+            {
+                SiphonEssence_Timer = 2000;
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+                me->CastSpell(me, SPELL_EVICTED_SOUL);
+                me->CastSpell(me, SPELL_EVICT_SOUL_NPC);
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if(!UpdateVictim())
+                    return;
+
+                if (IsHeroic())
+                {
+                    if (SiphonEssence_Timer <= diff)
+                    {
+                        me->CastSpell(me->getVictim(), SPELL_SIPHON_ESSENCE);
+                        SiphonEssence_Timer = 8000;
+                    }
+                    else SiphonEssence_Timer -= diff;
+                }
+
+                DoMeleeAttackIfReady();
+            }
+    };
+};
+
+class npc_empowering_spirit : public CreatureScript
+{
+public:
+    npc_empowering_spirit() : CreatureScript("npc_empowering_spirit") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_empowering_spiritAI(creature);
+    }
+
+    struct npc_empowering_spiritAI : public ScriptedAI
+    {
+            npc_empowering_spiritAI(Creature* creature) : ScriptedAI(creature) {}
+
+            void Reset()
+            {
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+                me->CastSpell(me, SPELL_EMPOWERING_SPIRIT);
+            }
+    };
+};
+
+
 void AddSC_boss_thalnos_the_soulrender()
 {
     new boss_thalnos_the_soulrender();
+    new npc_fallen_crusader();
+    new npc_evicted_soul();
+    new npc_empowering_spirit();
 }
