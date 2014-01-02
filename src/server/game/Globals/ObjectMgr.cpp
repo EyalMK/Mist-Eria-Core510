@@ -6105,13 +6105,15 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
     {
         case HIGHGUID_ITEM:
         {
+            SQLTransaction trans = CharacterDatabase.BeginTransaction();
             QueryResult ai = CharacterDatabase.Query("SELECT * FROM item_instance_auto_increment");
             if(!ai)
                 ASSERT(false);
             Field *f = ai->Fetch();
             uint32 auto_increment = f[0].GetUInt64();
-            sLog->outError(LOG_FILTER_NETWORKIO, "New guid %u\n", auto_increment);
-            CharacterDatabase.PQuery("ALTER TABLE item_instance auto_increment=%u", auto_increment+1);
+            sLog->outError(LOG_FILTER_NETWORKIO, "New guid %u\n", auto_increment);            
+            trans->PAppend("ALTER TABLE item_instance auto_increment=%u", auto_increment+1);
+            CharacterDatabase.CommitTransaction(trans);
             return (uint32)auto_increment;
         }
         case HIGHGUID_UNIT:
@@ -6131,6 +6133,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
         }
         case HIGHGUID_PLAYER:
         {
+            SQLTransaction trans = CharacterDatabase.BeginTransaction();
             QueryResult ai = CharacterDatabase.Query("SELECT * FROM characters_auto_increment");
             if(!ai)
                 ASSERT(false);
@@ -6138,7 +6141,8 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             uint32 auto_increment = f[0].GetUInt64();
             ASSERT(auto_increment != 0);
             sLog->outError(LOG_FILTER_NETWORKIO, "New guid %u\n", auto_increment);
-            CharacterDatabase.PQuery("ALTER TABLE characters auto_increment=%u", auto_increment+1);
+            trans->PAppend("ALTER TABLE item_instance auto_increment=%u", auto_increment+1);
+            CharacterDatabase.CommitTransaction(trans);
             return (uint32)auto_increment;
         }
         case HIGHGUID_GAMEOBJECT:
