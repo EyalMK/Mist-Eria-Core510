@@ -35,6 +35,7 @@ enum Spells
     SPELL_EVICTED_SOUL              = 115309,
     SPELL_EVICT_SOUL_NPC            = 115304,
     SPELL_EMPOWERING_SPIRIT         = 115157,
+    SPELL_EMPOWER_ZOMBIE_TRANSFORM  = 115258,
     SPELL_SIPHON_ESSENCE            = 40291
 };
 
@@ -131,6 +132,10 @@ public:
         void JustSummoned(Creature* Summoned)
         {
             Summons.Summon(Summoned);
+
+            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true);
+                if(target && target->GetTypeId() == TYPEID_PLAYER)
+                    Summoned->AI()->AttackStart(target);
         }
 
 
@@ -237,12 +242,17 @@ public:
             void Reset()
             {
                 SiphonEssence_Timer = 2000;
+
+                if(Player* summoner = me->ToTempSummon()->GetSummoner()->ToPlayer())
+                {
+                    me->SetDisplayId(summoner->GetDisplayId());
+                    summoner->CastSpell(me, SPELL_EVICT_SOUL_NPC, true);
+                }
             }
 
             void EnterCombat(Unit* /*who*/)
             {
                 me->CastSpell(me, SPELL_EVICTED_SOUL);
-                me->CastSpell(me, SPELL_EVICT_SOUL_NPC);
             }
 
             void UpdateAI(uint32 diff)
@@ -286,6 +296,20 @@ public:
             void EnterCombat(Unit* /*who*/)
             {
                 me->CastSpell(me, SPELL_EMPOWERING_SPIRIT);
+            }
+
+            void MoveInLineOfSight(Unit* who)
+            {
+                ScriptedAI::MoveInLineOfSight(who);
+
+                if (who->GetTypeId() == TYPEID_UNIT && who->isDead() && me->IsWithinDistInMap(who, 40.0f))
+                {
+                    if (who->GetEntry() == 59884)
+                    {
+                        me->CastSpell(me, SPELL_EMPOWER_ZOMBIE_TRANSFORM, true);
+                        me->DisappearAndDie();
+                    }
+                }
             }
     };
 };
