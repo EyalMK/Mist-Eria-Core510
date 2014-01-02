@@ -268,7 +268,7 @@ class spell_aggressive_behavior : public SpellScriptLoader
 
             void Register()
             {
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_aggressive_behavior_AuraScript::HandleEffectPeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_aggressive_behavior_AuraScript::HandleEffectPeriodic, EFFECT_5, SPELL_AURA_PERIODIC_DUMMY);
             }
         };
 
