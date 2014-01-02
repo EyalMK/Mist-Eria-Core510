@@ -6,7 +6,7 @@
 // Also, we must set the datas properly, so YanZhu will have the good spells
 
 // First entry is the basic entry (arbitrary chosen), the second entry is the eventually updated entry
-static const uint32 AlamentalsCombination[][] =
+static const uint32 AlamentalsCombination[3][2] =
 {
     {Mob_FizzyBrewAlamental, Mob_SudsyBrewAlamental}, // Stout ability
     {Mob_BubblingBrewAlamental, Mob_YeasyBrewAlamental}, // Ale ability
@@ -331,7 +331,7 @@ public :
             Map::PlayerList const& playerList = instance->GetPlayers();
             if(!playerList.isEmpty())
             {
-                for(Map::PlayerList::iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
+                for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
                 {
                     apply ? UpdatePowerOnPlayer(iter->getSource(), amount) : RemovePowerOnPlayer(iter->getSource());
                 }
