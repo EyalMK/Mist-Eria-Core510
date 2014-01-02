@@ -6141,7 +6141,7 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             uint32 auto_increment = f[0].GetUInt64();
             ASSERT(auto_increment != 0);
             sLog->outError(LOG_FILTER_NETWORKIO, "New guid %u\n", auto_increment);
-            trans->PAppend("ALTER TABLE item_instance auto_increment=%u", auto_increment+1);
+            trans->PAppend("ALTER TABLE characters auto_increment=%u", auto_increment+1);
             CharacterDatabase.CommitTransaction(trans);
             return (uint32)auto_increment;
         }
