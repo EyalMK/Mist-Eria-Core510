@@ -386,7 +386,6 @@ public :
                     HandleGameObject(GetData64(ullSecondGuid), true);
                 HandleGameObject(GetData64(ullFirstGuid), true);
             }
-            break ;
         }
 
     private :

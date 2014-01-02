@@ -45,14 +45,14 @@ enum InstanceGameObjects
 {
     // Doors of OokOok
     GameObject_OokOokEntranceDoor = 0,
-    GameObject_OokOokExitDoor = 0,
+    GameObject_OokOokExitDoor = 1,
 
     // Doors of Hoptallus
-    GameObject_HoptallusEntranceDoor = 0,
-    GameObject_HoptallusExitDoor = 0,
+    GameObject_HoptallusEntranceDoor = 2,
+    GameObject_HoptallusExitDoor = 3,
 
     // Door of YanZhu
-    GameObject_YanZhuEntranceDoor = 0
+    GameObject_YanZhuEntranceDoor = 4
 
 
     // Miscellanous GameObjects
