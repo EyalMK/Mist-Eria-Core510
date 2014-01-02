@@ -31,9 +31,6 @@ set(sources
   Pandaria/ShadoPanMonastery/boss_master_snowdrift.cpp
   Pandaria/ShadoPanMonastery/boss_sha_of_violence.cpp
   Pandaria/ShadoPanMonastery/boss_taran_zhu.cpp
-  Pandaria/StormstoutBrewery/boss_hoptallus.cpp
-  Pandaria/StormstoutBrewery/boss_ook_ook.cpp
-  Pandaria/StormstoutBrewery/boss_yan_zhu.cpp
   Pandaria/TempleoftheJadeSerpent/temple_of_the_jade_serpent.h
   Pandaria/GateoftheSettingSun/boss_commander_rimok.cpp
   Pandaria/GateoftheSettingSun/boss_raigonn.cpp
