@@ -245,7 +245,7 @@ public :
             Creature* barrel = me->SummonCreature(Npc_RollingBarrel, barrelsPositions[ucId][0], TEMPSUMMON_MANUAL_DESPAWN, 0, Vehicle_Barrel);
             if(barrel)
                 if(barrel->GetMotionMaster())
-                    barrel->GetMotionMaster()->MovePoint(barrelsPositions[ucId][1]);
+                    barrel->GetMotionMaster()->MovePoint(0, barrelsPositions[ucId][1]);
         }
 
         void RemoveSpawned(const uint32 entry)
