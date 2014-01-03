@@ -365,7 +365,7 @@ public :
             // Remember : implicit targets do not allow player to be hit by the spell !
 
             // If Ook Ook is not started, it is pointless to check him
-            if(instance && instance->GetData(Data_OokOokEventProgress == NOT_STARTED))
+            if(instance && instance->GetData(Data_OokOokEventProgress) == NOT_STARTED)
             {
                 for(uint8 i = 0 ; i < MAX_OOKOOK_ENTOURAGE ; ++i)
                 {
