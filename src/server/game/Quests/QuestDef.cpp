@@ -192,10 +192,6 @@ Quest::Quest(Field* questRecord)
         if (RewardItemId[i])
             ++m_rewItemsCount;
 
-    for (int i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
-        if (RewardChoiceItemId[i])
-            ++m_rewChoiceItemsCount;
-
     for (int i = 0; i < QUEST_REWARD_CURRENCY_COUNT; ++i)
         if (RewardCurrencyId[i])
             ++m_rewCurrencyCount;
@@ -205,6 +201,42 @@ Quest::Quest(Field* questRecord)
             ++m_reqCurrencyCount;
 
 	RewardType = questRecord[173].GetUInt8(); // For quest package item
+
+	if (uint8(questRecord[173].GetUInt8()) > 0)
+	{
+		//								                  1        2        3        4        5       6
+		QueryResult result = WorldDatabase.Query("SELECT questId, itemId1, itemId2, itemId3, itemId4, itemId5,"
+		//                                               7        8        9       10        11
+													 "itemId6, itemId7, itemId8, itemId9, itemId10 FROM item_quest_package");
+
+		if (!result)
+			return;
+
+		do
+		{
+			Field* questPackageRecord = result->Fetch();
+
+			/*for (int i = 0; i < QUEST_MAX_REWARDS_COUNT; ++i)
+				RewardPackageItemId[i] = questPackageRecord[1+i].GetUInt32();
+
+			for (int i = 0; i < QUEST_MAX_REWARDS_COUNT; ++i)
+				RewardPackageItemIdCount[i] = questPackageRecord[1+i].GetUInt16();*/
+
+			for (int i = 0; i < QUEST_MAX_REWARD_CHOICES_COUNT; ++i)
+				RewardPackageChoiceItemId[i] = questPackageRecord[1+i].GetUInt32();
+
+			for (int i = 0; i < QUEST_MAX_REWARD_CHOICES_COUNT; ++i)
+				if (RewardPackageChoiceItemCount[i] = 1)
+					++m_rewChoiceItemsCount;
+
+		} while (result->NextRow());
+	}
+	else
+	{
+		for (int i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
+			if (RewardChoiceItemId[i])
+				++m_rewChoiceItemsCount;
+	}
 }
 
 uint32 Quest::XPValue(Player* player) const
@@ -248,8 +280,8 @@ int32 Quest::GetRewOrReqMoney() const
 
 void Quest::BuildExtraQuestInfo(WorldPacket& data, Player* player) const
 {
-	//if (RewardType == 0)
-	//{
+	if (RewardType == 0)
+	{
 		data << uint32(GetRewChoiceItemsCount());
 		for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
 		{
@@ -274,41 +306,38 @@ void Quest::BuildExtraQuestInfo(WorldPacket& data, Player* player) const
 			else
 				data << uint32(0);
 		}
-	//}
-	/*else
-	{                                          //           1        2        3        4        5       6
-		QueryResult result = WorldDatabase.Query("SELECT questId, itemId1, itemId2, itemId3, itemId4, itemId5,"
-		//                                           7        8        9       10        11
-												 "itemId6, itemId7, itemId8, itemId9, itemId10 FROM item_quest_package");
-
-		if (!result)
-			return;
-
-		do
+	}
+	else
+	{
+		data << uint32(GetRewChoiceItemsCount());
+		for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
 		{
-			Field* questPackageRecord = result->Fetch();
+			if (GetItemRewardGroup(RewardPackageChoiceItemId[i]) ==
+				GetItemRewardGroupFromSpec(player->GetPrimaryTalentTree(player->GetActiveSpec())))
+			{
+				data << uint32(RewardPackageChoiceItemId[i]);
+				data << uint32(RewardPackageChoiceItemCount[i]);
+				if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(RewardPackageChoiceItemId[i]))
+					data << uint32(itemTemplate->DisplayInfoID);
+				else
+					data << uint32(0);
+			}
+		}
 
-			for (int i = 0; i < QUEST_MAX_REWARDS_COUNT; ++i)
-				RewardItemId[i] = questPackageRecord[1+i].GetUInt32();
+		data << uint32(GetReqItemsCount());
 
-			for (int i = 0; i < QUEST_REWARDS_COUNT; ++i)
-				RewardItemIdCount[i] = questPackageRecord[53+i].GetUInt16();
-
-			for (int i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
-				RewardChoiceItemId[i] = questPackageRecord[57+i].GetUInt32();
-
-			for (int i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
-				RewardChoiceItemCount[i] = questPackageRecord[63+i].GetUInt16();
-
-
-			Id = questPackageRecord[0].GetUInt32();
-			uint32 questId = questPackageRecord[1].GetUInt32();
-			uint32 itemId = questPackageRecord[2].GetUInt32();
-			uint8 count = questPackageRecord[3].GetUInt32();
-			uint8 unk = questPackageRecord[4].GetUInt32();
-
-		} while (result->NextRow());
-	}*/
+		for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
+			data << uint32(0/*RewardItemId[i]*/);
+		for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
+			data << uint32(0/*RewardItemIdCount[i]*/);
+		for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
+		{
+			if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(RewardItemId[i]))
+				data << uint32(0/*itemTemplate->DisplayInfoID*/);
+			else
+				data << uint32(0);
+		}
+	}
 
     data << uint32(GetRewOrReqMoney());
     data << uint32(XPValue(player) * sWorld->getRate(RATE_XP_QUEST));
@@ -392,7 +421,7 @@ uint32 Quest::GetRewardChoiceIdForEntry(uint32 rewardEntry) const
     return QUEST_REWARD_CHOICES_COUNT;
 }
 
-/*uint8 Quest::GetItemRewardGroup(uint32 itemId) const
+uint8 Quest::GetItemRewardGroup(uint32 itemId) const
 {
 	if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId))
 		return uint8(itemTemplate->ItemQuestGroup);
@@ -488,4 +517,4 @@ uint8 Quest::GetItemRewardGroupFromSpec(uint32 spec) const
 	}
 
 	return group;
-}*/
+}

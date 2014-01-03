@@ -359,6 +359,10 @@ class Quest
         uint32 RewardChoiceItemCount[QUEST_REWARD_CHOICES_COUNT];
         uint32 RewardItemId[QUEST_REWARDS_COUNT];
         uint32 RewardItemIdCount[QUEST_REWARDS_COUNT];
+		uint32 RewardPackageChoiceItemId[QUEST_MAX_REWARD_CHOICES_COUNT]; // Quest rewards with package
+        uint32 RewardPackageChoiceItemCount[QUEST_MAX_REWARD_CHOICES_COUNT]; // Quest rewards with package
+        uint32 RewardPackageItemId[QUEST_MAX_REWARDS_COUNT]; // Quest rewards with package
+        uint32 RewardPackageItemIdCount[QUEST_MAX_REWARDS_COUNT]; // Quest rewards with package
         uint32 RewardFactionId[QUEST_REPUTATIONS_COUNT];
         int32  RewardFactionValueId[QUEST_REPUTATIONS_COUNT];
         int32  RewardFactionValueIdOverride[QUEST_REPUTATIONS_COUNT];
