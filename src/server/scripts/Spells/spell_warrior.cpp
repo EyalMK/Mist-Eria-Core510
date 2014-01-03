@@ -91,6 +91,7 @@ enum WarriorSpells
 	SPELL_WARRIOR_SLUGGISH                          = 129923,
 	SPELL_WARRIOR_SHOCKWAVE							= 46968,
 	SPELL_WARRIOR_SHIELD_BLOCK_TRIGGERED			= 132404,
+	SPELL_WARRIOR_VICTORIOUS						= 32216,
 };
 
 enum WarriorSpellIcons
@@ -803,7 +804,14 @@ class spell_warr_impending_victory : public SpellScriptLoader
 				else SetHitDamage(damage);
 
 				if (player)
-					player->CastSpell(player, SPELL_WARRIOR_IMPENDING_VICTORY);
+				{
+					if (player->HasAura(SPELL_WARRIOR_VICTORIOUS))
+					{
+						int32 bp0 = int32(player->CountPctFromMaxHealth(20));
+						player->CastCustomSpell(player, SPELL_WARRIOR_IMPENDING_VICTORY, &bp0, NULL, NULL, false);
+					}
+					else player->CastSpell(player, SPELL_WARRIOR_IMPENDING_VICTORY, true);
+				}
             }
 
             void Register()
@@ -1671,6 +1679,37 @@ class spell_warr_shield_block : public SpellScriptLoader
         }
 };
 
+// Victorious : 32216
+class spell_warr_victorious : public SpellScriptLoader
+{
+    public:
+        spell_warr_victorious() : SpellScriptLoader("spell_warr_victorious") { }
+
+        class spell_warr_victorious_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warr_victorious_AuraScript);
+
+            void EffectApply (AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+			{
+				Player* player = GetCaster()->ToPlayer();
+
+                if (!player || !player->HasSpellCooldown(SPELL_WARRIOR_IMPENDING_VICTORY))
+                    return;
+				else player->RemoveSpellCooldown(SPELL_WARRIOR_IMPENDING_VICTORY, true);
+			}
+
+            void Register()
+            {
+                 OnEffectApply += AuraEffectApplyFn(spell_warr_victorious_AuraScript::EffectApply, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_warr_victorious_AuraScript();
+        }
+};
+
 #define EVENT_HEROIC_LEAP 1
 
 class npc_warr_leap_target : public CreatureScript
@@ -1761,5 +1800,6 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_shield_block();
 	new spell_warr_berserker_rage();
 	new spell_warr_raging_blow();
+	new spell_warr_victorious();
 	new npc_warr_leap_target();
 }
