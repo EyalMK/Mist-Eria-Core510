@@ -37,7 +37,7 @@ public:
 
         void MoveInLineOfSight(Unit* who)
         {
-            if (!me->IsWithinDistInMap(who, 40.0f) || (who->ToPlayer() && who->ToPlayer()->isGameMaster()) || who->HasAura(SPELL_CYCLONIC_INSPIRATION))
+            if (!me->IsWithinDistInMap(who, 40.0f) || (who && who->ToPlayer() && who->ToPlayer()->isGameMaster()) || who->HasAura(SPELL_CYCLONIC_INSPIRATION))
                 return;
 
 			if (!who || !who->IsInWorld() || !me->HasAura(SPELL_SPINNING_CRANE_KICK))
