@@ -1592,46 +1592,6 @@ class spell_warr_berserker_rage : public SpellScriptLoader
         }
 };
 
-uint64 summonerGUID;
-bool cast;
-
-class npc_heroic_leap_damage : public CreatureScript
-{
-public :
-    npc_heroic_leap_damage() : CreatureScript("npc_heroic_leap_damage")
-    {}
-
-    struct npc_heroic_leap_damage_AIScript : public ScriptedAI
-    {
-    public :
-        npc_heroic_leap_damage_AIScript(Creature *creature) : ScriptedAI(creature)
-        {
-            summonerGUID = 0;
-            cast = false;
-        }
-
-        void IsSummonedBy(Unit* summoner)
-        {
-            if(summoner->GetTypeId() == TYPEID_PLAYER)
-                summonerGUID = summoner->GetGUID();
-        }
-
-        void MoveInLineOfSight(Unit* who)
-        {
-            if(summonerGUID == who->GetGUID())
-                if(who->IsWithinDist(me, 0.5, true) && !cast)
-                    who->CastSpell(who, SPELL_WARRIOR_HEROIC_LEAP_DAMAGE, true);
-        }
-    };
-
-
-
-    CreatureAI* GetAI(Creature *creature) const
-    {
-        return new npc_heroic_leap_damage_AIScript(creature);
-    }
-};
-
 class spell_warr_storm_bolt : public SpellScriptLoader
 {
 public:
@@ -1711,6 +1671,57 @@ class spell_warr_shield_block : public SpellScriptLoader
         }
 };
 
+#define EVENT_HEROIC_LEAP 1
+
+class npc_warr_leap_target : public CreatureScript
+{
+public:
+    npc_warr_leap_target() : CreatureScript("npc_warr_leap_target") { }
+
+    struct npc_warr_leap_targetAI : public ScriptedAI
+    {
+        npc_warr_leap_targetAI(Creature* creature) : ScriptedAI(creature)
+        {	}
+
+		EventMap events;
+
+        void Reset()
+		{
+			events.Reset();
+
+			events.ScheduleEvent(EVENT_HEROIC_LEAP, IN_MILLISECONDS);
+		}
+
+        void UpdateAI(uint32 diff)
+		{
+			events.Update(diff);
+
+			while(uint32 eventId = events.ExecuteEvent())
+			{
+				switch(eventId)
+				{
+					case EVENT_HEROIC_LEAP:
+						if (Player* player = me->ToTempSummon()->GetSummoner()->ToPlayer())
+							player->CastSpell(player, SPELL_WARRIOR_HEROIC_LEAP_DAMAGE, true);
+
+						events.CancelEvent(EVENT_HEROIC_LEAP);
+						break;
+
+					default:
+						break;
+				}
+			}
+
+			DoMeleeAttackIfReady();
+		}
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_warr_leap_targetAI(creature);
+    }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_bloodthirst();
@@ -1746,9 +1757,9 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_dragon_roar();
 	new spell_warr_glyph_of_hindering_strikes();
 	new spell_warr_shockwave();
-	new npc_heroic_leap_damage();
 	new spell_warr_storm_bolt();
 	new spell_warr_shield_block();
 	new spell_warr_berserker_rage();
 	new spell_warr_raging_blow();
+	new npc_warr_leap_target();
 }

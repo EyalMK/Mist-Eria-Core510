@@ -3885,6 +3885,11 @@ void SpellMgr::LoadSpellInfoCorrections()
 				case 49998: // Death Strike
 					spellInfo->Attributes &= SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK;
 					break;
+				case 6544: // Heroic Leap
+					spellInfo->Effects[EFFECT_1].BasePoints = 0;
+					spellInfo->Effects[EFFECT_1].MiscValue = 0;
+					spellInfo->Effects[EFFECT_1].MiscValueB = 150;
+					break;
 				default:
 					break;
 			}
