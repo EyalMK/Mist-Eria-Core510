@@ -36,7 +36,7 @@ enum Spells
     SPELL_EVICTED_SOUL              = 115309,
     SPELL_EVICT_SOUL_NPC            = 115304,
     SPELL_EMPOWERING_SPIRIT         = 115157,
-    SPELL_EMPOWER_ZOMBIE_TRANSFORM  = 115258,
+    SPELL_EMPOWER_ZOMBIE_TRANSFORM  = 115250,
     SPELL_SIPHON_ESSENCE            = 40291
 };
 
@@ -246,11 +246,10 @@ public:
 
                 if (TempSummon* summon = me->ToTempSummon())
                     if (Unit* summoner = summon->GetSummoner())
-                        if(summoner->GetTypeId() == TYPEID_PLAYER)
-                        {
-                            me->SetDisplayId(summoner->GetDisplayId());
-                            summoner->CastSpell(me, SPELL_EVICT_SOUL_NPC, true);
-                        }
+                    {
+                        me->SetDisplayId(summoner->GetDisplayId());
+                        summoner->CastSpell(me, SPELL_EVICT_SOUL_NPC, true);
+                    }
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -337,19 +336,18 @@ class spell_spirit_gale : public SpellScriptLoader
 
             void SummonTraqueurFlaque(SpellEffIndex /*effIndex*/)
             {
-                if (Unit* target = GetExplTargetUnit())
+                if (Unit* target = GetHitPlayer())
                 {
                     if (target->GetTypeId() == TYPEID_PLAYER)
                     {
                         target->SummonCreature(200011, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
                     }
                 }
-
             }
 
             void Register()
             {
-                OnEffectHit += SpellEffectFn(spell_spirit_gale_SpellScript::SummonTraqueurFlaque, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+                OnEffectHitTarget += SpellEffectFn(spell_spirit_gale_SpellScript::SummonTraqueurFlaque, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
             }
         };
 
