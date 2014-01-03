@@ -38,17 +38,21 @@ public:
         void MoveInLineOfSight(Unit* who)
         {
 <<<<<<< HEAD
+<<<<<<< HEAD
             if (!me->IsWithinDistInMap(who->ToPlayer(), 40.0f) || who->ToPlayer()->isGameMaster() || who->ToPlayer()->HasAura(SPELL_CYCLONIC_INSPIRATION))
 =======
             if (!me->IsWithinDistInMap(who, 40.0f) || (who && who->ToPlayer() && who->ToPlayer()->isGameMaster()) || who->HasAura(SPELL_CYCLONIC_INSPIRATION))
 >>>>>>> b755d3e0aca79bff61baa81e67a4a4cdbb1e1aea
+=======
+            if (!me->IsWithinDistInMap(who, 40.0f) || who->ToPlayer()->isGameMaster() || who->HasAura(SPELL_CYCLONIC_INSPIRATION))
+>>>>>>> parent of 347f6fe... Fix crash
                 return;
 
-			if (!who || !who->ToPlayer()->IsInWorld() || !me->HasAura(SPELL_SPINNING_CRANE_KICK))
+			if (!who || !who->IsInWorld() || !me->HasAura(SPELL_SPINNING_CRANE_KICK))
                 return;
 
-			if (who && who->ToPlayer() && !me->IsValidAttackTarget(who->ToPlayer()))
-                who->ToPlayer()->CastSpell(who->ToPlayer(), SPELL_CYCLONIC_INSPIRATION);
+			if (who && who->ToPlayer() && !me->IsValidAttackTarget(who))
+                who->CastSpell(who, SPELL_CYCLONIC_INSPIRATION);
         }
 
         void UpdateAI(uint32 diff)
