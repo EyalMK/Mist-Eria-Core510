@@ -19,6 +19,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "scarlet_monastery.h"
+#include "SpellScript.h"
 
 
 enum Spells
@@ -243,11 +244,13 @@ public:
             {
                 SiphonEssence_Timer = 2000;
 
-                if(Player* summoner = me->ToTempSummon()->GetSummoner()->ToPlayer())
-                {
-                    me->SetDisplayId(summoner->GetDisplayId());
-                    summoner->CastSpell(me, SPELL_EVICT_SOUL_NPC, true);
-                }
+                if (TempSummon* summon = me->ToTempSummon())
+                    if (Unit* summoner = summon->GetSummoner())
+                        if(summoner->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            me->SetDisplayId(summoner->GetDisplayId());
+                            summoner->CastSpell(me, SPELL_EVICT_SOUL_NPC, true);
+                        }
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -289,8 +292,10 @@ public:
     {
             npc_empowering_spiritAI(Creature* creature) : ScriptedAI(creature) {}
 
+            uint32 Test_timer;
             void Reset()
             {
+                Test_timer = 1000;
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -298,20 +303,60 @@ public:
                 me->CastSpell(me, SPELL_EMPOWERING_SPIRIT);
             }
 
-            void MoveInLineOfSight(Unit* who)
+            void UpdateAI(uint32 diff)
             {
-                ScriptedAI::MoveInLineOfSight(who);
+                if(!UpdateVictim())
+                    return;
 
-                if (who->GetTypeId() == TYPEID_UNIT && who->isDead() && me->IsWithinDistInMap(who, 40.0f))
+                if (Test_timer <= diff)
                 {
-                    if (who->GetEntry() == 59884)
+                    if(me->FindNearestCreature(59884, 100.0f, false))
                     {
                         me->CastSpell(me, SPELL_EMPOWER_ZOMBIE_TRANSFORM, true);
                         me->DisappearAndDie();
                     }
+                    else
+                        Test_timer = 1000;
                 }
+                else Test_timer -= diff;
+
+                DoMeleeAttackIfReady();
             }
     };
+};
+
+
+class spell_spirit_gale : public SpellScriptLoader
+{
+    public:
+        spell_spirit_gale() : SpellScriptLoader("spell_spirit_gale") { }
+
+        class spell_spirit_gale_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_spirit_gale_SpellScript);
+
+            void SummonTraqueurFlaque(SpellEffIndex /*effIndex*/)
+            {
+                if (Unit* target = GetExplTargetUnit())
+                {
+                    if (target->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        target->SummonCreature(200011, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+                    }
+                }
+
+            }
+
+            void Register()
+            {
+                OnEffectHit += SpellEffectFn(spell_spirit_gale_SpellScript::SummonTraqueurFlaque, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_spirit_gale_SpellScript();
+        }
 };
 
 
@@ -321,4 +366,5 @@ void AddSC_boss_thalnos_the_soulrender()
     new npc_fallen_crusader();
     new npc_evicted_soul();
     new npc_empowering_spirit();
+    new spell_spirit_gale();
 }
