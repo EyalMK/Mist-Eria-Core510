@@ -248,8 +248,7 @@ public:
 			if (instance)
 				instance->SetBossState(DATA_GEKKAN, FAIL);
 
-			me->CombatStop();
-			me->DeleteThreatList();
+			ScriptedAI::EnterEvadeMode();
 		}
 
 		void MoveInLineOfSight(Unit* who)
@@ -1031,8 +1030,8 @@ public:
 		void EnterEvadeMode()
 		{
 			me->RemoveAurasDueToSpell(SPELL_IRON_PROTECTOR, me->GetGUID());
-			me->CombatStop();
-			me->DeleteThreatList();
+
+			ScriptedAI::EnterEvadeMode();
 		}
 
 		void EnterCombat(Unit* /*who*/)

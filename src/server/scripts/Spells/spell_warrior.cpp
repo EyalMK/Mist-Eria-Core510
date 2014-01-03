@@ -781,7 +781,7 @@ class spell_warr_colossus_smash : public SpellScriptLoader
         }
 };
 
-/// Updated 5.1.0 : 103840 - Impending victory
+// 103840 - Impending victory
 class spell_warr_impending_victory : public SpellScriptLoader
 {
     public:
@@ -1693,9 +1693,13 @@ class spell_warr_victorious : public SpellScriptLoader
 			{
 				Player* player = GetCaster()->ToPlayer();
 
-                if (!player || !player->HasSpellCooldown(SPELL_WARRIOR_IMPENDING_VICTORY))
+                if (!player)
                     return;
-				else player->RemoveSpellCooldown(SPELL_WARRIOR_IMPENDING_VICTORY, true);
+
+				if (!player->HasSpellCooldown(SPELL_WARRIOR_IMPENDING_VICTORY))
+					return;
+				
+				player->RemoveSpellCooldown(SPELL_WARRIOR_IMPENDING_VICTORY, true);
 			}
 
             void Register()
@@ -1750,8 +1754,6 @@ public:
 						break;
 				}
 			}
-
-			DoMeleeAttackIfReady();
 		}
     };
 
