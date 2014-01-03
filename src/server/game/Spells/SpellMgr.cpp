@@ -3888,7 +3888,6 @@ void SpellMgr::LoadSpellInfoCorrections()
 				case 6544: // Heroic Leap
 					spellInfo->Effects[EFFECT_1].BasePoints = 0;
 					spellInfo->Effects[EFFECT_1].MiscValue = 0;
-					spellInfo->Effects[EFFECT_1].MiscValueB = 150;
 					break;
 				default:
 					break;
