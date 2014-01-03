@@ -33,9 +33,9 @@ enum Spells
 enum Events
 {
     EVENT_FIRESTORM_KICK    = 1,
-    EVENT_RISING_FLAME      = 2,
-    EVENT_BLAZING_FISTS     = 3,
-    EVENT_SCORCHED_EARTH    = 4
+    EVENT_BLAZING_FISTS     = 2,
+    EVENT_SCORCHED_EARTH    = 3,
+    EVENT_JUMP_FIRESTORM    = 4
 };
 
 
@@ -76,6 +76,7 @@ public:
             Summons.DespawnAll();
             scorchedearth = true;
             m_uiNextCastPercent = 90 ;
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_BROTHER_KORLOFF, NOT_STARTED);
@@ -130,7 +131,7 @@ public:
         {
             if(me->GetHealthPct() <= m_uiNextCastPercent)
             {
-                events.ScheduleEvent(EVENT_RISING_FLAME, 1*IN_MILLISECONDS);
+                DoCast(SPELL_RISING_FLAME);
                 m_uiNextCastPercent -= 10 ;
             }
         }
@@ -158,17 +159,19 @@ public:
                 {
                     if (instance)
                     {
-                        case EVENT_FIRESTORM_KICK:
+                        case EVENT_JUMP_FIRESTORM:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             {
-                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 10, 10);
-                                DoCast(SPELL_FIRESTORM_KICK);
+                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20, EVENT_JUMP);
+                                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                                events.ScheduleEvent(EVENT_FIRESTORM_KICK, 1*IN_MILLISECONDS);
                             }
-                            events.ScheduleEvent(EVENT_FIRESTORM_KICK, 30*IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_JUMP_FIRESTORM, 30*IN_MILLISECONDS);
                             break;
 
-                        case EVENT_RISING_FLAME:
-                            DoCast(SPELL_RISING_FLAME);
+                        case EVENT_FIRESTORM_KICK:
+                            DoCast(SPELL_FIRESTORM_KICK);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                             break;
 
                         case EVENT_SCORCHED_EARTH:
