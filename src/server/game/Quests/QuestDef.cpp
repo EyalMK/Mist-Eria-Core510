@@ -204,6 +204,7 @@ Quest::Quest(Field* questRecord)
         if (RequiredCurrencyId[i])
             ++m_reqCurrencyCount;
 
+	RewardType = questRecord[173].GetUInt8(); // For quest package item
 }
 
 uint32 Quest::XPValue(Player* player) const
@@ -247,30 +248,67 @@ int32 Quest::GetRewOrReqMoney() const
 
 void Quest::BuildExtraQuestInfo(WorldPacket& data, Player* player) const
 {
-    data << uint32(GetRewChoiceItemsCount());
-    for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
-    {
-        data << uint32(RewardChoiceItemId[i]);
-        data << uint32(RewardChoiceItemCount[i]);
-        if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(RewardChoiceItemId[i]))
-            data << uint32(itemTemplate->DisplayInfoID);
-        else
-            data << uint32(0);            
-    }
+	/if (RewardType == 0)
+	//{
+		data << uint32(GetRewChoiceItemsCount());
+		for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
+		{
+			data << uint32(RewardChoiceItemId[i]);
+			data << uint32(RewardChoiceItemCount[i]);
+			if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(RewardChoiceItemId[i]))
+				data << uint32(itemTemplate->DisplayInfoID);
+			else
+				data << uint32(0);            
+		}
 
-    data << uint32(GetReqItemsCount());
+		data << uint32(GetReqItemsCount());
 
-    for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
-        data << uint32(RewardItemId[i]);
-    for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
-        data << uint32(RewardItemIdCount[i]);
-    for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
-    {
-        if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(RewardItemId[i]))
-            data << uint32(itemTemplate->DisplayInfoID);
-        else
-            data << uint32(0);
-    }
+		for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
+			data << uint32(RewardItemId[i]);
+		for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
+			data << uint32(RewardItemIdCount[i]);
+		for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
+		{
+			if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(RewardItemId[i]))
+				data << uint32(itemTemplate->DisplayInfoID);
+			else
+				data << uint32(0);
+		}
+	//}
+	/*else
+	{                                          //           1        2        3        4        5       6
+		QueryResult result = WorldDatabase.Query("SELECT questId, itemId1, itemId2, itemId3, itemId4, itemId5,"
+		//                                           7        8        9       10        11
+												 "itemId6, itemId7, itemId8, itemId9, itemId10 FROM item_quest_package");
+
+		if (!result)
+			return;
+
+		do
+		{
+			Field* questPackageRecord = result->Fetch();
+
+			for (int i = 0; i < QUEST_MAX_REWARDS_COUNT; ++i)
+				RewardItemId[i] = questPackageRecord[1+i].GetUInt32();
+
+			for (int i = 0; i < QUEST_REWARDS_COUNT; ++i)
+				RewardItemIdCount[i] = questPackageRecord[53+i].GetUInt16();
+
+			for (int i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
+				RewardChoiceItemId[i] = questPackageRecord[57+i].GetUInt32();
+
+			for (int i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
+				RewardChoiceItemCount[i] = questPackageRecord[63+i].GetUInt16();
+
+
+			Id = questPackageRecord[0].GetUInt32();
+			uint32 questId = questPackageRecord[1].GetUInt32();
+			uint32 itemId = questPackageRecord[2].GetUInt32();
+			uint8 count = questPackageRecord[3].GetUInt32();
+			uint8 unk = questPackageRecord[4].GetUInt32();
+
+		} while (result->NextRow());
+	}*/
 
     data << uint32(GetRewOrReqMoney());
     data << uint32(XPValue(player) * sWorld->getRate(RATE_XP_QUEST));
@@ -345,10 +383,109 @@ uint32 Quest::CalculateHonorGain(uint8 level) const
     return honor;
 }
 
-uint32 Quest::GetRewardChoiceIdForEntry(uint32 rewardEntry) const {
-    for (int i=0 ; i<QUEST_REWARD_CHOICES_COUNT; ++i) {
+uint32 Quest::GetRewardChoiceIdForEntry(uint32 rewardEntry) const
+{
+    for (int i=0 ; i < QUEST_REWARD_CHOICES_COUNT; ++i)
         if (rewardEntry == RewardChoiceItemId[i])
             return i;
-    }
+
     return QUEST_REWARD_CHOICES_COUNT;
 }
+
+/*uint8 Quest::GetItemRewardGroup(uint32 itemId) const
+{
+	if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId))
+		return uint8(itemTemplate->ItemQuestGroup);
+}
+
+uint8 Quest::GetItemRewardGroupFromSpec(uint32 spec) const
+{
+	uint8 group = 0;
+
+	switch (spec)
+	{
+		case TALENT_TREE_WARRIOR_ARMS:
+		case TALENT_TREE_WARRIOR_FURY:
+		case TALENT_TREE_DEATH_KNIGHT_FROST:
+		case TALENT_TREE_DEATH_KNIGHT_UNHOLY:
+		case TALENT_TREE_PALADIN_RETRIBUTION:
+		{
+			group = 1;
+			break;
+		}
+
+		case TALENT_TREE_WARRIOR_PROTECTION:
+		case TALENT_TREE_PALADIN_PROTECTION:
+		case TALENT_TREE_DEATH_KNIGHT_BLOOD:
+		{
+			group = 2;
+			break;
+		}
+
+		case TALENT_TREE_PALADIN_HOLY:
+		{
+			group = 3;
+			break;
+		}
+
+		case TALENT_TREE_SHAMAN_ELEMENTAL:
+		case TALENT_TREE_SHAMAN_RESTORATION:
+		{
+			group = 4;
+			break;
+		}
+
+		case TALENT_TREE_SHAMAN_ENHANCEMENT:
+		case TALENT_TREE_HUNTER_BEAST_MASTERY:
+		case TALENT_TREE_HUNTER_MARKSMANSHIP:
+		case TALENT_TREE_HUNTER_SURVIVAL:
+		{
+			group = 5;
+			break;
+		}
+
+		case TALENT_TREE_DRUID_FERAL:
+		case TALENT_TREE_DRUID_GUARDIAN:
+		case TALENT_TREE_MONK_WINDWALKER:
+		case TALENT_TREE_MONK_BREWMASTER:
+		case TALENT_TREE_ROGUE_ASSASSINATION:
+		case TALENT_TREE_ROGUE_COMBAT:
+		case TALENT_TREE_ROGUE_SUBTLETY:
+		{
+			group = 6;
+			break;
+		}
+		
+		case TALENT_TREE_DRUID_BALANCE:
+		case TALENT_TREE_DRUID_RESTORATION:
+		case TALENT_TREE_MONK_MISTWEAVER:
+		{
+			group = 7;
+			break;
+		}
+		
+		case TALENT_TREE_PRIEST_SHADOW:
+		case TALENT_TREE_PRIEST_DISCIPLINE:
+		case TALENT_TREE_PRIEST_HOLY:
+		{
+			group = 8;
+			break;
+		}
+
+		case TALENT_TREE_MAGE_ARCANE:
+		case TALENT_TREE_MAGE_FIRE:
+		case TALENT_TREE_MAGE_FROST:
+		case TALENT_TREE_WARLOCK_AFFLICTION:
+		case TALENT_TREE_WARLOCK_DEMONOLOGY:
+		case TALENT_TREE_WARLOCK_DESTRUCTION:
+		{
+			group = 9;
+			break;
+		}
+
+		default:
+			break;
+	}
+
+	return group;
+}*/

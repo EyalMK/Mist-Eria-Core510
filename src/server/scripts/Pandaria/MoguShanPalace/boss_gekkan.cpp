@@ -1030,6 +1030,7 @@ public:
 
 		void EnterEvadeMode()
 		{
+			me->RemoveAurasDueToSpell(SPELL_IRON_PROTECTOR, me->GetGUID());
 			me->CombatStop();
 			me->DeleteThreatList();
 		}
@@ -1054,12 +1055,15 @@ public:
 
 		void UpdateAI(uint32 diff)
 		{
-			if (me->getVictim())
-			{
-				DoMeleeAttackIfReady();
-				me->GetMotionMaster()->MoveChase(me->getVictim());
+			if (!UpdateVictim())
+				return;
+
+			me->GetMotionMaster()->MoveChase(me->getVictim());
+
+			if (me->AI())
 				me->AI()->AttackStart(me->getVictim());
-			}
+
+			DoMeleeAttackIfReady();
 		}
 	};
 };

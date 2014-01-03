@@ -2547,6 +2547,7 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.FoodType                  = 0;
             itemTemplate.MinMoneyLoot              = 0;
             itemTemplate.MaxMoneyLoot              = 0;
+			itemTemplate.ItemQuestGroup	           = fields[139].GetUInt8();
             ++dbCount;
         } while (result->NextRow());
     }
@@ -3479,8 +3480,8 @@ void ObjectMgr::LoadQuests()
         "DetailsEmote1, DetailsEmote2, DetailsEmote3, DetailsEmote4, DetailsEmoteDelay1, DetailsEmoteDelay2, DetailsEmoteDelay3, DetailsEmoteDelay4, EmoteOnIncomplete, EmoteOnComplete, "
         //      164                 165               166                167                   168                       169                     170                  171
         "OfferRewardEmote1, OfferRewardEmote2, OfferRewardEmote3, OfferRewardEmote4, OfferRewardEmoteDelay1, OfferRewardEmoteDelay2, OfferRewardEmoteDelay3, OfferRewardEmoteDelay4, "
-        //    173
-        "WDBVerified"
+        //   173         174
+        "RewardType, WDBVerified"
         " FROM quest_template");
     if (!result)
     {
@@ -4191,6 +4192,13 @@ void ObjectMgr::LoadQuests()
                     qinfo->GetQuestId(), qinfo->RewardSkillPoints);
             }
         }
+
+		if (qinfo->RewardType)
+		{
+			if (qinfo->RewardType > 1)
+			sLog->outError(LOG_FILTER_SQL, "Quest %u has `RewardType` = %u, expected values are 0 or 1.", qinfo->GetQuestId(), uint8(qinfo->RewardType));
+			qinfo->RewardType = 1;
+		}
 
         // fill additional data stores
         if (qinfo->PrevQuestId)

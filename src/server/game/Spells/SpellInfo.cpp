@@ -1024,6 +1024,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effe
     ChainEntry = NULL;
 
 	m_difficulty = 0;
+	talentId = 0;
 }
 
 SpellInfo::~SpellInfo()

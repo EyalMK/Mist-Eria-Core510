@@ -252,7 +252,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectUnused,                                   //178 SPELL_EFFECT_178 unused
     &Spell::EffectNULL,                                     //179 SPELL_EFFECT_CREATE_AREATRIGGER
     &Spell::EffectUnused,                                   //180 SPELL_EFFECT_180 unused
-    &Spell::EffectRemoveTalent,                             //181 SPELL_EFFECT_REMOVE_TALENT
+    &Spell::EffectResetTalent,                              //181 SPELL_EFFECT_RESET_TALENT
     &Spell::EffectNULL,                                     //182 SPELL_EFFECT_182
 	&Spell::EffectNULL,                                     //183 SPELL_EFFECT_183
 	&Spell::EffectNULL,                                     //184 SPELL_EFFECT_184
@@ -6467,14 +6467,42 @@ void Spell::EffectResurrectWithAura(SpellEffIndex effIndex)
     SendResurrectRequest(target);
 }
 
-void Spell::EffectRemoveTalent(SpellEffIndex effIndex)
+void Spell::EffectResetTalent(SpellEffIndex effIndex)
 {
-    if(!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
 
-    if(TalentEntry const* talent = sTalentStore.LookupEntry(m_glyphIndex))
+    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    Player* player = m_caster->ToPlayer();
+
+    for(PlayerTalentMap::iterator itr = player->GetTalentMap(player->GetActiveSpec())->begin(); itr != player->GetTalentMap(player->GetActiveSpec())->end(); itr++)
     {
-        // Need fix Remove Talent (talent->Row)
-        unitTarget->ToPlayer()->SendTalentsInfoData(false);
+		SpellInfo const* spell = sSpellMgr->GetSpellInfo(itr->first);
+        if (!spell)
+            continue;
+
+		TalentEntry const* talent = sTalentStore.LookupEntry(spell->talentId);
+        if (!talent)
+            continue;
+
+        if (spell->talentId != m_glyphIndex)
+            continue;
+
+        player->removeSpell(itr->first, true);
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            if (spell->Effects[i].TriggerSpell > 0 && spell->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
+                player->removeSpell(spell->Effects[i].TriggerSpell, true);
+
+		itr->second->state = PLAYERSPELL_REMOVED;
+
+        player->SetUsedTalentCount(player->GetUsedTalentCount()-1);
+        player->SetFreeTalentPoints(player->GetFreeTalentPoints()+1);
+        break;
     }
+
+    player->SaveToDB();
+    player->SendTalentsInfoData(false);
 }

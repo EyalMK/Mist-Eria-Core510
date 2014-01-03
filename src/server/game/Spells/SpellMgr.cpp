@@ -2748,6 +2748,17 @@ void SpellMgr::LoadSpellInfoStore()
 		}
     }
 
+	for (uint32 i = 0; i < sTalentStore.GetNumRows(); i++)
+    {
+        TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
+        if (!talentInfo)
+            continue;
+
+        SpellInfo * spellEntry = mSpellInfoMap[0][talentInfo->SpellId];
+        if(spellEntry)
+            spellEntry->talentId = talentInfo->TalentID;
+    }
+
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded spell info store in %u ms", GetMSTimeDiffToNow(oldMSTime));
 }
 

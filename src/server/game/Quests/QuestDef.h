@@ -38,7 +38,9 @@ class ObjectMgr;
 #define QUEST_ITEM_OBJECTIVES_COUNT 6
 #define QUEST_SOURCE_ITEM_IDS_COUNT 4
 #define QUEST_REWARD_CHOICES_COUNT 6
+#define QUEST_MAX_REWARD_CHOICES_COUNT 10
 #define QUEST_REWARDS_COUNT 4
+#define QUEST_MAX_REWARDS_COUNT 10
 #define QUEST_DEPLINK_COUNT 10
 #define QUEST_REPUTATIONS_COUNT 5
 #define QUEST_EMOTE_COUNT 4
@@ -340,6 +342,9 @@ class Quest
         bool   IsAllowedInRaid(Difficulty difficulty) const;
         bool   IsDFQuest() const { return SpecialFlags & QUEST_SPECIAL_FLAGS_DF_QUEST; }
         uint32 CalculateHonorGain(uint8 level) const;
+		uint8 GetRewardType() const { return RewardType; }
+		uint8 GetItemRewardGroup(uint32 itemId) const;
+		uint8 GetItemRewardGroupFromSpec(uint32 spec) const;
 
         // multiple values
         std::string ObjectiveText[QUEST_OBJECTIVES_COUNT];
@@ -466,6 +471,7 @@ class Quest
         std::string QuestTurnTargetName;
         uint32 SoundAccept;
         uint32 SoundTurnIn;
+		uint8 RewardType;
 
         std::vector<QuestRequirement> m_requirement;
 

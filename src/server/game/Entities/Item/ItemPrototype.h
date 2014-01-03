@@ -728,6 +728,7 @@ struct ItemTemplate
     uint32 MinMoneyLoot;
     uint32 MaxMoneyLoot;
     uint32 FlagsCu;
+	uint8 ItemQuestGroup;
 
     // helpers
     bool CanChangeEquipStateInCombat() const

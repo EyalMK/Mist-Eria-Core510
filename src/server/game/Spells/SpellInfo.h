@@ -399,6 +399,7 @@ public:
     uint32 ExplicitTargetMask;
     SpellChainNode const* ChainEntry;
 	uint32 m_difficulty;
+    uint32 talentId;
 
     // struct access functions
     SpellMiscEntry const* GetSpellMiscs() const;

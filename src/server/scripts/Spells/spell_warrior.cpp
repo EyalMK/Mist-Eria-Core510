@@ -792,17 +792,18 @@ class spell_warr_impending_victory : public SpellScriptLoader
 
             void HandleDamage(SpellEffIndex /*effIndex*/)
             {
-				Player* caster = GetCaster()->ToPlayer();
+				Player* player = GetCaster()->ToPlayer();
 				int32 damage = GetHitDamage();
 
-				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_ARMS)
-					SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.7f));
-				else if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY ||
-					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_WARRIOR_PROTECTION)
-					SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.56f));
+				if (player->GetPrimaryTalentTree(player->GetActiveSpec()) == TALENT_TREE_WARRIOR_ARMS)
+					SetHitDamage(damage + (player->GetTotalAttackPowerValue(BASE_ATTACK) * 0.7f));
+				else if (player->GetPrimaryTalentTree(player->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY ||
+					player->GetPrimaryTalentTree(player->GetActiveSpec()) == TALENT_TREE_WARRIOR_PROTECTION)
+					SetHitDamage(damage + (player->GetTotalAttackPowerValue(BASE_ATTACK) * 0.56f));
 				else SetHitDamage(damage);
 
-				caster->CastSpell(caster, SPELL_WARRIOR_IMPENDING_VICTORY);
+				if (player)
+					player->CastSpell(player, SPELL_WARRIOR_IMPENDING_VICTORY);
             }
 
             void Register()
@@ -975,21 +976,24 @@ class spell_warr_raging_blow : public SpellScriptLoader
 			{
 				Unit* caster = GetCaster()->ToPlayer();
 
-				if (Aura* ragingBlow = caster->GetAura(SPELL_WARRIOR_RAGING_BLOW_STACKS, caster->GetGUID()))
+				if (caster)
 				{
-					if (ragingBlow->GetStackAmount() == 2)
-						ragingBlow->SetStackAmount(1);
-					else
-						caster->RemoveAurasDueToSpell(SPELL_WARRIOR_RAGING_BLOW_STACKS);
-				}
+					if (Aura* ragingBlow = caster->GetAura(SPELL_WARRIOR_RAGING_BLOW_STACKS, caster->GetGUID()))
+					{
+						if (ragingBlow->GetStackAmount() == 2)
+							ragingBlow->SetStackAmount(1);
+						else
+							caster->RemoveAurasDueToSpell(SPELL_WARRIOR_RAGING_BLOW_STACKS);
+					}
 
-				if (Aura* meatCleaver = caster->GetAura(SPELL_WARRIOR_MEAT_CLEAVER_PROC, caster->GetGUID()))
-				{
-					if (meatCleaver->GetStackAmount() == 3)
-						meatCleaver->SetStackAmount(2);
-					else if (meatCleaver->GetStackAmount() == 2)
-						meatCleaver->SetStackAmount(1);
-					else caster->RemoveAurasDueToSpell(SPELL_WARRIOR_MEAT_CLEAVER_PROC);
+					if (Aura* meatCleaver = caster->GetAura(SPELL_WARRIOR_MEAT_CLEAVER_PROC, caster->GetGUID()))
+					{
+						if (meatCleaver->GetStackAmount() == 3)
+							meatCleaver->SetStackAmount(2);
+						else if (meatCleaver->GetStackAmount() == 2)
+							meatCleaver->SetStackAmount(1);
+						else caster->RemoveAurasDueToSpell(SPELL_WARRIOR_MEAT_CLEAVER_PROC);
+					}
 				}
 			}
 
