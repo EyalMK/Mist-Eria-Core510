@@ -48,6 +48,27 @@ enum Says
 // This is where OokOok will land when the hozen party is disturbed ; also, it is his reset position ;
 static const Position ookOokLandingPosition = {0.0f, 0.0f, 0.0f, 0.0f};
 
+
+// First line : starting position ;
+// Second line : ending position ;
+static const Position barrelsPositions[2][5] =
+{
+    {
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f}
+    },
+    {
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f}
+    }
+};
+
 bool PositionsEgalityCheck(Position const* pos, Position const* otherPos)
 {
     if(!pos || !otherPos)
@@ -178,7 +199,7 @@ public :
                     case Event_OokOok_SpawnBarrel :
                         if(m_ucFirstSummonCount < 5) // The first time, he summons five barrel, at a 5 seconds interval
                         {
-                            SummonBarrel(ucId);
+                            SummonBarrel(m_ucFirstSummonCount);
                             events.ScheduleEvent(Event_OokOok_SpawnBarrel, 5000);
                             ++m_ucFirstSummonCount;
                         }
@@ -263,26 +284,6 @@ public :
     }
 };
 
-// First line : starting position ;
-// Second line : ending position ;
-static const Position barrelsPositions[5][2] =
-{
-    {
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f}
-    },
-    {
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f}
-    }
-};
-
 class npc_rolling_barrel : public CreatureScript
 {
 public :
@@ -352,6 +353,12 @@ public :
             else
                 m_uiCheckTimer -= uiDiff ;
         }
+		
+		void WaypointReached(uint32 m_uiWaypointId)
+		{
+			//! FIX THAT THING !!!
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Something happened") ;
+		}
 
         bool DoCheckZone()
         {
@@ -399,7 +406,7 @@ public :
         {
             if(!minions.empty())
             {
-                for(std::list<Creature*>::iterator iter = minions.begin() ; iter != minions.end() ; ++iter)
+                for(std::list<Creature*>::const_iterator iter = minions.begin() ; iter != minions.end() ; ++iter)
                 {
                     if(Creature* minion = *iter)
                     {
