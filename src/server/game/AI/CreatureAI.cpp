@@ -160,13 +160,6 @@ void CreatureAI::EnterEvadeMode()
             me->GetMotionMaster()->MoveTargetedHome();
         }
     }
-
-    Reset();
-
-    if (me->IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
-        me->GetVehicleKit()->Reset(true);
-
-    me->SetLastDamagedTime(0);
 }
 
 /*void CreatureAI::AttackedBy(Unit* attacker)
@@ -216,6 +209,13 @@ bool CreatureAI::UpdateVictim()
     else if (me->getThreatManager().isThreatListEmpty())
     {
         EnterEvadeMode();
+
+		Reset();
+
+		if (me->IsVehicle()) // use the same sequence of addtoworld, aireset may remove all summons!
+			me->GetVehicleKit()->Reset(true);
+
+		me->SetLastDamagedTime(0);
         return false;
     }
 

@@ -2428,8 +2428,8 @@ void ObjectMgr::LoadItemTemplates()
                                              "SocketColor_1, SocketContent_1, SocketColor_2, SocketContent_2, SocketColor_3, SocketContent_3, SocketBonus, "
     //                                        126            127                  128       129                130        131
                                              "GemProperties, ArmorDamageModifier, Duration, ItemLimitCategory, HolidayId, StatScalingFactor, "
-    //                                        132                     133
-                                             "CurrencySubstitutionId, CurrencySubstitutionCount, DisenchantID "
+    //                                        132                     133                        134           135
+                                             "CurrencySubstitutionId, CurrencySubstitutionCount, DisenchantID, ItemQuestGroup "
                                              "FROM item_template");
 
     if (result)
@@ -2547,7 +2547,7 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.FoodType                  = 0;
             itemTemplate.MinMoneyLoot              = 0;
             itemTemplate.MaxMoneyLoot              = 0;
-			itemTemplate.ItemQuestGroup	           = fields[139].GetUInt8();
+			itemTemplate.ItemQuestGroup	           = fields[135].GetUInt8();
             ++dbCount;
         } while (result->NextRow());
     }
