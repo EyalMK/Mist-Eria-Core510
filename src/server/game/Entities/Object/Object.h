@@ -540,6 +540,12 @@ struct Position
         }
         return fmod(o, 2.0f * static_cast<float>(M_PI));
     }
+	
+	bool operator==(Position const& position)
+    {
+        return ((GetPositionX() == position.GetPositionX() && GetPositionY() == position.GetPositionY() && GetPositionZ() == position.GetPositionZ()) 
+                || (GetPositionX() == position.GetPositionX() && GetPositionY() == position.GetPositionY()));
+    }
 };
 ByteBuffer& operator>>(ByteBuffer& buf, Position::PositionXYZOStreamer const& streamer);
 ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZStreamer const& streamer);
