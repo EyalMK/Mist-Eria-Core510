@@ -99,4 +99,8 @@ enum StaticActions
     Action_StartBossOokOokEvent = 1
 };
 
+// Each time a creature of one of these is killed, we increment the killed hozen counter (and the power of the players)
+static const uint32 OokOokEntourage[MAX_OOKOOK_ENTOURAGE] = {0};
+// We need to access it during OokOok encounter, so it is here ;
+
 #endif // STORMSTOUT_BREWERY_H

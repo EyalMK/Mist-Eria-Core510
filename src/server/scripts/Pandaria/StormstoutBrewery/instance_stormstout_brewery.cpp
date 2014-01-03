@@ -13,9 +13,6 @@ static const uint32 AlamentalsCombination[3][2] =
     {Mob_BloatedBrewAlamental, Mob_StoutBrewAlamental} // Wheat ability
 };
 
-// Each time a creature of one of these is killed, we increment the killed hozen counter (and the power of the players)
-static const uint32 OokOokEntourage[MAX_OOKOOK_ENTOURAGE] = {0};
-
 class instance_stormstout_brewery : public InstanceMapScript
 {
 public :
@@ -100,11 +97,14 @@ public :
             switch(uiDataIndex)
             {
             case Data_OokOokPartyCounter :
+                if(GetData(Data_OokOokPartyEventProgress) == DONE)
+                    return ;
                 m_ucKilledHozenCounter += ullDataValue ;
+                HandlePower(true, int32(ullDataValue));
                 if(m_ucKilledHozenCounter >= 40)
                 {
                     SetData(Data_OokOokPartyEventProgress, DONE);
-
+                    HandlePower(false, 0);
                 }
                 break ;
 
