@@ -2547,7 +2547,7 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.FoodType                  = 0;
             itemTemplate.MinMoneyLoot              = 0;
             itemTemplate.MaxMoneyLoot              = 0;
-			itemTemplate.ItemQuestGroup	           = fields[135].GetUInt8();
+			itemTemplate.ItemQuestGroup	           = fields[137].GetUInt8();
             ++dbCount;
         } while (result->NextRow());
     }
