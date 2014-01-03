@@ -152,6 +152,8 @@ public:
 				intro = false;
 				end = false;
 			}
+
+			ScriptedAI::EnterEvadeMode();
 		}
 
 		void MoveInLineOfSight(Unit* who)
@@ -477,6 +479,8 @@ public:
 
 				me->DespawnOrUnsummon(1*IN_MILLISECONDS);
 			}
+
+			ScriptedAI::EnterEvadeMode();
 		}
 
 		void UpdateAI(uint32 diff)
@@ -679,6 +683,8 @@ public:
 
 				me->DespawnOrUnsummon(1*IN_MILLISECONDS);
 			}
+
+			ScriptedAI::EnterEvadeMode();
 		}
 
 		void UpdateAI(uint32 diff)
@@ -805,6 +811,8 @@ public:
 		void EnterEvadeMode()
 		{
 			me->DespawnOrUnsummon();
+
+			ScriptedAI::EnterEvadeMode();
 		}
 
 		void UpdateAI(uint32 diff)

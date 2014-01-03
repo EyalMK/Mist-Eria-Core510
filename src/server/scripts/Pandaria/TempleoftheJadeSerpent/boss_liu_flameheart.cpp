@@ -219,6 +219,8 @@ public:
 
 			me->CastSpell(me, SPELL_SHA_MASK);
 			me->CastSpell(me, SPELL_SHA_CORRUPTION);
+
+			ScriptedAI::EnterEvadeMode();
 		}
 
 		void MoveInLineOfSight(Unit* who)
