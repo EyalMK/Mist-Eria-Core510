@@ -934,7 +934,7 @@ public:
                 uint32 spell = profSpell->GetUInt32();
 
                 if(!pPlayer->HasSpell(spell))
-                    pPlayer->learnSpell(spell, true);
+                    pPlayer->learnSpell(spell, false);
 
                 pPlayer->SetSkill(skill, pPlayer->GetSkillStep(skill), value, max);
             }
