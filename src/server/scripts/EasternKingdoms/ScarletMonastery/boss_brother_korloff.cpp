@@ -25,7 +25,8 @@ enum Spells
 {
     SPELL_FIRESTORM_KICK    = 113764,
     SPELL_RISING_FLAME      = 114410,
-    SPELL_BLAZING_FISTS     = 114807
+    SPELL_BLAZING_FISTS     = 114807,
+    SPELL_SCORCHED_EARTH    = 114460
 };
 
 
@@ -33,16 +34,16 @@ enum Events
 {
     EVENT_FIRESTORM_KICK    = 1,
     EVENT_RISING_FLAME      = 2,
-    EVENT_BLAZING_FISTS     = 3
+    EVENT_BLAZING_FISTS     = 3,
+    EVENT_SCORCHED_EARTH    = 4
 };
 
 
 enum Texts
 {
-    SAY_AGGRO                       = 1, // Je vais vous briser…
-    SAY_DEATH                       = 2, // Vous êtes… des pièces de métal…
-    SAY_FIRESTORM_KICK              = 3, // Quand on est mort, on est mort.
-    SAY_BLAZING_FISTS               = 4 // Mes poings sont rouge sang… votre sang !
+    SAY_AGGRO                       = 0,
+    SAY_DEATH                       = 1,
+    SAY_KILL                        = 2
 };
 
 
@@ -63,6 +64,8 @@ public:
             instance = creature->GetInstanceScript();
         }
 
+        bool scorchedearth;
+        uint32 m_uiNextCastPercent;
         InstanceScript* instance;
         SummonList Summons;
         EventMap events;
@@ -71,6 +74,8 @@ public:
         {
             events.Reset();
             Summons.DespawnAll();
+            scorchedearth = true;
+            m_uiNextCastPercent = 90 ;
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_BROTHER_KORLOFF, NOT_STARTED);
@@ -79,8 +84,13 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
+            Talk(SAY_AGGRO);
+
             if (instance)
                 instance->SetBossState(DATA_BOSS_BROTHER_KORLOFF, IN_PROGRESS);
+
+            events.ScheduleEvent(EVENT_FIRESTORM_KICK, 10*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_BLAZING_FISTS, 20*IN_MILLISECONDS);
         }
 
 
@@ -88,15 +98,41 @@ public:
         {
             if (instance)
                 instance->SetBossState(DATA_BOSS_BROTHER_KORLOFF, FAIL);
+
+            ScriptedAI::EnterEvadeMode();
         }
 
+        void KilledUnit(Unit* /*pWho*/)
+        {
+            Talk(SAY_KILL);
+        }
 
         void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_DEATH);
+            Summons.DespawnAll();
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_BROTHER_KORLOFF, DONE);
+        }
+
+        void JustSummoned(Creature* Summoned)
+        {
+            Summons.Summon(Summoned);
+
+            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true);
+                if(target && target->GetTypeId() == TYPEID_PLAYER)
+                    Summoned->AI()->AttackStart(target);
+        }
+
+
+        void DamageTaken(Unit* doneBy, uint32 &amount)
+        {
+            if(me->GetHealthPct() <= m_uiNextCastPercent)
+            {
+                events.ScheduleEvent(EVENT_RISING_FLAME, 1*IN_MILLISECONDS);
+                m_uiNextCastPercent -= 10 ;
+            }
         }
 
 
@@ -110,6 +146,12 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
+            if (me->HealthBelowPct(50) && scorchedearth)
+            {
+                events.ScheduleEvent(EVENT_SCORCHED_EARTH, 1*IN_MILLISECONDS);
+                scorchedearth = false;
+            }
+
             while(uint32 eventId = events.ExecuteEvent())
             {
                 switch(eventId)
@@ -117,12 +159,28 @@ public:
                     if (instance)
                     {
                         case EVENT_FIRESTORM_KICK:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                            {
+                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 10, 10);
+                                DoCast(SPELL_FIRESTORM_KICK);
+                            }
+                            events.ScheduleEvent(EVENT_FIRESTORM_KICK, 30*IN_MILLISECONDS);
                             break;
 
                         case EVENT_RISING_FLAME:
+                            DoCast(SPELL_RISING_FLAME);
+                            break;
+
+                        case EVENT_SCORCHED_EARTH:
+                            DoCast(SPELL_SCORCHED_EARTH);
                             break;
 
                         case EVENT_BLAZING_FISTS:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                            {
+                                DoCast(target, SPELL_BLAZING_FISTS);
+                            }
+                            events.ScheduleEvent(EVENT_BLAZING_FISTS, 30*IN_MILLISECONDS);
                             break;
 
                         default:
