@@ -480,7 +480,15 @@ class spell_evict_soul : public SpellScriptLoader
             {
                 if(auraEff)
                 {
-                    uint32 entry = auraEff->GetMiscValue();
+                    uint32 entry = 59974 ;
+					
+					SpellInfo const* evictSoul = sSpellMgr->GetSpellInfo(SPELL_EVICT_SOUL);
+					if(evictSoul)
+					{
+						SpellInfo const* evictSoulTriggered = sSpellMgr->GetSpellInfo(evictSoul->Effects[1].TriggerSpell);
+						if(evictSoulTriggered)
+							entry = evictSoulTriggered->Effects[0].MiscValue ;
+					}
 
                     if(WorldObject* owner = GetOwner())
                     {
