@@ -512,35 +512,18 @@ class spell_evict_soul : public SpellScriptLoader
         {
             PrepareAuraScript(spell_evict_soul_AuraScript);
 
-            void handleSetDisplayIdOnEffectPeriodic(AuraEffect const* auraEff)
+            void handleSetDisplayIdOnEffectPeriodic(AuraEffect const* /*auraEff*/)
             {
-                if(auraEff)
+                PreventDefaultAction();
+                if(Unit* player = GetUnitOwner())
                 {
-                    uint32 entry = 59974 ;
-
-                    SpellInfo const* evictSoul = sSpellMgr->GetSpellInfo(SPELL_EVICT_SOUL);
-                    if(evictSoul)
+                    if(player->GetTypeId() == TYPEID_PLAYER)
                     {
-                        SpellInfo const* evictSoulTriggered = sSpellMgr->GetSpellInfo(evictSoul->Effects[1].TriggerSpell);
-                        if(evictSoulTriggered)
-                            entry = evictSoulTriggered->Effects[0].MiscValue ;
-                    }
-
-                    if(WorldObject* owner = GetOwner())
-                    {
-                        if(owner->ToPlayer())
-                        {
-                            if(Creature* summon = owner->FindNearestCreature(entry, 100.0f, true))
-                            {
-                                if(summon)
-                                {
-                                    summon->SetDisplayId(owner->ToPlayer()->GetDisplayId());
-                                }
-                            }
-                        }
+                        if(Creature * summon = player->SummonCreature(NPC_EVICTED_SOUL, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 300000))
+                            summon->SetDisplayId(player->GetDisplayId());
                     }
                 }
-             }
+            }
 
             void Register()
             {
