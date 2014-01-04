@@ -288,14 +288,6 @@ public:
             void EnterCombat(Unit* /*who*/)
             {
                 me->CastSpell(me, SPELL_EVICTED_SOUL);
-
-                if (TempSummon* temp = me->ToTempSummon())
-                {
-                    if (Unit* summoner = temp->GetSummoner())
-                    {
-                        me->SetDisplayId(summoner->GetDisplayId());
-                    }
-                }
             }
 
             void UpdateAI(uint32 diff)
@@ -412,7 +404,7 @@ public:
                                         if(player->HasAura(SPELL_SPIRIT_GALE_AURA))
                                             continue ;
                                         else
-                                            DoCast(player, SPELL_SPIRIT_GALE_AURA, true);
+                                            player->CastSpell(player, SPELL_SPIRIT_GALE_AURA, TRIGGERED_FULL_MASK);
                                     }
                                     else
                                     {
@@ -481,14 +473,14 @@ class spell_evict_soul : public SpellScriptLoader
                 if(auraEff)
                 {
                     uint32 entry = 59974 ;
-					
-					SpellInfo const* evictSoul = sSpellMgr->GetSpellInfo(SPELL_EVICT_SOUL);
-					if(evictSoul)
-					{
-						SpellInfo const* evictSoulTriggered = sSpellMgr->GetSpellInfo(evictSoul->Effects[1].TriggerSpell);
-						if(evictSoulTriggered)
-							entry = evictSoulTriggered->Effects[0].MiscValue ;
-					}
+
+                    SpellInfo const* evictSoul = sSpellMgr->GetSpellInfo(SPELL_EVICT_SOUL);
+                    if(evictSoul)
+                    {
+                        SpellInfo const* evictSoulTriggered = sSpellMgr->GetSpellInfo(evictSoul->Effects[1].TriggerSpell);
+                        if(evictSoulTriggered)
+                            entry = evictSoulTriggered->Effects[0].MiscValue ;
+                    }
 
                     if(WorldObject* owner = GetOwner())
                     {
@@ -504,7 +496,7 @@ class spell_evict_soul : public SpellScriptLoader
                         }
                     }
                 }
-            }
+             }
 
             void Register()
             {
