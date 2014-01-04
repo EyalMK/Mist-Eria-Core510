@@ -35,7 +35,7 @@ enum Spells
     SPELL_MIND_ROT                  = 115143,
     SPELL_EVICTED_SOUL              = 115309,
     SPELL_EVICT_SOUL_NPC            = 115304,
-    SPELL_SPIRITI_GALE_AURA         = 115289,
+    SPELL_SPIRIT_GALE_AURA          = 115291,
     SPELL_EMPOWERING_SPIRIT         = 115157,
     SPELL_EMPOWER_ZOMBIE_TRANSFORM  = 115250,
     SPELL_AOE                       = 115272,
@@ -98,10 +98,20 @@ public:
         {
             events.Reset();
             Summons.DespawnAll();
+			Cleanup();
             me->CastSpell(me, SPELL_COSMETIC_VISUAL);
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_THALNOS_THE_SOULRENDER, NOT_STARTED);
+        }
+
+        void Cleanup()
+        {
+            std::list<Creature*> creatures;
+
+            GetCreatureListWithEntryInGrid(creatures, me, NPC_EVICTED_SOUL, 200.0f);
+            for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                (*itr)->DespawnOrUnsummon();
         }
 
 
@@ -195,7 +205,7 @@ public:
                         case EVENT_SPIRIT_GALE:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             {
-                                DoCast(target, SPELL_SPIRIT_GALE);
+                                target->CastSpell(target, SPELL_EVICT_SOUL, TRIGGERED_FULL_MASK);
                             }
                             events.ScheduleEvent(EVENT_SPIRIT_GALE, 8*IN_MILLISECONDS);
                             break;
@@ -399,15 +409,15 @@ public:
                                     player->GetPosition(&pos);
                                     if(me->GetExactDist2d(&pos) <= 2.0f)
                                     {
-                                        if(player->HasAura(SPELL_SPIRITI_GALE_AURA))
+                                        if(player->HasAura(SPELL_SPIRIT_GALE_AURA))
                                             continue ;
                                         else
-                                            DoCast(player, SPELL_SPIRITI_GALE_AURA, true);
+                                            DoCast(player, SPELL_SPIRIT_GALE_AURA, true);
                                     }
                                     else
                                     {
-                                        if(player->HasAura(SPELL_SPIRITI_GALE_AURA))
-                                            player->RemoveAurasDueToSpell(SPELL_SPIRITI_GALE_AURA);
+                                        if(player->HasAura(SPELL_SPIRIT_GALE_AURA))
+                                            player->RemoveAurasDueToSpell(SPELL_SPIRIT_GALE_AURA);
                                     }
                                 }
                             }
