@@ -3062,6 +3062,12 @@ void SpellMgr::LoadSpellCustomAttr()
 				case 72293: // Mark of the Fallen Champion (Deathbringer Saurfang)
 					spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE_EFF0;
 					break;
+				case 82691: // Ring of Frost
+                    spellInfo->Effects[0].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                    spellInfo->Effects[0].TargetB = 0;
+                    spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REFLECTED;
+                    spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(13);
+                    break;
 				default:
 					break;
 			}
