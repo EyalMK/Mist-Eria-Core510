@@ -1315,6 +1315,7 @@ bool SpellInfo::IsAutoRepeatRangedSpell() const
     return AttributesEx2 & SPELL_ATTR2_AUTOREPEAT_FLAG;
 }
 
+/*
 bool SpellInfo::IsCanBeStolen() const
 {
     // some of the rules for those spells that can be stolen by Dark Simulacrum
@@ -1367,7 +1368,7 @@ bool SpellInfo::IsCanBeStolen() const
     }
 
     return true;
-}
+}*/
 
 bool SpellInfo::IsAffectedBySpellMods() const
 {

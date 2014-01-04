@@ -6739,9 +6739,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!procSpell->IsCanBeStolen() || !triggeredByAura)
                         return false;
 
-                    if (Creature* targetCreature = victim->ToCreature())
+                    /*if (Creature* targetCreature = victim->ToCreature())
                         if (!targetCreature->isCanGiveSpell(caster))
-                            return false;
+                            return false;*/
 
                     caster->setSimulacrumTarget(victim->GetGUID());
 
