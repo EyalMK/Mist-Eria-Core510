@@ -477,6 +477,12 @@ struct ReputationOnKillEntry
     bool IsTeamAward1;
     bool IsTeamAward2;
     bool TeamDependent;
+	uint32 currencyid1;
+    uint32 currencyid2;
+    uint32 currencyid3;
+    int32 currencycount1;
+    int32 currencycount2;
+    int32 currencycount3;
 };
 
 struct RepSpilloverTemplate
