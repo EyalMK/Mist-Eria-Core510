@@ -205,7 +205,7 @@ public:
                         case EVENT_SPIRIT_GALE:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             {
-                                target->CastSpell(target, SPELL_EVICT_SOUL, TRIGGERED_FULL_MASK);
+                                DoCast(target, SPELL_SPIRIT_GALE);
                             }
                             events.ScheduleEvent(EVENT_SPIRIT_GALE, 8*IN_MILLISECONDS);
                             break;
@@ -467,6 +467,50 @@ class spell_spirit_gale : public SpellScriptLoader
 };
 
 
+class spell_evict_soul : public SpellScriptLoader
+{
+    public:
+        spell_evict_soul() : SpellScriptLoader("spell_evict_soul") { }
+
+        class spell_evict_soul_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_evict_soul_AuraScript);
+
+            void handleSetDisplayIdOnEffectPeriodic(AuraEffect const* auraEff)
+            {
+                if(auraEff)
+                {
+                    uint32 entry = auraEff->GetMiscValue();
+
+                    if(WorldObject* owner = GetOwner())
+                    {
+                        if(owner->ToPlayer())
+                        {
+                            if(Creature* summon = owner->FindNearestCreature(entry, 100.0f, true))
+                            {
+                                if(summon)
+                                {
+                                    summon->SetDisplayId(owner->ToPlayer()->GetDisplayId());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_evict_soul_AuraScript::handleSetDisplayIdOnEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_evict_soul_AuraScript();
+        }
+};
+
+
 void AddSC_boss_thalnos_the_soulrender()
 {
     new boss_thalnos_the_soulrender();
@@ -475,4 +519,5 @@ void AddSC_boss_thalnos_the_soulrender()
     new npc_empowering_spirit();
     new npc_traqueur_thalnos();
     new spell_spirit_gale();
+    new spell_evict_soul();
 }
