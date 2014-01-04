@@ -726,7 +726,7 @@ void GameEventMgr::LoadFromDB()
 
                 uint32 guid     = fields[0].GetUInt32();
                 uint16 event_id = fields[1].GetUInt8();
-                uint32 npcflag  = fields[2].GetUInt32();
+                uint32 npcflag  = fields[2].GetUInt64();
 
                 if (event_id >= mGameEvent.size())
                 {
@@ -933,7 +933,7 @@ void GameEventMgr::LoadFromDB()
     }
 }
 
-uint32 GameEventMgr::GetNPCFlag(Creature* cr)
+uint64 GameEventMgr::GetNPCFlag(Creature* cr)
 {
     uint32 mask = 0;
     uint32 guid = cr->GetDBTableGUIDLow();
@@ -1149,10 +1149,10 @@ void GameEventMgr::UpdateEventNPCFlags(uint16 event_id)
             // if we found the creature, modify its npcflag
             if (cr)
             {
-                uint32 npcflag = GetNPCFlag(cr);
+                uint64 npcflag = GetNPCFlag(cr);
                 if (const CreatureTemplate* ci = cr->GetCreatureTemplate())
                     npcflag |= ci->npcflag;
-                cr->SetUInt32Value(UNIT_NPC_FLAGS, npcflag);
+                cr->SetUInt64Value(UNIT_NPC_FLAGS, npcflag);
                 // reset gossip options, since the flag change might have added / removed some
                 //cr->ResetGossipOptions();
             }

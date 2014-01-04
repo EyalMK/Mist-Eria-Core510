@@ -424,7 +424,7 @@ public:
             cInfo->expansion          = fields[15].GetUInt16();
             cInfo->faction_A          = fields[16].GetUInt16();
             cInfo->faction_H          = fields[17].GetUInt16();
-            cInfo->npcflag            = fields[18].GetUInt32();
+            cInfo->npcflag            = fields[18].GetUInt64();
             cInfo->speed_walk         = fields[19].GetFloat();
             cInfo->speed_run          = fields[20].GetFloat();
             cInfo->scale              = fields[21].GetFloat();

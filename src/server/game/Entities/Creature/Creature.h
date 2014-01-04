@@ -91,7 +91,7 @@ struct CreatureTemplate
     uint32  expansionUnknown;                               // either 0 or 3, sent to the client / wdb
     uint32  faction_A;
     uint32  faction_H;
-    uint32  npcflag;
+    uint64  npcflag;
     float   speed_walk;
     float   speed_run;
     float   scale;
@@ -256,7 +256,7 @@ struct CreatureData
     uint32 curmana;
     uint8 movementType;
     uint32 spawnMask;
-    uint32 npcflag;
+    uint64 npcflag;
     uint32 unit_flags;                                      // enum UnitFlags mask values
     uint32 dynamicflags;
     bool dbData;
