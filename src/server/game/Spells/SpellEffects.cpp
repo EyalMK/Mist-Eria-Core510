@@ -385,6 +385,11 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
             switch (m_spellInfo->Id)                     // better way to check unknown
             {
+			// Mirror Image, Frost Bolt
+                    case 59638:
+                        if (m_caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                            damage += int32(((Guardian*)m_caster)->GetBonusDamage() * 0.25f);
+                        break;
             // Consumption
             case 28865:
                 damage = (((InstanceMap*)m_caster->GetMap())->GetDifficulty() == REGULAR_DIFFICULTY ? 2750 : 4250);
@@ -617,6 +622,23 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
         }
         case SPELLFAMILY_MAGE:
         {
+			switch (m_spellInfo->Id)
+                {
+                    // Mirror Image, Fire Blast
+                    case 59637:
+                        if (m_caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                            damage += int32(((Guardian*)m_caster)->GetBonusDamage() * 0.15f);
+                        break;
+                    // Frost Bomb
+                    case 113092:
+                    {
+                        if (effIndex == 0)
+                            damage += m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()) * 2.462f;
+                        else if (effIndex == 1)
+                            damage += m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()) * 1.231f;
+                    }
+                    break;
+                }
             // Deep Freeze should deal damage to permanently stun-immune targets.
             if (m_spellInfo->Id == 71757)
                 if (unitTarget->GetTypeId() != TYPEID_UNIT || !(unitTarget->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(44572), 0)))

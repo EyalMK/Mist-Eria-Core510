@@ -106,6 +106,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Dragon's Breath
             else if (spellproto->SpellFamilyFlags[0] & 0x800000)
                 return DIMINISHING_DRAGONS_BREATH;
+			// Ring of Frost
+            else if (spellproto->Id == 82691)
+                return DIMINISHING_DISORIENT;
             break;
         }
         case SPELLFAMILY_WARRIOR:
@@ -3059,6 +3062,24 @@ void SpellMgr::LoadSpellCustomAttr()
 				case 72293: // Mark of the Fallen Champion (Deathbringer Saurfang)
 					spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE_EFF0;
 					break;
+				case 82691: // Ring of Frost
+                    spellInfo->Effects[0].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                    spellInfo->Effects[0].TargetB = 0;
+                    spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REFLECTED;
+                    spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(13);
+                    break;
+				case 45204: // Mirror Image - Clone Me!
+                    spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
+                    spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+                    break;
+                case 41055: // Copy Weapon Spells
+                case 45206:
+                case 63416:
+                case 69891:
+                case 69892:
+                    spellInfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;
+                    spellInfo->Mechanic = 0;
+                    break;
 				default:
 					break;
 			}

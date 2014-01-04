@@ -1361,6 +1361,8 @@ class Unit : public WorldObject
         bool isTotem() const    { return m_unitTypeMask & UNIT_MASK_TOTEM; }
         bool IsVehicle() const  { return m_unitTypeMask & UNIT_MASK_VEHICLE; }
 
+		bool IsPetGuardianStuff() const { return m_unitTypeMask & ( UNIT_MASK_SUMMON | UNIT_MASK_GUARDIAN | UNIT_MASK_PET | UNIT_MASK_HUNTER_PET | UNIT_MASK_TOTEM ); }
+
         uint8 getLevel() const { return uint8(GetUInt32Value(UNIT_FIELD_LEVEL)); }
         uint8 getLevelForTarget(WorldObject const* /*target*/) const { return getLevel(); }
         void SetLevel(uint8 lvl);
@@ -1937,6 +1939,11 @@ class Unit : public WorldObject
 		void ResetDamageDoneInPastSecs(uint32 secs);
 		void ResetHealingDoneInPastSecs(uint32 secs);
 
+		// helper for dark simulacrum spell
+        Unit* GetSimulacrumTarget();
+        void setSimulacrumTarget(uint64 guid) { simulacrumTargetGUID = guid; }
+        void removeSimulacrumTarget() { simulacrumTargetGUID = 0; }
+
         uint32 m_addDmgOnce;
         uint64 m_SummonSlot[MAX_SUMMON_SLOT];
         uint64 m_ObjectSlot[MAX_GAMEOBJECT_SLOT];
@@ -2384,6 +2391,8 @@ class Unit : public WorldObject
         uint32 m_state;                                     // Even derived shouldn't modify
         uint32 m_CombatTimer;
         TimeTrackerSmall m_movesplineTimer;
+
+		uint64 simulacrumTargetGUID;
 
         Diminishing m_Diminishing;
         // Manage all Units that are threatened by us

@@ -162,16 +162,16 @@ public:
                         case EVENT_JUMP_FIRESTORM:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             {
-                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20, EVENT_JUMP);
+                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20);
                                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                                 events.ScheduleEvent(EVENT_FIRESTORM_KICK, 1*IN_MILLISECONDS);
                             }
-                            events.ScheduleEvent(EVENT_JUMP_FIRESTORM, 30*IN_MILLISECONDS);
                             break;
 
                         case EVENT_FIRESTORM_KICK:
                             DoCast(SPELL_FIRESTORM_KICK);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                            events.ScheduleEvent(EVENT_JUMP_FIRESTORM, 29*IN_MILLISECONDS);
                             break;
 
                         case EVENT_SCORCHED_EARTH:

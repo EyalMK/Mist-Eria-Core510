@@ -247,6 +247,8 @@ Unit::Unit(bool isWorldObject): WorldObject(isWorldObject)
 
     m_CombatTimer = 0;
 
+	simulacrumTargetGUID = NULL;
+
     for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
         m_threatModifier[i] = 1.0f;
 
@@ -6720,6 +6722,40 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         return false;
                 }
                 break;
+            }
+			if (dummySpell->Id == 77606) // Dark Simulacrum
+            {
+                    if (!procSpell)
+                        return false;
+
+                    Unit* caster = triggeredByAura->GetCaster();
+                    victim = this;
+
+                    if (!caster || !victim)
+                        return false;
+
+                    caster->removeSimulacrumTarget();
+
+                    /*if (!procSpell->IsCanBeStolen() || !triggeredByAura)
+                        return false;*/
+
+                    if (Creature* targetCreature = victim->ToCreature())
+                        if (!targetCreature->isCanGiveSpell(caster))
+                            return false;
+
+                    caster->setSimulacrumTarget(victim->GetGUID());
+
+                    if (HasAura(77616))
+                        return false;
+
+                    // Replacer
+                    int32  basepoints0 = procSpell->Id;
+                    caster->CastCustomSpell(this, 77616, &basepoints0, NULL, NULL, true);
+
+                    // SpellPower
+                    basepoints0 = victim->SpellBaseDamageBonusDone(SpellSchoolMask(procSpell->SchoolMask));
+                    caster->CastCustomSpell(caster, 94984, &basepoints0, &basepoints0, NULL, true);
+                    return true;
             }
             // Runic Power Back on Snare/Root
             if (dummySpell->Id == 61257)
@@ -17743,4 +17779,17 @@ void Unit::ResetHealingDoneInPastSecs(uint32 secs)
 
     for (uint32 i = 0; i < secs; i++)
         m_heal_done[i] = 0;
+}
+
+Unit* Unit::GetSimulacrumTarget()
+{
+    if (Unit* simulacrumTarget = sObjectAccessor->FindUnit(simulacrumTargetGUID))
+    {
+        if (simulacrumTarget->IsInWorld())
+            return simulacrumTarget;
+        else
+            return NULL;
+    }
+    else
+        return NULL;
 }

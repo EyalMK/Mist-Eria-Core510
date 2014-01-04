@@ -35,6 +35,7 @@ enum Spells
     SPELL_MIND_ROT                  = 115143,
     SPELL_EVICTED_SOUL              = 115309,
     SPELL_EVICT_SOUL_NPC            = 115304,
+    SPELL_SPIRIT_GALE_AURA          = 115291,
     SPELL_EMPOWERING_SPIRIT         = 115157,
     SPELL_EMPOWER_ZOMBIE_TRANSFORM  = 115250,
     SPELL_AOE                       = 115272,
@@ -64,6 +65,9 @@ enum Texts
 enum Creatures
 {
     NPC_ZOMBIE                  = 59884,
+    NPC_EVICTED_SOUL            = 59974,
+    NPC_EMPOWERING_SPIRITS      = 59893,
+    NPC_EMPOWERED_ZOMBIE        = 59930,
     NPC_THALNOS                 = 59789,
     NPC_TRAQUEUR_INVISIBLE      = 200011
 };
@@ -94,10 +98,20 @@ public:
         {
             events.Reset();
             Summons.DespawnAll();
+			Cleanup();
             me->CastSpell(me, SPELL_COSMETIC_VISUAL);
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_THALNOS_THE_SOULRENDER, NOT_STARTED);
+        }
+
+        void Cleanup()
+        {
+            std::list<Creature*> creatures;
+
+            GetCreatureListWithEntryInGrid(creatures, me, NPC_EVICTED_SOUL, 200.0f);
+            for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                (*itr)->DespawnOrUnsummon();
         }
 
 
@@ -142,9 +156,27 @@ public:
         {
             Summons.Summon(Summoned);
 
-            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true);
+            if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+            {
                 if(target && target->GetTypeId() == TYPEID_PLAYER)
-                    Summoned->AI()->AttackStart(target);
+                {
+                    switch (Summoned->GetEntry())
+                    {
+                        case NPC_ZOMBIE:
+                            Summoned->AI()->AttackStart(target);
+                            break;
+                        case NPC_EVICTED_SOUL :
+                            Summoned->AI()->AttackStart(target);
+                            break;
+                        case NPC_EMPOWERING_SPIRITS:
+                            Summoned->AI()->AttackStart(target);
+                            break;
+                        case NPC_EMPOWERED_ZOMBIE:
+                            Summoned->AI()->AttackStart(target);
+                            break;
+                    }
+                }
+            }
         }
 
 
@@ -310,10 +342,13 @@ public:
 
                 if (Test_timer <= diff)
                 {
-                    if(Creature* thalnos = me->FindNearestCreature(NPC_ZOMBIE, 100.0f, false))
+                    if(Creature* thalnos = me->FindNearestCreature(NPC_THALNOS, 100.0f))
                     {
-                        thalnos->CastSpell(me, SPELL_EMPOWER_ZOMBIE_TRANSFORM, true);
-                        me->DisappearAndDie();
+                        if(me->FindNearestCreature(NPC_ZOMBIE, 100.0f, false))
+                        {
+                            thalnos->CastSpell(me, SPELL_EMPOWER_ZOMBIE_TRANSFORM, true);
+                            me->DisappearAndDie();
+                        }
                     }
                     else
                         Test_timer = 1000;
@@ -339,9 +374,50 @@ public:
     {
             npc_traqueur_thalnosAI(Creature* creature) : ScriptedAI(creature) {}
 
+            uint32 position_Timer;
+
             void Reset()
             {
+                me->SetReactState(REACT_PASSIVE);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
                 me->CastSpell(me, SPELL_AOE);
+                position_Timer = 500;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if (position_Timer <= diff)
+                {
+                    if(me->GetMap())
+                    {
+                        Map::PlayerList const & playerList = me->GetMap()->GetPlayers();
+                        if(!playerList.isEmpty())
+                        {
+                            for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
+                            {
+                                if(Player* player =iter->getSource())
+                                {
+                                    Position pos ;
+                                    player->GetPosition(&pos);
+                                    if(me->GetExactDist2d(&pos) <= 2.0f)
+                                    {
+                                        if(player->HasAura(SPELL_SPIRIT_GALE_AURA))
+                                            continue ;
+                                        else
+                                            player->CastSpell(player, SPELL_SPIRIT_GALE_AURA, TRIGGERED_FULL_MASK);
+                                    }
+                                    else
+                                    {
+                                        if(player->HasAura(SPELL_SPIRIT_GALE_AURA))
+                                            player->RemoveAurasDueToSpell(SPELL_SPIRIT_GALE_AURA);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    position_Timer = 500;
+                }
+                else position_Timer -= diff;
             }
     };
 };
@@ -359,12 +435,13 @@ class spell_spirit_gale : public SpellScriptLoader
             void SummonTraqueurFlaque(SpellEffIndex /*effIndex*/)
             {                     
                 if (Unit* target = GetHitPlayer())
-                {
-                    Creature* thalnos = target->FindNearestCreature(NPC_THALNOS, 100.0f);
-
-                    if (target->GetTypeId() == TYPEID_PLAYER)
+                {                  
+                    if(Creature* thalnos = target->FindNearestCreature(NPC_THALNOS, 100.0f))
                     {
-                        thalnos->SummonCreature(NPC_TRAQUEUR_INVISIBLE, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
+                        if (target->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            thalnos->SummonCreature(NPC_TRAQUEUR_INVISIBLE, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
+                        }
                     }
                 }
             }
@@ -382,6 +459,58 @@ class spell_spirit_gale : public SpellScriptLoader
 };
 
 
+class spell_evict_soul : public SpellScriptLoader
+{
+    public:
+        spell_evict_soul() : SpellScriptLoader("spell_evict_soul") { }
+
+        class spell_evict_soul_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_evict_soul_AuraScript);
+
+            void handleSetDisplayIdOnEffectPeriodic(AuraEffect const* auraEff)
+            {
+                if(auraEff)
+                {
+                    uint32 entry = 59974 ;
+
+                    SpellInfo const* evictSoul = sSpellMgr->GetSpellInfo(SPELL_EVICT_SOUL);
+                    if(evictSoul)
+                    {
+                        SpellInfo const* evictSoulTriggered = sSpellMgr->GetSpellInfo(evictSoul->Effects[1].TriggerSpell);
+                        if(evictSoulTriggered)
+                            entry = evictSoulTriggered->Effects[0].MiscValue ;
+                    }
+
+                    if(WorldObject* owner = GetOwner())
+                    {
+                        if(owner->ToPlayer())
+                        {
+                            if(Creature* summon = owner->FindNearestCreature(entry, 100.0f, true))
+                            {
+                                if(summon)
+                                {
+                                    summon->SetDisplayId(owner->ToPlayer()->GetDisplayId());
+                                }
+                            }
+                        }
+                    }
+                }
+             }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_evict_soul_AuraScript::handleSetDisplayIdOnEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_evict_soul_AuraScript();
+        }
+};
+
+
 void AddSC_boss_thalnos_the_soulrender()
 {
     new boss_thalnos_the_soulrender();
@@ -390,4 +519,5 @@ void AddSC_boss_thalnos_the_soulrender()
     new npc_empowering_spirit();
     new npc_traqueur_thalnos();
     new spell_spirit_gale();
+    new spell_evict_soul();
 }
