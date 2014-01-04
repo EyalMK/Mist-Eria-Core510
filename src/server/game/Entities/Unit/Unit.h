@@ -1937,7 +1937,10 @@ class Unit : public WorldObject
 		void ResetDamageDoneInPastSecs(uint32 secs);
 		void ResetHealingDoneInPastSecs(uint32 secs);
 
-		Unit* GetSimulacrumTarget();
+		// helper for dark simulacrum spell
+        Unit* GetSimulacrumTarget();
+        void setSimulacrumTarget(uint64 guid) { simulacrumTargetGUID = guid; }
+        void removeSimulacrumTarget() { simulacrumTargetGUID = 0; }
 
         uint32 m_addDmgOnce;
         uint64 m_SummonSlot[MAX_SUMMON_SLOT];
@@ -2386,6 +2389,8 @@ class Unit : public WorldObject
         uint32 m_state;                                     // Even derived shouldn't modify
         uint32 m_CombatTimer;
         TimeTrackerSmall m_movesplineTimer;
+
+		uint64 simulacrumTargetGUID;
 
         Diminishing m_Diminishing;
         // Manage all Units that are threatened by us

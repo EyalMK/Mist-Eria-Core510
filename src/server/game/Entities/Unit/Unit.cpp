@@ -6723,6 +6723,40 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 }
                 break;
             }
+			if (dummySpell->Id == 77606) // Dark Simulacrum
+            {
+                    if (!procSpell)
+                        return false;
+
+                    Unit* caster = triggeredByAura->GetCaster();
+                    victim = this;
+
+                    if (!caster || !victim)
+                        return false;
+
+                    caster->removeSimulacrumTarget();
+
+                    if (!procSpell->IsCanBeStolen() || !triggeredByAura)
+                        return false;
+
+                    if (Creature* targetCreature = victim->ToCreature())
+                        if (!targetCreature->isCanGiveSpell(caster))
+                            return false;
+
+                    caster->setSimulacrumTarget(victim->GetGUID());
+
+                    if (HasAura(77616))
+                        return false;
+
+                    // Replacer
+                    int32  basepoints0 = procSpell->Id;
+                    caster->CastCustomSpell(this, 77616, &basepoints0, NULL, NULL, true);
+
+                    // SpellPower
+                    basepoints0 = victim->SpellBaseDamageBonusDone(SpellSchoolMask(procSpell->SchoolMask));
+                    caster->CastCustomSpell(caster, 94984, &basepoints0, &basepoints0, NULL, true);
+                    return true;
+            }
             // Runic Power Back on Snare/Root
             if (dummySpell->Id == 61257)
             {
