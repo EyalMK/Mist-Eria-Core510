@@ -1315,6 +1315,60 @@ bool SpellInfo::IsAutoRepeatRangedSpell() const
     return AttributesEx2 & SPELL_ATTR2_AUTOREPEAT_FLAG;
 }
 
+bool SpellInfo::IsCanBeStolen() const
+{
+    // some of the rules for those spells that can be stolen by Dark Simulacrum
+    // spells should use mana
+    if (PowerType != POWER_MANA)
+        return false;
+
+    // and should have mana cost
+    if (!ManaCost && !ManaCostPercentage)
+        return false;
+
+    // special rules
+    switch (Id)
+    {
+        case 633:   // Lay on Hands
+        case 22812: // Barkskin
+        case 24275: // Hammer of Wrath
+        case 31935: // Avenger's Shield
+        case 53563: // Beaconf of the Light
+            return false;
+        default:
+            break;
+    }
+
+    for (uint8 x = 0; x < MAX_SPELL_EFFECTS; ++x)
+    {
+        switch (Effects[x].Effect)
+        {
+            case SPELL_EFFECT_SUMMON:
+            case SPELL_EFFECT_SUMMON_PET:
+            case SPELL_EFFECT_CAST_BUTTON:
+            case SPELL_EFFECT_TAMECREATURE:
+            case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+            case SPELL_EFFECT_KNOCK_BACK:
+                return false;
+            case SPELL_EFFECT_SCHOOL_DAMAGE:
+                if (DmgClass == SPELL_DAMAGE_CLASS_MELEE)
+                    return false;
+                break;
+            default:
+                break;
+        }
+        switch (Effects[x].ApplyAuraName)
+        {
+            case SPELL_AURA_MOD_SHAPESHIFT:
+                return false;
+            default:
+                break;
+        }
+    }
+
+    return true;
+}
+
 bool SpellInfo::IsAffectedBySpellMods() const
 {
     return !(AttributesEx3 & SPELL_ATTR3_NO_DONE_BONUS);
