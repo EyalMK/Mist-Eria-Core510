@@ -7594,9 +7594,8 @@ void Player::SendNewCurrency(uint32 id) const
     if (!entry) // should never happen
         return;
 
-    uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
-    uint32 weekCount = itr->second.weekCount / precision;
-    uint32 weekCap = GetCurrencyWeekCap(entry) / precision;
+    uint32 weekCount = itr->second.weekCount;
+    uint32 weekCap = GetCurrencyWeekCap(entry);
 
 	packet.WriteBits(0, 5); // some flags
 	packet.WriteBit(0);     // season total earned
@@ -7604,7 +7603,7 @@ void Player::SendNewCurrency(uint32 id) const
 	packet.WriteBit(weekCap);
    
 	currencyData << uint32(entry->ID);
-    currencyData << uint32(itr->second.totalCount / precision);
+    currencyData << uint32(itr->second.totalCount);
 
     if (weekCap)
         currencyData << uint32(weekCap);
@@ -7635,9 +7634,8 @@ void Player::SendCurrencies() const
         if (!entry || entry->Category == CURRENCY_CATEGORY_META_CONQUEST)
             continue;
 
-        uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
-        uint32 weekCount = itr->second.weekCount / precision;
-        uint32 weekCap = GetCurrencyWeekCap(entry) / precision;
+        uint32 weekCount = itr->second.weekCount;
+        uint32 weekCap = GetCurrencyWeekCap(entry);
 
         packet.WriteBits(0, 5); // some flags
         packet.WriteBit(0);     // season total earned
@@ -7645,7 +7643,7 @@ void Player::SendCurrencies() const
 		packet.WriteBit(weekCap);
 
         currencyData << uint32(entry->ID);
-        currencyData << uint32(itr->second.totalCount / precision);
+        currencyData << uint32(itr->second.totalCount);
 
         if (weekCap)
             currencyData << uint32(weekCap);
