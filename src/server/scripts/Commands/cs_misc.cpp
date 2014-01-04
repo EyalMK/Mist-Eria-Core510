@@ -35,6 +35,8 @@
 #include "Pet.h"
 #include "LFG.h"
 #include "GroupMgr.h"
+#include "BattlegroundMgr.h"
+#include "BattlegroundQueue.h"
 
 class misc_commandscript : public CommandScript
 {
@@ -129,6 +131,7 @@ public:
             { "bindsight",          SEC_ADMINISTRATOR,      false, HandleBindSightCommand,              "", NULL },
             { "unbindsight",        SEC_ADMINISTRATOR,      false, HandleUnbindSightCommand,            "", NULL },
             { "playall",            SEC_GAMEMASTER,         false, HandlePlayAllCommand,                "", NULL },
+			{ "pvpinfo",            SEC_PLAYER,				false, HandlePVPInfoCommand,                "", NULL },
             { NULL,                 0,                      false, NULL,                                "", NULL }
         };
         return commandTable;
@@ -2997,6 +3000,105 @@ public:
 
         return true;
     }
+
+	static bool HandlePVPInfoCommand(ChatHandler *handler, char const* /*args*/)
+    {
+		uint16 qA[MAX_BATTLEGROUND_QUEUE_TYPES], qH[MAX_BATTLEGROUND_QUEUE_TYPES], qI[MAX_BATTLEGROUND_QUEUE_TYPES];
+
+        std::stringstream ss;
+        ss << "Infos PvP : \n";
+
+        for (uint8 i=1; i<MAX_BATTLEGROUND_QUEUE_TYPES; ++i)
+        {
+			qA[i] = 0;
+			qH[i] = 0;
+			qI[i] = sBattlegroundMgr->GetBattlegroundCount(sBattlegroundMgr->BGTemplateId((BattlegroundQueueTypeId)i));
+
+            BattlegroundQueue *bgqueue = &(sBattlegroundMgr->GetBattlegroundQueue((BattlegroundQueueTypeId)i));
+
+            if (!bgqueue->m_QueuedPlayers.size()) // On affiche seulement un BG avec au moins 1 personne en attente
+                continue;
+
+            for(BattlegroundQueue::QueuedPlayersMap::const_iterator it = bgqueue->m_QueuedPlayers.begin(); it != bgqueue->m_QueuedPlayers.end() ; ++it)
+            {
+                uint64 guid = it->first;
+                if (Player *player = sObjectMgr->GetPlayerByLowGUID(GUID_LOPART(guid)))
+                {
+                    if (player->GetTeamId() == TEAM_ALLIANCE)
+                        qA[i]++;
+                    else
+                        qH[i]++;
+                }
+            }
+		}
+
+		for (uint8 i=1; i<MAX_BATTLEGROUND_QUEUE_TYPES; ++i)
+        {
+			if((qA[i] + qH[i] == 0) && (qI[i] = 0))
+				continue;
+
+			switch (i)
+			{
+				case BATTLEGROUND_QUEUE_AV:
+					ss << "Vallée d'Altérac";
+				case BATTLEGROUND_QUEUE_WS:
+					ss << "Goulet des Chanteguerres";
+				case BATTLEGROUND_QUEUE_AB:
+					ss << "Vallée d'Altérac";
+				case BATTLEGROUND_QUEUE_EY:
+					ss << "Oeil du Cyclone";
+				case BATTLEGROUND_QUEUE_SA:
+					ss << "Rivage des Anciens";
+				case BATTLEGROUND_QUEUE_IC:
+					ss << "Ile des Conquérants";
+				case BATTLEGROUND_QUEUE_TP:
+					ss << "Pics Jumeaux";
+				case BATTLEGROUND_QUEUE_BFG:
+					ss << "Bataille de Gilnéas";
+				case BATTLEGROUND_QUEUE_TK:
+					ss << "Temple de Kotmogu";
+				case BATTLEGROUND_QUEUE_SM:
+					ss << "Mines d'éclargent";
+				case BATTLEGROUND_QUEUE_RB:
+					ss << "Champs de Bataille Aléatoire";
+				case BATTLEGROUND_QUEUE_2v2:
+					ss << "Arène 2c2";
+				case BATTLEGROUND_QUEUE_3v3:
+					ss << "Arène 3c3";
+				case BATTLEGROUND_QUEUE_5v5:
+					ss << "Arène 5v5";
+				default:
+					ss << "";
+			}
+            ss << " : ";
+
+            if (i<=BATTLEGROUND_QUEUE_RB) // BGs
+            {
+                ss << qI[i] << "en cours, |cff0000ff" << qA[i] << " A |r- |cffff0000" << qH[i] << " H|r\n";
+            }
+            else // Arenes
+            {
+				uint8 arena = 1;
+				uint32 team = qA[i] + qH[i];
+                switch (i)
+                {
+                    case BATTLEGROUND_QUEUE_2v2:
+                        arena = 2;
+                    case BATTLEGROUND_QUEUE_3v3:
+                        arena = 3;
+                    case BATTLEGROUND_QUEUE_5v5:
+                        arena = 5;
+                }
+                team /= arena;
+                ss << "|cff00ff00" << qI[i]*2 << " équipes en combat, " << team << " dans la file|r\n";
+            }
+        }
+
+        handler->SendSysMessage(ss.str().c_str());
+
+        return true;
+    }
+
 };
 
 void AddSC_misc_commandscript()
