@@ -231,7 +231,7 @@ public:
 			if (!who || !who->IsInWorld())
 				return;
 
-			if (who && who->GetTypeId() == TYPEID_PLAYER && !intro && !me->IsValidAttackTarget(who))
+			if (who && who->GetTypeId() == TYPEID_PLAYER && !intro && !me->IsValidAttackTarget(who) && who->isAlive())
 			{
 				Talk(SAY_INTRO);
 				intro = true;

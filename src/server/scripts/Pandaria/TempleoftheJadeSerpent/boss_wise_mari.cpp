@@ -258,13 +258,13 @@ public:
 
 		void MoveInLineOfSight(Unit* who)
 		{
-			if (!me->IsWithinDistInMap(who, 60.0f) || intro)
+			if (!me->IsWithinDistInMap(who, 45.0f) || intro)
 				return;
 
 			if (!who || !who->IsInWorld())
 				return;
 
-			if (who && who->GetTypeId() == TYPEID_PLAYER && !intro && !me->IsValidAttackTarget(who))
+			if (who && who->GetTypeId() == TYPEID_PLAYER && !intro && me->IsValidAttackTarget(who) && who->isAlive())
 			{
 				Talk(SAY_INTRO);
 				intro = true;
