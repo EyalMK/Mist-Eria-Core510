@@ -35,6 +35,7 @@ enum Spells
     SPELL_MIND_ROT                  = 115143,
     SPELL_EVICTED_SOUL              = 115309,
     SPELL_EVICT_SOUL_NPC            = 115304,
+    SPELL_SPIRITI_GALE_AURA         = 115289,
     SPELL_EMPOWERING_SPIRIT         = 115157,
     SPELL_EMPOWER_ZOMBIE_TRANSFORM  = 115250,
     SPELL_AOE                       = 115272,
@@ -277,6 +278,14 @@ public:
             void EnterCombat(Unit* /*who*/)
             {
                 me->CastSpell(me, SPELL_EVICTED_SOUL);
+
+                if (TempSummon* temp = me->ToTempSummon())
+                {
+                    if (Unit* summoner = temp->GetSummoner())
+                    {
+                        me->SetDisplayId(summoner->GetDisplayId());
+                    }
+                }
             }
 
             void UpdateAI(uint32 diff)
@@ -363,9 +372,50 @@ public:
     {
             npc_traqueur_thalnosAI(Creature* creature) : ScriptedAI(creature) {}
 
+            uint32 position_Timer;
+
             void Reset()
             {
+                me->SetReactState(REACT_PASSIVE);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
                 me->CastSpell(me, SPELL_AOE);
+                position_Timer = 500;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if (position_Timer <= diff)
+                {
+                    if(me->GetMap())
+                    {
+                        Map::PlayerList const & playerList = me->GetMap()->GetPlayers();
+                        if(!playerList.isEmpty())
+                        {
+                            for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
+                            {
+                                if(Player* player =iter->getSource())
+                                {
+                                    Position pos ;
+                                    player->GetPosition(&pos);
+                                    if(me->GetExactDist2d(&pos) <= 2.0f)
+                                    {
+                                        if(player->HasAura(SPELL_SPIRITI_GALE_AURA))
+                                            continue ;
+                                        else
+                                            DoCast(player, SPELL_SPIRITI_GALE_AURA, true);
+                                    }
+                                    else
+                                    {
+                                        if(player->HasAura(SPELL_SPIRITI_GALE_AURA))
+                                            player->RemoveAurasDueToSpell(SPELL_SPIRITI_GALE_AURA);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    position_Timer = 500;
+                }
+                else position_Timer -= diff;
             }
     };
 };
