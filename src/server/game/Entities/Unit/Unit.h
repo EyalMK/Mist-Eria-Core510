@@ -692,8 +692,6 @@ enum NPCFlags
 	UNIT_NPC_FLAG_BLACK_MARKET			= 0x80000000		// black market auction house
 };	
 
-#define UNIT_NPC_FLAG_UPGRADE 4294967296
-
 enum MovementFlags
 {
     MOVEMENTFLAG_NONE                  = 0x00000000,

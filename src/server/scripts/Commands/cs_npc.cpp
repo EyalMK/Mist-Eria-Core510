@@ -555,7 +555,7 @@ public:
         if (!*args)
             return false;
 
-        uint64 npcFlags = (uint32) atoi((char*)args);
+        uint32 npcFlags = (uint32) atoi((char*)args);
 
         Creature* creature = handler->getSelectedCreature();
 
@@ -566,11 +566,11 @@ public:
             return false;
         }
 
-        creature->SetUInt64Value(UNIT_NPC_FLAGS, npcFlags);
+        creature->SetUInt32Value(UNIT_NPC_FLAGS, npcFlags);
 
         PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_NPCFLAG);
 
-        stmt->setUInt64(0, npcFlags);
+        stmt->setUInt32(0, npcFlags);
         stmt->setUInt32(1, creature->GetEntry());
 
         WorldDatabase.Execute(stmt);
@@ -645,7 +645,7 @@ public:
         }
 
         uint32 faction = target->getFaction();
-        uint32 npcflags = target->GetUInt64Value(UNIT_NPC_FLAGS);
+        uint32 npcflags = target->GetUInt32Value(UNIT_NPC_FLAGS);
         uint32 displayid = target->GetDisplayId();
         uint32 nativeid = target->GetNativeDisplayId();
         uint32 Entry = target->GetEntry();
