@@ -1937,6 +1937,8 @@ class Unit : public WorldObject
 		void ResetDamageDoneInPastSecs(uint32 secs);
 		void ResetHealingDoneInPastSecs(uint32 secs);
 
+		Unit* GetSimulacrumTarget();
+
         uint32 m_addDmgOnce;
         uint64 m_SummonSlot[MAX_SUMMON_SLOT];
         uint64 m_ObjectSlot[MAX_GAMEOBJECT_SLOT];

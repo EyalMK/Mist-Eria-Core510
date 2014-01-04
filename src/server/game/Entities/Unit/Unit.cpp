@@ -17744,3 +17744,16 @@ void Unit::ResetHealingDoneInPastSecs(uint32 secs)
     for (uint32 i = 0; i < secs; i++)
         m_heal_done[i] = 0;
 }
+
+Unit* Unit::GetSimulacrumTarget()
+{
+    if (Unit* simulacrumTarget = sObjectAccessor->FindUnit(simulacrumTargetGUID))
+    {
+        if (simulacrumTarget->IsInWorld())
+            return simulacrumTarget;
+        else
+            return NULL;
+    }
+    else
+        return NULL;
+}
