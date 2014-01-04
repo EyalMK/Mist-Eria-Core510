@@ -64,6 +64,9 @@ enum Texts
 enum Creatures
 {
     NPC_ZOMBIE                  = 59884,
+    NPC_EVICTED_SOUL            = 59974,
+    NPC_EMPOWERING_SPIRITS      = 59893,
+    NPC_EMPOWERED_ZOMBIE        = 59930,
     NPC_THALNOS                 = 59789,
     NPC_TRAQUEUR_INVISIBLE      = 200011
 };
@@ -142,9 +145,27 @@ public:
         {
             Summons.Summon(Summoned);
 
-            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true);
+            if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+            {
                 if(target && target->GetTypeId() == TYPEID_PLAYER)
-                    Summoned->AI()->AttackStart(target);
+                {
+                    switch (Summoned->GetEntry())
+                    {
+                        case NPC_ZOMBIE:
+                            Summoned->AI()->AttackStart(target);
+                            break;
+                        case NPC_EVICTED_SOUL :
+                            Summoned->AI()->AttackStart(target);
+                            break;
+                        case NPC_EMPOWERING_SPIRITS:
+                            Summoned->AI()->AttackStart(target);
+                            break;
+                        case NPC_EMPOWERED_ZOMBIE:
+                            Summoned->AI()->AttackStart(target);
+                            break;
+                    }
+                }
+            }
         }
 
 
@@ -310,10 +331,13 @@ public:
 
                 if (Test_timer <= diff)
                 {
-                    if(Creature* thalnos = me->FindNearestCreature(NPC_ZOMBIE, 100.0f, false))
+                    if(Creature* thalnos = me->FindNearestCreature(NPC_THALNOS, 100.0f))
                     {
-                        thalnos->CastSpell(me, SPELL_EMPOWER_ZOMBIE_TRANSFORM, true);
-                        me->DisappearAndDie();
+                        if(me->FindNearestCreature(NPC_ZOMBIE, 100.0f, false))
+                        {
+                            thalnos->CastSpell(me, SPELL_EMPOWER_ZOMBIE_TRANSFORM, true);
+                            me->DisappearAndDie();
+                        }
                     }
                     else
                         Test_timer = 1000;
@@ -359,12 +383,13 @@ class spell_spirit_gale : public SpellScriptLoader
             void SummonTraqueurFlaque(SpellEffIndex /*effIndex*/)
             {                     
                 if (Unit* target = GetHitPlayer())
-                {
-                    Creature* thalnos = target->FindNearestCreature(NPC_THALNOS, 100.0f);
-
-                    if (target->GetTypeId() == TYPEID_PLAYER)
+                {                  
+                    if(Creature* thalnos = target->FindNearestCreature(NPC_THALNOS, 100.0f))
                     {
-                        thalnos->SummonCreature(NPC_TRAQUEUR_INVISIBLE, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
+                        if (target->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            thalnos->SummonCreature(NPC_TRAQUEUR_INVISIBLE, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
+                        }
                     }
                 }
             }
