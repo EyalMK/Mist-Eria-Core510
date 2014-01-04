@@ -7684,9 +7684,8 @@ uint32 Player::GetCurrency(uint32 id, bool usePrecision) const
         return 0;
 
     CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
-    uint32 precision = (usePrecision && currency->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
 
-    return itr->second.totalCount / precision;
+    return itr->second.totalCount;
 }
 
 uint32 Player::GetCurrencyOnWeek(uint32 id, bool usePrecision) const
@@ -7696,9 +7695,8 @@ uint32 Player::GetCurrencyOnWeek(uint32 id, bool usePrecision) const
         return 0;
 
     CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
-    uint32 precision = (usePrecision && currency->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
 
-    return itr->second.weekCount / precision;
+    return itr->second.weekCount;
 }
 
 bool Player::HasCurrency(uint32 id, uint32 count) const
@@ -7718,7 +7716,6 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
     if (!ignoreMultipliers)
         count *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_CURRENCY_GAIN, id);
 
-    int32 precision = currency->Flags & CURRENCY_FLAG_HIGH_PRECISION ? CURRENCY_PRECISION : 1;
     uint32 oldTotalCount = 0;
     uint32 oldWeekCount = 0;
     PlayerCurrenciesMap::iterator itr = _currencyStorage.find(id);
@@ -7792,7 +7789,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
         WorldPacket packet(SMSG_UPDATE_CURRENCY, 12);
 
         packet << uint32(id);
-		packet << uint32(newTotalCount / precision);
+		packet << uint32(newTotalCount);
 
         packet.WriteBit(weekCap != 0);
 		packet.WriteBit(!printLog); // print in log
@@ -7803,7 +7800,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
         //    packet << uint32(0);
 
         if (weekCap)
-            packet << uint32(newWeekCount / precision);
+            packet << uint32(newWeekCount);
 
         GetSession()->SendPacket(&packet);
     }
@@ -7828,9 +7825,7 @@ uint32 Player::GetCurrencyWeekCap(uint32 id, bool usePrecision) const
     if (!entry)
         return 0;
 
-    uint32 precision = (usePrecision && entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
-
-    return GetCurrencyWeekCap(entry) / precision;
+    return GetCurrencyWeekCap(entry);
 }
 
 void Player::ResetCurrencyWeekCap()
@@ -7865,10 +7860,10 @@ uint32 Player::GetCurrencyWeekCap(CurrencyTypesEntry const* currency) const
             return std::max(GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_ARENA, false), GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_RBG, false));
         case CURRENCY_TYPE_CONQUEST_META_ARENA:
             // should add precision mod = 100
-            return Trinity::Currency::ConquestRatingCalculator(_maxPersonalArenaRate) * CURRENCY_PRECISION;
+            return Trinity::Currency::ConquestRatingCalculator(_maxPersonalArenaRate);
         case CURRENCY_TYPE_CONQUEST_META_RBG:
             // should add precision mod = 100
-            return Trinity::Currency::BgConquestRatingCalculator(GetRBGPersonalRating()) * CURRENCY_PRECISION;
+            return Trinity::Currency::BgConquestRatingCalculator(GetRBGPersonalRating());
     }
 
     return currency->WeekCap;
@@ -26627,9 +26622,8 @@ void Player::SendRefundInfo(Item* item)
     for (uint8 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)                       // currency cost data
     {
         CurrencyTypesEntry const* currencyType = sCurrencyTypesStore.LookupEntry(iece->RequiredCurrency[i]);
-        uint32 precision = (currencyType && currencyType->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
 
-        data << uint32(iece->RequiredCurrencyCount[i] / precision);
+        data << uint32(iece->RequiredCurrencyCount[i]);
         data << uint32(iece->RequiredCurrency[i]);
     }
 
@@ -26684,9 +26678,8 @@ void Player::SendItemRefundResult(Item* item, ItemExtendedCostEntry const* iece,
         for (uint8 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
         {
             CurrencyTypesEntry const* currencyType = sCurrencyTypesStore.LookupEntry(iece->RequiredCurrency[i]);
-            uint32 precision = (currencyType && currencyType->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
 
-            data << uint32(iece->RequiredCurrencyCount[i] / precision);
+            data << uint32(iece->RequiredCurrencyCount[i]);
             data << uint32(iece->RequiredCurrency[i]);
         }
 
