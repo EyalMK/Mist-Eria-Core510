@@ -347,6 +347,10 @@ public:
     SpellDurationEntry const* DurationEntry;
     SpellPowerEntry const* SpellPowerId[MAX_SPELL_POWERS];
     uint8 currentInitPower;
+	uint32 PowerType;
+    uint32 ManaCost;
+    uint32 ManaPerSecond;
+    float ManaCostPercentage;
     uint32 RuneCostID;
     float APMultiplier;
     SpellRangeEntry const* RangeEntry;
