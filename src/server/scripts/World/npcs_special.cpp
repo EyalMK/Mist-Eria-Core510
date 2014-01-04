@@ -1764,52 +1764,6 @@ public:
     }
 };
 
-class npc_mirror_image : public CreatureScript
-{
-public:
-    npc_mirror_image() : CreatureScript("npc_mirror_image") { }
-
-    struct npc_mirror_imageAI : CasterAI
-    {
-        npc_mirror_imageAI(Creature* creature) : CasterAI(creature) {}
-
-        void InitializeAI()
-        {
-            CasterAI::InitializeAI();
-            Unit* owner = me->GetOwner();
-            if (!owner)
-                return;
-            // Inherit Master's Threat List (not yet implemented)
-            owner->CastSpell((Unit*)NULL, 58838, true);
-            // here mirror image casts on summoner spell (not present in client dbc) 49866
-            // here should be auras (not present in client dbc): 35657, 35658, 35659, 35660 selfcasted by mirror images (stats related?)
-            // Clone Me!
-            owner->CastSpell(me, 45204, false);
-        }
-
-        // Do not reload Creature templates on evade mode enter - prevent visual lost
-        void EnterEvadeMode()
-        {
-            if (me->IsInEvadeMode() || !me->isAlive())
-                return;
-
-            Unit* owner = me->GetCharmerOrOwner();
-
-            me->CombatStop(true);
-            if (owner && !me->HasUnitState(UNIT_STATE_FOLLOW))
-            {
-                me->GetMotionMaster()->Clear(false);
-                me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_mirror_imageAI(creature);
-    }
-};
-
 class npc_ebon_gargoyle : public CreatureScript
 {
 public:
@@ -3492,7 +3446,6 @@ void AddSC_npcs_special()
     new npc_tonk_mine();
     new npc_brewfest_reveler();
     new npc_snake_trap();
-    new npc_mirror_image();
     new npc_ebon_gargoyle();
     new npc_lightwell();
     new mob_mojo();
