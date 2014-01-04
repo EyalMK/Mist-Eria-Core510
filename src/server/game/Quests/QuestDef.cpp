@@ -202,11 +202,11 @@ Quest::Quest(Field* questRecord)
 
 	RewardType = questRecord[173].GetUInt8(); // For quest package item
 
-	if (uint8(questRecord[173].GetUInt8()) > 0)
+	if (RewardType > 0)
 	{
-		//								                  1        2        3        4        5       6
+		//								                    0        1        2        3        4       5
 		QueryResult result = WorldDatabase.Query("SELECT questId, itemId1, itemId2, itemId3, itemId4, itemId5,"
-		//                                               7        8        9       10        11
+		//                                                6       7        8       9        10
 													 "itemId6, itemId7, itemId8, itemId9, itemId10 FROM item_quest_package");
 
 		if (!result)
@@ -226,7 +226,7 @@ Quest::Quest(Field* questRecord)
 				RewardPackageChoiceItemId[i] = questPackageRecord[1+i].GetUInt32();
 
 			for (int i = 0; i < QUEST_MAX_REWARD_CHOICES_COUNT; ++i)
-				if (RewardPackageChoiceItemCount[i] = 1)
+				if (RewardPackageChoiceItemCount[i])
 					++m_rewChoiceItemsCount;
 
 		} while (result->NextRow());
@@ -424,7 +424,7 @@ uint32 Quest::GetRewardChoiceIdForEntry(uint32 rewardEntry) const
 uint8 Quest::GetItemRewardGroup(uint32 itemId) const
 {
 	if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId))
-		return uint8(itemTemplate->ItemQuestGroup);
+		return itemTemplate->ItemQuestGroup;
 }
 
 uint8 Quest::GetItemRewardGroupFromSpec(uint32 spec) const

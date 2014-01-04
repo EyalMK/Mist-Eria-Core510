@@ -229,6 +229,8 @@ public:
 				if (GameObject* go = me->FindNearestGameObject(GO_SHA_OF_DOUBT_GATE, 99999.0f))
 					go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
 			}
+
+			ScriptedAI::EnterEvadeMode();
 		}
 
 		void EnterCombat(Unit* /*who*/)
@@ -434,6 +436,8 @@ public:
 		{
 			if (instance)
 				me->DespawnOrUnsummon();
+
+			ScriptedAI::EnterEvadeMode();
 		}
 
         void JustDied(Unit *pWho)

@@ -252,6 +252,8 @@ public:
 					}
 				}
 			}
+
+			ScriptedAI::EnterEvadeMode();
 		}
 
 		void MoveInLineOfSight(Unit* who)
@@ -658,7 +660,10 @@ public:
 
 		void EnterEvadeMode()
 		{
-			me->DespawnOrUnsummon();
+			if (instance)
+				me->DespawnOrUnsummon();
+
+			ScriptedAI::EnterEvadeMode();
 		}
 
 		void DamageTaken(Unit* who, uint32& damage)
@@ -831,7 +836,10 @@ public:
 
 		void EnterEvadeMode()
 		{
-			me->DespawnOrUnsummon();
+			if (instance)
+				me->DespawnOrUnsummon();
+
+			ScriptedAI::EnterEvadeMode();
 		}
 
 		void UpdateAI(uint32 diff) 
