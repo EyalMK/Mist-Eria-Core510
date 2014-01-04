@@ -360,6 +360,89 @@ public:
     };
 };
 
+class npc_traqueur_verification : public CreatureScript
+{
+public:
+    npc_traqueur_verification() : CreatureScript("npc_traqueur_verification") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_traqueur_verificationAI(creature);
+    }
+
+    struct npc_traqueur_verificationAI : public ScriptedAI
+    {
+           npc_traqueur_verificationAI(Creature* creature) : ScriptedAI(creature) {}
+
+            uint32 m_uiCheckTimer;
+
+            void Reset()
+            {
+                me->SetReactState(REACT_PASSIVE);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+                m_uiCheckTimer = 250 ;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if(m_uiCheckTimer <= diff)
+                {
+                    DoCheckPlayers();
+                    m_uiCheckTimer = 250 ;
+                }
+                else
+                    m_uiCheckTimer -= diff ;
+
+            }
+
+            void DoCheckPlayers()
+            {
+                std::list<Creature*> stalkers ;
+                GetCreatureListWithEntryInGrid(stalkers, me, NPC_TRAQUEUR_INVISIBLE, 50000.0f);
+                if(Map* map = me->GetMap())
+                {
+                    Map::PlayerList const & playerList = map->GetPlayers();
+                    if(!playerList.isEmpty())
+                    {
+                        for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
+                        {
+                            if(Player* p = iter->getSource())
+                            {
+                                if(DoCheckPlayer(p, stalkers))
+                                {
+                                    if(!p->HasAura(SPELL_SPIRIT_GALE_AURA))
+                                        p->CastSpell(p, SPELL_SPIRIT_GALE_AURA, true);
+                                }
+                                else
+                                    p->RemoveAurasDueToSpell(SPELL_SPIRIT_GALE_AURA);
+                             }
+                        }
+                    }
+                }
+            }
+
+            bool DoCheckPlayer(Player *player, std::list<Creature*> const& stalkersList)
+            {
+                if(stalkersList.empty())
+                    return false ;
+
+                for(std::list<Creature*>::const_iterator iter = stalkersList.begin() ; iter != stalkersList.end() ; ++iter)
+                {
+                    Position pos ;
+                    if(Creature* stalker = *iter)
+                    {
+                        stalker->GetPosition(&pos);
+                        if(player->GetExactDist2d(&pos) <= 2.0f)
+                            return true ;
+                        else
+                            continue ;
+                     }
+                }
+                return false ;
+            }
+    };
+};
+
 class npc_traqueur_thalnos : public CreatureScript
 {
 public:
@@ -374,50 +457,11 @@ public:
     {
             npc_traqueur_thalnosAI(Creature* creature) : ScriptedAI(creature) {}
 
-            uint32 position_Timer;
-
             void Reset()
             {
                 me->SetReactState(REACT_PASSIVE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
                 me->CastSpell(me, SPELL_AOE);
-                position_Timer = 500;
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (position_Timer <= diff)
-                {
-                    if(me->GetMap())
-                    {
-                        Map::PlayerList const & playerList = me->GetMap()->GetPlayers();
-                        if(!playerList.isEmpty())
-                        {
-                            for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
-                            {
-                                if(Player* player =iter->getSource())
-                                {
-                                    Position pos ;
-                                    player->GetPosition(&pos);
-                                    if(me->GetExactDist2d(&pos) <= 2.0f)
-                                    {
-                                        if(player->HasAura(SPELL_SPIRIT_GALE_AURA))
-                                            continue ;
-                                        else
-                                            player->CastSpell(player, SPELL_SPIRIT_GALE_AURA, TRIGGERED_FULL_MASK);
-                                    }
-                                    else
-                                    {
-                                        if(player->HasAura(SPELL_SPIRIT_GALE_AURA))
-                                            player->RemoveAurasDueToSpell(SPELL_SPIRIT_GALE_AURA);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    position_Timer = 500;
-                }
-                else position_Timer -= diff;
             }
     };
 };
@@ -517,6 +561,7 @@ void AddSC_boss_thalnos_the_soulrender()
     new npc_fallen_crusader();
     new npc_evicted_soul();
     new npc_empowering_spirit();
+    new npc_traqueur_verification();
     new npc_traqueur_thalnos();
     new spell_spirit_gale();
     new spell_evict_soul();
