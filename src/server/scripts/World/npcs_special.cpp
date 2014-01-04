@@ -3429,6 +3429,52 @@ class npc_ring_of_frost : public CreatureScript
         }
 };
 
+class npc_mirror_image : public CreatureScript
+{
+public:
+    npc_mirror_image() : CreatureScript("npc_mirror_image") { }
+
+    struct npc_mirror_imageAI : CasterAI
+    {
+        npc_mirror_imageAI(Creature* creature) : CasterAI(creature) {}
+
+        void InitializeAI()
+        {
+            CasterAI::InitializeAI();
+            Unit* owner = me->GetOwner();
+            if (!owner)
+                return;
+            // Inherit Master's Threat List (not yet implemented)
+            owner->CastSpell((Unit*)NULL, 58838, true);
+            // here mirror image casts on summoner spell (not present in client dbc) 49866
+            // here should be auras (not present in client dbc): 35657, 35658, 35659, 35660 selfcasted by mirror images (stats related?)
+            // Clone Me!
+            owner->CastSpell(me, 45204, true);
+        }
+
+        // Do not reload Creature templates on evade mode enter - prevent visual lost
+        void EnterEvadeMode()
+        {
+            if (me->IsInEvadeMode() || !me->isAlive())
+                return;
+
+            Unit* owner = me->GetCharmerOrOwner();
+
+            me->CombatStop(true);
+            if (owner && !me->HasUnitState(UNIT_STATE_FOLLOW))
+            {
+                me->GetMotionMaster()->Clear(false);
+                me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_mirror_imageAI(creature);
+    }
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3471,4 +3517,5 @@ void AddSC_npcs_special()
 	new npc_dire_beast();
     new npc_flyingmount_aura_stalker();
 	new npc_ring_of_frost();
+	new npc_mirror_image();
 }

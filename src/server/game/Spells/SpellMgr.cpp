@@ -3068,6 +3068,18 @@ void SpellMgr::LoadSpellCustomAttr()
                     spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REFLECTED;
                     spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(13);
                     break;
+				case 45204: // Mirror Image - Clone Me!
+                    spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
+                    spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+                    break;
+                case 41055: // Copy Weapon Spells
+                case 45206:
+                case 63416:
+                case 69891:
+                case 69892:
+                    spellInfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;
+                    spellInfo->Mechanic = 0;
+                    break;
 				default:
 					break;
 			}
