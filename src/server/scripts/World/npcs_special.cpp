@@ -2961,7 +2961,7 @@ public:
 			QueryResult result = WorldDatabase.Query("SELECT text FROM creature_text WHERE entry = 560130");
 
 			if (!result)
-			return;
+			return false;
 
 			std::string text;
 
