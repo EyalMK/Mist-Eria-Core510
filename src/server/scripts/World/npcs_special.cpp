@@ -2895,8 +2895,6 @@ public:
     }
 };
 
-#define GOSSIP_SELECT_FACTION "Je suis pret a prendre ma decision."
-
 class npc_neutral_faction_select : public CreatureScript
 {
 public:
@@ -2909,7 +2907,20 @@ public:
 
         if(player->hasQuest(31450))
         {
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SELECT_FACTION , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+			QueryResult result = WorldDatabase.Query("SELECT text FROM creature_text WHERE entry = 560130");
+
+			if (!result)
+			return;
+
+			std::string text;
+
+			do
+			{
+				Field* neutralFaction = result->Fetch();
+				text = neutralFaction[0].GetString();
+			} while (result->NextRow());
+
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, text , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
         player->PlayerTalkClass->SendGossipMenu(724006, creature->GetGUID());
@@ -2946,8 +2957,22 @@ public:
     bool OnGossipHello(Player* player, Creature* creature)
     {
 		if (player->getRace() == RACE_PANDAREN)
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SELECT_FACTION , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+		{
+			QueryResult result = WorldDatabase.Query("SELECT text FROM creature_text WHERE entry = 560130");
 
+			if (!result)
+			return;
+
+			std::string text;
+
+			do
+			{
+				Field* neutralFaction = result->Fetch();
+				text = neutralFaction[0].GetString();
+			} while (result->NextRow());
+
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, text , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+		}
         player->PlayerTalkClass->SendGossipMenu(724006, creature->GetGUID());
 
         return true;
