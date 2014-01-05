@@ -3041,34 +3041,48 @@ public:
 			{
 				case BATTLEGROUND_QUEUE_AV:
 					ss << "Vallée d'Altérac";
+					break;
 				case BATTLEGROUND_QUEUE_WS:
 					ss << "Goulet des Chanteguerres";
+					break;
 				case BATTLEGROUND_QUEUE_AB:
 					ss << "Vallée d'Altérac";
+					break;
 				case BATTLEGROUND_QUEUE_EY:
 					ss << "Oeil du Cyclone";
+					break;
 				case BATTLEGROUND_QUEUE_SA:
 					ss << "Rivage des Anciens";
+					break;
 				case BATTLEGROUND_QUEUE_IC:
 					ss << "Ile des Conquérants";
+					break;
 				case BATTLEGROUND_QUEUE_TP:
 					ss << "Pics Jumeaux";
+					break;
 				case BATTLEGROUND_QUEUE_BFG:
 					ss << "Bataille de Gilnéas";
+					break;
 				case BATTLEGROUND_QUEUE_TK:
 					ss << "Temple de Kotmogu";
+					break;
 				case BATTLEGROUND_QUEUE_SM:
 					ss << "Mines d'éclargent";
+					break;
 				case BATTLEGROUND_QUEUE_RB:
 					ss << "Champs de Bataille Aléatoire";
+					break;
 				case BATTLEGROUND_QUEUE_2v2:
 					ss << "Arène 2c2";
+					break;
 				case BATTLEGROUND_QUEUE_3v3:
 					ss << "Arène 3c3";
+					break;
 				case BATTLEGROUND_QUEUE_5v5:
 					ss << "Arène 5v5";
+					break;
 				default:
-					ss << "";
+					break;
 			}
             ss << " : ";
 
@@ -3084,10 +3098,15 @@ public:
                 {
                     case BATTLEGROUND_QUEUE_2v2:
                         arena = 2;
+						break;
                     case BATTLEGROUND_QUEUE_3v3:
                         arena = 3;
+						break;
                     case BATTLEGROUND_QUEUE_5v5:
                         arena = 5;
+						break;
+					default:
+						break;
                 }
                 team /= arena;
                 ss << "|cff00ff00" << qI[i]*2 << " équipes en combat, " << team << " dans la file|r\n";
