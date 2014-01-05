@@ -100,7 +100,7 @@ public:
             if (instance)
                 instance->SetBossState(DATA_BOSS_BROTHER_KORLOFF, IN_PROGRESS);
 
-            events.ScheduleEvent(EVENT_FIRESTORM_KICK, 10*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_JUMP_FIRESTORM, 10*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_BLAZING_FISTS, 20*IN_MILLISECONDS);
         }
 
@@ -172,7 +172,7 @@ public:
                         case EVENT_JUMP_FIRESTORM:
                             if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST))
                             {
-                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20);
+                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 10);
                                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                                 events.ScheduleEvent(EVENT_FIRESTORM_KICK, 2*IN_MILLISECONDS);
                             }
@@ -181,7 +181,7 @@ public:
                         case EVENT_FIRESTORM_KICK:
                             DoCast(SPELL_FIRESTORM_KICK);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                            events.ScheduleEvent(EVENT_JUMP_FIRESTORM, 29*IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_JUMP_FIRESTORM, 28*IN_MILLISECONDS);
                             break;
 
                         case EVENT_SCORCHED_EARTH:
@@ -222,10 +222,25 @@ public:
     {
             npc_scorched_earthAI(Creature* creature) : ScriptedAI(creature) {}
 
+            uint32 m_uiCheckTimer;
+
             void Reset()
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
                 me->CastSpell(me, SPELL_SCORCHED_EARTH_AURA, true);
+                m_uiCheckTimer = 2000;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if(m_uiCheckTimer <= diff)
+                {
+                    me->CastSpell(me, SPELL_SCORCHED_EARTH_AURA, true);
+                    m_uiCheckTimer = 2000;
+                }
+                else
+                    m_uiCheckTimer -= diff;
+
             }
     };
 };
@@ -250,17 +265,21 @@ class spell_scorched_earth : public SpellScriptLoader
                 std::list<Creature*> creaturesList;
                 caster->GetCreatureListWithEntryInGrid(creaturesList, NPC_SCORCHED_EARTH, 500.0f);
 
-                for(std::list<Creature*>::const_iterator iter = creaturesList.begin() ; iter != creaturesList.end() ; ++iter)
+                if(!creaturesList.empty())
                 {
-                    Position pos ;
-                    if(Creature* creatures = *iter)
+                    for(std::list<Creature*>::const_iterator iter = creaturesList.begin() ; iter != creaturesList.end() ; ++iter)
                     {
-                        creatures->GetPosition(&pos);
-                        if(caster->GetExactDist2d(&pos) >= 3.0f)
-                            caster->CastSpell(caster, SPELL_SCORCHED_EARTH_POP, true);
+                        Position pos ;
+                        if(Creature* creatures = *iter)
+                        {
+                            creatures->GetPosition(&pos);
+                            if(caster->GetExactDist2d(&pos) >= 3.0f)
+                                caster->CastSpell(caster, SPELL_SCORCHED_EARTH_POP, true);
+                        }
                     }
                 }
-
+                else
+                    caster->CastSpell(caster, SPELL_SCORCHED_EARTH_POP, true);
             }
 
             void Register()
