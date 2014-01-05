@@ -75,6 +75,7 @@ enum WarlockSpells
 	SPELL_WARLOCK_FEL_FLAME							= 77799,
 	SPELL_WARLOCK_INCINERATE						= 29722,
 	SPELL_WARLOCK_DRAIN_LIFE						= 689,
+	SPELL_WARLOCK_FIRE_AND_BRIMSTONE				= 108683,
 };
 
 enum WarlockMisc
@@ -1307,18 +1308,18 @@ class spell_warl_burning_embers : public SpellScriptLoader
 
 				switch(spellId)
 				{
-				case SPELL_WARLOCK_CONFLAGRATE:
-				case SPELL_WARLOCK_FEL_FLAME:
-				case SPELL_WARLOCK_INCINERATE:
-					embers = 1;
-					if (crit)
-						embers *= 2;
-					break;
-				case SPELL_WARLOCK_IMMOLATE:
-					embers = crit ? 2 : 0;
-					break;
-				default:
-					return;
+					case SPELL_WARLOCK_CONFLAGRATE:
+					case SPELL_WARLOCK_FEL_FLAME:
+					case SPELL_WARLOCK_INCINERATE:
+						embers = 1;
+						if (crit)
+							embers *= 2;
+						break;
+					case SPELL_WARLOCK_IMMOLATE:
+						embers = crit ? 2 : 0;
+						break;
+					default:
+						return;
 				}
 
                 if (Player* _player = GetOwner()->ToPlayer())
@@ -1582,7 +1583,6 @@ class spell_warl_hellfire : public SpellScriptLoader
             return new spell_warl_hellfire_SpellScript();
         }
 };
-
 
 void AddSC_warlock_spell_scripts()
 {
