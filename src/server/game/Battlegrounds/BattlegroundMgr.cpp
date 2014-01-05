@@ -1955,3 +1955,8 @@ void BattlegroundMgr::RemoveBattleground(BattlegroundTypeId bgTypeId, uint32 ins
 {
     bgDataStore[bgTypeId].m_Battlegrounds.erase(instanceId);
 }
+
+uint32 BattlegroundMgr::GetBattlegroundCount(BattlegroundTypeId bgTypeId)
+{
+	return bgDataStore[bgTypeId].m_Battlegrounds.size();
+}
