@@ -3003,7 +3003,9 @@ public:
 
 	static bool HandlePVPInfoCommand(ChatHandler *handler, char const* /*args*/)
     {
-		uint16 qA[MAX_BATTLEGROUND_QUEUE_TYPES], qH[MAX_BATTLEGROUND_QUEUE_TYPES], qI[MAX_BATTLEGROUND_QUEUE_TYPES];
+		uint32	qA[MAX_BATTLEGROUND_QUEUE_TYPES], //Alliance counter
+				qH[MAX_BATTLEGROUND_QUEUE_TYPES], //Horde counter
+				qI[MAX_BATTLEGROUND_QUEUE_TYPES]; //In progress counter
 
         std::stringstream ss;
         ss << "Infos PvP : \n";
@@ -3015,7 +3017,7 @@ public:
         {
 			qA[i] = 0;
 			qH[i] = 0;
-			qI[i] = sBattlegroundMgr->GetBattlegroundCount(sBattlegroundMgr->BGTemplateId((BattlegroundQueueTypeId)i));
+			qI[i] = 0; //sBattlegroundMgr->GetBattlegroundCount(sBattlegroundMgr->BGTemplateId((BattlegroundQueueTypeId)i));
 
             BattlegroundQueue *bgqueue = &(sBattlegroundMgr->GetBattlegroundQueue((BattlegroundQueueTypeId)i));
 
@@ -3037,7 +3039,7 @@ public:
 
 		for (uint8 i=1; i<MAX_BATTLEGROUND_QUEUE_TYPES; ++i)
         {
-			if((qA[i] + qH[i] == 0) && (qI[i] = 0))
+			if(((qA[i] + qH[i]) == 0) && (qI[i] == 0))
 				continue;
 
 			ss.str("");
@@ -3051,7 +3053,7 @@ public:
 					ss << "Goulet des Chanteguerres";
 					break;
 				case BATTLEGROUND_QUEUE_AB:
-					ss << "Vallée d'Altérac";
+					ss << "Bassin d'Arathi";
 					break;
 				case BATTLEGROUND_QUEUE_EY:
 					ss << "Oeil du Cyclone";
@@ -3093,7 +3095,7 @@ public:
 
             if (i<=BATTLEGROUND_QUEUE_RB) // BGs
             {
-                ss << qI[i] << "en cours, |cff0000ff" << qA[i] << " A |r- |cffff0000" << qH[i] << " H|r\n";
+                ss << qI[i] << " en cours, |cff0000ff" << qA[i] << " A |r- |cffff0000" << qH[i] << " H|r\n";
             }
             else // Arenes
             {
