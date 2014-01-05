@@ -3003,7 +3003,9 @@ public:
 
 	static bool HandlePVPInfoCommand(ChatHandler *handler, char const* /*args*/)
     {
-		uint16 qA[MAX_BATTLEGROUND_QUEUE_TYPES], qH[MAX_BATTLEGROUND_QUEUE_TYPES], qI[MAX_BATTLEGROUND_QUEUE_TYPES];
+		uint32	qA[MAX_BATTLEGROUND_QUEUE_TYPES], //Alliance counter
+				qH[MAX_BATTLEGROUND_QUEUE_TYPES], //Horde counter
+				qI[MAX_BATTLEGROUND_QUEUE_TYPES]; //In progress counter
 
         std::stringstream ss;
         ss << "Infos PvP : \n";
@@ -3015,7 +3017,7 @@ public:
         {
 			qA[i] = 0;
 			qH[i] = 0;
-			qI[i] = sBattlegroundMgr->GetBattlegroundCount(sBattlegroundMgr->BGTemplateId((BattlegroundQueueTypeId)i));
+			qI[i] = 0; //sBattlegroundMgr->GetBattlegroundCount(sBattlegroundMgr->BGTemplateId((BattlegroundQueueTypeId)i));
 
             BattlegroundQueue *bgqueue = &(sBattlegroundMgr->GetBattlegroundQueue((BattlegroundQueueTypeId)i));
 
