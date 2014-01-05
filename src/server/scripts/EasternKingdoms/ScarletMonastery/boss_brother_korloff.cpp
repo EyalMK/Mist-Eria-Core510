@@ -143,6 +143,16 @@ public:
             }
         }
 
+        void MovementInform(uint32 type, uint32 id)
+        {
+            switch (id)
+            {
+                case EVENT_JUMP:
+                    events.ScheduleEvent(EVENT_FIRESTORM_KICK, 100);
+                    break;
+            }
+        }
+
 
         void UpdateAI(uint32 diff)
         {
@@ -169,10 +179,8 @@ public:
                         case EVENT_JUMP_FIRESTORM:
                             if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST))
                             {
-                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20);
+                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20, EVENT_JUMP);
                             }
-
-                            events.ScheduleEvent(EVENT_FIRESTORM_KICK, 2*IN_MILLISECONDS);
                             break;
 
                         case EVENT_FIRESTORM_KICK:
