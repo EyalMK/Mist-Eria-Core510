@@ -3007,6 +3007,9 @@ public:
 
         std::stringstream ss;
         ss << "Infos PvP : \n";
+		handler->SendSysMessage(ss.str().c_str());
+
+		
 
         for (uint8 i=1; i<MAX_BATTLEGROUND_QUEUE_TYPES; ++i)
         {
@@ -3036,6 +3039,8 @@ public:
         {
 			if((qA[i] + qH[i] == 0) && (qI[i] = 0))
 				continue;
+
+			ss.str("");
 
 			switch (i)
 			{
@@ -3111,9 +3116,10 @@ public:
                 team /= arena;
                 ss << "|cff00ff00" << qI[i]*2 << " équipes en combat, " << team << " dans la file|r\n";
             }
-        }
 
-        handler->SendSysMessage(ss.str().c_str());
+			handler->SendSysMessage(ss.str().c_str());
+
+        }
 
         return true;
     }
