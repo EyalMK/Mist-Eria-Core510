@@ -172,11 +172,11 @@ public:
                                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                             }
 
-							events.ScheduleEvent(EVENT_FIRESTORM_KICK, 1*IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_FIRESTORM_KICK, 1.5*IN_MILLISECONDS);
                             break;
 
                         case EVENT_FIRESTORM_KICK:
-                            DoCast(SPELL_FIRESTORM_KICK);
+                            me->CastSpell(me, SPELL_FIRESTORM_KICK, true);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 
                             events.ScheduleEvent(EVENT_JUMP_FIRESTORM, 28*IN_MILLISECONDS);
@@ -185,12 +185,11 @@ public:
                         case EVENT_SCORCHED_EARTH:
                             DoCast(SPELL_SCORCHED_EARTH);
 
-							events.CancelEvent(EVENT_SCORCHED_EARTH);
+                            events.CancelEvent(EVENT_SCORCHED_EARTH);
                             break;
 
                         case EVENT_BLAZING_FISTS:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
-                                me->CastSpell(target, SPELL_BLAZING_FISTS);
+                            me->CastSpell(me, SPELL_BLAZING_FISTS, true);
 
                             events.ScheduleEvent(EVENT_BLAZING_FISTS, 30*IN_MILLISECONDS);
                             break;
@@ -226,10 +225,7 @@ public:
             void Reset()
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
-
-				if (me->HasAura(SPELL_SCORCHED_EARTH_AURA))
-					me->RemoveAurasDueToSpell(SPELL_SCORCHED_EARTH_AURA, me->GetGUID());
-
+                me->RemoveAurasDueToSpell(SPELL_SCORCHED_EARTH_AURA);
                 me->CastSpell(me, SPELL_SCORCHED_EARTH_AURA, true);
                 m_uiCheckTimer = 2000;
             }
@@ -262,8 +258,8 @@ class spell_scorched_earth : public SpellScriptLoader
                 if (!caster)
                     return;
 
-				if (caster->FindNearestCreature(NPC_SCORCHED_EARTH, 3.0f, true))
-					return;
+                if (caster->FindNearestCreature(NPC_SCORCHED_EARTH, 3.0f, true))
+                    return;
 
                 caster->CastSpell(caster, SPELL_SCORCHED_EARTH_POP, true);
             }
