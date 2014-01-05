@@ -38,8 +38,7 @@ enum Events
     EVENT_FIRESTORM_KICK    = 1,
     EVENT_BLAZING_FISTS     = 2,
     EVENT_SCORCHED_EARTH    = 3,
-    EVENT_JUMP_FIRESTORM    = 4,
-    EVENT_DISABLE_MOVE      = 5
+    EVENT_JUMP_FIRESTORM    = 4
 };
 
 enum Texts
@@ -148,7 +147,7 @@ public:
             switch (id)
             {
                 case EVENT_JUMP:
-                    events.ScheduleEvent(EVENT_FIRESTORM_KICK, 100);
+                    events.ScheduleEvent(EVENT_FIRESTORM_KICK, 500);
                     break;
             }
         }
@@ -184,15 +183,9 @@ public:
                             break;
 
                         case EVENT_FIRESTORM_KICK:
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                             DoCast(SPELL_FIRESTORM_KICK);
 
-                            events.ScheduleEvent(EVENT_DISABLE_MOVE, 6*IN_MILLISECONDS);
                             events.ScheduleEvent(EVENT_JUMP_FIRESTORM, 28*IN_MILLISECONDS);
-                            break;
-
-                        case EVENT_DISABLE_MOVE:
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                             break;
 
                         case EVENT_SCORCHED_EARTH:
@@ -202,10 +195,8 @@ public:
                             break;
 
                         case EVENT_BLAZING_FISTS:
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                             DoCast(SPELL_BLAZING_FISTS);
 
-                            events.ScheduleEvent(EVENT_DISABLE_MOVE, 6*IN_MILLISECONDS);
                             events.ScheduleEvent(EVENT_BLAZING_FISTS, 30*IN_MILLISECONDS);
                             break;
 
