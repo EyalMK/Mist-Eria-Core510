@@ -61,16 +61,21 @@ enum WarlockSpells
     SPELL_WARLOCK_SOULSHATTER                       = 32835,
     SPELL_WARLOCK_UNSTABLE_AFFLICTION               = 30108,
     SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL        = 31117,
-	 WARLOCK_KIL_JAEDENS_CUNNING_PASSIVE     = 108507,
-	 WARLOCK_HARVEST_LIFE_HEAL               = 125314,
-	 WARLOCK_SUPPLANT_DEMONIC_COMMAND        = 119904,
-	 WARLOCK_GRIMOIRE_OF_SACRIFICE           = 108503,
-	 WARLOCK_DRAIN_LIFE_HEAL                 = 89653,
-	 WARLOCK_SOULBURN_AURA                   = 74434,
-	 WARLOCK_MOLTEN_CORE                     = 122355,
-    WARLOCK_MOLTEN_CORE_AURA                = 122351,
-	WARLOCK_DECIMATE_AURA                   = 108869,
-	WARLOCK_METAMORPHOSIS                   = 103958,
+	SPELL_WARLOCK_KIL_JAEDENS_CUNNING_PASSIVE		= 108507,
+	SPELL_WARLOCK_HARVEST_LIFE_HEAL					= 125314,
+	SPELL_WARLOCK_SUPPLANT_DEMONIC_COMMAND			= 119904,
+	SPELL_WARLOCK_GRIMOIRE_OF_SACRIFICE				= 108503,
+	SPELL_WARLOCK_DRAIN_LIFE_HEAL					= 89653,
+	SPELL_WARLOCK_SOULBURN_AURA						= 74434,
+	SPELL_WARLOCK_MOLTEN_CORE						= 122355,
+    SPELL_WARLOCK_MOLTEN_CORE_AURA					= 122351,
+	SPELL_WARLOCK_DECIMATE_AURA						= 108869,
+	SPELL_WARLOCK_METAMORPHOSIS						= 103958,
+	SPELL_WARLOCK_CONFLAGRATE						= 17962,
+	SPELL_WARLOCK_FEL_FLAME							= 77799,
+	SPELL_WARLOCK_INCINERATE						= 29722,
+	SPELL_WARLOCK_IMMOLATE							= 348,
+	SPELL_WARLOCK_DRAIN_LIFE						= 689,
 };
 
 enum WarlockMisc
@@ -145,41 +150,6 @@ class spell_warl_banish : public SpellScriptLoader
         SpellScript* GetSpellScript() const
         {
             return new spell_warl_banish_SpellScript();
-        }
-};
-
-// 17962 - Conflagrate - Updated to 4.3.4
-class spell_warl_conflagrate : public SpellScriptLoader
-{
-    public:
-        spell_warl_conflagrate() : SpellScriptLoader("spell_warl_conflagrate") { }
-
-        class spell_warl_conflagrate_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_warl_conflagrate_SpellScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_IMMOLATE))
-                    return false;
-                return true;
-            }
-
-            void HandleHit(SpellEffIndex /*effIndex*/)
-            {
-                if (AuraEffect const* aurEff = GetHitUnit()->GetAuraEffect(SPELL_WARLOCK_IMMOLATE, EFFECT_2, GetCaster()->GetGUID()))
-                    SetHitDamage(CalculatePct(aurEff->GetAmount(), GetSpellInfo()->Effects[EFFECT_1].CalcValue(GetCaster())));
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_warl_conflagrate_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_warl_conflagrate_SpellScript();
         }
 };
 
@@ -417,8 +387,8 @@ public:
                     player->RemoveMovementImpairingAuras();
 
                     if (aurEff->GetSpellInfo()->Id == SPELL_WARLOCK_SOULBURN_DEMONIC_CIRCLE_TELE)
-                        if (player->HasAura(WARLOCK_SOULBURN_AURA))
-                            player->RemoveAurasDueToSpell(WARLOCK_SOULBURN_AURA);
+                        if (player->HasAura(SPELL_WARLOCK_SOULBURN_AURA))
+                            player->RemoveAurasDueToSpell(SPELL_WARLOCK_SOULBURN_AURA);
                 }
             }
         }
@@ -1057,13 +1027,13 @@ class spell_warl_kil_jaedens_cunning : public SpellScriptLoader
             void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes mode)
             {
                 if (GetCaster())
-                    GetCaster()->RemoveAura(WARLOCK_KIL_JAEDENS_CUNNING_PASSIVE);
+                    GetCaster()->RemoveAura(SPELL_WARLOCK_KIL_JAEDENS_CUNNING_PASSIVE);
             }
 
             void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes mode)
             {
                 if (GetCaster())
-                    GetCaster()->CastSpell(GetCaster(), WARLOCK_KIL_JAEDENS_CUNNING_PASSIVE, true);
+                    GetCaster()->CastSpell(GetCaster(), SPELL_WARLOCK_KIL_JAEDENS_CUNNING_PASSIVE, true);
             }
 
             void Register()
@@ -1134,11 +1104,11 @@ class spell_warl_harvest_life : public SpellScriptLoader
 
                     AddPct(basepoints, 33);
 
-                    if (!_player->HasSpellCooldown(WARLOCK_HARVEST_LIFE_HEAL))
+                    if (!_player->HasSpellCooldown(SPELL_WARLOCK_HARVEST_LIFE_HEAL))
                     {
-                        _player->CastCustomSpell(_player, WARLOCK_HARVEST_LIFE_HEAL, &basepoints, NULL, NULL, true);
+                        _player->CastCustomSpell(_player, SPELL_WARLOCK_HARVEST_LIFE_HEAL, &basepoints, NULL, NULL, true);
                         // prevent the heal to proc off for each targets
-                        _player->AddSpellCooldown(WARLOCK_HARVEST_LIFE_HEAL, 0, time(NULL) + 1);
+                        _player->AddSpellCooldown(SPELL_WARLOCK_HARVEST_LIFE_HEAL, 0, time(NULL) + 1);
                     }
 
                     _player->EnergizeBySpell(_player, aurEff->GetSpellInfo()->Id, 4, POWER_DEMONIC_FURY);
@@ -1178,7 +1148,7 @@ class spell_warl_grimoire_of_sacrifice : public SpellScriptLoader
                         {
                             int32 bp = 0;
 
-                            player->RemoveAura(WARLOCK_SUPPLANT_DEMONIC_COMMAND);
+                            player->RemoveAura(SPELL_WARLOCK_SUPPLANT_DEMONIC_COMMAND);
 
                             switch (pet->GetEntry())
                             {
@@ -1202,7 +1172,7 @@ class spell_warl_grimoire_of_sacrifice : public SpellScriptLoader
                             }
 
                             if (bp)
-                                player->CastCustomSpell(player, WARLOCK_SUPPLANT_DEMONIC_COMMAND, &bp, NULL, NULL, true);
+                                player->CastCustomSpell(player, SPELL_WARLOCK_SUPPLANT_DEMONIC_COMMAND, &bp, NULL, NULL, true);
                         }
                     }
                 }
@@ -1223,7 +1193,7 @@ class spell_warl_grimoire_of_sacrifice : public SpellScriptLoader
                     // EFFECT_8 : +50% on EFFECT_4 and EFFECT_5 of Drain Soul -> Always set to 0
                     // EFFECT_9 : Always set to 0
                     // EFFECT_10 : Always set to 0
-                    if (Aura* grimoireOfSacrifice = player->GetAura(WARLOCK_GRIMOIRE_OF_SACRIFICE))
+                    if (Aura* grimoireOfSacrifice = player->GetAura(SPELL_WARLOCK_GRIMOIRE_OF_SACRIFICE))
                     {
                         if (grimoireOfSacrifice->GetEffect(EFFECT_10))
                             grimoireOfSacrifice->GetEffect(EFFECT_10)->SetAmount(0);
@@ -1300,8 +1270,8 @@ class spell_warl_grimoire_of_sacrifice : public SpellScriptLoader
                     return;
 
                 if (Player* _player = GetTarget()->ToPlayer())
-                    if (_player->HasAura(WARLOCK_SUPPLANT_DEMONIC_COMMAND))
-                        _player->RemoveAura(WARLOCK_SUPPLANT_DEMONIC_COMMAND);
+                    if (_player->HasAura(SPELL_WARLOCK_SUPPLANT_DEMONIC_COMMAND))
+                        _player->RemoveAura(SPELL_WARLOCK_SUPPLANT_DEMONIC_COMMAND);
             }
 
             void Register()
@@ -1338,14 +1308,14 @@ class spell_warl_burning_embers : public SpellScriptLoader
 
 				switch(spellId)
 				{
-				case 17962:
-				case 77799:
-				case 29722:
+				case SPELL_WARLOCK_CONFLAGRATE:
+				case SPELL_WARLOCK_FEL_FLAME:
+				case SPELL_WARLOCK_INCINERATE:
 					embers = 1;
 					if (crit)
 						embers *= 2;
 					break;
-				case 348:
+				case SPELL_WARLOCK_IMMOLATE:
 					embers = crit ? 2 : 0;
 					break;
 				default:
@@ -1392,9 +1362,9 @@ class spell_warl_drain_life : public SpellScriptLoader
                     int32 basepoints = _player->GetMaxHealth() / 50;
 
                     // In Demonology spec : Generates 10 Demonic Fury per second
-                        _player->EnergizeBySpell(_player, 689, 10, POWER_DEMONIC_FURY);
+                        _player->EnergizeBySpell(_player, SPELL_WARLOCK_DRAIN_LIFE, 10, POWER_DEMONIC_FURY);
 
-                    _player->CastCustomSpell(_player, WARLOCK_DRAIN_LIFE_HEAL, &basepoints, NULL, NULL, true);
+                    _player->CastCustomSpell(_player, SPELL_WARLOCK_DRAIN_LIFE_HEAL, &basepoints, NULL, NULL, true);
                 }
             }
 
@@ -1423,8 +1393,8 @@ class spell_warl_soulburn_drain_life : public SpellScriptLoader
             void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (GetCaster())
-                    if (GetCaster()->HasAura(WARLOCK_SOULBURN_AURA))
-                        GetCaster()->RemoveAura(WARLOCK_SOULBURN_AURA);
+                    if (GetCaster()->HasAura(SPELL_WARLOCK_SOULBURN_AURA))
+                        GetCaster()->RemoveAura(SPELL_WARLOCK_SOULBURN_AURA);
             }
 
             void OnTick(AuraEffect const* aurEff)
@@ -1439,9 +1409,9 @@ class spell_warl_soulburn_drain_life : public SpellScriptLoader
                     int32 basepoints = _player->CountPctFromMaxHealth(3);
 
                     // In Demonology spec : Generates 10 Demonic Fury per second
-                        _player->EnergizeBySpell(_player, 689, 10, POWER_DEMONIC_FURY);
+                        _player->EnergizeBySpell(_player, SPELL_WARLOCK_DRAIN_LIFE, 10, POWER_DEMONIC_FURY);
 
-                    _player->CastCustomSpell(_player, WARLOCK_DRAIN_LIFE_HEAL, &basepoints, NULL, NULL, true);
+                    _player->CastCustomSpell(_player, SPELL_WARLOCK_DRAIN_LIFE_HEAL, &basepoints, NULL, NULL, true);
                 }
             }
 
@@ -1473,9 +1443,9 @@ class spell_warl_molten_core_dot : public SpellScriptLoader
             {
                 if (GetCaster())
                 {
-                    if (GetCaster()->HasAura(WARLOCK_MOLTEN_CORE_AURA) && GetCaster()->getLevel() >= 69)
+                    if (GetCaster()->HasAura(SPELL_WARLOCK_MOLTEN_CORE_AURA) && GetCaster()->getLevel() >= 69)
                         if (roll_chance_i(8))
-                            GetCaster()->CastSpell(GetCaster(), WARLOCK_MOLTEN_CORE, true);
+                            GetCaster()->CastSpell(GetCaster(), SPELL_WARLOCK_MOLTEN_CORE, true);
 
                     GetCaster()->EnergizeBySpell(GetCaster(), aurEff->GetSpellInfo()->Id, 2, POWER_DEMONIC_FURY);
                 }
@@ -1509,9 +1479,9 @@ class spell_warl_decimate : public SpellScriptLoader
                 if (Player* _player = GetCaster()->ToPlayer())
                 {
                     if (Unit* target = GetHitUnit())
-                        if (_player->HasAura(WARLOCK_DECIMATE_AURA) && _player->getLevel() >= 73)
+                        if (_player->HasAura(SPELL_WARLOCK_DECIMATE_AURA) && _player->getLevel() >= 73)
                             if (target->GetHealthPct() < 25.0f)
-                                _player->CastSpell(_player, WARLOCK_MOLTEN_CORE, true);
+                                _player->CastSpell(_player, SPELL_WARLOCK_MOLTEN_CORE, true);
 
                         _player->EnergizeBySpell(_player, GetSpellInfo()->Id, GetSpellInfo()->Id == 686 ? 25 : 30, POWER_DEMONIC_FURY);
                 }
@@ -1542,7 +1512,7 @@ class spell_warl_metamorphosis_cost : public SpellScriptLoader
             void OnTick(AuraEffect const* aurEff)
             {
                 if (GetCaster())
-                    GetCaster()->EnergizeBySpell(GetCaster(), WARLOCK_METAMORPHOSIS, -6, POWER_DEMONIC_FURY);
+                    GetCaster()->EnergizeBySpell(GetCaster(), SPELL_WARLOCK_METAMORPHOSIS, -6, POWER_DEMONIC_FURY);
             }
 
             void Register()
@@ -1619,7 +1589,6 @@ void AddSC_warlock_spell_scripts()
 {
     new spell_warl_bane_of_doom();
     new spell_warl_banish();
-    new spell_warl_conflagrate();
     new spell_warl_create_healthstone();
     new spell_warl_use_healthstone();
     new spell_warl_demonic_circle_summon();
