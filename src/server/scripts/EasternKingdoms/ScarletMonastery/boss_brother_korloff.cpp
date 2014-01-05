@@ -170,14 +170,11 @@ public:
                     if (instance)
                     {
                         case EVENT_JUMP_FIRESTORM:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                            if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST))
                             {
                                 me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20);
-                                if (me->GetPositionX() == target->GetPositionX() && me->GetPositionY() == target->GetPositionY())
-                                {
-                                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                                    events.ScheduleEvent(EVENT_FIRESTORM_KICK, 100);
-                                }
+                                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                                events.ScheduleEvent(EVENT_FIRESTORM_KICK, 2*IN_MILLISECONDS);
                             }
                             break;
 
@@ -227,8 +224,7 @@ public:
 
             void Reset()
             {
-                me->SetReactState(REACT_PASSIVE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
                 me->CastSpell(me, SPELL_SCORCHED_EARTH_AURA, true);
             }
     };
@@ -252,7 +248,7 @@ class spell_scorched_earth : public SpellScriptLoader
                     return;
 
                 std::list<Creature*> creaturesList;
-                caster->GetCreatureListWithEntryInGrid(creaturesList, 29844, 500.0f);
+                caster->GetCreatureListWithEntryInGrid(creaturesList, NPC_SCORCHED_EARTH, 500.0f);
 
                 for(std::list<Creature*>::const_iterator iter = creaturesList.begin() ; iter != creaturesList.end() ; ++iter)
                 {
@@ -260,7 +256,7 @@ class spell_scorched_earth : public SpellScriptLoader
                     if(Creature* creatures = *iter)
                     {
                         creatures->GetPosition(&pos);
-                        if(caster->GetExactDist2d(&pos) >= 2.0f)
+                        if(caster->GetExactDist2d(&pos) >= 3.0f)
                             caster->CastSpell(caster, SPELL_SCORCHED_EARTH_POP, true);
                     }
                 }
