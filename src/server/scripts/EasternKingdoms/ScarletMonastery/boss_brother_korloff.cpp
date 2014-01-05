@@ -19,14 +19,19 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "scarlet_monastery.h"
+#include "SpellScript.h"
 
 
 enum Spells
 {
-    SPELL_FIRESTORM_KICK    = 113764,
-    SPELL_RISING_FLAME      = 114410,
-    SPELL_BLAZING_FISTS     = 114807,
-    SPELL_SCORCHED_EARTH    = 114460
+    SPELL_FIRESTORM_KICK        = 113764,
+    SPELL_RISING_FLAME          = 114410,
+    SPELL_BLAZING_FISTS         = 114807,
+    SPELL_SCORCHED_EARTH        = 114460,
+
+    /* Autres */
+    SPELL_SCORCHED_EARTH_POP    = 114463,
+    SPELL_SCORCHED_EARTH_AURA   = 114464
 };
 
 
@@ -44,6 +49,11 @@ enum Texts
     SAY_AGGRO                       = 0,
     SAY_DEATH                       = 1,
     SAY_KILL                        = 2
+};
+
+enum Creatures
+{
+    NPC_SCORCHED_EARTH              = 59507
 };
 
 
@@ -163,8 +173,11 @@ public:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             {
                                 me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20);
-                                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                                events.ScheduleEvent(EVENT_FIRESTORM_KICK, 1*IN_MILLISECONDS);
+                                if (me->GetPositionX() == target->GetPositionX() && me->GetPositionY() == target->GetPositionY())
+                                {
+                                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                                    events.ScheduleEvent(EVENT_FIRESTORM_KICK, 100);
+                                }
                             }
                             break;
 
@@ -198,7 +211,77 @@ public:
 
 };
 
+class npc_scorched_earth : public CreatureScript
+{
+public:
+    npc_scorched_earth() : CreatureScript("npc_scorched_earth") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_scorched_earthAI(creature);
+    }
+
+    struct npc_scorched_earthAI : public ScriptedAI
+    {
+            npc_scorched_earthAI(Creature* creature) : ScriptedAI(creature) {}
+
+            void Reset()
+            {
+                me->SetReactState(REACT_PASSIVE);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+                me->CastSpell(me, SPELL_SCORCHED_EARTH_AURA, true);
+            }
+    };
+};
+
+
+class spell_scorched_earth : public SpellScriptLoader
+{
+    public:
+        spell_scorched_earth() : SpellScriptLoader("spell_scorched_earth") { }
+
+        class spell_scorched_earth_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_scorched_earth_SpellScript);
+
+            void SummonTraqueurFlaque(SpellEffIndex /*effIndex*/)
+            {
+                Unit* caster = GetCaster();
+
+                if (!caster)
+                    return;
+
+                std::list<Creature*> creaturesList;
+                caster->GetCreatureListWithEntryInGrid(creaturesList, 29844, 500.0f);
+
+                for(std::list<Creature*>::const_iterator iter = creaturesList.begin() ; iter != creaturesList.end() ; ++iter)
+                {
+                    Position pos ;
+                    if(Creature* creatures = *iter)
+                    {
+                        creatures->GetPosition(&pos);
+                        if(caster->GetExactDist2d(&pos) >= 2.0f)
+                            caster->CastSpell(caster, SPELL_SCORCHED_EARTH_POP, true);
+                    }
+                }
+
+            }
+
+            void Register()
+            {
+                OnEffectHit += SpellEffectFn(spell_scorched_earth_SpellScript::SummonTraqueurFlaque, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_scorched_earth_SpellScript();
+        }
+};
+
 void AddSC_boss_brother_korloff()
 {
     new boss_brother_korloff();
+    new npc_scorched_earth();
+    new spell_scorched_earth();
 }
