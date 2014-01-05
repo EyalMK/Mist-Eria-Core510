@@ -172,7 +172,7 @@ public:
                                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                             }
 
-							events.ScheduleEvent(EVENT_FIRESTORM_KICK, 2*IN_MILLISECONDS);
+							events.ScheduleEvent(EVENT_FIRESTORM_KICK, 1*IN_MILLISECONDS);
                             break;
 
                         case EVENT_FIRESTORM_KICK:
