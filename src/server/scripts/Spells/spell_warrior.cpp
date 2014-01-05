@@ -794,21 +794,22 @@ class spell_warr_impending_victory : public SpellScriptLoader
             void HandleDamage(SpellEffIndex /*effIndex*/)
             {
 				Player* player = GetCaster()->ToPlayer();
-				int32 damage = GetHitDamage();
-
-				if (player->GetPrimaryTalentTree(player->GetActiveSpec()) == TALENT_TREE_WARRIOR_ARMS)
-					SetHitDamage(damage + (player->GetTotalAttackPowerValue(BASE_ATTACK) * 0.7f));
-				else if (player->GetPrimaryTalentTree(player->GetActiveSpec()) == TALENT_TREE_WARRIOR_FURY ||
-					player->GetPrimaryTalentTree(player->GetActiveSpec()) == TALENT_TREE_WARRIOR_PROTECTION)
-					SetHitDamage(damage + (player->GetTotalAttackPowerValue(BASE_ATTACK) * 0.56f));
-				else SetHitDamage(damage);
-
+				
 				if (player)
 				{
-					if (player->HasAura(SPELL_WARRIOR_VICTORIOUS))
+					int32 pct = 0;
+					int32 spec = player->GetPrimaryTalentTree(player->GetActiveSpec());
+
+					if (spec == TALENT_TREE_WARRIOR_ARMS)
+						pct = 70;
+					else pct = 56;
+
+					SetHitDamage(int32(CalculatePct(player->GetTotalAttackPowerValue(BASE_ATTACK), pct)));
+
+					if (player->HasAura(SPELL_WARRIOR_VICTORIOUS, player->GetGUID()))
 					{
 						int32 bp0 = int32(player->CountPctFromMaxHealth(20));
-						player->CastCustomSpell(player, SPELL_WARRIOR_IMPENDING_VICTORY, &bp0, NULL, NULL, false);
+						player->CastCustomSpell(player, SPELL_WARRIOR_IMPENDING_VICTORY, &bp0, NULL, NULL, true);
 					}
 					else player->CastSpell(player, SPELL_WARRIOR_IMPENDING_VICTORY, true);
 				}
@@ -1546,14 +1547,20 @@ class spell_warr_shockwave : public SpellScriptLoader
             }
 
             void HandleDamage(SpellEffIndex /*effIndex*/)
-            {                
-                Unit* caster = GetCaster();
-				uint32 damage = GetHitDamage();
+            {
+				Player* player = GetCaster()->ToPlayer();
 
-                if(!caster)
-                    return;
+				if (player)
+				{
+					int32 pct = 0;
+					int32 spec = player->GetPrimaryTalentTree(player->GetActiveSpec());
+					
+					if (spec == TALENT_TREE_WARRIOR_ARMS)
+						pct = 90;
+					else pct = 75;
 
-				SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.22f));
+					SetHitDamage(int32(CalculatePct(player->GetTotalAttackPowerValue(BASE_ATTACK), pct)));
+				}
             }
 
             void Register()
