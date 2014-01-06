@@ -33,6 +33,7 @@ class instance_scarlet_monastery : public InstanceMapScript
                 BossThalnosTheSoulrenderGUID        = 0;
                 BossBrotherKorloffGUID              = 0;
                 BossHighInquisitorWhitemaneGUID		= 0;
+                BossCommanderDurandGUID             = 0;
             }
 
             void OnCreatureCreate(Creature* creature)
@@ -49,6 +50,10 @@ class instance_scarlet_monastery : public InstanceMapScript
 
                     case BOSS_HIGH_INQUISITOR_WHITEMANE:
                         BossHighInquisitorWhitemaneGUID	 = creature->GetGUID();
+                        break;
+
+                    case BOSS_COMMANDER_DURAND:
+                        BossCommanderDurandGUID	 = creature->GetGUID();
                         break;
 
                     default:
@@ -83,6 +88,9 @@ class instance_scarlet_monastery : public InstanceMapScript
                     case DATA_BOSS_HIGH_INQUISITOR_WHITEMANE:
                         return BossHighInquisitorWhitemaneGUID;
 
+                    case DATA_BOSS_COMMANDER_DURAND:
+                        return BossCommanderDurandGUID;
+
                     default:
                         break;
                 }
@@ -94,6 +102,7 @@ class instance_scarlet_monastery : public InstanceMapScript
                 uint64 BossThalnosTheSoulrenderGUID;
                 uint64 BossBrotherKorloffGUID;
                 uint64 BossHighInquisitorWhitemaneGUID;
+                uint64 BossCommanderDurandGUID;
 
         };
 

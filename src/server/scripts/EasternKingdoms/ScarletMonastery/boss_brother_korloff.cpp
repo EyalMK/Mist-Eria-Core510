@@ -38,7 +38,8 @@ enum Events
     EVENT_FIRESTORM_KICK    = 1,
     EVENT_BLAZING_FISTS     = 2,
     EVENT_SCORCHED_EARTH    = 3,
-    EVENT_JUMP_FIRESTORM    = 4
+    EVENT_JUMP_FIRESTORM    = 4,
+    EVENT_ATTACK            = 5
 };
 
 enum Texts
@@ -142,7 +143,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+       /* void MovementInform(uint32 type, uint32 id)
         {
             switch (id)
             {
@@ -150,7 +151,7 @@ public:
                     events.ScheduleEvent(EVENT_FIRESTORM_KICK, 500);
                     break;
             }
-        }
+        }*/
 
 
         void UpdateAI(uint32 diff)
@@ -178,13 +179,15 @@ public:
                         case EVENT_JUMP_FIRESTORM:
                             if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST))
                             {
-                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20, EVENT_JUMP);
+                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20, EVENT_FIRESTORM_KICK);
+                                me->AttackStop();
                             }
                             break;
 
                         case EVENT_FIRESTORM_KICK:
                             DoCast(SPELL_FIRESTORM_KICK);
 
+                            events.ScheduleEvent(EVENT_ATTACK, 6*IN_MILLISECONDS);
                             events.ScheduleEvent(EVENT_JUMP_FIRESTORM, 28*IN_MILLISECONDS);
                             break;
 
@@ -195,9 +198,18 @@ public:
                             break;
 
                         case EVENT_BLAZING_FISTS:
+                            me->AttackStop();
                             DoCast(SPELL_BLAZING_FISTS);
 
+                            events.ScheduleEvent(EVENT_ATTACK, 6*IN_MILLISECONDS);
                             events.ScheduleEvent(EVENT_BLAZING_FISTS, 30*IN_MILLISECONDS);
+                            break;
+
+                        case EVENT_ATTACK:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                            {
+                                me->AI()->AttackStart(target);
+                            }
                             break;
 
                         default:
