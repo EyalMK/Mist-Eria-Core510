@@ -287,7 +287,7 @@ public:
                 instance->SetBossState(DATA_BOSS_COMMANDER_DURAND, DONE);
         }
 
-        void DamageTaken(Unit* /*doneBy*/, uint32 &damage) OVERRIDE
+        void DamageTaken(Unit* /*doneBy*/, uint32 &damage)
         {
             if (damage < me->GetHealth())
                 return;
