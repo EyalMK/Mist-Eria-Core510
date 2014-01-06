@@ -307,7 +307,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* /*who*/, const SpellInfo* spell) OVERRIDE
+        void SpellHit(Unit* /*who*/, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_SCARLET_RESURRECTION)
             {
