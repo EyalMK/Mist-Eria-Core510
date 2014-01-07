@@ -27,6 +27,7 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_DISMISS_CONTROLLED_VEHICLE");
 
+	/*
     uint64 vehicleGUID = _player->GetCharmGUID();
 
     if (!vehicleGUID)                                       // something wrong here...
@@ -39,6 +40,7 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recvData)
     _player->ReadMovementInfo(recvData, &mi);
 
     _player->m_movementInfo = mi;
+	*/
 
     _player->ExitVehicle();
 }
