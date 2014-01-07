@@ -59,6 +59,8 @@ enum DeathKnightSpells
     SPELL_DK_SOUL_REAPER_HASTE                  = 114868,
     SPELL_DK_SOUL_REAPER_DAMAGE                 = 114867,
 	SPELL_DK_DEATH_AND_DECAY					= 52212,
+	SPELL_DK_REMORSELESS_WINTER					= 115000,
+	SPELL_DK_REMORSELESS_WINTER_STUN			= 115001
 };
 
 enum DeathKnightSpellIcons
@@ -1357,6 +1359,37 @@ class spell_dk_death_and_decay : public SpellScriptLoader
         }
 };
 
+
+// 115000 : Remorseless Winter
+class spell_dk_remorseless_winter : public SpellScriptLoader
+{
+    public:
+        spell_dk_remorseless_winter() : SpellScriptLoader("spell_dk_remorseless_winter") { }
+
+        class spell_dk_remorseless_winter_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_dk_remorseless_winter_AuraScript);
+
+            void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if(Unit* target = GetTarget())
+					if(Aura *aur = target->GetAura(SPELL_DK_REMORSELESS_WINTER))
+						if((aur->GetStackAmount() == 5) && !target->HasAura(SPELL_DK_REMORSELESS_WINTER_STUN))
+							target->CastSpell(target, SPELL_DK_REMORSELESS_WINTER_STUN, true);
+            }
+
+            void Register()
+            {
+                AfterEffectApply += AuraEffectApplyFn(spell_dk_remorseless_winter_AuraScript::HandleAfterEffectApply, EFFECT_1, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_dk_remorseless_winter_AuraScript();
+        }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_anti_magic_shell_raid();
@@ -1387,4 +1420,5 @@ void AddSC_deathknight_spell_scripts()
 	new spell_dk_soul_reaper();
 	new spell_dk_soul_reaper_damage();
 	new spell_dk_death_and_decay();
+	new spell_dk_remorseless_winter();
 }
