@@ -73,7 +73,7 @@ public:
 
         static ChatCommand auraCommandTable[] =
         {
-            { "list",           SEC_ADMINISTRATOR, false, &HandleAuraListCommand, "Liste toutes les auras présentent sur le joueur ou PNJ selectionné. Si aucun PNJ ou joueur n'est selectionné, liste vos auras.\nUtilisez \".aura list nd\" pour ignorer les doublons", NULL},
+            { "list",           SEC_ADMINISTRATOR, false, &HandleAuraListCommand, "Liste toutes les auras presentent sur le joueur ou PNJ selectionne. Si aucun PNJ ou joueur n'est selectionne, liste vos auras.\nUtilisez \".aura list nd\" pour ignorer les doublons", NULL},
             { "",               SEC_ADMINISTRATOR, false, &HandleAuraCommand,     "", NULL},
             { NULL,             0,                 false, NULL,                   "", NULL }
         };
@@ -270,8 +270,6 @@ public:
         if(arg == "nd")
             ignoreDoublon = true;
 
-        if(ignoreDoublon) handler->PSendSysMessage("****Début du listage (doublon ignorés) ****");
-        else handler->PSendSysMessage("****Début du listage ****");
         
 
         for(Unit::AuraMap::const_iterator i = auras.begin() ; i != auras.end() ; ++i)
@@ -3047,7 +3045,7 @@ public:
 			switch (i)
 			{
 				case BATTLEGROUND_QUEUE_AV:
-					ss << "Vallée d'Altérac";
+					ss << "Vallee d'Alterac";
 					break;
 				case BATTLEGROUND_QUEUE_WS:
 					ss << "Goulet des Chanteguerres";
@@ -3062,31 +3060,31 @@ public:
 					ss << "Rivage des Anciens";
 					break;
 				case BATTLEGROUND_QUEUE_IC:
-					ss << "Ile des Conquérants";
+					ss << "Ile des Conquerants";
 					break;
 				case BATTLEGROUND_QUEUE_TP:
 					ss << "Pics Jumeaux";
 					break;
 				case BATTLEGROUND_QUEUE_BFG:
-					ss << "Bataille de Gilnéas";
+					ss << "Bataille de Gilneas";
 					break;
 				case BATTLEGROUND_QUEUE_TK:
 					ss << "Temple de Kotmogu";
 					break;
 				case BATTLEGROUND_QUEUE_SM:
-					ss << "Mines d'éclargent";
+					ss << "Mines d'eclargent";
 					break;
 				case BATTLEGROUND_QUEUE_RB:
-					ss << "Champs de Bataille Aléatoire";
+					ss << "Champs de Bataille Aleatoire";
 					break;
 				case BATTLEGROUND_QUEUE_2v2:
-					ss << "Arène 2c2";
+					ss << "Arene 2c2";
 					break;
 				case BATTLEGROUND_QUEUE_3v3:
-					ss << "Arène 3c3";
+					ss << "Arene 3c3";
 					break;
 				case BATTLEGROUND_QUEUE_5v5:
-					ss << "Arène 5v5";
+					ss << "Arene 5v5";
 					break;
 				default:
 					break;
@@ -3116,7 +3114,7 @@ public:
 						break;
                 }
                 team /= arena;
-                ss << "|cff00ff00" << qI[i]*2 << " équipes en combat, " << team << " dans la file|r\n";
+                ss << "|cff00ff00" << qI[i]*2 << " equipes en combat, " << team << " dans la file|r\n";
             }
 
 			handler->SendSysMessage(ss.str().c_str());
