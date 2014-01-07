@@ -113,8 +113,8 @@ public:
             if (instance)
                 instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, IN_PROGRESS);
 
-            events.ScheduleEvent(EVENT_POWER_WORD_SHIELD, 1*IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_HOLY_SMITE, 2*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_POWER_WORD_SHIELD, 2*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_HOLY_SMITE, 3*IN_MILLISECONDS);
         }
 
 
@@ -162,7 +162,7 @@ public:
                     if (instance)
                     {
                         case EVENT_POWER_WORD_SHIELD:
-                            me->CastSpell(me, SPELL_POWER_WORD_SHIELD);
+                            DoCast(SPELL_POWER_WORD_SHIELD);
                             events.ScheduleEvent(EVENT_POWER_WORD_SHIELD, 20*IN_MILLISECONDS);
                             break;
 
@@ -297,13 +297,14 @@ public:
 
             if (damage > me->GetHealth() && CheckDurand)
             {
+                damage = 0;
                 events.ScheduleEvent(EVENT_FEIGN_DEATH, 1*IN_MILLISECONDS);
-                CheckDurand = false;
 
                 if (Unit* Whitemane = Unit::GetUnit(*me, instance->GetData64(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE)))
                 {
-                    Whitemane->GetMotionMaster()->MovePoint(1, 1163.113370f, 1398.856812f, 32.527786f);
+                    Whitemane->GetMotionMaster()->MovePoint(1, 747.77f, 602.39f, 16.00f);
                 }
+                CheckDurand = false;
             }
         }
 
@@ -351,6 +352,9 @@ public:
                             events.CancelEvent(EVENT_FLASH_OF_STEEL);
                             Talk(SAY_DEATH_DURAND);
                             me->SetHealth(0);
+                            me->GetMotionMaster()->MovementExpired();
+                            me->GetMotionMaster()->MoveIdle();
+                            me->ClearAllReactives();
                             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             me->SetStandState(UNIT_STAND_STATE_DEAD);
                             break;

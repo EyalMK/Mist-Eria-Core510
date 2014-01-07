@@ -30,7 +30,8 @@ enum Spells
 
     /* Autres */
     SPELL_SCORCHED_EARTH_POP    = 114463,
-    SPELL_SCORCHED_EARTH_AURA   = 114464
+    SPELL_SCORCHED_EARTH_AURA   = 114464,
+    SPELL_HEAL                  = 111024
 };
 
 enum Events
@@ -143,7 +144,7 @@ public:
             }
         }
 
-       /* void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id)
         {
             switch (id)
             {
@@ -151,7 +152,7 @@ public:
                     events.ScheduleEvent(EVENT_FIRESTORM_KICK, 500);
                     break;
             }
-        }*/
+        }
 
 
         void UpdateAI(uint32 diff)
@@ -179,7 +180,7 @@ public:
                         case EVENT_JUMP_FIRESTORM:
                             if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST))
                             {
-                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20, EVENT_FIRESTORM_KICK);
+                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20, EVENT_JUMP);
                                 me->AttackStop();
                             }
                             break;
@@ -294,9 +295,49 @@ class spell_scorched_earth : public SpellScriptLoader
         }
 };
 
+class npc_spirit_of_redemption : public CreatureScript
+{
+public:
+    npc_spirit_of_redemption() : CreatureScript("npc_spirit_of_redemption") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_spirit_of_redemptionAI(creature);
+    }
+
+    struct npc_spirit_of_redemptionAI : public ScriptedAI
+    {
+            npc_spirit_of_redemptionAI(Creature* creature) : ScriptedAI(creature) {}
+
+            uint32 m_uiCheckTimer;
+
+            void Reset()
+            {
+                m_uiCheckTimer = 1000;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if(m_uiCheckTimer <= diff)
+                {
+                    if(Unit* target = DoSelectLowestHpFriendly(30, 1000))
+                    {
+                        me->CastSpell(target, SPELL_HEAL, true);
+                        m_uiCheckTimer = 6000;
+                        return;
+                    }
+                    m_uiCheckTimer = 1000;
+                }
+                else m_uiCheckTimer -= diff;
+            }
+    };
+};
+
+
 void AddSC_boss_brother_korloff()
 {
     new boss_brother_korloff();
     new npc_scorched_earth();
     new spell_scorched_earth();
+    new npc_spirit_of_redemption();
 }
