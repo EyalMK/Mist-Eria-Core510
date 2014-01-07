@@ -59,7 +59,8 @@ enum Texts_Durand
     /* Commander Durand */
     SAY_AGGRO_DURAND                = 0, // C’est AUJOURD’HUI qu’est écrite ma légende ! 27527
     SAY_DEATH_DURAND                = 1, // Mais… et ma légende ?! 27528
-    SAY_KILL_DURAND                 = 2  // Ma lame est irremplaçable ! 27530    Une parfaite maitîse technique ! 27531
+    SAY_KILL_DURAND                 = 2, // Ma lame est irremplaçable ! 27530    Une parfaite maitîse technique ! 27531
+    SAY_INTRO_DURAND                = 3
 
 };
 
@@ -72,154 +73,23 @@ enum Texts_Whitemane
     SAY_RESSURECTION_WHITEMANE      = 3  // Que mon champion se lève ! 5840
 };
 
-
-class boss_high_inquisitor_whitemane : public CreatureScript
+enum Actions
 {
-public:
-    boss_high_inquisitor_whitemane() : CreatureScript("boss_high_inquisitor_whitemane") { }
+    ACTION_INTRO    = 1
+};
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new boss_high_inquisitor_whitemaneAI(creature);
-    }
+class at_commander_durand_intro : public AreaTriggerScript
+{
+    public:
+        at_commander_durand_intro() : AreaTriggerScript("at_commander_durand_intro") { }
 
-    struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
-    {
-        boss_high_inquisitor_whitemaneAI(Creature* creature) : ScriptedAI(creature), Summons(me)
+        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
         {
-            instance = creature->GetInstanceScript();
+            if (InstanceScript* instance = player->GetInstanceScript())
+                if (Creature* durand = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_BOSS_COMMANDER_DURAND)))
+                    durand->AI()->DoAction(ACTION_INTRO);
+            return true;
         }
-
-        bool CheckWhitemane;
-        InstanceScript* instance;
-        SummonList Summons;
-        EventMap events;
-
-        void Reset()
-        {
-            events.Reset();
-            Summons.DespawnAll();
-            CheckWhitemane = true;
-
-            if (instance)
-                instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, NOT_STARTED);
-        }
-
-
-        void EnterCombat(Unit* /*who*/)
-        {
-            Talk(SAY_AGGRO_WHITEMANE);
-
-            if (instance)
-                instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, IN_PROGRESS);
-
-            events.ScheduleEvent(EVENT_POWER_WORD_SHIELD, 2*IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_HOLY_SMITE, 3*IN_MILLISECONDS);
-        }
-
-
-        void EnterEvadeMode()
-        {
-            if (instance)
-                instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, FAIL);
-
-            ScriptedAI::EnterEvadeMode();
-        }
-
-        void KilledUnit(Unit* /*pWho*/)
-        {
-            Talk(SAY_KILL_WHITEMANE);
-        }
-
-        void JustDied(Unit* /*killer*/)
-        {
-            Talk(SAY_DEATH_WHITEMANE);
-
-            if (instance)
-                instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, DONE);
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if(!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            if(me->HealthBelowPct(50) && CheckWhitemane)
-            {
-                events.ScheduleEvent(EVENT_DEEP_SLEEP, 1*IN_MILLISECONDS);
-                CheckWhitemane = false;
-            }
-
-            while(uint32 eventId = events.ExecuteEvent())
-            {
-                switch(eventId)
-                {
-                    if (instance)
-                    {
-                        case EVENT_POWER_WORD_SHIELD:
-                            DoCast(SPELL_POWER_WORD_SHIELD);
-                            events.ScheduleEvent(EVENT_POWER_WORD_SHIELD, 20*IN_MILLISECONDS);
-                            break;
-
-                        case EVENT_HOLY_SMITE:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                            {
-                                me->CastSpell(target, SPELL_HOLY_SMITE, true);
-                            }
-                            events.ScheduleEvent(EVENT_HOLY_SMITE, 3*IN_MILLISECONDS);
-                            break;
-
-                        case EVENT_MASS_RESURRECTION:
-                            DoCast(SPELL_MASS_RESURRECTION);
-                            events.ScheduleEvent(EVENT_MASS_RESURRECTION, 60*IN_MILLISECONDS);
-                            break;
-
-                        case EVENT_DEEP_SLEEP:
-                            events.CancelEvent(EVENT_POWER_WORD_SHIELD);
-                            events.CancelEvent(EVENT_HOLY_SMITE);
-
-                            if(Map* map = me->GetMap())
-                            {
-                                Map::PlayerList const & playerList = map->GetPlayers();
-                                if(!playerList.isEmpty())
-                                {
-                                    for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
-                                    {
-                                        if(Player* player = iter->getSource())
-                                        {
-                                            me->CastSpell(player, SPELL_DEEP_SLEEP);
-                                        }
-                                    }
-                                }
-                            }
-                            events.ScheduleEvent(EVENT_SCARLET_RESURRECTION, 1*IN_MILLISECONDS);
-                            break;
-
-                        case EVENT_SCARLET_RESURRECTION:
-                            if (Unit* Durand = Unit::GetUnit(*me, instance->GetData64(DATA_BOSS_COMMANDER_DURAND)))
-                            {
-                                me->CastSpell(Durand, SPELL_SCARLET_RESURRECTION, true);
-                                Talk(SAY_RESSURECTION_WHITEMANE);
-                            }
-                            me->SetHealth(me->GetMaxHealth());
-                            events.ScheduleEvent(EVENT_POWER_WORD_SHIELD, 1*IN_MILLISECONDS);
-                            events.ScheduleEvent(EVENT_HOLY_SMITE, 2*IN_MILLISECONDS);
-                            events.ScheduleEvent(EVENT_MASS_RESURRECTION, 60*IN_MILLISECONDS);
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
-    };
-
 };
 
 
@@ -238,9 +108,11 @@ public:
         boss_commander_durandAI(Creature* creature) : ScriptedAI(creature), Summons(me)
         {
             instance = creature->GetInstanceScript();
+            Intro = false;
         }
 
         bool CheckDurand;
+        bool Intro;
         InstanceScript* instance;
         SummonList Summons;
         EventMap events;
@@ -250,9 +122,34 @@ public:
             events.Reset();
             Summons.DespawnAll();
             CheckDurand = true;
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetStandState(UNIT_STAND_STATE_STAND);
+
+            if (Creature* whitemane = me->GetCreature(*me, instance->GetData64(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE)))
+            {
+                if(!whitemane->IsAlive())
+                {
+                    whitemane->RemoveCorpse();
+                    whitemane->Respawn();
+                }
+            }
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_COMMANDER_DURAND, NOT_STARTED);
+        }
+
+        void DoAction(int32 action)
+        {
+            switch (action)
+            {
+                case ACTION_INTRO:
+                    if (!Intro)
+                    {
+                        Talk(SAY_INTRO_DURAND);
+                        Intro = true;
+                    }
+                    break;
+            }
         }
 
 
@@ -342,7 +239,10 @@ public:
                             break;
 
                         case EVENT_DASHING_STRIKE:
-                            DoCast(SPELL_DASHING_STRIKE);
+                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                            {
+                                me->CastSpell(target, SPELL_DASHING_STRIKE, true);
+                            }
 
                             events.ScheduleEvent(EVENT_DASHING_STRIKE, 25*IN_MILLISECONDS);
                             break;
@@ -379,8 +279,167 @@ public:
     };
 };
 
+class boss_high_inquisitor_whitemane : public CreatureScript
+{
+public:
+    boss_high_inquisitor_whitemane() : CreatureScript("boss_high_inquisitor_whitemane") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new boss_high_inquisitor_whitemaneAI(creature);
+    }
+
+    struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
+    {
+        boss_high_inquisitor_whitemaneAI(Creature* creature) : ScriptedAI(creature), Summons(me)
+        {
+            instance = creature->GetInstanceScript();
+        }
+
+        bool CheckWhitemane;
+        InstanceScript* instance;
+        SummonList Summons;
+        EventMap events;
+
+        void Reset()
+        {
+            events.Reset();
+            Summons.DespawnAll();
+            CheckWhitemane = true;
+
+            if (Creature* durand = me->GetCreature(*me, instance->GetData64(DATA_BOSS_COMMANDER_DURAND)))
+            {
+                if(!durand->IsAlive())
+                {
+                    durand->RemoveCorpse();
+                    durand->Respawn();
+                }
+            }
+
+            if (instance)
+                instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, NOT_STARTED);
+        }
+
+
+        void EnterCombat(Unit* /*who*/)
+        {
+            Talk(SAY_AGGRO_WHITEMANE);
+
+            if (instance)
+                instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, IN_PROGRESS);
+
+            events.ScheduleEvent(EVENT_POWER_WORD_SHIELD, 2*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_HOLY_SMITE, 3*IN_MILLISECONDS);
+        }
+
+
+        void EnterEvadeMode()
+        {
+            if (instance)
+                instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, FAIL);
+
+            ScriptedAI::EnterEvadeMode();
+        }
+
+        void KilledUnit(Unit* /*pWho*/)
+        {
+            Talk(SAY_KILL_WHITEMANE);
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            Talk(SAY_DEATH_WHITEMANE);
+
+            if (instance)
+                instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, DONE);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if(!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            if(me->HealthBelowPct(50) && CheckWhitemane)
+            {
+                events.ScheduleEvent(EVENT_DEEP_SLEEP, 1*IN_MILLISECONDS);
+                CheckWhitemane = false;
+            }
+
+            while(uint32 eventId = events.ExecuteEvent())
+            {
+                switch(eventId)
+                {
+                    if (instance)
+                    {
+                        case EVENT_POWER_WORD_SHIELD:
+                            DoCast(me, SPELL_POWER_WORD_SHIELD);
+                            events.ScheduleEvent(EVENT_POWER_WORD_SHIELD, 20*IN_MILLISECONDS);
+                            break;
+
+                        case EVENT_HOLY_SMITE:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                            {
+                                me->CastSpell(target, SPELL_HOLY_SMITE);
+                            }
+                            events.ScheduleEvent(EVENT_HOLY_SMITE, 3*IN_MILLISECONDS);
+                            break;
+
+                        case EVENT_MASS_RESURRECTION:
+                            DoCast(SPELL_MASS_RESURRECTION);
+                            events.ScheduleEvent(EVENT_MASS_RESURRECTION, 60*IN_MILLISECONDS);
+                            break;
+
+                        case EVENT_DEEP_SLEEP:
+                            events.CancelEvent(EVENT_POWER_WORD_SHIELD);
+                            events.CancelEvent(EVENT_HOLY_SMITE);
+
+                            if(Map* map = me->GetMap())
+                            {
+                                Map::PlayerList const & playerList = map->GetPlayers();
+                                if(!playerList.isEmpty())
+                                {
+                                    for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
+                                    {
+                                        if(Player* player = iter->getSource())
+                                        {
+                                            me->CastSpell(player, SPELL_DEEP_SLEEP);
+                                        }
+                                    }
+                                }
+                            }
+                            events.ScheduleEvent(EVENT_SCARLET_RESURRECTION, 1*IN_MILLISECONDS);
+                            break;
+
+                        case EVENT_SCARLET_RESURRECTION:
+                            if (Unit* Durand = Unit::GetUnit(*me, instance->GetData64(DATA_BOSS_COMMANDER_DURAND)))
+                            {
+                                me->CastSpell(Durand, SPELL_SCARLET_RESURRECTION);
+                                Talk(SAY_RESSURECTION_WHITEMANE);
+                            }
+                            me->SetHealth(me->GetMaxHealth());
+                            events.ScheduleEvent(EVENT_POWER_WORD_SHIELD, 1*IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_HOLY_SMITE, 2*IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_MASS_RESURRECTION, 60*IN_MILLISECONDS);
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+    };
+
+};
+
 void AddSC_boss_high_inquisitor_whitemane()
 {
     new boss_commander_durand();
     new boss_high_inquisitor_whitemane();
+    new at_commander_durand_intro();
 }

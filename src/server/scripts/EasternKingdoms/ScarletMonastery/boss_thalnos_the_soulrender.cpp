@@ -20,6 +20,7 @@
 #include "ScriptedCreature.h"
 #include "scarlet_monastery.h"
 #include "SpellScript.h"
+#include "Player.h"
 
 
 enum Spells
@@ -70,6 +71,16 @@ enum Creatures
     NPC_EMPOWERED_ZOMBIE        = 59930,
     NPC_THALNOS                 = 59789,
     NPC_TRAQUEUR_INVISIBLE      = 200011
+};
+
+enum Texts_Crane
+{
+    SAY_CRANE       = 0
+};
+
+enum Actions
+{
+    ACTION_CRANE    = 1
 };
 
 
@@ -380,7 +391,7 @@ public:
             {
                 me->SetReactState(REACT_PASSIVE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
-                m_uiCheckTimer = 250 ;
+                m_uiCheckTimer = 250;
             }
 
             void UpdateAI(uint32 diff)
@@ -388,10 +399,10 @@ public:
                 if(m_uiCheckTimer <= diff)
                 {
                     DoCheckPlayers();
-                    m_uiCheckTimer = 250 ;
+                    m_uiCheckTimer = 250;
                 }
                 else
-                    m_uiCheckTimer -= diff ;
+                    m_uiCheckTimer -= diff;
 
             }
 
@@ -537,6 +548,56 @@ class spell_evict_soul : public SpellScriptLoader
         }
 };
 
+class npc_traqueur_crane : public CreatureScript
+{
+public:
+    npc_traqueur_crane() : CreatureScript("npc_traqueur_crane") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_traqueur_craneAI(creature);
+    }
+
+    struct npc_traqueur_craneAI : public ScriptedAI
+    {
+            npc_traqueur_craneAI(Creature* creature) : ScriptedAI(creature)
+            {
+                Crane = false;
+            }
+
+            bool Crane;
+
+            void DoAction(int32 action)
+            {
+                switch (action)
+                {
+                    case ACTION_CRANE:
+                        if (!Crane)
+                        {
+                            Talk(SAY_CRANE);
+                            Crane = true;
+                        }
+                        break;
+                }
+            }
+    };
+};
+
+class at_crane_monastery : public AreaTriggerScript
+{
+    public:
+        at_crane_monastery () : AreaTriggerScript("at_crane_monastery ") { }
+
+        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        {
+            if (Creature* crane = player->FindNearestCreature(200013, 20, true))
+                crane->AI()->DoAction(ACTION_CRANE);
+            return true;
+        }
+};
+
+
+
 
 void AddSC_boss_thalnos_the_soulrender()
 {
@@ -548,4 +609,6 @@ void AddSC_boss_thalnos_the_soulrender()
     new npc_traqueur_thalnos();
     new spell_spirit_gale();
     new spell_evict_soul();
+	new npc_traqueur_crane();
+    new at_crane_monastery ();
 }

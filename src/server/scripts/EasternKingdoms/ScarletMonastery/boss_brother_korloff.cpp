@@ -39,8 +39,7 @@ enum Events
     EVENT_FIRESTORM_KICK    = 1,
     EVENT_BLAZING_FISTS     = 2,
     EVENT_SCORCHED_EARTH    = 3,
-    EVENT_JUMP_FIRESTORM    = 4,
-    EVENT_ATTACK            = 5
+    EVENT_JUMP_FIRESTORM    = 4
 };
 
 enum Texts
@@ -181,14 +180,12 @@ public:
                             if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST))
                             {
                                 me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20, EVENT_JUMP);
-                                me->AttackStop();
                             }
                             break;
 
                         case EVENT_FIRESTORM_KICK:
-                            DoCast(SPELL_FIRESTORM_KICK);
+                            DoCast(me, SPELL_FIRESTORM_KICK);
 
-                            events.ScheduleEvent(EVENT_ATTACK, 6*IN_MILLISECONDS);
                             events.ScheduleEvent(EVENT_JUMP_FIRESTORM, 28*IN_MILLISECONDS);
                             break;
 
@@ -199,18 +196,9 @@ public:
                             break;
 
                         case EVENT_BLAZING_FISTS:
-                            me->AttackStop();
-                            DoCast(SPELL_BLAZING_FISTS);
+                            DoCast(me, SPELL_BLAZING_FISTS);
 
-                            events.ScheduleEvent(EVENT_ATTACK, 6*IN_MILLISECONDS);
                             events.ScheduleEvent(EVENT_BLAZING_FISTS, 30*IN_MILLISECONDS);
-                            break;
-
-                        case EVENT_ATTACK:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
-                            {
-                                me->AI()->AttackStart(target);
-                            }
                             break;
 
                         default:
@@ -310,10 +298,12 @@ public:
             npc_spirit_of_redemptionAI(Creature* creature) : ScriptedAI(creature) {}
 
             uint32 m_uiCheckTimer;
+            uint32 m_uiDespawnTimer;
 
             void Reset()
             {
                 m_uiCheckTimer = 1000;
+                m_uiDespawnTimer = 20000;
             }
 
             void UpdateAI(uint32 diff)
@@ -322,13 +312,19 @@ public:
                 {
                     if(Unit* target = DoSelectLowestHpFriendly(30, 1000))
                     {
-                        me->CastSpell(target, SPELL_HEAL, true);
+                        me->CastSpell(target, SPELL_HEAL);
                         m_uiCheckTimer = 6000;
                         return;
                     }
                     m_uiCheckTimer = 1000;
                 }
                 else m_uiCheckTimer -= diff;
+
+                if(m_uiDespawnTimer <= diff)
+                {
+                    me->DespawnOrUnsummon();
+                }
+                else m_uiDespawnTimer -= diff;
             }
     };
 };

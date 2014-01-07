@@ -21,6 +21,14 @@
 #include "scarlet_monastery.h"
 
 
+DoorData const doorData[] =
+{
+    {GO_THALNOS_THE_SOULRENDER_GATE,        DATA_BOSS_THALNOS_THE_SOULRENDER,   DOOR_TYPE_PASSAGE,      BOUNDARY_NONE},
+    {GO_BROTHER_KORLOFF_GATE,               DATA_BOSS_BROTHER_KORLOFF,          DOOR_TYPE_PASSAGE,      BOUNDARY_NONE},
+    {GO_BROTHER_KORLOFF_GATE,               DATA_BOSS_COMMANDER_DURAND,         DOOR_TYPE_ROOM,         BOUNDARY_N},
+    {0,                                     0,                                  DOOR_TYPE_ROOM,         BOUNDARY_NONE}, // END
+};
+
 class instance_scarlet_monastery : public InstanceMapScript
 {
     public:
@@ -59,20 +67,35 @@ class instance_scarlet_monastery : public InstanceMapScript
                     default:
                         break;
                 }
+            }
 
-                switch (creature->GetGUID())
+            void OnGameObjectCreate(GameObject* go)
+            {
+                switch (go->GetEntry())
                 {
+                    case GO_THALNOS_THE_SOULRENDER_GATE:
+                    case GO_BROTHER_KORLOFF_GATE:
+                    case GO_HIGH_INQUISITOR_WHITEMANE_GATE:
+                        AddDoor(go, true);
+                        break;
                     default:
                         break;
                 }
             }
 
-            void OnGameObjectCreate(GameObject* /*go*/)
+            void OnGameObjectRemove(GameObject* go)
             {
-            }
+                switch (go->GetEntry())
+                {
+                    case GO_THALNOS_THE_SOULRENDER_GATE:
+                    case GO_BROTHER_KORLOFF_GATE:
+                    case GO_HIGH_INQUISITOR_WHITEMANE_GATE:
+                        AddDoor(go, false);
+                        break;
 
-            void OnGameObjectRemove(GameObject* /*go*/)
-            {
+                    default:
+                        break;
+                }
             }
 
             uint64 GetData64(uint32 id) const

@@ -1372,10 +1372,17 @@ class spell_dk_remorseless_winter : public SpellScriptLoader
 
             void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
+				
                 if(Unit* target = GetTarget())
+				{
 					if(Aura *aur = target->GetAura(SPELL_DK_REMORSELESS_WINTER))
+					{
 						if((aur->GetStackAmount() == 5) && !target->HasAura(SPELL_DK_REMORSELESS_WINTER_STUN))
+						{
 							target->CastSpell(target, SPELL_DK_REMORSELESS_WINTER_STUN, true);
+						}
+					}
+				}
             }
 
             void Register()
