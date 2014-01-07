@@ -753,7 +753,10 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         break;
                     case 107270: // Spinning Crane Kick
                         if (m_caster->GetTypeId() == TYPEID_PLAYER)
+						{
+							m_caster->SetSpeed(MOVE_RUN, 0.7f);
                             damage = CalculateMonkMeleeAttacks(m_caster, 1.59f, 14);
+						}
                         break;
                     case 107428: // Rising Sun Kick
                         if (m_caster->GetTypeId() == TYPEID_PLAYER)
@@ -1840,7 +1843,9 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
                     caster->RemoveAurasDueToSpell(114637);
                 }
 
-                addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
+				if (!caster->IsValidAttackTarget(unitTarget))
+					addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
+				else addhealth = caster->SpellHealingBonusDone(caster, m_spellInfo, addhealth, HEAL);
             }
 		else if (m_spellInfo->Id == 115072) // Expel Harm
             {
