@@ -1372,13 +1372,16 @@ class spell_dk_remorseless_winter : public SpellScriptLoader
 
             void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-				
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH DK >>> 0");
                 if(Unit* target = GetTarget())
 				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH DK >>> 1");
 					if(Aura *aur = target->GetAura(SPELL_DK_REMORSELESS_WINTER))
 					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH DK >>> 2");
 						if((aur->GetStackAmount() == 5) && !target->HasAura(SPELL_DK_REMORSELESS_WINTER_STUN))
 						{
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "DEBUG TERAH DK >>> 3");
 							target->CastSpell(target, SPELL_DK_REMORSELESS_WINTER_STUN, true);
 						}
 					}
