@@ -26,7 +26,7 @@ public:
 
         void MoveInLineOfSight(Unit* who)
         {
-			if (!me->IsWithinDistInMap(who, 1.0f) || intro)
+			if (!me->IsWithinDistInMap(who, 1.0f))
 				return;
 
 			if (!who || !who->IsInWorld())
