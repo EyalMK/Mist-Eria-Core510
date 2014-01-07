@@ -127,7 +127,7 @@ public:
 
             if (Creature* whitemane = me->GetCreature(*me, instance->GetData64(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE)))
             {
-                if(!whitemane->IsAlive())
+                if(!whitemane->isAlive())
                 {
                     whitemane->RemoveCorpse();
                     whitemane->Respawn();
@@ -309,7 +309,7 @@ public:
 
             if (Creature* durand = me->GetCreature(*me, instance->GetData64(DATA_BOSS_COMMANDER_DURAND)))
             {
-                if(!durand->IsAlive())
+                if(!durand->isAlive())
                 {
                     durand->RemoveCorpse();
                     durand->Respawn();
