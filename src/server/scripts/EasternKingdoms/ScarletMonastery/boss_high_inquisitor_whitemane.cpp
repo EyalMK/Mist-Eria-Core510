@@ -57,9 +57,9 @@ enum Events
 enum Texts_Durand
 {
     /* Commander Durand */
-    SAY_AGGRO_DURAND                = 0, // C’est AUJOURD’HUI qu’est écrite ma légende ! 27527
-    SAY_DEATH_DURAND                = 1, // Mais… et ma légende ?! 27528
-    SAY_KILL_DURAND                 = 2, // Ma lame est irremplaçable ! 27530    Une parfaite maitîse technique ! 27531
+    SAY_AGGRO_DURAND                = 0,
+    SAY_DEATH_DURAND                = 1,
+    SAY_KILL_DURAND                 = 2,
     SAY_INTRO_DURAND                = 3
 
 };
@@ -67,10 +67,10 @@ enum Texts_Durand
 enum Texts_Whitemane
 {
     /* Inquisitor Whitemane */
-    SAY_AGGRO_WHITEMANE             = 0, // Vous paierez pour cette traîtrise ! 29616
-    SAY_DEATH_WHITEMANE             = 1, // Mograine... 29617
-    SAY_KILL_WHITEMANE              = 2, // La lumière a parlé ! 29618
-    SAY_RESSURECTION_WHITEMANE      = 3  // Que mon champion se lève ! 5840
+    SAY_AGGRO_WHITEMANE             = 0,
+    SAY_DEATH_WHITEMANE             = 1,
+    SAY_KILL_WHITEMANE              = 2,
+    SAY_RESSURECTION_WHITEMANE      = 3
 };
 
 enum Actions
@@ -125,17 +125,24 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
 
-            if (Creature* whitemane = me->GetCreature(*me, instance->GetData64(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE)))
+            if (instance)
             {
-                if(!whitemane->isAlive())
+                instance->SetBossState(DATA_BOSS_COMMANDER_DURAND, NOT_STARTED);
+
+                if (Creature* whitemane = me->GetCreature(*me, instance->GetData64(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE)))
                 {
-                    whitemane->RemoveCorpse();
-                    whitemane->Respawn();
+                    if(!whitemane->isAlive())
+                    {
+                        whitemane->RemoveCorpse();
+                        whitemane->Respawn();
+                    }
+                }
+
+                if (GameObject* KorloffDoor = GameObject::GetGameObject(*me, instance->GetData64(DATA_GO_KORLOFF)))
+                {
+                    KorloffDoor->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                 }
             }
-
-            if (instance)
-                instance->SetBossState(DATA_BOSS_COMMANDER_DURAND, NOT_STARTED);
         }
 
         void DoAction(int32 action)
@@ -158,7 +165,13 @@ public:
             Talk(SAY_AGGRO_DURAND);
 
             if (instance)
+            {
                 instance->SetBossState(DATA_BOSS_COMMANDER_DURAND, IN_PROGRESS);
+                if (GameObject* KorloffDoor = GameObject::GetGameObject(*me, instance->GetData64(DATA_GO_KORLOFF)))
+                {
+                    KorloffDoor->SetGoState(GO_STATE_READY);
+                }
+            }
 
             events.ScheduleEvent(EVENT_FLASH_OF_STEEL, 10*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_DASHING_STRIKE, 25*IN_MILLISECONDS);
@@ -200,6 +213,11 @@ public:
                 if (Unit* Whitemane = Unit::GetUnit(*me, instance->GetData64(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE)))
                 {
                     Whitemane->GetMotionMaster()->MovePoint(1, 747.77f, 602.39f, 16.00f);
+                }
+
+                if (GameObject* WhitemaneDoor = GameObject::GetGameObject(*me, instance->GetData64(DATA_GO_WHITEMANE)))
+                {
+                    WhitemaneDoor->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                 }
                 CheckDurand = false;
             }
@@ -273,7 +291,6 @@ public:
                     }
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -307,17 +324,24 @@ public:
             Summons.DespawnAll();
             CheckWhitemane = true;
 
-            if (Creature* durand = me->GetCreature(*me, instance->GetData64(DATA_BOSS_COMMANDER_DURAND)))
+            if (instance)
             {
-                if(!durand->isAlive())
+                instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, NOT_STARTED);
+
+                if (Creature* durand = me->GetCreature(*me, instance->GetData64(DATA_BOSS_COMMANDER_DURAND)))
                 {
-                    durand->RemoveCorpse();
-                    durand->Respawn();
+                    if(!durand->isAlive())
+                    {
+                        durand->RemoveCorpse();
+                        durand->Respawn();
+                    }
+                }
+
+                if (GameObject* WhitemaneDoor = GameObject::GetGameObject(*me, instance->GetData64(DATA_GO_WHITEMANE)))
+                {
+                    WhitemaneDoor->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                 }
             }
-
-            if (instance)
-                instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, NOT_STARTED);
         }
 
 
@@ -326,13 +350,7 @@ public:
             Talk(SAY_AGGRO_WHITEMANE);
 
             if (instance)
-            {
                 instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, IN_PROGRESS);
-                if (GameObject* KorloffDoor = GameObject::GetGameObject(*me, instance->GetData64(DATA_GO_KORLOFF)))
-                {
-                    KorloffDoor->SetGoState(GO_STATE_READY);
-                }
-            }
 
             events.ScheduleEvent(EVENT_POWER_WORD_SHIELD, 2*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_HOLY_SMITE, 4*IN_MILLISECONDS);
@@ -343,6 +361,8 @@ public:
         {
             if (instance)
                 instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, FAIL);
+
+            me->GetMotionMaster()->MovePoint(1, 700.40f, 605.83f, 12.00f);
 
             ScriptedAI::EnterEvadeMode();
         }
@@ -383,14 +403,14 @@ public:
                     if (instance)
                     {
                         case EVENT_POWER_WORD_SHIELD:
-                            DoCast(me, SPELL_POWER_WORD_SHIELD);
+                            me->CastSpell(me, SPELL_POWER_WORD_SHIELD, false);
                             events.ScheduleEvent(EVENT_POWER_WORD_SHIELD, 20*IN_MILLISECONDS);
                             break;
 
                         case EVENT_HOLY_SMITE:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             {
-                                me->CastSpell(target, SPELL_HOLY_SMITE);
+                                me->CastSpell(target, SPELL_HOLY_SMITE, false);
                             }
                             events.ScheduleEvent(EVENT_HOLY_SMITE, 3*IN_MILLISECONDS);
                             break;

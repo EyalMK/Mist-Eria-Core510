@@ -13,6 +13,7 @@ set(sources
   Pandaria/boss_sha_of_anger.cpp
   Pandaria/zone_wandering_isle.cpp
   Pandaria/zone_vale_of_eternal_blossoms.cpp
+  Pandaria/zone_kun_lai_summit.cpp
   Pandaria/StormstoutBrewery/stormstout_brewery.h
   Pandaria/StormstoutBrewery/instance_stormstout_brewery.cpp
   Pandaria/StormstoutBrewery/boss_ook_ook.cpp
