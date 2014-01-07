@@ -30,7 +30,8 @@ enum Spells
 
     /* Autres */
     SPELL_SCORCHED_EARTH_POP    = 114463,
-    SPELL_SCORCHED_EARTH_AURA   = 114464
+    SPELL_SCORCHED_EARTH_AURA   = 114464,
+    SPELL_HEAL                  = 111024
 };
 
 enum Events
@@ -120,7 +121,13 @@ public:
             Summons.DespawnAll();
 
             if (instance)
+            {
                 instance->SetBossState(DATA_BOSS_BROTHER_KORLOFF, DONE);
+                if (GameObject* KorloffDoor = GameObject::GetGameObject(*me, instance->GetData64(DATA_GO_KORLOFF)))
+                {
+                    KorloffDoor->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                }
+            }
         }
 
         void JustSummoned(Creature* Summoned)
@@ -139,6 +146,16 @@ public:
             {
                 DoCast(SPELL_RISING_FLAME);
                 m_uiNextCastPercent -= 10 ;
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            switch (id)
+            {
+                case EVENT_JUMP:
+                    events.ScheduleEvent(EVENT_FIRESTORM_KICK, 500);
+                    break;
             }
         }
 
@@ -168,16 +185,12 @@ public:
                         case EVENT_JUMP_FIRESTORM:
                             if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST))
                             {
-                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20);
-                                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20, EVENT_JUMP);
                             }
-
-							events.ScheduleEvent(EVENT_FIRESTORM_KICK, 1*IN_MILLISECONDS);
                             break;
 
                         case EVENT_FIRESTORM_KICK:
-                            DoCast(SPELL_FIRESTORM_KICK);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                            DoCastAOE(SPELL_FIRESTORM_KICK);
 
                             events.ScheduleEvent(EVENT_JUMP_FIRESTORM, 28*IN_MILLISECONDS);
                             break;
@@ -185,12 +198,11 @@ public:
                         case EVENT_SCORCHED_EARTH:
                             DoCast(SPELL_SCORCHED_EARTH);
 
-							events.CancelEvent(EVENT_SCORCHED_EARTH);
+                            events.CancelEvent(EVENT_SCORCHED_EARTH);
                             break;
 
                         case EVENT_BLAZING_FISTS:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
-                                me->CastSpell(target, SPELL_BLAZING_FISTS);
+                            DoCastAOE(SPELL_BLAZING_FISTS);
 
                             events.ScheduleEvent(EVENT_BLAZING_FISTS, 30*IN_MILLISECONDS);
                             break;
@@ -226,10 +238,7 @@ public:
             void Reset()
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
-
-				if (me->HasAura(SPELL_SCORCHED_EARTH_AURA))
-					me->RemoveAurasDueToSpell(SPELL_SCORCHED_EARTH_AURA, me->GetGUID());
-
+                me->RemoveAurasDueToSpell(SPELL_SCORCHED_EARTH_AURA);
                 me->CastSpell(me, SPELL_SCORCHED_EARTH_AURA, true);
                 m_uiCheckTimer = 2000;
             }
@@ -262,8 +271,8 @@ class spell_scorched_earth : public SpellScriptLoader
                 if (!caster)
                     return;
 
-				if (caster->FindNearestCreature(NPC_SCORCHED_EARTH, 3.0f, true))
-					return;
+                if (caster->FindNearestCreature(NPC_SCORCHED_EARTH, 3.0f, true))
+                    return;
 
                 caster->CastSpell(caster, SPELL_SCORCHED_EARTH_POP, true);
             }
@@ -280,9 +289,57 @@ class spell_scorched_earth : public SpellScriptLoader
         }
 };
 
+class npc_spirit_of_redemption : public CreatureScript
+{
+public:
+    npc_spirit_of_redemption() : CreatureScript("npc_spirit_of_redemption") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_spirit_of_redemptionAI(creature);
+    }
+
+    struct npc_spirit_of_redemptionAI : public ScriptedAI
+    {
+            npc_spirit_of_redemptionAI(Creature* creature) : ScriptedAI(creature) {}
+
+            uint32 m_uiCheckTimer;
+            uint32 m_uiDespawnTimer;
+
+            void Reset()
+            {
+                m_uiCheckTimer = 1000;
+                m_uiDespawnTimer = 20000;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if(m_uiCheckTimer <= diff)
+                {
+                    if(Unit* target = DoSelectLowestHpFriendly(30, 1000))
+                    {
+                        me->CastSpell(target, SPELL_HEAL);
+                        m_uiCheckTimer = 6000;
+                        return;
+                    }
+                    m_uiCheckTimer = 1000;
+                }
+                else m_uiCheckTimer -= diff;
+
+                if(m_uiDespawnTimer <= diff)
+                {
+                    me->DespawnOrUnsummon();
+                }
+                else m_uiDespawnTimer -= diff;
+            }
+    };
+};
+
+
 void AddSC_boss_brother_korloff()
 {
     new boss_brother_korloff();
     new npc_scorched_earth();
     new spell_scorched_earth();
+    new npc_spirit_of_redemption();
 }

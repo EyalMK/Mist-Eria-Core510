@@ -31,8 +31,14 @@ class instance_scarlet_monastery : public InstanceMapScript
             instance_scarlet_monastery_InstanceMapScript(Map* map) : InstanceScript(map)
             {
                 BossThalnosTheSoulrenderGUID        = 0;
+                NpcTriggerCraneGUID                 = 0;
                 BossBrotherKorloffGUID              = 0;
                 BossHighInquisitorWhitemaneGUID		= 0;
+                BossCommanderDurandGUID             = 0;
+
+                ThalnosDoorGUID                     = 0;
+                KorloffDoorGUID                     = 0;
+                WhitemaneDoorGUID                   = 0;
             }
 
             void OnCreatureCreate(Creature* creature)
@@ -43,6 +49,9 @@ class instance_scarlet_monastery : public InstanceMapScript
                         BossThalnosTheSoulrenderGUID = creature->GetGUID();
                         break;
 
+                    case NPC_TRIGGER_CRANE:
+                        NpcTriggerCraneGUID = creature->GetGUID();
+
                     case BOSS_BROTHER_KORLOFF:
                         BossBrotherKorloffGUID = creature->GetGUID();
                         break;
@@ -51,23 +60,31 @@ class instance_scarlet_monastery : public InstanceMapScript
                         BossHighInquisitorWhitemaneGUID	 = creature->GetGUID();
                         break;
 
+                    case BOSS_COMMANDER_DURAND:
+                        BossCommanderDurandGUID	 = creature->GetGUID();
+                        break;
+
                     default:
                         break;
                 }
+            }
 
-                switch (creature->GetGUID())
+            void OnGameObjectCreate(GameObject* go)
+            {
+                switch (go->GetEntry())
                 {
-                    default:
+                    case GO_THALNOS_GATE:
+                        ThalnosDoorGUID = go->GetGUID();
+                        break;
+
+                    case GO_KORLOFF_GATE:
+                        KorloffDoorGUID = go->GetGUID();
+                        break;
+
+                    case GO_WHITEMANE_GATE:
+                        WhitemaneDoorGUID = go->GetGUID();
                         break;
                 }
-            }
-
-            void OnGameObjectCreate(GameObject* /*go*/)
-            {
-            }
-
-            void OnGameObjectRemove(GameObject* /*go*/)
-            {
             }
 
             uint64 GetData64(uint32 id) const
@@ -77,11 +94,26 @@ class instance_scarlet_monastery : public InstanceMapScript
                     case DATA_BOSS_THALNOS_THE_SOULRENDER:
                         return BossThalnosTheSoulrenderGUID;
 
+                    case DATA_NPC_TRIGGER_CRANE:
+                        return NpcTriggerCraneGUID;
+
                     case DATA_BOSS_BROTHER_KORLOFF:
                         return BossBrotherKorloffGUID;
 
                     case DATA_BOSS_HIGH_INQUISITOR_WHITEMANE:
                         return BossHighInquisitorWhitemaneGUID;
+
+                    case DATA_BOSS_COMMANDER_DURAND:
+                        return BossCommanderDurandGUID;
+
+                    case DATA_GO_THALNOS:
+                        return ThalnosDoorGUID;
+
+                    case DATA_GO_KORLOFF:
+                        return KorloffDoorGUID;
+
+                    case DATA_GO_WHITEMANE:
+                        return WhitemaneDoorGUID;
 
                     default:
                         break;
@@ -92,8 +124,14 @@ class instance_scarlet_monastery : public InstanceMapScript
 
             protected:
                 uint64 BossThalnosTheSoulrenderGUID;
+                uint64 NpcTriggerCraneGUID ;
                 uint64 BossBrotherKorloffGUID;
                 uint64 BossHighInquisitorWhitemaneGUID;
+                uint64 BossCommanderDurandGUID;
+
+                uint64 ThalnosDoorGUID;
+                uint64 KorloffDoorGUID;
+                uint64 WhitemaneDoorGUID;
 
         };
 

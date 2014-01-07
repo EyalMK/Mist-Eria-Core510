@@ -5,14 +5,6 @@
 // After that, when OnCreatureCreate() is called, we update the entries if needed
 // Also, we must set the datas properly, so YanZhu will have the good spells
 
-// First entry is the basic entry (arbitrary chosen), the second entry is the eventually updated entry
-static const uint32 AlamentalsCombination[3][2] =
-{
-    {Mob_FizzyBrewAlamental, Mob_SudsyBrewAlamental}, // Stout ability
-    {Mob_BubblingBrewAlamental, Mob_YeasyBrewAlamental}, // Ale ability
-    {Mob_BloatedBrewAlamental, Mob_StoutBrewAlamental} // Wheat ability
-};
-
 class instance_stormstout_brewery : public InstanceMapScript
 {
 public :
@@ -34,12 +26,8 @@ public :
         void Initialize()
         {
             memset(m_auiEncounter, NOT_STARTED, sizeof(m_auiEncounter)) ; // Initialize the events states
-            memset(m_auiAlamental, 0, sizeof(m_auiAlamental)); // Initialize the npcs
 
             m_ullHoptallusGuid = m_ullOokOokGuid = m_ullYanZhuGuid = m_ucKilledHozenCounter = 0 ; // Initialize counters
-
-            for(uint8 i = 0 ; i < MAX_ALAMENTAL ; ++i)
-                m_auiAlamental[i] = AlamentalsCombination[RAND(0,1)][i];
         }
 
         /// @note : Tweex said that if the server crashes while a player is in the instance, doors may be closed again, since it is their original status
@@ -124,10 +112,6 @@ public :
             case Data_YanZhuEventProgress :
                 return m_auiEncounter[uiDataIndex];
 
-            case Data_AleAlamental :
-            case Data_WheatAlamental :
-            case Data_StoutAlamental :
-                return m_auiAlamental[uiDataIndex - 4];
             default :
                 return 0 ;
             }
@@ -390,7 +374,6 @@ public :
 
     private :
         uint32 m_auiEncounter[MAX_ENCOUNTER];
-        uint32 m_auiAlamental[MAX_ALAMENTAL];
 
         uint8 m_ucKilledHozenCounter ;
         uint64 m_ullOokOokGuid ;
