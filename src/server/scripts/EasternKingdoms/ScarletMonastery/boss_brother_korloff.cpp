@@ -121,7 +121,13 @@ public:
             Summons.DespawnAll();
 
             if (instance)
+            {
                 instance->SetBossState(DATA_BOSS_BROTHER_KORLOFF, DONE);
+                if (GameObject* KorloffDoor = GameObject::GetGameObject(*me, instance->GetData64(DATA_GO_KORLOFF)))
+                {
+                    KorloffDoor->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                }
+            }
         }
 
         void JustSummoned(Creature* Summoned)
@@ -184,7 +190,7 @@ public:
                             break;
 
                         case EVENT_FIRESTORM_KICK:
-                            DoCast(me, SPELL_FIRESTORM_KICK);
+                            DoCastAOE(SPELL_FIRESTORM_KICK);
 
                             events.ScheduleEvent(EVENT_JUMP_FIRESTORM, 28*IN_MILLISECONDS);
                             break;
@@ -196,7 +202,7 @@ public:
                             break;
 
                         case EVENT_BLAZING_FISTS:
-                            DoCast(me, SPELL_BLAZING_FISTS);
+                            DoCastAOE(SPELL_BLAZING_FISTS);
 
                             events.ScheduleEvent(EVENT_BLAZING_FISTS, 30*IN_MILLISECONDS);
                             break;

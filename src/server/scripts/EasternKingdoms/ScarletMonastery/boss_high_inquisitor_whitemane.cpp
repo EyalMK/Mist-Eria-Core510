@@ -326,10 +326,16 @@ public:
             Talk(SAY_AGGRO_WHITEMANE);
 
             if (instance)
+            {
                 instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, IN_PROGRESS);
+                if (GameObject* KorloffDoor = GameObject::GetGameObject(*me, instance->GetData64(DATA_GO_KORLOFF)))
+                {
+                    KorloffDoor->SetGoState(GO_STATE_READY);
+                }
+            }
 
             events.ScheduleEvent(EVENT_POWER_WORD_SHIELD, 2*IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_HOLY_SMITE, 3*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_HOLY_SMITE, 4*IN_MILLISECONDS);
         }
 
 
@@ -422,8 +428,8 @@ public:
                                 Talk(SAY_RESSURECTION_WHITEMANE);
                             }
                             me->SetHealth(me->GetMaxHealth());
-                            events.ScheduleEvent(EVENT_POWER_WORD_SHIELD, 1*IN_MILLISECONDS);
-                            events.ScheduleEvent(EVENT_HOLY_SMITE, 2*IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_POWER_WORD_SHIELD, 2*IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_HOLY_SMITE, 4*IN_MILLISECONDS);
                             events.ScheduleEvent(EVENT_MASS_RESURRECTION, 60*IN_MILLISECONDS);
                             break;
 

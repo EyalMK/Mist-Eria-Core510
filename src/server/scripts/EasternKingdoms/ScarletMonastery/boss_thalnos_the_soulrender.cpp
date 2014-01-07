@@ -145,6 +145,7 @@ public:
             if (instance)
                 instance->SetBossState(DATA_BOSS_THALNOS_THE_SOULRENDER, FAIL);
 
+            Cleanup();
             ScriptedAI::EnterEvadeMode();
         }
 
@@ -160,7 +161,13 @@ public:
             Summons.DespawnAll();
 
             if (instance)
+            {
                 instance->SetBossState(DATA_BOSS_THALNOS_THE_SOULRENDER, DONE);
+                if (GameObject* ThalnosDoor = GameObject::GetGameObject(*me, instance->GetData64(DATA_GO_THALNOS)))
+                {
+                    ThalnosDoor->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                }
+            }
         }
 
         void JustSummoned(Creature* Summoned)
@@ -590,8 +597,9 @@ class at_crane_monastery : public AreaTriggerScript
 
         bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
         {
-            if (Creature* crane = player->FindNearestCreature(200013, 20, true))
-                crane->AI()->DoAction(ACTION_CRANE);
+            if (InstanceScript* instance = player->GetInstanceScript())
+                if (Creature* crane = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_NPC_TRIGGER_CRANE)))
+                    crane->AI()->DoAction(ACTION_CRANE);
             return true;
         }
 };
@@ -610,5 +618,5 @@ void AddSC_boss_thalnos_the_soulrender()
     new spell_spirit_gale();
     new spell_evict_soul();
 	new npc_traqueur_crane();
-    new at_crane_monastery ();
+    new at_crane_monastery();
 }

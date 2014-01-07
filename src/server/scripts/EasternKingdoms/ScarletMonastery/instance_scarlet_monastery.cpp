@@ -21,14 +21,6 @@
 #include "scarlet_monastery.h"
 
 
-DoorData const doorData[] =
-{
-    {GO_THALNOS_THE_SOULRENDER_GATE,        DATA_BOSS_THALNOS_THE_SOULRENDER,   DOOR_TYPE_PASSAGE,      BOUNDARY_NONE},
-    {GO_BROTHER_KORLOFF_GATE,               DATA_BOSS_BROTHER_KORLOFF,          DOOR_TYPE_PASSAGE,      BOUNDARY_NONE},
-    {GO_BROTHER_KORLOFF_GATE,               DATA_BOSS_COMMANDER_DURAND,         DOOR_TYPE_ROOM,         BOUNDARY_N},
-    {0,                                     0,                                  DOOR_TYPE_ROOM,         BOUNDARY_NONE}, // END
-};
-
 class instance_scarlet_monastery : public InstanceMapScript
 {
     public:
@@ -39,9 +31,14 @@ class instance_scarlet_monastery : public InstanceMapScript
             instance_scarlet_monastery_InstanceMapScript(Map* map) : InstanceScript(map)
             {
                 BossThalnosTheSoulrenderGUID        = 0;
+                NpcTriggerCraneGUID                 = 0;
                 BossBrotherKorloffGUID              = 0;
                 BossHighInquisitorWhitemaneGUID		= 0;
                 BossCommanderDurandGUID             = 0;
+
+                ThalnosDoorGUID                     = 0;
+                KorloffDoorGUID                     = 0;
+                WhitemaneDoorGUID                   = 0;
             }
 
             void OnCreatureCreate(Creature* creature)
@@ -51,6 +48,9 @@ class instance_scarlet_monastery : public InstanceMapScript
                     case BOSS_THALNOS_THE_SOULRENDER:
                         BossThalnosTheSoulrenderGUID = creature->GetGUID();
                         break;
+
+                    case NPC_TRIGGER_CRANE:
+                        NpcTriggerCraneGUID = creature->GetGUID();
 
                     case BOSS_BROTHER_KORLOFF:
                         BossBrotherKorloffGUID = creature->GetGUID();
@@ -73,27 +73,16 @@ class instance_scarlet_monastery : public InstanceMapScript
             {
                 switch (go->GetEntry())
                 {
-                    case GO_THALNOS_THE_SOULRENDER_GATE:
-                    case GO_BROTHER_KORLOFF_GATE:
-                    case GO_HIGH_INQUISITOR_WHITEMANE_GATE:
-                        AddDoor(go, true);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            void OnGameObjectRemove(GameObject* go)
-            {
-                switch (go->GetEntry())
-                {
-                    case GO_THALNOS_THE_SOULRENDER_GATE:
-                    case GO_BROTHER_KORLOFF_GATE:
-                    case GO_HIGH_INQUISITOR_WHITEMANE_GATE:
-                        AddDoor(go, false);
+                    case GO_THALNOS_GATE:
+                        ThalnosDoorGUID = go->GetGUID();
                         break;
 
-                    default:
+                    case GO_KORLOFF_GATE:
+                        KorloffDoorGUID = go->GetGUID();
+                        break;
+
+                    case GO_WHITEMANE_GATE:
+                        WhitemaneDoorGUID = go->GetGUID();
                         break;
                 }
             }
@@ -105,6 +94,9 @@ class instance_scarlet_monastery : public InstanceMapScript
                     case DATA_BOSS_THALNOS_THE_SOULRENDER:
                         return BossThalnosTheSoulrenderGUID;
 
+                    case DATA_NPC_TRIGGER_CRANE:
+                        return NpcTriggerCraneGUID;
+
                     case DATA_BOSS_BROTHER_KORLOFF:
                         return BossBrotherKorloffGUID;
 
@@ -113,6 +105,15 @@ class instance_scarlet_monastery : public InstanceMapScript
 
                     case DATA_BOSS_COMMANDER_DURAND:
                         return BossCommanderDurandGUID;
+
+                    case DATA_GO_THALNOS:
+                        return ThalnosDoorGUID;
+
+                    case DATA_GO_KORLOFF:
+                        return KorloffDoorGUID;
+
+                    case DATA_GO_WHITEMANE:
+                        return WhitemaneDoorGUID;
 
                     default:
                         break;
@@ -123,9 +124,14 @@ class instance_scarlet_monastery : public InstanceMapScript
 
             protected:
                 uint64 BossThalnosTheSoulrenderGUID;
+                uint64 NpcTriggerCraneGUID ;
                 uint64 BossBrotherKorloffGUID;
                 uint64 BossHighInquisitorWhitemaneGUID;
                 uint64 BossCommanderDurandGUID;
+
+                uint64 ThalnosDoorGUID;
+                uint64 KorloffDoorGUID;
+                uint64 WhitemaneDoorGUID;
 
         };
 
