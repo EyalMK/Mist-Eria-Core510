@@ -698,187 +698,102 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 				break ;
 			}
         case SPELLFAMILY_MONK:
-        {
-            switch(m_spellInfo->Id)
             {
-            case 100784: // Blackout Kick
-            {
-                int32 baseDamage = 7;
-                if (m_caster->ToPlayer()) {
+                switch (m_spellInfo->Id)
+                {
+                    case 123408: // Spinning Fire Blossom
+                        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                            damage = CalculateMonkMeleeAttacks(m_caster, 1.5f, 6);
+                        break;
+                    case 117418: // Fists of Fury
+                    {
+                        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            damage = CalculateMonkMeleeAttacks(m_caster, 7.5f, 14);
 
-                    switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
-                    {
-                    case TALENT_TREE_MONK_BREWMASTER:
-                    {
-                        damage = irand(6.4f*minMainHandDmg + 3.2f*minOffHandDmg + 0.509f*attackPower - baseDamage, 6.4f*maxMainHandDmg + 3.2f*maxOffHandDmg + 0.509f*attackPower + baseDamage);
-                        //[ 640% of Mainhand Min DPS + 320% of Offhand Min DPS + 50.9% of AP - 7 ]		to [ 640% of Mainhand Max DPS + 320% of Offhand Max DPS + 50.9% of AP + 7 ]
+                            uint32 count = 0;
+                            for (std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+                                if (ihit->effectMask & (1<<effIndex))
+                                    ++count;
+
+                            damage /= count;
+                        }
+
                         break;
                     }
-                    case TALENT_TREE_MONK_WINDWALKER:
-                    {
-                        damage = irand(6.4f*minMainHandDmg + 3.2f*minOffHandDmg + 0.509f*attackPower - baseDamage, 6.4f*maxMainHandDmg + 3.2f*maxOffHandDmg + 0.509f*attackPower + baseDamage);
-                        //[ 640% of Mainhand Min DPS + 320% of Offhand Min DPS + 50.9% of AP - 7 ]		to [ 640% of Mainhand Max DPS + 320% of Offhand Max DPS + 50.9% of AP + 7 ]
+                    case 100780: // Jab
+                    case 108557: // Jab (Staff)
+                    case 115698: // Jab (Polearm)
+                    case 115687: // Jab (Axes)
+                    case 115693: // Jab (Maces)
+                    case 115695: // Jab (Swords)
+                        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                            damage = CalculateMonkMeleeAttacks(m_caster, 1.5f, 14);
                         break;
-                    }
-                    case TALENT_TREE_MONK_MISTWEAVER:
-                    {
-                        damage = irand(9.6f*minMainHandDmg + 0.509f*attackPower - baseDamage, 9.6f*maxMainHandDmg + 0.509f*attackPower + baseDamage);
-                        //[ 960% of Mainhand Min DPS + 50.9% of AP - 7 ] 			to [ 960% of Mainhand Max DPS + 50.9% of AP + 7 ]
+                    case 115080: // Touch of Death
+                        if (Unit* caster = GetCaster())
+                        {
+                            if (unitTarget)
+                            {
+                                uint32 damage = unitTarget->GetHealth();
+                                m_caster->SendSpellNonMeleeDamageLog(unitTarget, m_spellInfo->Id, damage, m_spellInfo->GetSchoolMask(), 0, 0, false, NULL, false);
+                                m_caster->DealDamageMods(unitTarget, damage, NULL);
+                                m_caster->DealDamage(unitTarget, damage, NULL, SPELL_DIRECT_DAMAGE, m_spellInfo->GetSchoolMask(), m_spellInfo, false);
+                            }
+                        }
+
+                        return;
+                    case 100787: // Tiger Palm
+                        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            damage = CalculateMonkMeleeAttacks(m_caster, 3.0f, 14);
+                            m_caster->RemoveAurasDueToSpell(118864); // Combo Breaker
+                        }
+
                         break;
-                    }
+                    case 107270: // Spinning Crane Kick
+                        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                            damage = CalculateMonkMeleeAttacks(m_caster, 1.59f, 14);
+                        break;
+                    case 107428: // Rising Sun Kick
+                        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                            damage = CalculateMonkMeleeAttacks(m_caster, 14.4f, 14);
+                        m_caster->CastSpell(unitTarget, 130320, true);
+                        break;
+                    case 100784: // Blackout Kick
+                        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            damage = CalculateMonkMeleeAttacks(m_caster, 8.0f, 14);
+                            m_caster->RemoveAurasDueToSpell(116768); // Combo Breaker
+                        }
+
+                        break;
+                    case 124335: // Swift Reflexes
+                        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
+                            {
+                                case TALENT_TREE_MONK_BREWMASTER:
+                                    damage = CalculateMonkMeleeAttacks(m_caster, 0.3f, 5);
+                                    break;
+								case TALENT_TREE_MONK_WINDWALKER:
+                                case TALENT_TREE_MONK_MISTWEAVER:
+                                    damage = CalculateMonkMeleeAttacks(m_caster, 0.3f, 6);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        break;
+                    case 121253: // Keg Smash
+                        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                            damage = CalculateMonkMeleeAttacks(m_caster, 8.12f, 11);
+                        break;
                     default:
                         break;
-                    }
                 }
-
                 break;
             }
-            case 124335: // Swift Reflexes
-            {
-                int32 baseDamage = 2;
-                if (m_caster->ToPlayer()) {
-
-                    switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
-                    {
-                    case TALENT_TREE_MONK_BREWMASTER:
-                        damage = irand(0.809f*minMainHandDmg + 0.404f*minOffHandDmg + 0.205f*attackPower - baseDamage, 0.809f*maxMainHandDmg + 0.404f*maxOffHandDmg + 0.205f*attackPower + baseDamage);
-                        //[ 80.9% of Mainhand Min DPS + 40.4% of Offhand Min DPS + 20.5% of AP - 2 ]		to [ 80.9% of Mainhand Max DPS + 40.4% of Offhand Max DPS + 20.5% of AP + 2 ]
-                        break;
-                    case TALENT_TREE_MONK_WINDWALKER:
-                        damage = irand(2.022f*minMainHandDmg + 1.011f*minOffHandDmg + 0.161f*attackPower - baseDamage, 2.022f*maxMainHandDmg + 1.011f*maxOffHandDmg + 0.161f*attackPower + baseDamage);
-                        //[ 202.2% of Mainhand Min DPS + 101.1% of Offhand Min DPS + 16.1% of AP - 2 ]	to [ 202.2% of Mainhand Max DPS + 101.1% of Offhand Max DPS + 16.1% of AP + 2 ]
-                        break;
-                    case TALENT_TREE_MONK_MISTWEAVER:
-                        damage = irand(3.034f*minMainHandDmg + 0.161f*attackPower - baseDamage, 3.034f*maxMainHandDmg + 0.161f*attackPower + baseDamage);
-                        //[ 303.4% of Mainhand Min DPS + 16.1% of AP - 2 ]			to [ 303.4% of Mainhand Max DPS + 16.1% of AP + 2 ]
-                        break;
-                    default:
-                        break;
-                    }
-                }
-            }
-                break;
-            case 107270: // Spinning Crane Kick
-            {
-                m_caster->SetSpeed(MOVE_WALK, 0.7f, true);
-                m_caster->SetSpeed(MOVE_RUN, 0.7f, true);
-                int32 baseDamage = 2;
-                int32 minDMG, maxDMG;
-                if (m_caster->ToPlayer()) {
-
-                    switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
-                    {
-                    case TALENT_TREE_MONK_BREWMASTER:
-                        minDMG = (uint32)(0.629f*minMainHandDmg + 0.315f*minOffHandDmg + 0.159f*attackPower - baseDamage);
-                        maxDMG = (uint32)(0.629f*maxMainHandDmg + 0.315f*maxOffHandDmg + 0.159f*attackPower + baseDamage);
-                        //[ 62.9% of Mainhand Min DPS + 31.5% of Offhand Min DPS + 15.9% of AP - 2 ]		to [ 62.9% of Mainhand Max DPS + 31.5% of Offhand Max DPS + 15.9% of AP + 2 ]
-                        break;
-                    case TALENT_TREE_MONK_WINDWALKER:
-                        minDMG = (uint32)(1.573f*minMainHandDmg + 0.787f*minOffHandDmg + 0.125f*attackPower - baseDamage);
-                        maxDMG = (uint32)(1.573f*maxMainHandDmg + 0.787f*maxOffHandDmg + 0.125f*attackPower + baseDamage);
-                        //[ 157.3% of Mainhand Min DPS + 78.7% of Offhand Min DPS + 12.5% of AP - 2 ]		to [ 157.3% of Mainhand Max DPS + 78.7% of Offhand Max DPS + 12.5% of AP + 2 ]
-                        break;
-                    case TALENT_TREE_MONK_MISTWEAVER:
-                        minDMG = (uint32)(2.36f*minMainHandDmg + 0.125f*attackPower - baseDamage);
-                        maxDMG = (uint32)(2.36f*maxMainHandDmg + 0.125f*attackPower + baseDamage);
-                        //[ 236% of Mainhand Min DPS + 12.5% of AP - 2 ]			to [ 236% of Mainhand Max DPS + 12.5% of AP + 2 ]
-                        break;
-                    default:
-                        break;
-                    }
-                }
-                if (minDMG > maxDMG) {
-                    uint32 tmp = minDMG;
-                    minDMG = maxDMG;
-                    maxDMG = tmp;
-                }
-                damage = irand(minDMG, maxDMG);
-            }
-                break;
-                /* case 100787: // Tiger Palm
-                {
-                    int32 baseDamage = 3;
-
-                    int32 minDMG, maxDMG;
-
-                    switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
-                    {
-                    case TALENT_TREE_MONK_BREWMASTER:
-                    case TALENT_TREE_MONK_WINDWALKER:
-                        minDMG = (uint32)(2.697f*minMainHandDmg + 1.348f*minOffHandDmg + 0.214f*attackPower - baseDamage);
-                        maxDMG = (uint32)(2.697f*maxMainHandDmg + 1.348f*maxOffHandDmg + 0.214f*attackPower + baseDamage);
-
-                        //[ 269.7% of Mainhand Min DPS + 134.8% of Offhand Min DPS + 21.4% of AP - 3 ]		to [ 269.7% of Mainhand Max DPS + 134.8% of Offhand Max DPS + 21.4% of AP + 3 ]
-                        break;
-                    case TALENT_TREE_MONK_MISTWEAVER:
-                        minDMG = (uint32)(8.09f*minMainHandDmg + 0.429f*attackPower - (2*baseDamage));
-                        maxDMG = (uint32)(8.09f*maxMainHandDmg + 0.429f*attackPower + (2*baseDamage));
-
-                        //[ 809% of Mainhand Min DPS + 42.9% of AP - 6 ]				to [ 809% of Mainhand Max DPS + 42.9% of AP + 6 ]
-                        break;
-                    default:
-                        break;
-                    }
-
-                    if (minDMG > maxDMG) {
-                        uint32 tmp = minDMG;
-                        minDMG = maxDMG;
-                        maxDMG = tmp;
-                    }
-                    damage = irand(minDMG, maxDMG);
-                }
-                break;
-                case 100780: // Jab
-                {
-                    int32 baseDamage = 2;
-
-                    int32 minDMG, maxDMG;
-
-                    switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
-                    {
-                    case TALENT_TREE_MONK_BREWMASTER:
-                    case TALENT_TREE_MONK_WINDWALKER:
-                        minDMG = (uint32)(1.348f*minMainHandDmg + 0.674f*minOffHandDmg + 0.107f*attackPower - baseDamage);
-                        maxDMG = (uint32)(1.348f*maxMainHandDmg + 0.674f*maxOffHandDmg + 0.107f*attackPower + baseDamage);
-                        //[ 134.8% of Mainhand Min DPS + 67.4% of Offhand Min DPS + 10.7% of AP - 2 ]		to [ 134.8% of Mainhand Max DPS + 67.4% of Offhand Max DPS + 10.7% of AP + 2 ]
-                        break;
-                    case TALENT_TREE_MONK_MISTWEAVER:
-                        minDMG = (uint32)(2.02f*minMainHandDmg + 0.107f*attackPower - baseDamage);
-                        maxDMG = (uint32)(2.022f*maxMainHandDmg + 0.107f*attackPower + baseDamage);
-                        //[ 202.2% of Mainhand Min DPS + 10.7% of AP - 2 ]					to [ 202.2% of Mainhand Max DPS + 10.7% of AP + 2 ]
-                        break;
-                    default:
-                        break;
-                    }
-                    if (minDMG > maxDMG) {
-                        uint32 tmp = minDMG;
-                        minDMG = maxDMG;
-                        maxDMG = tmp;
-                    }
-                    damage = irand(minDMG, maxDMG);
-                }
-                break;
-                case 117418: // Fists of Fury
-                {
-                    int32 baseDamage = 7;
-                    damage = irand(6.0f*minMainHandDmg + 3.0f*minOffHandDmg + 0.477f*attackPower - baseDamage, 6.0f*maxMainHandDmg + 3.0f*maxOffHandDmg + 0.477f*attackPower + baseDamage);
-                    // [ 600% of Mainhand Min DPS + 300% of Offhand Min DPS + 47.7% of AP - 7 ]					to [ 600% of Mainhand Max DPS + 300% of Offhand Max DPS + 47.7% of AP + 7 ]
-                }
-                break;
-                case 107428: // Rising Sun Kick
-                {
-                    int32 baseDamage = 13;
-
-                    damage = irand(11.52f*minMainHandDmg + 5.76f*minOffHandDmg + 0.915f*attackPower - baseDamage, 11.52f*maxMainHandDmg + 5.76f*maxOffHandDmg + 0.915f*attackPower + baseDamage);
-                    //[ 1,152% of Mainhand Min DPS + 576% of Offhand Min DPS + 91.5% of AP - 13 ]					to [ 1,152% of Mainhand Max DPS + 576% of Offhand Max DPS + 91.5% of AP + 13 ]
-                }
-                break;*/
-            default:
-                break;
-            }
-
-            break;
-        }
         default:
             break;
         }
@@ -1892,27 +1807,63 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         // Death Pact - return pct of max health to caster
         else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && m_spellInfo->SpellFamilyFlags[0] & 0x00080000)
             addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, int32(caster->CountPctFromMaxHealth(damage)), HEAL);
-		else if(m_spellInfo->Id == 130551)
-		{
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Word of Glory : Entering EffectHeal Handler");
-			uint8 count = m_caster->GetPower(POWER_HOLY_POWER);
-			count = count > 3 ? 3 : count ;
-			if(m_caster->HasAura(112859))
-			{
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "Word of Glory : Caster has aura Clairvoyance Sacree");
-				addhealth += addhealth/2 ;
-			}
-			if(m_caster->HasAura(53503))
-			{
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "Word of Glory : Caster has aura Epee de Lumiere");
-				addhealth += addhealth/3 ;
-			}
+		else if (m_spellInfo->Id == 114163 || m_spellInfo->Id == 130551)// Eternal Flame & Word of Glory
+            {
+                if (!caster || !unitTarget)
+                    return;
 
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Word of Glory : Final calculation ; count = %u", int32(count));
+                if (caster->GetTypeId() != TYPEID_PLAYER)
+                    return;
 
-			if(count > 0)
-				addhealth *= count ;
-		}
+                addhealth += int32(0.49f * m_caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->SchoolMask)));
+
+                int32 holyPower = caster->GetPower(POWER_HOLY_POWER) + 1;
+
+                if (holyPower > 3)
+                    holyPower = 3;
+
+                // Divine Purpose
+                if (caster->HasAura(90174))
+                    holyPower = 3;
+
+                addhealth *= holyPower;
+
+                // Bastion of Glory : +10% of power per application if target is caster
+                if (unitTarget->GetGUID() == caster->GetGUID() && caster->HasAura(114637))
+                {
+                    Aura* bastionOfGlory = caster->GetAura(114637);
+                    if (!bastionOfGlory)
+                        return;
+
+                    AddPct(addhealth, (10 * bastionOfGlory->GetStackAmount()));
+
+                    caster->RemoveAurasDueToSpell(114637);
+                }
+
+                addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
+            }
+		else if (m_spellInfo->Id == 115072) // Expel Harm
+            {
+                if (caster && caster->getClass() == CLASS_MONK && addhealth && m_spellInfo->Id == 115072)
+                {
+                    addhealth = Spell::CalculateMonkMeleeAttacks(m_caster, 7, 14);
+                    addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
+                }
+            }
+		else if (m_spellInfo->Id == 121129) // Daybreak
+            {
+                uint32 count = 0;
+                for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+                    if (ihit->effectMask & (1 << effIndex))
+                        ++count;
+
+                count--; // Remove main target
+
+                if (count > 0)
+                    addhealth /= count;
+
+                addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
+            }
         else
             addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
 
@@ -6527,4 +6478,57 @@ void Spell::EffectResetTalent(SpellEffIndex effIndex)
 
     player->SaveToDB();
     player->SendTalentsInfoData(false);
+}
+
+int32 Spell::CalculateMonkMeleeAttacks(Unit* caster, float coeff, int32 APmultiplier)
+{
+    Item* mainItem = caster->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+    Item* offItem = caster->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+
+    float minDamage = 0;
+    float maxDamage = 0;
+    bool dualwield = (mainItem && offItem) ? 1 : 0;
+    int32 AP = caster->GetTotalAttackPowerValue(BASE_ATTACK);
+
+    if (coeff < 0)
+        coeff = 0.0f;
+
+    // Main Hand
+    if (mainItem)
+    {
+        minDamage += mainItem->GetTemplate()->DamageMin;
+        maxDamage += mainItem->GetTemplate()->DamageMax;
+
+        minDamage /= float(m_caster->GetAttackTime(BASE_ATTACK) / 1000.0f);
+        maxDamage /= float(m_caster->GetAttackTime(BASE_ATTACK) / 1000.0f);
+    }
+
+    // Off Hand
+    if (offItem)
+    {
+        minDamage += offItem->GetTemplate()->DamageMin / 2.0f;
+        maxDamage += offItem->GetTemplate()->DamageMax / 2.0f;
+
+        minDamage /= float(m_caster->GetAttackTime(BASE_ATTACK) / 1000.0f);
+        maxDamage /= float(m_caster->GetAttackTime(BASE_ATTACK) / 1000.0f);
+    }
+
+    // DualWield coefficient
+    if (dualwield)
+    {
+        minDamage *= 0.898882275f;
+        maxDamage *= 0.898882275f;
+    }
+
+    minDamage += float(AP / APmultiplier);
+    maxDamage += float(AP / APmultiplier);
+
+    // Off Hand penalty reapplied if only equiped by an off hand weapon
+    if (offItem && !mainItem)
+    {
+        minDamage /= 2.0f;
+        maxDamage /= 2.0f;
+    }
+
+    return irand(int32(minDamage * coeff), int32(maxDamage * coeff));
 }
