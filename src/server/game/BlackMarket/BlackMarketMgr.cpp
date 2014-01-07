@@ -340,15 +340,21 @@ std::string BMAuctionEntry::BuildAuctionMailBody(uint32 lowGuid)
 
 void BlackMarketMgr::SendAuctionOutbidded(BMAuctionEntry* auction, uint32 newPrice, Player* newBidder, SQLTransaction& trans)
 {
-	WorldPacket data(SMSG_BLACK_MARKET_OUT_BID, 12);
+	
 
-	data << uint32(1);
-	data << uint32(auction->bm_template->itemEntry);
-	data << uint32(1);
+	Player* bidder = sObjectAccessor->FindPlayer(MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER));
+	uint32 bidder_acc = sObjectMgr->GetPlayerAccountIdByGUID(MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER));
 
-	if (Player* bidder = sObjectAccessor->FindPlayer(MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER)))
+	if (bidder || bidder_acc)
 	{
-		bidder->GetSession()->SendPacket(&data);
+		if(bidder)
+		{
+			WorldPacket data(SMSG_BLACK_MARKET_OUT_BID, 12);
+			data << uint32(1);
+			data << uint32(auction->bm_template->itemEntry);
+			data << uint32(1);
+			bidder->GetSession()->SendPacket(&data);
+		}
 
 		MailDraft(auction->BuildAuctionMailSubject(BM_AUCTION_OUTBIDDED), auction->BuildAuctionMailBody(auction->bm_template->seller))
             .AddMoney(auction->bid)
@@ -358,13 +364,19 @@ void BlackMarketMgr::SendAuctionOutbidded(BMAuctionEntry* auction, uint32 newPri
 
 void BlackMarketMgr::SendAuctionWon(BMAuctionEntry* auction, SQLTransaction& trans)
 {
-	if (Player* bidder = sObjectAccessor->FindPlayer(MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER)))
+	Player* bidder = sObjectAccessor->FindPlayer(MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER));
+	uint32 bidder_acc = sObjectMgr->GetPlayerAccountIdByGUID(MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER));
+
+	if (bidder || bidder_acc)
 	{
-		WorldPacket data(SMSG_BLACK_MARKET_BID_WON, 12);
-		data << uint32(auction->bm_template->itemEntry);
-		data << uint32(1);
-		data << uint32(1);
-		bidder->GetSession()->SendPacket(&data);
+		if(bidder)
+		{
+			WorldPacket data(SMSG_BLACK_MARKET_BID_WON, 12);
+			data << uint32(auction->bm_template->itemEntry);
+			data << uint32(1);
+			data << uint32(1);
+			bidder->GetSession()->SendPacket(&data);
+		}
 
 		ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(auction->bm_template->itemEntry);
         if (!itemTemplate)
