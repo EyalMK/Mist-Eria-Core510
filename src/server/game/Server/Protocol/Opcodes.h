@@ -129,7 +129,7 @@ enum Opcodes
     CMSG_CANCEL_TRADE                                 = 0x04C2,//16357
     CMSG_CAST_SPELL                                   = 0x014C,//16357
     CMSG_CHANGEPLAYER_DIFFICULTY                      = 0x0117,//16357
-    CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE           = 0x1092,
+    CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE           = 0x021B,//16357
     CMSG_CHANNEL_ANNOUNCEMENTS                        = 0x0F7B,//16357
     CMSG_CHANNEL_BAN                                  = 0x030B,//16357
     CMSG_CHANNEL_DISPLAY_LIST                         = 0x1095,
