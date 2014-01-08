@@ -127,23 +127,23 @@ void WorldSession::HandleEnterPlayerVehicle(WorldPacket& data)
     // Read guid
     ObjectGuid guid;
 
-	guid[5] = recvData.ReadBit();
- 	guid[0] = recvData.ReadBit();
- 	guid[3] = recvData.ReadBit();
- 	guid[1] = recvData.ReadBit();
- 	guid[7] = recvData.ReadBit();
- 	guid[2] = recvData.ReadBit();
- 	guid[6] = recvData.ReadBit();
- 	guid[4] = recvData.ReadBit();
+	guid[5] = data.ReadBit();
+ 	guid[0] = data.ReadBit();
+ 	guid[3] = data.ReadBit();
+ 	guid[1] = data.ReadBit();
+ 	guid[7] = data.ReadBit();
+ 	guid[2] = data.ReadBit();
+ 	guid[6] = data.ReadBit();
+ 	guid[4] = data.ReadBit();
 
-	recvData.ReadByteSeq(guid[7]);
- 	recvData.ReadByteSeq(guid[6]);
- 	recvData.ReadByteSeq(guid[0]);
- 	recvData.ReadByteSeq(guid[3]);
- 	recvData.ReadByteSeq(guid[5]);
- 	recvData.ReadByteSeq(guid[4]);
- 	recvData.ReadByteSeq(guid[1]);
- 	recvData.ReadByteSeq(guid[2]);
+	data.ReadByteSeq(guid[7]);
+ 	data.ReadByteSeq(guid[6]);
+ 	data.ReadByteSeq(guid[0]);
+ 	data.ReadByteSeq(guid[3]);
+ 	data.ReadByteSeq(guid[5]);
+ 	data.ReadByteSeq(guid[4]);
+ 	data.ReadByteSeq(guid[1]);
+ 	data.ReadByteSeq(guid[2]);
 
     if (Player* player = ObjectAccessor::FindPlayer(guid))
     {
