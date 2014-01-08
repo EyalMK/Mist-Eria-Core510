@@ -154,6 +154,15 @@ public:
             Talk(SAY_KILL);
         }
 
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+        {
+            if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+                for (uint8 i = 0; i < 7; ++i)
+                    if (spell->Effects[i].Effect == SPELL_EFFECT_INTERRUPT_CAST)
+                        if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_SPIRIT_GALE)
+                            me->InterruptSpell(CURRENT_GENERIC_SPELL, false);
+        }
+
 
         void JustDied(Unit* /*killer*/)
         {
@@ -161,13 +170,7 @@ public:
             Summons.DespawnAll();
 
             if (instance)
-            {
                 instance->SetBossState(DATA_BOSS_THALNOS_THE_SOULRENDER, DONE);
-                if (GameObject* ThalnosDoor = GameObject::GetGameObject(*me, instance->GetData64(DATA_GO_THALNOS)))
-                {
-                    ThalnosDoor->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                }
-            }
         }
 
         void JustSummoned(Creature* Summoned)

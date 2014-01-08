@@ -121,13 +121,7 @@ public:
             Summons.DespawnAll();
 
             if (instance)
-            {
                 instance->SetBossState(DATA_BOSS_BROTHER_KORLOFF, DONE);
-                if (GameObject* KorloffDoor = GameObject::GetGameObject(*me, instance->GetData64(DATA_GO_KORLOFF)))
-                {
-                    KorloffDoor->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                }
-            }
         }
 
         void JustSummoned(Creature* Summoned)
@@ -212,9 +206,6 @@ public:
                     }
                 }
             }
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
             DoMeleeAttackIfReady();
         }
     };
