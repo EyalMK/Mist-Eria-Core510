@@ -129,7 +129,7 @@ enum Opcodes
     CMSG_CANCEL_TRADE                                 = 0x04C2,//16357
     CMSG_CAST_SPELL                                   = 0x014C,//16357
     CMSG_CHANGEPLAYER_DIFFICULTY                      = 0x0117,//16357
-    CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE           = 0x021B,//16357
+    CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE           = 0x02BF,//16357
     CMSG_CHANNEL_ANNOUNCEMENTS                        = 0x0F7B,//16357
     CMSG_CHANNEL_BAN                                  = 0x030B,//16357
     CMSG_CHANNEL_DISPLAY_LIST                         = 0x1095,
@@ -487,7 +487,7 @@ enum Opcodes
     CMSG_REQUEST_VEHICLE_EXIT                         = 0x0527,//16357
     CMSG_REQUEST_VEHICLE_NEXT_SEAT                    = 0x1429,
     CMSG_REQUEST_VEHICLE_PREV_SEAT                    = 0x1430,
-    CMSG_REQUEST_VEHICLE_SWITCH_SEAT                  = 0x1431,
+    CMSG_REQUEST_VEHICLE_SWITCH_SEAT                  = 0x02BF,//16357
     CMSG_RESET_FACTION_CHEAT                          = 0x1432,
     CMSG_RESET_INSTANCES                              = 0x0B2C,//16357
     CMSG_RESURRECT_RESPONSE                           = 0x1E9,//16357
