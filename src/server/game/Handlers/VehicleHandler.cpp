@@ -67,29 +67,23 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
 
     switch (recvData.GetOpcode())
     {
-        case CMSG_REQUEST_VEHICLE_PREV_SEAT:
+        case CMSG_REQUEST_VEHICLE_PREV_SEAT: // to find value for this opcode
             GetPlayer()->ChangeSeat(-1, false);
             break;
-        case CMSG_REQUEST_VEHICLE_NEXT_SEAT:
+        case CMSG_REQUEST_VEHICLE_NEXT_SEAT: // to find value for this opcode
             GetPlayer()->ChangeSeat(-1, true);
             break;
-        /*case CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE:
+        case CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE:
         {
-            uint64 guid;        // current vehicle guid
-            recvData.readPackGUID(guid);
-
-            MovementInfo movementInfo;
-            ReadMovementInfo(recvData, &movementInfo);
-            vehicle_base->m_movementInfo = movementInfo;
-
-            uint64 accessory;        //  accessory guid
-            recvData.readPackGUID(accessory);
-
+            float x, y, z; // need to test the order of floats 
+            recvData >> z;
             int8 seatId;
+			recvData >> y;
             recvData >> seatId;
-
-            if (vehicle_base->GetGUID() != guid)
-                return;
+            recvData >> x;
+            
+            uint64 accessory;        // accessory vehicle guid
+            recvData >> accessory;
 
             if (!accessory)
                 GetPlayer()->ChangeSeat(-1, seatId > 0); // prev/next
@@ -100,8 +94,8 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
                         vehUnit->HandleSpellClick(GetPlayer(), seatId);
             }
             break;
-        }*/
-        case CMSG_REQUEST_VEHICLE_SWITCH_SEAT:
+        }
+        case CMSG_REQUEST_VEHICLE_SWITCH_SEAT: // to find value for this opcode
         {
             uint64 guid;        // current vehicle guid
             recvData.readPackGUID(guid);
@@ -125,8 +119,25 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
 void WorldSession::HandleEnterPlayerVehicle(WorldPacket& data)
 {
     // Read guid
-    uint64 guid;
-    data >> guid;
+    ObjectGuid guid;
+
+	guid[5] = data.ReadBit();
+ 	guid[0] = data.ReadBit();
+ 	guid[3] = data.ReadBit();
+ 	guid[1] = data.ReadBit();
+ 	guid[7] = data.ReadBit();
+ 	guid[2] = data.ReadBit();
+ 	guid[6] = data.ReadBit();
+ 	guid[4] = data.ReadBit();
+
+	data.ReadByteSeq(guid[7]);
+ 	data.ReadByteSeq(guid[6]);
+ 	data.ReadByteSeq(guid[0]);
+ 	data.ReadByteSeq(guid[3]);
+ 	data.ReadByteSeq(guid[5]);
+ 	data.ReadByteSeq(guid[4]);
+ 	data.ReadByteSeq(guid[1]);
+ 	data.ReadByteSeq(guid[2]);
 
     if (Player* player = ObjectAccessor::FindPlayer(guid))
     {

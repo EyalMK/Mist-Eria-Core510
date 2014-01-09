@@ -45,22 +45,22 @@ class instance_scarlet_monastery : public InstanceMapScript
             {
                 switch (creature->GetEntry())
                 {
-                    case BOSS_THALNOS_THE_SOULRENDER:
+                    case NPC_THALNOS_THE_SOULRENDER:
                         BossThalnosTheSoulrenderGUID = creature->GetGUID();
                         break;
 
                     case NPC_TRIGGER_CRANE:
                         NpcTriggerCraneGUID = creature->GetGUID();
 
-                    case BOSS_BROTHER_KORLOFF:
+                    case NPC_BROTHER_KORLOFF:
                         BossBrotherKorloffGUID = creature->GetGUID();
                         break;
 
-                    case BOSS_HIGH_INQUISITOR_WHITEMANE:
+                    case NPC_HIGH_INQUISITOR_WHITEMANE:
                         BossHighInquisitorWhitemaneGUID	 = creature->GetGUID();
                         break;
 
-                    case BOSS_COMMANDER_DURAND:
+                    case NPC_COMMANDER_DURAND:
                         BossCommanderDurandGUID	 = creature->GetGUID();
                         break;
 
@@ -75,16 +75,54 @@ class instance_scarlet_monastery : public InstanceMapScript
                 {
                     case GO_THALNOS_GATE:
                         ThalnosDoorGUID = go->GetGUID();
+                        if (GetBossState(DATA_BOSS_THALNOS_THE_SOULRENDER) == DONE)
+                            HandleGameObject(0, true, go);
                         break;
 
                     case GO_KORLOFF_GATE:
                         KorloffDoorGUID = go->GetGUID();
+                        if (GetBossState(DATA_BOSS_BROTHER_KORLOFF) == DONE)
+                            HandleGameObject(0, true, go);
+                        if (GetBossState(DATA_BOSS_COMMANDER_DURAND) == IN_PROGRESS)
+                            HandleGameObject(0, false, go);
                         break;
 
                     case GO_WHITEMANE_GATE:
                         WhitemaneDoorGUID = go->GetGUID();
+                        if (GetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE) == IN_PROGRESS)
+                            HandleGameObject(0, true, go);
+                        if (GetBossState(DATA_BOSS_COMMANDER_DURAND) == NOT_STARTED)
+                            HandleGameObject(0, false, go);
                         break;
                 }
+            }
+
+            bool SetBossState(uint32 type, EncounterState state)
+            {
+                if (!InstanceScript::SetBossState(type, state))
+                    return false;
+
+                switch (type)
+                {
+                    case DATA_BOSS_THALNOS_THE_SOULRENDER:
+                        if(state == DONE)
+                            HandleGameObject(ThalnosDoorGUID, true);
+                    case DATA_BOSS_BROTHER_KORLOFF:
+                        if(state == DONE)
+                            HandleGameObject(KorloffDoorGUID, true);
+                    case DATA_BOSS_HIGH_INQUISITOR_WHITEMANE:
+                        if(state == IN_PROGRESS)
+                            HandleGameObject(WhitemaneDoorGUID, true);
+                    case DATA_BOSS_COMMANDER_DURAND:
+                        if(state == NOT_STARTED)
+                            HandleGameObject(WhitemaneDoorGUID, false);
+                        if(state == IN_PROGRESS)
+                            HandleGameObject(KorloffDoorGUID, false);
+                        break;
+                    default:
+                        break;
+                }
+                return true;
             }
 
             uint64 GetData64(uint32 id) const
@@ -105,15 +143,6 @@ class instance_scarlet_monastery : public InstanceMapScript
 
                     case DATA_BOSS_COMMANDER_DURAND:
                         return BossCommanderDurandGUID;
-
-                    case DATA_GO_THALNOS:
-                        return ThalnosDoorGUID;
-
-                    case DATA_GO_KORLOFF:
-                        return KorloffDoorGUID;
-
-                    case DATA_GO_WHITEMANE:
-                        return WhitemaneDoorGUID;
 
                     default:
                         break;

@@ -20,26 +20,26 @@
 #ifndef DEF_SCARLET_MONASTERY_H
 #define DEF_SCARLET_MONASTERY_H
 
-enum Data64
-{
-    DATA_BOSS_THALNOS_THE_SOULRENDER,
-    DATA_NPC_TRIGGER_CRANE,
-    DATA_BOSS_BROTHER_KORLOFF,
-    DATA_BOSS_HIGH_INQUISITOR_WHITEMANE,
-    DATA_BOSS_COMMANDER_DURAND,
+uint32 const EncounterCount     = 5;
 
-    DATA_GO_THALNOS,
-    DATA_GO_KORLOFF,
-    DATA_GO_WHITEMANE
+#define SMScriptName "instance_scarlet_monastery"
+
+enum SMEncounter
+{
+    DATA_BOSS_THALNOS_THE_SOULRENDER        = 0,
+    DATA_BOSS_BROTHER_KORLOFF               = 1,
+    DATA_BOSS_HIGH_INQUISITOR_WHITEMANE     = 2,
+    DATA_BOSS_COMMANDER_DURAND              = 3,
+    DATA_NPC_TRIGGER_CRANE                  = 4
 };
 
 enum CreatureIds
 {
-    BOSS_THALNOS_THE_SOULRENDER         = 59789,
+    NPC_THALNOS_THE_SOULRENDER          = 59789,
     NPC_TRIGGER_CRANE                   = 200013,
-    BOSS_BROTHER_KORLOFF                = 59223,
-    BOSS_HIGH_INQUISITOR_WHITEMANE		= 3977,
-    BOSS_COMMANDER_DURAND               = 60040
+    NPC_BROTHER_KORLOFF                 = 59223,
+    NPC_HIGH_INQUISITOR_WHITEMANE		= 3977,
+    NPC_COMMANDER_DURAND                = 60040
 };
 
 enum GameObjects

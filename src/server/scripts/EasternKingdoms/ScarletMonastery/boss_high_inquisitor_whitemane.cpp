@@ -19,6 +19,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "scarlet_monastery.h"
+#include "SpellScript.h"
 
 
 enum Spells
@@ -137,11 +138,6 @@ public:
                         whitemane->Respawn();
                     }
                 }
-
-                if (GameObject* KorloffDoor = GameObject::GetGameObject(*me, instance->GetData64(DATA_GO_KORLOFF)))
-                {
-                    KorloffDoor->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                }
             }
         }
 
@@ -165,13 +161,7 @@ public:
             Talk(SAY_AGGRO_DURAND);
 
             if (instance)
-            {
                 instance->SetBossState(DATA_BOSS_COMMANDER_DURAND, IN_PROGRESS);
-                if (GameObject* KorloffDoor = GameObject::GetGameObject(*me, instance->GetData64(DATA_GO_KORLOFF)))
-                {
-                    KorloffDoor->SetGoState(GO_STATE_READY);
-                }
-            }
 
             events.ScheduleEvent(EVENT_FLASH_OF_STEEL, 10*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_DASHING_STRIKE, 25*IN_MILLISECONDS);
@@ -213,11 +203,6 @@ public:
                 if (Unit* Whitemane = Unit::GetUnit(*me, instance->GetData64(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE)))
                 {
                     Whitemane->GetMotionMaster()->MovePoint(1, 747.77f, 602.39f, 16.00f);
-                }
-
-                if (GameObject* WhitemaneDoor = GameObject::GetGameObject(*me, instance->GetData64(DATA_GO_WHITEMANE)))
-                {
-                    WhitemaneDoor->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                 }
                 CheckDurand = false;
             }
@@ -272,6 +257,7 @@ public:
                             me->SetHealth(0);
                             me->GetMotionMaster()->MovementExpired();
                             me->GetMotionMaster()->MoveIdle();
+                            me->AttackStop();
                             me->ClearAllReactives();
                             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             me->SetStandState(UNIT_STAND_STATE_DEAD);
@@ -281,6 +267,8 @@ public:
                             DoCast(SPELL_FURIOUS_RESOLVE);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             me->SetStandState(UNIT_STAND_STATE_STAND);
+                            me->SetReactState(REACT_AGGRESSIVE);
+
                             events.ScheduleEvent(EVENT_DASHING_STRIKE, 20*IN_MILLISECONDS);
                             events.ScheduleEvent(EVENT_FLASH_OF_STEEL, 5*IN_MILLISECONDS);
                             events.CancelEvent(EVENT_FURIOUS_RESOLVE);
@@ -336,11 +324,6 @@ public:
                         durand->Respawn();
                     }
                 }
-
-                if (GameObject* WhitemaneDoor = GameObject::GetGameObject(*me, instance->GetData64(DATA_GO_WHITEMANE)))
-                {
-                    WhitemaneDoor->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                }
             }
         }
 
@@ -362,7 +345,8 @@ public:
             if (instance)
                 instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, FAIL);
 
-            me->GetMotionMaster()->MovePoint(1, 700.40f, 605.83f, 12.00f);
+           // me->GetMotionMaster()->MovePoint(1, 700.40f, 605.83f, 12.00f);
+            me->NearTeleportTo(700.40f, 605.83f, 12.00f, 0);
 
             ScriptedAI::EnterEvadeMode();
         }
@@ -378,6 +362,15 @@ public:
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, DONE);
+        }
+
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+        {
+            if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+                for (uint8 i = 0; i < 7; ++i)
+                    if (spell->Effects[i].Effect == SPELL_EFFECT_INTERRUPT_CAST)
+                        if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_HOLY_SMITE || me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_MASS_RESURRECTION)
+                            me->InterruptSpell(CURRENT_GENERIC_SPELL, false);
         }
 
         void UpdateAI(uint32 diff)
@@ -403,14 +396,14 @@ public:
                     if (instance)
                     {
                         case EVENT_POWER_WORD_SHIELD:
-                            me->CastSpell(me, SPELL_POWER_WORD_SHIELD, false);
+                            DoCast(me, SPELL_POWER_WORD_SHIELD);
                             events.ScheduleEvent(EVENT_POWER_WORD_SHIELD, 20*IN_MILLISECONDS);
                             break;
 
                         case EVENT_HOLY_SMITE:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             {
-                                me->CastSpell(target, SPELL_HOLY_SMITE, false);
+                                DoCast(target, SPELL_HOLY_SMITE);
                             }
                             events.ScheduleEvent(EVENT_HOLY_SMITE, 3*IN_MILLISECONDS);
                             break;
@@ -458,6 +451,7 @@ public:
                     }
                 }
             }
+            DoMeleeAttackIfReady();
         }
     };
 

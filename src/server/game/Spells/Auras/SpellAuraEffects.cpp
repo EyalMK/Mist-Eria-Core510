@@ -3202,7 +3202,7 @@ void AuraEffect::HandleAuraModDecreaseSpeed(AuraApplication const* aurApp, uint8
     if(GetSpellInfo()->Id == 8056) //Horion de givre
     {
         Unit *caster = GetCaster();
-        if(caster || caster->HasAura(63374))
+        if(caster && caster->HasAura(63374))
             caster->CastSpell(target, 63685, true);
     }
 }
