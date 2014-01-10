@@ -30,8 +30,7 @@ enum Spells
 
     /* Autres */
     SPELL_SCORCHED_EARTH_POP    = 114463,
-    SPELL_SCORCHED_EARTH_AURA   = 114464,
-    SPELL_HEAL                  = 111024
+    SPELL_SCORCHED_EARTH_AURA   = 114464
 };
 
 enum Events
@@ -282,57 +281,10 @@ class spell_scorched_earth : public SpellScriptLoader
         }
 };
 
-class npc_spirit_of_redemption : public CreatureScript
-{
-public:
-    npc_spirit_of_redemption() : CreatureScript("npc_spirit_of_redemption") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_spirit_of_redemptionAI(creature);
-    }
-
-    struct npc_spirit_of_redemptionAI : public ScriptedAI
-    {
-            npc_spirit_of_redemptionAI(Creature* creature) : ScriptedAI(creature) {}
-
-            uint32 m_uiCheckTimer;
-            uint32 m_uiDespawnTimer;
-
-            void Reset()
-            {
-                m_uiCheckTimer = 1000;
-                m_uiDespawnTimer = 20000;
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if(m_uiCheckTimer <= diff)
-                {
-                    if(Unit* target = DoSelectLowestHpFriendly(30, 1000))
-                    {
-                        me->CastSpell(target, SPELL_HEAL);
-                        m_uiCheckTimer = 6000;
-                        return;
-                    }
-                    m_uiCheckTimer = 1000;
-                }
-                else m_uiCheckTimer -= diff;
-
-                if(m_uiDespawnTimer <= diff)
-                {
-                    me->DespawnOrUnsummon();
-                }
-                else m_uiDespawnTimer -= diff;
-            }
-    };
-};
-
 
 void AddSC_boss_brother_korloff()
 {
     new boss_brother_korloff();
     new npc_scorched_earth();
     new spell_scorched_earth();
-    new npc_spirit_of_redemption();
 }

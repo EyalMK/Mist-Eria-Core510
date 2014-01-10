@@ -18,7 +18,25 @@
 
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
+#include "ScriptedCreature.h"
 #include "scarlet_monastery.h"
+#include "Player.h"
+
+enum Spells
+{
+    SPELL_HEAL                  = 111024
+};
+
+enum Texts
+{
+    SAY_CRANE       = 0
+};
+
+enum Actions
+{
+    ACTION_CRANE    = 1
+};
+
 
 
 class instance_scarlet_monastery : public InstanceMapScript
@@ -107,12 +125,15 @@ class instance_scarlet_monastery : public InstanceMapScript
                     case DATA_BOSS_THALNOS_THE_SOULRENDER:
                         if(state == DONE)
                             HandleGameObject(ThalnosDoorGUID, true);
+                        break;
                     case DATA_BOSS_BROTHER_KORLOFF:
                         if(state == DONE)
                             HandleGameObject(KorloffDoorGUID, true);
+                        break;
                     case DATA_BOSS_HIGH_INQUISITOR_WHITEMANE:
                         if(state == IN_PROGRESS)
                             HandleGameObject(WhitemaneDoorGUID, true);
+                        break;
                     case DATA_BOSS_COMMANDER_DURAND:
                         if(state == NOT_STARTED)
                             HandleGameObject(WhitemaneDoorGUID, false);
@@ -170,7 +191,107 @@ class instance_scarlet_monastery : public InstanceMapScript
         }
 };
 
+
+class npc_spirit_of_redemption : public CreatureScript
+{
+public:
+    npc_spirit_of_redemption() : CreatureScript("npc_spirit_of_redemption") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_spirit_of_redemptionAI(creature);
+    }
+
+    struct npc_spirit_of_redemptionAI : public ScriptedAI
+    {
+            npc_spirit_of_redemptionAI(Creature* creature) : ScriptedAI(creature) {}
+
+            uint32 m_uiCheckTimer;
+            uint32 m_uiDespawnTimer;
+
+            void Reset()
+            {
+                m_uiCheckTimer = 1000;
+                m_uiDespawnTimer = 20000;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if(m_uiCheckTimer <= diff)
+                {
+                    if(Unit* target = DoSelectLowestHpFriendly(30, 1000))
+                    {
+                        me->CastSpell(target, SPELL_HEAL);
+                        m_uiCheckTimer = 6000;
+                        return;
+                    }
+                    m_uiCheckTimer = 1000;
+                }
+                else m_uiCheckTimer -= diff;
+
+                if(m_uiDespawnTimer <= diff)
+                {
+                    me->DespawnOrUnsummon();
+                }
+                else m_uiDespawnTimer -= diff;
+            }
+    };
+};
+
+class npc_traqueur_crane : public CreatureScript
+{
+public:
+    npc_traqueur_crane() : CreatureScript("npc_traqueur_crane") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_traqueur_craneAI(creature);
+    }
+
+    struct npc_traqueur_craneAI : public ScriptedAI
+    {
+            npc_traqueur_craneAI(Creature* creature) : ScriptedAI(creature)
+            {
+                Crane = false;
+            }
+
+            bool Crane;
+
+            void DoAction(int32 action)
+            {
+                switch (action)
+                {
+                    case ACTION_CRANE:
+                        if (!Crane)
+                        {
+                            Talk(SAY_CRANE);
+                            Crane = true;
+                        }
+                        break;
+                }
+            }
+    };
+};
+
+class at_crane_monastery : public AreaTriggerScript
+{
+    public:
+        at_crane_monastery () : AreaTriggerScript("at_crane_monastery ") { }
+
+        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        {
+            if (InstanceScript* instance = player->GetInstanceScript())
+                if (Creature* crane = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_NPC_TRIGGER_CRANE)))
+                    crane->AI()->DoAction(ACTION_CRANE);
+            return true;
+        }
+};
+
+
 void AddSC_instance_scarlet_monastery()
 {
    new instance_scarlet_monastery();
+   new npc_spirit_of_redemption();
+   new npc_traqueur_crane();
+   new at_crane_monastery();
 }

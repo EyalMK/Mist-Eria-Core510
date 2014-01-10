@@ -302,6 +302,7 @@ public:
         }
 
         bool CheckWhitemane;
+        bool CheckWhitemane2;
         InstanceScript* instance;
         SummonList Summons;
         EventMap events;
@@ -311,6 +312,7 @@ public:
             events.Reset();
             Summons.DespawnAll();
             CheckWhitemane = true;
+            CheckWhitemane2 = true;
 
             if (instance)
             {
@@ -344,11 +346,9 @@ public:
         {
             if (instance)
                 instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, FAIL);
-
-           // me->GetMotionMaster()->MovePoint(1, 700.40f, 605.83f, 12.00f);
-            me->NearTeleportTo(700.40f, 605.83f, 12.00f, 0);
-
             ScriptedAI::EnterEvadeMode();
+
+            me->NearTeleportTo(700.40f, 605.83f, 12.00f, 0);
         }
 
         void KilledUnit(Unit* /*pWho*/)
@@ -362,6 +362,21 @@ public:
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, DONE);
+        }
+
+        void DamageTaken(Unit* /*doneBy*/, uint32 &damage)
+        {
+            if (damage < me->GetHealth())
+                return;
+
+            if (!instance)
+                return;
+
+            if (damage > me->GetHealth() && CheckWhitemane2)
+            {
+                damage = 0;
+                CheckWhitemane2 = false;
+            }
         }
 
         void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
