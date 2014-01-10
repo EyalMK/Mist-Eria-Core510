@@ -7611,9 +7611,11 @@ void Player::SendNewCurrency(uint32 id) const
 	packet.WriteBit(0);     // season total earned
     packet.WriteBit(weekCount);
 	packet.WriteBit(weekCap);
+
+    int precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1;
    
 	currencyData << uint32(entry->ID);
-    currencyData << uint32(itr->second.totalCount);
+    currencyData << uint32(itr->second.totalCount/precision);
 
     if (weekCap)
         currencyData << uint32(weekCap);
@@ -7652,8 +7654,10 @@ void Player::SendCurrencies() const
         packet.WriteBit(weekCount);
 		packet.WriteBit(weekCap);
 
+        int precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1;
+
         currencyData << uint32(entry->ID);
-        currencyData << uint32(itr->second.totalCount);
+        currencyData << uint32(itr->second.totalCount / precision);
 
         if (weekCap)
             currencyData << uint32(weekCap);
