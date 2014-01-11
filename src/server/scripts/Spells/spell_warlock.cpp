@@ -1584,6 +1584,98 @@ class spell_warl_hellfire : public SpellScriptLoader
         }
 };
 
+/*
+ * * Shadow Bolt      : 0x0000000001, 0x0000000000, 0x0000000000
+ * * Soul Fire        : 0x0000000000, 0x0000000080, 0x0000000000
+ * * Fel Flame        : 0x0000000000, 0x0000000000, 0x0000010000
+ * * Chaos Bolt       : 0x0000000000, 0x0000002000, 0x0000000000
+ * * Touch of Chaos   : 0x0000000000, 0x0010000000, 0x0000000000
+ * * Incinerate       : 0x0000000000, 0x0000000040, 0x0000000000
+ * * Haunt            : 0x0000000000, 0x0000000000, 0x0000000000
+ * * Drain Soul       : 0x0000004000, 0x0000000000, 0x0000000000
+ * * Malefic Grasp    : 0x0000000000, 0x0000020000, 0x0000000000
+ * * Sum              : 0x0000004001, 0x00100220C0, 0x0000010000
+ */
+class spell_warl_soul_leech : public SpellScriptLoader
+{
+public :
+    spell_warl_soul_leech() : SpellScriptLoader("spell_warl_soul_leech")
+    {
+
+    }
+
+    class spell_warl_soul_leech_AuraScript : public AuraScript
+    {
+    private :
+        uint32 m_damage ;
+
+    private :
+        bool Validate(const SpellInfo *spellInfo)
+        {
+            return true ;
+        }
+
+        bool Load()
+        {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Warlock : Soul Leech : Loading");
+            if(GetOwner() && GetOwner()->ToPlayer() && GetOwner()->ToPlayer()->getClass() == CLASS_WARLOCK)
+            {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Warlock : Soul Leech : Loading : Success !");
+                m_damage = 0 ;
+                return true ;
+            }
+            else if(GetOwner() && GetOwner()->ToPlayer() && GetOwner()->ToPlayer()->getClass() != CLASS_WARLOCK)
+            {
+                sLog->outError(LOG_FILTER_NETWORKIO, "SPELLS : Warlock : Soul Leech : aura proced but owner is not a warlock ! Owner %s (guid %u)",
+                               GetOwner()->GetName().c_str(), GetOwner()->GetGUID());
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Warlock : Soul Leech : Loading : Failed !");
+                return false ;
+            }
+        }
+
+        void HandleProc(ProcEventInfo& eventInfo)
+        {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Warlock : Soul Leech : OnProc");
+
+            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo() ;
+            WorldObject* owner = GetOwner();
+
+            if(spellInfo && damageInfo && owner)
+            {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Warlock : Soul Leech : OnProc : Pointers initialized and not null");
+                m_damage = damageInfo->GetDamage();
+
+                Player* ownerAsPlayer = owner->ToPlayer() ;
+                if(ownerAsPlayer)
+                {
+                    uint32 countPercent = (ownerAsPlayer->GetActiveSpec() == TALENT_TREE_WARLOCK_AFFLICTION) ? 20 : 10 ;
+                    m_damage /= countPercent * 100;
+
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Warlock : Soul Leech : OnProc : Heal Amount set to %u (owner active spec : %u)",
+                                   m_damage, uint32(ownerAsPlayer->GetActiveSpec()));
+
+                    if(Pet* pet = ownerAsPlayer->GetPet())
+                        ownerAsPlayer->CastCustomSpell(pet, 108366, &m_damage, NULL, NULL, true, NULL, NULL, 0);
+
+                    ownerAsPlayer->CastCustomSpell(ownerAsPlayer, 108366, &m_damage, NULL, NULL, true, NULL, NULL, 0);
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnProc += AuraProcFn(spell_warl_soul_leech_AuraScript::HandleProc);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_warl_soul_leech_AuraScript();
+    }
+};
+
+
 void AddSC_warlock_spell_scripts()
 {
     new spell_warl_bane_of_doom();
@@ -1618,4 +1710,5 @@ void AddSC_warlock_spell_scripts()
 	new spell_warl_metamorphosis_cost();
 	new spell_warl_immolation_aura();
 	new spell_warl_hellfire();
+	new spell_warl_soul_leech();
 }
