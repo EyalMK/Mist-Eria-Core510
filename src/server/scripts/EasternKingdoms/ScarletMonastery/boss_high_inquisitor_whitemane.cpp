@@ -22,6 +22,9 @@
 #include "SpellScript.h"
 
 
+/* High = Correction Rez masse + stop cast sinon nikel */
+/* Durrand = Corriger cest 2 spell + attaque au sol */
+
 enum Spells
 {
     /* Commander Durand */
@@ -195,7 +198,7 @@ public:
             if (!instance)
                 return;
 
-            if (damage > me->GetHealth() && CheckDurand)
+            if (damage >= me->GetHealth() && CheckDurand)
             {
                 damage = 0;
                 events.ScheduleEvent(EVENT_FEIGN_DEATH, 1*IN_MILLISECONDS);
@@ -255,17 +258,27 @@ public:
                             events.CancelEvent(EVENT_FLASH_OF_STEEL);
                             Talk(SAY_DEATH_DURAND);
                             me->SetHealth(0);
+
                             me->GetMotionMaster()->MovementExpired();
                             me->GetMotionMaster()->MoveIdle();
-                            me->AttackStop();
+                            me->SetHealth(0);
+
+                            if (me->IsNonMeleeSpellCasted(false))
+                                me->InterruptNonMeleeSpells(false);
+
+                            me->ClearComboPointHolders();
+                            me->RemoveAllAuras();
                             me->ClearAllReactives();
+
                             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                             me->SetStandState(UNIT_STAND_STATE_DEAD);
                             break;
 
                         case EVENT_FURIOUS_RESOLVE:
                             DoCast(SPELL_FURIOUS_RESOLVE);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                             me->SetStandState(UNIT_STAND_STATE_STAND);
                             me->SetReactState(REACT_AGGRESSIVE);
 
@@ -372,7 +385,7 @@ public:
             if (!instance)
                 return;
 
-            if (damage > me->GetHealth() && CheckWhitemane2)
+            if (damage >= me->GetHealth() && CheckWhitemane2)
             {
                 damage = 0;
                 CheckWhitemane2 = false;
@@ -395,14 +408,14 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
             if(me->HealthBelowPct(50) && CheckWhitemane)
             {
                 events.ScheduleEvent(EVENT_DEEP_SLEEP, 1*IN_MILLISECONDS);
                 CheckWhitemane = false;
             }
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
 
             while(uint32 eventId = events.ExecuteEvent())
             {

@@ -22,6 +22,7 @@
 #include "SpellScript.h"
 #include "Player.h"
 
+/* Nikel sauf spall canaliser */
 
 enum Spells
 {

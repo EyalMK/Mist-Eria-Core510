@@ -22,7 +22,6 @@
 
 uint32 const EncounterCount     = 5;
 
-
 enum SMEncounter
 {
     DATA_BOSS_THALNOS_THE_SOULRENDER        = 0,
