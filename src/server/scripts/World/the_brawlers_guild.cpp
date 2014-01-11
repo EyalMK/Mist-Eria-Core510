@@ -255,9 +255,66 @@ public:
     }
 };
 
+class npc_brawlgar_arena_grunt : public CreatureScript
+{
+public:
+    npc_brawlgar_arena_grunt() : CreatureScript("npc_brawlgar_arena_grunt") { }
+
+    struct npc_brawlgar_arena_gruntAI : public ScriptedAI
+    {
+        npc_brawlgar_arena_gruntAI(Creature* creature) : ScriptedAI(creature) {}
+
+		bool OnGossipHello(Player* player, Creature* creature)
+        {
+			if (player)
+			{
+				if (!player->HasAura(SPELL_QUEUED_FOR_BRAWL))
+					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_QUEUE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+
+				player->PlayerTalkClass->SendGossipMenu(40040, creature->GetGUID());
+			}
+
+            return true;
+        }
+
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+        {
+			if (player)
+			{
+				player->PlayerTalkClass->ClearMenus();
+
+				if (action == GOSSIP_ACTION_INFO_DEF+1)
+				{
+					player->CastSpell(player, SPELL_QUEUED_FOR_BRAWL, true);
+					player->CLOSE_GOSSIP_MENU();
+				}
+			}
+
+            return true;
+        }
+
+        void Reset()
+        {
+
+        }
+
+        void UpdateAI(uint32 const /*diff*/)
+        {
+            if (!UpdateVictim())
+                return;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_brawlgar_arena_gruntAI(creature);
+    }
+};
+
 void AddSC_the_brawlers_guild()
 {
 	new npc_bizmos_brawlpub_bouncer();
 	new npc_bizmo();
 	new npc_the_brawlers_guild_trigger();
+	new npc_brawlgar_arena_grunt();
 }
