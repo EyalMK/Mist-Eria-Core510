@@ -1619,20 +1619,7 @@ public :
 
         bool Load()
         {
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Warlock : Soul Leech : Loading");
-            if(GetOwner() && GetOwner()->ToPlayer() && GetOwner()->ToPlayer()->getClass() == CLASS_WARLOCK)
-            {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Warlock : Soul Leech : Loading : Success !");
-                m_damage = 0 ;
-                return true ;
-            }
-            else if(GetOwner() && GetOwner()->ToPlayer() && GetOwner()->ToPlayer()->getClass() != CLASS_WARLOCK)
-            {
-                sLog->outError(LOG_FILTER_NETWORKIO, "SPELLS : Warlock : Soul Leech : aura proced but owner is not a warlock ! Owner %s (guid %u)",
-                               GetOwner()->GetName().c_str(), GetOwner()->GetGUID());
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Warlock : Soul Leech : Loading : Failed !");
-                return false ;
-            }
+            return true ;
         }
 
         void HandleProc(ProcEventInfo& eventInfo)
