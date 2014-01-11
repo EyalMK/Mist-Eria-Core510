@@ -1607,7 +1607,7 @@ public :
     class spell_warl_soul_leech_AuraScript : public AuraScript
     {
     private :
-        uint32 m_damage ;
+        int32 m_damage ;
 
     private :
         bool Validate(const SpellInfo *spellInfo)
