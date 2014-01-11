@@ -1751,8 +1751,10 @@ public:
 				switch(eventId)
 				{
 					case EVENT_HEROIC_LEAP:
-						if (Player* player = me->ToTempSummon()->GetSummoner()->ToPlayer())
-							player->CastSpell(player, SPELL_WARRIOR_HEROIC_LEAP_DAMAGE, true);
+                        if(TempSummon *tmpS = me->ToTempSummon())
+                            if(Unit *summoner = tmpS->GetSummoner())
+                                if (Player* player = summoner->ToPlayer())
+                                    player->CastSpell(player, SPELL_WARRIOR_HEROIC_LEAP_DAMAGE, true);
 
 						events.CancelEvent(EVENT_HEROIC_LEAP);
 						break;
