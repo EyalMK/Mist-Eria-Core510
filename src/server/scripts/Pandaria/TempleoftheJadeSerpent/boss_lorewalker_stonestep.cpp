@@ -413,8 +413,6 @@ public:
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
-			me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
 		}
 
@@ -447,6 +445,9 @@ public:
 						instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, DONE);
 						instance->DoCastSpellOnPlayers(SPELL_LOREWALKER_S_ALACRITY);
 					}
+
+			if (me->FindNearestCreature(NPC_PERIL, 99999.0f, true))
+				me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
 		}
 
 		void DamageTaken(Unit* who, uint32& damage)
@@ -617,8 +618,6 @@ public:
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
-			me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
 		}
 
@@ -651,6 +650,9 @@ public:
 						instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, DONE);
 						instance->DoCastSpellOnPlayers(SPELL_LOREWALKER_S_ALACRITY);
 					}
+
+			if (me->FindNearestCreature(NPC_STRIFE, 99999.0f, true))
+				me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
 		}
 
 		void DamageTaken(Unit* who, uint32& damage)
@@ -819,47 +821,48 @@ public:
 		{
 			events.Update(diff);
 
-			while(uint32 eventId = events.ExecuteEvent())
+			if (!UpdateVictim)
 			{
-				switch(eventId)
+				while(uint32 eventId = events.ExecuteEvent())
 				{
-					if (instance)
+					switch(eventId)
 					{
-						case EVENT_AGGRO:
-							Talk(SAY_OSONG_AGGRO);
+						if (instance)
+						{
+							case EVENT_AGGRO:
+								Talk(SAY_OSONG_AGGRO);
 
-							events.ScheduleEvent(EVENT_ATTACK_STRIFE, 2*IN_MILLISECONDS);
-							break;
+								events.ScheduleEvent(EVENT_ATTACK_STRIFE, 2*IN_MILLISECONDS);
+								break;
 
-						case EVENT_ATTACK_STRIFE:
-							if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 99999.0f))
-							{
-								me->AI()->AttackStart(strife);
-								me->AddThreat(strife, 99999.0f);
-							}
+							case EVENT_ATTACK_STRIFE:
+								if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 99999.0f))
+								{
+									me->GetMotionMaster()->MoveChase(strife);
+									me->AI()->AttackStart(strife);
+								}
 
-							events.ScheduleEvent(EVENT_ATTACK_PERIL, 8*IN_MILLISECONDS);
-							events.CancelEvent(EVENT_ATTACK_STRIFE);
-							break;
+								events.ScheduleEvent(EVENT_ATTACK_PERIL, 8*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_ATTACK_STRIFE);
+								break;
 
-						case EVENT_ATTACK_PERIL:
-							if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 99999.0f))
-							{
-								me->AI()->AttackStart(peril);
-								me->AddThreat(peril, 99999.0f);
-							}
+							case EVENT_ATTACK_PERIL:
+								if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 99999.0f))
+								{
+									me->GetMotionMaster()->MoveChase(peril);
+									me->AI()->AttackStart(peril);
+								}
 
-							events.ScheduleEvent(EVENT_ATTACK_STRIFE, 8*IN_MILLISECONDS);
-							events.CancelEvent(EVENT_ATTACK_PERIL);
-							break;
+								events.ScheduleEvent(EVENT_ATTACK_STRIFE, 8*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_ATTACK_PERIL);
+								break;
 						
-						default:
-							break;
+							default:
+								break;
+						}
 					}
 				}
 			}
-
-			DoMeleeAttackIfReady();
 		}
 	};
 };

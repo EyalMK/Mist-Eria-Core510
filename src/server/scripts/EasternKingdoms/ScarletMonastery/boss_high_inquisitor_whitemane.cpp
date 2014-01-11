@@ -29,7 +29,7 @@ enum Spells
 {
     /* Commander Durand */
     SPELL_FLASH_OF_STEEL            = 115629,
-    SPELL_DASHING_STRIKE            = 115739,
+    SPELL_DASHING_STRIKE            = 115676,
     SPELL_FURIOUS_RESOLVE           = 115876,
 
     /* Inquisitor Whitemane */
@@ -45,16 +45,17 @@ enum Events
 {
     /* Commander Durand */
     EVENT_FLASH_OF_STEEL            = 1,
-    EVENT_DASHING_STRIKE            = 2,
-    EVENT_FURIOUS_RESOLVE           = 3,
-    EVENT_FEIGN_DEATH               = 4,
+    EVENT_FLASH_OF_STEEL_TEST       = 2,
+    EVENT_DASHING_STRIKE            = 3,
+    EVENT_FURIOUS_RESOLVE           = 4,
+    EVENT_FEIGN_DEATH               = 5,
 
     /* Inquisitor Whitemane */
-    EVENT_POWER_WORD_SHIELD         = 5,
-    EVENT_HOLY_SMITE                = 6,
-    EVENT_MASS_RESURRECTION         = 7,
-    EVENT_DEEP_SLEEP                = 8,
-    EVENT_SCARLET_RESURRECTION      = 9
+    EVENT_POWER_WORD_SHIELD         = 6,
+    EVENT_HOLY_SMITE                = 7,
+    EVENT_MASS_RESURRECTION         = 8,
+    EVENT_DEEP_SLEEP                = 9,
+    EVENT_SCARLET_RESURRECTION      = 10
 };
 
 
@@ -117,6 +118,7 @@ public:
 
         bool CheckDurand;
         bool Intro;
+        uint32 FlashSteel;
         InstanceScript* instance;
         SummonList Summons;
         EventMap events;
@@ -166,7 +168,7 @@ public:
             if (instance)
                 instance->SetBossState(DATA_BOSS_COMMANDER_DURAND, IN_PROGRESS);
 
-            events.ScheduleEvent(EVENT_FLASH_OF_STEEL, 10*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_FLASH_OF_STEEL_TEST, 9*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_DASHING_STRIKE, 25*IN_MILLISECONDS);
         }
 
@@ -188,6 +190,10 @@ public:
         {
             if (instance)
                 instance->SetBossState(DATA_BOSS_COMMANDER_DURAND, DONE);
+
+            if(Creature* whitemane = me->GetCreature(*me, instance->GetData64(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE)))
+                if(whitemane->isAlive())
+                    me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
         }
 
         void DamageTaken(Unit* /*doneBy*/, uint32 &damage)
@@ -229,25 +235,37 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
+
             while(uint32 eventId = events.ExecuteEvent())
             {
                 switch(eventId)
                 {
                     if (instance)
                     {
+                        case EVENT_FLASH_OF_STEEL_TEST:
+                            FlashSteel = 0;
+                            events.ScheduleEvent(EVENT_FLASH_OF_STEEL, 1*IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_FLASH_OF_STEEL_TEST, 25*IN_MILLISECONDS);
+                            break;
                         case EVENT_FLASH_OF_STEEL:
-                            for (uint32 i = 0; i < 5; ++i)
+                            if(FlashSteel < 5)
                             {
                                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                                    me->CastSpell(target, SPELL_FLASH_OF_STEEL, true);
+                                {
+                                    DoCast(target, SPELL_FLASH_OF_STEEL);
+                                    FlashSteel += 1;
+                                    events.ScheduleEvent(EVENT_FLASH_OF_STEEL, 1*IN_MILLISECONDS);
+                                }
                             }
-                            events.ScheduleEvent(EVENT_FLASH_OF_STEEL, 25*IN_MILLISECONDS);
+                            else
+                               events.CancelEvent(EVENT_FLASH_OF_STEEL);
                             break;
 
                         case EVENT_DASHING_STRIKE:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             {
-                                me->CastSpell(target, SPELL_DASHING_STRIKE, true);
+                                me->GetMotionMaster()->MoveCharge(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 10.0f);
+                                me->CastSpell(me, SPELL_DASHING_STRIKE, true);
                             }
 
                             events.ScheduleEvent(EVENT_DASHING_STRIKE, 25*IN_MILLISECONDS);
@@ -255,35 +273,30 @@ public:
 
                         case EVENT_FEIGN_DEATH:
                             events.CancelEvent(EVENT_DASHING_STRIKE);
-                            events.CancelEvent(EVENT_FLASH_OF_STEEL);
+                            events.CancelEvent(EVENT_FLASH_OF_STEEL_TEST);
                             Talk(SAY_DEATH_DURAND);
-                            me->SetHealth(0);
 
-                            me->GetMotionMaster()->MovementExpired();
-                            me->GetMotionMaster()->MoveIdle();
-                            me->SetHealth(0);
-
-                            if (me->IsNonMeleeSpellCasted(false))
-                                me->InterruptNonMeleeSpells(false);
-
-                            me->ClearComboPointHolders();
                             me->RemoveAllAuras();
                             me->ClearAllReactives();
 
                             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                            me->SetReactState(REACT_PASSIVE);
                             me->SetStandState(UNIT_STAND_STATE_DEAD);
+
+                            if (instance)
+                                instance->SetBossState(DATA_BOSS_COMMANDER_DURAND, SPECIAL);
                             break;
 
                         case EVENT_FURIOUS_RESOLVE:
                             DoCast(SPELL_FURIOUS_RESOLVE);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                             me->SetStandState(UNIT_STAND_STATE_STAND);
                             me->SetReactState(REACT_AGGRESSIVE);
 
-                            events.ScheduleEvent(EVENT_DASHING_STRIKE, 20*IN_MILLISECONDS);
-                            events.ScheduleEvent(EVENT_FLASH_OF_STEEL, 5*IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_DASHING_STRIKE, 25*IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_FLASH_OF_STEEL_TEST, 10*IN_MILLISECONDS);
                             events.CancelEvent(EVENT_FURIOUS_RESOLVE);
                             break;
 
@@ -375,6 +388,10 @@ public:
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE, DONE);
+
+            if(Creature* durand = me->GetCreature(*me, instance->GetData64(DATA_BOSS_COMMANDER_DURAND)))
+                if(durand->isAlive())
+                    me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
         }
 
         void DamageTaken(Unit* /*doneBy*/, uint32 &damage)

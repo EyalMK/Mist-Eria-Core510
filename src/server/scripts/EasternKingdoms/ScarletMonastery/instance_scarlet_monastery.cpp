@@ -108,13 +108,17 @@ class instance_scarlet_monastery : public InstanceMapScript
                             HandleGameObject(0, true, go);
                         if (GetBossState(DATA_BOSS_COMMANDER_DURAND) == IN_PROGRESS)
                             HandleGameObject(0, false, go);
+                        if (GetBossState(DATA_BOSS_COMMANDER_DURAND) == NOT_STARTED && GetBossState(DATA_BOSS_BROTHER_KORLOFF) == DONE)
+                            HandleGameObject(0, true, go);
+                        if (GetBossState(DATA_BOSS_COMMANDER_DURAND) == DONE)
+                            HandleGameObject(0, true, go);
                         break;
 
                     case GO_WHITEMANE_GATE:
                         WhitemaneDoorGUID = go->GetGUID();
-                        if (GetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE) == IN_PROGRESS)
+                        if (GetBossState(DATA_BOSS_COMMANDER_DURAND) == SPECIAL)
                             HandleGameObject(0, true, go);
-                        if (GetBossState(DATA_BOSS_COMMANDER_DURAND) == NOT_STARTED)
+                        if (GetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE) == NOT_STARTED)
                             HandleGameObject(0, false, go);
                         break;
                 }
@@ -136,14 +140,18 @@ class instance_scarlet_monastery : public InstanceMapScript
                             HandleGameObject(KorloffDoorGUID, true);
                         break;
                     case DATA_BOSS_HIGH_INQUISITOR_WHITEMANE:
-                        if(state == IN_PROGRESS)
-                            HandleGameObject(WhitemaneDoorGUID, true);
-                        break;
-                    case DATA_BOSS_COMMANDER_DURAND:
                         if(state == NOT_STARTED)
                             HandleGameObject(WhitemaneDoorGUID, false);
+                        break;
+                    case DATA_BOSS_COMMANDER_DURAND:
+                        if(state == NOT_STARTED && GetBossState(DATA_BOSS_BROTHER_KORLOFF) == DONE)
+                            HandleGameObject(KorloffDoorGUID, true);
+                        if(state == SPECIAL)
+                            HandleGameObject(WhitemaneDoorGUID, true);
                         if(state == IN_PROGRESS)
                             HandleGameObject(KorloffDoorGUID, false);
+                        if(state == DONE)
+                            HandleGameObject(KorloffDoorGUID, true);
                         break;
                 }
                 return true;
@@ -350,11 +358,14 @@ public:
     {
             npc_scarlet_judicatorAI(Creature* creature) : ScriptedAI(creature) {}
 
+            uint32 m_uiCheckTimer;
+
             void Reset()
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
+                m_uiCheckTimer = 1000;
             }
 
             void SpellHit(Unit* /*who*/, const SpellInfo* spell)
@@ -365,12 +376,22 @@ public:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->SetReactState(REACT_AGGRESSIVE);
+                }
+            }
 
+            void UpdateAI(uint32 diff)
+            {
+                if(m_uiCheckTimer <= diff)
+                {
                     if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
                         if(target && target->GetTypeId() == TYPEID_PLAYER)
                             me->AI()->AttackStart(target);
                 }
+                else
+                    m_uiCheckTimer -= diff;
+
             }
+
     };
 };
 
