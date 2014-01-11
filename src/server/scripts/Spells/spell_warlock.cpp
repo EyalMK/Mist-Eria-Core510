@@ -1610,6 +1610,8 @@ public :
         int32 m_damage ;
 
     private :
+		PrepareAuraScript(spell_warl_soul_leech_AuraScript);
+	
         bool Validate(const SpellInfo *spellInfo)
         {
             return true ;
