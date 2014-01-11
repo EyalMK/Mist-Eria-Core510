@@ -27,15 +27,16 @@ enum Texts
 };
 
 #define DISPLAYID_GYROCOPTER	44634
+#define GOSSIP_OPTION_QUEUE		"Oui, inscrivez-moi pour un combat !"
 
-class npc_bizmos_brawlpub_entrance : public CreatureScript
+class npc_bizmos_brawlpub_bounce : public CreatureScript
 {
 public:
-    npc_bizmos_brawlpub_entrance() : CreatureScript("npc_bizmos_brawlpub_entrance") { }
+    npc_bizmos_brawlpub_bounce() : CreatureScript("npc_bizmos_brawlpub_bounce") { }
 
-    struct npc_bizmos_brawlpub_entranceAI : public ScriptedAI
+    struct npc_bizmos_brawlpub_bounceAI : public ScriptedAI
     {
-        npc_bizmos_brawlpub_entranceAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_bizmos_brawlpub_bounceAI(Creature* creature) : ScriptedAI(creature) {}
 
         void Reset()
         {
@@ -51,7 +52,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_bizmos_brawlpub_entranceAI(creature);
+        return new npc_bizmos_brawlpub_bounceAI(creature);
     }
 };
 
@@ -84,6 +85,6 @@ public:
 
 void AddSC_the_brawlers_guild()
 {
-	new npc_bizmos_brawlpub_entrance();
+	new npc_bizmos_brawlpub_bounce();
 	new npc_bizmo();
 }

@@ -58,12 +58,12 @@ namespace Trinity
                 data << uint8(i_msgtype);
                 data << uint32(LANG_UNIVERSAL);
                 data << uint64(i_player.GetGUID());
-                data << uint32(0);
+                data << uint32(5);
 				data << uint32(strlen(text) + 1);
                 data << text;
                 data << uint64(i_player.GetGUID());
 				data << uint32(i_achievementId);
-                data << uint8(0);
+                data << uint16(0);
             }
 
         private:

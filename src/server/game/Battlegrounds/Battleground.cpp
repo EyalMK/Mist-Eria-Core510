@@ -77,7 +77,7 @@ namespace Trinity
 				data << text;
                 data << uint64(0);
 				data << uint32(0);
-                data << uint8(0); // Test
+                data << uint16(_source ? _source->GetChatTag() : 0);
             }
 
             ChatMsg _msgtype;
