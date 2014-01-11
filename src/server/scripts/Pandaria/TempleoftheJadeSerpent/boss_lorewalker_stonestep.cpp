@@ -821,7 +821,7 @@ public:
 		{
 			events.Update(diff);
 
-			if (!UpdateVictim)
+			if (!UpdateVictim())
 			{
 				while(uint32 eventId = events.ExecuteEvent())
 				{
