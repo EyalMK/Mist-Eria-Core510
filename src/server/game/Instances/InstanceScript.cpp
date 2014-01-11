@@ -48,7 +48,7 @@ void InstanceScript::HandleGameObject(uint64 GUID, bool open, GameObject* go)
     if (!go)
         go = instance->GetGameObject(GUID);
     if (go)
-        go->SetGoState(open ? GO_STATE_ACTIVE : GO_STATE_READY);
+        go->SetGoState(open ? GO_STATE_ACTIVE_ALTERNATIVE : GO_STATE_READY);
     else
         sLog->outDebug(LOG_FILTER_TSCR, "InstanceScript: HandleGameObject failed");
 }

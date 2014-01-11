@@ -24,7 +24,8 @@
 
 enum Spells
 {
-    SPELL_HEAL                  = 111024
+    SPELL_HEAL                  = 111024,
+    SPELL_MASS_RESURRECTION     = 113134
 };
 
 enum Texts
@@ -46,8 +47,11 @@ class instance_scarlet_monastery : public InstanceMapScript
 
         struct instance_scarlet_monastery_InstanceMapScript : public InstanceScript
         {
-            instance_scarlet_monastery_InstanceMapScript(Map* map) : InstanceScript(map)
+            instance_scarlet_monastery_InstanceMapScript(Map* map) : InstanceScript(map){}
+
+            void Initialize()
             {
+                SetBossNumber(EncounterCount);
                 BossThalnosTheSoulrenderGUID        = 0;
                 NpcTriggerCraneGUID                 = 0;
                 BossBrotherKorloffGUID              = 0;
@@ -69,6 +73,7 @@ class instance_scarlet_monastery : public InstanceMapScript
 
                     case NPC_TRIGGER_CRANE:
                         NpcTriggerCraneGUID = creature->GetGUID();
+                        break;
 
                     case NPC_BROTHER_KORLOFF:
                         BossBrotherKorloffGUID = creature->GetGUID();
@@ -140,8 +145,6 @@ class instance_scarlet_monastery : public InstanceMapScript
                         if(state == IN_PROGRESS)
                             HandleGameObject(KorloffDoorGUID, false);
                         break;
-                    default:
-                        break;
                 }
                 return true;
             }
@@ -152,24 +155,69 @@ class instance_scarlet_monastery : public InstanceMapScript
                 {
                     case DATA_BOSS_THALNOS_THE_SOULRENDER:
                         return BossThalnosTheSoulrenderGUID;
+                        break;
 
                     case DATA_NPC_TRIGGER_CRANE:
                         return NpcTriggerCraneGUID;
+                        break;
 
                     case DATA_BOSS_BROTHER_KORLOFF:
                         return BossBrotherKorloffGUID;
+                        break;
 
                     case DATA_BOSS_HIGH_INQUISITOR_WHITEMANE:
                         return BossHighInquisitorWhitemaneGUID;
+                        break;
 
                     case DATA_BOSS_COMMANDER_DURAND:
                         return BossCommanderDurandGUID;
-
-                    default:
                         break;
                 }
 
                 return 0;
+            }
+
+            std::string GetSaveData()
+            {
+                OUT_SAVE_INST_DATA;
+
+                std::ostringstream saveStream;
+                saveStream << "S M " << GetBossSaveData();
+
+                OUT_SAVE_INST_DATA_COMPLETE;
+                return saveStream.str();
+            }
+
+            void Load(const char* strIn)
+            {
+                if (!strIn)
+                {
+                    OUT_LOAD_INST_DATA_FAIL;
+                    return;
+                }
+
+                OUT_LOAD_INST_DATA(strIn);
+
+                char dataHead1, dataHead2;
+
+                std::istringstream loadStream(strIn);
+                loadStream >> dataHead1 >> dataHead2;
+
+                if (dataHead1 == 'S' && dataHead2 == 'M')
+                {
+                    for (uint8 i = 0; i < EncounterCount; ++i)
+                    {
+                        uint32 tmpState;
+                        loadStream >> tmpState;
+                        if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                            tmpState = NOT_STARTED;
+                            SetBossState(i, EncounterState(tmpState));
+                    }
+                }
+                else
+                    OUT_LOAD_INST_DATA_FAIL;
+
+                OUT_LOAD_INST_DATA_COMPLETE;
             }
 
             protected:
@@ -288,10 +336,49 @@ class at_crane_monastery : public AreaTriggerScript
 };
 
 
+class npc_scarlet_judicator : public CreatureScript
+{
+public:
+    npc_scarlet_judicator() : CreatureScript("npc_scarlet_judicator") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_scarlet_judicatorAI(creature);
+    }
+
+    struct npc_scarlet_judicatorAI : public ScriptedAI
+    {
+            npc_scarlet_judicatorAI(Creature* creature) : ScriptedAI(creature) {}
+
+            void Reset()
+            {
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetStandState(UNIT_STAND_STATE_DEAD);
+            }
+
+            void SpellHit(Unit* /*who*/, const SpellInfo* spell)
+            {
+                if (spell->Id == SPELL_MASS_RESURRECTION)
+                {
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetReactState(REACT_AGGRESSIVE);
+
+                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
+                        if(target && target->GetTypeId() == TYPEID_PLAYER)
+                            me->AI()->AttackStart(target);
+                }
+            }
+    };
+};
+
 void AddSC_instance_scarlet_monastery()
 {
-   new instance_scarlet_monastery();
-   new npc_spirit_of_redemption();
-   new npc_traqueur_crane();
-   new at_crane_monastery();
+    new instance_scarlet_monastery();
+    new npc_spirit_of_redemption();
+    new npc_traqueur_crane();
+    new at_crane_monastery();
+    new npc_scarlet_judicator();
 }
