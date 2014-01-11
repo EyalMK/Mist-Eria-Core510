@@ -22,6 +22,7 @@ set(sources
   World/npc_professions.cpp
   World/npc_taxi.cpp
   World/npcs_special.cpp
+  World/the_brawlers_guild.cpp
 )
 
 message("  -> Prepared: World")
