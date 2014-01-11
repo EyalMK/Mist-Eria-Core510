@@ -10,34 +10,13 @@
 // Max number of different npcs that when killed increase the killed hozen counter
 #define MAX_OOKOOK_ENTOURAGE 6
 
-// Max number of alamental that can be summoned
-#define MAX_ALAMENTAL 3
-
 // Creatures entries we will need to access
 enum InstanceCreatures
 {
     // Bosses
     Boss_OokOok = 56637,
     Boss_Hoptallus = 56717,
-    Boss_YanZhutheUncasked = 59479,
-
-
-    // Alamentals
-
-    // Stout ability
-    Mob_SudsyBrewAlamental = 59522,
-    Mob_FizzyBrewAlamental = 59520,
-
-    // Ale ability
-    Mob_BubblingBrewAlamental = 59521,
-    Mob_YeasyBrewAlamental = 66413,
-
-    // Wheat ability
-    Mob_StoutBrewAlamental = 59519,
-    Mob_BloatedBrewAlamental = 59518
-
-
-    // Miscellanous NPCS
+    Boss_YanZhutheUncasked = 59479
 };
 
 // GameObjects entries we will need to access
@@ -76,12 +55,7 @@ enum InstanceDatas
     Data_OokOokPartyEventProgress = 0,
     Data_OokOokEventProgress = 1,
     Data_HoptallusEventProgress = 2,
-    Data_YanZhuEventProgress = 3,
-
-    // Alamentals
-    Data_AleAlamental = 4,
-    Data_WheatAlamental = 5,
-    Data_StoutAlamental = 6
+    Data_YanZhuEventProgress = 3
 };
 
 // Identifier returning the guids (used in the ObjectAccessor)

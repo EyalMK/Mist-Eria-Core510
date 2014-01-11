@@ -5549,6 +5549,18 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 triggered_spell_id = 58567;
                 break;
             }
+			// Sudden Death
+			if (dummySpell->Id == 29725)
+			{
+				victim = this;
+
+				if (!victim || !victim->isAlive() || !procSpell)
+                    return false;
+
+				triggered_spell_id = 52437;
+
+				break;
+			}
             break;
         }
         case SPELLFAMILY_WARLOCK:

@@ -20,6 +20,7 @@
 #include "ScriptedCreature.h"
 #include "scarlet_monastery.h"
 #include "SpellScript.h"
+#include "Player.h"
 
 
 enum Spells
@@ -71,7 +72,6 @@ enum Creatures
     NPC_THALNOS                 = 59789,
     NPC_TRAQUEUR_INVISIBLE      = 200011
 };
-
 
 class boss_thalnos_the_soulrender : public CreatureScript
 {
@@ -134,12 +134,22 @@ public:
             if (instance)
                 instance->SetBossState(DATA_BOSS_THALNOS_THE_SOULRENDER, FAIL);
 
+            Cleanup();
             ScriptedAI::EnterEvadeMode();
         }
 
         void KilledUnit(Unit* /*pWho*/)
         {
             Talk(SAY_KILL);
+        }
+
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+        {
+            if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+                for (uint8 i = 0; i < 7; ++i)
+                    if (spell->Effects[i].Effect == SPELL_EFFECT_INTERRUPT_CAST)
+                        if (me->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_SPIRIT_GALE)
+                            me->InterruptSpell(CURRENT_GENERIC_SPELL, false);
         }
 
 
@@ -380,7 +390,7 @@ public:
             {
                 me->SetReactState(REACT_PASSIVE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
-                m_uiCheckTimer = 250 ;
+                m_uiCheckTimer = 250;
             }
 
             void UpdateAI(uint32 diff)
@@ -388,10 +398,10 @@ public:
                 if(m_uiCheckTimer <= diff)
                 {
                     DoCheckPlayers();
-                    m_uiCheckTimer = 250 ;
+                    m_uiCheckTimer = 250;
                 }
                 else
-                    m_uiCheckTimer -= diff ;
+                    m_uiCheckTimer -= diff;
 
             }
 
@@ -536,6 +546,7 @@ class spell_evict_soul : public SpellScriptLoader
             return new spell_evict_soul_AuraScript();
         }
 };
+
 
 
 void AddSC_boss_thalnos_the_soulrender()

@@ -21,7 +21,6 @@
 #include "scarlet_monastery.h"
 #include "SpellScript.h"
 
-
 enum Spells
 {
     SPELL_FIRESTORM_KICK        = 113764,
@@ -34,7 +33,6 @@ enum Spells
     SPELL_SCORCHED_EARTH_AURA   = 114464
 };
 
-
 enum Events
 {
     EVENT_FIRESTORM_KICK    = 1,
@@ -42,7 +40,6 @@ enum Events
     EVENT_SCORCHED_EARTH    = 3,
     EVENT_JUMP_FIRESTORM    = 4
 };
-
 
 enum Texts
 {
@@ -55,7 +52,6 @@ enum Creatures
 {
     NPC_SCORCHED_EARTH              = 59507
 };
-
 
 class boss_brother_korloff : public CreatureScript
 {
@@ -100,7 +96,7 @@ public:
             if (instance)
                 instance->SetBossState(DATA_BOSS_BROTHER_KORLOFF, IN_PROGRESS);
 
-            events.ScheduleEvent(EVENT_FIRESTORM_KICK, 10*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_JUMP_FIRESTORM, 10*IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_BLAZING_FISTS, 20*IN_MILLISECONDS);
         }
 
@@ -146,6 +142,16 @@ public:
             }
         }
 
+        void MovementInform(uint32 type, uint32 id)
+        {
+            switch (id)
+            {
+                case EVENT_JUMP:
+                    events.ScheduleEvent(EVENT_FIRESTORM_KICK, 500);
+                    break;
+            }
+        }
+
 
         void UpdateAI(uint32 diff)
         {
@@ -172,27 +178,25 @@ public:
                         case EVENT_JUMP_FIRESTORM:
                             if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST))
                             {
-                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20);
-                                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                                events.ScheduleEvent(EVENT_FIRESTORM_KICK, 2*IN_MILLISECONDS);
+                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20, EVENT_JUMP);
                             }
                             break;
 
                         case EVENT_FIRESTORM_KICK:
-                            DoCast(SPELL_FIRESTORM_KICK);
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                            events.ScheduleEvent(EVENT_JUMP_FIRESTORM, 29*IN_MILLISECONDS);
+                            DoCastAOE(SPELL_FIRESTORM_KICK);
+
+                            events.ScheduleEvent(EVENT_JUMP_FIRESTORM, 28*IN_MILLISECONDS);
                             break;
 
                         case EVENT_SCORCHED_EARTH:
                             DoCast(SPELL_SCORCHED_EARTH);
+
+                            events.CancelEvent(EVENT_SCORCHED_EARTH);
                             break;
 
                         case EVENT_BLAZING_FISTS:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
-                            {
-                                DoCast(target, SPELL_BLAZING_FISTS);
-                            }
+                            DoCastAOE(SPELL_BLAZING_FISTS);
+
                             events.ScheduleEvent(EVENT_BLAZING_FISTS, 30*IN_MILLISECONDS);
                             break;
 
@@ -201,7 +205,6 @@ public:
                     }
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -222,14 +225,27 @@ public:
     {
             npc_scorched_earthAI(Creature* creature) : ScriptedAI(creature) {}
 
+            uint32 m_uiCheckTimer;
+
             void Reset()
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
+                me->RemoveAurasDueToSpell(SPELL_SCORCHED_EARTH_AURA);
                 me->CastSpell(me, SPELL_SCORCHED_EARTH_AURA, true);
+                m_uiCheckTimer = 2000;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if(m_uiCheckTimer <= diff)
+                {
+                    me->CastSpell(me, SPELL_SCORCHED_EARTH_AURA, true);
+                    m_uiCheckTimer = 2000;
+                }
+                else m_uiCheckTimer -= diff;
             }
     };
 };
-
 
 class spell_scorched_earth : public SpellScriptLoader
 {
@@ -247,20 +263,10 @@ class spell_scorched_earth : public SpellScriptLoader
                 if (!caster)
                     return;
 
-                std::list<Creature*> creaturesList;
-                caster->GetCreatureListWithEntryInGrid(creaturesList, NPC_SCORCHED_EARTH, 500.0f);
+                if (caster->FindNearestCreature(NPC_SCORCHED_EARTH, 3.0f, true))
+                    return;
 
-                for(std::list<Creature*>::const_iterator iter = creaturesList.begin() ; iter != creaturesList.end() ; ++iter)
-                {
-                    Position pos ;
-                    if(Creature* creatures = *iter)
-                    {
-                        creatures->GetPosition(&pos);
-                        if(caster->GetExactDist2d(&pos) >= 3.0f)
-                            caster->CastSpell(caster, SPELL_SCORCHED_EARTH_POP, true);
-                    }
-                }
-
+                caster->CastSpell(caster, SPELL_SCORCHED_EARTH_POP, true);
             }
 
             void Register()
@@ -274,6 +280,7 @@ class spell_scorched_earth : public SpellScriptLoader
             return new spell_scorched_earth_SpellScript();
         }
 };
+
 
 void AddSC_boss_brother_korloff()
 {

@@ -657,7 +657,9 @@ void AddSC_zangarmarsh();
 
 //Pandaria
 
+// Zones MoP
 void AddSC_wandering_isle();
+void AddSC_kun_lai_summit();
 
 // Events
 void AddSC_event_childrens_week();
@@ -1326,7 +1328,9 @@ void AddNorthrendScripts()
 void AddPandariaScripts()
 {
 #ifdef SCRIPTS
+	// Zones MoP
 	AddSC_wandering_isle();
+	AddSC_kun_lai_summit();
 
 	// Mogushan Vaults
 	AddSC_boss_the_stone_guard();

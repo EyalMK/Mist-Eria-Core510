@@ -7494,7 +7494,7 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
     GetSession()->SendPacket(&data);
 
     // add honor points
-    ModifyCurrency(CURRENCY_TYPE_HONOR_POINTS, int32(honor));
+    ModifyCurrency(CURRENCY_TYPE_HONOR_POINTS, int32(honor/100)); // Need to be /100
 
     if (InBattleground() && honor > 0)
     {
@@ -21002,6 +21002,7 @@ void Player::VehicleSpellInitialize()
     WorldPacket data(SMSG_PET_SPELLS, 8 + 2 + 4 + 4 + 4 * 10 + 1 + 1 + cooldownCount * (4 + 2 + 4 + 4));
     data << uint64(vehicle->GetGUID());                     // Guid
     data << uint16(0);                                      // Pet Family (0 for all vehicles)
+    data << uint16(0);
     data << uint32(vehicle->isSummon() ? vehicle->ToTempSummon()->GetTimer() : 0); // Duration
     // The following three segments are read by the client as one uint32
     data << uint8(vehicle->GetReactState());                // React State
@@ -21072,6 +21073,7 @@ void Player::VehicleSpellInitialize()
             data << uint32(0);
         }
     }
+    data << uint8(0);
 
     GetSession()->SendPacket(&data);
 }

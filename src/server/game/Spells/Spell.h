@@ -487,6 +487,7 @@ class Spell
         void CleanupTargetList();
 
         void SetSpellValue(SpellValueMod mod, int32 value);
+		int32 CalculateMonkMeleeAttacks(Unit* caster, float coeff, int32 APmultiplier);
     protected:
         bool HasGlobalCooldown() const;
         void TriggerGlobalCooldown();

@@ -3913,6 +3913,9 @@ void SpellMgr::LoadSpellInfoCorrections()
 					spellInfo->Effects[EFFECT_1].BasePoints = 0;
 					spellInfo->Effects[EFFECT_1].MiscValue = 0;
 					break;
+				case 114465:
+					spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_1_YARD);
+					break ;
 				default:
 					break;
 			}
