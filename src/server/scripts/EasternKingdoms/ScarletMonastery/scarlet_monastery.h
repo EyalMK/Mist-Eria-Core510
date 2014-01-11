@@ -22,7 +22,6 @@
 
 uint32 const EncounterCount     = 5;
 
-#define SMScriptName "instance_scarlet_monastery"
 
 enum SMEncounter
 {
