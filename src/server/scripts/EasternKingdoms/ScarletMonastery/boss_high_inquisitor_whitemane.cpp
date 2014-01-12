@@ -119,6 +119,7 @@ public:
 
         bool CheckDurand;
         bool Intro;
+        bool FakeDeath;
         uint32 FlashSteel;
         InstanceScript* instance;
         SummonList Summons;
@@ -129,6 +130,7 @@ public:
             events.Reset();
             Summons.DespawnAll();
             CheckDurand = true;
+            FakeDeath = false;
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
 
@@ -208,6 +210,11 @@ public:
             if (damage >= me->GetHealth() && CheckDurand)
             {
                 damage = 0;
+
+                events.CancelEvent(EVENT_DASHING_STRIKE);
+                events.CancelEvent(EVENT_FLASH_OF_STEEL);
+                events.CancelEvent(EVENT_FLASH_OF_STEEL_TEST);
+
                 me->InterruptNonMeleeSpells(false);
                 me->SetHealth(0);
                 me->StopMoving();
@@ -227,6 +234,7 @@ public:
                     Whitemane->GetMotionMaster()->MovePoint(1, 747.77f, 602.39f, 16.00f);
                 }
                 CheckDurand = false;
+                FakeDeath = true;
             }
         }
 
@@ -235,6 +243,7 @@ public:
             if (spell->Id == SPELL_SCARLET_RESURRECTION)
             {
                 events.ScheduleEvent(EVENT_FURIOUS_RESOLVE, 1*IN_MILLISECONDS);
+                FakeDeath = false;
             }
         }
 
@@ -248,6 +257,8 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
+            if (FakeDeath)
+                return;
 
             while(uint32 eventId = events.ExecuteEvent())
             {
@@ -277,7 +288,7 @@ public:
                         case EVENT_DASHING_STRIKE:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             {
-                                me->GetMotionMaster()->MoveCharge(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 10.0f);
+                                me->GetMotionMaster()->MoveCharge(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 40);
                                 if(Map* map = me->GetMap())
                                 {
                                     Map::PlayerList const & playerList = map->GetPlayers();

@@ -110,7 +110,7 @@ public:
         {
             std::list<Creature*> creatures;
 
-            GetCreatureListWithEntryInGrid(creatures, me, NPC_EVICTED_SOUL, 200.0f);
+            GetCreatureListWithEntryInGrid(creatures, me, NPC_EVICTED_SOUL, 400.0f);
             for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
                 (*itr)->DespawnOrUnsummon();
         }
@@ -207,7 +207,8 @@ public:
                 {
                     if (instance)
                     {
-                        case EVENT_RAISE_FALLEN_CRUSADER:                           
+                        case EVENT_RAISE_FALLEN_CRUSADER:
+                            me->StopMoving();
                             Talk(SAY_RAISE_FALLEN_CRUSADER);
                             DoCast(SPELL_RAISE_FALLEN_CRUSADER);
                             events.ScheduleEvent(EVENT_RAISE_FALLEN_CRUSADER, 60*IN_MILLISECONDS);
@@ -231,6 +232,7 @@ public:
                             break;
 
                         case EVENT_SUMMON_EMPOWERING_SPIRITS:
+                            me->StopMoving();
                             events.CancelEvent(EVENT_SPIRIT_GALE);
                             Talk(SAY_SUMMON_EMPOWERING_SPIRITS);
                             DoCast(SPELL_SUMMON_EMPOWERING_SPIRITS);

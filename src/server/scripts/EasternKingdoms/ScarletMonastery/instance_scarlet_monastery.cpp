@@ -308,10 +308,12 @@ public:
     {
             npc_traqueur_craneAI(Creature* creature) : ScriptedAI(creature)
             {
+                instance = creature->GetInstanceScript();
                 Crane = false;
             }
 
             bool Crane;
+            InstanceScript* instance;
 
             void DoAction(int32 action)
             {
@@ -376,16 +378,25 @@ public:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->SetReactState(REACT_AGGRESSIVE);
+
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.0f, true))
+                    if(target && target->GetTypeId() == TYPEID_PLAYER)
+                        me->AI()->AttackStart(target);
                 }
+            }
+
+            void EnterEvadeMode()
+            {
+                ScriptedAI::EnterEvadeMode();
             }
 
             void UpdateAI(uint32 diff)
             {
                 if(m_uiCheckTimer <= diff)
                 {
-                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.0f, true))
-                        if(target && target->GetTypeId() == TYPEID_PLAYER)
-                            me->AI()->AttackStart(target);
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.0f, true))
+                    if(target && target->GetTypeId() == TYPEID_PLAYER)
+                        me->AI()->AttackStart(target);
                 }
                 else
                     m_uiCheckTimer -= diff;

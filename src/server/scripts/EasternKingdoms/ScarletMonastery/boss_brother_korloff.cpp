@@ -199,7 +199,7 @@ public:
                         case EVENT_JUMP_FIRESTORM:
                             if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST))
                             {
-                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20, EVENT_JUMP);
+                                me->GetMotionMaster()->MoveJump(target->GetPositionX()+3, target->GetPositionY()+3, target->GetPositionZ(), 20, 20, EVENT_JUMP);
                             }
                             break;
 
