@@ -99,51 +99,12 @@ void WorldSession::HandleGuildDeclineOpcode(WorldPacket& /*recvPacket*/)
 
 void WorldSession::HandleGuildRosterOpcode(WorldPacket& recvPacket)
 {
-	// this should be ok , just need to finish SMSG_GUILD_ROSTER
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GUILD_ROSTER");
 
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_ROSTER [%s]", GetPlayerInfo().c_str());
-    
-	ObjectGuid guid;
-	ObjectGuid guid2;
+    recvPacket.rfinish();
 
-    guid[1] = recvPacket.ReadBit();
-	guid2[4] = recvPacket.ReadBit();
-	guid2[0] = recvPacket.ReadBit();
-	guid[0] = recvPacket.ReadBit();
-	guid2[1] = recvPacket.ReadBit();
-	guid[4] = recvPacket.ReadBit();
-	guid[2] = recvPacket.ReadBit();
-	guid2[3] = recvPacket.ReadBit();
-    guid[5] = recvPacket.ReadBit();
-    guid2[7] = recvPacket.ReadBit();
-    guid[7] = recvPacket.ReadBit();
-    guid2[5] = recvPacket.ReadBit();
-    guid2[6] = recvPacket.ReadBit();
-    guid[6] = recvPacket.ReadBit();
-    guid2[2] = recvPacket.ReadBit();
-	guid[3] = recvPacket.ReadBit();
-
-    recvPacket.ReadByteSeq(guid[2]);
-    recvPacket.ReadByteSeq(guid2[5]);
-    recvPacket.ReadByteSeq(guid2[3]);
-    recvPacket.ReadByteSeq(guid2[4]);
-    recvPacket.ReadByteSeq(guid[3]);
-    recvPacket.ReadByteSeq(guid[4]);
-    recvPacket.ReadByteSeq(guid2[2]);
-    recvPacket.ReadByteSeq(guid2[1]);
-	recvPacket.ReadByteSeq(guid[7]);
-    recvPacket.ReadByteSeq(guid[1]);
-    recvPacket.ReadByteSeq(guid2[0]);
-    recvPacket.ReadByteSeq(guid2[6]);
-    recvPacket.ReadByteSeq(guid[0]);
-    recvPacket.ReadByteSeq(guid[6]);
-    recvPacket.ReadByteSeq(guid2[7]);
-    recvPacket.ReadByteSeq(guid[5]);
-
-    if (Guild* guild = GetPlayer()->GetGuild())
+    if (Guild* guild = _GetPlayerGuild(this, true))
         guild->HandleRoster(this);
-    else
-        Guild::SendCommandResult(this, GUILD_COMMAND_ROSTER, ERR_GUILD_PLAYER_NOT_IN_GUILD);
 }
 
 void WorldSession::HandleGuildPromoteOpcode(WorldPacket& recvPacket)
