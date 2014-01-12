@@ -241,8 +241,8 @@ float Player::GetHealthBonusFromStamina()
 	if (getLevel() > 83)
 		ratio = 14;
 
-    //if (gtOCTHpPerStaminaEntry const* hpBase = sGtOCTHpPerStaminaStore.LookupEntry((getClass() - 1) * GT_MAX_LEVEL + getLevel() - 1))
-        //ratio = hpBase->ratio; Now it's the same for all classes
+    if (gtOCTHpPerStaminaEntry const* hpBase = sGtOCTHpPerStaminaStore.LookupEntry((getClass() - 1) * GT_MAX_LEVEL + getLevel() - 1))
+        ratio = hpBase->ratio;
 
     float stamina = GetStat(STAT_STAMINA);
     float baseStam = std::min(20.0f, stamina);
