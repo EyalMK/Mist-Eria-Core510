@@ -121,6 +121,7 @@ class Pet : public Guardian
 
         PetSpellMap     m_spells;
         AutoSpellList   m_autospells;
+		bool            m_Stampeded;
 
         void InitPetCreateSpells();
 
@@ -150,8 +151,6 @@ class Pet : public Guardian
         uint64  m_auraRaidUpdateMask;
         bool    m_loading;
         uint32  m_regenTimer;
-		
-		bool m_Stampeded ; //! Not sure ; guessing instead of reverting commit
 
         DeclinedName *m_declinedname;
 
