@@ -64,14 +64,14 @@ enum Texts
 	SAY_RANDOM_3		= 9,
 	SAY_RANDOM_4		= 10,
 
-	/* Lorewalker => Osong */
+	/* Lorewalker for Osong */
 	SAY_OSONG_INTRO_1	= 11,
 	SAY_OSONG_INTRO_2	= 12,
 	SAY_OSONG_INTRO_3	= 13,
 	SAY_OSONG_INTRO_4	= 14,
 	SAY_OSONG_INTRO_5	= 15,
 
-	/* Lorewalker => Zao */
+	/* Lorewalker for Zao */
 	SAY_ZAO_INTRO_1		= 16,
 	SAY_ZAO_INTRO_2		= 17,
 	SAY_ZAO_INTRO_3		= 18,
@@ -229,6 +229,7 @@ public:
 							break;
 
 						case EVENT_SAY_END_1:
+						{
 							if (Creature* trigger = me->FindNearestCreature(NPC_LOREWALKER_TRIGGER, 99999.0f, true))
 								trigger->Kill(trigger);
 
@@ -263,6 +264,7 @@ public:
 							events.ScheduleEvent(EVENT_SAY_END_2, 9*IN_MILLISECONDS, 0, PHASE_BOSSES);
 							events.CancelEvent(EVENT_SAY_END_1);
 							break;
+						}
 
 						case EVENT_SAY_END_2:
 						{
