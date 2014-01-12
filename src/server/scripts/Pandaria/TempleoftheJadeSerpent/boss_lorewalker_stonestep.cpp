@@ -488,6 +488,9 @@ public:
 				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 99999.0f, true))
 					osong->DespawnOrUnsummon();
 
+				if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 99999.0f, false))
+					peril->DespawnOrUnsummon();
+
 				me->DespawnOrUnsummon(1*IN_MILLISECONDS);
 			}
 
@@ -692,6 +695,9 @@ public:
 
 				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 99999.0f, true))
 					osong->DespawnOrUnsummon();
+
+				if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 99999.0f, false))
+					strife->DespawnOrUnsummon();
 
 				me->DespawnOrUnsummon(1*IN_MILLISECONDS);
 			}
