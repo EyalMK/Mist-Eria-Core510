@@ -99,51 +99,12 @@ void WorldSession::HandleGuildDeclineOpcode(WorldPacket& /*recvPacket*/)
 
 void WorldSession::HandleGuildRosterOpcode(WorldPacket& recvPacket)
 {
-	// this should be ok , just need to finish SMSG_GUILD_ROSTER
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GUILD_ROSTER");
 
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_ROSTER [%s]", GetPlayerInfo().c_str());
-    
-	ObjectGuid guid;
-	ObjectGuid guid2;
-
-    guid[1] = recvPacket.ReadBit();
-	guid2[4] = recvPacket.ReadBit();
-	guid2[0] = recvPacket.ReadBit();
-	guid[0] = recvPacket.ReadBit();
-	guid2[1] = recvPacket.ReadBit();
-	guid[4] = recvPacket.ReadBit();
-	guid[2] = recvPacket.ReadBit();
-	guid2[3] = recvPacket.ReadBit();
-    guid[5] = recvPacket.ReadBit();
-    guid2[7] = recvPacket.ReadBit();
-    guid[7] = recvPacket.ReadBit();
-    guid2[5] = recvPacket.ReadBit();
-    guid2[6] = recvPacket.ReadBit();
-    guid[6] = recvPacket.ReadBit();
-    guid2[2] = recvPacket.ReadBit();
-	guid[3] = recvPacket.ReadBit();
-
-    recvPacket.ReadByteSeq(guid[2]);
-    recvPacket.ReadByteSeq(guid2[5]);
-    recvPacket.ReadByteSeq(guid2[3]);
-    recvPacket.ReadByteSeq(guid2[4]);
-    recvPacket.ReadByteSeq(guid[3]);
-    recvPacket.ReadByteSeq(guid[4]);
-    recvPacket.ReadByteSeq(guid2[2]);
-    recvPacket.ReadByteSeq(guid2[1]);
-	recvPacket.ReadByteSeq(guid[7]);
-    recvPacket.ReadByteSeq(guid[1]);
-    recvPacket.ReadByteSeq(guid2[0]);
-    recvPacket.ReadByteSeq(guid2[6]);
-    recvPacket.ReadByteSeq(guid[0]);
-    recvPacket.ReadByteSeq(guid[6]);
-    recvPacket.ReadByteSeq(guid2[7]);
-    recvPacket.ReadByteSeq(guid[5]);
+    recvPacket.rfinish();
 
     if (Guild* guild = GetPlayer()->GetGuild())
         guild->HandleRoster(this);
-    else
-        Guild::SendCommandResult(this, GUILD_COMMAND_ROSTER, ERR_GUILD_PLAYER_NOT_IN_GUILD);
 }
 
 void WorldSession::HandleGuildPromoteOpcode(WorldPacket& recvPacket)
@@ -814,45 +775,26 @@ void WorldSession::HandleGuildRewardsQueryOpcode(WorldPacket& recvPacket)
 {
     recvPacket.read_skip<uint32>(); // Unk
 
-    if (sGuildMgr->GetGuildById(_player->GetGuildId()))
+    if (Guild* guild = sGuildMgr->GetGuildById(_player->GetGuildId()))
     {
         std::vector<GuildReward> const& rewards = sGuildMgr->GetGuildRewards();
 
-        WorldPacket data(SMSG_GUILD_REWARDS_LIST, 3 + rewards.size() * (4 + 4 + 4 + 8 + 4 + 4));
-
-		data << uint32(time(NULL));
-
+        WorldPacket data(SMSG_GUILD_REWARDS_LIST, (3 + rewards.size() * (4 + 4 + 4 + 8 + 4 + 4)));
+        ByteBuffer dataBuffer;
         data.WriteBits(rewards.size(), 21);
-        
-
-		for (uint32 i = 0; i < rewards.size(); i++)
-        {
-			data.WriteBits(1, 24); // unk
-		}
-
-
-		data.FlushBits();
+        data.FlushBits();
 
         for (uint32 i = 0; i < rewards.size(); i++)
         {
-			data << uint32(1);
-			data << uint32(4000);
-
-			data << uint32(1000);
-			data << uint32(2000);
-			data << uint32(3000);
-
-			/*
-			data << uint32(rewards[i].AchievementId);
-
-            data << uint32(rewards[i].Standing);
-            data << int32(rewards[i].Racemask);
-            data << uint32(rewards[i].Entry);
-			*/
-
-            data << uint64(rewards[i].Price); 
+            data.WriteBits(0, 24);
+            dataBuffer << uint32(rewards[i].Standing);
+            dataBuffer << uint32(rewards[i].Entry);
+            dataBuffer << uint32(rewards[i].AchievementId);
+            dataBuffer << int32(rewards[i].Racemask);
+			dataBuffer << uint64(rewards[i].Price);
         }
-        
+        data.append(dataBuffer);
+        data << uint32(time(NULL));
         SendPacket(&data);
     }
 }

@@ -69,15 +69,14 @@ namespace Trinity
             {
                 uint64 target_guid = _source ? _source->GetGUID() : 0;
 
-                data << uint8(_msgtype);
+                data << uint8 (_msgtype);
                 data << uint32(LANG_UNIVERSAL);
                 data << uint64(target_guid);                // there 0 for BG messages
                 data << uint32(0);                          // can be chat msg group or something
-				data << uint32(strlen(text) + 1);
-				data << text;
                 data << uint64(0);
-				data << uint32(0);
-                data << uint8(0); // Test
+                data << uint32(strlen(text) + 1);
+                data << text;
+                data << uint16(_source ? _source->GetChatTag() : 0);
             }
 
             ChatMsg _msgtype;
@@ -108,9 +107,9 @@ namespace Trinity
                 data << uint64(target_guid);                // there 0 for BG messages
                 data << uint32(0);                          // can be chat msg group or something
                 data << uint64(0);
-                data << uint32(strlen(str) + 1);
-                data << str;
-                data << uint16(_source ? _source->GetChatTag() : uint8(0));
+                data << uint32(strlen(text) + 1);
+                data << text;
+                data << uint16(_source ? _source->GetChatTag() : 0);
             }
 
         private:

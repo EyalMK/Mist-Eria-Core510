@@ -20,23 +20,19 @@
 #ifndef DEF_SCARLET_MONASTERY_H
 #define DEF_SCARLET_MONASTERY_H
 
-uint32 const EncounterCount     = 5;
-
-#define SMScriptName "instance_scarlet_monastery"
+uint32 const EncounterCount     = 4;
 
 enum SMEncounter
 {
     DATA_BOSS_THALNOS_THE_SOULRENDER        = 0,
     DATA_BOSS_BROTHER_KORLOFF               = 1,
     DATA_BOSS_HIGH_INQUISITOR_WHITEMANE     = 2,
-    DATA_BOSS_COMMANDER_DURAND              = 3,
-    DATA_NPC_TRIGGER_CRANE                  = 4
+    DATA_BOSS_COMMANDER_DURAND              = 3
 };
 
 enum CreatureIds
 {
     NPC_THALNOS_THE_SOULRENDER          = 59789,
-    NPC_TRIGGER_CRANE                   = 200013,
     NPC_BROTHER_KORLOFF                 = 59223,
     NPC_HIGH_INQUISITOR_WHITEMANE		= 3977,
     NPC_COMMANDER_DURAND                = 60040

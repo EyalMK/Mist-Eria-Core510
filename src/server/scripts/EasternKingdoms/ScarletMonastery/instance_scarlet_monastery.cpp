@@ -18,7 +18,15 @@
 
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
+#include "ScriptedCreature.h"
 #include "scarlet_monastery.h"
+#include "Player.h"
+
+enum Spells
+{
+    SPELL_HEAL                  = 111024,
+    SPELL_MASS_RESURRECTION     = 113134
+};
 
 
 class instance_scarlet_monastery : public InstanceMapScript
@@ -28,10 +36,12 @@ class instance_scarlet_monastery : public InstanceMapScript
 
         struct instance_scarlet_monastery_InstanceMapScript : public InstanceScript
         {
-            instance_scarlet_monastery_InstanceMapScript(Map* map) : InstanceScript(map)
+            instance_scarlet_monastery_InstanceMapScript(Map* map) : InstanceScript(map){}
+
+            void Initialize()
             {
+                SetBossNumber(EncounterCount);
                 BossThalnosTheSoulrenderGUID        = 0;
-                NpcTriggerCraneGUID                 = 0;
                 BossBrotherKorloffGUID              = 0;
                 BossHighInquisitorWhitemaneGUID		= 0;
                 BossCommanderDurandGUID             = 0;
@@ -48,9 +58,6 @@ class instance_scarlet_monastery : public InstanceMapScript
                     case NPC_THALNOS_THE_SOULRENDER:
                         BossThalnosTheSoulrenderGUID = creature->GetGUID();
                         break;
-
-                    case NPC_TRIGGER_CRANE:
-                        NpcTriggerCraneGUID = creature->GetGUID();
 
                     case NPC_BROTHER_KORLOFF:
                         BossBrotherKorloffGUID = creature->GetGUID();
@@ -85,13 +92,17 @@ class instance_scarlet_monastery : public InstanceMapScript
                             HandleGameObject(0, true, go);
                         if (GetBossState(DATA_BOSS_COMMANDER_DURAND) == IN_PROGRESS)
                             HandleGameObject(0, false, go);
+                        if (GetBossState(DATA_BOSS_COMMANDER_DURAND) == NOT_STARTED && GetBossState(DATA_BOSS_BROTHER_KORLOFF) == DONE)
+                            HandleGameObject(0, true, go);
+                        if (GetBossState(DATA_BOSS_COMMANDER_DURAND) == DONE)
+                            HandleGameObject(0, true, go);
                         break;
 
                     case GO_WHITEMANE_GATE:
                         WhitemaneDoorGUID = go->GetGUID();
-                        if (GetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE) == IN_PROGRESS)
+                        if (GetBossState(DATA_BOSS_COMMANDER_DURAND) == SPECIAL)
                             HandleGameObject(0, true, go);
-                        if (GetBossState(DATA_BOSS_COMMANDER_DURAND) == NOT_STARTED)
+                        if (GetBossState(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE) == NOT_STARTED)
                             HandleGameObject(0, false, go);
                         break;
                 }
@@ -107,19 +118,24 @@ class instance_scarlet_monastery : public InstanceMapScript
                     case DATA_BOSS_THALNOS_THE_SOULRENDER:
                         if(state == DONE)
                             HandleGameObject(ThalnosDoorGUID, true);
+                        break;
                     case DATA_BOSS_BROTHER_KORLOFF:
                         if(state == DONE)
                             HandleGameObject(KorloffDoorGUID, true);
+                        break;
                     case DATA_BOSS_HIGH_INQUISITOR_WHITEMANE:
-                        if(state == IN_PROGRESS)
-                            HandleGameObject(WhitemaneDoorGUID, true);
-                    case DATA_BOSS_COMMANDER_DURAND:
                         if(state == NOT_STARTED)
                             HandleGameObject(WhitemaneDoorGUID, false);
+                        break;
+                    case DATA_BOSS_COMMANDER_DURAND:
+                        if(state == NOT_STARTED && GetBossState(DATA_BOSS_BROTHER_KORLOFF) == DONE)
+                            HandleGameObject(KorloffDoorGUID, true);
+                        if(state == SPECIAL)
+                            HandleGameObject(WhitemaneDoorGUID, true);
                         if(state == IN_PROGRESS)
                             HandleGameObject(KorloffDoorGUID, false);
-                        break;
-                    default:
+                        if(state == DONE)
+                            HandleGameObject(KorloffDoorGUID, true);
                         break;
                 }
                 return true;
@@ -131,29 +147,69 @@ class instance_scarlet_monastery : public InstanceMapScript
                 {
                     case DATA_BOSS_THALNOS_THE_SOULRENDER:
                         return BossThalnosTheSoulrenderGUID;
-
-                    case DATA_NPC_TRIGGER_CRANE:
-                        return NpcTriggerCraneGUID;
+                        break;
 
                     case DATA_BOSS_BROTHER_KORLOFF:
                         return BossBrotherKorloffGUID;
+                        break;
 
                     case DATA_BOSS_HIGH_INQUISITOR_WHITEMANE:
                         return BossHighInquisitorWhitemaneGUID;
+                        break;
 
                     case DATA_BOSS_COMMANDER_DURAND:
                         return BossCommanderDurandGUID;
-
-                    default:
                         break;
                 }
 
                 return 0;
             }
 
+            std::string GetSaveData()
+            {
+                OUT_SAVE_INST_DATA;
+
+                std::ostringstream saveStream;
+                saveStream << "S M " << GetBossSaveData();
+
+                OUT_SAVE_INST_DATA_COMPLETE;
+                return saveStream.str();
+            }
+
+            void Load(const char* strIn)
+            {
+                if (!strIn)
+                {
+                    OUT_LOAD_INST_DATA_FAIL;
+                    return;
+                }
+
+                OUT_LOAD_INST_DATA(strIn);
+
+                char dataHead1, dataHead2;
+
+                std::istringstream loadStream(strIn);
+                loadStream >> dataHead1 >> dataHead2;
+
+                if (dataHead1 == 'S' && dataHead2 == 'M')
+                {
+                    for (uint8 i = 0; i < EncounterCount; ++i)
+                    {
+                        uint32 tmpState;
+                        loadStream >> tmpState;
+                        if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                            tmpState = NOT_STARTED;
+                            SetBossState(i, EncounterState(tmpState));
+                    }
+                }
+                else
+                    OUT_LOAD_INST_DATA_FAIL;
+
+                OUT_LOAD_INST_DATA_COMPLETE;
+            }
+
             protected:
                 uint64 BossThalnosTheSoulrenderGUID;
-                uint64 NpcTriggerCraneGUID ;
                 uint64 BossBrotherKorloffGUID;
                 uint64 BossHighInquisitorWhitemaneGUID;
                 uint64 BossCommanderDurandGUID;
@@ -170,7 +226,101 @@ class instance_scarlet_monastery : public InstanceMapScript
         }
 };
 
+
+class npc_spirit_of_redemption : public CreatureScript
+{
+public:
+    npc_spirit_of_redemption() : CreatureScript("npc_spirit_of_redemption") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_spirit_of_redemptionAI(creature);
+    }
+
+    struct npc_spirit_of_redemptionAI : public ScriptedAI
+    {
+            npc_spirit_of_redemptionAI(Creature* creature) : ScriptedAI(creature) {}
+
+            uint32 m_uiCheckTimer;
+            uint32 m_uiDespawnTimer;
+
+            void Reset()
+            {
+                m_uiCheckTimer = 1000;
+                m_uiDespawnTimer = 20000;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if(m_uiCheckTimer <= diff)
+                {
+                    if(Unit* target = DoSelectLowestHpFriendly(30, 1000))
+                    {
+                        me->CastSpell(target, SPELL_HEAL);
+                        m_uiCheckTimer = 6000;
+                        return;
+                    }
+                    m_uiCheckTimer = 1000;
+                }
+                else m_uiCheckTimer -= diff;
+
+                if(m_uiDespawnTimer <= diff)
+                {
+                    me->DespawnOrUnsummon();
+                }
+                else m_uiDespawnTimer -= diff;
+            }
+    };
+};
+
+
+class npc_scarlet_judicator : public CreatureScript
+{
+public:
+    npc_scarlet_judicator() : CreatureScript("npc_scarlet_judicator") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_scarlet_judicatorAI(creature);
+    }
+
+    struct npc_scarlet_judicatorAI : public ScriptedAI
+    {
+            npc_scarlet_judicatorAI(Creature* creature) : ScriptedAI(creature) {}
+
+            void Reset()
+            {
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetStandState(UNIT_STAND_STATE_DEAD);
+            }
+
+            void SpellHit(Unit* /*who*/, const SpellInfo* spell)
+            {
+                if (spell->Id == SPELL_MASS_RESURRECTION)
+                {
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetReactState(REACT_AGGRESSIVE);
+
+                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.0f, true))
+                        if(target && target->GetTypeId() == TYPEID_PLAYER)
+                            me->GetMotionMaster()->MoveChase(target);
+                }
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                DoMeleeAttackIfReady();
+            }
+
+    };
+};
+
 void AddSC_instance_scarlet_monastery()
 {
-   new instance_scarlet_monastery();
+    new instance_scarlet_monastery();
+    new npc_spirit_of_redemption();
+    new npc_scarlet_judicator();
 }

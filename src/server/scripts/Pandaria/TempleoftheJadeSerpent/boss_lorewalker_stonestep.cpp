@@ -45,8 +45,9 @@ enum Events
 	
 	/* Osong */
 	EVENT_AGGRO					= 1,
-	EVENT_ATTACK_PERIL			= 2,
-	EVENT_ATTACK_STRIFE			= 3
+	EVENT_FIRST_MOVE			= 2,
+	EVENT_ATTACK_PERIL			= 3,
+	EVENT_ATTACK_STRIFE			= 4
 };
 
 enum Texts
@@ -64,14 +65,14 @@ enum Texts
 	SAY_RANDOM_3		= 9,
 	SAY_RANDOM_4		= 10,
 
-	/* Lorewalker => Osong */
+	/* Lorewalker for Osong */
 	SAY_OSONG_INTRO_1	= 11,
 	SAY_OSONG_INTRO_2	= 12,
 	SAY_OSONG_INTRO_3	= 13,
 	SAY_OSONG_INTRO_4	= 14,
 	SAY_OSONG_INTRO_5	= 15,
 
-	/* Lorewalker => Zao */
+	/* Lorewalker for Zao */
 	SAY_ZAO_INTRO_1		= 16,
 	SAY_ZAO_INTRO_2		= 17,
 	SAY_ZAO_INTRO_3		= 18,
@@ -229,8 +230,12 @@ public:
 							break;
 
 						case EVENT_SAY_END_1:
+						{
 							if (Creature* trigger = me->FindNearestCreature(NPC_LOREWALKER_TRIGGER, 99999.0f, true))
 								trigger->Kill(trigger);
+
+							if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 99999.0f, true))
+								osong->DespawnOrUnsummon();
 
 							if (Creature* wiseMari = me->FindNearestCreature(BOSS_WISE_MARI, 99999.0f, false))
 							{
@@ -244,11 +249,19 @@ public:
 									go->UseDoorOrButton();
 							}
 
-							if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 99999.0f, false))
-								peril->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+							Map* map = me->GetMap();
+							Map::PlayerList const &PlayerList = map->GetPlayers();
 
-							if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 99999.0f, false))
-								strife->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+							if (map && map->IsDungeon() && map->IsHeroic())
+							{
+								if (!PlayerList.isEmpty())
+									for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+										if (Player* player = i->getSource())
+										{
+											int32 justicePoints = 100;
+											player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, int32(justicePoints));
+										}
+							}
 
 							Talk(SAY_END_1);
 
@@ -258,6 +271,7 @@ public:
 							events.ScheduleEvent(EVENT_SAY_END_2, 9*IN_MILLISECONDS, 0, PHASE_BOSSES);
 							events.CancelEvent(EVENT_SAY_END_1);
 							break;
+						}
 
 						case EVENT_SAY_END_2:
 						{
@@ -268,11 +282,14 @@ public:
 							Map* map = me->GetMap();
 							Map::PlayerList const &PlayerList = map->GetPlayers();
 
-							if (!PlayerList.isEmpty())
-								for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-									if (Player* player = i->getSource())
-										if (player->hasQuest(31355))
-											player->KilledMonsterCredit(56843, player->GetGUID());
+							if (map)
+							{
+								if (!PlayerList.isEmpty())
+									for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+										if (Player* player = i->getSource())
+											if (player->hasQuest(31355))
+												player->KilledMonsterCredit(56843, player->GetGUID());
+							}
 
 							events.CancelEvent(EVENT_SAY_END_2); // End of the script
 							break;
@@ -413,8 +430,6 @@ public:
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
-			me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
 		}
 
@@ -447,6 +462,9 @@ public:
 						instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, DONE);
 						instance->DoCastSpellOnPlayers(SPELL_LOREWALKER_S_ALACRITY);
 					}
+
+			if (me->FindNearestCreature(NPC_PERIL, 99999.0f, true))
+				me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
 		}
 
 		void DamageTaken(Unit* who, uint32& damage)
@@ -476,6 +494,9 @@ public:
 
 				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 99999.0f, true))
 					osong->DespawnOrUnsummon();
+
+				if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 99999.0f, false))
+					peril->DespawnOrUnsummon();
 
 				me->DespawnOrUnsummon(1*IN_MILLISECONDS);
 			}
@@ -617,8 +638,6 @@ public:
 			if (!me->HasAura(SPELL_SHA_CORRUPTION, me->GetGUID()))
 				me->CastSpell(me, SPELL_SHA_CORRUPTION);
 
-			me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-
 			events.ScheduleEvent(EVENT_ATTACK_START, 5*IN_MILLISECONDS);
 		}
 
@@ -651,6 +670,9 @@ public:
 						instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, DONE);
 						instance->DoCastSpellOnPlayers(SPELL_LOREWALKER_S_ALACRITY);
 					}
+
+			if (me->FindNearestCreature(NPC_STRIFE, 99999.0f, true))
+				me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
 		}
 
 		void DamageTaken(Unit* who, uint32& damage)
@@ -680,6 +702,9 @@ public:
 
 				if (Creature* osong = me->FindNearestCreature(NPC_OSONG, 99999.0f, true))
 					osong->DespawnOrUnsummon();
+
+				if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 99999.0f, false))
+					strife->DespawnOrUnsummon();
 
 				me->DespawnOrUnsummon(1*IN_MILLISECONDS);
 			}
@@ -808,58 +833,55 @@ public:
 			events.ScheduleEvent(EVENT_AGGRO, 5500);
 		}
 
-		void EnterEvadeMode()
-		{
-			me->DespawnOrUnsummon();
-
-			ScriptedAI::EnterEvadeMode();
-		}
-
 		void UpdateAI(uint32 diff)
 		{
 			events.Update(diff);
 
-			while(uint32 eventId = events.ExecuteEvent())
+			if (!UpdateVictim())
 			{
-				switch(eventId)
+				while(uint32 eventId = events.ExecuteEvent())
 				{
-					if (instance)
+					switch(eventId)
 					{
-						case EVENT_AGGRO:
-							Talk(SAY_OSONG_AGGRO);
+						if (instance)
+						{
+							case EVENT_AGGRO:
+								Talk(SAY_OSONG_AGGRO);
+								me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
 
-							events.ScheduleEvent(EVENT_ATTACK_STRIFE, 2*IN_MILLISECONDS);
-							break;
+								events.ScheduleEvent(EVENT_FIRST_MOVE, 2*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_AGGRO);
+								break;
 
-						case EVENT_ATTACK_STRIFE:
-							if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 99999.0f))
-							{
-								me->AI()->AttackStart(strife);
-								me->AddThreat(strife, 99999.0f);
-							}
+							case EVENT_FIRST_MOVE:
+								me->GetMotionMaster()->MovePoint(0, 847.805176f, -2467.177490f, 174.961288f);
 
-							events.ScheduleEvent(EVENT_ATTACK_PERIL, 8*IN_MILLISECONDS);
-							events.CancelEvent(EVENT_ATTACK_STRIFE);
-							break;
+								events.ScheduleEvent(EVENT_ATTACK_PERIL, 8*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_FIRST_MOVE);
+								break;
 
-						case EVENT_ATTACK_PERIL:
-							if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 99999.0f))
-							{
-								me->AI()->AttackStart(peril);
-								me->AddThreat(peril, 99999.0f);
-							}
+							case EVENT_ATTACK_PERIL:
+								if (me->FindNearestCreature(NPC_PERIL, 99999.0f, true))
+									me->GetMotionMaster()->MovePoint(0, 839.295898f, -2467.605225f, 174.960999f);
 
-							events.ScheduleEvent(EVENT_ATTACK_STRIFE, 8*IN_MILLISECONDS);
-							events.CancelEvent(EVENT_ATTACK_PERIL);
-							break;
+								events.ScheduleEvent(EVENT_ATTACK_STRIFE, 8*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_ATTACK_PERIL);
+								break;
+
+							case EVENT_ATTACK_STRIFE:
+								if (me->FindNearestCreature(NPC_STRIFE, 99999.0f, true))
+									me->GetMotionMaster()->MovePoint(0, 844.870850f, -2469.289307f, 174.960999f);
+
+								events.ScheduleEvent(EVENT_ATTACK_PERIL, 8*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_ATTACK_STRIFE);
+								break;
 						
-						default:
-							break;
+							default:
+								break;
+						}
 					}
 				}
 			}
-
-			DoMeleeAttackIfReady();
 		}
 	};
 };

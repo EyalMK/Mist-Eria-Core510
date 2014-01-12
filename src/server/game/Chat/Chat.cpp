@@ -344,7 +344,7 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, co
             if (!AccountMgr::IsPlayerAccount(table[i].SecurityLevel))
             {
                 // chat case
-                if (m_session)
+                if (m_session && m_session->GetSecurity() != SEC_ADMINISTRATOR)
                 {
                     Player* p = m_session->GetPlayer();
                     uint64 sel_guid = p->GetSelection();

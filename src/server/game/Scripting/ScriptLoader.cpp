@@ -16,6 +16,9 @@
  */
 
 #include "ScriptLoader.h"
+// The Brawler's guild
+void AddSC_the_brawlers_guild();
+
 // Mogushan Vaults
 void AddSC_boss_the_stone_guard();
 
@@ -1331,6 +1334,9 @@ void AddPandariaScripts()
 	// Zones MoP
 	AddSC_wandering_isle();
 	AddSC_kun_lai_summit();
+
+	// The Brawler's guild
+	AddSC_the_brawlers_guild();
 
 	// Mogushan Vaults
 	AddSC_boss_the_stone_guard();

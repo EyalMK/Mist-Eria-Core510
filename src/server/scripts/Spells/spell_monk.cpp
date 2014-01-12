@@ -2633,46 +2633,156 @@ class spell_monk_touch_of_death : public SpellScriptLoader
                 return true;
             }
 
-			SpellCastResult CheckCast()
+            SpellCastResult CheckCast()
             {
-				if (GetHitUnit()->GetTypeId() == TYPEID_PLAYER)
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : CheckCast");
+                Unit* caster = GetCaster();
+                Unit* target = GetExplTargetUnit();
+
+                if(caster && target)
+                {
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : caster && target not null");
+                    switch(target->GetTypeId())
+                    {
+                    case TYPEID_PLAYER :
+                        {
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : expltarget is a player");
+                            uint32 total = target->GetMaxHealth();
+                            uint32 tenPercent = uint32(total / 100 * 10) ;
+							
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : values calculated ; total = %u, tenPercent = %u", total, tenPercent);
+                            if(target->GetHealth() <= tenPercent)
+							{
+								sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : target health < tenPercent ; health = %u, tenPercent = %u", target->GetHealth(), tenPercent);
+                                return SPELL_CAST_OK ;
+							}
+                            else
+							{
+								sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : target health > tenPercent ; health = %u, tenPercent = %u", target->GetHealth(), tenPercent);
+                                return SPELL_FAILED_ERROR ;
+							}
+
+                            break ;
+                        }
+
+                    case TYPEID_UNIT :
+                        {
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : expltarget is unit");
+                            uint32 targetLife = target->GetHealth() ;
+                            uint32 casterLife = caster->GetHealth() ;
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : lifes calculated : caster = %u, target = %u", casterLife, targetLife);
+                            if(targetLife <= casterLife)
+							{
+								sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : target life < caster life ; caster %u, target %u", casterLife, targetLife);
+                                return SPELL_CAST_OK ;
+							}
+                            else
+							{
+								sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : target life > caster life ; caster %u, target %u", casterLife, targetLife);
+                                return SPELL_FAILED_ERROR ;
+							}
+
+                            break ;
+                        }
+
+                    default :
+                        {
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : expltarget is not player nor unit");
+                            return SPELL_FAILED_BAD_TARGETS ;
+                        }
+                    }
+                }
+                else
 				{
-					if (GetHitUnit()->GetHealth() > GetHitUnit()->GetMaxHealth()*0.10f)
-						return SPELL_FAILED_ERROR;
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : caster or target is null");
+                    return SPELL_FAILED_ERROR ;
 				}
-
-				if (GetHitUnit()->GetTypeId() != TYPEID_PLAYER && GetCaster()->GetHealth() < GetHitUnit()->GetHealth())
-					return SPELL_FAILED_ERROR;
-
-				if (GetCaster() == GetHitUnit())
-					return SPELL_FAILED_NO_VALID_TARGETS;
-
-				return SPELL_CAST_OK;
             }
 
-            void HandleDummy(SpellEffIndex /*effIndex*/)
+            void HandleDamage(SpellEffIndex effectIndex)
             {
-				Unit* caster = GetCaster();
-				Unit* target = GetHitUnit();
-				uint32 damage = 0;
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : HandleDamage");
+                Unit* caster = GetCaster();
+                Unit* hit = GetHitUnit() ;
 
-				if (caster->GetTypeId() == TYPEID_PLAYER && target->GetHealth() <= target->GetMaxHealth()*0.10f)
-				{
-					damage = GetHitUnit()->GetHealth();
-					SetHitDamage(damage);
-				}
+                if(caster && hit)
+                {
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : caster && hit not null");
+                    if(hit->GetTypeId() == TYPEID_PLAYER)
+                    {
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : hit is player ; preventing effects");
+                        PreventHitDamage();
+                        PreventHitDefaultEffect(effectIndex);
+                        PreventHitEffect(effectIndex);
+                        return ;
+                    }
 
-				if (target->GetTypeId() != TYPEID_PLAYER && caster->GetHealth() >= target->GetHealth())
+                    uint32 casterLife = caster->GetHealth();
+                    uint32 hitLife = hit->GetHealth();
+					
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : lifes initialized ; caster = %u, hit = %u", casterLife, hitLife);
+                    if(hitLife <= casterLife)
+					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : hitLife < casterLife ; caster = %u, hit = %u", casterLife, hitLife);
+                        SetHitDamage(hit->GetHealth());
+					}
+                }
+                else
 				{
-					damage = GetHitUnit()->GetHealth();
-					SetHitDamage(damage);
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : caster or hit is null");
+                    return ;
 				}
-			}
+            }
+
+            void HandleDummy(SpellEffIndex effectIndex)
+            {
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : HandleDummy");
+                Unit* caster = GetCaster();
+                Unit* hit = GetHitUnit();
+
+                if(caster && hit)
+                {
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : caster && hit not null");
+                    if(hit->GetTypeId() != TYPEID_PLAYER)
+					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : hit is not a player ; returning");
+                        return ;
+					}
+
+                    Player* player = hit->ToPlayer();
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : hit casted to player");
+                    if(player)
+                    {
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : hit casted to player not null");
+                        uint32 total = player->GetMaxHealth() ;
+                        uint32 tenPercent = total / 100 * 10 ;
+                        uint32 health = hit->GetHealth() ;
+						
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : values initialized ; total = %u, tenPercent = %u, health = %u", total, tenPercent, health);
+                        if(health <= tenPercent)
+						{
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : Health < tenPercent ; setting damages ; health = %u, tenPercent = %u", health, tenPercent);
+                            SetHitDamage(hit->GetHealth());
+						}
+                    }
+                    else
+					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : hit casted to player is null");
+                        return ;
+					}
+                }
+                else
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Touch of Death : hit or caster is null");
+                    return ;
+				}
+            }
 
             void Register()
             {
-                OnEffectHit += SpellEffectFn(spell_monk_touch_of_death_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
-				OnCheckCast += SpellCheckCastFn(spell_monk_touch_of_death_SpellScript::CheckCast);
+                OnCheckCast += SpellCheckCastFn(spell_monk_touch_of_death_SpellScript::CheckCast);
+                OnEffectHitTarget += SpellEffectFn(spell_monk_touch_of_death_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+                OnEffectHitTarget += SpellEffectFn(spell_monk_touch_of_death_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
             }
         };
 

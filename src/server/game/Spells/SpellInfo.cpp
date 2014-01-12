@@ -1315,6 +1315,47 @@ bool SpellInfo::IsAutoRepeatRangedSpell() const
     return AttributesEx2 & SPELL_ATTR2_AUTOREPEAT_FLAG;
 }
 
+bool SpellInfo::IsCustomCharged(SpellInfo const* procSpell) const
+{
+    // Stealth aura and some custom rules ...
+    if (HasAura(SPELL_AURA_MOD_STEALTH))
+    {
+        if (procSpell)
+        {
+            if (procSpell->Id == 93435 ||   // Roar of Courage
+                procSpell->Id == 32182 ||   // Heroism
+                procSpell->Id == 2825 ||    // Bloodlust
+                procSpell->Id == 1725 ||    // Distract
+                procSpell->Id == 114198 ||  // Mocking Banner taunt
+                procSpell->Id == 130733)    // and Shadow Word: Insanity allowing Cast
+                return true;
+        }
+    }
+
+    switch (Id)
+    {
+        case 16246: // Clearcasting (Shaman)
+            if (procSpell && procSpell->Id == 8004)
+                return true;
+            break;
+        case 20066: // Repentence
+            if (procSpell && procSpell->Id == 31803)
+                return true;
+            break;
+        case 324:   // Lightning Shield
+        case 36032: // Arcane Charge
+        case 79683: // Arcane Missiles !
+        case 93400: // Shooting Stars
+        case 114637:// Bastion of Glory
+        case 119962:// Overpower !
+        case 121153:// Blindside
+        case 131116:// Raging Blow !
+            return true;
+    }
+
+    return false;
+}
+
 /*
 bool SpellInfo::IsCanBeStolen() const
 {
