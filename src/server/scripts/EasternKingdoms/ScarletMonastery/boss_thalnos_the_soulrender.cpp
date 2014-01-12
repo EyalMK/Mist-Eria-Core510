@@ -86,7 +86,7 @@ class at_crane_monastery : public AreaTriggerScript
         bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
         {
             if (InstanceScript* instance = player->GetInstanceScript())
-                if (Creature* crane = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_NPC_TRIGGER_CRANE)))
+                if (Creature* crane = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_BOSS_THALNOS_THE_SOULRENDER)))
                     crane->AI()->DoAction(ACTION_INTRO);
             return true;
         }
@@ -107,11 +107,13 @@ public:
         boss_thalnos_the_soulrenderAI(Creature* creature) : ScriptedAI(creature), Summons(me)
         {
             instance = creature->GetInstanceScript();
+            Intro = false;
         }
 
         InstanceScript* instance;
         SummonList Summons;
         EventMap events;
+        bool Intro;
 
         void Reset()
         {
