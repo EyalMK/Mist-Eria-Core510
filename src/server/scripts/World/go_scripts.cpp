@@ -964,7 +964,7 @@ public:
         }
 
         // I assume we do not need to check summoner
-        void GossipHello(Player *player)
+        bool GossipHello(Player *player)
         {
             sLog->outDebug(LOG_FILTER_NETWORKIO, "Soulwell : Entering OnGossipHello");
             if(!player->HasItemCount(ITEM_HEALTHSTONE))
