@@ -939,7 +939,7 @@ enum Soulwell
 class go_soulwell : public GameObjectScript
 {
 public:
-    go_soulwell() : GameObjectScript("go_soulweel")
+    go_soulwell() : GameObjectScript("go_soulwell")
     {
 
     }
