@@ -543,8 +543,9 @@ class spell_mass_resurrection : public SpellScriptLoader
             {
                 if (Creature* judicator = GetHitCreature())
                 {
-                    if(judicator->GetEntry() == NPC_JUDICATOR)
-                        judicator->SummonCreature(NPC_JUDICATOR_POP, judicator->GetPositionX(), judicator->GetPositionY(), judicator->GetPositionY(), 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
+                    if(Unit* whitemane = GetCaster())
+                        if(judicator->GetEntry() == NPC_JUDICATOR && whitemane->GetEntry() == NPC_HIGH_INQUISITOR_WHITEMANE)
+                            whitemane->SummonCreature(NPC_JUDICATOR_POP, judicator->GetPositionX(), judicator->GetPositionY(), judicator->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
                 }
             }
 
