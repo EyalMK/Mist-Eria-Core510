@@ -524,6 +524,8 @@ public:
 	void SetDifficulty(uint32 difficulty);
 	uint32 GetDifficulty() const {return m_difficulty; };
 
+	bool IsCustomCharged(SpellInfo const* procSpell) const;
+
     // loading helpers
     uint32 _GetExplicitTargetMask() const;
     bool _IsPositiveEffect(uint8 effIndex, bool deep) const;
