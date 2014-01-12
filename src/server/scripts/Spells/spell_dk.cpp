@@ -1441,6 +1441,54 @@ public :
     }
 };
 
+class spell_dk_conversion : public SpellScriptLoader
+{
+public :
+    spell_dk_conversion() : SpellScriptLoader("spell_dk_conversion")
+    {
+
+    }
+
+    class spell_dk_conversion_AuraScript : public AuraScript
+    {
+    private :
+        PrepareAuraScript(spell_dk_conversion_AuraScript);
+
+        bool Validate(const SpellInfo *spellInfo)
+        {
+            return true ;
+        }
+
+        bool Load()
+        {
+            return true ;
+        }
+
+        void HandlePeriodicTick(AuraEffect const* auraEff)
+        {
+            WorldObject* owner = GetOwner();
+            if(owner)
+            {
+                Player* player = GetOwner()->ToPlayer();
+                if(player)
+                {
+                    player->ModifyPower(POWER_RUNIC_POWER, -5);
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_dk_conversion_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dk_conversion_AuraScript();
+    }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_anti_magic_shell_raid();
@@ -1473,4 +1521,5 @@ void AddSC_deathknight_spell_scripts()
 	new spell_dk_death_and_decay();
 	new spell_dk_remorseless_winter();
 	new spell_dk_raise_dead();
+	new spell_dk_conversion();
 }
