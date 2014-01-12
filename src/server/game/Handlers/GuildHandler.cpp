@@ -266,13 +266,13 @@ void WorldSession::HandleGuildSetNoteOpcode(WorldPacket& recvPacket)
     ObjectGuid playerGuid;
 
     playerGuid[1] = recvPacket.ReadBit();
-	uint32 noteLength = recvPacket.ReadBits(8);
-    playerGuid[2] = recvPacket.ReadBit();
+	playerGuid[2] = recvPacket.ReadBit();
     playerGuid[4] = recvPacket.ReadBit();
     playerGuid[0] = recvPacket.ReadBit();
     playerGuid[3] = recvPacket.ReadBit();
     playerGuid[5] = recvPacket.ReadBit();
     playerGuid[7] = recvPacket.ReadBit(); 
+	uint32 noteLength = recvPacket.ReadBits(8);
     playerGuid[6] = recvPacket.ReadBit();
 	bool ispublic = recvPacket.ReadBit();      // 0 == Officer, 1 == Public
 

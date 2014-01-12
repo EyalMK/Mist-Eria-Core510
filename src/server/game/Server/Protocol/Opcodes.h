@@ -277,6 +277,7 @@ enum Opcodes
     CMSG_GUILD_QUERY_NEWS                             = 0x0B47,//16357
     CMSG_GUILD_QUERY_RANKS                            = 0x08A6,//16357
     CMSG_GUILD_REMOVE                                 = 0x1231,
+	CMSG_GUILD_RENAME								  = 0x0BEA,//16357
     CMSG_GUILD_REPLACE_GUILD_MASTER                   = 0x1232,
     CMSG_GUILD_REQUEST_CHALLENGE_UPDATE               = 0x1233,
     CMSG_GUILD_REQUEST_MAX_DAILY_XP                   = 0x05EF,//16357
