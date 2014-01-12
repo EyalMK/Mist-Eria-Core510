@@ -20,6 +20,7 @@
 #include "ScriptedCreature.h"
 #include "scarlet_monastery.h"
 #include "SpellScript.h"
+#include "Player.h"
 
 /* Nikel sauf spall canaliser */
 
@@ -32,7 +33,9 @@ enum Spells
 
     /* Autres */
     SPELL_SCORCHED_EARTH_POP    = 114463,
-    SPELL_SCORCHED_EARTH_AURA   = 114464
+    SPELL_SCORCHED_EARTH_AURA   = 114464,
+    SPELL_BURNING_MAN           = 125852,
+    SPELL_BURNING_MAN_2         = 125844
 };
 
 enum Events
@@ -123,6 +126,22 @@ public:
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_BROTHER_KORLOFF, DONE);
+
+            if(Map* map = me->GetMap())
+            {
+                Map::PlayerList const & playerList = map->GetPlayers();
+                if(!playerList.isEmpty())
+                {
+                    for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
+                    {
+                        if(Player* p = iter->getSource())
+                        {
+                            p->RemoveAurasDueToSpell(SPELL_BURNING_MAN);
+                            p->RemoveAurasDueToSpell(SPELL_BURNING_MAN_2);
+                        }
+                    }
+                }
+            }
         }
 
         void JustSummoned(Creature* Summoned)
@@ -180,11 +199,12 @@ public:
                         case EVENT_JUMP_FIRESTORM:
                             if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST))
                             {
-                                me->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 20, 20, EVENT_JUMP);
+                                me->GetMotionMaster()->MoveJump(target->GetPositionX()+3, target->GetPositionY()+3, target->GetPositionZ(), 20, 20, EVENT_JUMP);
                             }
                             break;
 
                         case EVENT_FIRESTORM_KICK:
+                            me->StopMoving();
                             DoCastAOE(SPELL_FIRESTORM_KICK);
 
                             events.ScheduleEvent(EVENT_JUMP_FIRESTORM, 28*IN_MILLISECONDS);
@@ -197,6 +217,7 @@ public:
                             break;
 
                         case EVENT_BLAZING_FISTS:
+                            me->StopMoving();
                             DoCastAOE(SPELL_BLAZING_FISTS);
 
                             events.ScheduleEvent(EVENT_BLAZING_FISTS, 30*IN_MILLISECONDS);

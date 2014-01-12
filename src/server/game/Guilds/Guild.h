@@ -402,6 +402,8 @@ private:
 
         inline Player* FindPlayer() const { return ObjectAccessor::FindPlayer(m_guid); }
 
+		uint32 GetRemainingWeeklyReputation() const { return 0; }
+
     private:
         uint32 m_guildId;
         // Fields from characters table

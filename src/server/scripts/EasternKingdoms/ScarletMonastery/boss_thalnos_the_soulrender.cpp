@@ -22,8 +22,6 @@
 #include "SpellScript.h"
 #include "Player.h"
 
-/* Nikel sauf spall canaliser */
-
 enum Spells
 {
     /* Thalnos */
@@ -61,7 +59,8 @@ enum Texts
     SAY_KILL                        = 2,
     SAY_RAISE_FALLEN_CRUSADER       = 3,
     SAY_EVICT_SOUL                  = 4,
-    SAY_SUMMON_EMPOWERING_SPIRITS   = 5
+    SAY_SUMMON_EMPOWERING_SPIRITS   = 5,
+    SAY_INTRO_THALNOS               = 6
 };
 
 enum Creatures
@@ -72,6 +71,25 @@ enum Creatures
     NPC_EMPOWERED_ZOMBIE        = 59930,
     NPC_THALNOS                 = 59789,
     NPC_TRAQUEUR_INVISIBLE      = 200011
+};
+
+enum Actions
+{
+    ACTION_INTRO    = 1
+};
+
+class at_crane_monastery : public AreaTriggerScript
+{
+    public:
+        at_crane_monastery () : AreaTriggerScript("at_crane_monastery ") { }
+
+        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        {
+            if (InstanceScript* instance = player->GetInstanceScript())
+                if (Creature* crane = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_BOSS_THALNOS_THE_SOULRENDER)))
+                    crane->AI()->DoAction(ACTION_INTRO);
+            return true;
+        }
 };
 
 class boss_thalnos_the_soulrender : public CreatureScript
@@ -89,11 +107,13 @@ public:
         boss_thalnos_the_soulrenderAI(Creature* creature) : ScriptedAI(creature), Summons(me)
         {
             instance = creature->GetInstanceScript();
+            Intro = false;
         }
 
         InstanceScript* instance;
         SummonList Summons;
         EventMap events;
+        bool Intro;
 
         void Reset()
         {
@@ -110,9 +130,23 @@ public:
         {
             std::list<Creature*> creatures;
 
-            GetCreatureListWithEntryInGrid(creatures, me, NPC_EVICTED_SOUL, 200.0f);
+            GetCreatureListWithEntryInGrid(creatures, me, NPC_EVICTED_SOUL, 400.0f);
             for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
                 (*itr)->DespawnOrUnsummon();
+        }
+
+        void DoAction(int32 action)
+        {
+            switch (action)
+            {
+                case ACTION_INTRO:
+                    if (!Intro)
+                    {
+                        Talk(SAY_INTRO_THALNOS);
+                        Intro = true;
+                    }
+                    break;
+            }
         }
 
 
@@ -207,7 +241,8 @@ public:
                 {
                     if (instance)
                     {
-                        case EVENT_RAISE_FALLEN_CRUSADER:                           
+                        case EVENT_RAISE_FALLEN_CRUSADER:
+                            me->StopMoving();
                             Talk(SAY_RAISE_FALLEN_CRUSADER);
                             DoCast(SPELL_RAISE_FALLEN_CRUSADER);
                             events.ScheduleEvent(EVENT_RAISE_FALLEN_CRUSADER, 60*IN_MILLISECONDS);
@@ -231,6 +266,7 @@ public:
                             break;
 
                         case EVENT_SUMMON_EMPOWERING_SPIRITS:
+                            me->StopMoving();
                             events.CancelEvent(EVENT_SPIRIT_GALE);
                             Talk(SAY_SUMMON_EMPOWERING_SPIRITS);
                             DoCast(SPELL_SUMMON_EMPOWERING_SPIRITS);
@@ -552,6 +588,7 @@ class spell_evict_soul : public SpellScriptLoader
 
 void AddSC_boss_thalnos_the_soulrender()
 {
+    new at_crane_monastery();
     new boss_thalnos_the_soulrender();
     new npc_fallen_crusader();
     new npc_evicted_soul();

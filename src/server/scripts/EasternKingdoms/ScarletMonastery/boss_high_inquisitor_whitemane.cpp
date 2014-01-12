@@ -20,6 +20,7 @@
 #include "ScriptedCreature.h"
 #include "scarlet_monastery.h"
 #include "SpellScript.h"
+#include "Player.h"
 
 
 /* High = Correction Rez masse + stop cast sinon nikel */
@@ -29,7 +30,7 @@ enum Spells
 {
     /* Commander Durand */
     SPELL_FLASH_OF_STEEL            = 115629,
-    SPELL_DASHING_STRIKE            = 115676,
+    SPELL_DASHING_STRIKE            = 115739,
     SPELL_FURIOUS_RESOLVE           = 115876,
 
     /* Inquisitor Whitemane */
@@ -48,14 +49,13 @@ enum Events
     EVENT_FLASH_OF_STEEL_TEST       = 2,
     EVENT_DASHING_STRIKE            = 3,
     EVENT_FURIOUS_RESOLVE           = 4,
-    EVENT_FEIGN_DEATH               = 5,
 
     /* Inquisitor Whitemane */
-    EVENT_POWER_WORD_SHIELD         = 6,
-    EVENT_HOLY_SMITE                = 7,
-    EVENT_MASS_RESURRECTION         = 8,
-    EVENT_DEEP_SLEEP                = 9,
-    EVENT_SCARLET_RESURRECTION      = 10
+    EVENT_POWER_WORD_SHIELD         = 5,
+    EVENT_HOLY_SMITE                = 6,
+    EVENT_MASS_RESURRECTION         = 7,
+    EVENT_DEEP_SLEEP                = 8,
+    EVENT_SCARLET_RESURRECTION      = 9
 };
 
 
@@ -77,6 +77,7 @@ enum Texts_Whitemane
     SAY_KILL_WHITEMANE              = 2,
     SAY_RESSURECTION_WHITEMANE      = 3
 };
+
 
 enum Actions
 {
@@ -118,6 +119,7 @@ public:
 
         bool CheckDurand;
         bool Intro;
+        bool FakeDeath;
         uint32 FlashSteel;
         InstanceScript* instance;
         SummonList Summons;
@@ -128,6 +130,7 @@ public:
             events.Reset();
             Summons.DespawnAll();
             CheckDurand = true;
+            FakeDeath = false;
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
 
@@ -207,13 +210,33 @@ public:
             if (damage >= me->GetHealth() && CheckDurand)
             {
                 damage = 0;
-                events.ScheduleEvent(EVENT_FEIGN_DEATH, 1*IN_MILLISECONDS);
+
+                events.CancelEvent(EVENT_DASHING_STRIKE);
+                events.CancelEvent(EVENT_FLASH_OF_STEEL);
+                events.CancelEvent(EVENT_FLASH_OF_STEEL_TEST);
+
+                Talk(SAY_DEATH_DURAND);
+
+                me->InterruptNonMeleeSpells(false);
+                me->SetHealth(0);
+                me->StopMoving();
+                me->ClearComboPointHolders();
+                me->RemoveAllAurasOnDeath();
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->ClearAllReactives();
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveIdle();
+                me->SetStandState(UNIT_STAND_STATE_DEAD);
+
+                if (instance)
+                    instance->SetBossState(DATA_BOSS_COMMANDER_DURAND, SPECIAL);
 
                 if (Unit* Whitemane = Unit::GetUnit(*me, instance->GetData64(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE)))
                 {
                     Whitemane->GetMotionMaster()->MovePoint(1, 747.77f, 602.39f, 16.00f);
                 }
                 CheckDurand = false;
+                FakeDeath = true;
             }
         }
 
@@ -222,6 +245,7 @@ public:
             if (spell->Id == SPELL_SCARLET_RESURRECTION)
             {
                 events.ScheduleEvent(EVENT_FURIOUS_RESOLVE, 1*IN_MILLISECONDS);
+                FakeDeath = false;
             }
         }
 
@@ -235,6 +259,8 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
+            if (FakeDeath)
+                return;
 
             while(uint32 eventId = events.ExecuteEvent())
             {
@@ -264,34 +290,20 @@ public:
                         case EVENT_DASHING_STRIKE:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             {
-                                me->GetMotionMaster()->MoveCharge(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 10.0f);
-                                me->CastSpell(me, SPELL_DASHING_STRIKE, true);
+                                me->CastSpell(target, SPELL_DASHING_STRIKE);
                             }
-
                             events.ScheduleEvent(EVENT_DASHING_STRIKE, 25*IN_MILLISECONDS);
                             break;
 
-                        case EVENT_FEIGN_DEATH:
-                            events.CancelEvent(EVENT_DASHING_STRIKE);
-                            events.CancelEvent(EVENT_FLASH_OF_STEEL_TEST);
-                            Talk(SAY_DEATH_DURAND);
-
-                            me->RemoveAllAuras();
-                            me->ClearAllReactives();
-
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                            me->SetReactState(REACT_PASSIVE);
-                            me->SetStandState(UNIT_STAND_STATE_DEAD);
-
-                            if (instance)
-                                instance->SetBossState(DATA_BOSS_COMMANDER_DURAND, SPECIAL);
-                            break;
 
                         case EVENT_FURIOUS_RESOLVE:
                             DoCast(SPELL_FURIOUS_RESOLVE);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+
+                            if (me->getVictim())
+                                me->GetMotionMaster()->MoveChase(me->getVictim());
+
                             me->SetStandState(UNIT_STAND_STATE_STAND);
                             me->SetReactState(REACT_AGGRESSIVE);
 

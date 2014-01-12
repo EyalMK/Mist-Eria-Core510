@@ -929,107 +929,59 @@ public:
 ## go_soulwell
 ######*/
 
-enum SoulWellData
+enum Soulwell
 {
-    GO_SOUL_WELL_R1                     = 181621,
-    GO_SOUL_WELL_R2                     = 193169,
-
-    SPELL_IMPROVED_HEALTH_STONE_R1      = 18692,
-    SPELL_IMPROVED_HEALTH_STONE_R2      = 18693,
-
-    SPELL_CREATE_MASTER_HEALTH_STONE_R0 = 34130,
-    SPELL_CREATE_MASTER_HEALTH_STONE_R1 = 34149,
-    SPELL_CREATE_MASTER_HEALTH_STONE_R2 = 34150,
-
-    SPELL_CREATE_FEL_HEALTH_STONE_R0    = 58890,
-    SPELL_CREATE_FEL_HEALTH_STONE_R1    = 58896,
-    SPELL_CREATE_FEL_HEALTH_STONE_R2    = 58898,
+    SPELL_GLYPH_OF_SOULWELL     = 58094, // Apply Aura 403 with MiscValue 29893 ; maybe it is the new displayId of the gob ?
+    SPELL_CREATE_HEALTHSTONE    = 23517, // Creates the item
+    ITEM_HEALTHSTONE            = 5512 // The item
 };
 
 class go_soulwell : public GameObjectScript
 {
-    public:
-        go_soulwell() : GameObjectScript("go_soulwell") {}
+public:
+    go_soulwell() : GameObjectScript("go_soulwell")
+    {
 
-        struct go_soulwellAI : public GameObjectAI
+    }
+
+    class go_soulwell_AI : public GameObjectAI
+    {
+    public :
+        go_soulwell_AI(GameObject* gameObject) : GameObjectAI(gameObject)
         {
-            go_soulwellAI(GameObject* go) : GameObjectAI(go)
-            {
-                _stoneSpell = 0;
-                _stoneId = 0;
-                switch (go->GetEntry())
-                {
-                    case GO_SOUL_WELL_R1:
-                        _stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R0;
-                        if (Unit* owner = go->GetOwner())
-                        {
-                            if (owner->HasAura(SPELL_IMPROVED_HEALTH_STONE_R1))
-                                _stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R1;
-                            else if (owner->HasAura(SPELL_CREATE_MASTER_HEALTH_STONE_R2))
-                                _stoneSpell = SPELL_CREATE_MASTER_HEALTH_STONE_R2;
-                        }
-                        break;
-                    case GO_SOUL_WELL_R2:
-                        _stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R0;
-                        if (Unit* owner = go->GetOwner())
-                        {
-                            if (owner->HasAura(SPELL_IMPROVED_HEALTH_STONE_R1))
-                                _stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R1;
-                            else if (owner->HasAura(SPELL_CREATE_MASTER_HEALTH_STONE_R2))
-                                _stoneSpell = SPELL_CREATE_FEL_HEALTH_STONE_R2;
-                        }
-                        break;
-                }
-                if (_stoneSpell == 0) // Should never happen
-                    return;
 
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(_stoneSpell);
-                if (!spellInfo)
-                    return;
-
-                _stoneId = spellInfo->Effects[EFFECT_0].ItemType;
-            }
-
-            /// Due to the fact that this GameObject triggers CMSG_GAMEOBJECT_USE
-            /// _and_ CMSG_GAMEOBJECT_REPORT_USE, this GossipHello hook is called
-            /// twice. The script's handling is fine as it won't remove two charges
-            /// on the well. We have to find how to segregate REPORT_USE and USE.
-            bool GossipHello(Player* player)
-            {
-                Unit* owner = go->GetOwner();
-                if (_stoneSpell == 0 || _stoneId == 0)
-                    return true;
-
-                if (!owner || owner->GetTypeId() != TYPEID_PLAYER || !player->IsInSameRaidWith(owner->ToPlayer()))
-                    return true;
-
-                // Don't try to add a stone if we already have one.
-                if (player->HasItemCount(_stoneId))
-                {
-                    if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_stoneSpell))
-                        Spell::SendCastResult(player, spell, 0, SPELL_FAILED_TOO_MANY_OF_ITEM);
-                    return true;
-                }
-
-                owner->CastSpell(player, _stoneSpell, true);
-                // Item has to actually be created to remove a charge on the well.
-                if (player->HasItemCount(_stoneId))
-                    go->AddUse();
-
-                return false;
-            }
-
-        private:
-            uint32 _stoneSpell;
-            uint32 _stoneId;
-        };
-
-        GameObjectAI* GetAI(GameObject* go) const
-        {
-            return new go_soulwellAI(go);
         }
-};
 
+        void Reset()
+        {
+            if(Unit* summoner = go->GetOwner())
+            {
+                if(summoner->HasAura(SPELL_GLYPH_OF_SOULWELL))
+                {
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Caster of soulwell has the glyph");
+                }
+            }
+        }
+
+        // I assume we do not need to check summoner
+        bool GossipHello(Player *player)
+        {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "Soulwell : Entering OnGossipHello");
+            if(!player->HasItemCount(ITEM_HEALTHSTONE))
+            {
+                go->CastSpell(player, SPELL_CREATE_HEALTHSTONE);
+                return true ;
+            }
+
+            return false ;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject *gameObject) const
+    {
+        return new go_soulwell_AI(gameObject);
+    }
+};
 /*######
 ## Quest 11255: Prisoners of Wyrmskull
 ## go_dragonflayer_cage
