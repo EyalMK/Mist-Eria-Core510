@@ -1751,7 +1751,7 @@ public:
 				switch(eventId)
 				{
 					case EVENT_HEROIC_LEAP:
-                        if(TempSummon* tmpSsum = me->ToTempSummon())
+                        if(TempSummon* tmpSum = me->ToTempSummon())
                             if(Unit* summoner = tmpSum->GetSummoner())
                                 if (Player* player = summoner->ToPlayer())
                                     player->CastSpell(player, SPELL_WARRIOR_HEROIC_LEAP_DAMAGE, true);
