@@ -3080,6 +3080,9 @@ void SpellMgr::LoadSpellCustomAttr()
                     spellInfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;
                     spellInfo->Mechanic = 0;
                     break;
+				case 7384: // Overpower
+                    spellInfo->AttributesEx |= SPELL_ATTR1_ENABLE_AT_DODGE;
+                    break;
 				default:
 					break;
 			}

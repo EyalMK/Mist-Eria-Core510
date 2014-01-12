@@ -9617,6 +9617,22 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                                crit_chance += aurEff->GetAmount();
                            break;
                        }
+					   switch (spellProto->Id)
+                        {
+                            case 7384:  // Overpower ...
+                                // ... has a 60% increased chance to be a critical strike.
+                                crit_chance += 60.0f;
+                                break;
+                            case 23881: // Bloodthirst ...
+                                // ... has double critical chance
+                                crit_chance *= 2;
+                                break;
+                            case 118000:// Dragon Roar ...
+                                // ... is always a critical hit
+                                return 100.0f;
+                            default:
+                                break;
+                        }
                     break;
                 }
             }
@@ -13307,6 +13323,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                 {
                     ToPlayer()->AddComboPoints(target, 1);
                     StartReactiveTimer(REACTIVE_OVERPOWER);
+                    CastSpell(this, 119962, true);
                 }
             }
         }
@@ -13606,6 +13623,10 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
 
         // Remove charge (aura can be removed by triggers)
         if (prepare && useCharges && takeCharges)
+            i->aura->DropCharge();
+
+		if (prepare && useCharges && takeCharges && ((i->aura->GetId() == 119962 && procSpell && procSpell->Id == 7384)
+            || (i->aura->GetId() == 131116 && procSpell && procSpell->Id == 96103)))                                    
             i->aura->DropCharge();
 
         i->aura->CallScriptAfterProcHandlers(aurApp, eventInfo);
