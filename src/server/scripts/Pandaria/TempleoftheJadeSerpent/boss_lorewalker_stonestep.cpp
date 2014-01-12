@@ -253,7 +253,7 @@ public:
 								if (!PlayerList.isEmpty())
 									for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 										if (Player* player = i->getSource())
-											player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, 100);
+											player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, int32(100));
 							}
 
 							Talk(SAY_END_1);
