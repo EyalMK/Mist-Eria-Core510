@@ -45,49 +45,10 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
     if (!sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))
     {
         GmTicket* ticket = new GmTicket(GetPlayer(), recvData);
-
-        uint32 count;
-        std::list<uint32> times;
-        uint32 decompressedSize;
-        std::string chatLog;
-
-        recvData >> count;
-
-        for (uint32 i = 0; i < count; i++)
-        {
-            uint32 time;
-            recvData >> time;
-            times.push_back(time);
-        }
-
-        recvData >> decompressedSize;
-
-        if (count && decompressedSize && decompressedSize < 0xFFFF)
-        {
-            uint32 pos = recvData.rpos();
-            ByteBuffer dest;
-            dest.resize(decompressedSize);
-
-            uLongf realSize = decompressedSize;
-            if (uncompress(dest.contents(), &realSize, recvData.contents() + pos, recvData.size() - pos) == Z_OK)
-            {
-                dest >> chatLog;
-                ticket->SetChatLog(times, chatLog);
-            }
-            else
-            {
-                sLog->outError(LOG_FILTER_NETWORKIO, "CMSG_GMTICKET_CREATE possibly corrupt. Uncompression failed.");
-                recvData.rfinish();
-                return;
-            }
-
-            recvData.rfinish(); // Will still have compressed data in buffer.
-        }
-
         sTicketMgr->AddTicket(ticket);
         sTicketMgr->UpdateLastChange();
 
-        sWorld->SendGMText(LANG_COMMAND_TICKETNEW, GetPlayer()->GetName().c_str(), ticket->GetId());
+        sWorld->SendGMText(LANG_COMMAND_TICKETNEW, GetPlayer()->GetName(), ticket->GetId());
 
         response = GMTICKET_RESPONSE_CREATE_SUCCESS;
     }
@@ -109,7 +70,7 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket& recvData)
         ticket->SetMessage(message);
         ticket->SaveToDB(trans);
 
-        sWorld->SendGMText(LANG_COMMAND_TICKETUPDATED, GetPlayer()->GetName().c_str(), ticket->GetId());
+        sWorld->SendGMText(LANG_COMMAND_TICKETUPDATED, GetPlayer()->GetName(), ticket->GetId());
 
         response = GMTICKET_RESPONSE_UPDATE_SUCCESS;
     }
@@ -127,7 +88,7 @@ void WorldSession::HandleGMTicketDeleteOpcode(WorldPacket & /*recvData*/)
         data << uint32(GMTICKET_RESPONSE_TICKET_DELETED);
         SendPacket(&data);
 
-        sWorld->SendGMText(LANG_COMMAND_TICKETPLAYERABANDON, GetPlayer()->GetName().c_str(), ticket->GetId());
+        sWorld->SendGMText(LANG_COMMAND_TICKETPLAYERABANDON, GetPlayer()->GetName(), ticket->GetId());
 
         sTicketMgr->CloseTicket(ticket->GetId(), GetPlayer()->GetGUID());
         sTicketMgr->SendTicket(this, NULL);

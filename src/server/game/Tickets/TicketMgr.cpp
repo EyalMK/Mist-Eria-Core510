@@ -34,14 +34,14 @@ inline float GetAge(uint64 t) { return float(time(NULL) - t) / DAY; }
 // GM ticket
 GmTicket::GmTicket() { }
 
-GmTicket::GmTicket(Player* player, WorldPacket& recvData) : _createTime(time(NULL)), _lastModifiedTime(time(NULL)), _closedBy(0), _assignedTo(0), _completed(false), _escalatedStatus(TICKET_UNASSIGNED), _haveTicket(false)
+GmTicket::GmTicket(Player* player, WorldPacket& recvData) : _createTime(time(NULL)), _lastModifiedTime(time(NULL)), _closedBy(0), _assignedTo(0), _completed(false), _escalatedStatus(TICKET_UNASSIGNED)
 {
     _id = sTicketMgr->GenerateTicketId();
     _playerName = player->GetName();
     _playerGuid = player->GetGUID();
 
     uint32 mapId;
-    recvData >> mapId;                      // Map is sent as UInt32!
+    recvData >> mapId; // Map is sent as UInt32!
     _mapId = mapId;
 
     recvData >> _posX;
@@ -50,8 +50,21 @@ GmTicket::GmTicket(Player* player, WorldPacket& recvData) : _createTime(time(NUL
     recvData >> _message;
     uint32 needResponse;
     recvData >> needResponse;
-    _needResponse = (needResponse == 17);   // Requires GM response. 17 = true, 1 = false (17 is default)
-    recvData >> _haveTicket;                // Requests further GM interaction on a ticket to which a GM has already responded. Basically means "has a new ticket"
+    _needResponse = (needResponse == 17); // Requires GM response. 17 = true, 1 = false (17 is default)
+    uint8 unk1;
+    recvData >> unk1; // Requests further GM interaction on a ticket to which a GM has already responded
+
+    recvData.rfinish();
+    /*
+    recvData >> count; // text lines
+    for (int i = 0; i < count; i++)
+        recvData >> uint32();
+
+    if (something)
+        recvData >> uint32();
+    else
+        compressed uint32 + string;
+    */
 }
 
 GmTicket::~GmTicket() { }
@@ -119,61 +132,25 @@ void GmTicket::DeleteFromDB()
 
 void GmTicket::WritePacket(WorldPacket& data) const
 {
-
-	std::string str1 = "Hello";
-	std::string str2 = "World";
-
-	data << uint32(GMTICKET_STATUS_HASTEXT);
-	data.WriteBit(_haveTicket);
-
-	if(_haveTicket)
-	{
-		data.WriteBits(str1.size(), 12);
-		data.WriteBits(str2.size(), 11);
-	}
-
-	data.FlushBits();
-
-	if(_haveTicket)
-	{
-		data << uint8(1);
-		data << uint32(1);
-		data << uint32(1);
-		data << uint32(1);
-		data << uint32(1);
-
-		data << uint8(std::min(_escalatedStatus, TICKET_IN_ESCALATION_QUEUE));                              // escalated data
-		data << uint8(_viewed ? GMTICKET_OPENEDBYGM_STATUS_OPENED : GMTICKET_OPENEDBYGM_STATUS_NOT_OPENED); // whether or not it has been viewed
-
-		data << uint32(1);
-
-		data << str2;
-		data << str1;
-	}
-
-
-	/*
-    data << uint32(GMTICKET_STATUS_HASTEXT);
-    data << uint32(_id);
-    data << _message;
-    data << uint8(_haveTicket);
-    data << GetAge(_lastModifiedTime);
+    data << uint32(GetAge(_lastModifiedTime));
+    
     if (GmTicket* ticket = sTicketMgr->GetOldestOpenTicket())
-        data << GetAge(ticket->GetLastModifiedTime());
+        data << uint32(GetAge(ticket->GetLastModifiedTime()));
     else
-        data << float(0);
-
+        data << uint32(float(0));
+       
     // I am not sure how blizzlike this is, and we don't really have a way to find out
-    data << GetAge(sTicketMgr->GetLastChange());
+    data << uint32(GetAge(sTicketMgr->GetLastChange()));
+    data << uint32(GetId());
+
+    data.WriteString(GetMessage());
+    data << uint8(0);
+    data.WriteString(GetMessage());
 
     data << uint8(std::min(_escalatedStatus, TICKET_IN_ESCALATION_QUEUE));                              // escalated data
     data << uint8(_viewed ? GMTICKET_OPENEDBYGM_STATUS_OPENED : GMTICKET_OPENEDBYGM_STATUS_NOT_OPENED); // whether or not it has been viewed
 
-    // TODO: implement these
-    std::string waitTimeOverrideMessage = "";
-    data << waitTimeOverrideMessage;
-    data << uint32(0); // waitTimeOverrideMinutes
-	*/
+    data << uint32(GetId());
 }
 
 void GmTicket::SendResponse(WorldSession* session) const
@@ -208,8 +185,10 @@ std::string GmTicket::FormatMessageString(ChatHandler& handler, bool detailed) c
     time_t curTime = time(NULL);
 
     std::stringstream ss;
+    std::string nameLink = handler.playerLink(_playerName);
+
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTGUID, _id);
-    ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTNAME, _playerName.c_str());
+    ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTNAME, nameLink.c_str());
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTAGECREATE, (secsToTimeString(curTime - _createTime, true, false)).c_str());
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTAGE, (secsToTimeString(curTime - _lastModifiedTime, true, false)).c_str());
 
@@ -222,8 +201,6 @@ std::string GmTicket::FormatMessageString(ChatHandler& handler, bool detailed) c
         ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTMESSAGE, _message.c_str());
         if (!_comment.empty())
             ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTCOMMENT, _comment.c_str());
-        if (!_response.empty())
-            ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTRESPONSE, _response.c_str());
     }
     return ss.str();
 }
@@ -419,12 +396,30 @@ void TicketMgr::ShowEscalatedList(ChatHandler& handler) const
 
 void TicketMgr::SendTicket(WorldSession* session, GmTicket* ticket) const
 {
-    WorldPacket data(SMSG_GMTICKET_GETTICKET, (ticket ? (4 + 4 + 1 + 4 + 4 + 4 + 1 + 1) : 4));
+    uint32 status = GMTICKET_STATUS_DEFAULT;
+    std::string message;
+    if (ticket)
+    {
+        message = ticket->GetMessage();
+        status = GMTICKET_STATUS_HASTEXT;
+    }
+
+    WorldPacket data(SMSG_GMTICKET_GETTICKET, (4 + (ticket ? 4 + message.length() + 1 + 4 + 4 + 4 + 1 + 1 : 0)));
+    data.WriteBit(status == GMTICKET_STATUS_HASTEXT);                         // standard 0x0A, 0x06 if text present
 
     if (ticket)
-        ticket->WritePacket(data);
-    else
-        data << uint32(GMTICKET_STATUS_DEFAULT);
+    {
+        data.WriteBits(message.size(), 11);
+        data.WriteBits(message.size(), 7);
+        //data << uint32(ticket->GetId());            // ticketID
+        //data << message.c_str();                    // ticket text
+        //data << uint8(0x7);                         // ticket category; why is this hardcoded? does it make a diff re: client?
 
+        // we've got the easy stuff done by now.
+        // Now we need to go through the client logic for displaying various levels of ticket load
+        ticket->WritePacket(data);
+    }
+    data << uint32(status);
     session->SendPacket(&data);
 }
+
