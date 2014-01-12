@@ -2730,7 +2730,7 @@ class spell_monk_touch_of_death : public SpellScriptLoader
 
             void Register()
             {
-                OnCheckCast += SpellCheckCastFn(spell_monk_touch_of_death_SpellScript::CheckCast());
+                OnCheckCast += SpellCheckCastFn(spell_monk_touch_of_death_SpellScript::CheckCast);
                 OnEffectHitTarget += SpellEffectFn(spell_monk_touch_of_death_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
                 OnEffectHitTarget += SpellEffectFn(spell_monk_touch_of_death_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
             }
