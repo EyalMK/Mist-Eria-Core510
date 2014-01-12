@@ -20,14 +20,15 @@
 #ifndef DEF_SCARLET_MONASTERY_H
 #define DEF_SCARLET_MONASTERY_H
 
-uint32 const EncounterCount     = 4;
+uint32 const EncounterCount     = 5;
 
 enum SMEncounter
 {
     DATA_BOSS_THALNOS_THE_SOULRENDER        = 0,
     DATA_BOSS_BROTHER_KORLOFF               = 1,
     DATA_BOSS_HIGH_INQUISITOR_WHITEMANE     = 2,
-    DATA_BOSS_COMMANDER_DURAND              = 3
+    DATA_BOSS_COMMANDER_DURAND              = 3,
+    DATA_NPC_TRAQUEUR_INTRO                 = 4
 };
 
 enum CreatureIds
@@ -35,7 +36,8 @@ enum CreatureIds
     NPC_THALNOS_THE_SOULRENDER          = 59789,
     NPC_BROTHER_KORLOFF                 = 59223,
     NPC_HIGH_INQUISITOR_WHITEMANE		= 3977,
-    NPC_COMMANDER_DURAND                = 60040
+    NPC_COMMANDER_DURAND                = 60040,
+    NPC_TRAQUEUR_INTRO                  = 200013
 };
 
 enum GameObjects

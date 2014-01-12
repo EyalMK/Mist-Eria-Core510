@@ -22,8 +22,6 @@
 #include "SpellScript.h"
 #include "Player.h"
 
-/* Nikel sauf spall canaliser */
-
 enum Spells
 {
     SPELL_FIRESTORM_KICK        = 113764,

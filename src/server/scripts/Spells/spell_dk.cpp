@@ -1423,8 +1423,8 @@ public :
                 SpellInfo const* spellInfo = GetSpellInfo();
                 if(player && spellInfo)
                 {
-                    sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Raise Dead: Summoning");
-                    player->CastSpell(player, spellInfo->Effects[player->GetActiveSpec() == TALENT_TREE_DEATH_KNIGHT_UNHOLY ? 1 : 0].BasePoints, true);
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Raise Dead: Summoning ; player spec %u", uint32(player->GetActiveSpec()));
+                    player->CastSpell(player, spellInfo->Effects[(player->GetPrimaryTalentTree(player->GetActiveSpec()) == TALENT_TREE_DEATH_KNIGHT_UNHOLY) ? 1 : 0].BasePoints, true);
                 }
             }
         }
@@ -1438,6 +1438,55 @@ public :
     SpellScript* GetSpellScript() const
     {
         return new spell_dk_raise_dead_SpellScript();
+    }
+};
+
+class spell_dk_conversion : public SpellScriptLoader
+{
+public :
+    spell_dk_conversion() : SpellScriptLoader("spell_dk_conversion")
+    {
+
+    }
+
+    class spell_dk_conversion_AuraScript : public AuraScript
+    {
+    private :
+        PrepareAuraScript(spell_dk_conversion_AuraScript);
+
+        bool Validate(const SpellInfo *spellInfo)
+        {
+            return true ;
+        }
+
+        bool Load()
+        {
+            return true ;
+        }
+
+        void HandlePeriodicTick(AuraEffect const* auraEff)
+        {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Conversion: Entering OnEffectPeriodic Handler");
+            Unit* caster = auraEff->GetCaster();
+            if(caster && auraEff->GetBase())
+            {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Conversion (Periodic Handler): found a caster (guid %u, name %s), with runic power amount of %u", caster->GetGUID(), caster->GetName().c_str(), uint32(caster->GetPower(POWER_RUNIC_POWER)));
+                if(caster->GetPower(POWER_RUNIC_POWER) >= 10)
+                    caster->ModifyPower(POWER_RUNIC_POWER, -10);
+                else
+                    auraEff->GetBase()->Remove();
+            }
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_dk_conversion_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dk_conversion_AuraScript();
     }
 };
 
@@ -1473,4 +1522,5 @@ void AddSC_deathknight_spell_scripts()
 	new spell_dk_death_and_decay();
 	new spell_dk_remorseless_winter();
 	new spell_dk_raise_dead();
+	new spell_dk_conversion();
 }
