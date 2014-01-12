@@ -302,7 +302,7 @@ class at_crane_monastery : public AreaTriggerScript
         bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
         {
             if (InstanceScript* instance = player->GetInstanceScript())
-                if (Creature* crane = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_BOSS_THALNOS_THE_SOULRENDER)))
+                if (Creature* crane = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_NPC_TRAQUEUR_INTRO)))
                     crane->AI()->DoAction(ACTION_INTRO);
             return true;
         }
