@@ -244,11 +244,16 @@ public:
 									go->UseDoorOrButton();
 							}
 
-							if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 99999.0f, false))
-								peril->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+							Map* map = me->GetMap();
+							Map::PlayerList const &PlayerList = map->GetPlayers();
 
-							if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 99999.0f, false))
-								strife->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+							if (map && map->IsDungeon() && map->IsHeroic())
+							{
+								if (!PlayerList.isEmpty())
+									for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+										if (Player* player = i->getSource())
+											player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, 100);
+							}
 
 							Talk(SAY_END_1);
 
@@ -268,11 +273,14 @@ public:
 							Map* map = me->GetMap();
 							Map::PlayerList const &PlayerList = map->GetPlayers();
 
-							if (!PlayerList.isEmpty())
-								for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-									if (Player* player = i->getSource())
-										if (player->hasQuest(31355))
-											player->KilledMonsterCredit(56843, player->GetGUID());
+							if (map)
+							{
+								if (!PlayerList.isEmpty())
+									for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+										if (Player* player = i->getSource())
+											if (player->hasQuest(31355))
+												player->KilledMonsterCredit(56843, player->GetGUID());
+							}
 
 							events.CancelEvent(EVENT_SAY_END_2); // End of the script
 							break;
@@ -808,13 +816,6 @@ public:
 			events.Reset();
 
 			events.ScheduleEvent(EVENT_AGGRO, 5500);
-		}
-
-		void EnterEvadeMode()
-		{
-			me->DespawnOrUnsummon();
-
-			ScriptedAI::EnterEvadeMode();
 		}
 
 		void UpdateAI(uint32 diff)
