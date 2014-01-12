@@ -1391,6 +1391,56 @@ class spell_dk_remorseless_winter : public SpellScriptLoader
         }
 };
 
+class spell_dk_raise_dead : public SpellScriptLoader
+{
+public :
+    spell_dk_raise_dead() : SpellScriptLoader("spell_dk_raise_dead")
+    {
+        
+    }
+    
+    class spell_dk_raise_dead_SpellScript : public SpellScript
+    {
+    private :
+        PrepareSpellScript(spell_dk_raise_dead_SpellScript);
+        
+        bool Validate(const SpellInfo *spellInfo)
+        {
+            return true ;
+        }
+        
+        bool Load()
+        {
+            return true ;
+        }
+        
+        void HandleOnCast()
+        {
+            Unit* caster = GetCaster();
+            if(caster)
+            {
+                Player* player = caster->ToPlayer();
+                SpellInfo const* spellInfo = GetSpellInfo();
+                if(player && spellInfo)
+                {
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Raise Dead: Summoning");
+                    player->CastSpell(player, spellInfo->Effects[player->GetActiveSpec() == TALENT_TREE_DEATH_KNIGHT_UNHOLY ? 1 : 0].BasePoints, true);
+                }
+            }
+        }
+        
+        void Register()
+        {
+            OnCast += SpellCastFn(spell_dk_raise_dead_SpellScript::HandleOnCast);
+        }
+    };
+    
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dk_raise_dead_SpellScript();
+    }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_anti_magic_shell_raid();
@@ -1422,4 +1472,5 @@ void AddSC_deathknight_spell_scripts()
 	new spell_dk_soul_reaper_damage();
 	new spell_dk_death_and_decay();
 	new spell_dk_remorseless_winter();
+	new spell_dk_raise_dead();
 }

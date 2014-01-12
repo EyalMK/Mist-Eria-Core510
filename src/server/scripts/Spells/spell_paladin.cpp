@@ -75,20 +75,22 @@ enum PaladinSpells
 	SPELL_EXORCISM								 = 879,
 	SPELL_HAMMER_OF_WRATH						 = 24275,
 
-	PALADIN_SPELL_EXECUTION_SENTENCE             = 114916,
-    PALADIN_SPELL_STAY_OF_EXECUTION              = 114917,
+	SPELL_PALADIN_EXECUTION_SENTENCE             = 114916,
+    SPELL_PALADIN_STAY_OF_EXECUTION              = 114917,
 
-	PALADIN_SPELL_HOLY_PRISM_ALLIES              = 114871,
-    PALADIN_SPELL_HOLY_PRISM_ENNEMIES            = 114852,
-    PALADIN_SPELL_HOLY_PRISM_DAMAGE_VISUAL       = 114862,
-    PALADIN_SPELL_HOLY_PRISM_DAMAGE_VISUAL_2     = 114870,
-    PALADIN_SPELL_HOLY_PRISM_HEAL_VISUAL         = 121551,
-    PALADIN_SPELL_HOLY_PRISM_HEAL_VISUAL_2       = 121552,
+	SPELL_PALADIN_HOLY_PRISM_ALLIES              = 114871,
+    SPELL_PALADIN_HOLY_PRISM_ENNEMIES            = 114852,
+    SPELL_PALADIN_HOLY_PRISM_DAMAGE_VISUAL       = 114862,
+    SPELL_PALADIN_HOLY_PRISM_DAMAGE_VISUAL_2     = 114870,
+    SPELL_PALADIN_HOLY_PRISM_HEAL_VISUAL         = 121551,
+    SPELL_PALADIN_HOLY_PRISM_HEAL_VISUAL_2       = 121552,
 
-	PALADIN_SPELL_TOWER_OF_RADIANCE_ENERGIZE     = 88852,
-    PALADIN_SPELL_BEACON_OF_LIGHT                = 53563,
-    PALADIN_SPELL_SELFLESS_HEALER_STACK          = 114250,
-	PALADIN_SPELL_TOWER_OF_RADIANCE              = 85512
+	SPELL_PALADIN_TOWER_OF_RADIANCE_ENERGIZE     = 88852,
+    SPELL_PALADIN_BEACON_OF_LIGHT                = 53563,
+    SPELL_PALADIN_SELFLESS_HEALER_STACK          = 114250,
+	SPELL_PALADIN_TOWER_OF_RADIANCE              = 85512,
+
+	SPELL_PALADIN_ANCIENT_POWER                  = 86700,
 };
 
 //24275 -- SPELL_HAMMER_OF_WRATH
@@ -1255,11 +1257,11 @@ class spell_pal_execution_sentence : public SpellScriptLoader
                     if (Unit* target = GetHitUnit())
                     {
                         if (_player->IsValidAttackTarget(target))
-                            _player->CastSpell(target, PALADIN_SPELL_EXECUTION_SENTENCE, true);
+                            _player->CastSpell(target, SPELL_PALADIN_EXECUTION_SENTENCE, true);
                         else if (_player->GetGUID() == target->GetGUID())
-                            _player->CastSpell(_player, PALADIN_SPELL_STAY_OF_EXECUTION, true);
+                            _player->CastSpell(_player, SPELL_PALADIN_STAY_OF_EXECUTION, true);
                         else
-                            _player->CastSpell(target, PALADIN_SPELL_STAY_OF_EXECUTION, true);
+                            _player->CastSpell(target, SPELL_PALADIN_STAY_OF_EXECUTION, true);
                     }
                 }
             }
@@ -1295,13 +1297,13 @@ class spell_pal_holy_prism_visual : public SpellScriptLoader
                     {
                         if (_player->IsValidAttackTarget(target))
                         {
-                            _player->CastSpell(target, PALADIN_SPELL_HOLY_PRISM_DAMAGE_VISUAL_2, true);
-                            _player->CastSpell(target, PALADIN_SPELL_HOLY_PRISM_DAMAGE_VISUAL_2, true);
+                            _player->CastSpell(target, SPELL_PALADIN_HOLY_PRISM_DAMAGE_VISUAL_2, true);
+                            _player->CastSpell(target, SPELL_PALADIN_HOLY_PRISM_DAMAGE_VISUAL_2, true);
                         }
                         else
                         {
-                            _player->CastSpell(target, PALADIN_SPELL_HOLY_PRISM_HEAL_VISUAL_2, true);
-                            _player->CastSpell(target, PALADIN_SPELL_HOLY_PRISM_HEAL_VISUAL_2, true);
+                            _player->CastSpell(target, SPELL_PALADIN_HOLY_PRISM_HEAL_VISUAL_2, true);
+                            _player->CastSpell(target, SPELL_PALADIN_HOLY_PRISM_HEAL_VISUAL_2, true);
                         }
                     }
                 }
@@ -1338,10 +1340,10 @@ class spell_pal_holy_prism_effect : public SpellScriptLoader
                     {
                         // damage
                         if (GetSpellInfo()->Id == 114862)
-                            _player->CastSpell(target, PALADIN_SPELL_HOLY_PRISM_ENNEMIES, true);
+                            _player->CastSpell(target, SPELL_PALADIN_HOLY_PRISM_ENNEMIES, true);
                         // heal
                         else if (GetSpellInfo()->Id == 121551)
-                            _player->CastSpell(target, PALADIN_SPELL_HOLY_PRISM_ALLIES, true);
+                            _player->CastSpell(target, SPELL_PALADIN_HOLY_PRISM_ALLIES, true);
                     }
                 }
             }
@@ -1376,13 +1378,13 @@ class spell_pal_holy_prism : public SpellScriptLoader
                     {
                         if (_player->IsValidAttackTarget(target))
                         {
-                            _player->CastSpell(target, PALADIN_SPELL_HOLY_PRISM_DAMAGE_VISUAL, true);
-                            _player->CastSpell(target, PALADIN_SPELL_HOLY_PRISM_DAMAGE_VISUAL_2, true);
+                            _player->CastSpell(target, SPELL_PALADIN_HOLY_PRISM_DAMAGE_VISUAL, true);
+                            _player->CastSpell(target, SPELL_PALADIN_HOLY_PRISM_DAMAGE_VISUAL_2, true);
                         }
                         else
                         {
-                            _player->CastSpell(target, PALADIN_SPELL_HOLY_PRISM_HEAL_VISUAL, true);
-                            _player->CastSpell(target, PALADIN_SPELL_HOLY_PRISM_HEAL_VISUAL_2, true);
+                            _player->CastSpell(target, SPELL_PALADIN_HOLY_PRISM_HEAL_VISUAL, true);
+                            _player->CastSpell(target, SPELL_PALADIN_HOLY_PRISM_HEAL_VISUAL_2, true);
                         }
                     }
                 }
@@ -1417,9 +1419,9 @@ class spell_pal_selfless_healer : public SpellScriptLoader
                 {
                     if (Unit* target = GetHitUnit())
                     {
-                        if (_player->HasAura(PALADIN_SPELL_SELFLESS_HEALER_STACK))
+                        if (_player->HasAura(SPELL_PALADIN_SELFLESS_HEALER_STACK))
                         {
-                            int32 charges = _player->GetAura(PALADIN_SPELL_SELFLESS_HEALER_STACK)->GetStackAmount();
+                            int32 charges = _player->GetAura(SPELL_PALADIN_SELFLESS_HEALER_STACK)->GetStackAmount();
 
                             if (_player->IsValidAssistTarget(target) && target != _player)
                                 SetHitHeal(int32(GetHitHeal() + ((GetHitHeal() * 0.35f) * charges)));
@@ -1455,9 +1457,9 @@ class spell_pal_tower_of_radiance : public SpellScriptLoader
             {
                 if (Player* _player = GetCaster()->ToPlayer())
                     if (Unit* target = GetHitUnit())
-                        if (_player->HasAura(PALADIN_SPELL_TOWER_OF_RADIANCE))
-                            if (target->HasAura(PALADIN_SPELL_BEACON_OF_LIGHT, _player->GetGUID()))
-                                _player->EnergizeBySpell(_player, PALADIN_SPELL_TOWER_OF_RADIANCE_ENERGIZE, 1, POWER_HOLY_POWER);
+                        if (_player->HasAura(SPELL_PALADIN_TOWER_OF_RADIANCE))
+                            if (target->HasAura(SPELL_PALADIN_BEACON_OF_LIGHT, _player->GetGUID()))
+                                _player->EnergizeBySpell(_player, SPELL_PALADIN_TOWER_OF_RADIANCE_ENERGIZE, 1, POWER_HOLY_POWER);
             }
 
             void Register()
@@ -1470,6 +1472,55 @@ class spell_pal_tower_of_radiance : public SpellScriptLoader
         {
             return new spell_pal_tower_of_radiance_SpellScript();
         }
+};
+
+class npc_pal_guardian_of_ancient_kings : public CreatureScript
+{
+public:
+    npc_pal_guardian_of_ancient_kings() : CreatureScript("npc_pal_guardian_of_ancient_kings") { }
+
+    struct npc_pal_guardian_of_ancient_kingsAI : public ScriptedAI
+    {
+        npc_pal_guardian_of_ancient_kingsAI(Creature* creature) : ScriptedAI(creature)
+        {	}
+
+		//EventMap events;
+
+        void Reset()
+		{
+			//events.Reset();
+		}
+
+		void DamageDealt(Unit* /*target*/, uint32& damage, DamageEffectType damageType)
+        {
+			if (damage > 0 && me->GetEntry() == 46506) // Retribution
+				if(TempSummon* tmpSum = me->ToTempSummon())
+					if(Unit* summoner = tmpSum->GetSummoner())
+						if (Player* player = summoner->ToPlayer())
+						    player->CastSpell(player, SPELL_PALADIN_ANCIENT_POWER, true);
+        }
+
+        void UpdateAI(uint32 diff)
+		{
+			/*events.Update(diff);
+
+			while(uint32 eventId = events.ExecuteEvent())
+			{
+				switch(eventId)
+				{
+					default:
+						break;
+				}
+			}*/
+
+			DoMeleeAttackIfReady();
+		}
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_pal_guardian_of_ancient_kingsAI(creature);
+    }
 };
 
 void AddSC_paladin_spell_scripts()
@@ -1503,4 +1554,5 @@ void AddSC_paladin_spell_scripts()
 	new spell_pal_holy_prism_effect();
 	new spell_pal_selfless_healer();
 	new spell_pal_tower_of_radiance();
+	new npc_pal_guardian_of_ancient_kings();
 }
