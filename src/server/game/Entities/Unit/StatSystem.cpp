@@ -214,8 +214,33 @@ void Player::UpdateArmor()
 
 float Player::GetHealthBonusFromStamina()
 {
-    // Taken from PaperDollFrame.lua - 4.3.4.15595
-    float ratio = 10.0f;
+	float ratio = 0.0f;
+
+	// Taken from gtOCTHpPerStamina.dbc
+	if (getLevel() < 80)
+		ratio = 10.0f;
+
+	switch (getLevel())
+	{
+		case 80:
+			ratio = 10.8f;
+			break;
+		case 81:
+			ratio = 11.6f;
+			break;
+		case 82:
+			ratio = 12.4f;
+			break;
+		case 83:
+			ratio = 13.2f;
+			break;
+		default:
+			break;
+	}
+
+	if (getLevel() > 83)
+		ratio = 14;
+
     if (gtOCTHpPerStaminaEntry const* hpBase = sGtOCTHpPerStaminaStore.LookupEntry((getClass() - 1) * GT_MAX_LEVEL + getLevel() - 1))
         ratio = hpBase->ratio;
 
