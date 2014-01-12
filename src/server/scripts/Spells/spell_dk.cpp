@@ -1466,14 +1466,15 @@ public :
 
         void HandlePeriodicTick(AuraEffect const* auraEff)
         {
-            WorldObject* owner = GetOwner();
-            if(owner)
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Conversion: Entering OnEffectPeriodic Handler");
+            Unit* caster = auraEff->GetCaster();
+            if(caster && auraEff->GetBase())
             {
-                Player* player = GetOwner()->ToPlayer();
-                if(player)
-                {
-                    player->ModifyPower(POWER_RUNIC_POWER, -5);
-                }
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Conversion (Periodic Handler): found a caster (guid %u, name %s), with runic power amount of %u", caster->GetGUID(), caster->GetName().c_str(), uint32(caster->GetPower(POWER_RUNIC_POWER)));
+                if(caster->GetPower(POWER_RUNIC_POWER) >= 10)
+                    caster->ModifyPower(POWER_RUNIC_POWER, -10);
+                else
+                    auraEff->GetBase()->Remove();
             }
         }
 
