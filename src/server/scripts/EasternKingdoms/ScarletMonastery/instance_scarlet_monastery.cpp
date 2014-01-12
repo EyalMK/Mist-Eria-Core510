@@ -383,13 +383,14 @@ public:
             {
                 if(m_uiCheckTimer <= diff)
                 {
-                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
+                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.0f, true))
                         if(target && target->GetTypeId() == TYPEID_PLAYER)
                             me->AI()->AttackStart(target);
                 }
                 else
                     m_uiCheckTimer -= diff;
 
+                DoMeleeAttackIfReady();
             }
 
     };

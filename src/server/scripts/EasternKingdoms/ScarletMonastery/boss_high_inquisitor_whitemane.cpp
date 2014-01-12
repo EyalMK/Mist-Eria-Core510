@@ -20,6 +20,7 @@
 #include "ScriptedCreature.h"
 #include "scarlet_monastery.h"
 #include "SpellScript.h"
+#include "Player.h"
 
 
 /* High = Correction Rez masse + stop cast sinon nikel */
@@ -29,7 +30,7 @@ enum Spells
 {
     /* Commander Durand */
     SPELL_FLASH_OF_STEEL            = 115629,
-    SPELL_DASHING_STRIKE            = 115676,
+    SPELL_DASHING_STRIKE            = 115739,
     SPELL_FURIOUS_RESOLVE           = 115876,
 
     /* Inquisitor Whitemane */
@@ -48,14 +49,13 @@ enum Events
     EVENT_FLASH_OF_STEEL_TEST       = 2,
     EVENT_DASHING_STRIKE            = 3,
     EVENT_FURIOUS_RESOLVE           = 4,
-    EVENT_FEIGN_DEATH               = 5,
 
     /* Inquisitor Whitemane */
-    EVENT_POWER_WORD_SHIELD         = 6,
-    EVENT_HOLY_SMITE                = 7,
-    EVENT_MASS_RESURRECTION         = 8,
-    EVENT_DEEP_SLEEP                = 9,
-    EVENT_SCARLET_RESURRECTION      = 10
+    EVENT_POWER_WORD_SHIELD         = 5,
+    EVENT_HOLY_SMITE                = 6,
+    EVENT_MASS_RESURRECTION         = 7,
+    EVENT_DEEP_SLEEP                = 8,
+    EVENT_SCARLET_RESURRECTION      = 9
 };
 
 
@@ -77,6 +77,7 @@ enum Texts_Whitemane
     SAY_KILL_WHITEMANE              = 2,
     SAY_RESSURECTION_WHITEMANE      = 3
 };
+
 
 enum Actions
 {
@@ -207,7 +208,19 @@ public:
             if (damage >= me->GetHealth() && CheckDurand)
             {
                 damage = 0;
-                events.ScheduleEvent(EVENT_FEIGN_DEATH, 1*IN_MILLISECONDS);
+                me->InterruptNonMeleeSpells(false);
+                me->SetHealth(0);
+                me->StopMoving();
+                me->ClearComboPointHolders();
+                me->RemoveAllAurasOnDeath();
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->ClearAllReactives();
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveIdle();
+                me->SetStandState(UNIT_STAND_STATE_DEAD);
+
+                if (instance)
+                    instance->SetBossState(DATA_BOSS_COMMANDER_DURAND, SPECIAL);
 
                 if (Unit* Whitemane = Unit::GetUnit(*me, instance->GetData64(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE)))
                 {
@@ -265,28 +278,25 @@ public:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             {
                                 me->GetMotionMaster()->MoveCharge(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 10.0f);
-                                me->CastSpell(me, SPELL_DASHING_STRIKE, true);
+                                if(Map* map = me->GetMap())
+                                {
+                                    Map::PlayerList const & playerList = map->GetPlayers();
+                                    if(!playerList.isEmpty())
+                                    {
+                                        for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
+                                        {
+                                            if(Player* p = iter->getSource())
+                                            {
+                                                if(p->FindNearestCreature(NPC_COMMANDER_DURAND, 2.0f, true))
+                                                    p->CastSpell(p, SPELL_DASHING_STRIKE, true);
+                                            }
+                                        }
+                                    }
+                                }
                             }
-
                             events.ScheduleEvent(EVENT_DASHING_STRIKE, 25*IN_MILLISECONDS);
                             break;
 
-                        case EVENT_FEIGN_DEATH:
-                            events.CancelEvent(EVENT_DASHING_STRIKE);
-                            events.CancelEvent(EVENT_FLASH_OF_STEEL_TEST);
-                            Talk(SAY_DEATH_DURAND);
-
-                            me->RemoveAllAuras();
-                            me->ClearAllReactives();
-
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                            me->SetReactState(REACT_PASSIVE);
-                            me->SetStandState(UNIT_STAND_STATE_DEAD);
-
-                            if (instance)
-                                instance->SetBossState(DATA_BOSS_COMMANDER_DURAND, SPECIAL);
-                            break;
 
                         case EVENT_FURIOUS_RESOLVE:
                             DoCast(SPELL_FURIOUS_RESOLVE);
