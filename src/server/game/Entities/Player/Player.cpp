@@ -20744,6 +20744,14 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
         if (GetGroup())
             SetGroupUpdateFlag(GROUP_UPDATE_PET);
     }
+
+	// Spirit Bond
+    if (HasSpell(109212) && HasAura(118694))
+        RemoveAura(118694);
+
+    // Kindred Spirits
+    if (HasAura(56315))
+        pet->RemoveAura(56315);
 }
 
 void Player::StopCastingCharm()

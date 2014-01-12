@@ -1452,7 +1452,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
 
 		memberData.WriteString(member->GetName());
 
-		memberData << float(player ? 0.0f : float(::time(NULL) - member->GetLogoutTime()) / DAY);
+		memberData << float(member->IsOnline() ? 0.0f : float(::time(NULL) - member->GetLogoutTime()) / DAY);
 		memberData << uint8(flags);
 
 		memberData.WriteByteSeq(guid[5]);
