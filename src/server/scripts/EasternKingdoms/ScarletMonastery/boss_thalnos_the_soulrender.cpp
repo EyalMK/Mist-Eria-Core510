@@ -81,7 +81,7 @@ enum Actions
 class at_crane_monastery : public AreaTriggerScript
 {
     public:
-        at_crane_monastery () : AreaTriggerScript("at_crane_monastery ") { }
+        at_crane_monastery () : AreaTriggerScript("at_crane_monastery") { }
 
         bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
         {

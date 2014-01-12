@@ -79,6 +79,13 @@ enum Texts_Whitemane
 };
 
 
+enum Creatures
+{
+    NPC_JUDICATOR           = 58643,
+    NPC_JUDICATOR_POP       = 58605
+};
+
+
 enum Actions
 {
     ACTION_INTRO    = 1
@@ -406,6 +413,15 @@ public:
                     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
         }
 
+        void JustSummoned(Creature* Summoned)
+        {
+            Summons.Summon(Summoned);
+
+            if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
+                if(target && target->GetTypeId() == TYPEID_PLAYER)
+                    Summoned->AI()->AttackStart(target);
+        }
+
         void DamageTaken(Unit* /*doneBy*/, uint32 &damage)
         {
             if (damage < me->GetHealth())
@@ -514,9 +530,40 @@ public:
 
 };
 
+class spell_mass_resurrection : public SpellScriptLoader
+{
+    public:
+        spell_mass_resurrection() : SpellScriptLoader("spell_mass_resurrection") { }
+
+        class spell_mass_resurrection_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_mass_resurrection_SpellScript);
+
+            void SummonJudicator(SpellEffIndex /*effIndex*/)
+            {
+                if (Creature* judicator = GetHitCreature())
+                {
+                    if(judicator->GetEntry() == NPC_JUDICATOR)
+                        judicator->SummonCreature(NPC_JUDICATOR_POP, judicator->GetPositionX(), judicator->GetPositionY(), judicator->GetPositionY(), 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_mass_resurrection_SpellScript::SummonJudicator, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_mass_resurrection_SpellScript();
+        }
+};
+
 void AddSC_boss_high_inquisitor_whitemane()
 {
     new boss_commander_durand();
     new boss_high_inquisitor_whitemane();
     new at_commander_durand_intro();
+    new spell_mass_resurrection();
 }

@@ -294,27 +294,6 @@ public:
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
             }
-
-            void SpellHit(Unit* /*who*/, const SpellInfo* spell)
-            {
-                if (spell->Id == SPELL_MASS_RESURRECTION)
-                {
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->SetReactState(REACT_AGGRESSIVE);
-
-                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.0f, true))
-                        if(target && target->GetTypeId() == TYPEID_PLAYER)
-                            me->GetMotionMaster()->MoveChase(target);
-                }
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                DoMeleeAttackIfReady();
-            }
-
     };
 };
 
