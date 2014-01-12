@@ -253,7 +253,10 @@ public:
 								if (!PlayerList.isEmpty())
 									for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 										if (Player* player = i->getSource())
-											player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, int32(100));
+										{
+											int32 justicePoints = 100;
+											player->ModifyCurrency(CURRENCY_TYPE_JUSTICE_POINTS, int32(justicePoints));
+										}
 							}
 
 							Talk(SAY_END_1);
@@ -840,13 +843,14 @@ public:
 						{
 							case EVENT_AGGRO:
 								Talk(SAY_OSONG_AGGRO);
+								me->HandleEmoteCommand(EMOTE_STATE_READY_UNARMED);
 
 								events.ScheduleEvent(EVENT_ATTACK_STRIFE, 2*IN_MILLISECONDS);
 								break;
 
 							case EVENT_ATTACK_STRIFE:
 								if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 99999.0f))
-									me->GetMotionMaster()->MoveChase(strife);
+									me->GetMotionMaster()->MoveFollow(strife, 1.0f, 1.0f);
 
 								events.ScheduleEvent(EVENT_ATTACK_PERIL, 8*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_ATTACK_STRIFE);
@@ -854,7 +858,7 @@ public:
 
 							case EVENT_ATTACK_PERIL:
 								if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 99999.0f))
-									me->GetMotionMaster()->MoveChase(peril);
+									me->GetMotionMaster()->MoveFollow(peril, 1.0f, 1.0f);
 
 								events.ScheduleEvent(EVENT_ATTACK_STRIFE, 8*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_ATTACK_PERIL);
