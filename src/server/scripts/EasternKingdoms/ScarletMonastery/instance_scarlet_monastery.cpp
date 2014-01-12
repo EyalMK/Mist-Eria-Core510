@@ -379,7 +379,7 @@ public:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->SetReactState(REACT_AGGRESSIVE);
 
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.0f, true))
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.0f, true);
                     if(target && target->GetTypeId() == TYPEID_PLAYER)
                         me->AI()->AttackStart(target);
                 }
@@ -394,7 +394,7 @@ public:
             {
                 if(m_uiCheckTimer <= diff)
                 {
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.0f, true))
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.0f, true);
                     if(target && target->GetTypeId() == TYPEID_PLAYER)
                         me->AI()->AttackStart(target);
                 }

@@ -150,6 +150,8 @@ class Pet : public Guardian
         uint64  m_auraRaidUpdateMask;
         bool    m_loading;
         uint32  m_regenTimer;
+		
+		bool m_Stampeded ; //! Not sure ; guessing instead of reverting commit
 
         DeclinedName *m_declinedname;
 
