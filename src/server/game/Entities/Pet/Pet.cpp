@@ -544,6 +544,19 @@ void Pet::Update(uint32 diff)
     {
         case CORPSE:
         {
+			// Spirit Bond and Kindred Spirits
+            if (Player* owner = GetOwner())
+            {
+                if (!m_Stampeded)
+                {
+                    if (owner->HasSpell(109212) && owner->HasAura(118694))
+                        owner->RemoveAura(118694);
+
+                    if (owner->HasAura(56315))
+                        RemoveAura(56315);
+                }
+            }
+
             if (getPetType() != HUNTER_PET || m_corpseRemoveTime <= time(NULL))
             {
                 Remove(PET_SAVE_NOT_IN_SLOT);               //hunters' pets never get removed because of death, NEVER!
@@ -561,6 +574,14 @@ void Pet::Update(uint32 diff)
                 Remove(PET_SAVE_NOT_IN_SLOT, true);
                 return;
             }
+
+			// Spirit Bond - While your pet is active, you and your pet regen 2% health each 2s
+            if (owner->HasSpell(109212) && !owner->HasAura(118694) && !m_Stampeded)
+                CastSpell(this, 118694, true);
+
+            // Kindred Spirits
+            if (owner->HasAura(56315) && !HasAura(56315) && !m_Stampeded)
+                CastSpell(this, 56315, true);
 
             if (isControlled())
             {
@@ -618,6 +639,19 @@ void Pet::Update(uint32 diff)
             break;
         }
         default:
+			if (!isAlive())
+            {
+                if (Player* owner = GetOwner())
+                {
+                    // Spirit Bond
+                    if (owner->HasSpell(109212) && owner->HasAura(118694) && !m_Stampeded)
+                        owner->RemoveAura(118694);
+
+                    // Kindred Spirits
+                    if (owner->HasAura(56315) && !m_Stampeded)
+                        RemoveAura(56315);
+                }
+            }
             break;
     }
     Creature::Update(diff);
