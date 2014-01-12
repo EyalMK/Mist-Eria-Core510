@@ -3919,9 +3919,6 @@ void SpellMgr::LoadSpellInfoCorrections()
 				case 114465:
 					spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_1_YARD);
 					break ;
-				case 86698:
-					spellInfo->Effects[EFFECT_1].TriggerSpell = 86700;
-					break;
 				default:
 					break;
 			}
