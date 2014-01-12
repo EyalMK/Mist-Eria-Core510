@@ -854,23 +854,21 @@ public:
 								break;
 
 							case EVENT_FIRST_MOVE:
-								me->GetMotionMaster()->MovePoint(0, 848.223511f, -2470.850586f, 174.961578f);
+								me->GetMotionMaster()->MovePoint(0, 847.805176f, -2467.177490f, 174.961288f);
 
 								events.ScheduleEvent(EVENT_ATTACK_PERIL, 8*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_FIRST_MOVE);
 								break;
 
 							case EVENT_ATTACK_PERIL:
-								if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 99999.0f))
-									me->GetMotionMaster()->MovePoint(0, 839.295898f, -2467.605225f, 174.960999f);
+								me->GetMotionMaster()->MovePoint(0, 839.295898f, -2467.605225f, 174.960999f);
 
 								events.ScheduleEvent(EVENT_ATTACK_STRIFE, 8*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_ATTACK_PERIL);
 								break;
 
 							case EVENT_ATTACK_STRIFE:
-								if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 99999.0f))
-									me->GetMotionMaster()->MovePoint(0, 844.870850f, -2469.289307f, 174.960999f);
+								me->GetMotionMaster()->MovePoint(0, 844.870850f, -2469.289307f, 174.960999f);
 
 								events.ScheduleEvent(EVENT_ATTACK_PERIL, 8*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_ATTACK_STRIFE);
