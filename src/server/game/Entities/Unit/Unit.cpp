@@ -8372,6 +8372,12 @@ bool Unit::HasAuraState(AuraStateType flag, SpellInfo const* spellProto, Unit co
                 if ((*j)->IsAffectingSpell(spellProto))
                     return true;
         }
+		// Fix Brain Freeze (57761) - Frostfire Bolt (44614) act as if target has aurastate frozen
+        if (spellProto && spellProto->Id == 44614 && Caster->HasAura(57761))
+            return true;
+        // Fix Fingers of Frost (44544) - Ice Lance (30455) and Deep Freeze (44572) act as if target has aurastate frozen
+        if (spellProto && (spellProto->Id == 30455 || spellProto->Id == 44572) && Caster->HasAura(44544))
+            return true;
         // Check per caster aura state
         // If aura with aurastate by caster not found return false
         if ((1<<(flag-1)) & PER_CASTER_AURA_STATE_MASK)
