@@ -28,17 +28,6 @@ enum Spells
     SPELL_MASS_RESURRECTION     = 113134
 };
 
-enum Texts
-{
-    SAY_CRANE       = 0
-};
-
-enum Actions
-{
-    ACTION_CRANE    = 1
-};
-
-
 
 class instance_scarlet_monastery : public InstanceMapScript
 {
@@ -53,7 +42,6 @@ class instance_scarlet_monastery : public InstanceMapScript
             {
                 SetBossNumber(EncounterCount);
                 BossThalnosTheSoulrenderGUID        = 0;
-                NpcTriggerCraneGUID                 = 0;
                 BossBrotherKorloffGUID              = 0;
                 BossHighInquisitorWhitemaneGUID		= 0;
                 BossCommanderDurandGUID             = 0;
@@ -69,10 +57,6 @@ class instance_scarlet_monastery : public InstanceMapScript
                 {
                     case NPC_THALNOS_THE_SOULRENDER:
                         BossThalnosTheSoulrenderGUID = creature->GetGUID();
-                        break;
-
-                    case NPC_TRIGGER_CRANE:
-                        NpcTriggerCraneGUID = creature->GetGUID();
                         break;
 
                     case NPC_BROTHER_KORLOFF:
@@ -165,10 +149,6 @@ class instance_scarlet_monastery : public InstanceMapScript
                         return BossThalnosTheSoulrenderGUID;
                         break;
 
-                    case DATA_NPC_TRIGGER_CRANE:
-                        return NpcTriggerCraneGUID;
-                        break;
-
                     case DATA_BOSS_BROTHER_KORLOFF:
                         return BossBrotherKorloffGUID;
                         break;
@@ -230,7 +210,6 @@ class instance_scarlet_monastery : public InstanceMapScript
 
             protected:
                 uint64 BossThalnosTheSoulrenderGUID;
-                uint64 NpcTriggerCraneGUID ;
                 uint64 BossBrotherKorloffGUID;
                 uint64 BossHighInquisitorWhitemaneGUID;
                 uint64 BossCommanderDurandGUID;
@@ -294,57 +273,6 @@ public:
     };
 };
 
-class npc_traqueur_crane : public CreatureScript
-{
-public:
-    npc_traqueur_crane() : CreatureScript("npc_traqueur_crane") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_traqueur_craneAI(creature);
-    }
-
-    struct npc_traqueur_craneAI : public ScriptedAI
-    {
-            npc_traqueur_craneAI(Creature* creature) : ScriptedAI(creature)
-            {
-                instance = creature->GetInstanceScript();
-                Crane = false;
-            }
-
-            bool Crane;
-            InstanceScript* instance;
-
-            void DoAction(int32 action)
-            {
-                switch (action)
-                {
-                    case ACTION_CRANE:
-                        if (!Crane)
-                        {
-                            Talk(SAY_CRANE);
-                            Crane = true;
-                        }
-                        break;
-                }
-            }
-    };
-};
-
-class at_crane_monastery : public AreaTriggerScript
-{
-    public:
-        at_crane_monastery () : AreaTriggerScript("at_crane_monastery ") { }
-
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
-        {
-            if (InstanceScript* instance = player->GetInstanceScript())
-                if (Creature* crane = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_NPC_TRIGGER_CRANE)))
-                    crane->AI()->DoAction(ACTION_CRANE);
-            return true;
-        }
-};
-
 
 class npc_scarlet_judicator : public CreatureScript
 {
@@ -360,14 +288,11 @@ public:
     {
             npc_scarlet_judicatorAI(Creature* creature) : ScriptedAI(creature) {}
 
-            uint32 m_uiCheckTimer;
-
             void Reset()
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
-                m_uiCheckTimer = 1000;
             }
 
             void SpellHit(Unit* /*who*/, const SpellInfo* spell)
@@ -379,28 +304,14 @@ public:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->SetReactState(REACT_AGGRESSIVE);
 
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.0f, true);
-                    if(target && target->GetTypeId() == TYPEID_PLAYER)
-                        me->AI()->AttackStart(target);
+                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.0f, true))
+                        if(target && target->GetTypeId() == TYPEID_PLAYER)
+                            me->GetMotionMaster()->MoveChase(target);
                 }
-            }
-
-            void EnterEvadeMode()
-            {
-                ScriptedAI::EnterEvadeMode();
             }
 
             void UpdateAI(uint32 diff)
             {
-                if(m_uiCheckTimer <= diff)
-                {
-                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.0f, true);
-                    if(target && target->GetTypeId() == TYPEID_PLAYER)
-                        me->AI()->AttackStart(target);
-                }
-                else
-                    m_uiCheckTimer -= diff;
-
                 DoMeleeAttackIfReady();
             }
 
@@ -411,7 +322,5 @@ void AddSC_instance_scarlet_monastery()
 {
     new instance_scarlet_monastery();
     new npc_spirit_of_redemption();
-    new npc_traqueur_crane();
-    new at_crane_monastery();
     new npc_scarlet_judicator();
 }

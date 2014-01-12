@@ -215,6 +215,8 @@ public:
                 events.CancelEvent(EVENT_FLASH_OF_STEEL);
                 events.CancelEvent(EVENT_FLASH_OF_STEEL_TEST);
 
+                Talk(SAY_DEATH_DURAND);
+
                 me->InterruptNonMeleeSpells(false);
                 me->SetHealth(0);
                 me->StopMoving();
@@ -288,22 +290,7 @@ public:
                         case EVENT_DASHING_STRIKE:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             {
-                                me->GetMotionMaster()->MoveCharge(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 40);
-                                if(Map* map = me->GetMap())
-                                {
-                                    Map::PlayerList const & playerList = map->GetPlayers();
-                                    if(!playerList.isEmpty())
-                                    {
-                                        for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
-                                        {
-                                            if(Player* p = iter->getSource())
-                                            {
-                                                if(p->FindNearestCreature(NPC_COMMANDER_DURAND, 2.0f, true))
-                                                    p->CastSpell(p, SPELL_DASHING_STRIKE, true);
-                                            }
-                                        }
-                                    }
-                                }
+                                me->CastSpell(target, SPELL_DASHING_STRIKE);
                             }
                             events.ScheduleEvent(EVENT_DASHING_STRIKE, 25*IN_MILLISECONDS);
                             break;
@@ -313,6 +300,10 @@ public:
                             DoCast(SPELL_FURIOUS_RESOLVE);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+
+                            if (me->getVictim())
+                                me->GetMotionMaster()->MoveChase(me->getVictim());
+
                             me->SetStandState(UNIT_STAND_STATE_STAND);
                             me->SetReactState(REACT_AGGRESSIVE);
 
