@@ -2633,46 +2633,106 @@ class spell_monk_touch_of_death : public SpellScriptLoader
                 return true;
             }
 
-			SpellCastResult CheckCast()
+            SpellCastResult CheckCast()
             {
-				if (GetHitUnit()->GetTypeId() == TYPEID_PLAYER)
-				{
-					if (GetHitUnit()->GetHealth() > GetHitUnit()->GetMaxHealth()*0.10f)
-						return SPELL_FAILED_ERROR;
-				}
+                Unit* caster = GetCaster();
+                Unit* target = GetExplTargetUnit();
 
-				if (GetHitUnit()->GetTypeId() != TYPEID_PLAYER && GetCaster()->GetHealth() < GetHitUnit()->GetHealth())
-					return SPELL_FAILED_ERROR;
+                if(caster && target)
+                {
+                    switch(target->GetTypeId())
+                    {
+                    case TYPEID_PLAYER :
+                        {
+                            uint32 total = target->GetMaxHealth();
+                            uint32 tenPercent = uint32(total / 100 * 10) ;
+                            if(target->GetHealth() <= tenPercent)
+                                return SPELL_CAST_OK ;
+                            else
+                                return SPELL_FAILED_ERROR ;
 
-				if (GetCaster() == GetHitUnit())
-					return SPELL_FAILED_NO_VALID_TARGETS;
+                            break ;
+                        }
 
-				return SPELL_CAST_OK;
+                    case TYPEID_UNIT :
+                        {
+                            uint32 targetLife = target->GetHealth() ;
+                            uint32 casterLife = caster->GetHealth() ;
+                            if(targetLife <= casterLife)
+                                return SPELL_CAST_OK ;
+                            else
+                                return SPELL_FAILED_ERROR ;
+
+                            break ;
+                        }
+
+                    default :
+                        {
+                            return SPELL_FAILED_BAD_TARGETS ;
+                        }
+                    }
+                }
+                else
+                    return SPELL_FAILED_ERROR ;
             }
 
-            void HandleDummy(SpellEffIndex /*effIndex*/)
+            void HandleDamage(SpellEffIndex effectIndex)
             {
-				Unit* caster = GetCaster();
-				Unit* target = GetHitUnit();
-				uint32 damage = 0;
+                Unit* caster = GetCaster();
+                Unit* hit = GetHitUnit() ;
 
-				if (caster->GetTypeId() == TYPEID_PLAYER && target->GetHealth() <= target->GetMaxHealth()*0.10f)
-				{
-					damage = GetHitUnit()->GetHealth();
-					SetHitDamage(damage);
-				}
+                if(caster && hit)
+                {
+                    if(hit->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        PreventHitDamage();
+                        PreventHitDefaultEffect(effectIndex);
+                        PreventHitEffect(effectIndex);
+                        return ;
+                    }
 
-				if (target->GetTypeId() != TYPEID_PLAYER && caster->GetHealth() >= target->GetHealth())
-				{
-					damage = GetHitUnit()->GetHealth();
-					SetHitDamage(damage);
-				}
-			}
+                    uint32 casterLife = caster->GetHealth();
+                    uint32 hitLife = hit->GetHealth();
+
+                    if(hitLife <= casterLife)
+                        SetHitDamage(hit->GetHealth());
+                }
+                else
+                    return ;
+            }
+
+            void HandleDummy(SpellEffIndex effectIndex)
+            {
+                Unit* caster = GetCaster();
+                Unit* hit = GetHitUnit();
+
+                if(caster && hit)
+                {
+                    if(hit->GetTypeId() != TYPEID_PLAYER)
+                        return ;
+
+                    Player* player = hit->ToPlayer();
+                    if(player)
+                    {
+                        uint32 total = player->GetMaxHealth() ;
+                        uint32 tenPercent = total / 100 * 10 ;
+                        uint32 health = hit->GetHealth() ;
+
+                        if(health <= tenPercent)
+                            SetHitDamage(hit->GetHealth());
+                    }
+                    else
+                        return ;
+                }
+                else
+                    return ;
+            }
 
             void Register()
             {
-                OnEffectHit += SpellEffectFn(spell_monk_touch_of_death_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
-				OnCheckCast += SpellCheckCastFn(spell_monk_touch_of_death_SpellScript::CheckCast);
+                OnCheckCast += SpellCheckCastFn(spell_monk_touch_of_death_SpellScript::CheckCast());
+                OnEffectHitTarget += SpellEffectFn(spell_monk_touch_of_death_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+                OnEffectHitTarget += SpellEffectFn(spell_monk_touch_of_death_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
             }
         };
 
