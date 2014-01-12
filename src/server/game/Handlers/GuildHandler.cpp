@@ -775,45 +775,26 @@ void WorldSession::HandleGuildRewardsQueryOpcode(WorldPacket& recvPacket)
 {
     recvPacket.read_skip<uint32>(); // Unk
 
-    if (sGuildMgr->GetGuildById(_player->GetGuildId()))
+    if (Guild* guild = sGuildMgr->GetGuildById(_player->GetGuildId()))
     {
         std::vector<GuildReward> const& rewards = sGuildMgr->GetGuildRewards();
 
-        WorldPacket data(SMSG_GUILD_REWARDS_LIST, 3 + rewards.size() * (4 + 4 + 4 + 8 + 4 + 4));
-
-		data << uint32(time(NULL));
-
+        WorldPacket data(SMSG_GUILD_REWARDS_LIST, (3 + rewards.size() * (4 + 4 + 4 + 8 + 4 + 4)));
+        ByteBuffer dataBuffer;
         data.WriteBits(rewards.size(), 21);
-        
-
-		for (uint32 i = 0; i < rewards.size(); i++)
-        {
-			data.WriteBits(1, 24); // unk
-		}
-
-
-		data.FlushBits();
+        data.FlushBits();
 
         for (uint32 i = 0; i < rewards.size(); i++)
         {
-			data << uint32(1);
-			data << uint32(4000);
-
-			data << uint32(1000);
-			data << uint32(2000);
-			data << uint32(3000);
-
-			/*
-			data << uint32(rewards[i].AchievementId);
-
-            data << uint32(rewards[i].Standing);
-            data << int32(rewards[i].Racemask);
-            data << uint32(rewards[i].Entry);
-			*/
-
-            data << uint64(rewards[i].Price); 
+            data.WriteBits(0, 24);
+            dataBuffer << uint32(rewards[i].Standing);
+            dataBuffer << uint32(rewards[i].Entry);
+            dataBuffer << uint32(rewards[i].AchievementId);
+            dataBuffer << int32(rewards[i].Racemask);
+			dataBuffer << uint64(rewards[i].Price);
         }
-        
+        data.append(dataBuffer);
+        data << uint32(time(NULL));
         SendPacket(&data);
     }
 }
