@@ -840,10 +840,7 @@ public:
 
 							case EVENT_ATTACK_STRIFE:
 								if (Creature* strife = me->FindNearestCreature(NPC_STRIFE, 99999.0f))
-								{
 									me->GetMotionMaster()->MoveChase(strife);
-									me->AI()->AttackStart(strife);
-								}
 
 								events.ScheduleEvent(EVENT_ATTACK_PERIL, 8*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_ATTACK_STRIFE);
@@ -851,10 +848,7 @@ public:
 
 							case EVENT_ATTACK_PERIL:
 								if (Creature* peril = me->FindNearestCreature(NPC_PERIL, 99999.0f))
-								{
 									me->GetMotionMaster()->MoveChase(peril);
-									me->AI()->AttackStart(peril);
-								}
 
 								events.ScheduleEvent(EVENT_ATTACK_STRIFE, 8*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_ATTACK_PERIL);
