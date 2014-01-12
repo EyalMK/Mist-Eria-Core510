@@ -1370,7 +1370,11 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
     data << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP));
     data << uint32(m_accountsNumber);
 
-    data.WriteBits(m_members.size(), 18);
+    size_t infoLength = m_info.length();
+
+	data.WriteBits(m_motd.length(), 11); 
+	data.WriteBits(infoLength, 12);
+    data.WriteBits(m_members.size(), 18); 
     
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
@@ -1380,26 +1384,24 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         size_t offNoteLength = member->GetOfficerNote().length();
 
         ObjectGuid guid = member->GetGUID();
-        data.WriteBits(pubNoteLength, 8);
+
+		data.WriteBits(member->GetName().length(), 7);
         data.WriteBit(guid[4]);
 		data.WriteBit(guid[7]);
 		data.WriteBit(guid[5]);
 		data.WriteBit(guid[6]);
 		data.WriteBit(guid[1]);
+		data.WriteBits(pubNoteLength, 8);
+		data.WriteBit(guid[2]);
+		data.WriteBit(guid[0]);
         data.WriteBit(0); // Has Authenticator
         data.WriteBit(0); // Can Scroll of Ressurect
-        data.WriteBit(guid[2]);
-		data.WriteBit(guid[0]);
-        data.WriteBits(member->GetName().length(), 7);
         data.WriteBits(offNoteLength, 8);
         data.WriteBit(guid[3]);
     }
-    data.WriteBits(m_motd.length(), 11);
-    
-    size_t infoLength = m_info.length();
-    data.WriteBits(infoLength, 12);
     
     data.FlushBits();
+
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
         Member* member = itr->second;
@@ -1417,10 +1419,15 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
             if (player->isDND())
                 flags |= GUILDMEMBER_STATUS_DND;
         }
+
+		memberData.WriteByteSeq(guid[1]);
+		memberData << uint8(player ? player->getLevel() : member->GetLevel());
+		memberData << uint32(0);// player->GetAchievementMgr().GetCompletedAchievementsAmount()
+		memberData << uint32(player ? player->GetZoneId() : member->GetZoneId());  
         
         if (pubNoteLength)
             memberData.WriteString(member->GetPublicNote());
-        memberData << int32(0);                                     // unk
+
         // for (2 professions)
         for (int i = 0; i < 2; ++i)
         {
@@ -1434,29 +1441,39 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
                 memberData << uint32(0) << uint32(0) << uint32(0);
             }
         }
-        memberData << uint32(member->GetRemainingWeeklyReputation());// Remaining guild week Rep
-        memberData.WriteByteSeq(guid[1]);
-        memberData << int32(-1);                                     // unk -1
-        memberData.WriteByteSeq(guid[2]);
-        memberData << uint8(member->GetClass());
-        memberData << uint64(0);                                    
-        memberData.WriteByteSeq(guid[5]);
+
+		memberData << uint32(member->GetRemainingWeeklyReputation());// Remaining guild week Rep
+		memberData << uint64(0);   
+
+		memberData.WriteByteSeq(guid[2]);
+
+		if (offNoteLength)
+            memberData.WriteString(member->GetOfficerNote());
+
+		memberData.WriteString(member->GetName());
+
+		memberData << float(player ? 0.0f : float(::time(NULL) - member->GetLogoutTime()) / DAY);
+		memberData << uint8(flags);
+
+		memberData.WriteByteSeq(guid[5]);
         memberData.WriteByteSeq(guid[7]);
         memberData.WriteByteSeq(guid[4]);
-        memberData << float(player ? 0.0f : float(::time(NULL) - member->GetLogoutTime()) / DAY);
-        memberData << uint64(0);                                    
-        memberData << uint32(member->GetRankId());
-        if (offNoteLength)
-            memberData.WriteString(member->GetOfficerNote());
-        memberData.WriteString(member->GetName());
-        memberData << uint8(player ? player->getLevel() : member->GetLevel());
-        memberData.WriteByteSeq(guid[6]);
-        memberData << uint32(player ? player->GetZoneId() : member->GetZoneId());                                    
-        memberData << uint8(flags);
-        memberData << uint32(0);// player->GetAchievementMgr().GetCompletedAchievementsAmount()
-        memberData << uint8(0);                                     // unk 0 or 1
+
+		memberData << uint32(member->GetRankId());
+
+		memberData.WriteByteSeq(guid[6]);
+
+		memberData << uint8(0);                                     // unk 0 or 1
+		memberData << uint8(member->GetClass());
+
+		memberData << uint32(member->GetAchievementPoints());
+		memberData << uint64(member->GetTotalActivity());
+        
         memberData.WriteByteSeq(guid[3]);
-		memberData.WriteByteSeq(guid[0]);
+
+        memberData << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP) - member->GetWeekReputation()); // unk
+
+        memberData.WriteByteSeq(guid[0]);
     }
 
     data.append(memberData);
