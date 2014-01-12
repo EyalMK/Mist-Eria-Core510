@@ -1366,7 +1366,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
     WorldPacket data(SMSG_GUILD_ROSTER);
     
     data << uint32(0);
-    data << uint32(secsToTimeBitFields(m_createdDate));
+    data << uint32(m_createdDate);
     data << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP));
     data << uint32(m_accountsNumber);
 
@@ -1453,7 +1453,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         memberData.WriteString(member->GetName());
         memberData << uint8(player ? player->getLevel() : member->GetLevel());
         memberData.WriteByteSeq(guid[1]);
-        memberData << uint32(player ? player->GetZoneId() : member->GetZone());                                    
+        memberData << uint32(player ? player->GetZoneId() : member->GetZoneId());                                    
         memberData << uint8(flags);
         memberData << uint32(0);// player->GetAchievementMgr().GetCompletedAchievementsAmount()
         memberData << uint8(0);                                     // unk 0 or 1

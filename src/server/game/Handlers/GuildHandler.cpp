@@ -103,7 +103,7 @@ void WorldSession::HandleGuildRosterOpcode(WorldPacket& recvPacket)
 
     recvPacket.rfinish();
 
-    if (Guild* guild = _GetPlayerGuild(this, true))
+    if (Guild* guild = GetPlayer()->GetGuild())
         guild->HandleRoster(this);
 }
 
