@@ -23,9 +23,6 @@
 #include "Player.h"
 
 
-/* High = Correction Rez masse + stop cast sinon nikel */
-/* Durrand = Corriger cest 2 spell + attaque au sol */
-
 enum Spells
 {
     /* Commander Durand */
@@ -317,6 +314,21 @@ public:
                             events.ScheduleEvent(EVENT_DASHING_STRIKE, 25*IN_MILLISECONDS);
                             events.ScheduleEvent(EVENT_FLASH_OF_STEEL_TEST, 10*IN_MILLISECONDS);
                             events.CancelEvent(EVENT_FURIOUS_RESOLVE);
+
+                            if(Map* map = me->GetMap())
+                            {
+                                Map::PlayerList const & playerList = map->GetPlayers();
+                                if(!playerList.isEmpty())
+                                {
+                                    for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
+                                    {
+                                        if(Player* player = iter->getSource())
+                                        {
+                                            player->RemoveAurasDueToSpell(SPELL_DEEP_SLEEP);
+                                        }
+                                    }
+                                }
+                            }
                             break;
 
                         default:
@@ -373,7 +385,6 @@ public:
                 }
             }
         }
-
 
         void EnterCombat(Unit* /*who*/)
         {

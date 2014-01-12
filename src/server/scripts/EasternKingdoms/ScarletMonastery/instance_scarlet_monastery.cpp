@@ -28,6 +28,16 @@ enum Spells
     SPELL_MASS_RESURRECTION     = 113134
 };
 
+enum Actions
+{
+    ACTION_INTRO    = 1
+};
+
+enum Texts
+{
+    SAY_TRAQUEUR_INTRO   = 0
+};
+
 
 class instance_scarlet_monastery : public InstanceMapScript
 {
@@ -45,6 +55,7 @@ class instance_scarlet_monastery : public InstanceMapScript
                 BossBrotherKorloffGUID              = 0;
                 BossHighInquisitorWhitemaneGUID		= 0;
                 BossCommanderDurandGUID             = 0;
+                NpcTraqueurIntroGUID                = 0;
 
                 ThalnosDoorGUID                     = 0;
                 KorloffDoorGUID                     = 0;
@@ -64,11 +75,15 @@ class instance_scarlet_monastery : public InstanceMapScript
                         break;
 
                     case NPC_HIGH_INQUISITOR_WHITEMANE:
-                        BossHighInquisitorWhitemaneGUID	 = creature->GetGUID();
+                        BossHighInquisitorWhitemaneGUID	= creature->GetGUID();
                         break;
 
                     case NPC_COMMANDER_DURAND:
-                        BossCommanderDurandGUID	 = creature->GetGUID();
+                        BossCommanderDurandGUID	= creature->GetGUID();
+                        break;
+
+                    case NPC_TRAQUEUR_INTRO:
+                        NpcTraqueurIntroGUID = creature->GetGUID();
                         break;
 
                     default:
@@ -160,6 +175,10 @@ class instance_scarlet_monastery : public InstanceMapScript
                     case DATA_BOSS_COMMANDER_DURAND:
                         return BossCommanderDurandGUID;
                         break;
+
+                    case DATA_NPC_TRAQUEUR_INTRO:
+                        return NpcTraqueurIntroGUID;
+                        break;
                 }
 
                 return 0;
@@ -213,6 +232,7 @@ class instance_scarlet_monastery : public InstanceMapScript
                 uint64 BossBrotherKorloffGUID;
                 uint64 BossHighInquisitorWhitemaneGUID;
                 uint64 BossCommanderDurandGUID;
+                uint64 NpcTraqueurIntroGUID;
 
                 uint64 ThalnosDoorGUID;
                 uint64 KorloffDoorGUID;
@@ -274,26 +294,55 @@ public:
 };
 
 
-class npc_scarlet_judicator : public CreatureScript
+class at_crane_monastery : public AreaTriggerScript
+{
+    public:
+        at_crane_monastery () : AreaTriggerScript("at_crane_monastery") { }
+
+        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        {
+            if (InstanceScript* instance = player->GetInstanceScript())
+                if (Creature* crane = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_BOSS_THALNOS_THE_SOULRENDER)))
+                    crane->AI()->DoAction(ACTION_INTRO);
+            return true;
+        }
+};
+
+class npc_traqueur_crane : public CreatureScript
 {
 public:
-    npc_scarlet_judicator() : CreatureScript("npc_scarlet_judicator") { }
+    npc_traqueur_crane() : CreatureScript("npc_traqueur_crane") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_scarlet_judicatorAI(creature);
+        return new npc_traqueur_craneAI(creature);
     }
 
-    struct npc_scarlet_judicatorAI : public ScriptedAI
+    struct npc_traqueur_craneAI : public ScriptedAI
     {
-            npc_scarlet_judicatorAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_traqueur_craneAI(Creature* creature) : ScriptedAI(creature)
+        {
+            instance = creature->GetInstanceScript();
+            Intro = false;
+        }
 
-            void Reset()
+        InstanceScript* instance;
+        bool Intro;
+
+
+        void DoAction(int32 action)
+        {
+            switch (action)
             {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                me->SetStandState(UNIT_STAND_STATE_DEAD);
+                case ACTION_INTRO:
+                    if (!Intro)
+                    {
+                        Talk(SAY_TRAQUEUR_INTRO);
+                        Intro = true;
+                    }
+                    break;
             }
+        }
     };
 };
 
@@ -301,5 +350,6 @@ void AddSC_instance_scarlet_monastery()
 {
     new instance_scarlet_monastery();
     new npc_spirit_of_redemption();
-    new npc_scarlet_judicator();
+    new at_crane_monastery();
+    new npc_traqueur_crane();
 }
