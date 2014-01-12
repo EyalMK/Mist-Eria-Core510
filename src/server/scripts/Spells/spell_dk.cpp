@@ -1423,8 +1423,8 @@ public :
                 SpellInfo const* spellInfo = GetSpellInfo();
                 if(player && spellInfo)
                 {
-                    sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Raise Dead: Summoning");
-                    player->CastSpell(player, spellInfo->Effects[player->GetActiveSpec() == TALENT_TREE_DEATH_KNIGHT_UNHOLY ? 1 : 0].BasePoints, true);
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Raise Dead: Summoning ; player spec %u", uint32(player->GetActiveSpec()));
+                    player->CastSpell(player, spellInfo->Effects[(player->GetPrimaryTalentTree(player->GetActiveSpec()) == TALENT_TREE_DEATH_KNIGHT_UNHOLY) ? 1 : 0].BasePoints, true);
                 }
             }
         }
