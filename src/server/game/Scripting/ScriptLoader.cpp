@@ -232,6 +232,10 @@ void AddSC_boss_thalnos_the_soulrender();    //Scarlet Monastery
 void AddSC_boss_high_inquisitor_whitemane();
 void AddSC_boss_brother_korloff();
 void AddSC_instance_scarlet_monastery();
+void AddSC_boss_armsmaster_harlan(); // Scarlet Halls
+void AddSC_boss_flameweaver_koegler();
+void AddSC_boss_houndmaster_braun();
+void AddSC_instance_scarlet_halls();
 void AddSC_boss_darkmaster_gandling();       //Scholomance
 void AddSC_boss_death_knight_darkreaver();
 void AddSC_boss_theolenkrastinov();
@@ -885,6 +889,10 @@ void AddEasternKingdomsScripts()
 	AddSC_boss_high_inquisitor_whitemane();
 	AddSC_boss_brother_korloff();
 	AddSC_instance_scarlet_monastery();
+	AddSC_boss_armsmaster_harlan(); // Scarlet Halls
+	AddSC_boss_flameweaver_koegler();
+	AddSC_boss_houndmaster_braun();
+	AddSC_instance_scarlet_halls();
     AddSC_boss_darkmaster_gandling();       //Scholomance
     AddSC_boss_death_knight_darkreaver();
     AddSC_boss_theolenkrastinov();
