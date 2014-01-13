@@ -375,10 +375,16 @@ public:
 
         void EffectApply(AuraEffect const* aurEff, AuraEffectHandleModes mode)
         {
-            ShapeshiftForm form = GetCaster()->GetShapeshiftForm();
-            //Cast bear form
-            if(form != FORM_BEAR && form != FORM_CAT)
-                GetCaster()->CastSpell(GetCaster(), 5487, true);
+			if(GetOwner())
+			{
+				if(Player *p = GetOwner()->ToPlayer())
+				{
+					ShapeshiftForm form = p->GetShapeshiftForm();
+					//Cast bear form
+					if(form != FORM_BEAR && form != FORM_CAT)
+						p->CastSpell(p, 5487, true);
+				}
+			}
         }
 
         void Register()
