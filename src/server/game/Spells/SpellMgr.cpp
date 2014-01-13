@@ -3093,6 +3093,13 @@ void SpellMgr::LoadSpellCustomAttr()
 				case 91021: // Find Weakness
                     spellInfo->Effects[0].BasePoints = 70;
                     break;
+				case 1856:  // Vanish
+                    spellInfo->Effects[1].TriggerSpell = 131368;
+                    spellInfo->Effects[0].Effect = SPELL_EFFECT_SANCTUARY;
+                    break;
+                case 131369:// Vanish - Improved Stealth
+                    spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(27); // 3s
+                    break;
 				default:
 					break;
 			}
