@@ -3083,6 +3083,10 @@ void SpellMgr::LoadSpellCustomAttr()
 				case 7384: // Overpower
                     spellInfo->AttributesEx |= SPELL_ATTR1_ENABLE_AT_DODGE;
                     break;
+				case 55095: // Frost Fever
+                case 77489: // Echo of Light (HoT)
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER;
+                    break;
 				default:
 					break;
 			}
