@@ -7510,6 +7510,25 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+		case 108945:// Angelic Bulwark
+        {
+            if (GetTypeId() != TYPEID_PLAYER)
+                return false;
+
+            if (!damage)
+                return false;
+
+            if ((GetHealth() - damage) >= CountPctFromMaxHealth(30))
+                return false;
+
+            if (ToPlayer()->HasSpellCooldown(108945))
+                return false;
+
+            ToPlayer()->AddSpellCooldown(108945, 0, time(NULL) + 90);
+            basepoints0 = int32(CountPctFromMaxHealth(20));
+
+            break;
+        }
         // Deep Wounds
         case 12834:
         case 12849:

@@ -3087,6 +3087,9 @@ void SpellMgr::LoadSpellCustomAttr()
                 case 77489: // Echo of Light (HoT)
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER;
                     break;
+				case 108945:// Angelic Bulwark
+                    spellInfo->Effects[0].TriggerSpell = 114214;
+                    break;
 				default:
 					break;
 			}
