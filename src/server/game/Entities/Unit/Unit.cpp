@@ -193,6 +193,7 @@ Unit::Unit(bool isWorldObject): WorldObject(isWorldObject)
     m_modAttackSpeedPct[RANGED_ATTACK] = 1.0f;
 
     m_extraAttacks = 0;
+	insightCount = 0;
     m_canDualWield = false;
 
     m_rootTimes = 0;
@@ -13565,7 +13566,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
 
 		for (std::list<Creature*>::const_iterator i = shadowylist.begin(); i != shadowylist.end(); ++i)
         {
-            if(UnitAI* ai =  itr->GetAI())
+            if(UnitAI* ai =  (*i)->GetAI())
                 ai->SetGUID(target->GetGUID());
             (*i)->GetMotionMaster()->MovePoint(1, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
         }
