@@ -3100,10 +3100,11 @@ class spell_monk_legacy_of_the_white_tiger : public SpellScriptLoader
 
             void Cast()
             {
-                Unit* caster = GetCaster()->ToPlayer();
-
-				if (caster->HasAura(SPELL_MONK_LEGACY_OF_THE_EMPEROR))
-					caster->RemoveAura(SPELL_MONK_LEGACY_OF_THE_EMPEROR);
+                if(Unit* caster = GetCaster())
+				{
+					if (caster->HasAura(SPELL_MONK_LEGACY_OF_THE_EMPEROR))
+						caster->RemoveAura(SPELL_MONK_LEGACY_OF_THE_EMPEROR);
+				}
             }
 
             void Register()
