@@ -3090,6 +3090,9 @@ void SpellMgr::LoadSpellCustomAttr()
 				case 108945:// Angelic Bulwark
                     spellInfo->Effects[0].TriggerSpell = 114214;
                     break;
+				case 91021: // Find Weakness
+                    spellInfo->Effects[0].BasePoints = 70;
+                    break;
 				default:
 					break;
 			}

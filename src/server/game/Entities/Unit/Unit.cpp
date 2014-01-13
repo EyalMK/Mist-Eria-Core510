@@ -7719,6 +7719,8 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                 return false;
             break;
         }
+		case 91023: // Find Weakness
+			return false;
         default:
             break;
     }
@@ -13424,6 +13426,148 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     CastSpell(this, 119962, true);
                 }
             }
+        }
+    }
+
+	// Leader of the Pack
+    if (target && GetTypeId() == TYPEID_PLAYER && (procExtra & PROC_EX_CRITICAL_HIT) && HasAura(17007) && (attType == BASE_ATTACK || (procSpell && procSpell->GetSchoolMask() == SPELL_SCHOOL_MASK_NORMAL)))
+    {
+        if (!ToPlayer()->HasSpellCooldown(34299))
+        {
+            CastSpell(this, 34299, true); // Heal
+            EnergizeBySpell(this, 68285, CountPctFromMaxMana(8), POWER_MANA);
+            ToPlayer()->AddSpellCooldown(34299, 0, time(NULL) + 6); // 6s ICD
+        }
+    }
+
+    // Dematerialize
+    if (target && target->GetTypeId() == TYPEID_PLAYER && target->HasAura(122464) && procSpell && procSpell->GetAllEffectsMechanicMask() & (1 << MECHANIC_STUN))
+    {
+        if (!target->ToPlayer()->HasSpellCooldown(122465))
+        {
+            target->CastSpell(target, 122465, true);
+            target->ToPlayer()->AddSpellCooldown(122465, 0, time(NULL) + 10);
+        }
+    }
+
+    // Find Weakness - 91023
+    if (GetTypeId() == TYPEID_PLAYER && HasAura(91023) && procSpell && (procSpell->Id == 8676 || procSpell->Id == 703 || procSpell->Id == 1833))
+        CastSpell(target, 91021, true);
+
+    // Revealing Strike - 84617
+    if (GetTypeId() == TYPEID_PLAYER && target && target->HasAura(84617, GetGUID()) && procSpell && procSpell->Id == 1752)
+        if (roll_chance_i(20))
+            ToPlayer()->AddComboPoints(target, 1);
+
+    // Bandit's Guile - 84654
+    // Your Sinister Strike and Revealing Strike abilities increase your damage dealt by up to 30%
+    if (GetTypeId() == TYPEID_PLAYER && HasAura(84654) && procSpell && (procSpell->Id == 84617 || procSpell->Id == 1752))
+    {
+        insightCount++;
+
+        // it takes a total of 4 strikes to get a proc, or a level up
+        if (insightCount >= 4)
+        {
+            insightCount = 0;
+
+            // it takes 4 strikes to get Shallow insight
+            // than 4 strikes to get Moderate insight
+            // and than 4 strikes to get Deep Insight
+
+            // Shallow Insight
+            if (HasAura(84745))
+            {
+                RemoveAura(84745);
+                CastSpell(this, 84746, true); // Moderate Insight
+            }
+            else if (HasAura(84746))
+            {
+                RemoveAura(84746);
+                CastSpell(this, 84747, true); // Deep Insight
+            }
+            // the cycle will begin
+            else if (!HasAura(84747))
+                CastSpell(this, 84745, true); // Shallow Insight
+        }
+        else
+        {
+            // Each strike refreshes the duration of shallow insight or Moderate insight
+            // but you can't refresh Deep Insight without starting from shallow insight.
+            // Shallow Insight
+            if (Aura* shallowInsight = GetAura(84745))
+                shallowInsight->RefreshDuration();
+            // Moderate Insight
+            else if (Aura* moderateInsight = GetAura(84746))
+                moderateInsight->RefreshDuration();
+        }
+    }
+
+    // Hack Fix Ice Floes - Drop charges
+    if (GetTypeId() == TYPEID_PLAYER && HasAura(108839) && procSpell && procSpell->Id != 108839 &&
+        ((procSpell->CastTimeEntry && procSpell->CastTimeEntry->CastTime > 0 && procSpell->CastTimeEntry->CastTime < 4000)
+        || (procSpell->DurationEntry && procSpell->DurationEntry->Duration[0] > 0 && procSpell->DurationEntry->Duration[0] < 4000 && procSpell->AttributesEx & SPELL_ATTR1_CHANNELED_2)))
+        if (AuraApplication* aura = GetAuraApplication(108839, GetGUID()))
+            aura->GetBase()->DropCharge();
+
+    // Hack Fix Cobra Strikes - Drop charge
+    if (GetTypeId() == TYPEID_UNIT && HasAura(53257) && damage > 0)
+    {
+        if (Aura* aura = GetAura(53257))
+        {
+            aura->DropCharge();
+
+            if (GetOwner())
+                if (Aura* cobra = GetOwner()->GetAura(53257))
+                    cobra->DropCharge();
+        }
+    }
+
+    // Hack Fix Frenzy
+    if (GetTypeId() == TYPEID_UNIT && isHunterPet() && GetOwner() && GetOwner()->ToPlayer() && GetOwner()->HasAura(19623) && ToPet()->IsPermanentPetFor(GetOwner()->ToPlayer()) && !procSpell)
+        if (roll_chance_i(40))
+            CastSpell(this, 19615, true);
+
+    // Hack Fix for Invigoration
+    if (GetTypeId() == TYPEID_UNIT && GetOwner() && GetOwner()->ToPlayer() && GetOwner()->HasAura(53253) &&
+        damage > 0 && ToPet() && ToPet()->IsPermanentPetFor(GetOwner()->ToPlayer()))
+        if (roll_chance_i(15))
+            GetOwner()->EnergizeBySpell(GetOwner(), 53253, 20, POWER_FOCUS);
+
+    // Fix Drop charge for Killing Machine
+    if (GetTypeId() == TYPEID_PLAYER && HasAura(51124) && getClass() == CLASS_DEATH_KNIGHT && procSpell && (procSpell->Id == 49020 || procSpell->Id == 49143))
+        RemoveAura(51124);
+
+    // Fix Drop charge for Blindsight
+    if (GetTypeId() == TYPEID_PLAYER && HasAura(121152) && getClass() == CLASS_ROGUE && procSpell && procSpell->Id == 111240)
+        RemoveAura(121153);
+
+    // Fix Drop charge for Fingers of Frost
+    if (GetTypeId() == TYPEID_PLAYER && getClass() == CLASS_MAGE && procSpell && (procSpell->Id == 30455 || procSpell->Id == 44572))
+    {
+        if (Aura* fingersOfFrost = GetAura(44544, GetGUID()))
+            fingersOfFrost->ModStackAmount(-1);
+        if (Aura* fingersVisual = GetAura(126084, GetGUID()))
+            fingersVisual->ModStackAmount(-1);
+    }
+
+    // Hack Fix Immolate - Critical strikes generate burning embers
+    if (GetTypeId() == TYPEID_PLAYER && procSpell && procSpell->Id == 348 && procExtra & PROC_EX_CRITICAL_HIT)
+        if (roll_chance_i(50))
+            SetPower(POWER_BURNING_EMBERS, GetPower(POWER_BURNING_EMBERS) + 1);
+
+    // Summon Shadowy Apparitions when Shadow Word : Pain is crit
+    if (GetTypeId() == TYPEID_PLAYER && procSpell && procSpell->Id == 589 && HasAura(78203) && procExtra & PROC_EX_CRITICAL_HIT)
+    {
+        CastSpell(this, 87426, true);
+        std::list<Creature*> shadowylist;
+
+        GetCreatureListWithEntryInGrid(shadowylist, 61966, 1.0f);
+
+		for (std::list<Creature*>::const_iterator i = shadowylist.begin(); i != shadowylist.end(); ++i)
+        {
+            if(UnitAI* ai =  itr->GetAI())
+                ai->SetGUID(target->GetGUID());
+            (*i)->GetMotionMaster()->MovePoint(1, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
         }
     }
 
