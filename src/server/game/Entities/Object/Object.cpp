@@ -64,6 +64,7 @@ uint32 GuidHigh2TypeId(uint32 guid_hi)
         case HIGHGUID_GAMEOBJECT:   return TYPEID_GAMEOBJECT;
         case HIGHGUID_DYNAMICOBJECT:return TYPEID_DYNAMICOBJECT;
         case HIGHGUID_CORPSE:       return TYPEID_CORPSE;
+		case HIGHGUID_AREATRIGGER:  return TYPEID_AREATRIGGER;
         case HIGHGUID_MO_TRANSPORT: return TYPEID_GAMEOBJECT;
         case HIGHGUID_VEHICLE:      return TYPEID_UNIT;
     }
@@ -196,6 +197,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
         case HIGHGUID_PET:
         case HIGHGUID_CORPSE:
         case HIGHGUID_DYNAMICOBJECT:
+		case HIGHGUID_AREATRIGGER:
             updateType = UPDATETYPE_CREATE_OBJECT2;
             break;
         case HIGHGUID_UNIT:
@@ -1090,6 +1092,9 @@ uint32 Object::GetUpdateFieldData(Player const* target, uint32*& flags) const
             if (ToCorpse()->GetOwnerGUID() == target->GetGUID())
                 visibleFlag |= UF_FLAG_OWNER;
             break;
+		case TYPEID_AREATRIGGER:
+             flags = AreaTriggerUpdateFieldFlags;
+             break;
         case TYPEID_OBJECT:
             break;
     }
@@ -1869,6 +1874,22 @@ bool WorldObject::IsInBetween(const WorldObject* obj1, const WorldObject* obj2, 
 
     // not using sqrt() for performance
     return (size * size) >= GetExactDist2dSq(obj1->GetPositionX() + std::cos(angle) * dist, obj1->GetPositionY() + std::sin(angle) * dist);
+}
+
+bool WorldObject::IsInAxe(const WorldObject* obj1, const WorldObject* obj2, float size) const
+{
+    if (!obj1 || !obj2)
+        return false;
+
+    float dist = GetExactDist2d(obj1->GetPositionX(), obj1->GetPositionY());
+
+    if (!size)
+        size = GetObjectSize() / 2;
+
+    float angle = obj1->GetAngle(obj2);
+
+    // not using sqrt() for performance
+    return (size * size) >= GetExactDist2dSq(obj1->GetPositionX() + cos(angle) * dist, obj1->GetPositionY() + sin(angle) * dist);
 }
 
 bool WorldObject::isInFront(WorldObject const* target,  float arc) const
