@@ -23,9 +23,6 @@
 #include "Player.h"
 
 
-/* High = Correction Rez masse + stop cast sinon nikel */
-/* Durrand = Corriger cest 2 spell + attaque au sol */
-
 enum Spells
 {
     /* Commander Durand */
@@ -76,6 +73,13 @@ enum Texts_Whitemane
     SAY_DEATH_WHITEMANE             = 1,
     SAY_KILL_WHITEMANE              = 2,
     SAY_RESSURECTION_WHITEMANE      = 3
+};
+
+
+enum Creatures
+{
+    NPC_JUDICATOR           = 58643,
+    NPC_JUDICATOR_POP       = 58605
 };
 
 
@@ -310,6 +314,21 @@ public:
                             events.ScheduleEvent(EVENT_DASHING_STRIKE, 25*IN_MILLISECONDS);
                             events.ScheduleEvent(EVENT_FLASH_OF_STEEL_TEST, 10*IN_MILLISECONDS);
                             events.CancelEvent(EVENT_FURIOUS_RESOLVE);
+
+                            if(Map* map = me->GetMap())
+                            {
+                                Map::PlayerList const & playerList = map->GetPlayers();
+                                if(!playerList.isEmpty())
+                                {
+                                    for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
+                                    {
+                                        if(Player* player = iter->getSource())
+                                        {
+                                            player->RemoveAurasDueToSpell(SPELL_DEEP_SLEEP);
+                                        }
+                                    }
+                                }
+                            }
                             break;
 
                         default:
@@ -367,7 +386,6 @@ public:
             }
         }
 
-
         void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_AGGRO_WHITEMANE);
@@ -404,6 +422,15 @@ public:
             if(Creature* durand = me->GetCreature(*me, instance->GetData64(DATA_BOSS_COMMANDER_DURAND)))
                 if(durand->isAlive())
                     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+        }
+
+        void JustSummoned(Creature* Summoned)
+        {
+            Summons.Summon(Summoned);
+
+            if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
+                if(target && target->GetTypeId() == TYPEID_PLAYER)
+                    Summoned->AI()->AttackStart(target);
         }
 
         void DamageTaken(Unit* /*doneBy*/, uint32 &damage)
@@ -514,9 +541,41 @@ public:
 
 };
 
+class spell_mass_resurrection : public SpellScriptLoader
+{
+    public:
+        spell_mass_resurrection() : SpellScriptLoader("spell_mass_resurrection") { }
+
+        class spell_mass_resurrection_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_mass_resurrection_SpellScript);
+
+            void SummonJudicator(SpellEffIndex /*effIndex*/)
+            {
+                if (Creature* judicator = GetHitCreature())
+                {
+                    if(Unit* whitemane = GetCaster())
+                        if(judicator->GetEntry() == NPC_JUDICATOR && whitemane->GetEntry() == NPC_HIGH_INQUISITOR_WHITEMANE)
+                            whitemane->SummonCreature(NPC_JUDICATOR_POP, judicator->GetPositionX(), judicator->GetPositionY(), judicator->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_mass_resurrection_SpellScript::SummonJudicator, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_mass_resurrection_SpellScript();
+        }
+};
+
 void AddSC_boss_high_inquisitor_whitemane()
 {
     new boss_commander_durand();
     new boss_high_inquisitor_whitemane();
     new at_commander_durand_intro();
+    new spell_mass_resurrection();
 }

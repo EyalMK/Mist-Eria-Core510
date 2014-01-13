@@ -193,6 +193,7 @@ Unit::Unit(bool isWorldObject): WorldObject(isWorldObject)
     m_modAttackSpeedPct[RANGED_ATTACK] = 1.0f;
 
     m_extraAttacks = 0;
+	insightCount = 0;
     m_canDualWield = false;
 
     m_rootTimes = 0;
@@ -4491,9 +4492,19 @@ void Unit::_RegisterDynObject(DynamicObject* dynObj)
     m_dynObj.push_back(dynObj);
 }
 
+void Unit::_RegisterAreaTrigger(AreaTrigger* areaTrigger)
+{
+    m_AreaTrigger.push_back(areaTrigger);
+}
+
 void Unit::_UnregisterDynObject(DynamicObject* dynObj)
 {
     m_dynObj.remove(dynObj);
+}
+
+void Unit::_UnregisterAreaTrigger(AreaTrigger* areaTrigger)
+{
+    m_AreaTrigger.remove(areaTrigger);
 }
 
 DynamicObject* Unit::GetDynObject(uint32 spellId)
@@ -4507,6 +4518,46 @@ DynamicObject* Unit::GetDynObject(uint32 spellId)
             return dynObj;
     }
     return NULL;
+}
+
+AreaTrigger* Unit::GetAreaTrigger(uint32 spellId)
+{
+    if (m_AreaTrigger.empty())
+        return NULL;
+    for (AreaTriggerList::const_iterator i = m_AreaTrigger.begin(); i != m_AreaTrigger.end();++i)
+    {
+        AreaTrigger* areaTrigger = *i;
+        if (areaTrigger->GetSpellId() == spellId)
+            return areaTrigger;
+    }
+    return NULL;
+}
+
+int32 Unit::CountAreaTrigger(uint32 spellId)
+{
+    int32 count = 0;
+
+    if (m_AreaTrigger.empty())
+        return 0;
+    for (AreaTriggerList::const_iterator i = m_AreaTrigger.begin(); i != m_AreaTrigger.end();++i)
+    {
+        AreaTrigger* areaTrigger = *i;
+        if (areaTrigger->GetSpellId() == spellId)
+            count++;
+    }
+    return count;
+}
+
+void Unit::GetAreaTriggerList(std::list<AreaTrigger*> &list, uint32 spellId)
+{
+    if (m_AreaTrigger.empty())
+        return;
+    for (AreaTriggerList::const_iterator i = m_AreaTrigger.begin(); i != m_AreaTrigger.end();++i)
+    {
+        AreaTrigger* areaTrigger = *i;
+        if (areaTrigger->GetSpellId() == spellId)
+            list.push_back(areaTrigger);
+    }
 }
 
 void Unit::RemoveDynObject(uint32 spellId)
@@ -4526,10 +4577,33 @@ void Unit::RemoveDynObject(uint32 spellId)
     }
 }
 
+void Unit::RemoveAreaTrigger(uint32 spellId)
+{
+    if (m_AreaTrigger.empty())
+        return;
+    for (AreaTriggerList::iterator i = m_AreaTrigger.begin(); i != m_AreaTrigger.end();)
+    {
+        AreaTrigger* areaTrigger = *i;
+        if (areaTrigger->GetSpellId() == spellId)
+        {
+            areaTrigger->Remove();
+            i = m_AreaTrigger.begin();
+        }
+        else
+            ++i;
+    }
+}
+
 void Unit::RemoveAllDynObjects()
 {
     while (!m_dynObj.empty())
         m_dynObj.front()->Remove();
+}
+
+void Unit::RemoveAllAreasTrigger()
+{
+    while (!m_AreaTrigger.empty())
+        m_AreaTrigger.front()->Remove();
 }
 
 GameObject* Unit::GetGameObject(uint32 spellId) const
@@ -6694,24 +6768,18 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 else
                     return false;
             }
-            // Unholy Blight
-            if (dummySpell->Id == 49194)
-            {
-                triggered_spell_id = 50536;
-                SpellInfo const* unholyBlight = sSpellMgr->GetSpellInfo(triggered_spell_id);
-                if (!unholyBlight)
-                    return false;
+			if (dummySpell->Id == 49194) // Unholy Blight
+                {
+                    if (GetTypeId() != TYPEID_PLAYER)
+                        return false;
 
-                basepoints0 = CalculatePct(int32(damage), triggerAmount);
+                    basepoints0 = CalculatePct(int32(damage), triggerAmount);
+                    triggered_spell_id = 50536;
+                    basepoints0 += victim->GetRemainingPeriodicAmount(GetGUID(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE);
+                    break;
 
-                //Glyph of Unholy Blight
-                if (AuraEffect* glyph=GetAuraEffect(63332, 0))
-                    AddPct(basepoints0, glyph->GetAmount());
-
-                basepoints0 = basepoints0 / (unholyBlight->GetMaxDuration() / unholyBlight->Effects[0].Amplitude);
-                basepoints0 += victim->GetRemainingPeriodicAmount(GetGUID(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE);
-                break;
-            }
+                    break;
+                }
             // Threat of Thassarian
             if (dummySpell->SpellIconID == 2023)
             {
@@ -7510,6 +7578,25 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+		case 108945:// Angelic Bulwark
+        {
+            if (GetTypeId() != TYPEID_PLAYER)
+                return false;
+
+            if (!damage)
+                return false;
+
+            if ((GetHealth() - damage) >= CountPctFromMaxHealth(30))
+                return false;
+
+            if (ToPlayer()->HasSpellCooldown(108945))
+                return false;
+
+            ToPlayer()->AddSpellCooldown(108945, 0, time(NULL) + 90);
+            basepoints0 = int32(CountPctFromMaxHealth(20));
+
+            break;
+        }
         // Deep Wounds
         case 12834:
         case 12849:
@@ -7627,6 +7714,8 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                 return false;
             break;
         }
+		case 91023: // Find Weakness
+			return false;
         default:
             break;
     }
@@ -13332,6 +13421,148 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     CastSpell(this, 119962, true);
                 }
             }
+        }
+    }
+
+	// Leader of the Pack
+    if (target && GetTypeId() == TYPEID_PLAYER && (procExtra & PROC_EX_CRITICAL_HIT) && HasAura(17007) && (attType == BASE_ATTACK || (procSpell && procSpell->GetSchoolMask() == SPELL_SCHOOL_MASK_NORMAL)))
+    {
+        if (!ToPlayer()->HasSpellCooldown(34299))
+        {
+            CastSpell(this, 34299, true); // Heal
+            EnergizeBySpell(this, 68285, CountPctFromMaxMana(8), POWER_MANA);
+            ToPlayer()->AddSpellCooldown(34299, 0, time(NULL) + 6); // 6s ICD
+        }
+    }
+
+    // Dematerialize
+    if (target && target->GetTypeId() == TYPEID_PLAYER && target->HasAura(122464) && procSpell && procSpell->GetAllEffectsMechanicMask() & (1 << MECHANIC_STUN))
+    {
+        if (!target->ToPlayer()->HasSpellCooldown(122465))
+        {
+            target->CastSpell(target, 122465, true);
+            target->ToPlayer()->AddSpellCooldown(122465, 0, time(NULL) + 10);
+        }
+    }
+
+    // Find Weakness - 91023
+    if (GetTypeId() == TYPEID_PLAYER && HasAura(91023) && procSpell && (procSpell->Id == 8676 || procSpell->Id == 703 || procSpell->Id == 1833))
+        CastSpell(target, 91021, true);
+
+    // Revealing Strike - 84617
+    if (GetTypeId() == TYPEID_PLAYER && target && target->HasAura(84617, GetGUID()) && procSpell && procSpell->Id == 1752)
+        if (roll_chance_i(20))
+            ToPlayer()->AddComboPoints(target, 1);
+
+    // Bandit's Guile - 84654
+    // Your Sinister Strike and Revealing Strike abilities increase your damage dealt by up to 30%
+    if (GetTypeId() == TYPEID_PLAYER && HasAura(84654) && procSpell && (procSpell->Id == 84617 || procSpell->Id == 1752))
+    {
+        insightCount++;
+
+        // it takes a total of 4 strikes to get a proc, or a level up
+        if (insightCount >= 4)
+        {
+            insightCount = 0;
+
+            // it takes 4 strikes to get Shallow insight
+            // than 4 strikes to get Moderate insight
+            // and than 4 strikes to get Deep Insight
+
+            // Shallow Insight
+            if (HasAura(84745))
+            {
+                RemoveAura(84745);
+                CastSpell(this, 84746, true); // Moderate Insight
+            }
+            else if (HasAura(84746))
+            {
+                RemoveAura(84746);
+                CastSpell(this, 84747, true); // Deep Insight
+            }
+            // the cycle will begin
+            else if (!HasAura(84747))
+                CastSpell(this, 84745, true); // Shallow Insight
+        }
+        else
+        {
+            // Each strike refreshes the duration of shallow insight or Moderate insight
+            // but you can't refresh Deep Insight without starting from shallow insight.
+            // Shallow Insight
+            if (Aura* shallowInsight = GetAura(84745))
+                shallowInsight->RefreshDuration();
+            // Moderate Insight
+            else if (Aura* moderateInsight = GetAura(84746))
+                moderateInsight->RefreshDuration();
+        }
+    }
+
+    // Hack Fix Ice Floes - Drop charges
+    if (GetTypeId() == TYPEID_PLAYER && HasAura(108839) && procSpell && procSpell->Id != 108839 &&
+        ((procSpell->CastTimeEntry && procSpell->CastTimeEntry->CastTime > 0 && procSpell->CastTimeEntry->CastTime < 4000)
+        || (procSpell->DurationEntry && procSpell->DurationEntry->Duration[0] > 0 && procSpell->DurationEntry->Duration[0] < 4000 && procSpell->AttributesEx & SPELL_ATTR1_CHANNELED_2)))
+        if (AuraApplication* aura = GetAuraApplication(108839, GetGUID()))
+            aura->GetBase()->DropCharge();
+
+    // Hack Fix Cobra Strikes - Drop charge
+    if (GetTypeId() == TYPEID_UNIT && HasAura(53257) && damage > 0)
+    {
+        if (Aura* aura = GetAura(53257))
+        {
+            aura->DropCharge();
+
+            if (GetOwner())
+                if (Aura* cobra = GetOwner()->GetAura(53257))
+                    cobra->DropCharge();
+        }
+    }
+
+    // Hack Fix Frenzy
+    if (GetTypeId() == TYPEID_UNIT && isHunterPet() && GetOwner() && GetOwner()->ToPlayer() && GetOwner()->HasAura(19623) && ToPet()->IsPermanentPetFor(GetOwner()->ToPlayer()) && !procSpell)
+        if (roll_chance_i(40))
+            CastSpell(this, 19615, true);
+
+    // Hack Fix for Invigoration
+    if (GetTypeId() == TYPEID_UNIT && GetOwner() && GetOwner()->ToPlayer() && GetOwner()->HasAura(53253) &&
+        damage > 0 && ToPet() && ToPet()->IsPermanentPetFor(GetOwner()->ToPlayer()))
+        if (roll_chance_i(15))
+            GetOwner()->EnergizeBySpell(GetOwner(), 53253, 20, POWER_FOCUS);
+
+    // Fix Drop charge for Killing Machine
+    if (GetTypeId() == TYPEID_PLAYER && HasAura(51124) && getClass() == CLASS_DEATH_KNIGHT && procSpell && (procSpell->Id == 49020 || procSpell->Id == 49143))
+        RemoveAura(51124);
+
+    // Fix Drop charge for Blindsight
+    if (GetTypeId() == TYPEID_PLAYER && HasAura(121152) && getClass() == CLASS_ROGUE && procSpell && procSpell->Id == 111240)
+        RemoveAura(121153);
+
+    // Fix Drop charge for Fingers of Frost
+    if (GetTypeId() == TYPEID_PLAYER && getClass() == CLASS_MAGE && procSpell && (procSpell->Id == 30455 || procSpell->Id == 44572))
+    {
+        if (Aura* fingersOfFrost = GetAura(44544, GetGUID()))
+            fingersOfFrost->ModStackAmount(-1);
+        if (Aura* fingersVisual = GetAura(126084, GetGUID()))
+            fingersVisual->ModStackAmount(-1);
+    }
+
+    // Hack Fix Immolate - Critical strikes generate burning embers
+    if (GetTypeId() == TYPEID_PLAYER && procSpell && procSpell->Id == 348 && procExtra & PROC_EX_CRITICAL_HIT)
+        if (roll_chance_i(50))
+            SetPower(POWER_BURNING_EMBERS, GetPower(POWER_BURNING_EMBERS) + 1);
+
+    // Summon Shadowy Apparitions when Shadow Word : Pain is crit
+    if (GetTypeId() == TYPEID_PLAYER && procSpell && procSpell->Id == 589 && HasAura(78203) && procExtra & PROC_EX_CRITICAL_HIT)
+    {
+        CastSpell(this, 87426, true);
+        std::list<Creature*> shadowylist;
+
+        GetCreatureListWithEntryInGrid(shadowylist, 61966, 1.0f);
+
+		for (std::list<Creature*>::const_iterator i = shadowylist.begin(); i != shadowylist.end(); ++i)
+        {
+            if(UnitAI* ai =  (*i)->GetAI())
+                ai->SetGUID(target->GetGUID());
+            (*i)->GetMotionMaster()->MovePoint(1, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
         }
     }
 

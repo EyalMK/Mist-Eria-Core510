@@ -27,6 +27,7 @@
 #include "Object.h"
 #include "SpellAuraDefines.h"
 #include "ThreatManager.h"
+#include "../AreaTrigger/AreaTrigger.h"
 
 #define WORLD_TRIGGER   12999
 
@@ -331,6 +332,7 @@ class Creature;
 class Spell;
 class SpellInfo;
 class DynamicObject;
+class AreaTrigger;
 class GameObject;
 class Item;
 class Pet;
@@ -1309,6 +1311,7 @@ class Unit : public WorldObject
         void GetRandomContactPoint(const Unit* target, float &x, float &y, float &z, float distance2dMin, float distance2dMax) const;
         uint32 m_extraAttacks;
         bool m_canDualWield;
+		int32 insightCount;
 
         void _addAttacker(Unit* pAttacker)                  // must be called only from Unit::Attack(Unit*)
         {
@@ -1394,6 +1397,10 @@ class Unit : public WorldObject
         float GetHealthPct() const { return GetMaxHealth() ? 100.f * GetHealth() / GetMaxHealth() : 0.0f; }
         uint32 CountPctFromMaxHealth(int32 pct) const { return CalculatePct(GetMaxHealth(), pct); }
         uint32 CountPctFromCurHealth(int32 pct) const { return CalculatePct(GetHealth(), pct); }
+		uint32 CountPctFromMaxMana(int32 pct) const { return CalculatePct(GetMaxPower(POWER_MANA), pct); }
+        uint32 CountPctFromCurMana(int32 pct) const { return CalculatePct(GetPower(POWER_MANA), pct); }
+        uint32 CountPctFromMaxPower(int32 pct, Powers power) const { return CalculatePct(GetMaxPower(power), pct); }
+        uint32 CountPctFromCurPower(int32 pct, Powers power) const { return CalculatePct(GetPower(power), pct); }
 
         void SetHealth(uint32 val);
         void SetMaxHealth(uint32 val);
@@ -2059,6 +2066,15 @@ class Unit : public WorldObject
         void RemoveDynObject(uint32 spellId);
         void RemoveAllDynObjects();
 
+		// AreaTrigger management
+        void _RegisterAreaTrigger(AreaTrigger* areaTrigger);
+        void _UnregisterAreaTrigger(AreaTrigger* areaTrigger);
+        AreaTrigger* GetAreaTrigger(uint32 spellId);
+        int32 CountAreaTrigger(uint32 spellId);
+        void GetAreaTriggerList(std::list<AreaTrigger*> &list, uint32 spellId);
+        void RemoveAreaTrigger(uint32 spellId);
+        void RemoveAllAreasTrigger();
+
         GameObject* GetGameObject(uint32 spellId) const;
         void AddGameObject(GameObject* gameObj);
         void RemoveGameObject(GameObject* gameObj, bool del);
@@ -2313,6 +2329,9 @@ class Unit : public WorldObject
         typedef std::list<DynamicObject*> DynObjectList;
         DynObjectList m_dynObj;
 
+		typedef std::list<AreaTrigger*> AreaTriggerList;
+        AreaTriggerList m_AreaTrigger;
+
         typedef std::list<GameObject*> GameObjectList;
         GameObjectList m_gameObj;
         bool m_isSorted;
@@ -2441,6 +2460,20 @@ namespace Trinity
             {
                 float rA = a->GetMaxHealth() ? float(a->GetHealth()) / float(a->GetMaxHealth()) : 0.0f;
                 float rB = b->GetMaxHealth() ? float(b->GetHealth()) / float(b->GetMaxHealth()) : 0.0f;
+                return m_ascending ? rA < rB : rA > rB;
+            }
+        private:
+            const bool m_ascending;
+    };
+
+	class AreaTriggerDurationPctOrderPred
+    {
+        public:
+            AreaTriggerDurationPctOrderPred(bool ascending = true) : m_ascending(ascending) {}
+            bool operator() (const AreaTrigger* a, const AreaTrigger* b) const
+            {
+                int32 rA = a->GetDuration() ? float(a->GetDuration()) : 0;
+                int32 rB = b->GetDuration() ? float(b->GetDuration()) : 0;
                 return m_ascending ? rA < rB : rA > rB;
             }
         private:

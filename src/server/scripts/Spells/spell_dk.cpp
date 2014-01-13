@@ -60,7 +60,9 @@ enum DeathKnightSpells
     SPELL_DK_SOUL_REAPER_DAMAGE                 = 114867,
 	SPELL_DK_DEATH_AND_DECAY					= 52212,
 	SPELL_DK_REMORSELESS_WINTER					= 115000,
-	SPELL_DK_REMORSELESS_WINTER_STUN			= 115001
+	SPELL_DK_REMORSELESS_WINTER_STUN			= 115001,
+	SPELL_DK_FROST_FEVER                        = 55095,
+	SPELL_DK_BLOOD_PLAGUE                       = 55078,
 };
 
 enum DeathKnightSpellIcons
@@ -1233,9 +1235,11 @@ class spell_dk_howling_blast : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
 				Unit* caster = GetCaster()->ToPlayer();
+				Unit* target = GetHitUnit();
 				uint32 damage = GetHitDamage();
 
 				SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.681f));
+				caster->CastSpell(target, SPELL_DK_FROST_FEVER, true);
             }
 
             void Register()
@@ -1423,8 +1427,8 @@ public :
                 SpellInfo const* spellInfo = GetSpellInfo();
                 if(player && spellInfo)
                 {
-                    sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Raise Dead: Summoning");
-                    player->CastSpell(player, spellInfo->Effects[player->GetActiveSpec() == TALENT_TREE_DEATH_KNIGHT_UNHOLY ? 1 : 0].BasePoints, true);
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Raise Dead: Summoning ; player spec %u", uint32(player->GetActiveSpec()));
+                    player->CastSpell(player, spellInfo->Effects[(player->GetPrimaryTalentTree(player->GetActiveSpec()) == TALENT_TREE_DEATH_KNIGHT_UNHOLY) ? 1 : 0].BasePoints, true);
                 }
             }
         }
@@ -1439,6 +1443,89 @@ public :
     {
         return new spell_dk_raise_dead_SpellScript();
     }
+};
+
+class spell_dk_conversion : public SpellScriptLoader
+{
+public :
+    spell_dk_conversion() : SpellScriptLoader("spell_dk_conversion")
+    {
+
+    }
+
+    class spell_dk_conversion_AuraScript : public AuraScript
+    {
+    private :
+        PrepareAuraScript(spell_dk_conversion_AuraScript);
+
+        bool Validate(const SpellInfo *spellInfo)
+        {
+            return true ;
+        }
+
+        bool Load()
+        {
+            return true ;
+        }
+
+        void HandlePeriodicTick(AuraEffect const* auraEff)
+        {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Conversion: Entering OnEffectPeriodic Handler");
+            Unit* caster = auraEff->GetCaster();
+            if(caster && auraEff->GetBase())
+            {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Conversion (Periodic Handler): found a caster (guid %u, name %s), with runic power amount of %u", caster->GetGUID(), caster->GetName().c_str(), uint32(caster->GetPower(POWER_RUNIC_POWER)));
+                if(caster->GetPower(POWER_RUNIC_POWER) >= 10)
+                    caster->ModifyPower(POWER_RUNIC_POWER, -10);
+                else
+                    auraEff->GetBase()->Remove();
+            }
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_dk_conversion_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_dk_conversion_AuraScript();
+    }
+};
+
+// Unholy Blight - 115994
+class spell_dk_unholy_blight : public SpellScriptLoader
+{
+    public:
+        spell_dk_unholy_blight() : SpellScriptLoader("spell_dk_unholy_blight") { }
+
+        class spell_dk_unholy_blight_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dk_unholy_blight_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        _player->CastSpell(target, SPELL_DK_BLOOD_PLAGUE, true);
+                        _player->CastSpell(target, SPELL_DK_FROST_FEVER, true);
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_dk_unholy_blight_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dk_unholy_blight_SpellScript();
+        }
 };
 
 void AddSC_deathknight_spell_scripts()
@@ -1473,4 +1560,6 @@ void AddSC_deathknight_spell_scripts()
 	new spell_dk_death_and_decay();
 	new spell_dk_remorseless_winter();
 	new spell_dk_raise_dead();
+	new spell_dk_conversion();
+	new spell_dk_unholy_blight();
 }

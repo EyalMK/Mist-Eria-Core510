@@ -3083,6 +3083,23 @@ void SpellMgr::LoadSpellCustomAttr()
 				case 7384: // Overpower
                     spellInfo->AttributesEx |= SPELL_ATTR1_ENABLE_AT_DODGE;
                     break;
+				case 55095: // Frost Fever
+                case 77489: // Echo of Light (HoT)
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER;
+                    break;
+				case 108945:// Angelic Bulwark
+                    spellInfo->Effects[0].TriggerSpell = 114214;
+                    break;
+				case 91021: // Find Weakness
+                    spellInfo->Effects[0].BasePoints = 70;
+                    break;
+				case 1856:  // Vanish
+                    spellInfo->Effects[1].TriggerSpell = 131368;
+                    spellInfo->Effects[0].Effect = SPELL_EFFECT_SANCTUARY;
+                    break;
+                case 131369:// Vanish - Improved Stealth
+                    spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(27); // 3s
+                    break;
 				default:
 					break;
 			}
@@ -3919,9 +3936,6 @@ void SpellMgr::LoadSpellInfoCorrections()
 				case 114465:
 					spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_1_YARD);
 					break ;
-				case 86698:
-					spellInfo->Effects[EFFECT_1].TriggerSpell = 86700;
-					break;
 				default:
 					break;
 			}

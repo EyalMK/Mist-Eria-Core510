@@ -59,8 +59,7 @@ enum Texts
     SAY_KILL                        = 2,
     SAY_RAISE_FALLEN_CRUSADER       = 3,
     SAY_EVICT_SOUL                  = 4,
-    SAY_SUMMON_EMPOWERING_SPIRITS   = 5,
-    SAY_INTRO_THALNOS               = 6
+    SAY_SUMMON_EMPOWERING_SPIRITS   = 5
 };
 
 enum Creatures
@@ -73,24 +72,6 @@ enum Creatures
     NPC_TRAQUEUR_INVISIBLE      = 200011
 };
 
-enum Actions
-{
-    ACTION_INTRO    = 1
-};
-
-class at_crane_monastery : public AreaTriggerScript
-{
-    public:
-        at_crane_monastery () : AreaTriggerScript("at_crane_monastery ") { }
-
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
-        {
-            if (InstanceScript* instance = player->GetInstanceScript())
-                if (Creature* crane = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_BOSS_THALNOS_THE_SOULRENDER)))
-                    crane->AI()->DoAction(ACTION_INTRO);
-            return true;
-        }
-};
 
 class boss_thalnos_the_soulrender : public CreatureScript
 {
@@ -107,13 +88,11 @@ public:
         boss_thalnos_the_soulrenderAI(Creature* creature) : ScriptedAI(creature), Summons(me)
         {
             instance = creature->GetInstanceScript();
-            Intro = false;
         }
 
         InstanceScript* instance;
         SummonList Summons;
         EventMap events;
-        bool Intro;
 
         void Reset()
         {
@@ -134,21 +113,6 @@ public:
             for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
                 (*itr)->DespawnOrUnsummon();
         }
-
-        void DoAction(int32 action)
-        {
-            switch (action)
-            {
-                case ACTION_INTRO:
-                    if (!Intro)
-                    {
-                        Talk(SAY_INTRO_THALNOS);
-                        Intro = true;
-                    }
-                    break;
-            }
-        }
-
 
         void EnterCombat(Unit* /*who*/)
         {
@@ -462,7 +426,7 @@ public:
                                 }
                                 else
                                     p->RemoveAurasDueToSpell(SPELL_SPIRIT_GALE_AURA);
-                             }
+                            }
                         }
                     }
                 }
@@ -588,7 +552,6 @@ class spell_evict_soul : public SpellScriptLoader
 
 void AddSC_boss_thalnos_the_soulrender()
 {
-    new at_crane_monastery();
     new boss_thalnos_the_soulrender();
     new npc_fallen_crusader();
     new npc_evicted_soul();

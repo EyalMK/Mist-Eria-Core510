@@ -1493,11 +1493,14 @@ public:
 
 		void DamageDealt(Unit* /*target*/, uint32& damage, DamageEffectType damageType)
         {
-			if (damage > 0 && me->GetEntry() == 46506) // Retribution
-				if(TempSummon* tmpSum = me->ToTempSummon())
-					if(Unit* summoner = tmpSum->GetSummoner())
-						if (Player* player = summoner->ToPlayer())
-						    player->CastSpell(player, SPELL_PALADIN_ANCIENT_POWER, true);
+			if (damageType != SPELL_DIRECT_DAMAGE)
+                    return;
+
+			if(TempSummon* tmpSum = me->ToTempSummon())
+				if(Unit* summoner = tmpSum->GetSummoner())
+					if (Player* player = summoner->ToPlayer())
+						if (tmpSum->GetEntry() == 46506) // Retribution
+							player->CastSpell(player, SPELL_PALADIN_ANCIENT_POWER, true);
         }
 
         void UpdateAI(uint32 diff)
