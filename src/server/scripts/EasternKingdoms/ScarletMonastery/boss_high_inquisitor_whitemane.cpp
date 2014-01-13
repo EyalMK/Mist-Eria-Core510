@@ -75,11 +75,24 @@ enum Texts_Whitemane
     SAY_RESSURECTION_WHITEMANE      = 3
 };
 
+enum Crusader
+{
+    SAY_CRUSADER        = 0,
+    SAY_CRUSADER_HERO   = 1
+};
+
 
 enum Creatures
 {
     NPC_JUDICATOR           = 58643,
-    NPC_JUDICATOR_POP       = 58605
+    NPC_JUDICATOR_POP       = 58605,
+    NPC_CRUSADER            = 64841,
+    NPC_CRUSADER_HERO       = 64842
+};
+
+enum Gameobjects
+{
+    GO_CORPSE_WHITEMANE     = 3
 };
 
 
@@ -201,6 +214,19 @@ public:
             if(Creature* whitemane = me->GetCreature(*me, instance->GetData64(DATA_BOSS_HIGH_INQUISITOR_WHITEMANE)))
                 if(whitemane->isAlive())
                     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+
+            if (IsHeroic())
+                if(Creature * crusader = me->SummonCreature(NPC_CRUSADER_HERO, 831.04f, 605.42f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 300000))
+                {
+                    crusader->GetMotionMaster()->MovePoint(1, 790.03f, 605.63f, 13.00f);
+                    Talk(SAY_CRUSADER_HERO);
+                }
+            else
+                if(Creature * crusader = me->SummonCreature(NPC_CRUSADER, 831.04f, 605.42f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 300000))
+                {
+                    crusader->GetMotionMaster()->MovePoint(1, 790.03f, 605.63f, 13.00f);
+                    Talk(SAY_CRUSADER);
+                }
         }
 
         void DamageTaken(Unit* /*doneBy*/, uint32 &damage)
@@ -422,6 +448,8 @@ public:
             if(Creature* durand = me->GetCreature(*me, instance->GetData64(DATA_BOSS_COMMANDER_DURAND)))
                 if(durand->isAlive())
                     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+
+            me->SummonGameObject(GO_CORPSE_WHITEMANE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, 0, 0, 0, 0, 300000);
         }
 
         void JustSummoned(Creature* Summoned)
