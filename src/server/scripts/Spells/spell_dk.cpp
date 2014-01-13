@@ -62,6 +62,7 @@ enum DeathKnightSpells
 	SPELL_DK_REMORSELESS_WINTER					= 115000,
 	SPELL_DK_REMORSELESS_WINTER_STUN			= 115001,
 	SPELL_DK_FROST_FEVER                        = 55095,
+	SPELL_DK_BLOOD_PLAGUE                       = 55078,
 };
 
 enum DeathKnightSpellIcons
@@ -1493,6 +1494,40 @@ public :
     }
 };
 
+// Unholy Blight - 115994
+class spell_dk_unholy_blight : public SpellScriptLoader
+{
+    public:
+        spell_dk_unholy_blight() : SpellScriptLoader("spell_dk_unholy_blight") { }
+
+        class spell_dk_unholy_blight_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dk_unholy_blight_SpellScript);
+
+            void HandleOnHit()
+            {
+                if (Player* _player = GetCaster()->ToPlayer())
+                {
+                    if (Unit* target = GetHitUnit())
+                    {
+                        _player->CastSpell(target, SPELL_DK_BLOOD_PLAGUE, true);
+                        _player->CastSpell(target, SPELL_DK_FROST_FEVER, true);
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_dk_unholy_blight_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dk_unholy_blight_SpellScript();
+        }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     new spell_dk_anti_magic_shell_raid();
@@ -1526,4 +1561,5 @@ void AddSC_deathknight_spell_scripts()
 	new spell_dk_remorseless_winter();
 	new spell_dk_raise_dead();
 	new spell_dk_conversion();
+	new spell_dk_unholy_blight();
 }
