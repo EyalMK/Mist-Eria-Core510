@@ -60,7 +60,8 @@ enum DeathKnightSpells
     SPELL_DK_SOUL_REAPER_DAMAGE                 = 114867,
 	SPELL_DK_DEATH_AND_DECAY					= 52212,
 	SPELL_DK_REMORSELESS_WINTER					= 115000,
-	SPELL_DK_REMORSELESS_WINTER_STUN			= 115001
+	SPELL_DK_REMORSELESS_WINTER_STUN			= 115001,
+	SPELL_DK_FROST_FEVER                        = 55095,
 };
 
 enum DeathKnightSpellIcons
@@ -1233,9 +1234,11 @@ class spell_dk_howling_blast : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
 				Unit* caster = GetCaster()->ToPlayer();
+				Unit* target = GetHitUnit();
 				uint32 damage = GetHitDamage();
 
 				SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.681f));
+				caster->CastSpell(target, SPELL_DK_FROST_FEVER, true);
             }
 
             void Register()
