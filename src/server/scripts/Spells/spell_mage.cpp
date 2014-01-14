@@ -2029,6 +2029,50 @@ public :
     }
 };
 
+// 44457 - Living Bomb
+/// Updated 5.1.0
+class spell_mage_temporal_shield : public SpellScriptLoader
+{
+    public:
+        spell_mage_temporal_shield() : SpellScriptLoader("spell_mage_temporal_shield") { }
+
+        class spell_mage_temporal_shield_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_mage_temporal_shield_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(115611))
+                    return false;
+                return true;
+            }
+
+            void AfterRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            {
+                AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
+                if (removeMode != AURA_REMOVE_BY_ENEMY_SPELL && removeMode != AURA_REMOVE_BY_EXPIRE)
+                    return;
+
+                if (Unit* caster = GetCaster())
+				{
+					int32 bp = caster->GetDamageTakenInPastSecs(4) / 3;
+					caster->CastCustomSpell(caster, 115611, &bp, NULL, NULL, true);
+				}
+                    
+            }
+			
+            void Register()
+            {
+                AfterEffectRemove += AuraEffectRemoveFn(spell_mage_temporal_shield_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+			}
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_mage_temporal_shield_AuraScript();
+        }
+};
+
 void AddSC_mage_spell_scripts()
 {
     new spell_mage_blast_wave();
@@ -2064,4 +2108,5 @@ void AddSC_mage_spell_scripts()
 	new spell_mage_ice_block();
 	new spell_mage_arcane_missiles_proc();
 	new spell_mage_arcane_missiles();
+	new spell_mage_temporal_shield();
 }
