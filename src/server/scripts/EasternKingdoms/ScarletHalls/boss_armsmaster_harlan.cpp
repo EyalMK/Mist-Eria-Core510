@@ -143,24 +143,62 @@ public:
 
         void MovementInform(uint32 type, uint32 id)
         {
-            switch (id)
-            {
-                case EVENT_JUMP:
-                    events.ScheduleEvent(EVENT_HEROIC_LEAP, 100);
-                    break;
-            }
+            if (type == POINT_MOTION_TYPE)
+                switch (id)
+                {
+                    case EVENT_JUMP:
+                        events.ScheduleEvent(EVENT_HEROIC_LEAP, 100);
+                        break;
+                    case 1:
+                        me->GetMotionMaster()->MovePoint(2, 1199.28f, 455.25f, 1.2f);
+                        break;
+                    case 2:
+                        me->GetMotionMaster()->MovePoint(3, 1212.00f, 456.04f, 3.00f);
+                        break;
+                    case 3:
+                        me->GetMotionMaster()->MovePoint(4, 1220.20f, 446.20f, 6.20f);
+                        break;
+                    case 4:
+                        me->GetMotionMaster()->MovePoint(5, 1224.79f, 436.81f, 6.20f);
+                        break;
+                    case 5:
+                        me->GetMotionMaster()->MovePoint(6, 1214.36f, 426.06f, 6.20f);
+                        break;
+                    case 6:
+                        me->GetMotionMaster()->MovePoint(7, 1198.93f, 425.60f, 7.90f);
+                        break;
+                    case 7:
+                        me->GetMotionMaster()->MovePoint(8, 1187.82f, 436.83f, 10.90f);
+                        break;
+                    case 8:
+                        me->GetMotionMaster()->MovePoint(9, 1188.49f, 451.41f, 10.90f);
+                        break;
+                    case 9:
+                        me->GetMotionMaster()->MovePoint(10, 1197.87f, 462.36f, 8.10f);
+                        break;
+                    case 10:
+                        me->GetMotionMaster()->MovePoint(11, 1212.04f, 462.46f, 6.20f);
+                        break;
+                    case 11:
+                        me->GetMotionMaster()->MovePoint(12, 1224.22f, 453.38f, 6.20f);
+                        break;
+                    case 12:
+                        me->GetMotionMaster()->MovePoint(13, 1217.59f, 437.31f, 4.50f);
+                        break;
+                    case 13:
+                        me->GetMotionMaster()->MovePoint(14, 1208.86f, 430.74f, 2.10f);
+                        break;
+                    case 14:
+                        me->GetMotionMaster()->MovePoint(15, 1193.94f, 444.15f, 1.2f);
+                        break;
+                    case 15:
+                        me->RemoveAurasDueToSpell(SPELL_BLADES_OF_LIGHT);
+                        events.ScheduleEvent(EVENT_DRAGONS_REACH, 10*IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_CALL_REINFORCEMENTS, 15*IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_JUMP_LEAP, 40*IN_MILLISECONDS);
+                        break;
+                }
         }
-
-        void WaypointReached(uint32 waypointId)
-        {
-            if (waypointId == 15)
-            {
-                events.ScheduleEvent(EVENT_DRAGONS_REACH, 10*IN_MILLISECONDS);
-                events.ScheduleEvent(EVENT_CALL_REINFORCEMENTS, 15*IN_MILLISECONDS);
-                events.ScheduleEvent(EVENT_JUMP_LEAP, 40*IN_MILLISECONDS);
-            }
-        }
-
 
         void UpdateAI(uint32 diff)
         {
@@ -193,7 +231,7 @@ public:
 
                         case EVENT_HEROIC_LEAP:
                             DoCast(SPELL_HEROIC_LEAP);
-                            events.ScheduleEvent(EVENT_BLADES_OF_LIGHT, 1*IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_BLADES_OF_LIGHT, 100);
                             break;
 
                         case EVENT_DRAGONS_REACH:
@@ -208,20 +246,6 @@ public:
 
                         case EVENT_WAYPOINT_BLADES:
                             me->GetMotionMaster()->MovePoint(1, 1193.94f, 444.15f, 1.2f);
-                            me->GetMotionMaster()->MovePoint(2, 1199.28f, 455.25f, 1.2f);
-                            me->GetMotionMaster()->MovePoint(3, 1212.00f, 456.04f, 3.00f);
-                            me->GetMotionMaster()->MovePoint(4, 1220.20f, 446.20f, 6.20f);
-                            me->GetMotionMaster()->MovePoint(5, 1224.79f, 436.81f, 6.20f);
-                            me->GetMotionMaster()->MovePoint(6, 1214.36f, 426.06f, 6.20f);
-                            me->GetMotionMaster()->MovePoint(7, 1198.93f, 425.60f, 7.90f);
-                            me->GetMotionMaster()->MovePoint(8, 1187.82f, 436.83f, 10.90f);
-                            me->GetMotionMaster()->MovePoint(9, 1188.49f, 451.41f, 10.90f);
-                            me->GetMotionMaster()->MovePoint(10, 1197.87f, 462.36f, 8.10f);
-                            me->GetMotionMaster()->MovePoint(11, 1212.04f, 462.46f, 6.20f);
-                            me->GetMotionMaster()->MovePoint(12, 1224.22f, 453.38f, 6.20f);
-                            me->GetMotionMaster()->MovePoint(13, 1217.59f, 437.31f, 4.50f);
-                            me->GetMotionMaster()->MovePoint(14, 1208.86f, 430.74f, 2.10f);
-                            me->GetMotionMaster()->MovePoint(15, 1193.94f, 444.15f, 1.2f);
                             break;
 
                         case EVENT_BERSERKER_RAGE:
