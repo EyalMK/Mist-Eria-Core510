@@ -227,13 +227,14 @@ public:
                         {
                             crusader->GetMotionMaster()->MovePoint(1, 790.03f, 605.63f, 13.00f);
                             Talk(SAY_CRUSADER_HERO);
+                            return;
                         }
-                    else if(!IsHeroic())
-                        if(Creature * crusader = me->SummonCreature(NPC_CRUSADER, 831.04f, 605.42f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 300000))
-                        {
-                            crusader->GetMotionMaster()->MovePoint(1, 790.03f, 605.63f, 13.00f);
-                            Talk(SAY_CRUSADER);
-                        }
+
+                    if(Creature * crusader = me->SummonCreature(NPC_CRUSADER, 831.04f, 605.42f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 300000))
+                    {
+                        crusader->GetMotionMaster()->MovePoint(1, 790.03f, 605.63f, 13.00f);
+                        Talk(SAY_CRUSADER);
+                    }
                }
         }
 
@@ -464,13 +465,14 @@ public:
                         {
                             crusader->GetMotionMaster()->MovePoint(1, 790.03f, 605.63f, 13.00f);
                             Talk(SAY_CRUSADER_HERO);
+                            return;
                         }
-                    else if(!IsHeroic())
-                        if(Creature * crusader = me->SummonCreature(NPC_CRUSADER, 831.04f, 605.42f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 300000))
-                        {
-                            crusader->GetMotionMaster()->MovePoint(1, 790.03f, 605.63f, 13.00f);
-                            Talk(SAY_CRUSADER);
-                        }
+
+                    if(Creature * crusader = me->SummonCreature(NPC_CRUSADER, 831.04f, 605.42f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 300000))
+                    {
+                        crusader->GetMotionMaster()->MovePoint(1, 790.03f, 605.63f, 13.00f);
+                        Talk(SAY_CRUSADER);
+                    }
                }
 
             me->SummonGameObject(GO_CORPSE_WHITEMANE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, 0, 0, 0, 0, 300000);
