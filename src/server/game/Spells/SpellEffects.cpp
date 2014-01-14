@@ -2714,6 +2714,10 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                             summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
                         }
 
+						// Wild Mushroom : Plague
+                        if (summon && m_spellInfo->Id == 113516)
+                            m_originalCaster->CastSpell(m_originalCaster, 113517, true); // Wild Mushroom : Plague (periodic dummy)
+
                         ExecuteLogEffectSummonObject(effIndex, summon);
                     }
                     return;
@@ -5275,19 +5279,22 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
     if (!unitTarget)
         return;
 
-    bool forward = true;
-
-    switch(m_spellInfo->Id)
-    {
-        //case 781: forward = false;
-        default:
-			break;
-    }
-
     float speedxy = float(m_spellInfo->Effects[effIndex].MiscValue)/10;
     float speedz = float(damage/10);
+    bool back = true;
 
-    m_caster->JumpTo(speedxy, speedz, forward);
+    // Fix Glyph of Disengage
+    if (m_caster->HasAura(56844))
+    {
+        speedxy *= 1.5f;
+        speedz = float(75 / 10);
+    }
+
+    // Wild Charge (Moonkin) and Disengage
+    if (m_spellInfo->Id == 102383 || m_spellInfo->SpellIconID == 1891)
+        back = false;
+
+    m_caster->JumpTo(speedxy, speedz, back);
 }
 
 void Spell::EffectQuestClear(SpellEffIndex effIndex)

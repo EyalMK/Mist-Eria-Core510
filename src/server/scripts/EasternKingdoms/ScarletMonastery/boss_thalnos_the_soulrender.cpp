@@ -66,6 +66,7 @@ enum Creatures
 {
     NPC_ZOMBIE                  = 59884,
     NPC_EVICTED_SOUL            = 59974,
+    NPC_EVICTED_SOUL_HERO       = 599740,
     NPC_EMPOWERING_SPIRITS      = 59893,
     NPC_EMPOWERED_ZOMBIE        = 59930,
     NPC_THALNOS                 = 59789,
@@ -530,8 +531,9 @@ class spell_evict_soul : public SpellScriptLoader
                 {
                     if(player->GetTypeId() == TYPEID_PLAYER)
                     {
-                        if(Creature * summon = player->SummonCreature(NPC_EVICTED_SOUL, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 300000))
-                            summon->SetDisplayId(player->GetDisplayId());
+                        if(Unit* thalnos = GetCaster())
+                            if(Creature * summon = thalnos->SummonCreature(NPC_EVICTED_SOUL, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 300000))
+                                summon->SetDisplayId(player->GetDisplayId());
                     }
                 }
             }

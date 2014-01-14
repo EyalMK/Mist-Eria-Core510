@@ -1,71 +1,138 @@
-#include "ObjectMgr.h"
+/*
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "scarlet_halls.h"
 
-enum Yells
-{
-};
-
 enum Spells
 {
+    SPELL_FIRESTORM_KICK        = 113764
 };
 
 enum Events
 {
+    EVENT_FIRESTORM_KICK    = 1
 };
+
+enum Texts
+{
+    SAY_AGGRO                       = 0,
+    SAY_DEATH                       = 1,
+    SAY_KILL                        = 2
+};
+
 
 class boss_flameweaver_koegler : public CreatureScript
 {
-    public:
-        boss_flameweaver_koegler() : CreatureScript("boss_flameweaver_koegler") { }
+public:
+    boss_flameweaver_koegler() : CreatureScript("boss_flameweaver_koegler") { }
 
-        struct boss_flameweaver_koeglerAI : public BossAI
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new boss_flameweaver_koeglerAI(creature);
+    }
+
+    struct boss_flameweaver_koeglerAI : public ScriptedAI
+    {
+        boss_flameweaver_koeglerAI(Creature* creature) : ScriptedAI(creature), Summons(me)
         {
-            boss_flameweaver_koeglerAI(Creature* creature) : BossAI(creature, DATA_FLAMEWEAVER_KOEGLER)
+            instance = creature->GetInstanceScript();
+        }
+
+        InstanceScript* instance;
+        SummonList Summons;
+        EventMap events;
+
+        void Reset()
+        {
+            events.Reset();
+            Summons.DespawnAll();
+
+            if (instance)
+                instance->SetBossState(DATA_BOSS_FLAMEWEAVER_KOEGLER, NOT_STARTED);
+        }
+
+
+        void EnterCombat(Unit* /*who*/)
+        {
+            Talk(SAY_AGGRO);
+
+            if (instance)
+                instance->SetBossState(DATA_BOSS_FLAMEWEAVER_KOEGLER, IN_PROGRESS);
+        }
+
+
+        void EnterEvadeMode()
+        {
+            if (instance)
+                instance->SetBossState(DATA_BOSS_FLAMEWEAVER_KOEGLER, FAIL);
+
+            ScriptedAI::EnterEvadeMode();
+        }
+
+        void KilledUnit(Unit* /*pWho*/)
+        {
+            Talk(SAY_KILL);
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            Talk(SAY_DEATH);
+            Summons.DespawnAll();
+
+            if (instance)
+                instance->SetBossState(DATA_BOSS_FLAMEWEAVER_KOEGLER, DONE);
+
+        }
+
+        void JustSummoned(Creature* Summoned)
+        {
+            Summons.Summon(Summoned);
+
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if(!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while(uint32 eventId = events.ExecuteEvent())
             {
-            }
-
-            void Reset()
-            {
-            }
-
-            void EnterCombat(Unit* /*who*/)
-            {
-            }
-
-            void JustDied(Unit* /*killer*/)
-            {
-            }
-
-            void UpdateAI(uint32 const diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-                /*
-                while (uint32 eventId = events.ExecuteEvent())
+                switch(eventId)
                 {
-                    switch (eventId)
+                    if (instance)
                     {
+
                         default:
                             break;
                     }
                 }
-                */
-
-                DoMeleeAttackIfReady();
             }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_flameweaver_koeglerAI(creature);
+            DoMeleeAttackIfReady();
         }
+    };
+
 };
 
 void AddSC_boss_flameweaver_koegler()

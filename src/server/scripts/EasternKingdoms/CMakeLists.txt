@@ -148,6 +148,11 @@ set(sources
   EasternKingdoms/ScarletMonastery/boss_high_inquisitor_whitemane.cpp
   EasternKingdoms/ScarletMonastery/boss_thalnos_the_soulrender.cpp
   EasternKingdoms/ScarletMonastery/instance_scarlet_monastery.cpp
+  EasternKingdoms/ScarletHalls/boss_houndmaster_braun.cpp
+  EasternKingdoms/ScarletHalls/instance_scarlet_halls.cpp
+  EasternKingdoms/ScarletHalls/scarlet_halls.h
+  EasternKingdoms/ScarletHalls/boss_armsmaster_harlan.cpp
+  EasternKingdoms/ScarletHalls/boss_flameweaver_koegler.cpp
   EasternKingdoms/zone_undercity.cpp
   EasternKingdoms/zone_silvermoon_city.cpp
   EasternKingdoms/zone_loch_modan.cpp
