@@ -22,21 +22,56 @@
 
 enum Spells
 {
-    SPELL_FIRESTORM_KICK        = 113764
+    /* Koegler */
+    SPELL_BOOK_BURNER               = 113364,
+    SPELL_QUICKENED_MIND            = 113682,
+    SPELL_PYROBLAST                 = 113690,
+    SPELL_GREATER_DRAGONS_BREATH    = 113641,
+    SPELL_TELEPORT                  = 113626,
+    SPELL_FIREBALL_VOLLEY           = 113691,
+
+    /* Autres */
+    SPELL_BURNING_BOOKS             = 113616
 };
 
 enum Events
 {
-    EVENT_FIRESTORM_KICK    = 1
+    EVENT_BOOK_BURNER               = 1,
+    EVENT_QUICKENED_MIND            = 2,
+    EVENT_PYROBLAST                 = 3,
+    EVENT_GREATER_DRAGONS_BREATH    = 4,
+    EVENT_TELEPORT                  = 5,
+    EVENT_FIREBALL_VOLLEY           = 6
 };
 
 enum Texts
 {
     SAY_AGGRO                       = 0,
     SAY_DEATH                       = 1,
-    SAY_KILL                        = 2
+    SAY_KILL                        = 2,
+    SAY_INTRO                       = 3,
+    SAY_DRAGONS_BREATH              = 4,
+    SAY_BOOK_BURNER                 = 5
 };
 
+enum Actions
+{
+    ACTION_INTRO    = 1
+};
+
+class at_flameweaver_koegler_intro : public AreaTriggerScript
+{
+    public:
+        at_flameweaver_koegler_intro() : AreaTriggerScript("at_flameweaver_koegler_intro") { }
+
+        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        {
+            if (InstanceScript* instance = player->GetInstanceScript())
+                if (Creature* koegler = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_BOSS_FLAMEWEAVER_KOEGLER)))
+                    koegler->AI()->DoAction(ACTION_INTRO);
+            return true;
+        }
+};
 
 class boss_flameweaver_koegler : public CreatureScript
 {
@@ -53,8 +88,10 @@ public:
         boss_flameweaver_koeglerAI(Creature* creature) : ScriptedAI(creature), Summons(me)
         {
             instance = creature->GetInstanceScript();
+            Intro = false;
         }
 
+        bool Intro;
         InstanceScript* instance;
         SummonList Summons;
         EventMap events;
@@ -75,6 +112,27 @@ public:
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_FLAMEWEAVER_KOEGLER, IN_PROGRESS);
+
+            events.ScheduleEvent(EVENT_PYROBLAST, 4*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_QUICKENED_MIND, 8*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_FIREBALL_VOLLEY, 15*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_BOOK_BURNER, 25*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_TELEPORT, 30*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_GREATER_DRAGONS_BREATH, 31*IN_MILLISECONDS);
+        }
+
+        void DoAction(int32 action)
+        {
+            switch (action)
+            {
+                case ACTION_INTRO:
+                    if (!Intro)
+                    {
+                        Talk(SAY_INTRO);
+                        Intro = true;
+                    }
+                    break;
+            }
         }
 
 
@@ -123,6 +181,30 @@ public:
                 {
                     if (instance)
                     {
+                        case EVENT_PYROBLAST:
+                            DoCast(SPELL_PYROBLAST);
+                            events.ScheduleEvent(EVENT_PYROBLAST, 40*IN_MILLISECONDS);
+                            break;
+                        case EVENT_QUICKENED_MIND:
+                            DoCast(me, SPELL_QUICKENED_MIND);
+                            events.ScheduleEvent(EVENT_QUICKENED_MIND, 40*IN_MILLISECONDS);
+                            break;
+                        case EVENT_FIREBALL_VOLLEY:
+                            DoCast(SPELL_FIREBALL_VOLLEY);
+                            events.ScheduleEvent(EVENT_FIREBALL_VOLLEY, 40*IN_MILLISECONDS);
+                            break;
+                        case EVENT_BOOK_BURNER:
+                            DoCast(SPELL_BOOK_BURNER);
+                            events.ScheduleEvent(EVENT_BOOK_BURNER, 40*IN_MILLISECONDS);
+                            break;
+                        case EVENT_TELEPORT:
+                            DoCast(me, SPELL_TELEPORT);
+                            events.ScheduleEvent(EVENT_TELEPORT, 40*IN_MILLISECONDS);
+                            break;
+                        case EVENT_GREATER_DRAGONS_BREATH:
+                            DoCast(SPELL_GREATER_DRAGONS_BREATH);
+                            events.ScheduleEvent(EVENT_GREATER_DRAGONS_BREATH, 40*IN_MILLISECONDS);
+                            break;
 
                         default:
                             break;
@@ -135,7 +217,40 @@ public:
 
 };
 
+class npc_book_case : public CreatureScript
+{
+public:
+    npc_book_case() : CreatureScript("npc_book_case") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_book_caseAI(creature);
+    }
+
+    struct npc_book_caseAI : public ScriptedAI
+    {
+            npc_book_caseAI(Creature* creature) : ScriptedAI(creature) {}
+
+            void Reset()
+            {
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if(!UpdateVictim())
+                    return;
+
+                DoMeleeAttackIfReady();
+            }
+    };
+};
+
 void AddSC_boss_flameweaver_koegler()
 {
     new boss_flameweaver_koegler();
+    new npc_book_case();
 }

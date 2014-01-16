@@ -22,19 +22,34 @@
 
 enum Spells
 {
-    SPELL_FIRESTORM_KICK        = 113764
+    SPELL_DEATH_BLOSSOM_JUMP    = 114241,
+    SPELL_DEATH_BLOSSOM         = 114242,
+    SPELL_PIERCING_THROW        = 114004,
+  //  SPELL_BLOODY_MESS           = 114056,
+    SPELL_CALL_DOG              = 114259,
+    SPELL_BLOODY_RAGE           = 116140
 };
 
 enum Events
 {
-    EVENT_FIRESTORM_KICK    = 1
+    EVENT_DEATH_BLOSSOM_JUMP    = 1,
+    EVENT_DEATH_BLOSSOM         = 2,
+    EVENT_PIERCING_THROW        = 3,
+    EVENT_BLOODY_RAGE           = 4,
+    EVENT_DEATH                 = 5
 };
 
 enum Texts
 {
     SAY_AGGRO                       = 0,
     SAY_DEATH                       = 1,
-    SAY_KILL                        = 2
+    SAY_KILL                        = 2,
+    SAY_CALL_DOG                    = 3,
+    SAY_PIERCING                    = 4,
+    SAY_BLOSSOM                     = 5,
+    SAY_FAIL_DOG                    = 6,
+    SAY_PRE_DEATH_1                 = 7,
+    SAY_PRE_DEATH_2                 = 8
 };
 
 
@@ -55,6 +70,9 @@ public:
             instance = creature->GetInstanceScript();
         }
 
+        bool bloodyrage;
+        bool predeath;
+        uint32 m_uiNextCastPercent;
         InstanceScript* instance;
         SummonList Summons;
         EventMap events;
@@ -63,6 +81,9 @@ public:
         {
             events.Reset();
             Summons.DespawnAll();
+            bloodyrage = true;
+            predeath = true;
+            m_uiNextCastPercent = 90;
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_HOUNDMASTER_BRAUN, NOT_STARTED);
@@ -84,6 +105,9 @@ public:
                 instance->SetBossState(DATA_BOSS_HOUNDMASTER_BRAUN, FAIL);
 
             ScriptedAI::EnterEvadeMode();
+
+            events.ScheduleEvent(EVENT_DEATH_BLOSSOM_JUMP, 17*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_PIERCING_THROW, 7*IN_MILLISECONDS);
         }
 
         void KilledUnit(Unit* /*pWho*/)
@@ -99,6 +123,40 @@ public:
             if (instance)
                 instance->SetBossState(DATA_BOSS_HOUNDMASTER_BRAUN, DONE);
 
+        }
+
+        void DamageTaken(Unit* doneBy, uint32 &damage)
+        {
+            if(me->GetHealthPct() <= m_uiNextCastPercent && me->GetHealthPct() >= 55)
+            {
+                DoCast(SPELL_CALL_DOG);
+                m_uiNextCastPercent -= 10 ;
+            }
+
+            if (damage < me->GetHealth())
+                return;
+
+            if (!instance)
+                return;
+
+            if (damage >= me->GetHealth())
+            {
+                damage = 0;
+
+                events.CancelEvent(EVENT_PIERCING_THROW);
+                events.CancelEvent(EVENT_DEATH_BLOSSOM_JUMP);
+
+                me->InterruptNonMeleeSpells(false);
+                me->StopMoving();
+                me->ClearComboPointHolders();
+                me->RemoveAllAurasOnDeath();
+                me->ClearAllReactives();
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveIdle();
+
+                Talk(SAY_PRE_DEATH_2);
+                events.ScheduleEvent(EVENT_DEATH, 10*IN_MILLISECONDS);
+            }
         }
 
         void JustSummoned(Creature* Summoned)
@@ -117,12 +175,52 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
+            if (me->HealthBelowPct(50) && bloodyrage)
+            {
+                events.ScheduleEvent(EVENT_BLOODY_RAGE, 1*IN_MILLISECONDS);
+                bloodyrage = false;
+            }
+
+            if (me->HealthBelowPct(20) && predeath)
+            {
+                Talk(SAY_PRE_DEATH_1);
+                predeath = false;
+            }
+
             while(uint32 eventId = events.ExecuteEvent())
             {
                 switch(eventId)
                 {
                     if (instance)
                     {
+                        case EVENT_DEATH_BLOSSOM_JUMP:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                            {
+                                DoCast(target, SPELL_DEATH_BLOSSOM_JUMP);
+                            }
+                            events.ScheduleEvent(EVENT_DEATH_BLOSSOM_JUMP, 18*IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_DEATH_BLOSSOM, 1*IN_MILLISECONDS);
+                            break;
+
+                        case EVENT_DEATH_BLOSSOM:
+                            DoCast(SPELL_DEATH_BLOSSOM);
+                            break;
+
+                        case EVENT_PIERCING_THROW:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                            {
+                                DoCast(target, SPELL_PIERCING_THROW);
+                            }
+                            events.ScheduleEvent(EVENT_PIERCING_THROW, 7*IN_MILLISECONDS);
+                            break;
+
+                        case EVENT_BLOODY_RAGE:
+                            DoCast(me, SPELL_BLOODY_RAGE);
+                            break;
+
+                        case EVENT_DEATH:
+                            me->DisappearAndDie();
+                            break;
 
                         default:
                             break;

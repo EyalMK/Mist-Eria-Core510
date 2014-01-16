@@ -49,9 +49,9 @@ enum Events
 
 enum Texts
 {
-    SAY_AGGRO               = 0, // En garde ! 29426
-    SAY_DEATH               = 1, // Vaincu... par des espèces de... 29427
-    SAY_KILL                = 2 // Tsss ! Un peu d’entraînement vous ferait le plus grand bien. 29430 Hah-HAH! 29429
+    SAY_AGGRO               = 0,
+    SAY_DEATH               = 1,
+    SAY_KILL                = 2
 };
 
 
@@ -143,12 +143,16 @@ public:
 
         void MovementInform(uint32 type, uint32 id)
         {
+            switch (id)
+            {
+                case EVENT_JUMP:
+                    events.ScheduleEvent(EVENT_HEROIC_LEAP, 100);
+                    break;
+            }
+
             if (type == POINT_MOTION_TYPE)
                 switch (id)
                 {
-                    case EVENT_JUMP:
-                        events.ScheduleEvent(EVENT_HEROIC_LEAP, 100);
-                        break;
                     case 1:
                         me->GetMotionMaster()->MovePoint(2, 1199.28f, 455.25f, 1.2f);
                         break;
@@ -270,7 +274,40 @@ public:
 
 };
 
+class npc_scarlet_defender : public CreatureScript
+{
+public:
+    npc_scarlet_defender() : CreatureScript("npc_scarlet_defender") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_scarlet_defenderAI(creature);
+    }
+
+    struct npc_scarlet_defenderAI : public ScriptedAI
+    {
+            npc_scarlet_defenderAI(Creature* creature) : ScriptedAI(creature) {}
+
+            void Reset()
+            {
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if(!UpdateVictim())
+                    return;
+
+                DoMeleeAttackIfReady();
+            }
+    };
+};
+
 void AddSC_boss_armsmaster_harlan()
 {
     new boss_armsmaster_harlan();
+    new npc_scarlet_defender();
 }
