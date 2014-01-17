@@ -54,7 +54,14 @@ enum Texts
 
 enum Creatures
 {
-    NPC_OBEDIENT_HOUND      = 59309
+    NPC_OBEDIENT_HOUND      = 59309,
+    NPC_BRAUN               = 59303
+};
+
+enum Actions
+{
+    ACTION_DOG_ACTIVATE     = 1,
+    ACTION_DOG_ANGER        =2
 };
 
 
@@ -81,11 +88,13 @@ public:
         InstanceScript* instance;
         SummonList Summons;
         EventMap events;
+        std::list<Creature*> m_listDogs ;
 
         void Reset()
         {
             events.Reset();
             Summons.DespawnAll();
+            ResetDogs();
             bloodyrage = true;
             predeath = true;
             m_uiNextCastPercent = 90;
@@ -130,31 +139,32 @@ public:
                 instance->SetBossState(DATA_BOSS_HOUNDMASTER_BRAUN, DONE);
         }
 
-        void CheckDog()
+        void ResetDogs()
         {
-            std::list<Creature*> dogs;
-            GetCreatureListWithEntryInGrid(dogs, me, NPC_OBEDIENT_HOUND, 1000.0f);
+            m_listDogs.clear();
 
-            if(dogs.empty())
-                return;
+            std::list<Creature*> dogs ;
+            GetCreatureListWithEntryInGrid(dogs, me, NPC_OBEDIENT_HOUND, 5000.0f);
 
             for(std::list<Creature*>::const_iterator iter = dogs.begin() ; iter != dogs.end() ; ++iter)
             {
-                if(Creature* dogverif = *iter)
+                if(Creature* dog = *iter)
                 {
-                    if(dogverif->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
-                    {
-                        dogs.push_back(dogverif);
-                        if(Creature* dog = dogs.front())
-                        {
-                            dog->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-
-                            if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.0f, true))
-                                if(target && target->GetTypeId() == TYPEID_PLAYER)
-                                    dog->AI()->AttackStart(target);
-                        }
-                    }
+                    dog->AI()->Reset();
+                    m_listDogs.push_back(dog);
                 }
+            }
+        }
+
+        void CallDog()
+        {
+            std::list<Creature*>::const_iterator iter = m_listDogs.begin();
+            std::advance(iter, urand(0, m_listDogs.size()));
+
+            if(Creature* dog = *iter)
+            {
+                dog->AI()->DoAction(ACTION_DOG_ACTIVATE);
+                m_listDogs.remove(*iter);
             }
         }
 
@@ -165,7 +175,7 @@ public:
                 DoCast(SPELL_CALL_DOG);
                 m_uiNextCastPercent -= 10 ;
 
-                CheckDog();
+                CallDog();
             }
 
             if (damage < me->GetHealth())
@@ -177,7 +187,16 @@ public:
             if (damage >= me->GetHealth())
             {
                 if (instance)
-                    instance->SetBossState(DATA_BOSS_HOUNDMASTER_BRAUN, SPECIAL);
+                {
+                    std::list<Creature*> dogs ;
+                    GetCreatureListWithEntryInGrid(dogs, me, NPC_OBEDIENT_HOUND, 5000.0f);
+
+                    for(std::list<Creature*>::const_iterator iter = dogs.begin() ; iter != dogs.end() ; ++iter)
+                        if(Creature* dog = *iter)
+                            dog->AI()->DoAction(ACTION_DOG_ANGER);
+
+                }
+
 
                 damage = 0;
 
@@ -263,9 +282,10 @@ public:
                             me->SummonCreature(NPC_OBEDIENT_HOUND, 992.73f, 517.46f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
                             me->SummonCreature(NPC_OBEDIENT_HOUND, 991.71f, 518.65f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
                             me->SummonCreature(NPC_OBEDIENT_HOUND, 991.64f, 516.06f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
-                            me->SummonCreature(NPC_OBEDIENT_HOUND, 1013.29f, 530.31f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
-                            me->SummonCreature(NPC_OBEDIENT_HOUND, 1014.48f, 531.29f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
-                            me->SummonCreature(NPC_OBEDIENT_HOUND, 1012.10f, 531.33f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
+                            me->SummonCreature(NPC_OBEDIENT_HOUND, 1013.29f, 530.31f, 14.00f, 4.70f, TEMPSUMMON_TIMED_DESPAWN, 600000);
+                            me->SummonCreature(NPC_OBEDIENT_HOUND, 1014.48f, 531.29f, 14.00f, 4.70f, TEMPSUMMON_TIMED_DESPAWN, 600000);
+                            me->SummonCreature(NPC_OBEDIENT_HOUND, 1012.10f, 531.33f, 14.00f, 4.70f, TEMPSUMMON_TIMED_DESPAWN, 600000);
+                            ResetDogs();
                             break;
 
                         default:
@@ -302,14 +322,36 @@ public:
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             }
 
+            void EnterCombat(Unit* /*who*/)
+            {
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            }
+
+            void DoAction(int32 action)
+            {
+                switch (action)
+                {
+                    case ACTION_DOG_ACTIVATE:
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+
+                        if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
+                            if(target && target->GetTypeId() == TYPEID_PLAYER)
+                                me->AI()->AttackStart(target);
+
+                        break;
+
+                    case ACTION_DOG_ANGER:
+                        if(Creature* braun = me->FindNearestCreature(NPC_BRAUN, 500.0f))
+                        {
+                            me->setFaction(42);
+                            me->AI()->AttackStart(braun);
+                        }
+                        break;
+                }
+            }
+
             void UpdateAI(uint32 diff)
             {
-                if (Unit* Braun = Unit::GetUnit(*me, instance->GetBossState(DATA_BOSS_HOUNDMASTER_BRAUN) == SPECIAL))
-                {
-                    me->setFaction(42);
-                    me->AI()->AttackStart(Braun);
-                }
-
                 DoMeleeAttackIfReady();
             }
     };

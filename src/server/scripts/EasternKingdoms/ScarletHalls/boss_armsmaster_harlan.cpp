@@ -28,7 +28,6 @@ enum Spells
     SPELL_DRAGONS_REACH         = 111217,
     SPELL_BLADES_OF_LIGHT       = 111216,
     SPELL_BERSERKER_RAGE        = 111221,
-    //SPELL_CALL_REINFORCEMENTS   = 111755,
 
     /* Autres */
     SPELL_HEAVY_ARMOR           = 113959,
@@ -143,7 +142,6 @@ public:
 
         void MovementInform(uint32 type, uint32 id)
         {
-            if (type == POINT_MOTION_TYPE)
                 switch (id)
                 {
                     case 1:
@@ -193,6 +191,10 @@ public:
                         events.ScheduleEvent(EVENT_DRAGONS_REACH, 10*IN_MILLISECONDS);
                         events.ScheduleEvent(EVENT_CALL_REINFORCEMENTS, 15*IN_MILLISECONDS);
                         events.ScheduleEvent(EVENT_JUMP_LEAP, 40*IN_MILLISECONDS);
+                        break;
+
+                    case EVENT_JUMP:
+                        events.ScheduleEvent(EVENT_HEROIC_LEAP, 100);
                         break;
                 }
         }
@@ -254,10 +256,6 @@ public:
                             me->SummonCreature(NPC_SCARLET_DEFENDER, 1187.17f, 443.87f, 11.3f, 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
                             me->SummonCreature(NPC_SCARLET_DEFENDER, 1187.17f, 443.87f, 11.3f, 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
                             events.ScheduleEvent(EVENT_CALL_REINFORCEMENTS, 20*IN_MILLISECONDS);
-                            break;
-
-                        case EVENT_JUMP:
-                            events.ScheduleEvent(EVENT_HEROIC_LEAP, 100);
                             break;
 
                         default:
