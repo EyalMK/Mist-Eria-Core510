@@ -143,13 +143,6 @@ public:
 
         void MovementInform(uint32 type, uint32 id)
         {
-            switch (id)
-            {
-                case EVENT_JUMP:
-                    events.ScheduleEvent(EVENT_HEROIC_LEAP, 100);
-                    break;
-            }
-
             if (type == POINT_MOTION_TYPE)
                 switch (id)
                 {
@@ -263,6 +256,10 @@ public:
                             events.ScheduleEvent(EVENT_CALL_REINFORCEMENTS, 20*IN_MILLISECONDS);
                             break;
 
+                        case EVENT_JUMP:
+                            events.ScheduleEvent(EVENT_HEROIC_LEAP, 100);
+                            break;
+
                         default:
                             break;
                     }
@@ -288,18 +285,45 @@ public:
     {
             npc_scarlet_defenderAI(Creature* creature) : ScriptedAI(creature) {}
 
+            uint32 HeavyArmorTimer;
+            uint32 UnarmoredTimer;
+
             void Reset()
             {
+                HeavyArmorTimer = 500;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void DamageTaken(Unit* doneBy, uint32 &damage)
             {
+                if(!me->HasAura(SPELL_HEAVY_ARMOR))
+                   UnarmoredTimer = 500;
             }
+
 
             void UpdateAI(uint32 diff)
             {
                 if(!UpdateVictim())
                     return;
+
+                if(HeavyArmorTimer <= diff)
+                {
+                    me->CastSpell(me, SPELL_HEAVY_ARMOR);
+                }
+                else HeavyArmorTimer -= diff;
+
+                if(UnarmoredTimer <= diff)
+                {
+                    switch (urand(0, 1))
+                    {
+                        case 0:
+                            me->CastSpell(me, SPELL_UNARMORED_1);
+                            break;
+                        case 1:
+                            me->CastSpell(me, SPELL_UNARMORED_2);
+                            break;
+                    }
+                }
+                else UnarmoredTimer -= diff;
 
                 DoMeleeAttackIfReady();
             }

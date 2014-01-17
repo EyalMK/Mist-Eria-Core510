@@ -25,7 +25,6 @@ enum Spells
     SPELL_DEATH_BLOSSOM_JUMP    = 114241,
     SPELL_DEATH_BLOSSOM         = 114242,
     SPELL_PIERCING_THROW        = 114004,
-  //  SPELL_BLOODY_MESS           = 114056,
     SPELL_CALL_DOG              = 114259,
     SPELL_BLOODY_RAGE           = 116140
 };
@@ -36,7 +35,8 @@ enum Events
     EVENT_DEATH_BLOSSOM         = 2,
     EVENT_PIERCING_THROW        = 3,
     EVENT_BLOODY_RAGE           = 4,
-    EVENT_DEATH                 = 5
+    EVENT_DEATH                 = 5,
+    EVENT_POP_HOUND             = 6
 };
 
 enum Texts
@@ -50,6 +50,11 @@ enum Texts
     SAY_FAIL_DOG                    = 6,
     SAY_PRE_DEATH_1                 = 7,
     SAY_PRE_DEATH_2                 = 8
+};
+
+enum Creatures
+{
+    NPC_OBEDIENT_HOUND      = 59309
 };
 
 
@@ -96,6 +101,10 @@ public:
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_HOUNDMASTER_BRAUN, IN_PROGRESS);
+
+            events.ScheduleEvent(EVENT_DEATH_BLOSSOM_JUMP, 17*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_PIERCING_THROW, 7*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_POP_HOUND, 5*IN_MILLISECONDS);
         }
 
 
@@ -105,9 +114,6 @@ public:
                 instance->SetBossState(DATA_BOSS_HOUNDMASTER_BRAUN, FAIL);
 
             ScriptedAI::EnterEvadeMode();
-
-            events.ScheduleEvent(EVENT_DEATH_BLOSSOM_JUMP, 17*IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_PIERCING_THROW, 7*IN_MILLISECONDS);
         }
 
         void KilledUnit(Unit* /*pWho*/)
@@ -118,11 +124,38 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_DEATH);
-            Summons.DespawnAll();
+            //Summons.DespawnAll();
 
             if (instance)
                 instance->SetBossState(DATA_BOSS_HOUNDMASTER_BRAUN, DONE);
+        }
 
+        void CheckDog()
+        {
+            std::list<Creature*> dogs;
+            GetCreatureListWithEntryInGrid(dogs, me, NPC_OBEDIENT_HOUND, 1000.0f);
+
+            if(dogs.empty())
+                return;
+
+            for(std::list<Creature*>::const_iterator iter = dogs.begin() ; iter != dogs.end() ; ++iter)
+            {
+                if(Creature* dogverif = *iter)
+                {
+                    if(dogverif->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+                    {
+                        dogs.push_back(dogverif);
+                        if(Creature* dog = dogs.front())
+                        {
+                            dog->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+
+                            if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.0f, true))
+                                if(target && target->GetTypeId() == TYPEID_PLAYER)
+                                    dog->AI()->AttackStart(target);
+                        }
+                    }
+                }
+            }
         }
 
         void DamageTaken(Unit* doneBy, uint32 &damage)
@@ -131,6 +164,8 @@ public:
             {
                 DoCast(SPELL_CALL_DOG);
                 m_uiNextCastPercent -= 10 ;
+
+                CheckDog();
             }
 
             if (damage < me->GetHealth())
@@ -141,6 +176,9 @@ public:
 
             if (damage >= me->GetHealth())
             {
+                if (instance)
+                    instance->SetBossState(DATA_BOSS_HOUNDMASTER_BRAUN, SPECIAL);
+
                 damage = 0;
 
                 events.CancelEvent(EVENT_PIERCING_THROW);
@@ -162,7 +200,6 @@ public:
         void JustSummoned(Creature* Summoned)
         {
             Summons.Summon(Summoned);
-
         }
 
         void UpdateAI(uint32 diff)
@@ -222,6 +259,15 @@ public:
                             me->DisappearAndDie();
                             break;
 
+                        case EVENT_POP_HOUND:
+                            me->SummonCreature(NPC_OBEDIENT_HOUND, 992.73f, 517.46f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
+                            me->SummonCreature(NPC_OBEDIENT_HOUND, 991.71f, 518.65f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
+                            me->SummonCreature(NPC_OBEDIENT_HOUND, 991.64f, 516.06f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
+                            me->SummonCreature(NPC_OBEDIENT_HOUND, 1013.29f, 530.31f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
+                            me->SummonCreature(NPC_OBEDIENT_HOUND, 1014.48f, 531.29f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
+                            me->SummonCreature(NPC_OBEDIENT_HOUND, 1012.10f, 531.33f, 14.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
+                            break;
+
                         default:
                             break;
                     }
@@ -230,10 +276,47 @@ public:
             DoMeleeAttackIfReady();
         }
     };
+};
 
+class npc_obedient_hound : public CreatureScript
+{
+public:
+    npc_obedient_hound() : CreatureScript("npc_obedient_hound") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_obedient_houndAI(creature);
+    }
+
+    struct npc_obedient_houndAI : public ScriptedAI
+    {
+            npc_obedient_houndAI(Creature* creature) : ScriptedAI(creature)
+            {
+                instance = creature->GetInstanceScript();
+            }
+
+            InstanceScript* instance;
+
+            void Reset()
+            {
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if (Unit* Braun = Unit::GetUnit(*me, instance->GetBossState(DATA_BOSS_HOUNDMASTER_BRAUN) == SPECIAL))
+                {
+                    me->setFaction(42);
+                    me->AI()->AttackStart(Braun);
+                }
+
+                DoMeleeAttackIfReady();
+            }
+    };
 };
 
 void AddSC_boss_houndmaster_braun()
 {
     new boss_houndmaster_braun();
+    new npc_obedient_hound();
 }
