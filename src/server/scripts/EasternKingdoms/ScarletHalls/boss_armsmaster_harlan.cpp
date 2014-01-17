@@ -59,6 +59,10 @@ enum Creatures
     NPC_SCARLET_DEFENDER    = 58998
 };
 
+enum Misc
+{
+    HARLAN_PATH          = 586320
+};
 
 class boss_armsmaster_harlan : public CreatureScript
 {
@@ -144,7 +148,7 @@ public:
         {
                 switch (id)
                 {
-                    case 1:
+                    /*case 1:
                         me->GetMotionMaster()->MovePoint(2, 1199.28f, 455.25f, 1.2f);
                         break;
                     case 2:
@@ -185,7 +189,7 @@ public:
                         break;
                     case 14:
                         me->GetMotionMaster()->MovePoint(15, 1193.94f, 444.15f, 1.2f);
-                        break;
+                        break;*/
                     case 15:
                         me->RemoveAurasDueToSpell(SPELL_BLADES_OF_LIGHT);
                         events.ScheduleEvent(EVENT_DRAGONS_REACH, 10*IN_MILLISECONDS);
@@ -201,6 +205,7 @@ public:
 
         void UpdateAI(uint32 diff)
         {
+
             if(!UpdateVictim())
                 return;
 
@@ -244,7 +249,7 @@ public:
                             break;
 
                         case EVENT_WAYPOINT_BLADES:
-                            me->GetMotionMaster()->MovePoint(1, 1193.94f, 444.15f, 1.2f);
+                            me->GetMotionMaster()->MovePath(HARLAN_PATH, false);
                             break;
 
                         case EVENT_BERSERKER_RAGE:
