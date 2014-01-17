@@ -1496,15 +1496,32 @@ public:
 			if (damageType != SPELL_DIRECT_DAMAGE)
                     return;
 
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS TEST GUARDIAN PALADIN DAMAGE = %u", damage);
+
 			if(TempSummon* tmpSum = me->ToTempSummon())
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "me->ToTempSummon()");
 				if(Unit* summoner = tmpSum->GetSummoner())
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "tmpSum->GetSummoner()");
 					if (Player* player = summoner->ToPlayer())
+					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "summoner->ToPlayer()");
 						if (tmpSum->GetEntry() == 46506) // Retribution
+						{
 							player->CastSpell(player, SPELL_PALADIN_ANCIENT_POWER, true);
+							sLog->outDebug(LOG_FILTER_NETWORKIO, "tmpSum->GetEntry() == 46506");
+						}
+					}
+				}
+			}
         }
 
         void UpdateAI(uint32 diff)
 		{
+			if (!UpdateVictim())
+				return;
+
 			/*events.Update(diff);
 
 			while(uint32 eventId = events.ExecuteEvent())
