@@ -1493,9 +1493,6 @@ public:
 
 		void DamageDealt(Unit* /*target*/, uint32& damage, DamageEffectType damageType)
         {
-			if (damageType != SPELL_DIRECT_DAMAGE)
-                    return;
-
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS TEST GUARDIAN PALADIN DAMAGE = %u", damage);
 
 			if(TempSummon* tmpSum = me->ToTempSummon())
