@@ -16,7 +16,9 @@ public :
         {
         }
 
-        
+    
+	};
+	
     InstanceScript* GetInstanceScript(InstanceMap *instance) const
     {
         return new instance_stormstout_brewery_InstanceScript(instance);
