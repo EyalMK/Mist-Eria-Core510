@@ -60,8 +60,7 @@ enum Creatures
 
 enum Actions
 {
-    ACTION_DOG_ACTIVATE     = 1,
-    ACTION_DOG_ANGER        =2
+    ACTION_DOG_ANGER        = 1
 };
 
 
@@ -155,9 +154,13 @@ public:
 
             if(Creature* dog = *iter)
             {
-                dog->AI()->DoAction(ACTION_DOG_ACTIVATE);
-                dogs.remove(*iter);
+                dog->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+
+                if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
+                    if(target && target->GetTypeId() == TYPEID_PLAYER)
+                        me->AI()->AttackStart(target);
             }
+            dogs.clear();
         }
 
         void DamageTaken(Unit* doneBy, uint32 &damage)
@@ -320,14 +323,6 @@ public:
             {
                 switch (action)
                 {
-                    case ACTION_DOG_ACTIVATE:
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-
-                        if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
-                            if(target && target->GetTypeId() == TYPEID_PLAYER)
-                                me->AI()->AttackStart(target);
-                        break;
-
                     case ACTION_DOG_ANGER:
                         if(Creature* braun = me->FindNearestCreature(NPC_BRAUN, 500.0f))
                         {
