@@ -45,10 +45,8 @@ void AddSC_boss_saboteur_kiptilak();
 void AddSC_boss_raigonn();
 void AddSC_boss_commander_rimok();
 
-// Include : Stormstout Brewery
-/*void AddSC_boss_hoptallus();
-void AddSC_boss_ook_ook();
-void AddSC_boss_yan_zhu();*/
+// Stormstout Brewery
+void AddSC_instance_stormstout_brewery();
 
 // Temple of the Jade Serpent
 void AddSC_boss_wise_mari();
@@ -1372,9 +1370,7 @@ void AddPandariaScripts()
 	 AddSC_boss_commander_rimok();
 
     // Stormstout Brewery
-    /*AddSC_boss_hoptallus();
-    AddSC_boss_ook_ook();
-    AddSC_boss_yan_zhu();*/
+	AddSC_instance_stormstout_brewery();
 
 	//Temple of the Jade Serpent
     AddSC_boss_wise_mari();
