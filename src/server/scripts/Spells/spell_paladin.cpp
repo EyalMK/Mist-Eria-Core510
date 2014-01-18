@@ -1528,7 +1528,7 @@ public:
         void Reset()
 		{
 			events.Reset();
-			events.ScheduleEvent(EVENT_PALADIN_ANCIENT_FURY, 29997);
+			events.ScheduleEvent(EVENT_PALADIN_ANCIENT_FURY, 29980);
 		}
 
 		void DamageDealt(Unit* /*target*/, uint32& /*damage*/, DamageEffectType /*damageType*/)
@@ -1562,7 +1562,7 @@ public:
 						if(TempSummon* tmpSum = me->ToTempSummon())
                             if(Unit* summoner = tmpSum->GetSummoner())
                                 if (Player* player = summoner->ToPlayer())
-									player->RemoveAurasDueToSpell(SPELL_PALADIN_ANCIENT_POWER);
+									player->RemoveAurasDueToSpell(SPELL_PALADIN_ANCIENT_POWER, player->GetGUID());
 
 						events.CancelEvent(EVENT_PALADIN_REMOVE_ANCIENT_POWER);
 						break;
