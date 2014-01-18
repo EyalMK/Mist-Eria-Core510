@@ -91,6 +91,7 @@ enum PaladinSpells
 	SPELL_PALADIN_TOWER_OF_RADIANCE              = 85512,
 
 	SPELL_PALADIN_ANCIENT_POWER                  = 86700,
+	SPELL_PALADIN_ANCIENT_FURY                   = 86704,
 };
 
 //24275 -- SPELL_HAMMER_OF_WRATH
@@ -1474,44 +1475,64 @@ class spell_pal_tower_of_radiance : public SpellScriptLoader
         }
 };
 
-class npc_pal_guardian_of_ancient_kings : public CreatureScript
+// Ancient Fury : 86704
+class spell_pal_ancient_fury : public SpellScriptLoader
+{
+    public:
+        spell_pal_ancient_fury() : SpellScriptLoader("spell_pal_ancient_fury") { }
+
+        class spell_pal_ancient_fury_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pal_ancient_fury_SpellScript);
+
+            void HandleOnHit()
+            {
+				uint32 baseDmg = GetHitDamage();
+				uint32 damage = 0;
+
+				if (Player* player = GetCaster()->ToPlayer())
+					if (player->HasAura(SPELL_PALADIN_ANCIENT_POWER))
+						if (Aura* ancientPower = player->GetAura(SPELL_PALADIN_ANCIENT_POWER))
+						{
+							damage = uint32(ancientPower->GetStackAmount() * (0.107f * player->GetTotalAttackPowerValue(BASE_ATTACK)));
+							player->RemoveAurasDueToSpell(SPELL_PALADIN_ANCIENT_POWER);
+						}
+
+				SetHitDamage(baseDmg + damage);
+            }
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_pal_ancient_fury_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pal_ancient_fury_SpellScript();
+        }
+};
+
+#define EVENT_PALADIN_ANCIENT_FURY	1
+
+class npc_pal_guardian_of_ancient_kings_retri : public CreatureScript
 {
 public:
-    npc_pal_guardian_of_ancient_kings() : CreatureScript("npc_pal_guardian_of_ancient_kings") { }
+    npc_pal_guardian_of_ancient_kings_retri() : CreatureScript("npc_pal_guardian_of_ancient_kings_retri") { }
 
-    struct npc_pal_guardian_of_ancient_kingsAI : public ScriptedAI
+    struct npc_pal_guardian_of_ancient_kings_retriAI : public ScriptedAI
     {
-        npc_pal_guardian_of_ancient_kingsAI(Creature* creature) : ScriptedAI(creature)
+        npc_pal_guardian_of_ancient_kings_retriAI(Creature* creature) : ScriptedAI(creature)
         {	}
 
-		//EventMap events;
+        void Reset() {	}
 
-        void Reset()
-		{
-			//events.Reset();
-		}
-
-		void DamageDealt(Unit* /*target*/, uint32& damage, DamageEffectType damageType)
+		void DamageDealt(Unit* /*target*/, uint32& /*damage*/, DamageEffectType /*damageType*/)
         {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS TEST GUARDIAN PALADIN DAMAGE = %u", damage);
-
-			if(TempSummon* tmpSum = me->ToTempSummon())
-			{
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "me->ToTempSummon()");
-				if(Unit* summoner = tmpSum->GetSummoner())
-				{
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "tmpSum->GetSummoner()");
+			if (TempSummon* tmpSum = me->ToTempSummon())
+				if (Unit* summoner = tmpSum->GetSummoner())
 					if (Player* player = summoner->ToPlayer())
-					{
-						sLog->outDebug(LOG_FILTER_NETWORKIO, "summoner->ToPlayer()");
-						if (tmpSum->GetEntry() == 46506) // Retribution
-						{
-							player->CastSpell(player, SPELL_PALADIN_ANCIENT_POWER, true);
-							sLog->outDebug(LOG_FILTER_NETWORKIO, "tmpSum->GetEntry() == 46506");
-						}
-					}
-				}
-			}
+						player->CastSpell(player, SPELL_PALADIN_ANCIENT_POWER, true);
         }
 
         void UpdateAI(uint32 diff)
@@ -1519,24 +1540,13 @@ public:
 			if (!UpdateVictim())
 				return;
 
-			/*events.Update(diff);
-
-			while(uint32 eventId = events.ExecuteEvent())
-			{
-				switch(eventId)
-				{
-					default:
-						break;
-				}
-			}*/
-
 			DoMeleeAttackIfReady();
 		}
     };
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_pal_guardian_of_ancient_kingsAI(creature);
+        return new npc_pal_guardian_of_ancient_kings_retriAI(creature);
     }
 };
 
@@ -1571,5 +1581,6 @@ void AddSC_paladin_spell_scripts()
 	new spell_pal_holy_prism_effect();
 	new spell_pal_selfless_healer();
 	new spell_pal_tower_of_radiance();
-	new npc_pal_guardian_of_ancient_kings();
+	new spell_pal_ancient_fury();
+	new npc_pal_guardian_of_ancient_kings_retri();
 }
