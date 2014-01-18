@@ -1493,10 +1493,7 @@ class spell_pal_ancient_fury : public SpellScriptLoader
 				if (Player* player = GetCaster()->ToPlayer())
 					if (player->HasAura(SPELL_PALADIN_ANCIENT_POWER))
 						if (Aura* ancientPower = player->GetAura(SPELL_PALADIN_ANCIENT_POWER))
-						{
 							damage = uint32(ancientPower->GetStackAmount() * (0.107f * player->GetTotalAttackPowerValue(BASE_ATTACK)));
-							player->RemoveAurasDueToSpell(SPELL_PALADIN_ANCIENT_POWER);
-						}
 
 				SetHitDamage(baseDmg + damage);
             }
@@ -1514,6 +1511,7 @@ class spell_pal_ancient_fury : public SpellScriptLoader
 };
 
 #define EVENT_PALADIN_ANCIENT_FURY	1
+#define EVENT_PALADIN_REMOVE_ANCIENT_POWER	2
 
 class npc_pal_guardian_of_ancient_kings_retri : public CreatureScript
 {
@@ -1525,7 +1523,13 @@ public:
         npc_pal_guardian_of_ancient_kings_retriAI(Creature* creature) : ScriptedAI(creature)
         {	}
 
-        void Reset() {	}
+		EventMap events;
+
+        void Reset()
+		{
+			events.Reset();
+			events.ScheduleEvent(EVENT_PALADIN_ANCIENT_FURY, 29997);
+		}
 
 		void DamageDealt(Unit* /*target*/, uint32& /*damage*/, DamageEffectType /*damageType*/)
         {
@@ -1537,8 +1541,36 @@ public:
 
         void UpdateAI(uint32 diff)
 		{
-			if (!UpdateVictim())
-				return;
+			if (UpdateVictim() || !UpdateVictim())
+				events.Update(diff);
+
+			while(uint32 eventId = events.ExecuteEvent())
+			{
+				switch(eventId)
+				{
+					case EVENT_PALADIN_ANCIENT_FURY:
+                        if(TempSummon* tmpSum = me->ToTempSummon())
+                            if(Unit* summoner = tmpSum->GetSummoner())
+                                if (Player* player = summoner->ToPlayer())
+                                    player->CastSpell(player, SPELL_PALADIN_ANCIENT_FURY, true);
+
+						events.ScheduleEvent(EVENT_PALADIN_REMOVE_ANCIENT_POWER, 1);
+						events.CancelEvent(EVENT_PALADIN_ANCIENT_FURY);
+						break;
+
+					case EVENT_PALADIN_REMOVE_ANCIENT_POWER:
+						if(TempSummon* tmpSum = me->ToTempSummon())
+                            if(Unit* summoner = tmpSum->GetSummoner())
+                                if (Player* player = summoner->ToPlayer())
+									player->RemoveAurasDueToSpell(SPELL_PALADIN_ANCIENT_POWER);
+
+						events.CancelEvent(EVENT_PALADIN_REMOVE_ANCIENT_POWER);
+						break;
+
+					default:
+						break;
+				}
+			}
 
 			DoMeleeAttackIfReady();
 		}
