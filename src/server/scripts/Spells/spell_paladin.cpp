@@ -1524,19 +1524,22 @@ public:
         {	}
 
 		EventMap events;
+		bool furyDone;
 
         void Reset()
 		{
 			events.Reset();
 			events.ScheduleEvent(EVENT_PALADIN_ANCIENT_FURY, 29980);
+			furyDone = false;
 		}
 
 		void DamageDealt(Unit* /*target*/, uint32& /*damage*/, DamageEffectType /*damageType*/)
         {
-			if (TempSummon* tmpSum = me->ToTempSummon())
-				if (Unit* summoner = tmpSum->GetSummoner())
-					if (Player* player = summoner->ToPlayer())
-						player->CastSpell(player, SPELL_PALADIN_ANCIENT_POWER, true);
+			if (!furyDone)
+				if (TempSummon* tmpSum = me->ToTempSummon())
+					if (Unit* summoner = tmpSum->GetSummoner())
+						if (Player* player = summoner->ToPlayer())
+							player->CastSpell(player, SPELL_PALADIN_ANCIENT_POWER, true);
         }
 
         void UpdateAI(uint32 diff)
@@ -1562,7 +1565,10 @@ public:
 						if(TempSummon* tmpSum = me->ToTempSummon())
                             if(Unit* summoner = tmpSum->GetSummoner())
                                 if (Player* player = summoner->ToPlayer())
+								{
 									player->RemoveAurasDueToSpell(SPELL_PALADIN_ANCIENT_POWER, player->GetGUID());
+									furyDone = true;
+								}
 
 						events.CancelEvent(EVENT_PALADIN_REMOVE_ANCIENT_POWER);
 						break;
