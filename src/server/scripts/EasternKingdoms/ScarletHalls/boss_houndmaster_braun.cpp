@@ -84,6 +84,7 @@ public:
         bool bloodyrage;
         bool predeath;
         bool FakeDeath;
+        std::list<Creature*> m_listDogs;
         uint32 m_uiNextCastPercent;
         InstanceScript* instance;
         SummonList Summons;
@@ -137,20 +138,23 @@ public:
                 instance->SetBossState(DATA_BOSS_HOUNDMASTER_BRAUN, DONE);
         }
 
-        void Dogs()
+        void ResetDogs()
         {
-            std::list<Creature*> dogs;
-            GetCreatureListWithEntryInGrid(dogs, me, NPC_OBEDIENT_HOUND, 5000.0f);
+            m_listDogs.clear();
+
+            std::list<Creature*> dogs ;
+            GetCreatureListWithEntryInGrid(dogs, me, NPC_OBEDIENT_HOUND, 50000.0f);
 
             for(std::list<Creature*>::const_iterator iter = dogs.begin() ; iter != dogs.end() ; ++iter)
-            {
                 if(Creature* dog = *iter)
-                    if(!dog->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
-                        dogs.push_back(dog);
-            }
+                    if(dog->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+                        m_listDogs.push_back(dog);
+        }
 
-            std::list<Creature*>::const_iterator iter = dogs.begin();
-            std::advance(iter, urand(0, dogs.size()));
+        void CallDog()
+        {
+            std::list<Creature*>::const_iterator iter = m_listDogs.begin() ;
+            std::advance(iter, urand(0, m_listDogs.size()));
 
             if(Creature* dog = *iter)
             {
@@ -158,9 +162,10 @@ public:
 
                 if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
                     if(target && target->GetTypeId() == TYPEID_PLAYER)
-                        me->AI()->AttackStart(target);
+                        dog->AI()->AttackStart(target);
+
+                m_listDogs.remove(*iter);
             }
-            dogs.clear();
         }
 
         void DamageTaken(Unit* doneBy, uint32 &damage)
@@ -170,7 +175,7 @@ public:
                 DoCast(SPELL_CALL_DOG);
                 m_uiNextCastPercent -= 10 ;
 
-                Dogs();
+                CallDog();
             }
 
             if (damage < me->GetHealth())
@@ -283,6 +288,7 @@ public:
                             me->SummonCreature(NPC_OBEDIENT_HOUND, 1013.29f, 530.31f, 14.00f, 4.70f, TEMPSUMMON_TIMED_DESPAWN, 600000);
                             me->SummonCreature(NPC_OBEDIENT_HOUND, 1014.48f, 531.29f, 14.00f, 4.70f, TEMPSUMMON_TIMED_DESPAWN, 600000);
                             me->SummonCreature(NPC_OBEDIENT_HOUND, 1012.10f, 531.33f, 14.00f, 4.70f, TEMPSUMMON_TIMED_DESPAWN, 600000);
+                            ResetDogs();
                             break;
 
                         default:

@@ -59,10 +59,6 @@ enum Creatures
     NPC_SCARLET_DEFENDER    = 58998
 };
 
-enum Misc
-{
-    HARLAN_PATH          = 586320
-};
 
 class boss_armsmaster_harlan : public CreatureScript
 {
@@ -148,7 +144,7 @@ public:
         {
                 switch (id)
                 {
-                    /*case 1:
+                    case 1:
                         me->GetMotionMaster()->MovePoint(2, 1199.28f, 455.25f, 1.2f);
                         break;
                     case 2:
@@ -189,7 +185,7 @@ public:
                         break;
                     case 14:
                         me->GetMotionMaster()->MovePoint(15, 1193.94f, 444.15f, 1.2f);
-                        break;*/
+                        break;
                     case 15:
                         me->RemoveAurasDueToSpell(SPELL_BLADES_OF_LIGHT);
                         events.ScheduleEvent(EVENT_DRAGONS_REACH, 10*IN_MILLISECONDS);
@@ -249,7 +245,7 @@ public:
                             break;
 
                         case EVENT_WAYPOINT_BLADES:
-                            me->GetMotionMaster()->MovePath(HARLAN_PATH, false);
+                            me->GetMotionMaster()->MovePoint(1, 1199.28f, 455.25f, 1.2f);
                             break;
 
                         case EVENT_BERSERKER_RAGE:
@@ -289,11 +285,15 @@ public:
             npc_scarlet_defenderAI(Creature* creature) : ScriptedAI(creature) {}
 
             uint32 HeavyArmorTimer;
+            bool HeavyArmor;
             uint32 UnarmoredTimer;
+            bool Unarmored;
 
             void Reset()
             {
                 HeavyArmorTimer = 500;
+                HeavyArmor = true;
+                Unarmored = true;
             }
 
             void DamageTaken(Unit* doneBy, uint32 &damage)
@@ -308,21 +308,24 @@ public:
                 if(!UpdateVictim())
                     return;
 
-                if(HeavyArmorTimer <= diff)
+                if(HeavyArmorTimer <= diff && HeavyArmor)
                 {
                     me->CastSpell(me, SPELL_HEAVY_ARMOR);
+                    HeavyArmor = false;
                 }
                 else HeavyArmorTimer -= diff;
 
-                if(UnarmoredTimer <= diff)
+                if(UnarmoredTimer <= diff && Unarmored)
                 {
                     switch (urand(0, 1))
                     {
                         case 0:
                             me->CastSpell(me, SPELL_UNARMORED_1);
+                            Unarmored = false;
                             break;
                         case 1:
                             me->CastSpell(me, SPELL_UNARMORED_2);
+                            Unarmored = false;
                             break;
                     }
                 }
