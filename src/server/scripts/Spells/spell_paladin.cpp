@@ -1565,11 +1565,9 @@ public:
 						if(TempSummon* tmpSum = me->ToTempSummon())
                             if(Unit* summoner = tmpSum->GetSummoner())
                                 if (Player* player = summoner->ToPlayer())
-								{
-									player->RemoveAurasDueToSpell(SPELL_PALADIN_ANCIENT_POWER, player->GetGUID());
-									furyDone = true;
-								}
+									player->RemoveAurasDueToSpell(SPELL_PALADIN_ANCIENT_POWER);
 
+						furyDone = true;
 						events.CancelEvent(EVENT_PALADIN_REMOVE_ANCIENT_POWER);
 						break;
 
