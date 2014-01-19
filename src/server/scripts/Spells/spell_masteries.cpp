@@ -56,6 +56,16 @@ enum WarriorSpells
 	SPELL_WARR_RAGING_BLOW	= 131116,
 };
 
+enum PaladinSpells
+{
+	SPELL_PAL_HAND_OF_LIGHT_TRIGGERED	= 96172,
+	SPELL_PAL_CRUSADER_STRIKE			= 35395,
+	SPELL_PAL_HAMMER_OF_THE_RIGHTEOUS	= 53595,
+	SPELL_PAL_HAMMER_OF_WRATH			= 24275,
+	SPELL_PAL_TEMPLARS_VERDICT			= 85256,
+	SPELL_PAL_DIVINE_STORM				= 53385,
+};
+
 // Warrior spell : Enrage 12880
 class spell_mastery_unshackled_fury : public SpellScriptLoader
 {
@@ -97,7 +107,108 @@ class spell_mastery_unshackled_fury : public SpellScriptLoader
         }
 };
 
+// Paladin spell : Hand of Light 76672
+class spell_mastery_hand_of_light : public SpellScriptLoader
+{
+    public:
+        spell_mastery_hand_of_light() : SpellScriptLoader("spell_mastery_hand_of_light") { }
+
+        class spell_mastery_hand_of_light_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_mastery_hand_of_light_AuraScript);
+
+			bool Load()
+            {
+                _procTarget = NULL;
+                return true;
+            }
+
+			bool CheckProc(ProcEventInfo& /*eventInfo*/)
+            {
+				_procTarget = GetCaster()->getVictim();
+                return _procTarget;
+            }
+
+			void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+            {
+                PreventDefaultAction();
+                GetTarget()->CastSpell(_procTarget, SPELL_PAL_HAND_OF_LIGHT_TRIGGERED, true, NULL, aurEff);
+            }
+
+            void Register()
+            {
+				DoCheckProc += AuraCheckProcFn(spell_mastery_hand_of_light_AuraScript::CheckProc);
+                OnEffectProc += AuraEffectProcFn(spell_mastery_hand_of_light_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+            }
+
+			private:
+				Unit* _procTarget;
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_mastery_hand_of_light_AuraScript();
+        }
+};
+
+// Paladin spell : Hand of Light triggered
+class spell_mastery_hand_of_light_triggered : public SpellScriptLoader
+{
+    public:
+        spell_mastery_hand_of_light_triggered() : SpellScriptLoader("spell_mastery_hand_of_light_triggered") { }
+
+        class spell_mastery_hand_of_light_triggered_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_mastery_hand_of_light_triggered_SpellScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+				if (!sSpellMgr->GetSpellInfo(SPELL_PAL_CRUSADER_STRIKE))
+                    return false;
+				if (!sSpellMgr->GetSpellInfo(SPELL_PAL_HAMMER_OF_THE_RIGHTEOUS))
+                    return false;
+				if (!sSpellMgr->GetSpellInfo(SPELL_PAL_HAMMER_OF_WRATH))
+                    return false;
+				if (!sSpellMgr->GetSpellInfo(SPELL_PAL_DIVINE_STORM))
+                    return false;
+                return true;
+            }
+
+            void HandleOnHit()
+            {
+				int32 bp0 = 0;
+
+				if (Player* player = GetCaster()->ToPlayer())
+				{
+					if  (sSpellMgr->GetSpellInfo(SPELL_PAL_HAMMER_OF_WRATH))
+					{
+						int32 damage = int32(1.6f * player->GetTotalAttackPowerValue(BASE_ATTACK));
+						bp0 = int32(player->GetPourcentOfMastery() * damage);
+						player->CastCustomSpell(player->getVictim(), SPELL_PAL_HAND_OF_LIGHT_TRIGGERED, &bp0, NULL, NULL, true);
+					}
+					else
+					{
+						bp0 = int32(player->GetPourcentOfMastery() * GetHitDamage());
+						player->CastCustomSpell(player->getVictim(), SPELL_PAL_HAND_OF_LIGHT_TRIGGERED, &bp0, NULL, NULL, true);
+					}
+				}
+			}
+
+            void Register()
+            {
+                OnHit += SpellHitFn(spell_mastery_hand_of_light_triggered_SpellScript::HandleOnHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_mastery_hand_of_light_triggered_SpellScript();
+        }
+};
+
 void AddSC_masteries_spell_scripts()
 {
 	new spell_mastery_unshackled_fury();
+	new spell_mastery_hand_of_light();
+	new spell_mastery_hand_of_light_triggered();
 }

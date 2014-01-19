@@ -92,54 +92,7 @@ enum PaladinSpells
 
 	SPELL_PALADIN_ANCIENT_POWER                  = 86700,
 	SPELL_PALADIN_ANCIENT_FURY                   = 86704,
-};
-
-// 24275 - Hammer of Wrath
-class spell_pal_hammer_of_wrath : public SpellScriptLoader
-{
-    public:
-        spell_pal_hammer_of_wrath() : SpellScriptLoader("spell_pal_hammer_of_wrath") { }
-
-        class spell_pal_hammer_of_wrath_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_pal_hammer_of_wrath_SpellScript);
-			
-            void HandleEffect(SpellEffIndex /*effIndex*/)
-            {
-				Player* player = GetCaster()->ToPlayer();
-
-				uint32 baseDmg = GetHitDamage();
-				uint32 damage = 0;
-				uint32 spec = player->GetPrimaryTalentTree(player->GetActiveSpec());
-
-				switch (spec)
-				{
-					case TALENT_TREE_PALADIN_HOLY:
-						damage = 1.6f * player->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false);
-						break;
-
-					case TALENT_TREE_PALADIN_PROTECTION:
-					case TALENT_TREE_PALADIN_RETRIBUTION:
-						damage = 1.6f * player->GetTotalAttackPowerValue(BASE_ATTACK);
-						break;
-
-					default:
-						break;
-				}
-
-				SetHitDamage(baseDmg + damage);
-            }
-			
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_pal_hammer_of_wrath_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-			}
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_pal_hammer_of_wrath_SpellScript();
-        }
+	SPELL_PALADIN_HAND_OF_LIGHT_TRIGGERED        = 96172,
 };
 
 // 879 - Exorcism
@@ -417,95 +370,6 @@ class spell_pal_divine_sacrifice : public SpellScriptLoader
         AuraScript* GetAuraScript() const
         {
             return new spell_pal_divine_sacrifice_AuraScript();
-        }
-};
-
-// 53385 - Divine Storm
-class spell_pal_divine_storm : public SpellScriptLoader
-{
-    public:
-        spell_pal_divine_storm() : SpellScriptLoader("spell_pal_divine_storm") { }
-
-        class spell_pal_divine_storm_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_pal_divine_storm_SpellScript);
-
-            uint32 healPct;
-
-            bool Validate(SpellInfo const* /*spellInfo*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_PALADIN_DIVINE_STORM_DUMMY))
-                    return false;
-                return true;
-            }
-
-            bool Load()
-            {
-                healPct = GetSpellInfo()->Effects[EFFECT_1].CalcValue(GetCaster());
-                return true;
-            }
-
-            void TriggerHeal()
-            {
-                Unit* caster = GetCaster();
-                caster->CastCustomSpell(SPELL_PALADIN_DIVINE_STORM_DUMMY, SPELLVALUE_BASE_POINT0, (GetHitDamage() * healPct) / 100, caster, true);
-            }
-
-            void Register()
-            {
-                AfterHit += SpellHitFn(spell_pal_divine_storm_SpellScript::TriggerHeal);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_pal_divine_storm_SpellScript();
-        }
-};
-
-// 54171 - Divine Storm (Dummy)
-class spell_pal_divine_storm_dummy : public SpellScriptLoader
-{
-    public:
-        spell_pal_divine_storm_dummy() : SpellScriptLoader("spell_pal_divine_storm_dummy") { }
-
-        class spell_pal_divine_storm_dummy_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_pal_divine_storm_dummy_SpellScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_PALADIN_DIVINE_STORM_HEAL))
-                    return false;
-                return true;
-            }
-
-            void CountTargets(std::list<WorldObject*>& targetList)
-            {
-                _targetCount = targetList.size();
-            }
-
-            void HandleDummy(SpellEffIndex /*effIndex*/)
-            {
-                if (!_targetCount || ! GetHitUnit())
-                    return;
-
-                int32 heal = GetEffectValue() / _targetCount;
-                GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_PALADIN_DIVINE_STORM_HEAL, &heal, NULL, NULL, true);
-            }
-        private:
-            uint32 _targetCount;
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_pal_divine_storm_dummy_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_pal_divine_storm_dummy_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_CASTER_AREA_RAID);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_pal_divine_storm_dummy_SpellScript();
         }
 };
 
@@ -981,10 +845,16 @@ class spell_pal_templar_s_verdict : public SpellScriptLoader
 
             void ChangeDamage(SpellEffIndex /*effIndex*/)
             {                
-                Unit* caster = GetCaster();
-				uint8 level = caster->getLevel();
-				int32 damage = int32((level*(19 - 0.134f*(level-1))) + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * (275.0f /100.0f)));
+				Player* player = GetCaster()->ToPlayer();
+				uint8 level = player->getLevel();
+				int32 damage = int32((level*(19 - 0.134f*(level-1))) + (player->GetTotalAttackPowerValue(BASE_ATTACK) * (275.0f /100.0f)));
                 SetHitDamage(damage);
+
+				if (player->HasAura(76672) && player->getLevel() >= 80) // Paladin retribution mastery
+				{
+					int32 bp0 = int32(player->GetPourcentOfMastery() * damage);
+					player->CastCustomSpell(player->getVictim(), SPELL_PALADIN_HAND_OF_LIGHT_TRIGGERED, &bp0, NULL, NULL, true);
+				}
             }
 
             void Register()

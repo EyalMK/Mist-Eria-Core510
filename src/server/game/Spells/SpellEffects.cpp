@@ -481,6 +481,36 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             }
             break;
         }
+		case SPELLFAMILY_PALADIN:
+		{
+			switch (m_spellInfo->Id)
+			{
+				case 24275: // Hammer of Wrath
+				{
+					Player* player = m_caster->ToPlayer();
+
+					uint32 spec = player->GetPrimaryTalentTree(player->GetActiveSpec());
+
+					switch (spec)
+					{
+						case TALENT_TREE_PALADIN_HOLY:
+							damage += int32(1.6f * player->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false));
+							break;
+
+						case TALENT_TREE_PALADIN_PROTECTION:
+						case TALENT_TREE_PALADIN_RETRIBUTION:
+							damage += int32(1.6f * player->GetTotalAttackPowerValue(BASE_ATTACK));
+							break;
+
+						default:
+							break;
+					}
+					break;
+				}
+				default:
+					break;
+			}
+		}
         case SPELLFAMILY_WARLOCK:
         {
             // Incinerate Rank 1 & 2
