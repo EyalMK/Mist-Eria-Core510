@@ -424,14 +424,14 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS] =
     &AuraEffect::HandleNULL,                                      //363 SPELL_AURA_MOD_NEXT_SPELL
     &AuraEffect::HandleUnused,                                    //364 unused (4.3.4)
     &AuraEffect::HandleNULL,                                      //365 SPELL_AURA_MAX_FAR_CLIP_PLANE
-    &AuraEffect::HandleNULL,                                      //366 SPELL_AURA_OVERRIDE_SPELL_POWER_BY_AP_PCT
+    &AuraEffect::HandleOverrideSpellPowerByAttackPower,           //366 SPELL_AURA_OVERRIDE_SPELL_POWER_BY_AP_PCT
     &AuraEffect::HandleNULL,                                      //367 SPELL_AURA_367
     &AuraEffect::HandleUnused,                                    //368 unused (4.3.4)
     &AuraEffect::HandleNULL,                                      //369 SPELL_AURA_ENABLE_POWER_BAR_TIMER
     &AuraEffect::HandleNULL,                                      //370
     &AuraEffect::HandleNULL,                                      //371
     &AuraEffect::HandleNULL,                                      //372
-    &AuraEffect::HandleNULL,                                      //373
+    &AuraEffect::HandleAuraModIncreaseSpeed,                      //373 SPELL_AURA_INCREASE_MIN_SWIM_SPEED
     &AuraEffect::HandleNULL,                                      //374
     &AuraEffect::HandleNULL,                                      //375
     &AuraEffect::HandleNULL,                                      //376
@@ -462,15 +462,15 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS] =
     &AuraEffect::HandleNULL,                                      //401
     &AuraEffect::HandleNULL,                                      //402
     &AuraEffect::HandleNULL,                                      //403
-    &AuraEffect::HandleNULL,                                      //404
-    &AuraEffect::HandleNULL,                                      //405
+    &AuraEffect::HandleOverrideAttackPowerBySpellPower,           //404 SPELL_AURA_OVERRIDE_AP_BY_SPELL_POWER_PCT
+    &AuraEffect::HandleIncreaseHasteFromItemsByPct,               //405 SPELL_AURA_INCREASE_HASTE_FROM_ITEMS_BY_PCT
     &AuraEffect::HandleNULL,                                      //406
     &AuraEffect::HandleModFear,                                   //407 SPELL_AURA_MOD_FEAR2
     &AuraEffect::HandleNULL,                                      //408
     &AuraEffect::HandleNULL,                                      //409
     &AuraEffect::HandleNULL,                                      //410
     &AuraEffect::HandleNULL,                                      //411
-    &AuraEffect::HandleNULL,                                      //412
+    &AuraEffect::HandleModManaRegenByHaste,                       //412 SPELL_AURA_MOD_REGEN_BY_HASTE
 };
 
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32 *baseAmount, Unit* caster):
@@ -4502,6 +4502,54 @@ void AuraEffect::HandleAuraModAttackPowerOfArmor(AuraApplication const* aurApp, 
         target->ToPlayer()->UpdateAttackPowerAndDamage(false);
 }
 
+void AuraEffect::HandleOverrideAttackPowerBySpellPower(AuraApplication const* aurApp, uint8 mode, bool apply) const
+{
+    if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
+        return;
+
+    Unit* target = aurApp->GetTarget();
+
+    if (target->GetTypeId() == TYPEID_PLAYER)
+        target->ToPlayer()->UpdateAttackPowerAndDamage(false);
+
+    target->SetFloatValue(PLAYER_FIELD_OVERRIDE_AP_BY_SPELL_POWER_PCT, float(GetAmount()));
+}
+
+void AuraEffect::HandleOverrideSpellPowerByAttackPower(AuraApplication const* aurApp, uint8 mode, bool apply) const
+{
+    if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
+        return;
+
+    Unit* target = aurApp->GetTarget();
+
+    target->SetFloatValue(PLAYER_FIELD_OVERRIDE_SPELL_POWER_BY_AP_PCT, float(GetAmount()));
+}
+
+void AuraEffect::HandleIncreaseHasteFromItemsByPct(AuraApplication const* aurApp, uint8 mode, bool apply) const
+{
+    if (!(mode & (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_STAT)))
+        return;
+
+    Unit* target = aurApp->GetTarget();
+
+    if (!target->ToPlayer())
+        return;
+
+    if (apply)
+    {
+        float HasteRating = target->ToPlayer()->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_HASTE_MELEE);
+        HasteRating *= (1 + GetAmount() / 100.0f);
+        float haste = 1 / (1 + (HasteRating * target->ToPlayer()->GetRatingMultiplier(CR_HASTE_MELEE)) / 100);
+
+        // Update haste percentage for client
+        target->SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, haste);
+        target->SetFloatValue(UNIT_MOD_CAST_HASTE, haste);
+        target->SetFloatValue(UNIT_MOD_HASTE, haste);
+    }
+    else
+        target->ToPlayer()->UpdateRating(CR_HASTE_MELEE);
+}
+
 /********************************/
 /***        DAMAGE BONUS      ***/
 /********************************/
@@ -6731,4 +6779,17 @@ void AuraEffect::HandleAuraForceWeather(AuraApplication const* aurApp, uint8 mod
             }
         }
     }
+}
+
+void AuraEffect::HandleModManaRegenByHaste(AuraApplication const* aurApp, uint8 mode, bool apply) const
+{
+    if (!(mode & AURA_EFFECT_HANDLE_REAL))
+        return;
+
+    Unit* target = aurApp->GetTarget();
+    if (!target)
+        return;
+
+    if (target->GetTypeId() == TYPEID_PLAYER)
+        target->ToPlayer()->UpdateManaRegen();
 }

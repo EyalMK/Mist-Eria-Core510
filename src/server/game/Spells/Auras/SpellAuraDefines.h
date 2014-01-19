@@ -429,7 +429,7 @@ enum AuraType
     SPELL_AURA_SET_FAIR_FAR_CLIP                            = 370,  // Overrides client's View Distance setting to max("Fair", current_setting)
 	SPELL_AURA_371                                          = 371,
 	SPELL_AURA_372                                          = 372,
-	SPELL_AURA_373                                          = 373,
+	SPELL_AURA_INCREASE_MIN_SWIM_SPEED                      = 373,
 	SPELL_AURA_MOD_FALL_DAMAGE                              = 374,
 	SPELL_AURA_375                                          = 375,
 	SPELL_AURA_MOD_HONOR_GAIN_PCT_2                         = 376,
@@ -460,15 +460,15 @@ enum AuraType
 	SPELL_AURA_401                                          = 401,
 	SPELL_AURA_402                                          = 402,
 	SPELL_AURA_403                                          = 403,
-	SPELL_AURA_404                                          = 404,
-	SPELL_AURA_405                                          = 405,
+	SPELL_AURA_OVERRIDE_AP_BY_SPELL_POWER_PCT               = 404,
+	SPELL_AURA_INCREASE_HASTE_FROM_ITEMS_BY_PCT             = 405,
 	SPELL_AURA_406                                          = 406,
 	SPELL_AURA_MOD_FEAR2                                    = 407,
 	SPELL_AURA_408                                          = 408,
 	SPELL_AURA_409                                          = 409,
 	SPELL_AURA_410                                          = 410,
 	SPELL_AURA_411                                          = 411,
-	SPELL_AURA_MOD_MANA_REGEN_FROM_HASTE                    = 412,
+	SPELL_AURA_MOD_MANA_REGEN_BY_HASTE                      = 412,
     TOTAL_AURAS                                             = 413   // 5.1.0a
 };
 
