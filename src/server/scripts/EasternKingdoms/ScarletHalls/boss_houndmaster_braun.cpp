@@ -168,6 +168,31 @@ public:
             }
         }
 
+        void DoCastPiercingThrow()
+        {
+            if(Unit* mainTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
+            {
+                if(Map* map = me->GetMap())
+                {
+                    Map::PlayerList const& playerList = map->GetPlayers();
+                    if(!playerList.isEmpty())
+                    {
+                        for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
+                        {
+                            if(Player* player = iter->getSource())
+                            {
+                                if(player->IsInBetween(me, mainTarget))
+                                {
+                                    DoCast(player, 114020, true);
+                                    player->CastSpell(player, 114056, true);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         void DamageTaken(Unit* doneBy, uint32 &damage)
         {
             if(me->GetHealthPct() <= m_uiNextCastPercent && me->GetHealthPct() >= 55)
@@ -269,6 +294,7 @@ public:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             {
                                 DoCast(target, SPELL_PIERCING_THROW);
+                                DoCastPiercingThrow();
                             }
                             events.ScheduleEvent(EVENT_PIERCING_THROW, 7*IN_MILLISECONDS);
                             break;

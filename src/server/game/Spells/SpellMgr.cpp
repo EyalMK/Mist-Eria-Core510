@@ -3936,6 +3936,10 @@ void SpellMgr::LoadSpellInfoCorrections()
 				case 114465:
 					spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_1_YARD);
 					break ;
+				case 114020: // Percing Throw (Scarlet Halls)
+					spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
+					spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
+					break ;
 				default:
 					break;
 			}
