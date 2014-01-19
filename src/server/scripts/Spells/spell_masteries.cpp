@@ -91,7 +91,7 @@ class spell_mastery_unshackled_fury : public SpellScriptLoader
             {
                 if (Player* player = GetCaster()->ToPlayer())
                     if (player->HasAura(MASTERY_WARRIOR_FURY) && player->getLevel() >= 80)
-						amount = player->GetFloatValue(PLAYER_MASTERY);
+						amount = int32(player->GetFloatValue(PLAYER_MASTERY) * 1.4f / 100);
             }
 
             void Register()
@@ -107,59 +107,15 @@ class spell_mastery_unshackled_fury : public SpellScriptLoader
         }
 };
 
-// Paladin spell : Hand of Light 76672
+// Paladin spell : Hand of Light
 class spell_mastery_hand_of_light : public SpellScriptLoader
 {
     public:
         spell_mastery_hand_of_light() : SpellScriptLoader("spell_mastery_hand_of_light") { }
 
-        class spell_mastery_hand_of_light_AuraScript : public AuraScript
+        class spell_mastery_hand_of_light_SpellScript : public SpellScript
         {
-            PrepareAuraScript(spell_mastery_hand_of_light_AuraScript);
-
-			bool Load()
-            {
-                _procTarget = NULL;
-                return true;
-            }
-
-			bool CheckProc(ProcEventInfo& /*eventInfo*/)
-            {
-				_procTarget = GetCaster()->getVictim();
-                return _procTarget;
-            }
-
-			void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
-            {
-                PreventDefaultAction();
-                GetTarget()->CastSpell(_procTarget, SPELL_PAL_HAND_OF_LIGHT_TRIGGERED, true, NULL, aurEff);
-            }
-
-            void Register()
-            {
-				DoCheckProc += AuraCheckProcFn(spell_mastery_hand_of_light_AuraScript::CheckProc);
-                OnEffectProc += AuraEffectProcFn(spell_mastery_hand_of_light_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-            }
-
-			private:
-				Unit* _procTarget;
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_mastery_hand_of_light_AuraScript();
-        }
-};
-
-// Paladin spell : Hand of Light triggered
-class spell_mastery_hand_of_light_triggered : public SpellScriptLoader
-{
-    public:
-        spell_mastery_hand_of_light_triggered() : SpellScriptLoader("spell_mastery_hand_of_light_triggered") { }
-
-        class spell_mastery_hand_of_light_triggered_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_mastery_hand_of_light_triggered_SpellScript);
+            PrepareSpellScript(spell_mastery_hand_of_light_SpellScript);
 
             bool Validate(SpellInfo const* /*spellInfo*/)
             {
@@ -177,18 +133,20 @@ class spell_mastery_hand_of_light_triggered : public SpellScriptLoader
             void HandleOnHit()
             {
 				int32 bp0 = 0;
-
+				
 				if (Player* player = GetCaster()->ToPlayer())
 				{
+					float mastery = player->GetFloatValue(PLAYER_MASTERY) * 2.1f / 100;
+
 					if  (sSpellMgr->GetSpellInfo(SPELL_PAL_HAMMER_OF_WRATH))
 					{
 						int32 damage = int32(1.6f * player->GetTotalAttackPowerValue(BASE_ATTACK));
-						bp0 = int32(player->GetPourcentOfMastery() * damage);
+						bp0 = int32(mastery * damage);
 						player->CastCustomSpell(player->getVictim(), SPELL_PAL_HAND_OF_LIGHT_TRIGGERED, &bp0, NULL, NULL, true);
 					}
 					else
 					{
-						bp0 = int32(player->GetPourcentOfMastery() * GetHitDamage());
+						bp0 = int32(mastery * GetHitDamage());
 						player->CastCustomSpell(player->getVictim(), SPELL_PAL_HAND_OF_LIGHT_TRIGGERED, &bp0, NULL, NULL, true);
 					}
 				}
@@ -196,13 +154,13 @@ class spell_mastery_hand_of_light_triggered : public SpellScriptLoader
 
             void Register()
             {
-                OnHit += SpellHitFn(spell_mastery_hand_of_light_triggered_SpellScript::HandleOnHit);
+                OnHit += SpellHitFn(spell_mastery_hand_of_light_SpellScript::HandleOnHit);
             }
         };
 
         SpellScript* GetSpellScript() const
         {
-            return new spell_mastery_hand_of_light_triggered_SpellScript();
+            return new spell_mastery_hand_of_light_SpellScript();
         }
 };
 
@@ -210,5 +168,4 @@ void AddSC_masteries_spell_scripts()
 {
 	new spell_mastery_unshackled_fury();
 	new spell_mastery_hand_of_light();
-	new spell_mastery_hand_of_light_triggered();
 }
