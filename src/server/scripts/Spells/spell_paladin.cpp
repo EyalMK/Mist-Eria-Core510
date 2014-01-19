@@ -1529,7 +1529,7 @@ public:
         void Reset()
 		{
 			events.Reset();
-			events.ScheduleEvent(EVENT_PALADIN_ANCIENT_FURY, 29980);
+			events.ScheduleEvent(EVENT_PALADIN_ANCIENT_FURY, 29950);
 			furyDone = false;
 		}
 
@@ -1552,6 +1552,7 @@ public:
 				switch(eventId)
 				{
 					case EVENT_PALADIN_ANCIENT_FURY:
+					{
                         if(TempSummon* tmpSum = me->ToTempSummon())
                             if(Unit* summoner = tmpSum->GetSummoner())
                                 if (Player* player = summoner->ToPlayer())
@@ -1560,16 +1561,19 @@ public:
 						events.ScheduleEvent(EVENT_PALADIN_REMOVE_ANCIENT_POWER, 1);
 						events.CancelEvent(EVENT_PALADIN_ANCIENT_FURY);
 						break;
+					}
 
 					case EVENT_PALADIN_REMOVE_ANCIENT_POWER:
+					{
 						if(TempSummon* tmpSum = me->ToTempSummon())
                             if(Unit* summoner = tmpSum->GetSummoner())
                                 if (Player* player = summoner->ToPlayer())
-									player->RemoveAurasDueToSpell(SPELL_PALADIN_ANCIENT_POWER);
+									player->RemoveAurasDueToSpell(SPELL_PALADIN_ANCIENT_POWER, player->GetGUID());
 
 						furyDone = true;
 						events.CancelEvent(EVENT_PALADIN_REMOVE_ANCIENT_POWER);
 						break;
+					}
 
 					default:
 						break;
