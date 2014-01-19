@@ -852,7 +852,8 @@ class spell_pal_templar_s_verdict : public SpellScriptLoader
 
 				if (player->HasAura(76672) && player->getLevel() >= 80) // Paladin retribution mastery
 				{
-					int32 bp0 = int32(player->GetPourcentOfMastery() * damage);
+					float mastery = player->GetFloatValue(PLAYER_MASTERY) * 2.1f / 100;
+					int32 bp0 = int32(mastery * damage);
 					player->CastCustomSpell(player->getVictim(), SPELL_PALADIN_HAND_OF_LIGHT_TRIGGERED, &bp0, NULL, NULL, true);
 				}
             }
