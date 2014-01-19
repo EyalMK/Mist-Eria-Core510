@@ -1468,8 +1468,6 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_blessing_of_faith();
     new spell_pal_blessing_of_sanctuary();
     new spell_pal_divine_sacrifice();
-    new spell_pal_divine_storm();
-    new spell_pal_divine_storm_dummy();
     new spell_pal_exorcism_and_holy_wrath_damage();
     new spell_pal_eye_for_an_eye();
     new spell_pal_guarded_by_the_light();
@@ -1485,7 +1483,6 @@ void AddSC_paladin_spell_scripts()
 	new spell_pal_word_of_glory();
 	new spell_pal_judgment();
 	new spell_pal_exorcism();
-	new spell_pal_hammer_of_wrath();
 	new spell_pal_inquisition();
 	new spell_pal_execution_sentence();
 	new spell_pal_holy_prism();
