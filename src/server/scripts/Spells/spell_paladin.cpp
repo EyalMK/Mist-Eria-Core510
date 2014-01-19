@@ -94,7 +94,7 @@ enum PaladinSpells
 	SPELL_PALADIN_ANCIENT_FURY                   = 86704,
 };
 
-//24275 -- SPELL_HAMMER_OF_WRATH
+// 24275 - Hammer of Wrath
 class spell_pal_hammer_of_wrath : public SpellScriptLoader
 {
     public:
@@ -106,26 +106,28 @@ class spell_pal_hammer_of_wrath : public SpellScriptLoader
 			
             void HandleEffect(SpellEffIndex /*effIndex*/)
             {
-				Player* caster = GetCaster()->ToPlayer();
+				Player* player = GetCaster()->ToPlayer();
 
-				int32 baseDamage = urand(1747, 1930);
+				uint32 baseDmg = GetHitDamage();
+				uint32 damage = 0;
+				uint32 spec = player->GetPrimaryTalentTree(player->GetActiveSpec());
 
-				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_PALADIN_HOLY)
+				switch (spec)
 				{
-					int32 damage = baseDamage + 1.61f * GetCaster()->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false);
-					SetHitDamage(damage);
+					case TALENT_TREE_PALADIN_HOLY:
+						damage = 1.6f * player->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false);
+						break;
+
+					case TALENT_TREE_PALADIN_PROTECTION:
+					case TALENT_TREE_PALADIN_RETRIBUTION:
+						damage = 1.6f * player->GetTotalAttackPowerValue(BASE_ATTACK);
+						break;
+
+					default:
+						break;
 				}
 
-				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_PALADIN_PROTECTION || caster->GetPrimaryTalentTree(caster->GetActiveSpec()) == TALENT_TREE_PALADIN_RETRIBUTION)
-				{
-					int32 damage = baseDamage + 1.61f * GetCaster()->GetTotalAttackPowerValue(BASE_ATTACK);
-					SetHitDamage(damage);
-				}
-
-				if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_PALADIN_HOLY &&
-					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_PALADIN_PROTECTION &&
-					caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_PALADIN_RETRIBUTION)
-					SetHitDamage(baseDamage);
+				SetHitDamage(baseDmg + damage);
             }
 			
             void Register()
@@ -140,7 +142,7 @@ class spell_pal_hammer_of_wrath : public SpellScriptLoader
         }
 };
 
-//879 -- SPELL_EXORCISM 
+// 879 - Exorcism
 class spell_pal_exorcism : public SpellScriptLoader
 {
     public:
