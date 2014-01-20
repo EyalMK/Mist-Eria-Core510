@@ -720,7 +720,7 @@ void Player::UpdateManaRegen()
 	if(HasAura(117957)) // Nether Attunement
 		base_regen *= 1.f + (GetRatingBonusValue(CR_HASTE_SPELL)/100.f) + GetTotalAuraModifier(SPELL_AURA_HASTE_SPELLS);
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "#\nratingbonus %f; auramod %d; auramult %f\#", GetRatingBonusValue(CR_HASTE_SPELL), GetTotalAuraModifier(SPELL_AURA_HASTE_SPELLS), GetTotalAuraMultiplier(SPELL_AURA_HASTE_SPELLS));
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "ratingbonus %f; auramod %d; auramult %f", GetRatingBonusValue(CR_HASTE_SPELL), GetTotalAuraModifier(SPELL_AURA_HASTE_SPELLS), GetTotalAuraMultiplier(SPELL_AURA_HASTE_SPELLS));
 
     // Set regen rate in cast state apply only on spirit based regen
     int32 modManaRegenInterrupt = GetTotalAuraModifier(SPELL_AURA_MOD_MANA_REGEN_INTERRUPT);
