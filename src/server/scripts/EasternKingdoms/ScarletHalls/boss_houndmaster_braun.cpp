@@ -20,6 +20,8 @@
 #include "ScriptedCreature.h"
 #include "scarlet_halls.h"
 
+/* Test */
+
 enum Spells
 {
     SPELL_DEATH_BLOSSOM_JUMP    = 114241,
