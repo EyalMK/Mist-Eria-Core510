@@ -910,7 +910,7 @@ void Battleground::EndBattleground(uint32 winner)
                 uint32 rating = player->GetArenaPersonalRating(winnerArenaTeam->GetSlot());
                 player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA, rating ? rating : 1);
                 player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA, GetMapId());
-                //player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_ARENA, sWorld->getIntConfig(CONFIG_CURRENCY_CONQUEST_POINTS_ARENA_REWARD)); No more currencies
+                player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_ARENA, sWorld->getIntConfig(CONFIG_CURRENCY_CONQUEST_POINTS_ARENA_REWARD));
 
                 winnerArenaTeam->MemberWon(player, loserMatchmakerRating, winnerMatchmakerChange);
             }
@@ -939,8 +939,8 @@ void Battleground::EndBattleground(uint32 winner)
                 if (!player->GetRandomWinner())
                 {
                     // 25cp awarded for the first random battleground won each day
-                    //player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_ARENA, BG_REWARD_WINNER_CONQUEST_FIRST); No more currencies
-                    //player->SetRandomWinner(true);
+                    player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_ARENA, BG_REWARD_WINNER_CONQUEST_FIRST);
+                    player->SetRandomWinner(true);
                 }
             }
 
@@ -1771,9 +1771,9 @@ void Battleground::SendWarningToAll(int32 entry, ...)
     data << (uint32)1;
     data << (uint8)0;
     data << (uint64)0;
-    data << (uint32)(msg.length() + 1);
+	data << (uint32)(strlen(msg.c_str()) + 1);
     data << msg.c_str();
-    data << (uint8)0;
+    data << (uint16)0;
     data << (float)0.0f;                                   // added in 4.2.0, unk
     data << (uint8)0;                                      // added in 4.2.0, unk
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
