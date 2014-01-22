@@ -7803,7 +7803,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
         WorldPacket packet(SMSG_UPDATE_CURRENCY, 12);
 
         packet << uint32(id);
-		packet << uint32(newTotalCount);
+		packet << uint32(newTotalCount/100);
 
         packet.WriteBit(weekCap != 0);
 		packet.WriteBit(!printLog); // print in log
