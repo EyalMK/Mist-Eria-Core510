@@ -7615,7 +7615,7 @@ void Player::SendNewCurrency(uint32 id) const
     int precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1;
    
 	currencyData << uint32(entry->ID);
-    currencyData << uint32(itr->second.totalCount/precision);
+    currencyData << uint32(itr->second.totalCount*precision);
 
     if (weekCap)
         currencyData << uint32(weekCap);
@@ -7657,7 +7657,7 @@ void Player::SendCurrencies() const
         int precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1;
 
         currencyData << uint32(entry->ID);
-        currencyData << uint32(itr->second.totalCount / precision);
+        currencyData << uint32(itr->second.totalCount * precision);
 
         if (weekCap)
             currencyData << uint32(weekCap);
@@ -7922,7 +7922,7 @@ void Player::UpdateConquestCurrencyCap(uint32 currency)
         uint32 cap = GetCurrencyWeekCap(currencyEntry);
 
         WorldPacket packet(SMSG_UPDATE_CURRENCY_WEEK_LIMIT, 8);
-        packet << uint32(cap / precision);
+        packet << uint32(cap * precision);
         packet << uint32(currenciesToUpdate[i]);
         GetSession()->SendPacket(&packet);
     }
