@@ -1057,7 +1057,7 @@ class spell_gen_profession_research : public SpellScriptLoader
                 return GetCaster()->GetTypeId() == TYPEID_PLAYER;
             }
 
-            SpellCastResult CheckRequirement()
+            /*SpellCastResult CheckRequirement()
             {
                 if (HasDiscoveredAllSpells(GetSpellInfo()->Id, GetCaster()->ToPlayer()))
                 {
@@ -1066,7 +1066,7 @@ class spell_gen_profession_research : public SpellScriptLoader
                 }
 
                 return SPELL_CAST_OK;
-            }
+            }*/
 
             void HandleScript(SpellEffIndex /*effIndex*/)
             {
@@ -1082,7 +1082,7 @@ class spell_gen_profession_research : public SpellScriptLoader
 
             void Register()
             {
-                OnCheckCast += SpellCheckCastFn(spell_gen_profession_research_SpellScript::CheckRequirement);
+               // OnCheckCast += SpellCheckCastFn(spell_gen_profession_research_SpellScript::CheckRequirement);
                 OnEffectHitTarget += SpellEffectFn(spell_gen_profession_research_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
