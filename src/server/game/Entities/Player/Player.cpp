@@ -7615,7 +7615,7 @@ void Player::SendNewCurrency(uint32 id) const
     int precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1;
    
 	currencyData << uint32(entry->ID);
-    currencyData << uint32(itr->second.totalCount/precision);
+    currencyData << uint32(itr->second.totalCount/*/precision*/);
 
     if (weekCap)
         currencyData << uint32(weekCap);
@@ -7657,7 +7657,7 @@ void Player::SendCurrencies() const
         int precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1;
 
         currencyData << uint32(entry->ID);
-        currencyData << uint32(itr->second.totalCount / precision);
+        currencyData << uint32(itr->second.totalCount/*/precision*/);
 
         if (weekCap)
             currencyData << uint32(weekCap);
@@ -7750,20 +7750,20 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
 
 
     // count can't be more then weekCap if used (weekCap > 0)
-    uint32 weekCap = GetCurrencyWeekCap(currency);
+    uint32 weekCap = GetCurrencyWeekCap(currency)*100;
     if (weekCap && count > int32(weekCap))
         count = weekCap;
 
     // count can't be more then totalCap if used (totalCap > 0)
-    uint32 totalCap = GetCurrencyTotalCap(currency);
+    uint32 totalCap = GetCurrencyTotalCap(currency)*100;
     if (totalCap && count > int32(totalCap))
         count = totalCap;
 
-    int32 newTotalCount = int32(oldTotalCount) + count;
+    int32 newTotalCount = (int32(oldTotalCount) + count)*100;
     if (newTotalCount < 0)
         newTotalCount = 0;
 
-    int32 newWeekCount = int32(oldWeekCount) + (count > 0 ? count : 0);
+    int32 newWeekCount = (int32(oldWeekCount) + (count > 0 ? count : 0))*100;
     if (newWeekCount < 0)
         newWeekCount = 0;
 
@@ -7922,7 +7922,7 @@ void Player::UpdateConquestCurrencyCap(uint32 currency)
         uint32 cap = GetCurrencyWeekCap(currencyEntry);
 
         WorldPacket packet(SMSG_UPDATE_CURRENCY_WEEK_LIMIT, 8);
-        packet << uint32(cap / precision);
+        packet << uint32(cap/*/precision*/);
         packet << uint32(currenciesToUpdate[i]);
         GetSession()->SendPacket(&packet);
     }
