@@ -3067,6 +3067,7 @@ void SpellMgr::LoadSpellCustomAttr()
                     spellInfo->Effects[0].TargetB = 0;
                     spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REFLECTED;
                     spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(13);
+					spellInfo->ExplicitTargetMask = TARGET_FLAG_UNIT_MASK ;
                     break;
 				case 45204: // Mirror Image - Clone Me!
                     spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
