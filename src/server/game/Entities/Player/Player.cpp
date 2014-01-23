@@ -7604,18 +7604,17 @@ void Player::SendNewCurrency(uint32 id) const
     if (!entry) // should never happen
         return;
 
-    uint32 weekCount = itr->second.weekCount;
-    uint32 weekCap = GetCurrencyWeekCap(entry);
+	uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
+    uint32 weekCount = itr->second.weekCount / precision;
+    uint32 weekCap = GetCurrencyWeekCap(entry) / precision;
 
 	packet.WriteBits(0, 5); // some flags
 	packet.WriteBit(0);     // season total earned
     packet.WriteBit(weekCount);
 	packet.WriteBit(weekCap);
-
-    int precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1;
    
 	currencyData << uint32(entry->ID);
-    currencyData << uint32(itr->second.totalCount/precision);
+    currencyData << uint32(itr->second.totalCount / precision);
 
     if (weekCap)
         currencyData << uint32(weekCap);
@@ -7646,15 +7645,14 @@ void Player::SendCurrencies() const
         if (!entry || entry->Category == CURRENCY_CATEGORY_META_CONQUEST)
             continue;
 
-        uint32 weekCount = itr->second.weekCount;
-        uint32 weekCap = GetCurrencyWeekCap(entry);
+		uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
+        uint32 weekCount = itr->second.weekCount / precision;
+        uint32 weekCap = GetCurrencyWeekCap(entry) / precision;
 
         packet.WriteBits(0, 5); // some flags
         packet.WriteBit(0);     // season total earned
         packet.WriteBit(weekCount);
 		packet.WriteBit(weekCap);
-
-        int precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1;
 
         currencyData << uint32(entry->ID);
         currencyData << uint32(itr->second.totalCount/precision);
@@ -7698,8 +7696,9 @@ uint32 Player::GetCurrency(uint32 id, bool usePrecision) const
         return 0;
 
     CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
+	uint32 precision = (usePrecision && currency->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
 
-    return itr->second.totalCount;
+    return itr->second.totalCount / precision;
 }
 
 uint32 Player::GetCurrencyOnWeek(uint32 id, bool usePrecision) const
@@ -7709,8 +7708,9 @@ uint32 Player::GetCurrencyOnWeek(uint32 id, bool usePrecision) const
         return 0;
 
     CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
+	uint32 precision = (usePrecision && currency->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
 
-    return itr->second.weekCount;
+    return itr->second.weekCount / precision;
 }
 
 bool Player::HasCurrency(uint32 id, uint32 count) const
@@ -7732,6 +7732,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
     if (!ignoreMultipliers)
         count *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_CURRENCY_GAIN, id);
 
+	int32 precision = currency->Flags & CURRENCY_FLAG_HIGH_PRECISION ? CURRENCY_PRECISION : 1;
     uint32 oldTotalCount = 0;
     uint32 oldWeekCount = 0;
     PlayerCurrenciesMap::iterator itr = _currencyStorage.find(id);
@@ -7805,7 +7806,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
         WorldPacket packet(SMSG_UPDATE_CURRENCY, 12);
 
         packet << uint32(id);
-		packet << uint32(newTotalCount/100);
+		packet << uint32(newTotalCount / precision);
 
         packet.WriteBit(weekCap != 0);
 		packet.WriteBit(!printLog); // print in log
@@ -7816,7 +7817,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
         //    packet << uint32(0);
 
         if (weekCap)
-            packet << uint32(newWeekCount);
+            packet << uint32(newWeekCount / precision);
 
         GetSession()->SendPacket(&packet);
     }
@@ -7922,7 +7923,7 @@ void Player::UpdateConquestCurrencyCap(uint32 currency)
         if (!currencyEntry)
             continue;
 
-        uint32 precision = (currencyEntry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1;
+        uint32 precision = (currencyEntry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
         uint32 cap = GetCurrencyWeekCap(currencyEntry);
 
         WorldPacket packet(SMSG_UPDATE_CURRENCY_WEEK_LIMIT, 8);

@@ -835,7 +835,6 @@ void WorldSession::SendListInventory(uint64 p_VendorGuid)
             if (l_VendorItem->ExtendedCost == 0)
                 continue; 
 
-            uint32 l_Precision = (l_CurrencyTemplate->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
             bool l_UnkFlag = false;
 
             ++l_PushedItemCount;
@@ -864,7 +863,7 @@ void WorldSession::SendListInventory(uint64 p_VendorGuid)
             if (l_UnkFlag)
                     l_ItemListData << uint32(0);
         
-            l_ItemListData << uint32(l_VendorItem->maxcount * l_Precision);
+            l_ItemListData << uint32(l_VendorItem->maxcount);
         }
     }
 
