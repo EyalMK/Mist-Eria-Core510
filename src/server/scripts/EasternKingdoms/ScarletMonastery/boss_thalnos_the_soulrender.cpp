@@ -502,14 +502,8 @@ class spell_spirit_gale : public SpellScriptLoader
                 }
             }
 
-            void AreaTriggerFlaque(SpellEffIndex effIndex)
-            {
-                PreventHitDefaultEffect(effIndex);
-            }
-
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_spirit_gale_SpellScript::AreaTriggerFlaque, EFFECT_1, SPELL_EFFECT_CREATE_AREATRIGGER);
                 OnEffectHitTarget += SpellEffectFn(spell_spirit_gale_SpellScript::SummonTraqueurFlaque, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
             }
         };
