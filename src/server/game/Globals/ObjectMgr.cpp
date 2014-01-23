@@ -54,6 +54,8 @@
 ScriptMapMap sSpellScripts;
 ScriptMapMap sEventScripts;
 ScriptMapMap sWaypointScripts;
+ScriptMapMap sQuestEndScripts;
+ScriptMapMap sQuestStartScripts;
 
 std::string GetScriptsTableNameByType(ScriptsType type)
 {
@@ -63,6 +65,8 @@ std::string GetScriptsTableNameByType(ScriptsType type)
         case SCRIPTS_SPELL:         res = "spell_scripts";      break;
         case SCRIPTS_EVENT:         res = "event_scripts";      break;
         case SCRIPTS_WAYPOINT:      res = "waypoint_scripts";   break;
+        case SCRIPTS_QUEST_END:     res = "quest_end_scripts";  break;
+        case SCRIPTS_QUEST_START:   res = "quest_start_scripts";break;
         default: break;
     }
     return res;
@@ -76,6 +80,8 @@ ScriptMapMap* GetScriptsMapByType(ScriptsType type)
         case SCRIPTS_SPELL:         res = &sSpellScripts;       break;
         case SCRIPTS_EVENT:         res = &sEventScripts;       break;
         case SCRIPTS_WAYPOINT:      res = &sWaypointScripts;    break;
+        case SCRIPTS_QUEST_END:     res = &sQuestEndScripts;    break;
+        case SCRIPTS_QUEST_START:   res = &sQuestStartScripts;  break;
         default: break;
     }
     return res;
@@ -3481,8 +3487,8 @@ void ObjectMgr::LoadQuests()
         "DetailsEmote1, DetailsEmote2, DetailsEmote3, DetailsEmote4, DetailsEmoteDelay1, DetailsEmoteDelay2, DetailsEmoteDelay3, DetailsEmoteDelay4, EmoteOnIncomplete, EmoteOnComplete, "
         //      164                 165               166                167                   168                       169                     170                  171
         "OfferRewardEmote1, OfferRewardEmote2, OfferRewardEmote3, OfferRewardEmote4, OfferRewardEmoteDelay1, OfferRewardEmoteDelay2, OfferRewardEmoteDelay3, OfferRewardEmoteDelay4, "
-        //   173         174
-        "RewardType, WDBVerified"
+        //   173         174            175           176
+        "RewardType, StartScript, CompleteScript, WDBVerified"
         " FROM quest_template");
     if (!result)
     {
@@ -4633,6 +4639,30 @@ void ObjectMgr::LoadScripts(ScriptsType type)
     while (result->NextRow());
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u script definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::LoadQuestEndScripts()
+{
+    LoadScripts(SCRIPTS_QUEST_END);
+
+    // check ids
+    for (ScriptMapMap::const_iterator itr = sQuestEndScripts.begin(); itr != sQuestEndScripts.end(); ++itr)
+    {
+        if (!GetQuestTemplate(itr->first))
+            sLog->outError(LOG_FILTER_SQL, "Table `quest_end_scripts` has not existing quest (Id: %u) as script id",itr->first);
+    }
+}
+
+void ObjectMgr::LoadQuestStartScripts()
+{
+    LoadScripts(SCRIPTS_QUEST_START);
+
+    // check ids
+    for (ScriptMapMap::const_iterator itr = sQuestStartScripts.begin(); itr != sQuestStartScripts.end(); ++itr)
+    {
+        if (!GetQuestTemplate(itr->first))
+            sLog->outError(LOG_FILTER_SQL, "Table `quest_start_scripts` has not existing quest (Id: %u) as script id",itr->first);
+    }
 }
 
 void ObjectMgr::LoadSpellScripts()

@@ -15553,6 +15553,10 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
     else
         questStatusData.Timer = 0;
 
+    //starting initial quest script
+    if (questGiver && quest->GetQuestStartScript() != 0)
+        GetMap()->ScriptsStart(sQuestStartScripts, quest->GetQuestStartScript(), questGiver, this);
+
     SetQuestSlot(log_slot, quest_id, qtime);
 
     m_QuestStatusSave[quest_id] = true;
@@ -15771,7 +15775,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     _SaveQuestStatus(trans);
 
     if (announce)
-        SendQuestReward(quest, XP);
+        SendQuestReward(quest, XP, questGiver);
 
     // cast spells after mark quest complete (some spells have quest completed state requirements in spell_area data)
     if (quest->GetRewSpellCast() > 0)
@@ -16951,7 +16955,7 @@ void Player::SendQuestComplete(Quest const* quest)
     }
 }
 
-void Player::SendQuestReward(Quest const* quest, uint32 XP)
+void Player::SendQuestReward(Quest const* quest, uint32 XP, Object * questGiver)
 {
     uint32 questId = quest->GetQuestId();
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_QUESTGIVER_QUEST_COMPLETE quest = %u", questId);
@@ -16986,6 +16990,9 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP)
 	data.WriteBit(0);									   // unk
 
     GetSession()->SendPacket(&data);
+
+    if (quest->GetQuestCompleteScript() != 0)
+        GetMap()->ScriptsStart(sQuestEndScripts, quest->GetQuestCompleteScript(), questGiver, this);
 }
 
 void Player::SendQuestFailed(uint32 questId, InventoryResult reason)
