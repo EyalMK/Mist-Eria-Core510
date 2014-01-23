@@ -7841,7 +7841,9 @@ uint32 Player::GetCurrencyWeekCap(uint32 id, bool usePrecision) const
     if (!entry)
         return 0;
 
-    return GetCurrencyWeekCap(entry);
+	uint32 precision = (usePrecision && entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
+
+    return GetCurrencyWeekCap(entry)/precision;
 }
 
 void Player::ResetCurrencyWeekCap()
