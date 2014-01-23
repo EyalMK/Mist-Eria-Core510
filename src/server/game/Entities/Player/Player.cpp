@@ -21912,7 +21912,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         for (int i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
         {
             if (iece->RequiredCurrency[i])
-                ModifyCurrency(iece->RequiredCurrency[i], -int32(iece->RequiredCurrencyCount[i] * stacks)/100, true, true);
+                ModifyCurrency(iece->RequiredCurrency[i], -int32(iece->RequiredCurrencyCount[i] * stacks), true, true);
         }
     }
 
