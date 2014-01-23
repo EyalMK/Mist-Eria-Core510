@@ -343,6 +343,8 @@ class Quest
         bool   IsDFQuest() const { return SpecialFlags & QUEST_SPECIAL_FLAGS_DF_QUEST; }
         uint32 CalculateHonorGain(uint8 level) const;
 		uint8 GetRewardType() const { return RewardType; }
+        uint32 GetQuestStartScript() const { return QuestStartScript; }
+        uint32 GetQuestCompleteScript() const { return QuestCompleteScript; }
 		uint8 GetItemRewardGroup(uint32 itemId) const;
 		uint8 GetItemRewardGroupFromSpec(uint32 spec) const;
 
@@ -476,6 +478,8 @@ class Quest
         uint32 SoundAccept;
         uint32 SoundTurnIn;
 		uint8 RewardType;
+        uint32 QuestStartScript;
+        uint32 QuestCompleteScript;
 
         std::vector<QuestRequirement> m_requirement;
 

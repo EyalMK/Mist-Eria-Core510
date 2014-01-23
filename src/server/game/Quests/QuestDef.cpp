@@ -237,6 +237,8 @@ Quest::Quest(Field* questRecord)
 			if (RewardChoiceItemId[i])
 				++m_rewChoiceItemsCount;
 	}
+    QuestStartScript = questRecord[174].GetUInt32();
+    QuestCompleteScript = questRecord[175].GetUInt32();
 }
 
 uint32 Quest::XPValue(Player* player) const

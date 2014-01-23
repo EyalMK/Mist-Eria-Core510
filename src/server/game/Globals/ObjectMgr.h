@@ -130,6 +130,9 @@ enum ScriptsType
     SCRIPTS_SPELL = SCRIPTS_FIRST,
     SCRIPTS_EVENT,
     SCRIPTS_WAYPOINT,
+    SCRIPTS_QUEST_END,
+    SCRIPTS_QUEST_START,
+    SCRIPTS_GOSSIP,
 
     SCRIPTS_LAST
 };
@@ -362,6 +365,9 @@ typedef std::pair<SpellScriptsContainer::iterator, SpellScriptsContainer::iterat
 extern ScriptMapMap sSpellScripts;
 extern ScriptMapMap sEventScripts;
 extern ScriptMapMap sWaypointScripts;
+extern ScriptMapMap sGossipScripts;
+extern ScriptMapMap sQuestEndScripts;
+extern ScriptMapMap sQuestStartScripts;
 
 std::string GetScriptsTableNameByType(ScriptsType type);
 ScriptMapMap* GetScriptsMapByType(ScriptsType type);
@@ -861,6 +867,9 @@ class ObjectMgr
             return _creatureQuestInvolvedRelations.equal_range(creature_entry);
         }
 
+        void LoadQuestEndScripts();
+        void LoadQuestStartScripts();
+        void LoadGossipScripts();
         void LoadEventScripts();
         void LoadSpellScripts();
         void LoadWaypointScripts();
