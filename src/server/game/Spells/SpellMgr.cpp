@@ -3067,6 +3067,7 @@ void SpellMgr::LoadSpellCustomAttr()
                     spellInfo->Effects[0].TargetB = 0;
                     spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REFLECTED;
                     spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(13);
+					spellInfo->ExplicitTargetMask = TARGET_FLAG_UNIT_MASK ;
                     break;
 				case 45204: // Mirror Image - Clone Me!
                     spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
@@ -3936,6 +3937,9 @@ void SpellMgr::LoadSpellInfoCorrections()
 				case 114465:
 					spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_1_YARD);
 					break ;
+                case 115290:
+                    spellInfo->Effects[EFFECT_1].Effect = NULL;
+                    break ;
 				case 114020: // Percing Throw (Scarlet Halls)
 					spellInfo->ExplicitTargetMask = TARGET_FLAG_UNIT_MASK ;
 					spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
