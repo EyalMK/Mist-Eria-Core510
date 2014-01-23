@@ -6499,7 +6499,6 @@ void Spell::EffectCreateAreatrigger(SpellEffIndex effIndex)
         {
             int32 count = m_caster->CountAreaTrigger(m_spellInfo->Id);
 
-            areaTrigger->SetVisualRadius(2.00f);
             if (count > 3)
             {
                 std::list<AreaTrigger*> healingSphereList;
@@ -6548,6 +6547,8 @@ void Spell::EffectCreateAreatrigger(SpellEffIndex effIndex)
         case 115290: // Spirit Gale
         {
             int32 count = m_caster->CountAreaTrigger(m_spellInfo->Id);
+
+            areaTrigger->SetVisualRadius(2.00f);
 
             if (count > 4)
             {
