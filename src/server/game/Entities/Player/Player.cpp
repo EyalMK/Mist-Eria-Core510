@@ -7340,7 +7340,7 @@ void Player::RewardCurrency(Quest const* quest)
         if (!quest->RewardCurrencyId[i])
             continue;
 
-        ModifyCurrency(quest->RewardCurrencyId[i], (quest->RewardCurrencyCount[i])/100);
+        ModifyCurrency(quest->RewardCurrencyId[i], quest->RewardCurrencyCount[i]);
 	}		
 }
 
