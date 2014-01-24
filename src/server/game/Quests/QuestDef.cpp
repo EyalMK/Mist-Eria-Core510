@@ -200,7 +200,7 @@ Quest::Quest(Field* questRecord)
         if (RequiredCurrencyId[i])
             ++m_reqCurrencyCount;
 
-	RewardType = questRecord[173].GetUInt8(); // For quest package item
+    RewardType = questRecord[172].GetUInt8(); // For quest package item
 
 	if (RewardType > 0)
 	{
@@ -237,8 +237,8 @@ Quest::Quest(Field* questRecord)
 			if (RewardChoiceItemId[i])
 				++m_rewChoiceItemsCount;
 	}
-    QuestStartScript = questRecord[174].GetUInt32();
-    QuestCompleteScript = questRecord[175].GetUInt32();
+    QuestStartScript = questRecord[173].GetUInt32();
+    QuestCompleteScript = questRecord[174].GetUInt32();
 }
 
 uint32 Quest::XPValue(Player* player) const
