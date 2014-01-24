@@ -15790,9 +15790,6 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
     //lets remove flag for delayed teleports
     SetCanDelayTeleport(false);
-
-    if (quest->GetQuestCompleteScript() != 0)
-        GetMap()->ScriptsStart(sQuestEndScripts, quest->GetQuestCompleteScript(), questGiver, this);
 }
 
 void Player::FailQuest(uint32 questId)
@@ -16993,6 +16990,12 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP, Object* questGiver)
 	data.WriteBit(0);									   // unk
 
     GetSession()->SendPacket(&data);
+
+    if (quest->GetQuestCompleteScript() != 0)
+    {
+        GetMap()->ScriptsStart(sQuestEndScripts, quest->GetQuestCompleteScript(), questGiver, this);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "QUEST END SCRIPT") ;
+    }
 }
 
 void Player::SendQuestFailed(uint32 questId, InventoryResult reason)
