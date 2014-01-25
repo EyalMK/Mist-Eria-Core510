@@ -257,7 +257,7 @@ public :
 
         uint32 GetData(uint32 uiData) const
         {
-            LogFunction("GetData");
+            //LogFunction("GetData");
 
             if(uiData >= MAX_ENCOUNTERS)
                 return 0;
