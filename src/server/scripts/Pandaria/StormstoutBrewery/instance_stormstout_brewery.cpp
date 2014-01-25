@@ -78,7 +78,7 @@ public :
         }
 
         // Update timers when world ticks
-        void Update(uint32 uiDiff)
+        /*void Update(uint32 uiDiff)
         {
             /// Quite simple ; instead of using a stalker, we handle this here ;
             /// Update is called at each world's tick
@@ -120,7 +120,7 @@ public :
                 else
                     m_uiHoptallusTrashSummonTimer -= uiDiff ;
             }
-        }
+        }*/
 
         /// Better than CAST_AI with stalker
         void ProcessEvent(WorldObject *source, uint32 eventId)
