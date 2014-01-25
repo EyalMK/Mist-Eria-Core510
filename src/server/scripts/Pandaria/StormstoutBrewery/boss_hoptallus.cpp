@@ -37,11 +37,11 @@ enum Misc
 #define MAX_SUMMON_VIRMEN 5
 const Position summonVirmenPosition[MAX_SUMMON_VIRMEN] =
 {
-    {-728.146240ff, 1249.065796ff, 164.800262ff, 0.291780f},
-    {-724.845337ff, 1254.960938ff, 164.800262ff, 0.291780f},
-    {-721.216980ff, 1249.473389ff, 164.800262ff, 0.291780f},
-    {-728.308960ff, 1260.730957ff, 164.800262ff, 0.291780f},
-    {-718.083557ff, 1243.474976ff, 164.800262ff, 0.291780f}
+    {-728.146240f, 1249.065796f, 164.800262f, 0.291780f},
+    {-724.845337f, 1254.960938f, 164.800262f, 0.291780f},
+    {-721.216980f, 1249.473389f, 164.800262f, 0.291780f},
+    {-728.308960f, 1260.730957f, 164.800262f, 0.291780f},
+    {-718.083557f, 1243.474976f, 164.800262f, 0.291780f}
 };
 
 const Position jumpVirmenPosition[MAX_SUMMON_VIRMEN] =
@@ -53,7 +53,7 @@ const Position jumpVirmenPosition[MAX_SUMMON_VIRMEN] =
     {-696.724609f, 1256.291992f, 162.785858f, 6.239606f}
 };
 
-const Position jumpPosition = {-695.928467ff, 1261.399414ff, 162.780762ff, 0.291780f};
+const Position jumpPosition = {-695.928467f, 1261.399414f, 162.780762f, 0.291780f};
 
 class boss_hoptallus : public CreatureScript
 {
@@ -86,9 +86,9 @@ public :
         {
             if(action == 0)
             {
-                if(GameObject* go = me->FindNearestGameObject(GOB_GIANT_BARREL))
+                if(GameObject* go = me->FindNearestGameObject(GOB_GIANT_BARREL, 50000.0f))
                     go->SetGoState(GO_STATE_ACTIVE);
-                me->GetMotionMaster()->MoveJump(jumpPosition);
+                me->GetMotionMaster()->MoveJump(jumpPosition, 1.0f, 1.0f);
                 m_bReady = true ;
             }
         }
@@ -418,7 +418,7 @@ public :
             x = center.GetPositionX() + cos(angle) * m_rayon ;
             y = center.GetPositionY() + sin(angle) * m_rayon ;
             z = center.GetPositionZ() ;
-            me->GetMotionMaster()->MovePoint(id, x, y, z);
+            me->GetMotionMaster()->MovePoint(m_id, x, y, z);
         }
 
     private :
@@ -457,7 +457,7 @@ public :
             return true ;
         }
 
-        void HandleEffectApply(AuraEffect const* auraEff, AuraEffectHandleModes mode)
+        void HandleEffectApply(AuraEffect const* auraEf, AuraEffectHandleModes mode)
         {
             if(Unit* caster = GetCaster())
             {
@@ -468,7 +468,7 @@ public :
                 float y = 2 * sin(caster->GetOrientation());
                 posSummon.Relocate(caster->GetPositionX() + x, caster->GetPositionY() + y, caster->GetPositionZ());
 
-                if(Creature* summon = caster->SummonCreature(NPC_CARROT_BREATH_HELPER))
+                if(Creature* summon = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, posSummon))
                 {
                     caster->SetTarget(summon->GetGUID());
                     caster->SetFacingToObject(summon);
@@ -476,7 +476,7 @@ public :
             }
         }
 
-        void HandleEffectRemove(AuraEffect const* auraEff, AuraEffectHandleModes mode)
+        void HandleEffectRemove(AuraEffect const* auraEf, AuraEffectHandleModes mode)
         {
             if(target)
             {
@@ -490,8 +490,8 @@ public :
 
         void Register()
         {
-            OnEffectApply += AuraEffectApplyFn(spell_hoptallus_carrot_breath_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY);
-            OnEffectRemove += AuraEffectRemoveFn(spell_hoptallus_carrot_breath_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY);
+            OnEffectApply += AuraEffectApplyFn(spell_hoptallus_carrot_breath_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_hoptallus_carrot_breath_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
 
     private :

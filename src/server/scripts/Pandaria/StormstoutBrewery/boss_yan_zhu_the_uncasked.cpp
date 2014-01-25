@@ -19,7 +19,7 @@ enum Events
     EVENT_CHECK_DIST    = 5
 };
 
-enum Creatures
+enum YanZhuCreatures
 {
     MOB_BUBBLE_SHIELD = 65522
 };
