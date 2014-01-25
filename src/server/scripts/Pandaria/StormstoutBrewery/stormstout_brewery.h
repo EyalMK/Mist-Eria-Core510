@@ -1,80 +1,100 @@
 #ifndef STORMSTOUT_BREWERY_H
 #define STORMSTOUT_BREWERY_H
 
-#include "ScriptPCH.h"
+#include "ScriptPCH.h" // Generic including, better than always including in each .cpp
 
-// Max Encounters in the instance
-//! First encounter : OokOok PreEvent ; second : OokOok Event
-#define MAX_ENCOUNTER 4
+#define MAX_ENCOUNTERS 3
 
-// Max number of different npcs that when killed increase the killed hozen counter
-#define MAX_OOKOOK_ENTOURAGE 6
-
-// Creatures entries we will need to access
-enum InstanceCreatures
+inline void LogFunction(const char* name, bool enter = true)
 {
-    // Bosses
-    Boss_OokOok = 56637,
-    Boss_Hoptallus = 56717,
-    Boss_YanZhutheUncasked = 59479
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "Instance Stormstout Brewery : %s %s", enter ? "Entering" : "Leaving", name);
+}
+
+typedef std::list<Creature*> CreatureList ;
+typedef std::list<Creature*>::iterator CreatureListIter ;
+typedef std::list<Creature*>::const_iterator CreatureListConstIter ;
+
+/**********************************/
+/************ENTITIES**************/
+/**********************************/
+enum Creatures
+{
+    BOSS_OOK_OOK    = 56637,
+    BOSS_HOPTALLUS  = 56717,
+    BOSS_YAN_ZHU    = 59479,
+
+    NPC_CHEN_STORMSTOUT     = 59704,
+    NPC_ROLLING_BARREL      = 56682,
+    VEHICLE_ROLLING_BARREL  = 411 /// @todo : This is a placeholder, unluckily
 };
 
-// GameObjects entries we will need to access
-enum InstanceGameObjects
+// Doors and others
+enum GameObjects
 {
-    // Doors of OokOok
-    GameObject_OokOokEntranceDoor = 0,
-    GameObject_OokOokExitDoor = 1,
-
-    // Doors of Hoptallus
-    GameObject_HoptallusEntranceDoor = 2,
-    GameObject_HoptallusExitDoor = 3,
-
-    // Door of YanZhu
-    GameObject_YanZhuEntranceDoor = 4
-
-
-    // Miscellanous GameObjects
+    GOB_OOK_OOK_ENTRANCE    = 200002,
+    GOB_HOPTALLUS_ENTRANCE  = 200003,
+    GOB_HOPTALLUS_EXIT      = 200004,
+    GOB_YAN_ZHU_ENTRANCE    = 200005
 };
 
-// Spells entries we need at any time, such as the power bar of OokOok
-enum InstanceSpells
+// For quests
+enum Items
 {
-    Spell_EnableBananaBar = 107297 // Each time a player enter the instance AND if OokOok event has not started, we apply this on the player
+
 };
 
-// Just in case (Hotpallus pre event ?)
-enum InstanceActions
+/**********************************/
+/***********MISCELLANOUS***********/
+/**********************************/
+enum Spells
 {
-    Action_StartHoptallusEvent = 0
+    SPELL_BANANA_BAR = 107297
 };
 
-// Identifier for each encounter and global event that occurs in the instance, such as the number of hozen killed
-enum InstanceDatas
+enum InstanceEvents
 {
-    Data_OokOokPartyEventProgress = 0,
-    Data_OokOokEventProgress = 1,
-    Data_HoptallusEventProgress = 2,
-    Data_YanZhuEventProgress = 3
+    INSTANCE_EVENT_SUMMON_BARREL_0  = 0,
+    INSTANCE_EVENT_SUMMON_BARREL_1  = 1,
+    INSTANCE_EVENT_SUMMON_BARREL_2  = 1,
+    INSTANCE_EVENT_SUMMON_BARREL_3  = 3,
+    INSTANCE_EVENT_SUMMON_BARREL_4  = 4,
+    INSTANCE_EVENT_SUMMON_BARREL_5  = 5,
+    INSTANCE_EVENT_SUMMON_ALL       = 6
 };
 
-// Identifier returning the guids (used in the ObjectAccessor)
-enum InstanceDatas64
+/**********************************/
+/***************DATAS**************/
+/**********************************/
+enum InstanceDatas // Aka, data32
 {
-    Data_OokOokPartyCounter = 0,
-    Data_BossOokOok = 1,
-    Data_BossHoptallus = 2,
-    Data_BossYanZhu = 3
+    INSTANCE_DATA_OOK_OOK_STATUS    = 0, // Ook Ook Fight
+    INSTANCE_DATA_HOPTALLUS_STATUS  = 1, // Hoptallus Fight
+    INSTANCE_DATA_YAN_ZHU_STATUS    = 2, // Yan Zhu Fight
+    INSTANCE_DATA_UNCLE_GAO_WAVE    = 3 // Eventually
 };
 
-// Actions that need to be accessed at any time, such at the OokOok launching phase
-enum StaticActions
+enum InstanceDatas64 // aka guids
 {
-    Action_StartBossOokOokEvent = 1
+    INSTANCE_DATA64_OOK_OOK_GUID    = 0,
+    INSTANCE_DATA64_HOPTALLUS_GUID  = 1,
+    INSTANCE_DATA64_YAN_ZHU_GUID    = 3,
+
+    INSTANCE_DATA64_OOK_OOK_ENTRANCE_GUID   = 4, // Big enormous barrel
+    INSTANCE_DATA64_HOPTALLUS_ENTRANCE_GUID = 5, // Standart door
+    INSTANCE_DATA64_HOPTALLUS_EXIT_GUID     = 6, // Big giant carrot
+    INSTANCE_DATA64_YAN_ZHU_ENTRANCE_GUID   = 7, // Standart door
+
+    INSTANCE_DATA64_KILLED_HOZENS               = 8,
+    INSTANCE_DATA64_KILLED_HOPTALLUS_TRASH      = 9,
+    INSTANCE_DATA64_SUMMONED_HOPTALLUS_TRASH    = 10
 };
 
-// Each time a creature of one of these is killed, we increment the killed hozen counter (and the power of the players)
-static const uint32 OokOokEntourage[MAX_OOKOOK_ENTOURAGE] = {0};
-// We need to access it during OokOok encounter, so it is here ;
+enum NpcsDatas
+{
+    NPC_ROLLING_BARREL_DATA_SUMMONING_ID    = 0,
+    BOSS_YAN_ZHU_DATA_ALE_SPELL             = 1,
+    BOSS_YAN_ZHU_DATA_STOUT_SPELL           = 2,
+    BOSS_YAN_ZHU_DATA_WHEAT_SPELL           = 3
+};
 
 #endif // STORMSTOUT_BREWERY_H
