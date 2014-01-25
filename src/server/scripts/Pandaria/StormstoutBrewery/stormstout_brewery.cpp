@@ -219,12 +219,12 @@ public :
                 if(instance->GetData(INSTANCE_DATA_OOK_OOK_STATUS) == DONE)
                     return ; // return since there is no need to continue
 
-            if(!target || (target && !target->IsInWorld()))
+            if(!target)
             {
                 if(m_uiCheckForTarget <= diff)
                 {
-                    bool target = CheckForTarget() ;
-                    if(!target)
+                    bool targetB = CheckForTarget() ;
+                    if(!targetB)
                         m_uiCheckForTarget = 1000 ;
                 }
                 else
@@ -1373,7 +1373,7 @@ void AddSC_stormstout_brewery()
     // Ook Ook
     new npc_chen_stormstout();
     new npc_auntie_stormstout();
-    new npc_sb_illusioner();
+    //new npc_sb_illusioner();
     new mob_habanero_brew();
     new mob_ook_ook_hozen();
     new npc_rolling_barrel();

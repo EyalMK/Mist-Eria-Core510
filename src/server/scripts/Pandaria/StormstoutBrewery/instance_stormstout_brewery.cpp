@@ -78,7 +78,7 @@ public :
         }
 
         // Update timers when world ticks
-        void Update(uint32 uiDiff)
+        /*void Update(uint32 uiDiff)
         {
             /// Quite simple ; instead of using a stalker, we handle this here ;
             /// Update is called at each world's tick
@@ -88,6 +88,7 @@ public :
             {
                 if(m_uiBarrelsTimer <= uiDiff)
                 {
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Instance Stormstout Brewery : summoning %u barrel !",  m_bNextWaveFull ? 6 : 1);
                     if(m_bNextWaveFull)
                     {
                         SummonAllBarrels();
@@ -119,7 +120,7 @@ public :
                 else
                     m_uiHoptallusTrashSummonTimer -= uiDiff ;
             }
-        }
+        }*/
 
         /// Better than CAST_AI with stalker
         void ProcessEvent(WorldObject *source, uint32 eventId)
@@ -257,7 +258,7 @@ public :
 
         uint32 GetData(uint32 uiData) const
         {
-            LogFunction("GetData");
+            //LogFunction("GetData");
 
             if(uiData >= MAX_ENCOUNTERS)
                 return 0;

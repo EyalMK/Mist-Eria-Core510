@@ -25,7 +25,7 @@ enum Creatures
 
     NPC_CHEN_STORMSTOUT     = 59704,
     NPC_ROLLING_BARREL      = 56682,
-    VEHICLE_ROLLING_BARREL  = 411 /// @todo : This is a placeholder, unluckily
+    VEHICLE_ROLLING_BARREL  = 0 /// @todo : This is a placeholder, unluckily
 };
 
 // Doors and others
