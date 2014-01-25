@@ -1,6 +1,6 @@
 #include "stormstout_brewery.h"
 
-enum Spells
+enum YanZhuSpells
 {
 
 };

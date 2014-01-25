@@ -1,6 +1,6 @@
 #include "stormstout_brewery.h"
 
-enum Spells
+enum HoptallusSpells
 {
     SPELL_FURLWIND      = 112992,
     SPELL_CARROT_BREATH = 112944
