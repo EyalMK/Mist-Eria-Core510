@@ -219,12 +219,12 @@ public :
                 if(instance->GetData(INSTANCE_DATA_OOK_OOK_STATUS) == DONE)
                     return ; // return since there is no need to continue
 
-            if(!target || (target && !target->IsInWorld()))
+            if(!target)
             {
                 if(m_uiCheckForTarget <= diff)
                 {
-                    bool target = CheckForTarget() ;
-                    if(!target)
+                    bool targetB = CheckForTarget() ;
+                    if(!targetB)
                         m_uiCheckForTarget = 1000 ;
                 }
                 else
