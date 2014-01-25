@@ -88,6 +88,7 @@ public :
             {
                 if(m_uiBarrelsTimer <= uiDiff)
                 {
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Instance Stormstout Brewery : summoning %u barrel !",  m_bNextWaveFull ? 6 : 1);
                     if(m_bNextWaveFull)
                     {
                         SummonAllBarrels();
