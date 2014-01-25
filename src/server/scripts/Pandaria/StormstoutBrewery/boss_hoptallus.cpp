@@ -264,8 +264,8 @@ public :
                 if(Creature* summon = me->SummonCreature(entry, posSummon))
 				{
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "Summoned virmen ; motion master");
-                    summon->GetMotionMaster()->MoveJump(posJump, 1.0f, 1.0f);
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "Jumped");
+                    //summon->GetMotionMaster()->MoveJump(posJump, 1.0f, 1.0f);
+					//sLog->outDebug(LOG_FILTER_NETWORKIO, "Jumped");
 				}
             }
         }
