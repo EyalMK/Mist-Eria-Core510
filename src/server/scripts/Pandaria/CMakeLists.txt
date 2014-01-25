@@ -43,6 +43,8 @@ set(sources
   Pandaria/GateoftheSettingSun/gate_setting_sun.cpp
   Pandaria/GateoftheSettingSun/gate_setting_sun.h
   Pandaria/GateoftheSettingSun/instance_gate_setting_sun.cpp
+  Pandaria/SiegeofNiuzaoTemple/instance_siege_of_niuzao_temple.cpp
+  Pandaria/SiegeofNiuzaoTemple/siege_of_niuzao_temple.h
   Pandaria/TempleoftheJadeSerpent/instance_temple_of_the_jade_serpent.cpp
   Pandaria/TempleoftheJadeSerpent/boss_wise_mari.cpp
   Pandaria/TempleoftheJadeSerpent/boss_lorewalker_stonestep.cpp

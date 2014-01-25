@@ -48,6 +48,9 @@ void AddSC_boss_commander_rimok();
 // Stormstout Brewery
 void AddSC_instance_stormstout_brewery();
 
+// Siege of Niuzao Temple
+void AddSC_instance_siege_of_niuzao_temple();
+
 // Temple of the Jade Serpent
 void AddSC_boss_wise_mari();
 void AddSC_boss_lorewalker_stonestep();
@@ -1371,7 +1374,10 @@ void AddPandariaScripts()
 
     // Stormstout Brewery
 	AddSC_instance_stormstout_brewery();
-
+	
+	// Siege of Niuzao Temple
+	AddSC_instance_siege_of_niuzao_temple();
+	
 	//Temple of the Jade Serpent
     AddSC_boss_wise_mari();
     AddSC_boss_lorewalker_stonestep();
