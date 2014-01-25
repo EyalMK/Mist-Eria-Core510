@@ -7724,8 +7724,9 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
     if (!count)
         return;
 
-    if (count > 0) // Prevent from negative counts like when a player buys an item (values are * 100 in database)
-        count *= 100; // Client precision
+    if(id == 390 || id == 392 || id == 395 || id == 396)
+        if (count > 0) // Prevent from negative counts like when a player buys an item (values are * 100 in database)
+            count *= 100; // Client precision
 
     CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
     ASSERT(currency);
