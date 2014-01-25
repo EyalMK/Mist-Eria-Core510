@@ -261,9 +261,9 @@ public :
             for(uint8 i = 0 ; i < 5 ; ++i)
             {
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "Looping");
-				uint32 index = urand(0, MAX_SUMMON_VIRMEN);
+				uint32 index = urand(0, MAX_SUMMON_VIRMEN - 1);
 				const Position posSummon = summonVirmenPosition[index];
-				index = urand(0, MAX_SUMMON_VIRMEN);
+				index = urand(0, MAX_SUMMON_VIRMEN - 1);
 				const Position posJump = jumpVirmenPosition[index];
 				uint32 entry = RAND(MOB_HOPPER, MOB_HOPPLING, MOB_BOPPER);
                 if(Creature* summon = me->SummonCreature(entry, posSummon))
