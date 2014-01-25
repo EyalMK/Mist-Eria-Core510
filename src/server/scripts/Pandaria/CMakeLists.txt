@@ -17,6 +17,7 @@ set(sources
   Pandaria/StormstoutBrewery/stormstout_brewery.h
   Pandaria/StormstoutBrewery/instance_stormstout_brewery.cpp
   Pandaria/StormstoutBrewery/stormstout_brewery.cpp
+  Pandaria/StormstoutBrewery/boss_ook_ook.cpp
   Pandaria/MoguShanPalace/boss_gekkan.cpp
   Pandaria/MoguShanPalace/boss_xin_the_weaponmaster.cpp
   Pandaria/MoguShanPalace/instance_mogushan_palace.cpp
