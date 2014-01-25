@@ -456,7 +456,7 @@ public :
             {
                 if(instance)
                 {
-                    instance->GetData(INSTANCE_DATA_OOK_OOK_STATUS == IN_PROGRESS) ? DoCheckOokOok() : DoCheckHozens();
+                    instance->GetData(INSTANCE_DATA_OOK_OOK_STATUS) == IN_PROGRESS ? DoCheckOokOok() : DoCheckHozens();
                     m_uiCheckTimer = 1000 ;
                 }
             }
