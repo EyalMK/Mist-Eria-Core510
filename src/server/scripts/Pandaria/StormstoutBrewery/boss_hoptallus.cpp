@@ -254,8 +254,11 @@ public :
         {
             for(uint8 i = 0 ; i < 5 ; ++i)
             {
-                if(Creature* summon = me->SummonCreature(RAND(MOB_HOPPER, MOB_HOPPLING, MOB_BOPPER), summonVirmenPosition[urand(0, MAX_SUMMON_VIRMEN)]))
-                    summon->GetMotionMaster()->MoveJump(jumpVirmenPosition[urand(0, MAX_SUMMON_VIRMEN)], 1.0f, 1.0f);
+				const Position posSummon = summonVirmenPosition[urand(0, MAX_SUMMON_VIRMEN)];
+				const Position posJump = jumpVirmenPosition[urand(0, MAX_SUMMON_VIRMEN)];
+				uint32 entry = RAND(MOB_HOPPER, MOB_HOPPLING, MOB_BOPPER);
+                if(Creature* summon = me->SummonCreature(entry, posSummon))
+                    summon->GetMotionMaster()->MoveJump(posJump, 1.0f, 1.0f);
             }
         }
 
