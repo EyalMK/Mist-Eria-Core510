@@ -139,7 +139,7 @@ public :
         {
             LogFunction("OnPlayerEnter");
 
-            if(player)
+            /*if(player)
             {
                 m_uiTeamInInstance = player->GetTeamId();
 
@@ -163,7 +163,7 @@ public :
 
                 if(GetData(INSTANCE_DATA_HOPTALLUS_STATUS) == DONE)
                     player->TeleportTo(TeleportLocation);
-            }
+            }*/
 
             ///@todo : here, handle the rp sequence between Chen and Auntie
             if(Creature* chen = instance->GetCreature(m_uiChenGuid))
