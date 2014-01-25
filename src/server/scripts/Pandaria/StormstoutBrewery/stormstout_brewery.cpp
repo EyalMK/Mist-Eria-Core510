@@ -246,7 +246,7 @@ public :
             CreatureList drunkenHozens ;
             GetCreatureListWithEntryInGrid(drunkenHozens, me, m_bWater ? 56862 : 56924, 50000.0f);
 
-            for(CreatureListConstIter iter = drunkenHozens.begin() ; iter != drukenHozens.end() ; ++iter)
+            for(CreatureListConstIter iter = drunkenHozens.begin() ; iter != drunkenHozens.end() ; ++iter)
             {
                 if(Creature* hozen = *iter)
                 {
@@ -464,7 +464,7 @@ public :
                 m_uiCheckTimer -= diff ;
         }
 
-        void DoCheckOok()
+        void DoCheckOokOok()
         {
             if(instance)
             {
@@ -701,7 +701,7 @@ public :
                 }
                 else
                 {
-                    if(Creature* c = me->SummonCreature(59684, summonDancer[1]))
+                    if(Creature* c = me->SummonCreature(59684, summonDancers[1]))
                     {
                         c->SetReactState(REACT_PASSIVE);
                         c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
@@ -728,9 +728,9 @@ public :
 
         void Move(const uint8 index, CreatureList const& source, CreatureListConstIter& iter, uint8 summonNumber)
         {
-            x = dancersPositions[index].GetPositionX() ;
-            y = dancersPositions[index].GetPositionY() ;
-            z = dancersPositions[index].GetPositionZ() + 1 ;
+            float x = dancersPositions[index].GetPositionX() ;
+            float y = dancersPositions[index].GetPositionY() ;
+            float z = dancersPositions[index].GetPositionZ() + 1 ;
 
             for(uint8 i = 0 ; i < summonNumber ; ++i)
             {
@@ -872,7 +872,7 @@ public :
     class mob_hoptallus_trashAI : public ScriptedAI
     {
     public :
-        mob_hoptallus_trashAI(Creature* creatre) : ScriptedAI(creature)
+        mob_hoptallus_trashAI(Creature* creature) : ScriptedAI(creature)
         {
 
         }
@@ -888,7 +888,7 @@ public :
             {
                 if(id < MAX_TRASH_POINT_ID - 1)
                 {
-                    Position const next = TrashPoints(id + 1);
+                    Position const next = TrashPoints[id + 1];
                     me->GetMotionMaster()->MovePoint(id + 1, next);
                 }
                 else if(id == MAX_TRASH_POINT_ID - 1)
