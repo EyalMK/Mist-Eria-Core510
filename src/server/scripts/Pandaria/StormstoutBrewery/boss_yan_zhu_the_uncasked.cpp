@@ -21,7 +21,9 @@ enum Events
 
 enum YanZhuCreatures
 {
-    MOB_BUBBLE_SHIELD = 65522
+    MOB_BUBBLE_SHIELD = 65522,
+	MOB_YEASTY_BREW_ALEMENTAL = 66413,
+	NPC_SUD = 59512
 };
 
 #define MIN_GROUND_Z 170.0f
@@ -107,7 +109,7 @@ public :
                         return ;
                     }
                     else
-                        shield->SetStackAmount(--shield->GetStackAmount());
+                        shield->SetStackAmount(shield->GetStackAmount() - 1);
                 }
             }
         }
