@@ -1,6 +1,6 @@
 #include "stormstout_brewery.h"
 
-enum Spells
+enum OokOokSpells
 {
     SPELL_GROUND_POUND  = 106807,
     SPELL_GOING_BANANAS = 106651
@@ -76,7 +76,7 @@ public :
 
         void EnterCombat(Unit *aggro)
         {
-            me->SummonGameObject(200002, -766.802002ff, 1391.209961ff, 146.738998ff, 0.236796f, 0, 0, 0, 0, 0);
+            me->SummonGameObject(200002, -766.802002f, 1391.209961f, 146.738998f, 0.236796f, 0, 0, 0, 0, 0);
             if(instance)
                 instance->SetData(INSTANCE_DATA_OOK_OOK_STATUS, IN_PROGRESS);
 
@@ -125,7 +125,7 @@ public :
                 if(instance)
                 {
                     instance->DoSendNotifyToInstance("Ook Ook is going bananas ! More barrels are coming !");
-                    instance->ProcessEvent(INSTANCE_EVENT_SUMMON_ALL);
+                    instance->ProcessEvent(NULL, INSTANCE_EVENT_SUMMON_ALL);
                 }
                 m_uiNextBananaPercent -= 30 ;
             }
