@@ -14852,7 +14852,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
             }
 
             menu->GetGossipMenu().AddMenuItem(itr->second.OptionIndex, itr->second.OptionIcon, strOptionText, 0, itr->second.OptionType, strBoxText, itr->second.BoxMoney, itr->second.BoxCoded);
-            menu->GetGossipMenu().AddGossipMenuItemData(itr->second.OptionIndex, itr->second.ActionMenuId, itr->second.ActionPoiId);
+            menu->GetGossipMenu().AddGossipMenuItemData(itr->second.OptionIndex, itr->second.ActionMenuId, itr->second.ActionPoiId, itr->second.action_script_id);
         }
     }
 }
@@ -14939,6 +14939,14 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
             {
                 PrepareGossipMenu(source, menuItemData->GossipActionMenuId);
                 SendPreparedGossip(source);
+            }
+
+            if (menuItemData->Action_script)
+            {
+                if (source->GetTypeId() == TYPEID_UNIT)
+                    GetMap()->ScriptsStart(sGossipScripts, menuItemData->Action_script, this, source);
+                else if (source->GetTypeId() == TYPEID_GAMEOBJECT)
+                    GetMap()->ScriptsStart(sGossipScripts, menuItemData->Action_script, source, this);
             }
 
             break;

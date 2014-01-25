@@ -95,6 +95,7 @@ public:
             { "gm_tickets",                   SEC_ADMINISTRATOR, true,  &HandleReloadGMTicketsCommand,                  "", NULL },
             { "gossip_menu",                  SEC_ADMINISTRATOR, true,  &HandleReloadGossipMenuCommand,                 "", NULL },
             { "gossip_menu_option",           SEC_ADMINISTRATOR, true,  &HandleReloadGossipMenuOptionCommand,           "", NULL },
+            { "gossip_scripts",               SEC_ADMINISTRATOR, true,  &HandleReloadGossipScriptsCommand,              "", NULL },
             { "item_enchantment_template",    SEC_ADMINISTRATOR, true,  &HandleReloadItemEnchantementsCommand,          "", NULL },
             { "item_loot_template",           SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesItemCommand,          "", NULL },
             { "lfg_dungeon_rewards",          SEC_ADMINISTRATOR, true,  &HandleReloadLfgRewardsCommand,                 "", NULL },
@@ -998,6 +999,26 @@ public:
 
         if (*args != 'a')
             handler->SendGlobalGMSysMessage("DB table `waypoint_scripts` reloaded.");
+
+        return true;
+    }
+
+    static bool HandleReloadGossipScriptsCommand(ChatHandler* handler, const char* args)
+    {
+        if (sScriptMgr->IsScriptScheduled())
+        {
+            handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (*args != 'a')
+            sLog->outInfo(LOG_FILTER_GENERAL, "Re-Loading Scripts from `gossip_scripts`...");
+
+        sObjectMgr->LoadGossipScripts();
+
+        if (*args != 'a')
+            handler->SendGlobalGMSysMessage("DB table `gossip_scripts` reloaded.");
 
         return true;
     }
