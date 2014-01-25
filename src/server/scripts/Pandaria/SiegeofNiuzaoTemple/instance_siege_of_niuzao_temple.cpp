@@ -4,7 +4,7 @@
 
 class instance_siege_of_niuzao_temple : public InstanceMapScript{
 public :
-    instance_siege_of_niuzao_temple() : InstanceMapScript("instance_siege_of_niuzao_template", 1011){
+    instance_siege_of_niuzao_temple() : InstanceMapScript("instance_siege_of_niuzao_temple", 1011){
         
     }
     
