@@ -78,7 +78,7 @@ public :
         }
 
         // Update timers when world ticks
-        /*void Update(uint32 uiDiff)
+        void Update(uint32 uiDiff)
         {
             /// Quite simple ; instead of using a stalker, we handle this here ;
             /// Update is called at each world's tick
@@ -95,7 +95,7 @@ public :
                         m_bNextWaveFull = false ; // We assume there will not be the need to summon all the barrels twice in a row
                     }
                     else
-                        SummonBarrel(urand(0, MAX_SUMMONING_BARRELS_POSITIONS));
+                        SummonBarrel(urand(0, MAX_SUMMONING_BARRELS_POSITIONS - 1));
 
                     m_uiBarrelsTimer = urand(5500, 9500);
                 }
@@ -120,7 +120,7 @@ public :
                 else
                     m_uiHoptallusTrashSummonTimer -= uiDiff ;
             }
-        }*/
+        }
 
         /// Better than CAST_AI with stalker
         void ProcessEvent(WorldObject *source, uint32 eventId)
