@@ -47,6 +47,10 @@ void AddSC_boss_commander_rimok();
 
 // Stormstout Brewery
 void AddSC_instance_stormstout_brewery();
+void AddSC_stormstout_brewery();
+void AddSC_boss_ook_ook();
+void AddSC_boss_hoptallus();
+void AddSC_boss_yan_zhu_the_uncasked();
 
 // Siege of Niuzao Temple
 void AddSC_instance_siege_of_niuzao_temple();
@@ -1374,6 +1378,10 @@ void AddPandariaScripts()
 
     // Stormstout Brewery
 	AddSC_instance_stormstout_brewery();
+	AddSC_stormstout_brewery();
+	AddSC_boss_ook_ook();
+	AddSC_boss_hoptallus();
+	AddSC_boss_yan_zhu_the_uncasked();
 	
 	// Siege of Niuzao Temple
 	AddSC_instance_siege_of_niuzao_temple();
