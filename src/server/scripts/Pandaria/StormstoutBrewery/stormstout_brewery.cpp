@@ -1373,7 +1373,7 @@ void AddSC_stormstout_brewery()
     // Ook Ook
     new npc_chen_stormstout();
     new npc_auntie_stormstout();
-    new npc_sb_illusioner();
+    //new npc_sb_illusioner();
     new mob_habanero_brew();
     new mob_ook_ook_hozen();
     new npc_rolling_barrel();
