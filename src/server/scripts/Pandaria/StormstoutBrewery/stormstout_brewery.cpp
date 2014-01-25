@@ -349,6 +349,7 @@ public :
 
         void JustDied(Unit *killer)
         {
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Creature entered JustDied");
             if(InstanceScript* instance = me->GetInstanceScript())
             {
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "Creature entered JustDied");
