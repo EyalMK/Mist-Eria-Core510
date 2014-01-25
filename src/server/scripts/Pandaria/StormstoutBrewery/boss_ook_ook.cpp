@@ -91,7 +91,7 @@ public :
                 instance->SetData(INSTANCE_DATA_OOK_OOK_STATUS, DONE);
             if(GameObject* go = me->FindNearestGameObject(200002, 50000.0f))
                 go->RemoveFromWorld();
-            if(Creature* stalker = me->FindNearestCreature(500001, 50000.0f))
+            if(Creature* stalker = me->FindNearestCreature(200501, 50000.0f))
                 stalker->AI()->DoAction(0);
 
             Talk(SAY_JUST_DIED);

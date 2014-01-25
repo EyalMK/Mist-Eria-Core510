@@ -252,13 +252,21 @@ public :
 
         void SummonVirmens()
         {
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Entered SummonVirmens");
             for(uint8 i = 0 ; i < 5 ; ++i)
             {
-				const Position posSummon = summonVirmenPosition[urand(0, MAX_SUMMON_VIRMEN)];
-				const Position posJump = jumpVirmenPosition[urand(0, MAX_SUMMON_VIRMEN)];
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Looping");
+				uint32 index = urand(0, MAX_SUMMON_VIRMEN);
+				const Position posSummon = summonVirmenPosition[index];
+				index = urand(0, MAX_SUMMON_VIRMEN);
+				const Position posJump = jumpVirmenPosition[index];
 				uint32 entry = RAND(MOB_HOPPER, MOB_HOPPLING, MOB_BOPPER);
                 if(Creature* summon = me->SummonCreature(entry, posSummon))
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Summoned virmen ; motion master");
                     summon->GetMotionMaster()->MoveJump(posJump, 1.0f, 1.0f);
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Jumped");
+				}
             }
         }
 

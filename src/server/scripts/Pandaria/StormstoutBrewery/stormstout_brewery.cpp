@@ -351,26 +351,36 @@ public :
         {
             if(InstanceScript* instance = me->GetInstanceScript())
             {
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Creature entered JustDied");
                 instance->SetData64(INSTANCE_DATA64_KILLED_HOZENS, 1);
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Data set in instancescript ; ready to change power");
                 AddPowerOnPlayers(1);
             }
         }
 
         void AddPowerOnPlayer(Player* p, int32 amount)
         {
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "entered addpoweronplayer");
             if(p)
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "player not null ; seting power");
                 p->ModifyPower(POWER_ALTERNATE_POWER, amount);
+			}
         }
 
         void AddPowerOnPlayers(int32 amount)
         {
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Entered addpoweronplayers");
             if(Map* map = me->GetMap())
             {
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "map not null");
                 Map::PlayerList const & playerList = map->GetPlayers();
                 if(!playerList.isEmpty())
                 {
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "playerlist not empty");
                     for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
                     {
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "ready to apply change");
                         AddPowerOnPlayer(iter->getSource(), amount);
                     }
                 }
