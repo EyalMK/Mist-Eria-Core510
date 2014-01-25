@@ -23,7 +23,7 @@ const Position PointBarrelsPositions[MAX_SUMMONING_BARRELS_POSITIONS] =
     {-753.769287f, 1391.448730f, 146.722473f, 0.981375f}
 };
 
-const WorldLocation TeleportLocation = {961, 0.0f, 0.0f, 0.0f, 0.0f};
+const WorldLocation TeleportLocation(961, 0.0f, 0.0f, 0.0f, 0.0f);
 
 // Generic Script
 class instance_stormstout_brewery : public InstanceMapScript
@@ -86,7 +86,7 @@ public :
             // Summoning barrels timer
             if(GetData(INSTANCE_DATA_OOK_OOK_STATUS) != DONE)
             {
-                if(m_uiBarrelsTimer <= diff)
+                if(m_uiBarrelsTimer <= uiDiff)
                 {
                     if(m_bNextWaveFull)
                     {
@@ -103,7 +103,7 @@ public :
             }
             else if((GetData(INSTANCE_DATA_OOK_OOK_STATUS) == DONE) && (GetData(INSTANCE_DATA_HOPTALLUS_STATUS) == NOT_STARTED) && !m_bHoptallusActive)
             {
-                if(m_uiHoptallusTrashSummonTimer <= diff)
+                if(m_uiHoptallusTrashSummonTimer <= uiDiff)
                 {
                     uint32 entry = RAND(56718, 59426, 56631);
                     Position const summonPosition = {-697.519836f, 1267.453369f, 162.775665f, 1.974109f}; // Summon
@@ -117,7 +117,7 @@ public :
                     m_uiHoptallusTrashSummonTimer = instance->GetDifficulty() == DUNGEON_DIFFICULTY_NORMAL ? 2000 : 1000 ;
                 }
                 else
-                    m_uiHoptallusTrashSummonTimer -= diff ;
+                    m_uiHoptallusTrashSummonTimer -= uiDiff ;
             }
         }
 
@@ -378,11 +378,11 @@ public :
         /// And make it move to his point (MotionMaster()->MovePoint())
         void SummonBarrel(uint32 uiIndex)
         {
-            Position& pos = SummonBarrelsPositions[uiIndex];
+            const Position pos = SummonBarrelsPositions[uiIndex];
             Creature* barrel = instance->SummonCreature(NPC_ROLLING_BARREL, pos, NULL, 0, NULL, 0, VEHICLE_ROLLING_BARREL);
             if(barrel)
             {
-                pos = PointBarrelsPositions[uiIndex];
+				const Position p = PointBarrelsPositions[uiIndex];
                 barrel->AI()->SetData(NPC_ROLLING_BARREL_DATA_SUMMONING_ID, uiIndex);
                 barrel->GetMotionMaster()->MovePoint(0, pos);
             }
