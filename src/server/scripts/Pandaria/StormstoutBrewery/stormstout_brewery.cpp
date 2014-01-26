@@ -364,9 +364,12 @@ public :
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "entered addpoweronplayer");
             if(p)
 			{
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "player not null ; seting power ; before %u", p->GetPower(POWER_ALTERNATE_POWER));
+				/*sLog->outDebug(LOG_FILTER_NETWORKIO, "player not null ; seting power ; before %u", p->GetPower(POWER_ALTERNATE_POWER));
                 p->SetPower(POWER_ALTERNATE_POWER, p->GetPower(POWER_ALTERNATE_POWER) + amount);
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "Now : %u", p->GetPower(POWER_ALTERNATE_POWER));
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Now : %u", p->GetPower(POWER_ALTERNATE_POWER));*/
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Player %u has power alternate power at index %u ; power value is actually %u", p->GetGUID(), p->GetPowerIndex(POWER_ALTERNATE_POWER), p->GetPower(POWER_ALTERNATE_POWER));
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Setting power !");
+				p->ModifyPower(POWER_ALTERNATE_POWER, 1);
 			}
         }
 
