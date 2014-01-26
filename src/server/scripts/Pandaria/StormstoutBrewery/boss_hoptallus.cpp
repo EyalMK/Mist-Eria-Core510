@@ -433,7 +433,7 @@ public :
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : target set to summoner");
                 angle = me->GetOrientation();
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : orientation set");
-                m_id = 0 ;
+                m_id = 1 ;
             }
         }
 
@@ -449,6 +449,7 @@ public :
             y = center.GetPositionY() + sin(angle) * m_rayon ;
             z = center.GetPositionZ() ;
 			
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : actual coords : x = %f, y = %f, z= %f", me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : coords computed, x = %f, y = %f, z = %f", x, y, z);
             me->GetMotionMaster()->MovePoint(m_id, x, y, z);
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : MOTION MASTER");
