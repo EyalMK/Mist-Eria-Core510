@@ -447,7 +447,7 @@ public :
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : floats declared");
             x = center.GetPositionX() + cos(angle) * m_rayon ;
             y = center.GetPositionY() + sin(angle) * m_rayon ;
-            z = center.GetPositionZ() ;
+            z = me->GetPositionZ() ;
 			
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : actual coords : x = %f, y = %f, z= %f", me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : coords computed, x = %f, y = %f, z = %f", x, y, z);
