@@ -446,7 +446,7 @@ public :
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : actual coords : x = %f, y = %f, z= %f", me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : coords computed, x = %f, y = %f, z = %f", x, y, z);
 			
-            me->GetMotionMaster()->MovePoint(m_id, x, y, z);
+            me->GetMotionMaster()->MovePoint(0, x, y, z);
 			
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : MOTION MASTER");
         }
@@ -457,7 +457,6 @@ public :
         float x, y, z ;
         float angle ;
         uint32 m_id ;
-		Unit* summoner ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
@@ -502,6 +501,7 @@ public :
                 if(Creature* summon = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, posSummon))
                 {
 					summon->AI()->DoAction(0);
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Summon Guid Is %u", summon->GetGUID());
                     caster->SetTarget(summon->GetGUID());
                     caster->SetFacingToObject(summon);
                 }
