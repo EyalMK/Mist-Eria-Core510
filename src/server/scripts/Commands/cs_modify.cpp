@@ -57,6 +57,7 @@ public:
             { "chi",            SEC_MODERATOR,      false, &HandleModifyChiCommand,           "", NULL },
             { "runicpower",     SEC_MODERATOR,      false, &HandleModifyRunicPowerCommand,    "", NULL },
 			{ "altpower",       SEC_MODERATOR,      false, &HandleModifyAltPowerCommand,      "", NULL },
+			{ "maxaltpower",    SEC_MODERATOR,      false, &HandleModifyMaxAltPowerCommand,   "", NULL },
             { "energy",         SEC_MODERATOR,      false, &HandleModifyEnergyCommand,        "", NULL },
             { "money",          SEC_MODERATOR,      false, &HandleModifyMoneyCommand,         "", NULL },
             { "scale",          SEC_MODERATOR,      false, &HandleModifyScaleCommand,         "", NULL },
@@ -363,6 +364,38 @@ public:
 
         return true;
     }
+
+	// Edit Player Max Alternate power
+	static bool HandleModifyMaxAltPowerCommand(ChatHandler* handler, const char* args)
+	{
+		if (!*args)
+			return false;
+
+		int32 maxAltPower = atoi((char*)args);
+
+		if (maxAltPower <= 0)
+		{
+			handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+		Player* target = handler->getSelectedPlayer();
+        if (!target)
+        {
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        handler->PSendSysMessage("You changed max Alternate power of %s to %i.", handler->GetNameLink(target).c_str(), maxAltPower);
+        if (handler->needReportToTarget(target))
+            ChatHandler(target->GetSession()).PSendSysMessage("You changed max Alternate power of %s to %i.", handler->GetNameLink(target).c_str(), maxAltPower);
+
+        target->SetMaxPower(POWER_ALTERNATE_POWER, maxAltPower);
+
+        return true;
+	}
 
     // Edit Player Faction
     static bool HandleModifyFactionCommand(ChatHandler* handler, const char* args)
