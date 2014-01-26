@@ -13,16 +13,6 @@ const Position SummonBarrelsPositions[MAX_SUMMONING_BARRELS_POSITIONS] =
     {-778.306885f, 1354.755127f, 146.779831f, 0.981375f}
 };
 
-const Position PointBarrelsPositions[MAX_SUMMONING_BARRELS_POSITIONS] =
-{
-    {-779.830566f, 1382.367676f, 146.725952f, 2.957428f},
-    {-795.707092f, 1360.484253f, 146.713882f, 3.337561f},
-    {-750.099548f, 1303.637207f, 146.692581f, 4.484246f},
-    {-727.915039f, 1367.620117f, 146.710236f, 0.289437f},
-    {-735.368713f, 1310.069702f, 146.700073f, 5.531971f},
-    {-753.769287f, 1391.448730f, 146.722473f, 0.981375f}
-};
-
 const WorldLocation TeleportLocation(961, 0.0f, 0.0f, 0.0f, 0.0f);
 
 // Generic Script
@@ -383,9 +373,8 @@ public :
             Creature* barrel = instance->SummonCreature(NPC_ROLLING_BARREL, pos, NULL, 0, NULL, 0, VEHICLE_ROLLING_BARREL);
             if(barrel)
             {
-				const Position p = PointBarrelsPositions[uiIndex];
                 barrel->AI()->SetData(NPC_ROLLING_BARREL_DATA_SUMMONING_ID, uiIndex);
-                barrel->GetMotionMaster()->MovePoint(0, pos);
+                barrel->AI()->DoAction(0);
             }
         }
 
