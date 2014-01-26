@@ -932,7 +932,7 @@ public :
 				float y = pos.GetPositionY();
 				float z = pos.GetPositionZ();
 				
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY: Virmen MotionMaster ; next point id set to %u, with x = %u, y = %u, z= %u", (id + 1), x, y , z);
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY: Virmen MotionMaster ; next point id set to %u, with x = %f, y = %f, z= %f", (id + 1), x, y , z);
 				me->GetMotionMaster()->MovePoint(id + 1, x, y, z);
             }
         }
