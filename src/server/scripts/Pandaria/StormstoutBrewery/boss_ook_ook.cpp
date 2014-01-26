@@ -1,81 +1,39 @@
 #include "stormstout_brewery.h"
-#include "ScriptedEscortAI.h"
 
-enum Spells
+enum OokOokSpells
 {
-    // Ook Ook
-    Spell_OokOok_GroundPound = 106807,
-    Spell_OokOok_GroundPoundPeriodic = 106808,
-    Spell_OokOok_GoingBananas = 106651,
-    Spell_OokOok_GoindBananasPeriodic = 115978,
-
-    // Barrel
-    Spell_Barrel_BrewExplosion = 106769,
-    Spell_Barrel_BrewExplosionHozen = 107351,
-    Spell_Barrel_BrewExplosionOokOok = 106784
-};
-
-enum Creatures
-{
-    Npc_RollingBarrel = 56682,
-    Vehicle_Barrel = 0 /** @todo : find that thing !*/
-};
-
-enum Events
-{
-    // Ook Ook
-    Event_OokOok_SpawnBarrel = 1,
-    Event_OokOok_GroundPound = 2
+    SPELL_GROUND_POUND  = 106807,
+    SPELL_GOING_BANANAS = 106651
 };
 
 enum Actions
 {
-    // Ook Ook
-    Action_OokOok_Land = 0
+    ACTION_JUMP = 0
 };
 
-enum Says
+enum Events
 {
-    Talk_OokOok_Land = 1,
-    Talk_OokOok_EnterCombat = 2,
-    Talk_OokOok_GoingBananas_One = 3,
-    Talk_OokOok_GoingBananas_Two = 4,
-    Talk_OokOok_GoingBananas_Three = 5,
-    Talk_OokOok_KilledPlayer = 6,
-    Talk_OokOok_JustDied = 7
+    EVENT_GROUND_POUND  = 1,
+    EVENT_CHECK         = 2
 };
 
-// This is where OokOok will land when the hozen party is disturbed ; also, it is his reset position ;
-static const Position ookOokLandingPosition = {0.0f, 0.0f, 0.0f, 0.0f};
-
-
-// First line : starting position ;
-// Second line : ending position ;
-static const Position barrelsPositions[2][5] =
+enum Misc
 {
-    {
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f}
-    },
-    {
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f}
-    }
+
 };
 
-bool PositionsEgalityCheck(Position const* pos, Position const* otherPos)
+enum Talk
 {
-    if(!pos || !otherPos)
-        return false ;
+    SAY_JUMP                = 1,
+    SAY_ENTER_COMBAT        = 2,
+    SAY_GOING_BANANAS_ONE   = 3,
+    SAY_GOING_BANANAS_TWO   = 4,
+    SAY_GOING_BANANAS_THREE = 5,
+    SAY_KILLED_PLAYER       = 6,
+    SAY_JUST_DIED           = 7
+};
 
-    return (pos->GetPositionX() == otherPos->GetPositionX() && pos->GetPositionY() == otherPos->GetPositionY() && pos->GetPositionZ() == otherPos->GetPositionZ());
-}
+const Position jumpPosition = {0.0f, 0.0f, 0.0f, 0.0f};
 
 class boss_ook_ook : public CreatureScript
 {
@@ -85,123 +43,116 @@ public :
 
     }
 
-    struct boss_ook_ook_AIScript : public ScriptedAI
+    class boss_ook_ookAI : public ScriptedAI
     {
     public :
-        boss_ook_ook_AIScript(Creature* creature) : ScriptedAI(creature)
+        boss_ook_ookAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
-            m_bIsStarted = false ; // Since we construct the object before reset() (this is logic), we must initialize the boolean here
-            m_ucFirstSummonCount = 0 ; // We do not initialize it during Reset() because once the boss is started he will never summon barrels by himself
-            m_uiNextGoingBananasPercent = 90 ;
-            m_ucGoingBananasCount = 0 ;
+            m_bHasActivated = false ;
+            m_bReady = false ;
         }
 
         void Reset()
         {
-            // Always reset the EventMap before anything ;
+            if(instance)
+                instance->SetData(INSTANCE_DATA_OOK_OOK_STATUS, NOT_STARTED);
             events.Reset();
-            if(instance)
-                instance->SetData(Data_OokOokEventProgress, NOT_STARTED);
-
-            if(!m_bIsStarted)
-            {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "Instance Stormstout Brewery : OokOok Reset() vut he is not yet started ; however, if he was spawned this is normal");
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE); // The boss shouldn't do anything before he starts ;
-                events.ScheduleEvent(Event_OokOok_SpawnBarrel, 5000); // We summon a barrel every five seconds
-                /** @warning : this events is scheduled only five times, to summon five barrels ; otherwise, it is handled by the barrels  */
-                return ; // Nothing more
-            }
-
-            m_uiNextGoingBananasPercent = 90 ;
+            if(m_bHasActivated)
+                events.ScheduleEvent(EVENT_CHECK, 500);
+            m_uiNextBananaPercent = 90 ;
         }
 
-        // Since the boss is not supposed to be immediately attackable, EnterEvadeMode() would lead him out of players range
-        // So, we need to override the function (and by the way, to call Reset() here, instead of ScriptedAI::EnterEvadeMode();
-        void EnterEvadeMode()
+        void DoAction(const int32 action)
         {
-            if(instance)
-                instance->SetData(Data_OokOokEventProgress, FAIL);
-            if(!m_bIsStarted)
+            if(action == 0)
             {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "Instance Stormstout Brewery : OokOok EnterEvadeMode() but he is not yet started !");
-                return ; // Prevents resetting if not needed
+                Talk(SAY_JUMP);
+                me->GetMotionMaster()->MoveJump(jumpPosition, 1, 1);
+                m_bHasActivated = false;
+                m_bReady = true ;
             }
-
-            if(me->GetMotionMaster())
-                me->GetMotionMaster()->MovePoint(0, ookOokLandingPosition);
-            Reset();
         }
 
-        void DoAction(const int32 iActionId)
+        void EnterCombat(Unit *aggro)
         {
-            switch(iActionId)
-            {
-            case Action_OokOok_Land :
-                m_bIsStarted = true ;
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE);
-                if(me->GetMotionMaster())
-                    me->GetMotionMaster()->MoveJump(ookOokLandingPosition, 1, 1);
-                Talk(Talk_OokOok_Land);
-                break ;
-            }
+            me->SummonGameObject(200002, -766.802002f, 1391.209961f, 146.738998f, 0.236796f, 0, 0, 0, 0, 0);
+            if(instance)
+                instance->SetData(INSTANCE_DATA_OOK_OOK_STATUS, IN_PROGRESS);
+
+            events.ScheduleEvent(EVENT_GROUND_POUND, IsHeroic() ? 6000 : 8000);
+            Talk(SAY_ENTER_COMBAT);
+            m_bHasActivated = true ;
         }
 
-        void EnterCombat(Unit *attacker)
+        void JustDied(Unit* killer)
         {
             if(instance)
-                instance->SetData(Data_OokOokEventProgress, IN_PROGRESS);
-            DoZoneInCombat();
-            Talk(Talk_OokOok_EnterCombat);
-            events.CancelEvent(Event_OokOok_SpawnBarrel);
-            events.ScheduleEvent(Event_OokOok_GroundPound, IsHeroic() ? urand(5000, 7000) : urand(6000, 9000));
-        }
+                instance->SetData(INSTANCE_DATA_OOK_OOK_STATUS, DONE);
+            if(GameObject* go = me->FindNearestGameObject(200002, 50000.0f))
+                go->RemoveFromWorld();
+            if(Creature* stalker = me->FindNearestCreature(200501, 50000.0f))
+                stalker->AI()->DoAction(0);
 
-        void DamageTaken(Unit *doneBy, uint32 &amount)
-        {
-            uint32 life = me->GetHealth() - amount ;
-            uint32 percent = me->CountPctFromMaxHealth(life);
-
-            if(life <= m_uiNextGoingBananasPercent)
-            {
-                DoCast(me, Spell_OokOok_GoingBananas, true);
-                Talk(Talk_OokOok_GoingBananas_One + m_ucGoingBananasCount);
-                m_uiNextGoingBananasPercent -= 30 ;
-                ++m_ucGoingBananasCount;
-            }
+            Talk(SAY_JUST_DIED);
         }
 
         void KilledUnit(Unit *killed)
         {
-            if(killed->GetTypeId() == TYPEID_PLAYER)
-                Talk(Talk_OokOok_KilledPlayer);
+            Talk(SAY_KILLED_PLAYER);
+            if(!UpdateVictim())
+            {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Stormstout Brewery: Ook Ook killed a player and UpdateVictim() == NULL ; EnterEvadeMode() called");
+                m_bReady = false ;
+            }
         }
 
-        void JustDied(Unit *killer)
+        void EnterEvadeMode()
         {
             if(instance)
-                instance->SetData(Data_OokOokEventProgress, DONE);
-            Talk(Talk_OokOok_JustDied);
-            RemoveSpawned(Npc_RollingBarrel);
+                instance->SetData(INSTANCE_DATA_OOK_OOK_STATUS, FAIL);
+
+            if(!m_bReady)
+                ScriptedAI::EnterEvadeMode();
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void DamageTaken(Unit *doneBy, uint32 &amount)
         {
-            // Even if he is not yet started, he must spawn barrels
-            if(!m_bIsStarted)
+            if((me->GetHealth() - amount) < me->CountPctFromMaxHealth(m_uiNextBananaPercent))
             {
-                events.Update(uiDiff);
+                DoCast(me, SPELL_GOING_BANANAS, true);
+                Talk(SAY_KILLED_PLAYER - m_uiNextBananaPercent / 30);
+                if(instance)
+                {
+                    instance->DoSendNotifyToInstance("Ook Ook is going bananas ! More barrels are coming !");
+                    instance->ProcessEvent(NULL, INSTANCE_EVENT_SUMMON_ALL);
+                }
+                m_uiNextBananaPercent -= 30 ;
+            }
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if(!m_bReady && !UpdateVictim() && m_bHasActivated)
+            {
+                events.Update(diff);
 
                 while(uint32 eventId = events.ExecuteEvent())
                 {
                     switch(eventId)
                     {
-                    case Event_OokOok_SpawnBarrel :
-                        if(m_ucFirstSummonCount < 5) // The first time, he summons five barrel, at a 5 seconds interval
+                    case EVENT_CHECK :
+                        if(DoCheckForPlayers())
                         {
-                            SummonBarrel(m_ucFirstSummonCount);
-                            events.ScheduleEvent(Event_OokOok_SpawnBarrel, 5000);
-                            ++m_ucFirstSummonCount;
+                            me->GetMotionMaster()->MoveJump(jumpPosition, 1, 1);
+                            events.Reset();
+                            m_bReady = true ;
+                            break;
+                        }
+                        else
+                        {
+                            events.ScheduleEvent(EVENT_CHECK, 500);
+                            return ;
                         }
                         break ;
 
@@ -209,15 +160,12 @@ public :
                         break ;
                     }
                 }
-
-                return ;
             }
 
-            // Return since we have no target
-            if(!UpdateVictim())
+            if(m_bReady && !UpdateVictim())
                 return ;
 
-            events.Update(uiDiff);
+            events.Update(diff);
 
             if(me->HasUnitState(UNIT_STATE_CASTING))
                 return ;
@@ -226,10 +174,9 @@ public :
             {
                 switch(eventId)
                 {
-                case Event_OokOok_GroundPound :
-                    DoCast(Spell_OokOok_GroundPound);
-                    // Watch timers, with the Going Bananas buff it can become hard for players to handle damages
-                    events.ScheduleEvent(Event_OokOok_GroundPound, IsHeroic() ? urand(4000, 5000) : urand(5000, 7000));
+                case EVENT_GROUND_POUND :
+                    DoCastAOE(SPELL_GROUND_POUND);
+                    events.ScheduleEvent(EVENT_GROUND_POUND, IsHeroic() ? urand(5000, 6000) : urand(6000, 8000));
                     break ;
 
                 default :
@@ -240,207 +187,63 @@ public :
             DoMeleeAttackIfReady();
         }
 
-        void SummonBarrel(const uint8 ucId)
+        bool DoCheckForPlayers()
         {
-            Creature* barrel = me->SummonCreature(Npc_RollingBarrel, barrelsPositions[ucId][0], TEMPSUMMON_MANUAL_DESPAWN, 0, Vehicle_Barrel);
-            if(barrel)
-                if(barrel->GetMotionMaster())
-                    barrel->GetMotionMaster()->MovePoint(0, barrelsPositions[ucId][1]);
+            if(Map* map = me->GetMap())
+            {
+                Map::PlayerList const& playerList = map->GetPlayers();
+                if(!playerList.isEmpty())
+                {
+                    for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
+                    {
+                        if(Player* p = iter->getSource())
+                        {
+                            if(p->isDead())
+                                return false ;
+                            else
+                                continue ;
+                        }
+                    }
+                }
+                else
+                    return false ;
+            }
+            else
+                return false ;
+
+            return true ;
         }
 
-        void RemoveSpawned(const uint32 entry)
+        void DoRemoveBarrels()
         {
-            std::list<Creature*> spawned ;
-            GetCreatureListWithEntryInGrid(spawned, me, entry, 50000.0f);
+            CreatureList barrels ;
+            GetCreatureListWithEntryInGrid(barrels, me, NPC_ROLLING_BARREL, 50000.0f);
 
-            for(std::list<Creature*>::iterator iter = spawned.begin() ; iter != spawned.end() ; ++iter)
+            if(!barrels.empty())
             {
-                if(Creature* summoned = *iter)
+                for(CreatureListConstIter iter = barrels.begin() ; iter != barrels.end() ; ++iter)
                 {
-                    summoned->DisappearAndDie();
-                    summoned->DespawnOrUnsummon(); // Just in case
+                    if(Creature* c = *iter)
+                        c->DisappearAndDie();
                 }
             }
-        }
-
-        void EndEvent()
-        {
-            // Lots of things to do right here, but not very important
         }
 
     private :
         EventMap events ;
-        InstanceScript* instance ;
-
-        bool m_bIsStarted ;
-        uint8 m_ucFirstSummonCount ;
-        uint8 m_ucGoingBananasCount ;
-        uint32 m_uiNextGoingBananasPercent ;
+        InstanceScript * instance ;
+        uint32 m_uiNextBananaPercent ;
+        bool m_bHasActivated ;
+        bool m_bReady ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
     {
-        return new boss_ook_ook_AIScript(creature);
-    }
-};
-
-class npc_rolling_barrel : public CreatureScript
-{
-public :
-    npc_rolling_barrel() : CreatureScript("npc_rolling_barrel")
-    {
-
-    }
-
-    struct npc_rolling_barrel_AIScript : public npc_escortAI
-    {
-    public:
-        npc_rolling_barrel_AIScript(Creature* creature) : npc_escortAI(creature)
-        {
-            instance = creature->GetInstanceScript();
-            m_uiCheckTimer = 500 ;
-        }
-
-        void PassengerBoarded(Unit *passenger, int8 seat, bool boolean)
-        {
-            if(me->GetMotionMaster())
-                me->GetMotionMaster()->Clear(false);
-        }
-
-        void JustDied(Unit *killer)
-        {
-            for(uint8 i = 0 ; i < 5 ; ++i)
-            {
-                if(PositionsEgalityCheck(&homePosition, &barrelsPositions[i][0]))
-                {
-                    if(Creature* ookOok = ObjectAccessor::GetCreature(*me, instance ? instance->GetData64(Data_BossOokOok) : 0))
-                        CAST_AI(boss_ook_ook::boss_ook_ook_AIScript, ookOok->AI())->SummonBarrel(i);
-                }
-            }
-        }
-
-        void UpdateAI(const uint32 uiDiff)
-        {
-            npc_escortAI::UpdateAI(uiDiff);
-
-            if(me->GetVehicleKit())
-            {
-                if(!me->GetVehicleKit()->IsVehicleInUse())
-                {
-                    for(uint8 i = 0 ; i < 5 ; ++i)
-                    {
-                        Position pos ;
-                        me->GetPosition(&pos);
-
-                        if(PositionsEgalityCheck(&pos, &barrelsPositions[i][1]))
-                        {
-                            DoCast(Spell_Barrel_BrewExplosion);
-                            me->Kill(me);
-                            return ;
-                        }
-                    }
-                    return ;
-                }
-            }
-
-            if(m_uiCheckTimer <= uiDiff)
-            {
-                if(!DoCheckZone())
-                    m_uiCheckTimer = 500 ;
-                else
-                    me->Kill(me);
-            }
-            else
-                m_uiCheckTimer -= uiDiff ;
-        }
-		
-		void WaypointReached(uint32 m_uiWaypointId)
-		{
-			//! FIX THAT THING !!!
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Something happened") ;
-		}
-
-        bool DoCheckZone()
-        {
-            // Remember : implicit targets do not allow player to be hit by the spell !
-
-            // If Ook Ook is not started, it is pointless to check him
-            if(instance && instance->GetData(Data_OokOokEventProgress) == NOT_STARTED)
-            {
-                for(uint8 i = 0 ; i < MAX_OOKOOK_ENTOURAGE ; ++i)
-                {
-                    uint32 entry = OokOokEntourage[i];
-                    std::list<Creature*> minions = GetMinions(entry);
-
-                    if(CheckDistanceWithMinions(minions))
-                        return true ;
-                }
-            }
-            else
-            {
-                if(instance)
-                {
-                    if(Creature* ookOok = ObjectAccessor::GetCreature(*me, instance->GetData64(Data_BossOokOok)))
-                    {
-                        if(me->GetExactDist2d(ookOok->GetPositionX(), ookOok->GetPositionY()))
-                        {
-                            DoCast(ookOok, Spell_Barrel_BrewExplosion);
-                            return true ;
-                        }
-                    }
-                }
-            }
-
-            return false ;
-        }
-
-        std::list<Creature*> GetMinions(const uint32 entry)
-        {
-            std::list<Creature*> minions ;
-            GetCreatureListWithEntryInGrid(minions, me, entry, 1000.0f);
-
-            return minions ;
-        }
-
-        bool CheckDistanceWithMinions(std::list<Creature*> const& minions)
-        {
-            if(!minions.empty())
-            {
-                for(std::list<Creature*>::const_iterator iter = minions.begin() ; iter != minions.end() ; ++iter)
-                {
-                    if(Creature* minion = *iter)
-                    {
-                        if(me->GetExactDist2d(minion->GetPositionX(), minion->GetPositionY()) <= 2.0f)
-                        {
-                            DoCast(minion, Spell_Barrel_BrewExplosion);
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            return false ;
-        }
-
-        void SetHomePosition(Position const& position)
-        {
-            homePosition.Relocate(position.GetPositionX(), position.GetPositionY(), position.GetPositionZ());
-        }
-
-    private :
-        InstanceScript* instance ;
-        uint32 m_uiCheckTimer;
-        Position homePosition ;
-    };
-
-    CreatureAI* GetAI(Creature *creature) const
-    {
-        return new npc_rolling_barrel_AIScript(creature);
+        return new boss_ook_ookAI(creature);
     }
 };
 
 void AddSC_boss_ook_ook()
 {
     new boss_ook_ook();
-    new npc_rolling_barrel();
 }

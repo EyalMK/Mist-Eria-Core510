@@ -1,96 +1,41 @@
 #include "stormstout_brewery.h"
 
-/**
- * Bon je vais la faire en français, ce sera plus simple a comprendre :
- * Le spell Summon Suds :
- * Le principe en lui-meme est simple :
- * 1. On prend un cote de la salle aleatoirement
- * 2. On prend les coordonees de chaque extremite
- * 3. On calcule l'equation de la droite formee par les deux extremitees
- * 4. On pop des npcs a intervalles reguliers sur cette droite
- * 5. On calcule l'equation de la parallele a l'autre bout de la salle en prenant les coords de chaque extremite
- * 6. Chaque npc se deplace jusqu'au point correspondant
- *
- * Ce qui nous fait donc :
- * Quatre positions : sommet de depart, bas de depart, sommet d'arrivee, bas d'arrivee
- */
-
-// A gauche les points de summon debut et fin
-// A droite les points d'arrivee debut et fin
-static const Position summonHorizontal[2][2] =
+enum YanZhuSpells
 {
-    {{0.0f, 0.0f, 0.0f, 0.0f},{0.0f, 0.0f, 0.0f, 0.0f}},
-    {{0.0f, 0.0f, 0.0f, 0.0f},{0.0f, 0.0f, 0.0f, 0.0f}}
+
 };
 
-static const Position summonVertical[2][2] =
+enum Actions
 {
-    {{0.0f, 0.0f, 0.0f, 0.0f},{0.0f, 0.0f, 0.0f, 0.0f}},
-    {{0.0f, 0.0f, 0.0f, 0.0f},{0.0f, 0.0f, 0.0f, 0.0f}}
-};
 
-#define MAX_SUMMON_FIZZY_BUBBLES_POSITION 12
-static const Position summonFizzyBubblePositions[MAX_SUMMON_FIZZY_BUBBLES_POSITION] =
-{
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f}
-};
-
-#define FLOOR_Z 250.0f // This is horrible, but as the height of a player is higher when it jumps... this is the only check we can do... ten seconds of loop
-
-enum Spells
-{
-    /// Yan'Zhu
-
-    // Generic
-    Spell_YanZhu_BrewBolt = 114548,
-
-    // Wheat
-    Spell_YanZhu_Bloat = 106546, // WHAT THE FUCK ? HOW DO YOU HANDLE THE TARGETS ? DONT WORK
-    Spell_YanZhu_Bloated = 106549, // The triggerer of the crazy spell DONT WORK
-    Spell_YanZhu_BloatedPeriodic = 106560, // OH MY FUCKING GOD DONT WORK
-    Spell_YanZhu_BlackoutBrew = 106851, // Watch carefully WORKS
-    Spell_YanZhu_BlackoutDrunk = 106857, // When Blackout Brew reaches 10 stacks TO SCRIPT
-
-    // Ale
-    Spell_YanZhu_BubbleShield = 106563, // Npcs ? Can stack ? WORKS
-    // Here comes the yeasty brew alamental
-
-    // Stout
-    Spell_YanZhu_Carbonation = 115003, // WORKS
-    Spell_YanZhu_CarbonationPeriodic = 114386, // Must handle target select ; also there is a Carbonation that summons npcs... but WORKS
-    Spell_YanZhu_WallOfSuds = 114467,
-    Spell_YanZhu_WallOfSudsPeriodic = 114466,
-    Spell_YanZhu_Sudsy = 114468,
-    Spell_YanZhu_SudsyTriggered = 114470, // Scriptable ? I doubt >.<
-
-    Spell_YeastyBrewAlamental_BrewBolt = 114548,
-    Spell_YeastyBrewAlamental_Ferment = 106859,
-    Spell_YeastyBrewAlamental_FermentPeriodic = 114451
 };
 
 enum Events
 {
-    Event_YanZhu_BrewBolt = 1,
-    Event_YanZhu_AleAbility = 2,
-    Event_YanZhu_StoutAbility = 3,
-    Event_YanZhu_WheatAbility = 4,
-
-    Event_YeastyBrewAlamental_BrewBolt = 1,
-    Event_YeastyBrewAlamental_Ferment = 2
+    EVENT_ALE           = 1,
+    EVENT_STOUT         = 2,
+    EVENT_WHEAT         = 3,
+    EVENT_CHECK_JUMP    = 4,
+    EVENT_CHECK_DIST    = 5
 };
 
-#define NUMBER_OF_SUMMONED_SUDS 10U
+enum YanZhuCreatures
+{
+    MOB_BUBBLE_SHIELD = 65522,
+	MOB_YEASTY_BREW_ALEMENTAL = 66413,
+	NPC_SUD = 59512
+};
+
+#define MIN_GROUND_Z 170.0f
+
+#define PROGRESS_EAST_X 5.0f
+#define PROGRESS_EAST_Y 5.0f
+
+#define PROGRESS_NORTH_X 5.0f
+#define PROGRESS_NORTH_Y 5.0f
+
+const Position eastPosition = {0.0f, 0.0f, 0.0f, 0.0f};
+const Position northPosition = {0.0f, 0.0f, 0.0f, 0.0f};
 
 class boss_yan_zhu_the_uncasked : public CreatureScript
 {
@@ -100,70 +45,126 @@ public :
 
     }
 
-    struct boss_yan_zhu_the_uncasked_AIScript : public ScriptedAI
+    class boss_yan_zhu_the_uncaskedAI : public ScriptedAI
     {
     public :
-        boss_yan_zhu_the_uncasked_AIScript(Creature* creature) : ScriptedAI(creature)
+        boss_yan_zhu_the_uncaskedAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
+            m_uiAleAbility = 106563 ;
+            m_uiStoutAbility = 115003 ;
+            m_uiWheatAbility = 106546 ;
+            m_uiSudsLoop = 0 ;
         }
 
         void Reset()
         {
-            if(instance)
-                instance->SetData(Data_YanZhuEventProgress, NOT_STARTED);
-
-            m_uiWheatAbility = RAND(Spell_YanZhu_Bloat, Spell_YanZhu_BlackoutBrew);
-            m_uiAleAbility = RAND(0, Spell_YanZhu_BubbleShield);
-            m_uiStoutAbility = RAND(Spell_YanZhu_Carbonation, Spell_YanZhu_WallOfSuds);
-
-            m_uiBrewBoltTimer = 500 ;
-
             events.Reset();
+            if(instance)
+                instance->SetData(INSTANCE_DATA_YAN_ZHU_STATUS, NOT_STARTED);
+            m_uiSudsLoop = 0 ;
+        }
+
+        void EnterCombat(Unit *aggro)
+        {
+            if(instance)
+            {
+                instance->SetData(INSTANCE_DATA_YAN_ZHU_STATUS, IN_PROGRESS);
+                if(GameObject* entrance = ObjectAccessor::GetGameObject(*me, instance->GetData64(INSTANCE_DATA64_YAN_ZHU_ENTRANCE_GUID)))
+                    entrance->SetGoState(GO_STATE_READY);
+            }
         }
 
         void EnterEvadeMode()
         {
+            if(instance)
+            {
+                instance->SetData(INSTANCE_DATA_YAN_ZHU_STATUS, FAIL);
+                if(GameObject* entrance = ObjectAccessor::GetGameObject(*me, instance->GetData64(INSTANCE_DATA64_YAN_ZHU_ENTRANCE_GUID)))
+                    entrance->SetGoState(GO_STATE_ACTIVE);
+            }
+
             ScriptedAI::EnterEvadeMode();
-            if(instance)
-                instance->SetData(Data_YanZhuEventProgress, FAIL);
-        }
-
-        void EnterCombat(Unit *who)
-        {
-            if(instance)
-                instance->SetData(Data_YanZhuEventProgress, IN_PROGRESS);
-
-            DoZoneInCombat();
-            events.ScheduleEvent(Event_YanZhu_AleAbility, IsHeroic() ? 25000 : 30000);
-            events.ScheduleEvent(Event_YanZhu_StoutAbility, IsHeroic() ? 35000 : 40000);
-            events.ScheduleEvent(Event_YanZhu_WheatAbility, IsHeroic() ? 30000 : 35000);
         }
 
         void JustDied(Unit *killer)
         {
             if(instance)
-                instance->SetData(Data_YanZhuEventProgress, DONE);
+            {
+                instance->SetData(INSTANCE_DATA_YAN_ZHU_STATUS, DONE);
+                if(GameObject* entrance = ObjectAccessor::GetGameObject(*me, instance->GetData64(INSTANCE_DATA64_YAN_ZHU_ENTRANCE_GUID)))
+                    entrance->SetGoState(GO_STATE_ACTIVE);
+            }
+        }
 
-            ClearZone();
+        void SummonedCreatureDies(Creature *summon, Unit *killer)
+        {
+            if(summon->GetEntry() == MOB_BUBBLE_SHIELD)
+            {
+                if(Aura* shield = me->GetAura(106563))
+                {
+                    if(shield->GetStackAmount() == 1)
+                    {
+                        me->RemoveAura(106563);
+                        return ;
+                    }
+                    else
+                        shield->SetStackAmount(shield->GetStackAmount() - 1);
+                }
+            }
+        }
+
+        void SetData(uint32 data, uint32 value)
+        {
+            switch(data)
+            {
+            case BOSS_YAN_ZHU_DATA_ALE_SPELL :
+                if(value == 66413)
+                {
+                    m_uiAleAbility = value ; // Have a strong look at this
+                }
+                else
+                {
+
+                }
+                break ;
+
+            case BOSS_YAN_ZHU_DATA_STOUT_SPELL :
+                if(value == 59522)
+                {
+                    m_uiStoutAbility = 114466 ;
+                }
+                else
+                {
+
+                }
+                break ;
+
+            case BOSS_YAN_ZHU_DATA_WHEAT_SPELL :
+                if(value == 59519)
+                {
+                    m_uiWheatAbility = 106851 ;
+                }
+                else
+                {
+
+                }
+                break ;
+            }
+        }
+
+        void DoAction(const int32 action)
+        {
+            if(action == 0)
+            {
+                events.Reset();
+            }
         }
 
         void UpdateAI(const uint32 diff)
         {
             if(!UpdateVictim())
                 return ;
-
-            if(!DoCheckPlayers())
-            {
-                if(m_uiBrewBoltTimer <= diff)
-                {
-                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
-                        DoCast(target, Spell_YanZhu_BrewBolt);
-                    m_uiBrewBoltTimer = 500 ;
-                }
-                else
-                    m_uiBrewBoltTimer -= diff ;
-            }
 
             events.Update(diff);
 
@@ -174,326 +175,202 @@ public :
             {
                 switch(eventId)
                 {
-                case Event_YanZhu_AleAbility :
-                    if(m_uiAleAbility)
-                        SummonBubbleShield();
-                    else
-                        SummonYeastyBrewAlamental();
-
-                    events.ScheduleEvent(Event_YanZhu_AleAbility, IsHeroic() ? 25000 : 30000);
-                    break ;
-
-                case Event_YanZhu_StoutAbility :
-                    if(m_uiStoutAbility == Spell_YanZhu_Carbonation)
+                case EVENT_ALE :
+                    if(m_uiAleAbility == 66413)
                     {
-                        DoCast(m_uiStoutAbility);
-                        SummonFizzyBubbles();
+                        for(uint8 i = 0 ; i < 2 ; ++i)
+                            me->SummonCreature(MOB_YEASTY_BREW_ALEMENTAL, me->GetPositionX() + rand() % 10, me->GetPositionY() + rand() % 10,
+                                               me->GetPositionZ() + 0.5f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60 * MINUTE);
                     }
                     else
-                        CastWallOfSuds();
-
-                    events.ScheduleEvent(Event_YanZhu_StoutAbility, IsHeroic() ? 35000 : 40000);
+                    {
+                        for(float i = 0.0f ; i < 360.0f ; i += float(360/8))
+                            if(Creature* bubble = me->SummonCreature(MOB_BUBBLE_SHIELD, me->GetPositionX() + 0.5 * cos(i),
+                                                                     me->GetPositionY() + 0.5 * sin(i), me->GetPositionZ() + 5.0f,
+                                                                     0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 100))
+                                bubble->CastSpell(me, m_uiAleAbility, true);
+                    }
+                    events.ScheduleEvent(EVENT_ALE, IsHeroic() ? urand(15000, 20000) : urand(25000, 35000));
                     break ;
 
-                case Event_YanZhu_WheatAbility :
-                    if(m_uiWheatAbility == Spell_YanZhu_BlackoutBrew)
-                        DoCast(m_uiWheatAbility);
+                case EVENT_STOUT :
+                    if(m_uiStoutAbility == 115003)
+                    {
+                        DoCastAOE(m_uiStoutAbility);
+                        SummonBubbles();
+                    }
                     else
                     {
-                        if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                        if(Creature* sud = me->SummonCreature(NPC_SUD, eastPosition.GetPositionX() + PROGRESS_EAST_X * m_uiSudsLoop,
+                                                              eastPosition.GetPositionY() + PROGRESS_EAST_Y * m_uiSudsLoop, me->GetPositionZ(),
+                                                              0, TEMPSUMMON_TIMED_DESPAWN, 1500))
+                            sud->CastSpell((Unit*)NULL, m_uiStoutAbility);
+                        if(Creature* sud = me->SummonCreature(NPC_SUD, northPosition.GetPositionX() + PROGRESS_NORTH_X * m_uiSudsLoop,
+                                                              northPosition.GetPositionY() + PROGRESS_NORTH_Y * m_uiSudsLoop, me->GetPositionZ(),
+                                                              0, TEMPSUMMON_TIMED_DESPAWN, 1500))
+                            sud->CastSpell((Unit*)NULL, m_uiStoutAbility);
+
+                        ++m_uiSudsLoop ;
+
+                        if(m_uiSudsLoop < 9)
+                        {
+                            events.ScheduleEvent(EVENT_STOUT, 1500);
+                            if(m_uiSudsLoop == 1)
+                                events.ScheduleEvent(EVENT_JUMP, 500);
+                            break ;
+                        }
+                    }
+                    events.ScheduleEvent(EVENT_STOUT, IsHeroic() ? urand(35000, 55000) : urand(60000, 90000));
+                    break ;
+
+                case EVENT_WHEAT :
+                    if(m_uiWheatAbility == 106546)
+                    {
+                        if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
                             DoCast(target, m_uiWheatAbility, true);
                     }
-
-                    events.ScheduleEvent(Event_YanZhu_WheatAbility, IsHeroic() ? 30000 : 35000);
+                    else
+                        DoCastAOE(m_uiWheatAbility);
+                    events.ScheduleEvent(EVENT_WHEAT, IsHeroic() ? urand(12000, 14000) : urand(15000, 20000));
                     break ;
 
-                default :
+                case EVENT_CHECK_DIST :
+                    if(!DoCheckPlayers())
+                        if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                            DoCast(target, 114548);
+                    events.ScheduleEvent(EVENT_CHECK_DIST, 1000);
+                    break ;
+
+                case EVENT_JUMP :
+                    DoCheckPlayers(false);
+                    if(m_uiSudsLoop < 9)
+                        events.ScheduleEvent(EVENT_JUMP, 500);
                     break ;
                 }
             }
         }
 
-        void SummonBubbleShield()
+        bool DoCheckPlayers(bool melee = true)
         {
-            const float rayon = 2.0f ;
-            for(float i = 0 ; i < 2 * M_PI ; i += 2 * M_PI / 8)
-            {
-                float x = me->GetPositionX() + rayon * cos(i);
-                float y = me->GetPositionY() + rayon * sin(i);
-                float z = me->GetPositionZ() + 3.0f ;
-
-                if(Creature* bubbleShield = me->SummonCreature(Mob_BubbleShield, x, y, z))
-                    bubbleShield->CastSpell(me, Spell_YanZhu_BubbleShield, true);
-            }
-        }
-
-        void SummonYeastyBrewAlamental()
-        {
-            for(uint8 i = 0 ; i < DoCountCasters() ; ++i)
-            {
-                float x = me->GetPositionX() + rand() % 4 ;
-                float y = me->GetPositionY() + rand() % 4 ;
-                float z = me->GetPositionZ() ;
-
-                me->SummonCreature(Mob_YeastyBrewAlamental, x, y, z);
-            }
-        }
-
-        void SummonFizzyBubbles()
-        {
-            for(uint8 i = 0 ; i < MAX_SUMMON_FIZZY_BUBBLES_POSITION ; ++i)
-            {
-                Position pos ;
-                pos.Relocate(summonFizzyBubblePositions[i]);
-                me->SummonCreature(Npc_FizzyBubble, pos, TEMPSUMMON_TIMED_DESPAWN, 20000);
-            }
-        }
-
-        void CastWallOfSuds()
-        {
-            SummonSuds();
-            SummonSuds(false);
-        }
-
-        bool DoCheckPlayers()
-        {
+            bool toReturn = true ;
             if(Map* map = me->GetMap())
             {
-                Map::PlayerList const & playerList = map->GetPlayers();
+                Map::PlayerList const& playerList = map->GetPlayers();
                 if(!playerList.isEmpty())
-                {
                     for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
                     {
-                        if(Player* p = iter->getSource())
-                        {
-                            if(p->GetExactDist2d(me->GetPositionX(), me->GetPositionY()) <= 1.5f)
-                                return true ;
-                            else
-                                continue ;
-                        }
+                        if(melee)
+                            toReturn = DoCheckMelee(iter->getSource()) ;
+                        else
+                            DoCheckJump(iter->getSource());
                     }
-                }
             }
 
-            return false ;
+            return toReturn ;
         }
 
-        uint32 DoCountCasters()
+        bool DoCheckMelee(Player* player)
         {
-            uint32 count = 0 ;
-            if(Map* map = me->GetMap())
-            {
-                Map::PlayerList const & playerList = map->GetPlayers();
-                if(!playerList.isEmpty())
-                {
-                    for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
-                    {
-                        if(Player *p = iter->getSource())
-                        {
-                            if(p->GetPower(POWER_MANA))
-                                ++count ;
-                        }
-                    }
-                }
-            }
-
-            return count ;
-        }
-
-        void DespawnMinions(uint32 entry)
-        {
-            std::list<Creature*> minions ;
-            GetCreatureListWithEntryInGrid(minions, me, entry, 50000.0f);
-
-            if(!minions.empty())
-            {
-                for(std::list<Creature*>::const_iterator iter = minions.begin() ; iter != minions.end() ; ++iter)
-                {
-                    if(Creature* minion = *iter)
-                        minion->DisappearAndDie();
-                }
-            }
-        }
-
-        inline void ClearZone()
-        {
-            DespawnMinions(Mob_BubbleShield);
-            DespawnMinions(Mob_YeastyBrewAlamental);
-            DespawnMinions(Npc_Suds);
-        }
-
-        /** Wall of Suds system */
-        void SummonSuds(bool horizontal = true)
-        {
-            Position debutSummon, finSummon, debutArrivee, finArrivee; // The four positions we will need
-            RelocatePositions(&debutSummon, &finSummon, &debutArrivee, &finArrivee, horizontal); // Relocate them (generic)
-
-            float coeffSummon, ordoSummon, progressSummon, coeffEnd, ordoEnd, progressEnd ; // Enough to get two equations
-            CalculateEquation(&debutSummon, &finSummon, coeffSummon, ordoSummon, progressSummon); // Calculate them
-            CalculateEquation(&debutArrivee, &finArrivee, coeffEnd, ordoEnd, progressEnd);
-
-            // Start summoning
-            for(uint32 i = 0 ; i < NUMBER_OF_SUMMONED_SUDS ; ++i)
-            {
-                float summon_x, summon_y, summon_z, move_x, move_y, move_z ; // Six points to build two positions
-                RelocatePoints(&debutSummon, i, progressSummon, coeffSummon, ordoSummon, summon_x, summon_y, summon_z); // Relocate the summon
-                RelocatePoints(&debutArrivee, i, progressEnd, coeffEnd, ordoEnd, move_x, move_y, move_z); // Relocate the move point
-
-                // Compute all
-                if(Creature* summon = me->SummonCreature(Npc_Suds, summon_x, sumon_y, summon_z))
-                {
-                    summon->CastSpell(summon, Spell_YanZhu_WallOfSuds, true);
-                    summon->GetMotionMaster()->MovePoint(0, move_x, move_y, move_z);
-                }
-            }
-        }
-
-        /** Generic function that relocate the four positions passed as arguments with the arrays containing the summoning positions */
-        /** Param horizontal determines which array we will use */
-        void RelocatePositions(Position* startSummon, Position* endSummon, Position* moveStart, Position* moveEnd, bool const& horizontal = true)
-        {
-            if(horizontal)
-            {
-                startSummon->Relocate(summonHorizontal[0][0]);
-                endSummon->Relocate(summonHorizontal[1][0]);
-
-                moveStart->Relocate(summonHorizontal[0][1]);
-                moveEnd->Relocate(summonHorizontal[1][1]);
-            }
+            if(player)
+                return (player->GetExactDist2d(me->GetPositionX(), me->GetPositionY() <= 5.0f)) ;
             else
-            {
-                startSummon->Relocate(summonVertical[0][0]);
-                endSummon->Relocate(summonVertical[1][0]);
-
-                moveStart->Relocate(summonVertical[0][1]);
-                moveEnd->Relocate(summonVertical[1][1]);
-            }
+                return false ;
         }
 
-        // y = ax + b
-        // b = y - ax
-        /** Generic function that calculates the equation formed by two points (Position passed as args) */
-        /** Also it determines the distance between the x position of two summons, knowing the total number of summon (defined NUMBER_OF_SUMMONED_SUDS) */
-        void CalculateEquation(Position* start, Position* end, float& coeff, float& ordo, float& progress)
+        void DoCheckJump(Player* player)
         {
-            float x = start->GetPositionX();
-            coeff = (end->GetPositionY() - start->GetPositionY()) / (end->GetPositionX() - start->GetPositionX()); // a
-
-            float y = start->GetPositionY() ;
-            ordo = y - coeff * x ;
-
-            float delta = fabs(end->GetPositionX() - start->GetPositionX());
-            progress = delta / NUMBER_OF_SUMMONED_SUDS ;
+            if(player)
+                if((player->GetPositionZ() > MIN_GROUND_Z + 0.2f))
+                    if(Aura* aura = player->GetAura(114468))
+                        player->CastSpell(player, aura->GetSpellInfo()->Effects[0].TriggerSpell, true);
         }
 
-        /** Generic function that calculates x, y, and z coordinates knowing the component of the equation */
-        void RelocatePoints(Position const* start, uint32 i,
-                            float const& progress, float const& coeff, float const& ordo,
-                            float& x, float& y, float& z)
+        void SummonBubbles()
         {
-            x = start->GetPositionX() + i * progress ;
-            y = x * coeff + ordo ;
-            z = start->GetPositionZ() ;
+
         }
 
     private :
+        uint32 m_uiAleAbility;
+        uint32 m_uiStoutAbility;
+        uint32 m_uiWheatAbility;
+
+        uint32 m_uiSudsLoop ;
+
         EventMap events ;
         InstanceScript* instance ;
-
-        uint32 m_uiAleAbility ;
-        uint32 m_uiWheatAbility ;
-        uint32 m_uiStoutAbility ;
-
-        uint32 m_uiBrewBoltTimer ;
     };
-
-    CreatureAI* GetAI(Creature *creature) const
-    {
-        return new boss_yan_zhu_the_uncasked_AIScript(creature);
-    }
 };
 
-class mob_yeasty_brew_alamental : public CreatureScript
+class WallOfSudsTargetSelectorPredicate
 {
 public :
-    mob_yeasty_brew_alamental() : CreatureScript("mob_yeasty_brew_alamental")
+    WallOfSudsTargetSelectorPredicate(Unit* caster) : _caster(caster)
     {
 
     }
 
-    struct mob_yeasty_brew_alamental_AIScript : public ScriptedAI
+    bool operator()(WorldObject* target)
     {
+        if(!target || !_caster)
+            return true ;
 
-    };
+        if(target->GetTypeId() != TYPEID_PLAYER)
+            return true ;
 
-    CreatureAI* GetAI(Creature *creature) const
-    {
-        return new mob_yeasty_brew_alamental_AIScript(creature);
+        if(!target->isInFront(_caster))
+                return true ;
+
+        return false ;
     }
+
+private :
+    Unit* _caster ;
 };
 
-class npc_fizzy_bubble : public CreatureScript
+class spell_sb_wall_of_suds : public SpellScriptLoader
 {
 public :
-    npc_fizzy_bubble() : CreatureScript("npc_fizzy_bubble")
+    spell_sb_wall_of_suds() : SpellScriptLoader("spell_sb_wall_of_suds")
     {
 
     }
 
-    bool OnGossipHello(Player *player, Creature *creature)
+    class spell_sb_wall_of_suds_SpellScript : public SpellScript
     {
-        if(!p || !creature)
-            return false ;
+        PrepareSpellScript(spell_sb_wall_of_suds_SpellScript);
 
-        if(player->HasAura(114458))
-            return false ;
+        bool Validate(const SpellInfo *spellInfo)
+        {
+            return true ;
+        }
 
-        player->CastSpell(player, 114458, true);
-        player->PlayerTalkClass->SendCloseGossip();
-        creature->DisappearAndDie();
-        return true ;
-    }
-};
+        bool Load()
+        {
+            return true ;
+        }
 
-class npc_sudsy_stalker : public CreatureScript
-{
-public :
-    npc_sudsy_stalker() : CreatureScript("npc_sudsy_stalker")
-    {
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            targets.remove_if(WallOfSudsTargetSelectorPredicate(GetCaster()));
+        }
 
-    }
-
-    struct npc_sudsy_stalker_AIScript : public ScriptedAI
-    {
-
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sb_wall_of_suds_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_TARGET_ANY);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sb_wall_of_suds_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_TARGET_ANY);
+        }
     };
 
-    CreatureAI* GetAI(Creature *creature) const
+    SpellScript* GetSpellScript() const
     {
-        return new npc_sudsy_stalker_AIScript(creature);
+        return new spell_sb_wall_of_suds_SpellScript();
     }
 };
 
-class spell_yan_zhu_blackout_brew : public SpellScriptLoader
-{
-public :
-    spell_yan_zhu_blackout_brew() : SpellScriptLoader("spell_yan_zhu_blackout_brew")
-    {
-
-    }
-
-    class spell_yan_zhu_blackout_brew_AuraScript : public AuraScript
-    {
-
-    };
-
-    AuraScript* GetAuraScript() const
-    {
-        return new spell_yan_zhu_blackout_brew_AuraScript();
-    }
-};
 
 void AddSC_boss_yan_zhu_the_uncasked()
 {
     new boss_yan_zhu_the_uncasked();
+    new spell_sb_wall_of_suds();
 }

@@ -16,7 +16,10 @@ set(sources
   Pandaria/zone_kun_lai_summit.cpp
   Pandaria/StormstoutBrewery/stormstout_brewery.h
   Pandaria/StormstoutBrewery/instance_stormstout_brewery.cpp
+  Pandaria/StormstoutBrewery/stormstout_brewery.cpp
   Pandaria/StormstoutBrewery/boss_ook_ook.cpp
+  Pandaria/StormstoutBrewery/boss_hoptallus.cpp
+  Pandaria/StormstoutBrewery/boss_yan_zhu_the_uncasked.cpp
   Pandaria/MoguShanPalace/boss_gekkan.cpp
   Pandaria/MoguShanPalace/boss_xin_the_weaponmaster.cpp
   Pandaria/MoguShanPalace/instance_mogushan_palace.cpp
@@ -43,6 +46,8 @@ set(sources
   Pandaria/GateoftheSettingSun/gate_setting_sun.cpp
   Pandaria/GateoftheSettingSun/gate_setting_sun.h
   Pandaria/GateoftheSettingSun/instance_gate_setting_sun.cpp
+  Pandaria/SiegeofNiuzaoTemple/instance_siege_of_niuzao_temple.cpp
+  Pandaria/SiegeofNiuzaoTemple/siege_of_niuzao_temple.h
   Pandaria/TempleoftheJadeSerpent/instance_temple_of_the_jade_serpent.cpp
   Pandaria/TempleoftheJadeSerpent/boss_wise_mari.cpp
   Pandaria/TempleoftheJadeSerpent/boss_lorewalker_stonestep.cpp

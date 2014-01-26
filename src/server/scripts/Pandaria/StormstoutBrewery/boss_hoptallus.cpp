@@ -1,93 +1,64 @@
 #include "stormstout_brewery.h"
 
-#define SUMMONING_RAYON 30.0f
-
-enum Spells
+enum HoptallusSpells
 {
-    // Hoptallus
-    Spell_Hoptallus_Furlwind = 112992,
-    Spell_Hoptallus_FurlwindPeriodic = 112993,
-    Spell_Hoptallus_CarrotBreath = 112944,
-    Spell_Hoptallus_CarrotBreathPeriodic = 112945,
-
-    // Hopper
-    Spell_Hopper_ExplosiveBrew = 114291,
-
-    // Big Ol' Hammer
-    Spell_Hammer_SmashOverrider = 111662, /** @todo : look carefully those two */
-    Spell_Hammer_SmashDamager = 111666
-};
-
-enum Creatures
-{
-    Npc_CarrotBreathStalker = 56716,
-    Npc_BigOlHammer = 59539,
-    Mob_Hoppling = 60208, // Do nothing
-    Mob_Hopper = 59464, // Explosive Brew
-    Mob_Bopper = 59551 // Hammer
+    SPELL_FURLWIND      = 112992,
+    SPELL_CARROT_BREATH = 112944
 };
 
 enum Events
 {
-    // Hoptallus
-    Event_Hoptallus_Furlwind = 1,
-    Event_Hoptallus_CarrotBreath = 2,
-    Event_Hoptallus_SummonVirmen = 3
+    EVENT_SUMMON_VIRMEN = 1,
+    EVENT_FURLWIND      = 2,
+    EVENT_CARROT_BREATH = 3,
+    EVENT_CHECK         = 4
 };
 
-enum Actions
+enum Talk
 {
-    Action_Hoptallus_StartSummoning = 0
+    TALK_AGGRO          = 1,
+    TALK_KILLED_PLAYER  = 2,
+    TALK_FURLWIND       = 3,
+    TALK_CARROT_BREATH  = 4,
+    TALK_JUST_DIED      = 5
 };
 
-enum Says
+enum Misc
 {
-    Talk_Hoptallus_Aggro = 1,
-    Talk_Hoptallus_Furlwind = 2,
-    Talk_Hoptallus_CarrotBreath = 3,
-    Talk_Hoptallus_KilledPlayer = 4,
-    Talk_Hoptallus_Death = 5
+    GOB_GIANT_BARREL            = 211138,
+    NPC_CARROT_COLLECTOR        = 200505,
+    NPC_CARROT_BREATH_HELPER    = 200504,
+    MOB_BOPPER                  = 59551,
+    MOB_HOPPER                  = 59464,
+    MOB_HOPPLING                = 60208,
+    NPC_BIG_OL_HAMMER           = 59539
 };
 
-#define MAX_SUMMON_VIRMEN_POSITIONS 8
-static const Position summonVirmenPositions[MAX_SUMMON_VIRMEN_POSITIONS] =
+#define MAX_SUMMON_VIRMEN 5
+const Position summonVirmenPosition[MAX_SUMMON_VIRMEN] =
 {
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f}
+    {-728.146240f, 1249.065796f, 164.800262f, 0.291780f},
+    {-724.845337f, 1254.960938f, 164.800262f, 0.291780f},
+    {-721.216980f, 1249.473389f, 164.800262f, 0.291780f},
+    {-728.308960f, 1260.730957f, 164.800262f, 0.291780f},
+    {-718.083557f, 1243.474976f, 164.800262f, 0.291780f}
+	/*{-686.667542f, 1241.537993f, 162.795578f, 1.864492f},
+	{-682.696228f, 1244.395874f, 162.795578f, 1.864492f},
+	{-700.184814f, 1239.763672f, 162.795578f, 1.475719f},
+	{-707.646057f, 1272.627075f, 162.772934f, 5.390928f},
+	{-693.530945f, 1276.592407f, 162.793060f, 4.653439f}*/
 };
 
-#define MAX_JUMP_VIRMEN_POSITIONS 6
-static const Position jumpVirmenPositions[MAX_JUMP_VIRMEN_POSITIONS] =
+const Position jumpVirmenPosition[MAX_SUMMON_VIRMEN] =
 {
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f}
+    {-702.496643f, 1248.231689f, 162.794922f, 1.271960f},
+    {-706.126038f, 1266.666748f, 162.779785f, 0.039670f},
+    {-699.487671f, 1275.684326f, 162.770660f, 4.822747f},
+    {-690.849060f, 1244.437622f, 162.794586f, 1.847660f},
+    {-696.724609f, 1256.291992f, 162.785858f, 6.239606f}
 };
 
-#define MAX_PRE_EVENT_ADDS 3
-static const uint32 preEventAdds[MAX_PRE_EVENT_ADDS] = {56718, 59426, 59460};
-
-#define MAX_POINT_PATH_ADDS 8
-static const Position preEventAddsPaths[MAX_POINT_PATH_ADDS] =
-{
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f}
-};
+const Position jumpPosition = {-695.928467f, 1261.399414f, 162.780762f, 0.291780f};
 
 class boss_hoptallus : public CreatureScript
 {
@@ -97,75 +68,126 @@ public :
 
     }
 
-    struct boss_hoptallus_AIScript : public ScriptedAI
+    class boss_hoptallusAI : public ScriptedAI
     {
     public :
-        boss_hoptallus_AIScript(Creature* creature) : ScriptedAI(creature)
+        boss_hoptallusAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
-            b_hasStartedOnce = false ;
-            m_uiSummonTimer = 1000 ;
+            m_bHasStartedOnce = false ;
+            m_bReady = false ;
         }
 
         void Reset()
         {
             if(instance)
-                instance->SetData(Data_HoptallusEventProgress, NOT_STARTED);
+                instance->SetData(INSTANCE_DATA_HOPTALLUS_STATUS, NOT_STARTED);
             events.Reset();
+            if(m_bHasStartedOnce)
+                events.ScheduleEvent(EVENT_CHECK, 500);
+        }
+
+        void DoAction(const int32 action)
+        {
+            if(action == 0)
+            {
+                if(GameObject* go = me->FindNearestGameObject(GOB_GIANT_BARREL, 50000.0f))
+                    go->SetGoState(GO_STATE_ACTIVE);
+                me->GetMotionMaster()->MoveJump(jumpPosition, 1.0f, 1.0f);
+                m_bReady = true ;
+            }
+        }
+
+        void EnterCombat(Unit *aggro)
+        {
+            if(instance)
+            {
+                instance->SetData(INSTANCE_DATA_HOPTALLUS_STATUS, IN_PROGRESS);
+                if(GameObject* door = ObjectAccessor::GetGameObject(*me, instance->GetData64(INSTANCE_DATA64_HOPTALLUS_ENTRANCE_GUID)))
+                    door->SetGoState(GO_STATE_READY);
+            }
+            events.ScheduleEvent(EVENT_SUMMON_VIRMEN, IsHeroic() ? urand(10000, 11000) : urand(12000, 14000));
+            events.ScheduleEvent(EVENT_FURLWIND, IsHeroic() ? 6000 : 8000);
+            events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
+
+            Talk(TALK_AGGRO);
         }
 
         void EnterEvadeMode()
         {
             if(instance)
-                instance->SetData(Data_HoptallusEventProgress, FAIL);
+            {
+                instance->SetData(INSTANCE_DATA_HOPTALLUS_STATUS, FAIL);
+                if(GameObject* door = ObjectAccessor::GetGameObject(*me, instance->GetData64(INSTANCE_DATA64_HOPTALLUS_ENTRANCE_GUID)))
+                    door->SetGoState(GO_STATE_ACTIVE);
+            }
 
-            ScriptedAI::EnterEvadeMode();
-        }
-
-        void DoAction(const int32 actionId)
-        {
-            if(actionId == Action_Hoptallus_StartSummoning)
-                DoPreEvent(0);
-        }
-
-        void EnterCombat(Unit *who)
-        {
-            if(instance)
-                instance->SetData(Data_HoptallusEventProgress, IN_PROGRESS);
-
-            if(!b_hasStartedOnce)
-                b_hasStartedOnce = true ;
-
-            Talk(Talk_Hoptallus_Aggro);
-            DoZoneInCombat();
-            events.ScheduleEvent(Event_Hoptallus_Furlwind, IsHeroic() ? urand(6000, 8000) : urand(7000, 10000));
-            events.ScheduleEvent(Event_Hoptallus_CarrotBreath, IsHeroic() ? 10000 : 15000);
-            events.ScheduleEvent(Event_Hoptallus_SummonVirmen, IsHeroic() ? 15000 : 20000);
-        }
-
-        void KilledUnit(Unit *killed)
-        {
-            Talk(Talk_Hoptallus_KilledPlayer);
+            if(!m_bReady)
+                ScriptedAI::EnterEvadeMode();
         }
 
         void JustDied(Unit *killer)
         {
             if(instance)
-                instance->SetData(Data_HoptallusEventProgress, DONE);
+            {
+                instance->SetData(INSTANCE_DATA_HOPTALLUS_STATUS, DONE);
+                if(GameObject* entrance = ObjectAccessor::GetGameObject(*me, instance->GetData64(INSTANCE_DATA64_HOPTALLUS_ENTRANCE_GUID)))
+                    entrance->SetGoState(GO_STATE_ACTIVE);
+                if(GameObject* exit = ObjectAccessor::GetGameObject(*me, instance->GetData64(INSTANCE_DATA64_HOPTALLUS_EXIT_GUID)))
+                    exit->SetGoState(GO_STATE_ACTIVE);
+            }
 
-            Talk(Talk_Hoptallus_Death);
-            ClearZone();
+            if(Creature* c = me->SummonCreature(NPC_CARROT_COLLECTOR, -702.496643f, 1248.231689f, 162.794922f, 1.271960f))
+            {
+                if(Creature* carrot = me->FindNearestCreature(500002, 50000.0f, true))
+                    c->GetMotionMaster()->MoveFollow(carrot, 0.5f, carrot->GetOrientation() - M_PI / 4);
+            }
+
+            Talk(TALK_JUST_DIED);
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void KilledUnit(Unit *killed)
         {
-            if(!b_hasStartedOnce)
-                DoPreEvent(uiDiff);
-
+            Talk(TALK_KILLED_PLAYER);
             if(!UpdateVictim())
+                m_bReady = false ;
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if(!m_bReady && !UpdateVictim() && m_bHasStartedOnce)
+            {
+                events.Update(diff);
+
+                while(uint32 eventId = events.ExecuteEvent())
+                {
+                    switch(eventId)
+                    {
+                    case EVENT_CHECK :
+                        if(DoCheckForPlayers())
+                        {
+                            me->GetMotionMaster()->MoveJump(jumpPosition, 1, 1);
+                            events.Reset();
+                            m_bReady = true ;
+                            break;
+                        }
+                        else
+                        {
+                            events.ScheduleEvent(EVENT_CHECK, 500);
+                            return ;
+                        }
+                        break ;
+
+                    default :
+                        break ;
+                    }
+                }
+            }
+
+            if(m_bReady && !UpdateVictim())
                 return ;
 
-            events.Update(uiDiff);
+            events.Update(diff);
 
             if(me->HasUnitState(UNIT_STATE_CASTING))
                 return ;
@@ -174,112 +196,96 @@ public :
             {
                 switch(eventId)
                 {
-                case Event_Hoptallus_CarrotBreath :
-                    DoCast(Spell_Hoptallus_CarrotBreath);
-                    events.ScheduleEvent(Event_Hoptallus_CarrotBreath, IsHeroic() ? 10000 : 15000);
+                case EVENT_FURLWIND :
+                    Talk(TALK_FURLWIND);
+                    DoCastAOE(SPELL_FURLWIND);
+                    events.ScheduleEvent(EVENT_FURLWIND, IsHeroic() ? urand(6000, 7000) : urand(7000, 8500));
                     break ;
 
-                case Event_Hoptallus_Furlwind :
-                    DoCast(Spell_Hoptallus_Furlwind);
-                    events.ScheduleEvent(Event_Hoptallus_Furlwind, IsHeroic() ? urand(5000, 6500) : urand(6000, 8500));
+                case EVENT_CARROT_BREATH :
+                    DoCast(SPELL_CARROT_BREATH);
+                    events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
 
-                case Event_Hoptallus_SummonVirmen :
-                    SummonVirmen();
-                    events.ScheduleEvent(IsHeroic() ? 15000 : 20000);
+                case EVENT_SUMMON_VIRMEN :
+                    if(m_uiSummonTimes == 0)
+                        if(instance)
+                            instance->DoSendNotifyToInstance("Hoptallus emits a shrill cry : more virmens are coming !");
+                    SummonVirmens();
+                    ++m_uiSummonTimes;
+                    if(m_uiSummonTimes < 3)
+                        events.ScheduleEvent(EVENT_SUMMON_VIRMEN, 1000);
+                    else
+                    {
+                        events.ScheduleEvent(EVENT_SUMMON_VIRMEN, IsHeroic() ? 10000 : 15000);
+                        m_uiSummonTimes = 0 ;
+                    }
                     break ;
 
                 default :
                     break ;
                 }
             }
-
-            DoMeleeAttackIfReady();
         }
 
-        void SummonVirmen()
+        bool DoCheckForPlayers()
         {
-            uint32 counts[3] = {urand(1, 5), urand(1, 4), urand(1, 3)};
-            uint32 entry ;
-            for(uint8 i = 0 ; i < 3 ; ++i)
+            if(Map* map = me->GetMap())
             {
-                switch(i)
+                Map::PlayerList const& playerList = map->GetPlayers();
+                if(!playerList.isEmpty())
                 {
-                case 0 :
-                    entry = Mob_Hoppling ;
-                    break ;
-
-                case 1:
-                    entry = Mob_Hopper ;
-                    break ;
-
-                case 2:
-                    entry = Mob_Bopper ;
-                    break ;
-                }
-
-                for(uint32 j = 0 ; j < counts[i] ; ++j)
-                {
-
-                    Creature* virmen = me->SummonCreature(entry, summonVirmenPositions[urand(0, MAX_SUMMON_VIRMEN_POSITIONS - 1)], TEMPSUMMON_DEAD_DESPAWN);
-                    if(virmen)
-                        virmen->GetMotionMaster()->MoveJump(jumpVirmenPositions[urand(0, MAX_JUMP_VIRMEN_POSITIONS - 1)], 1.0f, 1.0f);
-                }
-            }
-        }
-
-        void DoPreEvent(const uint32 uiDiff)
-        {
-            if(instance && instance->GetData(Data_HoptallusEventProgress) == NOT_STARTED && !b_hasStartedOnce)
-            {
-                if(m_uiSummonTimer <= diff)
-                {
-                    Creature* add = me->SummonCreature(preEventAdds[urand(0, MAX_PRE_EVENT_ADDS - 1)], preEventAddsPaths[0]);
-                    if(add)
-                        add->GetMotionMaster()->MovePoint(1, preEventAddsPaths[1]);
-
-                    m_uiSummonTimer = 1000 ;
-                }
-                else
-                    m_uiSummonTimer = 1000 ;
-            }
-        }
-
-        void DespawnCreatures(uint32 entry)
-        {
-            std::list<Creature*> creatures ;
-            GetCreatureListWithEntryInGrid(creatures, me, entry, 50000.0f);
-
-            if(!creatures.empty())
-            {
-                for(std::list<Creature*>::const_iterator iter = creatures.begin() ; iter != creatures.end() ; ++iter)
-                {
-                    if(Creature* c = *iter)
+                    for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
                     {
-                        c->DisappearAndDie();
+                        if(Player* p = iter->getSource())
+                        {
+                            if(p->isDead())
+                                return false ;
+                            else
+                                continue ;
+                        }
                     }
                 }
+                else
+                    return false ;
             }
+            else
+                return false ;
+
+            return true ;
         }
 
-        inline void ClearZone()
+        void SummonVirmens()
         {
-            DespawnCreatures(Mob_Hopper);
-            DespawnCreatures(Mob_Hoppling);
-            DespawnCreatures(Mob_Bopper);
-            DespawnCreatures(Npc_BigOlHammer);
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Entered SummonVirmens");
+            for(uint8 i = 0 ; i < 5 ; ++i)
+            {
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Looping");
+				uint32 index = urand(0, MAX_SUMMON_VIRMEN - 1);
+				const Position posSummon = summonVirmenPosition[index];
+				index = urand(0, MAX_SUMMON_VIRMEN - 1);
+				const Position posJump = jumpVirmenPosition[index];
+				uint32 entry = RAND(MOB_HOPPER, MOB_HOPPLING, MOB_BOPPER);
+                if(Creature* summon = me->SummonCreature(entry, posSummon))
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Summoned virmen ; motion master");
+                    summon->GetMotionMaster()->MoveJump(posJump, 4.0f, 4.0f);
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Jumped");
+				}
+            }
         }
 
     private :
         EventMap events ;
-        InstanceScript* instance ;
-        bool b_hasStartedOnce ;
-        uint32 m_uiSummonTimer ;
+        InstanceScript * instance ;
+        bool m_bHasStartedOnce ;
+        bool m_bReady ;
+        uint8 m_uiSummonTimes ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
     {
-        return new boss_hoptallus_AIScript(creature);
+        return new boss_hoptallusAI(creature);
     }
 };
 
@@ -291,110 +297,78 @@ public :
 
     }
 
-    struct mob_virmen_AIScript : public ScriptedAI
+    class mob_virmenAI : public ScriptedAI
     {
     public :
-        mob_virmen_AIScript(Creature *creature) : ScriptedAI(creature)
+        mob_virmenAI(Creature* creature) : ScriptedAI(creature)
         {
 
         }
 
         void Reset()
         {
-            if(me->GetEntry() == Mob_Hopper)
-            {
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true);
-                if(target)
-                    me->GetMotionMaster()->MoveChase(target);
-            }
-            else
-                target = NULL ;
+            m_uiCheckTimer = 500 ;
         }
 
         void JustDied(Unit *killer)
         {
-            if(me->GetEntry() == Mob_Bopper)
+            if(me->GetEntry() == MOB_BOPPER)
             {
-                if(killer)
-                {
-                    Position pos ;
-                    killer->GetPosition(&pos);
-                    me->SummonCreature(Npc_BigOlHammer, pos);
-                }
+                Position pos ;
+                me->GetPosition(&pos);
+
+                me->SummonCreature(NPC_BIG_OL_HAMMER, pos, TEMPSUMMON_TIMED_DESPAWN, 20000);
             }
         }
 
         void UpdateAI(const uint32 diff)
         {
-            if(!UpdateVictim())
-                return ;
-
-            if(me->GetEntry() == Mob_Hopper)
+            if(me->GetEntry() == MOB_HOPPER)
             {
-                if(target && me->getVictim())
+                if(m_uiCheckTimer <= diff)
                 {
-                    if(target != me->getVictim())
-                    {
-                        me->AddThreat(me->getVictim(), -me->getThreatManager().getThreat(me->getVictim()));
-                        me->AddThreat(target, 1000000.0f);
-                        me->GetMotionMaster()->MoveChase(target);
-                    }
+                    if(DoCheckPlayers())
+                        me->Kill(me);
                     else
+                        m_uiCheckTimer = 500 ;
+                }
+                else
+                    m_uiCheckTimer -= diff ;
+            }
+        }
+
+        bool DoCheckPlayers()
+        {
+            if(Map* map = me->GetMap())
+            {
+                Map::PlayerList const& playerList = map->GetPlayers();
+                if(!playerList.isEmpty())
+                {
+                    for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
                     {
-                        Position pos ;
-                        target->GetPosition(&pos);
-                        if(me->GetExactDist2d(&pos) <= 2.0f)
+                        if(Player* p = iter->getSource())
                         {
-                            DoCast(Spell_Hopper_ExplosiveBrew);
-                            if(me && me->isAlive())
-                                me->Kill(me);
+                            float dist = me->GetExactDist2d(p->GetPositionX(), p->GetPositionY());
+                            if(dist <= 1.0f)
+                            {
+                                DoCast(p, 114291);
+                                return true ;
+                            }
                         }
                     }
                 }
             }
+
+            return false ;
         }
 
     private :
-        Unit* target ;
+        uint32 m_uiCheckTimer ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
     {
-        return new mob_virmen_AIScript(creature);
-    }
-};
-
-class mob_pre_event_add : public CreatureScript
-{
-public :
-    mob_pre_event_add() : CreautreScript("mob_pre_event_add")
-    {
-
-    }
-
-    struct mob_pre_event_add_AIScript : public ScriptedAI
-    {
-    public :
-        mob_pre_event_add_AIScript(Creature* creature) : ScriptedAI(creature)
-        {
-
-        }
-
-        void MovementInform(uint32 type, uint32 id)
-        {
-            if(id != 7)
-                me->GetMotionMaster()->MovePoint(preEventAddsPaths[id + 1]);
-            else
-            {
-                me->GetMotionMaster()->Clear(false);
-                me->DisappearAndDie();
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature *creature) const
-    {
-        return new mob_pre_event_add_AIScript(creature);
+        return new mob_virmenAI(creature);
     }
 };
 
@@ -403,96 +377,83 @@ class npc_big_ol_hammer : public CreatureScript
 public :
     npc_big_ol_hammer() : CreatureScript("npc_big_ol_hammer")
     {
-        m_ullLastFailedPlayer = 0 ;
+
     }
 
-    bool OnGossipHello(Player *player, Creature *me)
+    bool OnGossipHello(Player *p, Creature *me)
     {
-        if(!player || !me || (player && player->GetGUID() == m_ullLastFailedPlayer))
+        if(!p->HasAura(111662))
+        {
+            me->CastSpell(p, 116662, true);
+            me->Kill(me);
             return false ;
-
-        if(!player->HasAura(Spell_Hammer_SmashOverrider))
-        {
-            me->CastSpell(player, Spell_Hammer_SmashOverrider, true);
-            me->DisappearAndDie();
-        }
-        else
-        {
-            player->PlayerTalkClass->SendCloseGossip();
-            m_ullLastFailedPlayer = player->GetGUID();
         }
 
-        return true ;
+        return false ;
     }
-
-private :
-    uint64 m_ullLastFailedPlayer ;
 };
 
-class npc_carrot_breath_stalker : public CreatureScript
+class stalker_carrot_breath : public CreatureScript
 {
 public :
-    npc_carrot_breath_stalker() : CreatureScript("npc_carrot_breath_stalker")
+    stalker_carrot_breath() : CreatureScript("stalker_carrot_breath")
     {
 
     }
 
-    struct npc_carrot_breath_stalker_AIScript : public ScriptedAI
+    class stalker_carrot_breathAI : public ScriptedAI
     {
     public :
-        npc_carrot_breath_stalker_AIScript(Creature* creature) : ScriptedAI(creature)
+        stalker_carrot_breathAI(Creature* creature) : ScriptedAI(creature)
         {
 
         }
 
         void IsSummonedBy(Unit *summoner)
         {
-            SpellInfo const* carrotBreathSpellInfo = sSpellMgr->GetSpellInfo(112944);
-
-            if(summoner && carrotBreathSpellInfo)
+            if(summoner)
             {
+                m_rayon = me->GetExactDist2d(summoner->GetPositionX(), summoner->GetPositionY());
+                center.Relocate(summoner->GetPositionX(), summoner->GetPositionY());
+                me->SetSpeed(MOVE_RUN, 2 * M_PI * m_rayon / 15000);
+                me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * m_rayon / 15000);
+
                 me->SetFacingToObject(summoner);
                 me->SetTarget(summoner->GetGUID());
-
-                me->SetSpeed(MOVE_RUN, 2 * M_PI * m_fRayon / ((carrotBreathSpellInfo->DurationEntry->Duration)));
-
-                m_posHoptallus.Relocate(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ());
-                m_fRayon = me->GetExactDist2d(summoner->GetPositionX(), summoner->GetPositionY());
-                m_fAngle = me->GetOrientation();
-                m_uiPoint = 0 ;
+                angle = me->GetOrientation();
+                m_id = 0 ;
             }
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(const uint32 diff)
         {
-            if(SpellInfo const* carrotBreathSpellInfo = sSpellMgr->GetSpellInfo(112944))
-            {
-                ++m_uiPoint;
-                m_fAngle -= ((2 * M_PI / (carrotBreathSpellInfo->DurationEntry->Duration)) * uiDiff );
-                m_fx = m_posHoptallus.GetPositionX() + m_fRayon * cos(m_fAngle);
-                m_fy = m_posHoptallus.GetPositionY() + m_fRayon * sin(m_fAngle);
-                m_fz = m_posHoptallus.GetPositionZ() ;
+            ++m_id ;
+            angle -= (2 * M_PI / 15000)*diff ;
+            float x, y, z ;
 
-                me->GetMotionMaster()->MovePoint(m_uiPoint, m_fx, m_fy, m_fz);
-            }
+            x = center.GetPositionX() + cos(angle) * m_rayon ;
+            y = center.GetPositionY() + sin(angle) * m_rayon ;
+            z = center.GetPositionZ() ;
+            me->GetMotionMaster()->MovePoint(m_id, x, y, z);
         }
 
     private :
-        float m_fx, m_fy, m_fz, m_fo, m_fRayon, m_fAngle ;
-        uint32 m_uiPoint ;
-
-        Position m_posHoptallus ;
+        Position center ;
+        float m_rayon ;
+        float x, y, z ;
+        float angle ;
+        uint32 m_id ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
     {
-        return new npc_carrot_breath_stalker_AIScript(creature);
+        return new stalker_carrot_breathAI(creature);
     }
 };
 
 class spell_hoptallus_carrot_breath : public SpellScriptLoader
 {
-public:
+public :
     spell_hoptallus_carrot_breath() : SpellScriptLoader("spell_hoptallus_carrot_breath")
     {
 
@@ -500,7 +461,7 @@ public:
 
     class spell_hoptallus_carrot_breath_AuraScript : public AuraScript
     {
-        PrepareAuraScript(spell_hoptallus_carrot_breath_AuraScript)
+        PrepareAuraScript(spell_hoptallus_carrot_breath_AuraScript);
 
         bool Validate(const SpellInfo *spellInfo)
         {
@@ -512,52 +473,45 @@ public:
             return true ;
         }
 
-        void handleMiscOnEffectApply(AuraEffect const* auraEff, AuraEffectHandleModes mode)
+        void HandleEffectApply(AuraEffect const* auraEf, AuraEffectHandleModes mode)
         {
-            caster = GetCaster();
-            if(caster)
+            if(Unit* caster = GetCaster())
             {
-                victim = caster->getVictim();
+                target = caster->getVictim();
 
-                caster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                Position posSummon ;
+                float x = 2 * cos(caster->GetOrientation());
+                float y = 2 * sin(caster->GetOrientation());
+                posSummon.Relocate(caster->GetPositionX() + x, caster->GetPositionY() + y, caster->GetPositionZ());
 
-                Position summoningPosition ;
-                summoningPosition.Relocate(caster->GetPositionX() + SUMMONING_RAYON * cos(caster->GetOrientation()),
-                                           caster->GetPositionY() + SUMMONING_RAYON * sin(caster->GetOrientation()),
-                                           caster->GetPositionZ());
-
-                Creature* stalker = caster->SummonCreature(Npc_CarrotBreathStalker, summoningPosition, TEMPSUMMON_TIMED_DESPAWN, 15000, 0);
-                if(stalker)
+                if(Creature* summon = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, posSummon))
                 {
-                    caster->SetTarget(stalker->GetGUID());
-                    caster->SetFacingToObject(stalker);
+                    caster->SetTarget(summon->GetGUID());
+                    caster->SetFacingToObject(summon);
                 }
             }
-
         }
 
-        void handleMiscOnEffectRemove(AuraEffect const* auraEff, AuraEffectHandleModes mode)
+        void HandleEffectRemove(AuraEffect const* auraEf, AuraEffectHandleModes mode)
         {
-            if(caster)
+            if(target)
             {
-                caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                if(victim)
+                if(GetCaster())
                 {
-                    caster->SetTarget(victim->GetGUID());
-                    caster->SetFacingToObject(victim);
-                    caster->GetAI()->AttackStart(victim);
+                    GetCaster()->SetTarget(target->GetGUID());
+                    GetCaster()->SetFacingToObject(target);
                 }
             }
         }
 
         void Register()
         {
-            OnEffectApply += AuraEffectApplyFn(spell_hoptallus_carrot_breath_AuraScript::handleMiscOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_hoptallus_carrot_breath_AuraScript::handleMiscOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            OnEffectApply += AuraEffectApplyFn(spell_hoptallus_carrot_breath_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_hoptallus_carrot_breath_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
 
-        Unit* caster ;
-        Unit* victim ;
+    private :
+        Unit* target ;
     };
 
     AuraScript* GetAuraScript() const
@@ -570,8 +524,7 @@ void AddSC_boss_hoptallus()
 {
     new boss_hoptallus();
     new mob_virmen();
-    new mob_pre_event_add();
     new npc_big_ol_hammer();
-    new npc_carrot_breath_stalker();
+    new stalker_carrot_breath();
     new spell_hoptallus_carrot_breath();
 }

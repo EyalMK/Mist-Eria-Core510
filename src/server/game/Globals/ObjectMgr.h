@@ -523,6 +523,7 @@ struct GossipMenuItems
     uint32          BoxMoney;
     std::string     BoxText;
     ConditionList   Conditions;
+    uint32          action_script_id;
 };
 
 struct GossipMenus

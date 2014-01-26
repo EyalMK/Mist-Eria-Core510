@@ -2,25 +2,31 @@
 #include "InstanceScript.h"
 #include "siege_of_niuzao_temple.h"
 
-
-class instance_siege_of_niuzao_temple : public InstanceMapScript
-{
-    public:
-        instance_siege_of_niuzao_temple() : InstanceMapScript("instance_siege_of_niuzao_temple", 859) { }
-
-        struct instance_siege_of_niuzao_temple_InstanceMapScript : public InstanceScript
-        {
-            instance_siege_of_niuzao_temple_InstanceMapScript(Map* map) : InstanceScript(map)
-			{}
-        };
-
-        InstanceScript* GetInstanceScript(InstanceMap* map) const
-        {
-            return new instance_siege_of_niuzao_temple_InstanceMapScript(map);
+class instance_siege_of_niuzao_temple : public InstanceMapScript{
+public :
+    instance_siege_of_niuzao_temple() : InstanceMapScript("instance_siege_of_niuzao_temple", 1011){
+        
+    }
+    
+    class instance_siege_of_niuzao_temple_InstanceScript : public InstanceScript{
+    public :
+        instance_siege_of_niuzao_temple_InstanceScript(Map * map) : InstanceScript(map){
+            
         }
+        
+        void Initialize(){
+            
+        }
+        
+    private :
+        
+    };
+    
+    InstanceScript* GetInstanceScript(InstanceMap *instance) const{
+        return new instance_siege_of_niuzao_temple_InstanceScript(instance);
+    }
 };
 
-void AddSC_instance_siege_of_niuzao_temple()
-{
+void AddSC_instance_siege_of_niuzao_temple(){
     new instance_siege_of_niuzao_temple();
 }

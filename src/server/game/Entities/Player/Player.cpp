@@ -7340,7 +7340,7 @@ void Player::RewardCurrency(Quest const* quest)
         if (!quest->RewardCurrencyId[i])
             continue;
 
-		ModifyCurrency(quest->RewardCurrencyId[i], quest->RewardCurrencyCount[i]);
+        ModifyCurrency(quest->RewardCurrencyId[i], quest->RewardCurrencyCount[i]);
 	}		
 }
 
@@ -7724,8 +7724,9 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
     if (!count)
         return;
 
-	if (count > 0) // Prevent from negative counts like when a player buys an item (values are * 100 in database)
-		count *= 100; // Client precision
+    if(id == 390 || id == 392 || id == 395 || id == 396)
+        if (count > 0) // Prevent from negative counts like when a player buys an item (values are * 100 in database)
+            count *= 100; // Client precision
 
     CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
     ASSERT(currency);
@@ -14851,7 +14852,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
             }
 
             menu->GetGossipMenu().AddMenuItem(itr->second.OptionIndex, itr->second.OptionIcon, strOptionText, 0, itr->second.OptionType, strBoxText, itr->second.BoxMoney, itr->second.BoxCoded);
-            menu->GetGossipMenu().AddGossipMenuItemData(itr->second.OptionIndex, itr->second.ActionMenuId, itr->second.ActionPoiId);
+            menu->GetGossipMenu().AddGossipMenuItemData(itr->second.OptionIndex, itr->second.ActionMenuId, itr->second.ActionPoiId, itr->second.action_script_id);
         }
     }
 }
@@ -14938,6 +14939,14 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
             {
                 PrepareGossipMenu(source, menuItemData->GossipActionMenuId);
                 SendPreparedGossip(source);
+            }
+
+            if (menuItemData->Action_script)
+            {
+                if (source->GetTypeId() == TYPEID_UNIT)
+                    GetMap()->ScriptsStart(sGossipScripts, menuItemData->Action_script, this, source);
+                else if (source->GetTypeId() == TYPEID_GAMEOBJECT)
+                    GetMap()->ScriptsStart(sGossipScripts, menuItemData->Action_script, source, this);
             }
 
             break;
@@ -16955,7 +16964,7 @@ void Player::SendQuestComplete(Quest const* quest)
     }
 }
 
-void Player::SendQuestReward(Quest const* quest, uint32 XP, Object * questGiver)
+void Player::SendQuestReward(Quest const* quest, uint32 XP, Object* questGiver)
 {
     uint32 questId = quest->GetQuestId();
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_QUESTGIVER_QUEST_COMPLETE quest = %u", questId);
@@ -16992,7 +17001,10 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP, Object * questGiver)
     GetSession()->SendPacket(&data);
 
     if (quest->GetQuestCompleteScript() != 0)
+    {
         GetMap()->ScriptsStart(sQuestEndScripts, quest->GetQuestCompleteScript(), questGiver, this);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "QUEST END SCRIPT") ;
+    }
 }
 
 void Player::SendQuestFailed(uint32 questId, InventoryResult reason)

