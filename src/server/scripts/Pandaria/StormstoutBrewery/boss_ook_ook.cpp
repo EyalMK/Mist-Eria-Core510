@@ -77,7 +77,8 @@ public :
 
         void EnterCombat(Unit *aggro)
         {
-            me->SummonGameObject(200002, -766.802002f, 1391.209961f, 146.738998f, 0.236796f, 0, 0, 0, 0, 0);
+            if(GameObject* go = me->SummonGameObject(200002, -766.802002f, 1391.209961f, 146.738998f, 0.236796f, 0, 0, 0, 0, 0)
+				go->SetGoState(GO_STATE_READY);
             if(instance)
                 instance->SetData(INSTANCE_DATA_OOK_OOK_STATUS, IN_PROGRESS);
 
@@ -112,6 +113,9 @@ public :
         {
             if(instance)
                 instance->SetData(INSTANCE_DATA_OOK_OOK_STATUS, FAIL);
+			
+			if(GameObject* go = me->FindNearestGameObject(200002, 50000.0f))
+                go->RemoveFromWorld();
 
             if(!m_bReady)
                 ScriptedAI::EnterEvadeMode();
