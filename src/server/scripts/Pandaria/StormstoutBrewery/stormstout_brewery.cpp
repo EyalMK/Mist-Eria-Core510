@@ -367,7 +367,7 @@ public :
 				/*sLog->outDebug(LOG_FILTER_NETWORKIO, "player not null ; seting power ; before %u", p->GetPower(POWER_ALTERNATE_POWER));
 				p->SetPower(POWER_ALTERNATE_POWER, p->GetPower(POWER_ALTERNATE_POWER) + amount);
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "Now : %u", p->GetPower(POWER_ALTERNATE_POWER));*/
-				p->ModifyPower(POWER_ALTERNATE_POWER, 100);
+				p->SetPower(POWER_ALTERNATE_POWER, p->GetPower(POWER_ALTERNATE_POWER) + 1);
 			}
         }
 
