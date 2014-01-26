@@ -8179,8 +8179,8 @@ void ObjectMgr::LoadGossipMenuItems()
     QueryResult result = WorldDatabase.Query(
         //      0        1   2            3            4          5
         "SELECT menu_id, id, option_icon, option_text, option_id, npc_option_npcflag, "
-        // 6             7              8          9          10            11
-        "action_menu_id, action_poi_id, box_coded, box_money, box_text, action_script_id "
+        // 6             7                  8               9          10            11
+        "action_menu_id, action_poi_id, action_script_id, box_coded, box_money, box_text "
         "FROM gossip_menu_option ORDER BY menu_id, id");
 
     if (!result)
@@ -8210,10 +8210,11 @@ void ObjectMgr::LoadGossipMenuItems()
         gMenuItem.OptionNpcflag         = fields[5].GetUInt32();
         gMenuItem.ActionMenuId          = fields[6].GetUInt32();
         gMenuItem.ActionPoiId           = fields[7].GetUInt32();
-        gMenuItem.BoxCoded              = fields[8].GetBool();
-        gMenuItem.BoxMoney              = fields[9].GetUInt32();
-        gMenuItem.BoxText               = fields[10].GetString();
-        gMenuItem.action_script_id      = fields[11].GetUInt32();
+        gMenuItem.action_script_id      = fields[8].GetUInt32();
+        gMenuItem.BoxCoded              = fields[9].GetBool();
+        gMenuItem.BoxMoney              = fields[10].GetUInt32();
+        gMenuItem.BoxText               = fields[12].GetString();
+
 
         if (gMenuItem.OptionIcon >= GOSSIP_ICON_MAX)
         {
