@@ -355,11 +355,10 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage("Your alternate power set to %i.", altPower);
+        handler->PSendSysMessage("You changed Alternate power of %s to %i.", handler->GetNameLink(target).c_str(), altPower);
         if (handler->needReportToTarget(target))
-            ChatHandler(target->GetSession()).PSendSysMessage("Your alternate power set to %i by %s.", altPower, handler->GetNameLink(target).c_str());
+            ChatHandler(target->GetSession()).PSendSysMessage("You changed Alternate power of %s to %i.", handler->GetNameLink(target).c_str(), altPower);
 
-        target->SetMaxPower(POWER_ALTERNATE_POWER, altPower);
         target->SetPower(POWER_ALTERNATE_POWER, altPower);
 
         return true;
