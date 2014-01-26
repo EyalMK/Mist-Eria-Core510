@@ -914,9 +914,9 @@ public :
         {
 			if(m_uiMoveTimer <= diff)
 			{
-				if(m_uiPoints < MAX_TRASH_POINT_ID)
+				if(m_uiPoint < MAX_TRASH_POINT_ID)
 				{
-					Position pos = TrashPoints[m_uiPoints];
+					Position pos = TrashPoints[m_uiPoint];
 					float x, y, z ;
 					x = pos.GetPositionX();
 					y = pos.GetPositionY();
