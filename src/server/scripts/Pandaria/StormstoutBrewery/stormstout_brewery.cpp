@@ -408,6 +408,16 @@ public :
     }
 };
 
+const Position PointBarrelsPositions[MAX_SUMMONING_BARRELS_POSITIONS] =
+{
+    {-779.830566f, 1382.367676f, 146.725952f, 2.957428f},
+    {-795.707092f, 1360.484253f, 146.713882f, 3.337561f},
+    {-750.099548f, 1303.637207f, 146.692581f, 4.484246f},
+    {-727.915039f, 1367.620117f, 146.710236f, 0.289437f},
+    {-735.368713f, 1310.069702f, 146.700073f, 5.531971f},
+    {-753.769287f, 1391.448730f, 146.722473f, 0.981375f}
+};
+
 class npc_rolling_barrel : public CreatureScript
 {
 public :
@@ -423,6 +433,14 @@ public :
         {
             instance = creature->GetInstanceScript();
         }
+		
+		void DoAction(const int32 actionId)
+		{
+			if(actionId == 0)
+			{
+				me->GetMotionMaster()->MovePoint(0, PointBarrelsPositions[m_uiIndex]);
+			}
+		}
 
         void MovementInform(uint32 type, uint32 id)
         {
@@ -449,8 +467,8 @@ public :
 
         void Reset()
         {
-            if(me->GetMapId() == 961)
-                m_uiCheckTimer = 1000 ;
+            /*if(me->GetMapId() == 961)
+                m_uiCheckTimer = 1000 ;*/
         }
 
         void JustDied(Unit *killer)
@@ -461,7 +479,7 @@ public :
 
         void UpdateAI(const uint32 diff)
         {
-            if(me->GetMapId() != 961)
+            /*if(me->GetMapId() != 961)
                 return ; // Return since we are not ine the right map
             if(m_uiCheckTimer <= diff)
             {
@@ -472,7 +490,7 @@ public :
                 }
             }
             else
-                m_uiCheckTimer -= diff ;
+                m_uiCheckTimer -= diff ;*/
         }
 
         void DoCheckOokOok()
@@ -510,7 +528,7 @@ public :
                         if(dist <= 1.0f)
                         {
                             DoCastAOE(115875, true);
-                            me->Kill(me);;
+                            me->Kill(me);
                             return ;
                         }
                     }
