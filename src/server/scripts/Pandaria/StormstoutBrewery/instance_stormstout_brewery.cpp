@@ -164,7 +164,7 @@ public :
 
         void OnCreatureCreate(Creature *creature)
         {
-            LogFunction("OnCreatureCreate");
+            //LogFunction("OnCreatureCreate");
 
             if(creature)
             {
@@ -191,7 +191,7 @@ public :
                 }
             }
 
-            LogFunction("OnCreatureCreate", false);
+            //LogFunction("OnCreatureCreate", false);
         }
 
         void OnGameObjectCreate(GameObject *gameObject)
