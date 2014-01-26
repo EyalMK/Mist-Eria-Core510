@@ -364,20 +364,11 @@ public :
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "entered addpoweronplayer");
             if(p)
 			{
-				if(InstanceScript* instance = me->GetInstanceScript())
-				{
-					/*sLog->outDebug(LOG_FILTER_NETWORKIO, "player not null ; seting power ; before %u", p->GetPower(POWER_ALTERNATE_POWER));
-					p->SetPower(POWER_ALTERNATE_POWER, p->GetPower(POWER_ALTERNATE_POWER) + amount);
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "Now : %u", p->GetPower(POWER_ALTERNATE_POWER));*/
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "Player %u has power alternate power at index %u ; power value is actually %u", p->GetGUID(), p->GetPowerIndex(POWER_ALTERNATE_POWER), p->GetPower(POWER_ALTERNATE_POWER));
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "Setting power !");
-					p->SetPower(POWER_ALTERNATE_POWER, 0);
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "Power set to 0 !");
-					p->CastSpell(p, 107297, true);
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "Player casted spell on himself !");
-					p->ModifyPower(POWER_ALTERNATE_POWER, 100);
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "Power set !");
-				}
+				/*sLog->outDebug(LOG_FILTER_NETWORKIO, "player not null ; seting power ; before %u", p->GetPower(POWER_ALTERNATE_POWER));
+				p->SetPower(POWER_ALTERNATE_POWER, p->GetPower(POWER_ALTERNATE_POWER) + amount);
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Now : %u", p->GetPower(POWER_ALTERNATE_POWER));*/
+				p->SetMaxPower(POWER_ALTERNATE_POWER, 40);
+				p->SetPower(POWER_ALTERNATE_POWER, p->GetPower(POWER_ALTERNATE_POWER) + 1);
 			}
         }
 

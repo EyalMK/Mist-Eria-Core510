@@ -2167,10 +2167,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
 
     if (cainfo->auras != 0)
     {
-        if (HasAura(cainfo->auras))
-            return false;
-
-        AddAura(cainfo->auras, this);
+        CastSpell(this, cainfo->auras);
     }
 
    /* if (!cainfo->auras.empty())
