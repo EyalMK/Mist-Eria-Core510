@@ -590,8 +590,9 @@ void ObjectMgr::LoadCreatureTemplateAddons()
         creatureAddon.bytes1  = fields[3].GetUInt32();
         creatureAddon.bytes2  = fields[4].GetUInt32();
         creatureAddon.emote   = fields[5].GetUInt32();
+        creatureAddon.auras   = fields[6].GetUInt32();
 
-        Tokenizer tokens(fields[6].GetString(), ' ');
+        /*Tokenizer tokens(fields[6].GetString(), ' ');
         uint8 i = 0;
         creatureAddon.auras.resize(tokens.size());
         for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
@@ -603,7 +604,7 @@ void ObjectMgr::LoadCreatureTemplateAddons()
                 continue;
             }
             creatureAddon.auras[i++] = uint32(atol(*itr));
-        }
+        }*/
 
         if (creatureAddon.mount)
         {
@@ -972,8 +973,9 @@ void ObjectMgr::LoadCreatureAddons()
         creatureAddon.bytes1  = fields[3].GetUInt32();
         creatureAddon.bytes2  = fields[4].GetUInt32();
         creatureAddon.emote   = fields[5].GetUInt32();
+        creatureAddon.auras   = fields[6].GetUInt32();
 
-        Tokenizer tokens(fields[6].GetString(), ' ');
+        /*Tokenizer tokens(fields[6].GetString(), ' ');
         uint8 i = 0;
         creatureAddon.auras.resize(tokens.size());
         for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
@@ -985,7 +987,7 @@ void ObjectMgr::LoadCreatureAddons()
                 continue;
             }
             creatureAddon.auras[i++] = uint32(atol(*itr));
-        }
+        }*/
 
         if (creatureAddon.mount)
         {
