@@ -111,8 +111,8 @@ public :
 
                     if(Creature* trash = instance->SummonCreature(entry, summonPosition))
                     {
-                        Position const movePosition = {-710.459900f, 1310.748657f, 162.627029f, 2.754009f}; // Aka, pos 0 (Motion Master)
-                        trash->GetMotionMaster()->MovePoint(0, movePosition);
+                        //Position const movePosition = {-710.459900f, 1310.748657f, 162.627029f, 2.754009f}; // Aka, pos 0 (Motion Master)
+                        //trash->GetMotionMaster()->MovePoint(0, movePosition);
                         ++m_uiSummonedHoptallusTrash ;
                     }
                     m_uiHoptallusTrashSummonTimer = instance->GetDifficulty() == DUNGEON_DIFFICULTY_NORMAL ? 2000 : 1000 ;
