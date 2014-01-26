@@ -68,7 +68,8 @@ public :
             if(action == 0)
             {
                 Talk(SAY_JUMP);
-                me->GetMotionMaster()->MoveJump(jumpPosition, 1, 1);
+                me->GetMotionMaster()->MoveJump(jumpPosition, 10.0f, 10.0f);
+				DoSlayHozens();
                 m_bHasActivated = false;
                 m_bReady = true ;
             }
@@ -228,6 +229,15 @@ public :
                 }
             }
         }
+		
+		void DoSlayHozens()
+		{
+			CreatureList hozens ;
+			GetCreatureListWithEntryInGrid(hozens, me, 56927, 5000.0f);
+			
+			for(CreatureListConstIter iter = hozens.begin() ; iter != hozens.end() ; ++iter)
+				(*iter)->AI()->DoAction(1);
+		}
 
     private :
         EventMap events ;

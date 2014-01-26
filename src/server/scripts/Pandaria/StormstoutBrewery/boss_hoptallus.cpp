@@ -411,8 +411,10 @@ public :
 
         void IsSummonedBy(Unit *summoner)
         {
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Entering IsSummonedBy (Carrot Breath Helper)");
             if(summoner)
             {
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "IsSummonedBy : summoner not null");
                 m_rayon = me->GetExactDist2d(summoner->GetPositionX(), summoner->GetPositionY());
                 center.Relocate(summoner->GetPositionX(), summoner->GetPositionY());
                 me->SetSpeed(MOVE_RUN, 2 * M_PI * m_rayon / 15000);

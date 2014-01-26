@@ -78,7 +78,7 @@ public :
             {
                 if(m_uiBarrelsTimer <= uiDiff)
                 {
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "Instance Stormstout Brewery : summoning %u barrel !",  m_bNextWaveFull ? 6 : 1);
+					//sLog->outDebug(LOG_FILTER_NETWORKIO, "Instance Stormstout Brewery : summoning %u barrel !",  m_bNextWaveFull ? 6 : 1);
                     if(m_bNextWaveFull)
                     {
                         SummonAllBarrels();
@@ -129,31 +129,15 @@ public :
         {
             LogFunction("OnPlayerEnter");
 
-            /*if(player)
-            {
-                m_uiTeamInInstance = player->GetTeamId();
-
-                // Handle the power system :
-                if(m_uiKilledHozens < 40)
-                {
-                    if(player->HasAura(SPELL_BANANA_BAR))
-                    {
-                        player->ModifyPower(POWER_ALTERNATE_POWER, m_uiKilledHozens);
-                    }
-                    else
-                    {
-                        player->CastSpell(player, SPELL_BANANA_BAR, true);
-                        player->ModifyPower(POWER_ALTERNATE_POWER, m_uiKilledHozens);
-                    }
-                }
-                else
-                {
-                    player->RemoveAurasByType(SPELL_AURA_ENABLE_ALT_POWER);
-                }
-
-                if(GetData(INSTANCE_DATA_HOPTALLUS_STATUS) == DONE)
-                    player->TeleportTo(TeleportLocation);
-            }*/
+            if(player)
+			{
+				if(m_uiKilledHozens < 40)
+				{
+					player->CastSpell(player, 107297, true);
+					player->SetMaxPower(POWER_ALTERNATE_POWER, 40);
+					player->SetPower(POWER_ALTERNATE_POWER, m_uiKilledHozens);
+				}
+			}
 
             ///@todo : here, handle the rp sequence between Chen and Auntie
             if(Creature* chen = instance->GetCreature(m_uiChenGuid))
