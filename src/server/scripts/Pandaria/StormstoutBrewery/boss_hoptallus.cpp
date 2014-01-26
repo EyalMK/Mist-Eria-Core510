@@ -411,7 +411,7 @@ public :
 
         void DoAction(const int32 action)
         {
-			if(Unit* owner = me->GetOwner())
+			if(Unit* owner = me->ToTempSummon()->GetSummoner())
 			{
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "owner not null");
 				m_rayon = me->GetExactDist2d(owner->GetPositionX(), owner->GetPositionY());
