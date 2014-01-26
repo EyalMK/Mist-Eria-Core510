@@ -903,34 +903,37 @@ public :
                 {
                 case 0 :
                     pos = TrashPoints[1];
-                    me->GetMotionMaster()->MovePoint(1, pos);
                     break ;
                     
                 case 1 :
                     pos = TrashPoints[2];
-                    me->GetMotionMaster()->MovePoint(2, pos);
                     break ;
                     
                 case 2 :
                     pos = TrashPoints[3];
-                    me->GetMotionMaster()->MovePoint(3, pos);
                     break ;
                     
                 case 3 :
                     pos = TrashPoints[4];
-                    me->GetMotionMaster()->MovePoint(4, pos);
                     break ;
                     
                 case 4 :
                     pos = TrashPoints[5];
-                    me->GetMotionMaster()->MovePoint(5, pos);
                     break ;
                     
                 case 5 :
-                    me->GetMotionMaster()->MovePoint(6, me->GetPositionX() + rand() % 4, me->GetPositionY() + rand() % 4, me->GetPositionZ());
+                    me->GetMotionMaster()->MovePoint(id + 1, me->GetPositionX() + rand() % 4, me->GetPositionY() + rand() % 4, me->GetPositionZ());
+					return ;
                 default :
-                    break ;
+                    return ;
                 }
+				
+				float x = pos.GetPositionX();
+				float y = pos.GetPositionY();
+				float z = pos.GetPositionZ();
+				
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY: Virmen MotionMaster ; next point id set to %u, with x = %u, y = %u, z= %u", (id + 1), x, y , z);
+				me->GetMotionMaster()->MovePoint(id + 1, x, y, z);
             }
         }
 
