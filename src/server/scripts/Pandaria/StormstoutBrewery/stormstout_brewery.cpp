@@ -408,6 +408,8 @@ public :
     }
 };
 
+#define MAX_SUMMONING_BARRELS_POSITIONS 6
+
 const Position PointBarrelsPositions[MAX_SUMMONING_BARRELS_POSITIONS] =
 {
     {-779.830566f, 1382.367676f, 146.725952f, 2.957428f},
