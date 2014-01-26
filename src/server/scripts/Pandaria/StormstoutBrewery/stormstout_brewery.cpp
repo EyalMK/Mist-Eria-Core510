@@ -890,7 +890,8 @@ public :
 
         void Reset()
         {
-			m_uiPoint = 0 ;
+			m_uiPoint = 1 ;
+			m_uiMoveTimer = 24 * 60 * 60 ;
         }
 
         void MovementInform(uint32 type, uint32 id)
@@ -898,45 +899,8 @@ public :
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY: Virmen entering MovementInform, using type %u and point %u", type, id);
             if(type == POINT_MOTION_TYPE)
             {
-                Position pos ;
-                switch(m_uiPoint)
-                {
-                case 0 :
-                    pos = TrashPoints[1];
-                    break ;
-                    
-                case 1 :
-                    pos = TrashPoints[2];
-                    break ;
-                    
-                case 2 :
-                    pos = TrashPoints[3];
-                    break ;
-                    
-                case 3 :
-                    pos = TrashPoints[4];
-                    break ;
-                    
-                case 4 :
-                    pos = TrashPoints[5];
-                    break ;
-                    
-                case 5 :
-					me->GetMotionMaster()->Clear(false);
-                    me->GetMotionMaster()->MovePoint(0, me->GetPositionX() + rand() % 4, me->GetPositionY() + rand() % 4, me->GetPositionZ());
-					return ;
-                default :
-                    return ;
-                }
-				++m_uiPoint ;
-				
-				float x = pos.GetPositionX();
-				float y = pos.GetPositionY();
-				float z = pos.GetPositionZ();
-				
-				me->GetMotionMaster()->Clear(false);
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY: Virmen MotionMaster ; next point id set to %u, with x = %f, y = %f, z= %f", (id + 1), x, y , z);
-				me->GetMotionMaster()->MovePoint(0, x, y, z);
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY: Virmen MovementInfo : setting timer !");
+                m_uiMoveTimer = 100 ;
             }
         }
 
@@ -948,6 +912,29 @@ public :
 
         void UpdateAI(const uint32 diff)
         {
+			if(m_uiMoveTimer <= diff)
+			{
+				if(m_uiPoints < MAX_TRASH_POINT_ID)
+				{
+					Position pos = TrashPoints[m_uiPoints];
+					float x, y, z ;
+					x = pos.GetPositionX();
+					y = pos.GetPositionY();
+					z = pos.GetPositionZ();
+					
+					++m_uiPoint ;
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY: Virmen UpdateAI : next move point set to id %u, using x %f, y %f, z %f", m_uiPoint, x, y, z);
+					me->GetMotionMaster()->MovePoint(m_uiPoint, x, y, z);
+					m_uiMoveTimer = 24 * 60 * 60 ;
+				}
+				else
+				{
+					me->GetMotionMaster()->MovePoint(MAX_TRASH_POINT_ID, me->GetPositionX() + rand() % 4, me->GetPositionY() + rand() % 4, me->GetPositionZ());
+				}
+			}
+			else
+				m_uiMoveTimer -= diff ;
+			
             if(!UpdateVictim())
                 return ;
 
@@ -956,6 +943,7 @@ public :
 		
 	private :
 		uint32 m_uiPoint ;
+		uint32 m_uiMoveTimer ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
