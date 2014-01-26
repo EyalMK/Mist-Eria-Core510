@@ -411,16 +411,20 @@ public :
 
         void DoAction(const int32 action)
         {
-			m_rayon = me->GetExactDist2d(me->GetOwner()->GetPositionX(), me->GetOwner()->GetPositionY());
-			center.Relocate(me->GetOwner()->GetPositionX(), me->GetOwner()->GetPositionY());
-			
-			me->SetSpeed(MOVE_RUN, 2 * M_PI * m_rayon / 15000, true);
-			me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * m_rayon / 15000, true);
+			if(Unit* owner = me->GetOwner())
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "owner not null");
+				m_rayon = me->GetExactDist2d(owner->GetPositionX(), owner->GetPositionY());
+				center.Relocate(owner->GetPositionX(), owner->GetPositionY());
+				
+				me->SetSpeed(MOVE_RUN, 2 * M_PI * m_rayon / 15000, true);
+				me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * m_rayon / 15000, true);
 
-			me->SetFacingToObject(me->GetOwner());
-			me->SetTarget(me->GetOwnerGUID());
-			angle = me->GetOrientation();
-			m_id = 0 ;
+				me->SetFacingToObject(owner);
+				me->SetTarget(me->GetOwnerGUID());
+				angle = me->GetOrientation();
+				m_id = 0 ;
+			}
         }
 		
 		void MovementInform(uint32 type, uint32 id)
