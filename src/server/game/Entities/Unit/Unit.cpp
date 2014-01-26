@@ -12723,28 +12723,48 @@ int32 Unit::GetMaxPower(Powers power) const
 
 void Unit::SetPower(Powers power, int32 val)
 {
+	if(power == POWER_ALTERNATE_POWER)
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "Entering SetPower using val %u", val);
+		
     uint32 powerIndex = GetPowerIndex(power);
     if (powerIndex == MAX_POWERS)
         return;
 
+	if(power == POWER_ALTERNATE_POWER)
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "Power index correct ; found %u", powerIndex);
+		
     int32 maxPower = int32(GetMaxPower(power));
     if (maxPower < val)
         val = maxPower;
-
+	
+	if(power == POWER_ALTERNATE_POWER)
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "Max power checked ; found %u", maxPower);
     //dont update if it's the same power value than the precedent
     if(val == GetInt32Value(UNIT_FIELD_POWER1 + powerIndex))
         return;
-
+	
+	if(power == POWER_ALTERNATE_POWER)
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "Val wasn't equal to the precedent value of power ; precendent value : %u", GetInt32Value(UNIT_FIELD_POWER1 + powerIndex));
+		
     SetInt32Value(UNIT_FIELD_POWER1 + powerIndex, val);
 
+	if(power == POWER_ALTERNATE_POWER)
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "Value set to %u", GetInt32Value(UNIT_FIELD_POWER1 + powerIndex));
+	
     if (IsInWorld())
     {
+		if(power == POWER_ALTERNATE_POWER)
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Is in World = true");
+			
         WorldPacket data(SMSG_POWER_UPDATE, 8 + 4 + 1 + 4);
         data.append(GetPackGUID());
         data << uint32(1); //power count
         data << uint8(powerIndex);
         data << int32(val);
         SendMessageToSet(&data, GetTypeId() == TYPEID_PLAYER ? true : false);
+		
+		if(power == POWER_ALTERNATE_POWER)
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Data sent");
     }
 
 	// Custom MoP Script
@@ -12786,7 +12806,6 @@ void Unit::SetPower(Powers power, int32 val)
         }
     }
 }
-
 void Unit::SetMaxPower(Powers power, int32 val)
 {
     uint32 powerIndex = GetPowerIndex(power);
