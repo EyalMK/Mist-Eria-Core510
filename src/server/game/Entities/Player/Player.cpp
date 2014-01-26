@@ -7724,17 +7724,17 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
     if (!count)
         return;
 
-    if(id == 390 || id == 392 || id == 395 || id == 396)
-        if (count > 0) // Prevent from negative counts like when a player buys an item (values are * 100 in database)
-            count *= 100; // Client precision
-
     CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
     ASSERT(currency);
+
+	int32 precision = currency->Flags & CURRENCY_FLAG_HIGH_PRECISION ? CURRENCY_PRECISION : 1;
+
+	if (precision == CURRENCY_PRECISION && count > 0) // Prevent from negative counts like when a player buys an item (*100 in db)
+        count *= 100;
 
     if (!ignoreMultipliers)
         count *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_CURRENCY_GAIN, id);
 
-	int32 precision = currency->Flags & CURRENCY_FLAG_HIGH_PRECISION ? CURRENCY_PRECISION : 1;
     uint32 oldTotalCount = 0;
     uint32 oldWeekCount = 0;
     PlayerCurrenciesMap::iterator itr = _currencyStorage.find(id);
