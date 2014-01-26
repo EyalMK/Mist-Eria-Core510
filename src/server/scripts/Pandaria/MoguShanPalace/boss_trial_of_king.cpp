@@ -42,7 +42,7 @@ enum Actions
 enum NpcXinEvents
 {
 	EVENT_INTRO				= 1,
-	EVENT_JUMP				= 2,
+	EVENT_JUMP_BACK			= 2,
 	EVENT_KUAI				= 3
 };
 
@@ -154,7 +154,7 @@ public:
 
 			events.IsInPhase(PHASE_ONE);
 			events.ScheduleEvent(EVENT_INTRO, 3*IN_MILLISECONDS, 0);
-			events.ScheduleEvent(EVENT_JUMP, 21*IN_MILLISECONDS, 0);
+			events.ScheduleEvent(EVENT_JUMP_BACK, 21*IN_MILLISECONDS, 0);
 			events.ScheduleEvent(EVENT_KUAI, 26*IN_MILLISECONDS, 0);
 		}
 
@@ -189,7 +189,7 @@ public:
 						if (events.IsInPhase(PHASE_TWO))
 						{
 							float x, y, z, o;
-							case EVENT_JUMP:
+							case EVENT_JUMP_BACK:
 								me->CastSpell(x, y, z, SPELL_JUMP, true);
 								me->SetOrientation(o);
 								events.SetPhase(PHASE_THREE);
