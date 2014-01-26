@@ -436,6 +436,11 @@ public :
                 m_id = 1 ;
             }
         }
+		
+		void MovementInform(uint32 type, uint32 id)
+		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : Entering MovementInform using type %u, id %u", type, id);
+		}
 
         void UpdateAI(const uint32 diff)
         {
