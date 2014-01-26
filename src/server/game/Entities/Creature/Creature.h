@@ -309,8 +309,7 @@ struct CreatureAddon
     uint32 bytes1;
     uint32 bytes2;
     uint32 emote;
-    uint32 auras;
-    /*std::vector<uint32> auras;*/
+    std::vector<uint32> auras;
 };
 
 typedef UNORDERED_MAP<uint32, CreatureAddon> CreatureAddonContainer;
