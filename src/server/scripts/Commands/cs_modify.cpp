@@ -56,6 +56,7 @@ public:
             { "rage",           SEC_MODERATOR,      false, &HandleModifyRageCommand,          "", NULL },
             { "chi",            SEC_MODERATOR,      false, &HandleModifyChiCommand,           "", NULL },
             { "runicpower",     SEC_MODERATOR,      false, &HandleModifyRunicPowerCommand,    "", NULL },
+			{ "altpower",       SEC_MODERATOR,      false, &HandleModifyAltPowerCommand,      "", NULL },
             { "energy",         SEC_MODERATOR,      false, &HandleModifyEnergyCommand,        "", NULL },
             { "money",          SEC_MODERATOR,      false, &HandleModifyMoneyCommand,         "", NULL },
             { "scale",          SEC_MODERATOR,      false, &HandleModifyScaleCommand,         "", NULL },
@@ -84,7 +85,7 @@ public:
         return commandTable;
     }
 
-    //Edit Player HP
+    // Edit Player HP
     static bool HandleModifyHPCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -121,7 +122,7 @@ public:
         return true;
     }
 
-    //Edit Player Mana
+    // Edit Player Mana
     static bool HandleModifyManaCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -159,7 +160,7 @@ public:
         return true;
     }
 
-    //Edit Player Energy
+    // Edit Player Energy
     static bool HandleModifyEnergyCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -210,7 +211,7 @@ public:
         return true;
     }
 
-    //Edit Player Rage
+    // Edit Player Rage
     static bool HandleModifyRageCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -259,7 +260,7 @@ public:
         return true;
     }
 
-	//Edit Player Chi (Monk 5.x.x)
+	// Edit Player Chi (Monk 5.x.x)
 	static bool HandleModifyChiCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -331,7 +332,40 @@ public:
         return true;
     }
 
-    //Edit Player Faction
+	// Edit Player Alternative power
+	static bool HandleModifyAltPowerCommand(ChatHandler* handler, const char* args)
+    {
+        if (!*args)
+            return false;
+
+        int32 altPower = atoi((char*)args);
+
+        if (altPower <= 0)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* target = handler->getSelectedPlayer();
+        if (!target)
+        {
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        handler->PSendSysMessage("Your alternative power set to %i.", altPower);
+        if (handler->needReportToTarget(target))
+            ChatHandler(target->GetSession()).PSendSysMessage("Your alternative power set to %i by %s.", altPower, handler->GetNameLink(target).c_str());
+
+        target->SetMaxPower(POWER_ALTERNATIVE_POWER, altPower);
+        target->SetPower(POWER_ALTERNATIVE_POWER, altPower);
+
+        return true;
+    }
+
+    // Edit Player Faction
     static bool HandleModifyFactionCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -409,7 +443,7 @@ public:
         return true;
     }
 
-    //Edit Player Spell
+    // Edit Player Spell
     static bool HandleModifySpellCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -465,7 +499,7 @@ public:
         return true;
     }
 
-    //Edit Player TP
+    // Edit Player TP
     static bool HandleModifyTalentCommand (ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -511,7 +545,7 @@ public:
         return false;
     }
 
-    //Edit Player Aspeed
+    // Edit Player Aspeed
     static bool HandleModifyASpeedCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -559,7 +593,7 @@ public:
         return true;
     }
 
-    //Edit Player Speed
+    // Edit Player Speed
     static bool HandleModifySpeedCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -604,7 +638,7 @@ public:
         return true;
     }
 
-    //Edit Player Swim Speed
+    // Edit Player Swim Speed
     static bool HandleModifySwimCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -649,7 +683,7 @@ public:
         return true;
     }
 
-    //Edit Player Walk Speed
+    // Edit Player Walk Speed
     static bool HandleModifyBWalkCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -694,7 +728,7 @@ public:
         return true;
     }
 
-    //Edit Player Fly
+    // Edit Player Fly
     static bool HandleModifyFlyCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -730,7 +764,7 @@ public:
         return true;
     }
 
-    //Edit Player or Creature Scale
+    // Edit Player or Creature Scale
     static bool HandleModifyScaleCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -1029,7 +1063,7 @@ public:
         return true;
     }
 
-    //Edit Player money
+    // Edit Player money
     static bool HandleModifyMoneyCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -1100,7 +1134,7 @@ public:
         return true;
     }
 
-    //Edit Unit field
+    // Edit Unit field
     static bool HandleModifyBitCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)

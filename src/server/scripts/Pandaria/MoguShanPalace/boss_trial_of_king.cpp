@@ -1,4 +1,4 @@
-/* # Script de Sungis : Épreuve du roi # */
+/* # Script de Sungis : Trial of King # */
 
 #include "ScriptPCH.h"
 #include "SpellScript.h"
@@ -7,25 +7,26 @@
 enum Spells
 {
 	/* Xin the Weaponmaster */
-	SPELL_JUMP					= 116572, // Tester le sort.
+	SPELL_JUMP							= 116572, // Tester le sort.
 
 	/* Mu'Shiba */
-	SPELL_RAVAGE				= 119946,
+	SPELL_RAVAGE						= 119946,
 
 	/* Kuai the Brute */
-	SPELL_SHOCKWAVE				= 119922,
+	SPELL_SHOCKWAVE						= 119922,
 
 	/* Ming the Cunning */
-	SPELL_LIGHTNING_BOLT		= 123654,
-	SPELL_MAGNETIC_FIELD		= 120100,
-	SPELL_WHIRLING_DERVISH		= 119981,	
+	SPELL_LIGHTNING_BOLT				= 123654,
+	SPELL_MAGNETIC_FIELD				= 120100,
+	SPELL_SUMMON_WHIRLING_DERVISH		= 119981,
+	SPELL_WHIRLING_DERVISH_VISUAL		= 119982,
 
 	/* Haiyan the Unstoppable */
-	SPELL_CONFLAGRATE			= 120160,
-	SPELL_CONFLAGRATE_TRIGGER	= 120201,
-	SPELL_CONFLAGRATE_INSTANT	= 120167,
-	SPELL_METEOR				= 120195,
-	SPELL_TRAUMATIC_BLOW		= 123655,
+	SPELL_CONFLAGRATE					= 120160,
+	SPELL_CONFLAGRATE_TRIGGER			= 120201,
+	SPELL_CONFLAGRATE_INSTANT			= 120167,
+	SPELL_METEOR						= 120195,
+	SPELL_TRAUMATIC_BLOW				= 123655,
 };
 
 enum Actions
