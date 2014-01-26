@@ -2165,12 +2165,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
     if (cainfo->path_id != 0)
         m_path_id = cainfo->path_id;
 
-    if (cainfo->auras != 0)
-    {
-        CastSpell(this, cainfo->auras);
-    }
-
-   /* if (!cainfo->auras.empty())
+    if (!cainfo->auras.empty())
     {
         for (std::vector<uint32>::const_iterator itr = cainfo->auras.begin(); itr != cainfo->auras.end(); ++itr)
         {
@@ -2190,10 +2185,10 @@ bool Creature::LoadCreaturesAddon(bool reload)
                 continue;
             }
 
-            AddAura(*itr, this);
+            CastSpell(this, *itr);
             sLog->outDebug(LOG_FILTER_UNITS, "Spell: %u added to creature (GUID: %u Entry: %u)", *itr, GetGUIDLow(), GetEntry());
         }
-    }*/
+    }
 
     return true;
 }
