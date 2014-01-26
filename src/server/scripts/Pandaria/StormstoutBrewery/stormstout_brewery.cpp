@@ -365,7 +365,7 @@ public :
             if(p)
 			{
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "player not null ; seting power");
-                p->ModifyPower(POWER_ALTERNATE_POWER, amount);
+                p->SetPower(POWER_ALTERNATE_POWER, p->GetPower(POWER_ALTERNATE_POWER) + amount);
 			}
         }
 
