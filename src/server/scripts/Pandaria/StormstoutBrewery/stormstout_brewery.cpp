@@ -898,14 +898,38 @@ public :
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY: Virmen entering MovementInform, using type %u and point %u", type, id);
             if(type == POINT_MOTION_TYPE)
             {
-                if(id < MAX_TRASH_POINT_ID - 1)
+                Position pos ;
+                switch(id)
                 {
-                    Position const next = TrashPoints[id + 1];
-                    me->GetMotionMaster()->MovePoint(id + 1, next);
-                }
-                else if(id == MAX_TRASH_POINT_ID - 1)
-                {
-                    me->GetMotionMaster()->MovePoint(MAX_TRASH_POINT_ID, me->GetPositionX() + rand() % 4, me->GetPositionY() + rand() % 4, me->GetPositionZ());
+                case 0 :
+                    pos = TrashPoints[1];
+                    me->GetMotionMaster()->MovePoint(1, pos);
+                    break ;
+                    
+                case 1 :
+                    pos = TrashPoints[2];
+                    me->GetMotionMaster()->MovePoint(2, pos);
+                    break ;
+                    
+                case 2 :
+                    pos = TrashPoints[3];
+                    me->GetMotionMaster()->MovePoint(3, pos);
+                    break ;
+                    
+                case 3 :
+                    pos = TrashPoints[4];
+                    me->GetMotionMaster()->MovePoint(4, pos);
+                    break ;
+                    
+                case 4 :
+                    pos = TrashPoints[5];
+                    me->GetMotionMaster()->MovePoint(5, pos);
+                    break ;
+                    
+                case 5 :
+                    me->GetMotionMaster()->MovePoint(6, me->GetPositionX() + rand() % 4, me->GetPositionY() + rand() % 4, me->GetPositionZ());
+                default :
+                    break ;
                 }
             }
         }
