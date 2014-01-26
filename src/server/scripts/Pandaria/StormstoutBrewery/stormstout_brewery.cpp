@@ -890,7 +890,7 @@ public :
 
         void Reset()
         {
-
+			m_uiPoint = 0 ;
         }
 
         void MovementInform(uint32 type, uint32 id)
