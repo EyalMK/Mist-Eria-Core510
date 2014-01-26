@@ -498,7 +498,11 @@ public:
             sObjectMgr->CheckCreatureTemplate(cInfo);
         }
 
-        handler->SendGlobalGMSysMessage("Creature template reloaded.");
+		int32 id = atoi((char*)args);
+
+		std::stringstream reloadText;
+		reloadText << "Creature template reloaded (ID : " << id << ").";
+		handler->SendGlobalGMSysMessage(reloadText.str().c_str());
         return true;
     }
 
