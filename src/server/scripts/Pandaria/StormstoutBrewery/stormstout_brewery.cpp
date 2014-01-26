@@ -895,6 +895,7 @@ public :
 
         void MovementInform(uint32 type, uint32 id)
         {
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY: Virmen entering MovementInform, using type %u and point %u", type, id);
             if(type == POINT_MOTION_TYPE)
             {
                 if(id < MAX_TRASH_POINT_ID - 1)
