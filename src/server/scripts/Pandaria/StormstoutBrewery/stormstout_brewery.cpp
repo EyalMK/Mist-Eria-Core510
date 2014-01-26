@@ -303,7 +303,7 @@ public :
     }
 };
 
-const Position hozenFleePosition = {0.0f, 0.0f, 0.0f, 0.0f} ;
+const Position hozenFleePosition = {-774.154231f, 1420.184014f, 139.579605f, 3.463936f} ;
 
 class mob_ook_ook_hozen : public CreatureScript
 {
@@ -954,7 +954,7 @@ public :
 				}
 				else
 				{
-					me->GetMotionMaster()->MovePoint(MAX_TRASH_POINT_ID, me->GetPositionX() + rand() % 4, me->GetPositionY() + rand() % 4, me->GetPositionZ());
+					me->Kill(me);
 				}
 			}
 			else
