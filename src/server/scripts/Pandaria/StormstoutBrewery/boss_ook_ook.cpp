@@ -33,7 +33,7 @@ enum Talk
     SAY_JUST_DIED           = 7
 };
 
-const Position jumpPosition = {0.0f, 0.0f, 0.0f, 0.0f};
+const Position jumpPosition = {-756.727173f, 1354.609985f, 147.095245f, 2.085622};
 
 class boss_ook_ook : public CreatureScript
 {

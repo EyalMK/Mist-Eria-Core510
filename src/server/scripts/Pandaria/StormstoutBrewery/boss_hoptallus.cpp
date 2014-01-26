@@ -409,34 +409,50 @@ public :
 
         }
 
-        void IsSummonedBy(Unit *summoner)
+        void DoAction(const int32 action)
         {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Entering IsSummonedBy (Carrot Breath Helper)");
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Entering DoAction (Carrot Breath Helper)");
+			if(me->ToTempSummon())
+				summoner = me->ToTempSummon()->GetSummoner();
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : Summoner might have been initialized");
             if(summoner)
             {
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "IsSummonedBy : summoner not null");
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "DoAction : summoner not null");
                 m_rayon = me->GetExactDist2d(summoner->GetPositionX(), summoner->GetPositionY());
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : rayon initialized to %f", m_rayon);
                 center.Relocate(summoner->GetPositionX(), summoner->GetPositionY());
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : center relocated");
                 me->SetSpeed(MOVE_RUN, 2 * M_PI * m_rayon / 15000);
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : speed run set");
                 me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * m_rayon / 15000);
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : speed fly set");
 
                 me->SetFacingToObject(summoner);
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : facing summoner done");
                 me->SetTarget(summoner->GetGUID());
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : target set to summoner");
                 angle = me->GetOrientation();
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : orientation set");
                 m_id = 0 ;
             }
         }
 
         void UpdateAI(const uint32 diff)
         {
-            ++m_id ;
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : UPDATEAI");
             angle -= (2 * M_PI / 15000)*diff ;
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : angle computed");
             float x, y, z ;
-
+			
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : floats declared");
             x = center.GetPositionX() + cos(angle) * m_rayon ;
             y = center.GetPositionY() + sin(angle) * m_rayon ;
             z = center.GetPositionZ() ;
+			
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : coords computed");
             me->GetMotionMaster()->MovePoint(m_id, x, y, z);
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : MOTION MASTER");
+            ++m_id ;
         }
 
     private :
@@ -445,6 +461,7 @@ public :
         float x, y, z ;
         float angle ;
         uint32 m_id ;
+		Unit* summoner ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
