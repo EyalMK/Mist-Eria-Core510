@@ -421,7 +421,7 @@ public :
                 m_rayon = me->GetExactDist2d(summoner->GetPositionX(), summoner->GetPositionY());
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : rayon initialized to %f", m_rayon);
                 center.Relocate(summoner->GetPositionX(), summoner->GetPositionY());
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : center relocated");
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : center relocated, x = %f, y = %f, expected %f, %f", center.GetPositionX(), center.GetPositionY(), summoner->GetPositionX(), summoner->GetPositionY());
                 me->SetSpeed(MOVE_RUN, 2 * M_PI * m_rayon / 15000);
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : speed run set");
                 me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * m_rayon / 15000);
@@ -505,6 +505,7 @@ public :
 
                 if(Creature* summon = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, posSummon))
                 {
+					summon->AI()->DoAction(0);
                     caster->SetTarget(summon->GetGUID());
                     caster->SetFacingToObject(summon);
                 }
