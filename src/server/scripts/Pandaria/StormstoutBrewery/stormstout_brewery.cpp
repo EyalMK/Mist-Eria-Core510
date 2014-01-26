@@ -899,7 +899,7 @@ public :
             if(type == POINT_MOTION_TYPE)
             {
                 Position pos ;
-                switch(id)
+                switch(m_uiPoint)
                 {
                 case 0 :
                     pos = TrashPoints[1];
@@ -922,18 +922,21 @@ public :
                     break ;
                     
                 case 5 :
-                    me->GetMotionMaster()->MovePoint(id + 1, me->GetPositionX() + rand() % 4, me->GetPositionY() + rand() % 4, me->GetPositionZ());
+					me->GetMotionMaster()->Clear(false);
+                    me->GetMotionMaster()->MovePoint(0, me->GetPositionX() + rand() % 4, me->GetPositionY() + rand() % 4, me->GetPositionZ());
 					return ;
                 default :
                     return ;
                 }
+				++m_uiPoint ;
 				
 				float x = pos.GetPositionX();
 				float y = pos.GetPositionY();
 				float z = pos.GetPositionZ();
 				
+				me->GetMotionMaster()->Clear(false);
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY: Virmen MotionMaster ; next point id set to %u, with x = %f, y = %f, z= %f", (id + 1), x, y , z);
-				me->GetMotionMaster()->MovePoint(id + 1, x, y, z);
+				me->GetMotionMaster()->MovePoint(0, x, y, z);
             }
         }
 
@@ -950,6 +953,9 @@ public :
 
             DoMeleeAttackIfReady();
         }
+		
+	private :
+		uint32 m_uiPoint ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
