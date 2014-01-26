@@ -8213,7 +8213,7 @@ void ObjectMgr::LoadGossipMenuItems()
         gMenuItem.action_script_id      = fields[8].GetUInt32();
         gMenuItem.BoxCoded              = fields[9].GetBool();
         gMenuItem.BoxMoney              = fields[10].GetUInt32();
-        gMenuItem.BoxText               = fields[12].GetString();
+        gMenuItem.BoxText               = fields[11].GetString();
 
 
         if (gMenuItem.OptionIcon >= GOSSIP_ICON_MAX)
