@@ -98,7 +98,6 @@ enum HaiyanTexts
 
 enum XinPhases
 {
-	PHASE_NULL = 0,
 	PHASE_ONE = 1,
 	PHASE_TWO = 2,
 	PHASE_THREE = 3,
@@ -107,9 +106,9 @@ enum XinPhases
 
 enum KuaiPhases
 {
-	PHASE_NULL = 0,
-	PHASE_KUAI_WAITING = 1,
-	PHASE_KUAI_ATTACK = 2
+	PHASE_NULL,
+	PHASE_KUAI_WAITING,
+	PHASE_KUAI_ATTACK,
 };
 
 class npc_xin_the_weaponmaster : public CreatureScript
@@ -130,14 +129,14 @@ public:
 		}
 
 		InstanceScript* instance;
-		EventManager events;
+		EventMap events;
 
 		void Reset()
 		{
 			events.Reset();
 
 			if (instance)
-				instance->SetData(DATA_TRIAL_OF_KING, NOT_STARTED);
+				instance->SetData(DATA_NPC_XIN_THE_WEAPONMASTER, NOT_STARTED);
 
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -148,7 +147,7 @@ public:
 		void EnterCombat(Unit* /*who*/)
 		{
 			if (instance)
-				instance->SetData(DATA_TRIAL_OF_KING, IN_PROGRESS);
+				instance->SetData(DATA_NPC_XIN_THE_WEAPONMASTER, IN_PROGRESS);
 
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 			me->SetInCombatWithZone();
@@ -162,7 +161,7 @@ public:
 		void EnterEvadeMode()
 		{
 			if (instance)
-				instance->SetData(DATA_TRIAL_OF_KING, FAIL);
+				instance->SetData(DATA_NPC_XIN_THE_WEAPONMASTER, FAIL);
 		}
 
 		void UpdateAI(const uint32 diff)
@@ -172,7 +171,7 @@ public:
 
 			events.Update(diff);
 
-			while(uint32 eventId = events.ExecuteEvent())
+			/*while(uint32 eventId = events.ExecuteEvent())
 			{
 				switch(eventId)
 				{
@@ -189,7 +188,7 @@ public:
 
 						if (events.IsInPhase(PHASE_TWO))
 						{
-							float x = 0.0f, y = 0.0f, z = 0.0f, o = 0.0f; // Ajouter les coordonnées
+							float x, y, z, o;
 							case EVENT_JUMP:
 								me->CastSpell(x, y, z, SPELL_JUMP, true);
 								me->SetOrientation(o);
@@ -212,153 +211,7 @@ public:
 							break;
 					}
 				}
-			}
-		}
-	};
-};
-
-class boss_kuai_the_brute : public CreatureScript
-{
-public:
-	boss_kuai_the_brute() : CreatureScript("boss_kuai_the_brute") { }
-
-	CreatureAI* GetAI(Creature* pCreature) const
-	{
-		return new boss_kuai_the_bruteAI (pCreature);
-	}
-
-	struct boss_kuai_the_bruteAI : public ScriptedAI
-	{
-		boss_kuai_the_bruteAI(Creature *c) : ScriptedAI(c)
-		{
-			instance = c->GetInstanceScript();
-		}
-
-		InstanceScript* instance;
-		EventManager events;
-
-		bool checkKuaiTheBruteAlive;
-		bool checkMingTheCunningAlive;
-        bool checkHaiyanTheUnstoppableAlive;
-
-		void Reset()
-		{
-			me->SetReactState(REACT_PASSIVE);
-			checkKuaiTheBruteAlive = true;
-			checkMingTheCunningAlive = true;
-			checkHaiyanTheUnstoppableAlive = true;
-
-			events.Reset();
-
-			events.SetPhase(PHASE_KUAI_WAITING);
-		}
-
-		void DoAction(int32 action)
-        {
-            switch (action)
-            {
-				case ACTION_KUAI_THE_BRUTE_RESET:
-                    checkKuaiTheBruteAlive = true;
-                    break;
-                case ACTION_KUAI_THE_BRUTE_DIED:
-                    checkKuaiTheBruteAlive = false;
-                    break;
-                case ACTION_MING_THE_CUNNING_RESET:
-                    checkMingTheCunningAlive = true;
-                    break;
-                case ACTION_MING_THE_CUNNING_DIED:
-                    checkMingTheCunningAlive = false;
-                    break;
-                case ACTION_HAIYAN_THE_UNSTOPPABLE_RESET:
-                    checkHaiyanTheUnstoppableAlive = true;
-                    break;
-                case ACTION_HAIYAN_THE_UNSTOPPABLE_DIED:
-                    checkHaiyanTheUnstoppableAlive = false;
-                    break;
-			}
-		}
-
-		void EnterCombat(Unit* /*who*/)
-		{
-			Talk(SAY_AGGRO_KUAI);
-			
-			if (Creature* mushiba = me->GetCreature(*me, instance->GetData64(DATA_MUSHIBA)))
-			{
-				mushiba->SetReactState(REACT_AGGRESSIVE);
-				mushiba->SetInCombatWithZone();
-			}
-
-			events.SetPhase(PHASE_KUAI_ATTACK);
-			events.ScheduleEvent(EVENT_SHOCKWAVE, 17*IN_MILLISECONDS, 0);
-		}
-
-		void KilledUnit(Unit *pWho)
-		{
-			Talk(SAY_SLAY_KUAI);
-		}
-		
-		void EnterEvadeMode()
-		{
-			if (instance)
-				instance->SetData(DATA_TRIAL_OF_KING, FAIL);
-		}
-
-		void DamageTaken(Unit* who, uint32& damage)
-		{
-			if (damage >= me->GetHealth())
-			{
-				damage = 0;
-				JustDied(who);
-			}
-		}
-
-		void JustDied(Unit* /*killer*/)
-		{
-			if (Creature* ming = me->GetCreature(*me, instance->GetData64(DATA_MING_THE_CUNNING)))
-			{
-				ming->SetReactState(REACT_AGGRESSIVE);
-				ming->SetInCombatWithZone();
-			}
-
-			if (Creature* mushiba = me->GetCreature(*me, instance->GetData64(DATA_MUSHIBA)))
-			{
-				mushiba->SetReactState(REACT_PASSIVE);
-				mushiba->AttackStop();
-				mushiba->DeleteThreatList();
-				mushiba->CombatStop(true);
-			}
-
-			Talk(SAY_DEATH_KUAI);
-			me->SetReactState(REACT_PASSIVE);
-			me->AttackStop();
-			me->DeleteThreatList();
-			me->CombatStop(true);
-		}
-
-		void UpdateAI(const uint32 diff)
-		{
-			if(!UpdateVictim())
-				return;
-
-			events.Update(diff);
-			while(uint32 eventId = events.ExecuteEvent())
-			{
-				switch(eventId)
-				{
-					if (instance)
-					{
-						if (events.IsInPhase(PHASE_KUAI_ATTACK))
-						{
-							case EVENT_SHOCKWAVE:
-								DoCastVictim(SPELL_SHOCKWAVE);
-
-							events.ScheduleEvent(EVENT_SHOCKWAVE, 17*IN_MILLISECONDS, 0);
-							break;
-						}
-					}
-				}
-			}
-			DoMeleeAttackIfReady();
+			}*/
 		}
 	};
 };
@@ -446,7 +299,7 @@ public:
 		void EnterEvadeMode()
 		{
 			if (instance)
-				instance->SetData(DATA_TRIAL_OF_KING, FAIL);
+				instance->SetData(DATA_KUAI_THE_BRUTE, FAIL);
 		}
 
 		void DamageTaken(Unit* who, uint32& damage)
@@ -495,14 +348,16 @@ public:
 					{
 						if (events.IsInPhase(PHASE_KUAI_ATTACK))
 						{
-							case EVENT_WHIRLING_DERVISH_MOVE_RANDOM:
+							case EVENT_SHOCKWAVE:
+								DoCastVictim(SPELL_SHOCKWAVE);
 
-							events.ScheduleEvent(EVENT_WHIRLING_DERVISH_MOVE_RANDOM, 2*IN_MILLISECONDS, 0);
+							events.ScheduleEvent(EVENT_SHOCKWAVE, 17*IN_MILLISECONDS, 0);
 							break;
 						}
 					}
 				}
 			}
+			DoMeleeAttackIfReady();
 		}
 	};
 };

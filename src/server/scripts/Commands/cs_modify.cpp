@@ -332,7 +332,7 @@ public:
         return true;
     }
 
-	// Edit Player Alternative power
+	// Edit Player Alternate power
 	static bool HandleModifyAltPowerCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -355,12 +355,12 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage("Your alternative power set to %i.", altPower);
+        handler->PSendSysMessage("Your alternate power set to %i.", altPower);
         if (handler->needReportToTarget(target))
-            ChatHandler(target->GetSession()).PSendSysMessage("Your alternative power set to %i by %s.", altPower, handler->GetNameLink(target).c_str());
+            ChatHandler(target->GetSession()).PSendSysMessage("Your alternate power set to %i by %s.", altPower, handler->GetNameLink(target).c_str());
 
-        target->SetMaxPower(POWER_ALTERNATIVE_POWER, altPower);
-        target->SetPower(POWER_ALTERNATIVE_POWER, altPower);
+        target->SetMaxPower(POWER_ALTERNATE_POWER, altPower);
+        target->SetPower(POWER_ALTERNATE_POWER, altPower);
 
         return true;
     }
