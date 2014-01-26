@@ -439,8 +439,6 @@ public :
 			++m_id ;
             angle -= (2 * M_PI / 15000)*diff ;
 			
-            float x, y, z ;
-			
             x = center.GetPositionX() + cos(angle) * m_rayon ;
             y = center.GetPositionY() + sin(angle) * m_rayon ;
             z = me->GetPositionZ() ;
