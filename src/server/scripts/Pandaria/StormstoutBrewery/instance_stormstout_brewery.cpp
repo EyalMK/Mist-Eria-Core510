@@ -87,7 +87,7 @@ public :
                     else
                         SummonBarrel(urand(0, MAX_SUMMONING_BARRELS_POSITIONS - 1));
 
-                    m_uiBarrelsTimer = urand(5500, 9500);
+                    m_uiBarrelsTimer = 7500;
                 }
                 else
                     m_uiBarrelsTimer -= uiDiff ;
@@ -105,7 +105,7 @@ public :
                         //trash->GetMotionMaster()->MovePoint(0, movePosition);
                         ++m_uiSummonedHoptallusTrash ;
                     }
-                    m_uiHoptallusTrashSummonTimer = instance->GetDifficulty() == DUNGEON_DIFFICULTY_NORMAL ? 2000 : 1000 ;
+                    m_uiHoptallusTrashSummonTimer = instance->GetDifficulty() == DUNGEON_DIFFICULTY_NORMAL ? 6000 : 4000 ;
                 }
                 else
                     m_uiHoptallusTrashSummonTimer -= uiDiff ;
