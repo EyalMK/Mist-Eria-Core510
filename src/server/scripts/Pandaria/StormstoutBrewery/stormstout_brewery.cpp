@@ -892,13 +892,9 @@ public :
         {
 			m_uiPoint = 1 ;
 			m_uiMoveTimer = 24 * 60 * 60 ;
-        }
-		
-		void IsSummonedBy(Unit* summoner)
-		{
 			Position const movePosition = {-710.459900f, 1310.748657f, 162.627029f, 2.754009f}; // Aka, pos 0 (Motion Master)
             me->GetMotionMaster()->MovePoint(0, movePosition);
-		}
+        }
 
         void MovementInform(uint32 type, uint32 id)
         {
