@@ -233,7 +233,7 @@ public :
 		void DoSlayHozens()
 		{
 			CreatureList hozens ;
-			GetCreatureListWithEntry(hozens, me, 56927, 5000.0f);
+			GetCreatureListWithEntryInGrid(hozens, me, 56927, 5000.0f);
 			
 			for(CreatureListConstIter iter = hozens.begin() ; iter != hozens.end() ; ++iter)
 				(*iter)->AI()->DoAction(1);
