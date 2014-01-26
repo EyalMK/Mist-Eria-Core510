@@ -375,7 +375,7 @@ public :
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "Power set to 0 !");
 					p->CastSpell(p, 107297, true);
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "Player casted spell on himself !");
-					p->ModifyPower(POWER_ALTERNATE_POWER, 1);
+					p->ModifyPower(POWER_ALTERNATE_POWER, 100);
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "Power set !");
 				}
 			}
