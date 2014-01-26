@@ -449,7 +449,7 @@ public :
             y = center.GetPositionY() + sin(angle) * m_rayon ;
             z = center.GetPositionZ() ;
 			
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : coords computed");
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : coords computed, x = %f, y = %f, z = %f", x, y, z);
             me->GetMotionMaster()->MovePoint(m_id, x, y, z);
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : MOTION MASTER");
             ++m_id ;
