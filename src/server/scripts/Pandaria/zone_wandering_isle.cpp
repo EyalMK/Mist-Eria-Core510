@@ -679,7 +679,7 @@ private :
 /**The Lesson of the Iron Bough**/
 /********************************/
 
-/*class EquippedItemCheckPredicate
+class EquippedItemCheckPredicate
 {
 public :
     EquippedItemCheckPredicate(uint32 questId, uint32 itemId, uint32 itemId2) : item1(itemId), item2(itemId2), quest(questId)
@@ -812,7 +812,7 @@ public :
     {
         return new stalker_item_equipedAI(c);
     }
-};*/
+};
 
 /**********************************/
 /*****The Disciple's Challenge*****/
@@ -1220,7 +1220,7 @@ void AddSC_wandering_isle()
 	
 	new npc_trainee_stifled_pride();
     new npc_aysa_cloudsinger_quest29414();
-   // new stalker_item_equiped();
+    new stalker_item_equiped();
     new mob_jaomin_ro();
     new mob_amberleaf_scamp29419();
     new spell_summon_living_air();

@@ -1357,8 +1357,49 @@ public :
     }
 };
 
+class go_panda_test : public GameObjectScript
+{
+public:
+    go_panda_test() : GameObjectScript("go_panda_test")
+    {
+
+    }
+
+    class go_panda_test_AI : public GameObjectAI
+    {
+    public :
+        go_panda_test_AI(GameObject* gameObject) : GameObjectAI(gameObject)
+        {
+        }
+
+        uint32 ResetFlagTimer;
+
+        void Reset()
+        {
+            ResetFlagTimer = 1000;
+        }
+
+        void UpdateAI(uint32 const diff)
+        {
+            if (ResetFlagTimer <= diff)
+            {
+                go->SetSpellId(49414);
+                ResetFlagTimer = 10000;
+            }
+            else
+                ResetFlagTimer -= diff;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject *gameObject) const
+    {
+        return new go_panda_test_AI(gameObject);
+    }
+};
+
 void AddSC_go_scripts()
 {
+    new go_panda_test;
     new go_cat_figurine;
     new go_northern_crystal_pylon;
     new go_eastern_crystal_pylon;
