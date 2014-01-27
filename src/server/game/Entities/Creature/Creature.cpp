@@ -2185,7 +2185,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
                 continue;
             }
 
-            CastSpell(this, *itr);
+            CastSpell(this, *itr, true);
             sLog->outDebug(LOG_FILTER_UNITS, "Spell: %u added to creature (GUID: %u Entry: %u)", *itr, GetGUIDLow(), GetEntry());
         }
     }
