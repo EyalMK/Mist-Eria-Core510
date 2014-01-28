@@ -1373,19 +1373,47 @@ public:
         {
         }
 
-        void UpdateAI(uint32 const diff)
-        {
+        uint32 TestTimer;
 
+        void Reset()
+        {
+            TestTimer = 1000;
         }
 
-        bool IsAlwaysVisibleFor(WorldObject const* seer)
+        void UpdateAI(uint32 const diff)
+        {
+            if (TestTimer <= diff)
+            {
+                if(Map* map = go->GetMap())
+                {
+                    Map::PlayerList const & playerList = map->GetPlayers();
+                    if(!playerList.isEmpty())
+                    {
+                        for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
+                        {
+                            if(Player* player = iter->getSource())
+                            {
+                                if(player->GetQuestStatus(29406) == QUEST_STATUS_COMPLETE)
+                                    player->UpdateObjectVisibility(false);
+                                else
+                                    player->UpdateObjectVisibility(true);
+                            }
+                        }
+                    }
+                }
+                TestTimer = 1000;
+            }
+            else TestTimer -= diff;
+        }
+
+       /* bool IsAlwaysVisibleFor(WorldObject const* seer)
         {
             if (Player const* player = seer->ToPlayer())
                 if(player->GetQuestStatus(29406) == QUEST_STATUS_REWARDED)
                     return true;
                 else
                     return false;
-        }
+        }*/
     };
 
     GameObjectAI* GetAI(GameObject *gameObject) const
