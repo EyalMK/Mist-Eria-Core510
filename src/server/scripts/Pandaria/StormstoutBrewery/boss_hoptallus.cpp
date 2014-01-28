@@ -226,6 +226,7 @@ public :
                     break ;
                 }
             }
+			DoMeleeAttackIfReady();
         }
 
         bool DoCheckForPlayers()
