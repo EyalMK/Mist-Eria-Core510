@@ -1394,9 +1394,10 @@ public:
                             if(Player* player = iter->getSource())
                             {
                                 if(player->GetQuestStatus(29406) == QUEST_STATUS_COMPLETE)
-                                    player->UpdateObjectVisibility(false);
-                                else
-                                    player->UpdateObjectVisibility(true);
+                                {
+                                    !player->canSeeOrDetect(go);
+                                    sLog->outDebug(LOG_FILTER_NETWORKIO, "COUCOUUUUUUUUUUUUUUUUUUUUUUUU");
+                                }
                             }
                         }
                     }
@@ -1405,15 +1406,6 @@ public:
             }
             else TestTimer -= diff;
         }
-
-       /* bool IsAlwaysVisibleFor(WorldObject const* seer)
-        {
-            if (Player const* player = seer->ToPlayer())
-                if(player->GetQuestStatus(29406) == QUEST_STATUS_REWARDED)
-                    return true;
-                else
-                    return false;
-        }*/
     };
 
     GameObjectAI* GetAI(GameObject *gameObject) const
