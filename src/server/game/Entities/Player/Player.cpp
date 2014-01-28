@@ -15799,6 +15799,8 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
     //lets remove flag for delayed teleports
     SetCanDelayTeleport(false);
+
+    UpdateObjectVisibility();
 }
 
 void Player::FailQuest(uint32 questId)
