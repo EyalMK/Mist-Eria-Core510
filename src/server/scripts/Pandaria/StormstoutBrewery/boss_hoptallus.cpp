@@ -433,11 +433,9 @@ public :
 		{
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : Entering MovementInform using type %u, id %u", type, id);
 		}
-
-        void UpdateAI(const uint32 diff)
-        {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : UPDATEAI");
-            
+		
+		void DoUpdatePosition(const uint32 diff)
+		{
 			++m_id ;
             angle -= (2 * M_PI / 5000)*diff ;
 			
@@ -446,11 +444,16 @@ public :
             z = center.GetPositionZ() ;
 			
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : actual coords : x = %f, y = %f, z= %f", me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-			
-            me->GetMotionMaster()->MovePoint(m_id, x, y, z);
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : coords computed, x = %f, y = %f, z = %f", x, y, z);
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : MOTION MASTER");
 			
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : coords computed, x = %f, y = %f, z = %f", x, y, z);
+            me->GetMotionMaster()->MovePoint(m_id, x, y, z);
+			
+		}
+
+        void UpdateAI(const uint32 diff)
+        {
+			DoUpdatePosition(diff);
         }
 
     private :
