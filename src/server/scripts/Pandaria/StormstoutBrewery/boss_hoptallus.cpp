@@ -508,7 +508,7 @@ public :
                 float y = 35 * sin(caster->GetOrientation());
                 posSummon.Relocate(caster->GetPositionX() + x, caster->GetPositionY() + y, caster->GetPositionZ());
 
-                if(Creature* summoned = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, posSummon, TEMPSUMMON_TIMED_DESPAWN, 15100))
+                if(TempSummon* summoned = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, posSummon, TEMPSUMMON_TIMED_DESPAWN, 15100))
                 {
 					summon = summoned ;
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "Summon Guid Is %u", summoned->GetGUID());
