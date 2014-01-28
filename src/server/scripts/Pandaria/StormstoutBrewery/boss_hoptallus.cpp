@@ -407,21 +407,27 @@ public :
         stalker_carrot_breathAI(Creature* creature) : ScriptedAI(creature)
         {
 			instance = creature->GetInstanceScript();
-			if(Unit* owner = me->ToTempSummon()->GetSummoner())
-			{
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "owner not null");
-				center.Relocate(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ());
-				m_rayon = me->GetExactDist2d(center.GetPositionX(), center.GetPositionY());
-				
-				me->SetFacingToObject(owner);
-				me->SetTarget(me->GetOwnerGUID());
-				angle = me->GetOrientation();
-				m_id = 0 ;
-				
-				me->SetSpeed(MOVE_RUN, 2 * M_PI * m_rayon / 5000, true);
-				me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * m_rayon / 5000, true);
-			}
         }
+		
+		void Reset()
+		{
+			if(Unit* owner = me->ToTempSummon()->GetSummoner())
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "owner not null ; guid = %u ; hoptallus guid = %u", owner->GetGUID(), instance ? instance->GetData64(INSTANCE_DATA64_HOPTALLUS_GUID) : 0);
+					center.Relocate(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ());
+					m_rayon = me->GetExactDist2d(center.GetPositionX(), center.GetPositionY());
+					
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "rayon calculated %f", m_rayon);
+					
+					me->SetFacingToObject(owner);
+					me->SetTarget(me->GetOwnerGUID());
+					angle = me->GetOrientation();
+					m_id = 0 ;
+					
+					me->SetSpeed(MOVE_RUN, 2 * M_PI * m_rayon / 5000, true);
+					me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * m_rayon / 5000, true);
+				}
+		}
 		
 		void MovementInform(uint32 type, uint32 id)
 		{
