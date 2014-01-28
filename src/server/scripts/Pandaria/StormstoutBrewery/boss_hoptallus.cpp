@@ -434,6 +434,15 @@ public :
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : Entering MovementInform using type %u, id %u", type, id);
 		}
 		
+		void DoAction(const int32 action)
+		{
+			if(action == 0)
+			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : DO ACTION");
+				DoUpdatePosition(450);
+			}
+		}
+		
 		void DoUpdatePosition(const uint32 diff)
 		{
 			++m_id ;
@@ -450,11 +459,6 @@ public :
             me->GetMotionMaster()->MovePoint(m_id, x, y, z);
 			
 		}
-
-        void UpdateAI(const uint32 diff)
-        {
-			DoUpdatePosition(diff);
-        }
 
     private :
 		InstanceScript* instance ;
@@ -500,16 +504,25 @@ public :
                 target = caster->getVictim();
 
                 Position posSummon ;
-                float x = 20 * cos(caster->GetOrientation());
-                float y = 20 * sin(caster->GetOrientation());
+                float x = 35 * cos(caster->GetOrientation());
+                float y = 35 * sin(caster->GetOrientation());
                 posSummon.Relocate(caster->GetPositionX() + x, caster->GetPositionY() + y, caster->GetPositionZ());
 
-                if(Creature* summon = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, posSummon, TEMPSUMMON_TIMED_DESPAWN, 15100))
+                if(Creature* summoned = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, posSummon, TEMPSUMMON_TIMED_DESPAWN, 15100))
                 {
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "Summon Guid Is %u", summon->GetGUID());
-                    caster->SetTarget(summon->GetGUID());
-                    caster->SetFacingToObject(summon);
+					summon = summoned ;
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Summon Guid Is %u", summoned->GetGUID());
+                    caster->SetTarget(summoned->GetGUID());
+                    caster->SetFacingToObject(summoned);
                 }
+            }
+        }
+		
+		void HandlePeriodicTick(AuraEffect const* auraEff)
+        {
+            if(summon)
+            {
+                summon->AI()->DoAction(0);
             }
         }
 
@@ -529,10 +542,12 @@ public :
         {
             OnEffectApply += AuraEffectApplyFn(spell_hoptallus_carrot_breath_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_hoptallus_carrot_breath_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+			OnEffectPeriodic += AuraEffectPeriodicFn(spell_hoptallus_carrot_breath_AuraScript::HandlePeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
 
     private :
         Unit* target ;
+		TempSummon* summon ;
     };
 
     AuraScript* GetAuraScript() const
