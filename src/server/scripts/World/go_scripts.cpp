@@ -55,6 +55,7 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "GameObjectAI.h"
+#include "GameObject.h"
 #include "Spell.h"
 #include "Player.h"
 #include "WorldSession.h"
@@ -1372,22 +1373,18 @@ public:
         {
         }
 
-        uint32 ResetFlagTimer;
-
-        void Reset()
-        {
-            ResetFlagTimer = 1000;
-        }
-
         void UpdateAI(uint32 const diff)
         {
-            if (ResetFlagTimer <= diff)
-            {
-                go->SetSpellId(49414);
-                ResetFlagTimer = 10000;
-            }
-            else
-                ResetFlagTimer -= diff;
+
+        }
+
+        bool IsAlwaysVisibleFor(WorldObject const* seer)
+        {
+            if (Player const* player = seer->ToPlayer())
+                if(player->GetQuestStatus(29406) == QUEST_STATUS_REWARDED)
+                    return true;
+                else
+                    return false;
         }
     };
 
