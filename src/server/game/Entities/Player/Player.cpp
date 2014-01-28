@@ -15800,6 +15800,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     //lets remove flag for delayed teleports
     SetCanDelayTeleport(false);
 
+    m_invisibility.DelFlag(INVISIBILITY_QUEST_7);
     UpdateObjectVisibility();
 }
 
