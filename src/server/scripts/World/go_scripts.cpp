@@ -1395,8 +1395,6 @@ public:
                             {
                                 if(player->GetQuestStatus(29406) == QUEST_STATUS_REWARDED)
                                 {
-                                    player->canSeeOrDetect(go);
-                                    sLog->outDebug(LOG_FILTER_NETWORKIO, "COUCOUUUUUUUUUUUUUUUUUUUUUUUU");
                                 }
                             }
                         }
