@@ -406,24 +406,20 @@ public :
     public :
         stalker_carrot_breathAI(Creature* creature) : ScriptedAI(creature)
         {
-
-        }
-
-        void DoAction(const int32 action)
-        {
+			instance = creature->GetInstanceScript();
 			if(Unit* owner = me->ToTempSummon()->GetSummoner())
 			{
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "owner not null");
-				m_rayon = me->GetExactDist2d(owner->GetPositionX(), owner->GetPositionY());
-				center.Relocate(owner->GetPositionX(), owner->GetPositionY());
+				center.Relocate(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ());
+				m_rayon = me->GetExactDist2d(center.GetPositionX(), center.GetPositionY());
 				
-				me->SetSpeed(MOVE_RUN, 2 * M_PI * m_rayon / 15000, true);
-				me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * m_rayon / 15000, true);
-
 				me->SetFacingToObject(owner);
 				me->SetTarget(me->GetOwnerGUID());
 				angle = me->GetOrientation();
 				m_id = 0 ;
+				
+				me->SetSpeed(MOVE_RUN, 2 * M_PI * m_rayon / 5000, true);
+				me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * m_rayon / 5000, true);
 			}
         }
 		
@@ -437,26 +433,27 @@ public :
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : UPDATEAI");
             
 			++m_id ;
-            angle -= (2 * M_PI / 15000)*diff ;
+            angle -= (2 * M_PI / 5000)*diff ;
 			
             x = center.GetPositionX() + cos(angle) * m_rayon ;
             y = center.GetPositionY() + sin(angle) * m_rayon ;
-            z = me->GetPositionZ() ;
+            z = center.GetPositionZ() ;
 			
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : actual coords : x = %f, y = %f, z= %f", me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : coords computed, x = %f, y = %f, z = %f", x, y, z);
 			
-            me->GetMotionMaster()->MovePoint(0, x, y, z);
-			
+            me->GetMotionMaster()->MovePoint(m_id, x, y, z);
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : MOTION MASTER");
+			
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : coords computed, x = %f, y = %f, z = %f", x, y, z);
         }
 
     private :
+		InstanceScript* instance ;
         Position center ;
         float m_rayon ;
         float x, y, z ;
         float angle ;
-        uint32 m_id ;
+        int m_id ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
@@ -494,13 +491,12 @@ public :
                 target = caster->getVictim();
 
                 Position posSummon ;
-                float x = 2 * cos(caster->GetOrientation());
-                float y = 2 * sin(caster->GetOrientation());
+                float x = 20 * cos(caster->GetOrientation());
+                float y = 20 * sin(caster->GetOrientation());
                 posSummon.Relocate(caster->GetPositionX() + x, caster->GetPositionY() + y, caster->GetPositionZ());
 
-                if(Creature* summon = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, posSummon))
+                if(Creature* summon = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, posSummon, TEMPSUMMON_TIMED_DESPAWN, 15100))
                 {
-					summon->AI()->DoAction(0);
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "Summon Guid Is %u", summon->GetGUID());
                     caster->SetTarget(summon->GetGUID());
                     caster->SetFacingToObject(summon);
