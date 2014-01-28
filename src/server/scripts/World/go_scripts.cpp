@@ -1384,10 +1384,8 @@ public:
         {
             if (TestTimer <= diff)
             {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "TESTTTTTTTTTTTTTTT");
                 if(Map* map = go->GetMap())
                 {
-                    sLog->outDebug(LOG_FILTER_NETWORKIO, "ouaaaaaaaaaahhhhhhha");
                     Map::PlayerList const & playerList = map->GetPlayers();
                     if(!playerList.isEmpty())
                     {
@@ -1395,6 +1393,7 @@ public:
                         {
                             if(Player* player = iter->getSource())
                             {
+                                sLog->outDebug(LOG_FILTER_NETWORKIO, "TESTTTTTTTTTTTTTTT");
                                 if(player->GetQuestStatus(29406) == QUEST_STATUS_COMPLETE)
                                 {
                                     !player->canSeeOrDetect(go);
