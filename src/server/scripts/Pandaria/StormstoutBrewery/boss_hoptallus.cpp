@@ -425,8 +425,8 @@ public :
 					angle = me->GetOrientation();
 					m_id = 0 ;
 					
-					me->SetSpeed(MOVE_RUN, 2 * M_PI * m_rayon / 5000, true);
-					me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * m_rayon / 5000, true);
+					me->SetSpeed(MOVE_RUN, 2 * M_PI * m_rayon / 500, true);
+					me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * m_rayon / 500, true);
 				}
 		}
 		
@@ -447,7 +447,7 @@ public :
 		void DoUpdatePosition(const uint32 diff)
 		{
 			++m_id ;
-            angle -= (2 * M_PI / 5000)*diff ;
+            angle -= (2 * M_PI / 500)*diff ;
 			
             x = center.GetPositionX() + cos(angle) * m_rayon ;
             y = center.GetPositionY() + sin(angle) * m_rayon ;
