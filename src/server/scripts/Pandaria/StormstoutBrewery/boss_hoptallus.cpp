@@ -427,6 +427,8 @@ public :
 					
 					me->SetSpeed(MOVE_RUN, 2 * M_PI * m_rayon / 5000, true);
 					me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * m_rayon / 5000, true);
+					
+					msTimeDiff = 0 ;
 				}
 		}
 		
