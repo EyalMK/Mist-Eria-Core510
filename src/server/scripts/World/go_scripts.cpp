@@ -1393,10 +1393,9 @@ public:
                         {
                             if(Player* player = iter->getSource())
                             {
-                                sLog->outDebug(LOG_FILTER_NETWORKIO, "TESTTTTTTTTTTTTTTT");
-                                if(player->GetQuestStatus(29406) == QUEST_STATUS_COMPLETE)
+                                if(player->GetQuestStatus(29406) == QUEST_STATUS_REWARDED)
                                 {
-                                    !player->canSeeOrDetect(go);
+                                    player->canSeeOrDetect(go);
                                     sLog->outDebug(LOG_FILTER_NETWORKIO, "COUCOUUUUUUUUUUUUUUUUUUUUUUUU");
                                 }
                             }
