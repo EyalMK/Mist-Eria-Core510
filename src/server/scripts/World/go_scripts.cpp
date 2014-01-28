@@ -1378,6 +1378,9 @@ public:
         void Reset()
         {
             TestTimer = 1000;
+
+            InvisibilityType type = InvisibilityType(INVISIBILITY_UNK7);
+            go->m_invisibility.AddFlag(type);
         }
 
         void UpdateAI(uint32 const diff)
