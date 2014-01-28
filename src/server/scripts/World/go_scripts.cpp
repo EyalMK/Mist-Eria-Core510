@@ -1384,8 +1384,10 @@ public:
         {
             if (TestTimer <= diff)
             {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "TESTTTTTTTTTTTTTTT");
                 if(Map* map = go->GetMap())
                 {
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "ouaaaaaaaaaahhhhhhha");
                     Map::PlayerList const & playerList = map->GetPlayers();
                     if(!playerList.isEmpty())
                     {
