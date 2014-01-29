@@ -96,10 +96,17 @@ public :
                 me->GetMotionMaster()->MoveJump(jumpPosition, 1.0f, 1.0f);
                 m_bReady = true ;
             }
+            else if(action == 3)
+            {
+                summon = NULL ;
+            }
         }
 
         void EnterCombat(Unit *aggro)
         {
+            if(!m_bHasStartedOnce)
+                m_bHasStartedOnce = true ;
+
             if(instance)
             {
                 instance->SetData(INSTANCE_DATA_HOPTALLUS_STATUS, IN_PROGRESS);
@@ -155,7 +162,8 @@ public :
 
         void UpdateAI(const uint32 diff)
         {
-            if(!m_bReady && !UpdateVictim() && m_bHasStartedOnce)
+
+            if(!m_bReady && m_bHasStartedOnce)
             {
                 events.Update(diff);
 
@@ -182,6 +190,8 @@ public :
                         break ;
                     }
                 }
+
+                return ;
             }
 
             if(m_bReady && !UpdateVictim())
@@ -189,24 +199,12 @@ public :
 
             events.Update(diff);
 
-            if(me->HasUnitState(UNIT_STATE_CASTING))
-                return ;
+            DoUpdateCarrotBreath(diff);
 
             while(uint32 eventId = events.ExecuteEvent())
             {
                 switch(eventId)
                 {
-                case EVENT_FURLWIND :
-                    Talk(TALK_FURLWIND);
-                    DoCastAOE(SPELL_FURLWIND);
-                    events.ScheduleEvent(EVENT_FURLWIND, IsHeroic() ? urand(6000, 7000) : urand(7000, 8500));
-                    break ;
-
-                case EVENT_CARROT_BREATH :
-                    DoCast(SPELL_CARROT_BREATH);
-                    events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
-                    break ;
-
                 case EVENT_SUMMON_VIRMEN :
                     if(m_uiSummonTimes == 0)
                         if(instance)
@@ -222,11 +220,71 @@ public :
                     }
                     break ;
 
+                case EVENT_FURLWIND :
+                    if(me->HasUnitState(UNIT_STATE_CASTING))
+                    {
+                        events.ScheduleEvent(EVENT_FURLWIND, 100);
+                        return ;
+                    }
+                    Talk(TALK_FURLWIND);
+                    DoCastAOE(SPELL_FURLWIND);
+                    events.ScheduleEvent(EVENT_FURLWIND, IsHeroic() ? urand(12000, 14000) : urand(14000, 17000));
+                    break ;
+
+                case EVENT_CARROT_BREATH :
+                    if(me->HasUnitState(UNIT_STATE_CASTING))
+                    {
+                        events.ScheduleEvent(EVENT_CARROT_BREATH, 100);
+                        return ;
+                    }
+
+                    summon = me->SummonCreature(NPC_CARROT_BREATH_HELPER, 5 * cos(me->GetOrientation()), 5 * sin(me->GetOrientation()), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15100);
+                    if(summon)
+                    {
+                        summon->SetFacingToObject(me);
+                        summon->SetTarget(me->GetGUID());
+
+                        // Reset threat to make sure we will not change target
+                        DoResetThreat();
+
+                        me->SetTarget(summon->GetGUID());
+                        me->SetFacingToObject(summon);
+                    }
+                    DoCast(SPELL_CARROT_BREATH);
+                    events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
+                    break ;
+
+
                 default :
                     break ;
                 }
             }
 			DoMeleeAttackIfReady();
+        }
+
+        void DoUpdateCarrotBreath(const uint32 uiDiff)
+        {
+            // L'idee est simple : comme le motion master ne fonctionne pas bien, on va respawn le npc en chaine :
+            if(summon)
+            {
+                float x, y, z ;
+                float rayon = me->GetExactDist2d(summon->GetPositionX(), summon->GetPositionY());
+
+                float angle = me->GetOrientation() + (2 * M_PI / 15000.0f) * uiDiff ;
+
+                angle = Position::NormalizeOrientation(angle);
+
+                x = me->GetPositionX() + cos(angle) * rayon ;
+                y = me->GetPositionY() + sin(angle) * rayon ;
+                z = me->GetPositionZ() + 1.0f ;
+
+                summon->Relocate(x, y, z);
+                me->SetFacingToObject(summon);
+                me->SetTarget(summon->GetGUID());
+
+                summon->SetFacingToObject(me);
+                summon->SetTarget(me->GetGUID());
+            }
         }
 
         bool DoCheckForPlayers()
@@ -282,6 +340,8 @@ public :
         bool m_bHasStartedOnce ;
         bool m_bReady ;
         uint8 m_uiSummonTimes ;
+
+        TempSummon* summon ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
@@ -441,7 +501,7 @@ public :
 		void DoUpdatePosition(const uint32 diff)
 		{
 			++m_id ;
-            angle -= (2 * M_PI / 5000)*msTimeDiff ;
+            angle -= (2 * M_PI / 5000.0f)* float(msTimeDiff) ;
 			
 			msTimeDiff = 0 ;
 			
@@ -505,7 +565,7 @@ public :
             {
                 target = caster->getVictim();
 
-                Position posSummon ;
+                /*Position posSummon ;
                 float x = 35 * cos(caster->GetOrientation());
                 float y = 35 * sin(caster->GetOrientation());
                 posSummon.Relocate(caster->GetPositionX() + x, caster->GetPositionY() + y, caster->GetPositionZ());
@@ -516,7 +576,7 @@ public :
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "Summon Guid Is %u", summoned->GetGUID());
                     caster->SetTarget(summoned->GetGUID());
                     caster->SetFacingToObject(summoned);
-                }
+                }*/
             }
         }
 		
@@ -536,6 +596,7 @@ public :
                 {
                     GetCaster()->SetTarget(target->GetGUID());
                     GetCaster()->SetFacingToObject(target);
+                    GetCaster()->GetAI()->DoAction(3);
                 }
             }
         }
@@ -563,6 +624,6 @@ void AddSC_boss_hoptallus()
     new boss_hoptallus();
     new mob_virmen();
     new npc_big_ol_hammer();
-    new stalker_carrot_breath();
+    //new stalker_carrot_breath();
     new spell_hoptallus_carrot_breath();
 }
