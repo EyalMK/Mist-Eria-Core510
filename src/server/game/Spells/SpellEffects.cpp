@@ -524,7 +524,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 			switch (m_spellInfo->Id)
 			{
 				case 116858: // Chaos Bolt
-					damage += int32(m_caster->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false) * 2.25f * (m_caster->ToPlayer()->GetRatingBonusValue(CR_CRIT_SPELL) / 100));
+					damage += int32(m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()) * 2.25f * (1 + (m_caster->ToPlayer()->GetRatingBonusValue(CR_CRIT_SPELL) / 100)));
 					break;
 
 				default:
