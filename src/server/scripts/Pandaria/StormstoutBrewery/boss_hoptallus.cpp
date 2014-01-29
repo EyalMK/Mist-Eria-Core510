@@ -76,6 +76,8 @@ public :
             instance = creature->GetInstanceScript();
             m_bHasStartedOnce = false ;
             m_bReady = false ;
+			
+			summon = NULL ;
         }
 
         void Reset()
@@ -162,7 +164,6 @@ public :
 
         void UpdateAI(const uint32 diff)
         {
-
             if(!m_bReady && m_bHasStartedOnce)
             {
                 events.Update(diff);
