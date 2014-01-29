@@ -239,7 +239,7 @@ public :
                         return ;
                     }
 
-                    summon = me->SummonCreature(NPC_CARROT_BREATH_HELPER, me->GetPositionX() + 5 * cos(me->GetOrientation()), me->GetPositionY() 5 * sin(me->GetOrientation()), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15100);
+                    summon = me->SummonCreature(NPC_CARROT_BREATH_HELPER, me->GetPositionX() + 5 * cos(me->GetOrientation()), me->GetPositionY() + 5 * sin(me->GetOrientation()), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15100);
                     if(summon)
                     {
                         summon->SetFacingToObject(me);
