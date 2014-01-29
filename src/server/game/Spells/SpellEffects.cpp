@@ -250,7 +250,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectNULL,                                     //176 SPELL_EFFECT_176
     &Spell::EffectNULL,                                     //177 SPELL_EFFECT_177
     &Spell::EffectUnused,                                   //178 SPELL_EFFECT_178 unused
-    &Spell::EffectCreateAreatrigger,                        //179 SPELL_EFFECT_CREATE_AREATRIGGER
+    &Spell::EffectNULL,                                     //179 SPELL_EFFECT_CREATE_AREATRIGGER
     &Spell::EffectUnused,                                   //180 SPELL_EFFECT_180 unused
     &Spell::EffectResetTalent,                              //181 SPELL_EFFECT_RESET_TALENT
     &Spell::EffectNULL,                                     //182 SPELL_EFFECT_182
@@ -6454,104 +6454,6 @@ void Spell::EffectSummonRaFFriend(SpellEffIndex effIndex)
         return;
 
     m_caster->CastSpell(unitTarget, m_spellInfo->Effects[effIndex].TriggerSpell, true);
-}
-
-void Spell::EffectCreateAreatrigger(SpellEffIndex effIndex)
-{
-    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
-        return;
-
-    Position pos;
-    if (!m_targets.HasDst())
-        GetCaster()->GetPosition(&pos);
-    else
-        destTarget->GetPosition(&pos);
-
-    // trigger entry/miscvalue relation is currently unknown, for now use MiscValue as trigger entry
-    uint32 triggerEntry = GetSpellInfo()->Effects[effIndex].MiscValue;
-
-    AreaTrigger* areaTrigger = new AreaTrigger;
-    if (!areaTrigger->CreateAreaTrigger(sObjectMgr->GenerateLowGuid(HIGHGUID_AREATRIGGER), triggerEntry, m_caster, GetSpellInfo(), pos))
-        delete areaTrigger;
-
-    // Custom MoP Script
-    switch (m_spellInfo->Id)
-    {
-        case 121536:// Angelic Feather
-        {
-            int32 count = m_caster->CountAreaTrigger(m_spellInfo->Id);
-
-            if (count > 3)
-            {
-                std::list<AreaTrigger*> angelicFeatherList;
-                m_caster->GetAreaTriggerList(angelicFeatherList, m_spellInfo->Id);
-
-                if (!angelicFeatherList.empty())
-                {
-                    angelicFeatherList.sort(Trinity::AreaTriggerDurationPctOrderPred());
-
-					for (std::list<AreaTrigger*>::const_iterator i = angelicFeatherList.begin(); i != angelicFeatherList.end(); ++i)
-                    {
-                        AreaTrigger* angelicFeather = (*i);
-                        angelicFeather->SetDuration(0);
-                        break;
-                    }
-                }
-            }
-
-            break;
-        }
-        case 115460:// Healing Sphere
-        {
-            int32 count = m_caster->CountAreaTrigger(m_spellInfo->Id);
-
-            if (count > 3)
-            {
-                std::list<AreaTrigger*> healingSphereList;
-                m_caster->GetAreaTriggerList(healingSphereList, m_spellInfo->Id);
-
-                if (!healingSphereList.empty())
-                {
-                    healingSphereList.sort(Trinity::AreaTriggerDurationPctOrderPred());
-
-					for (std::list<AreaTrigger*>::const_iterator i = healingSphereList.begin(); i != healingSphereList.end(); ++i)
-                    {
-                        AreaTrigger* healingSphere = (*i);
-                        healingSphere->SetDuration(0);
-                        break;
-                    }
-                }
-            }
-
-            break;
-        }
-        case 116011:// Rune of Power
-        {
-            int32 count = m_caster->CountAreaTrigger(m_spellInfo->Id);
-
-            if (count > 2)
-            {
-                std::list<AreaTrigger*> runeOfPowerList;
-                m_caster->GetAreaTriggerList(runeOfPowerList, m_spellInfo->Id);
-
-                if (!runeOfPowerList.empty())
-                {
-                    runeOfPowerList.sort(Trinity::AreaTriggerDurationPctOrderPred());
-
-					for (std::list<AreaTrigger*>::const_iterator i = runeOfPowerList.begin(); i != runeOfPowerList.end(); ++i)
-                    {
-                        AreaTrigger* runeOfPower = (*i);
-                        runeOfPower->SetDuration(0);
-                        break;
-                    }
-                }
-            }
-
-            break;
-        }
-        default:
-            break;
-    }
 }
 
 void Spell::EffectResurrectWithAura(SpellEffIndex effIndex)
