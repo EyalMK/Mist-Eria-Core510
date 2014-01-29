@@ -1374,6 +1374,7 @@ public:
         {
             InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_7);
             go->m_invisibility.AddFlag(type);
+            go->m_invisibility.AddValue(INVISIBILITY_QUEST_7, 7);
         }
 
     };
@@ -1400,6 +1401,7 @@ public:
         {
             InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_8);
             go->m_invisibility.AddFlag(type);
+            go->m_invisibility.AddValue(INVISIBILITY_QUEST_8, 8);
         }
 
     };
@@ -1426,6 +1428,7 @@ public:
         {
             InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_9);
             go->m_invisibility.AddFlag(type);
+            go->m_invisibility.AddValue(INVISIBILITY_QUEST_9, 9);
         }
 
     };
