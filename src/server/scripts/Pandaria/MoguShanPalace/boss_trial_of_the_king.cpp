@@ -1,4 +1,4 @@
-/* # Script de Sungis : Trial of King # */
+/* # Script de Sungis : Trial of the King # */
 
 #include "ScriptPCH.h"
 #include "SpellScript.h"
@@ -6,15 +6,12 @@
 
 enum Spells
 {
-	/* Xin the Weaponmaster */
-	SPELL_JUMP							= 116572, // Tester le sort.
-
-	/* Mu'Shiba */
-	SPELL_RAVAGE						= 119946,
-
 	/* Kuai the Brute */
 	SPELL_SHOCKWAVE						= 119922,
 
+	/* Mu'Shiba */
+	SPELL_RAVAGE						= 119946,
+	
 	/* Ming the Cunning */
 	SPELL_LIGHTNING_BOLT				= 123654,
 	SPELL_MAGNETIC_FIELD				= 120100,
@@ -150,7 +147,7 @@ public:
 				instance->SetData(DATA_NPC_XIN_THE_WEAPONMASTER, IN_PROGRESS);
 
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-			me->SetInCombatWithZone();
+			DoZoneInCombat();
 
 			events.IsInPhase(PHASE_ONE);
 			events.ScheduleEvent(EVENT_INTRO, 3*IN_MILLISECONDS, 0);
@@ -171,47 +168,14 @@ public:
 
 			events.Update(diff);
 
-			/*while(uint32 eventId = events.ExecuteEvent())
+			while(uint32 eventId = events.ExecuteEvent())
 			{
 				switch(eventId)
 				{
-					if (instance)
-					{
-						if (events.IsInPhase(PHASE_ONE))
-						{
-							case EVENT_INTRO:
-								Talk(SAY_INTRO);
-
-								events.SetPhase(PHASE_TWO);
-								break;
-						}
-
-						if (events.IsInPhase(PHASE_TWO))
-						{
-							float x, y, z, o;
-							case EVENT_JUMP_BACK:
-								me->CastSpell(x, y, z, SPELL_JUMP, true);
-								me->SetOrientation(o);
-								events.SetPhase(PHASE_THREE);
-						}
-
-						if (events.IsInPhase(PHASE_THREE))
-						{
-							case EVENT_KUAI:
-								if (Creature* kuai = me->GetCreature(*me, instance->GetData64(DATA_KUAI_THE_BRUTE)))
-								{
-									kuai->SetReactState(REACT_AGGRESSIVE);
-									kuai->SetInCombatWithZone();
-								}
-
-								events.SetPhase(PHASE_LAST);
-						}
-								
-						default:
-							break;
-					}
+					default:
+						break;
 				}
-			}*/
+			}
 		}
 	};
 };
@@ -340,6 +304,7 @@ public:
 				return;
 
 			events.Update(diff);
+
 			while(uint32 eventId = events.ExecuteEvent())
 			{
 				switch(eventId)
@@ -362,7 +327,7 @@ public:
 	};
 };
 
-void AddSC_trial_of_king()
+void AddSC_trial_of_the_king()
 {
 	new npc_xin_the_weaponmaster;
 	new boss_kuai_the_brute;
