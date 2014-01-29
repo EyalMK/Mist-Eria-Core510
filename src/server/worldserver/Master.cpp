@@ -42,6 +42,7 @@
 #include "Util.h"
 #include "AuthSocket.h"
 #include "RealmList.h"
+#include "SRASServer.h"
 
 #include "BigNumber.h"
 
@@ -244,6 +245,11 @@ int Master::Run()
         soap_thread = new ACE_Based::Thread(runnable);
     }
 
+#ifdef linux
+    SRASServer *srasServer = new SRASServer;
+    ACE_Based::Thread *srasThread = new ACE_Based::Thread(srasServer);
+#endif
+
     ///- Start up freeze catcher thread
     if (uint32 freeze_delay = ConfigMgr::GetIntDefault("MaxCoreStuckTime", 0))
     {
@@ -273,6 +279,11 @@ int Master::Run()
     // since worldrunnable uses them, it will crash if unloaded after master
     world_thread.wait();
     rar_thread.wait();
+#ifdef linux
+    srasThread->wait();
+    srasThread->destroy();
+    delete srasThread;
+#endif
 
     if (soap_thread)
     {
