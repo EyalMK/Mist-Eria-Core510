@@ -496,13 +496,15 @@ public:
             cInfo->ScriptID           = sObjectMgr->GetScriptId(fields[84].GetCString());
 
             sObjectMgr->CheckCreatureTemplate(cInfo);
+
+			std::stringstream reloadText;
+			std::stringstream name;
+			reloadText << "Creature template reloaded entry : " << entry << ".";
+			name << "Name : " << cInfo->Name << ".";
+			handler->SendGlobalGMSysMessage(reloadText.str().c_str());
+			handler->PSendSysMessage(name.str().c_str());
         }
 
-		int32 id = atoi((char*)args);
-
-		std::stringstream reloadText;
-		reloadText << "Creature template reloaded (ID : " << id << ").";
-		handler->SendGlobalGMSysMessage(reloadText.str().c_str());
         return true;
     }
 

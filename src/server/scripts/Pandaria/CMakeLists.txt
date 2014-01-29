@@ -21,7 +21,7 @@ set(sources
   Pandaria/StormstoutBrewery/boss_hoptallus.cpp
   Pandaria/StormstoutBrewery/boss_yan_zhu_the_uncasked.cpp
   Pandaria/MoguShanPalace/boss_gekkan.cpp
-  Pandaria/MoguShanPalace/boss_trial_of_king.cpp
+  Pandaria/MoguShanPalace/boss_trial_of_the_king.cpp
   Pandaria/MoguShanPalace/boss_xin_the_weaponmaster.cpp
   Pandaria/MoguShanPalace/instance_mogushan_palace.cpp
   Pandaria/MoguShanPalace/mogushan_palace.h

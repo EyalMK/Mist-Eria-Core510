@@ -23,6 +23,7 @@ void AddSC_the_brawlers_guild();
 void AddSC_boss_the_stone_guard();
 
 // Mogushan Palace
+void AddSC_trial_of_the_king();
 void AddSC_boss_gekkan();
 void AddSC_instance_mogushan_palace();
 
@@ -1355,6 +1356,7 @@ void AddPandariaScripts()
 	AddSC_boss_the_stone_guard();
 
 	// Mogushan Palace
+	AddSC_trial_of_the_king();
     AddSC_boss_gekkan();
     AddSC_instance_mogushan_palace();
 
