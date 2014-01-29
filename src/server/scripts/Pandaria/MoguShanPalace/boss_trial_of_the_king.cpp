@@ -172,8 +172,7 @@ public:
 							break;
 
 						case EVENT_JUMP_BACK:
-							me->SetSpeed(MOVE_WALK, 5.0f);
-							me->GetMotionMaster()->MoveJump(XinJumpPosition, 5.0f, 7.5f);
+							me->GetMotionMaster()->MoveJump(XinJumpPosition, 10.0f, 10.0f);
 
 							events.ScheduleEvent(EVENT_CHOOSE_BOSS, 3*IN_MILLISECONDS);
 							events.CancelEvent(EVENT_JUMP_BACK);
@@ -216,10 +215,12 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
+		bool evade;
 
 		void Reset()
 		{
 			events.Reset();
+			evade = false;
 
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -252,24 +253,21 @@ public:
 			events.ScheduleEvent(EVENT_SHOCKWAVE, 17*IN_MILLISECONDS, 0);
 		}
 
-		void KilledUnit(Unit *pWho)
-		{
-
-		}
-		
 		void EnterEvadeMode()
 		{
 			if (instance)
-				instance->SetData(DATA_KUAI_THE_BRUTE, FAIL);
-
-			ScriptedAI::EnterEvadeMode();
-
-			if (Creature* xin = me->GetCreature(*me, instance->GetData64(DATA_NPC_XIN_THE_WEAPONMASTER)))
 			{
-				xin->Kill(xin);
-				xin->RemoveCorpse();
-				xin->Relocate(xin->GetHomePosition());
-				xin->Respawn(true);
+				if (!evade)
+				{
+					if (Creature* xin = me->GetCreature(*me, instance->GetData64(DATA_NPC_XIN_THE_WEAPONMASTER)))
+					{
+						xin->Kill(xin);
+						xin->RemoveCorpse();
+						xin->Relocate(xin->GetHomePosition());
+						xin->Respawn(true);
+					}
+				}
+				else instance->SetData(DATA_KUAI_THE_BRUTE, FAIL);
 			}
 		}
 
@@ -278,6 +276,7 @@ public:
 			if (damage >= me->GetHealth())
 			{
 				damage = 0;
+				evade = true;
 				JustDied(who);
 			}
 		}
@@ -297,6 +296,8 @@ public:
 			me->AttackStop();
 			me->DeleteThreatList();
 			me->CombatStop(true);
+
+			ScriptedAI::EnterEvadeMode();
 		}
 
 		void UpdateAI(const uint32 diff)
