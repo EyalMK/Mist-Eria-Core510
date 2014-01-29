@@ -55,6 +55,7 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "GameObjectAI.h"
+#include "GameObject.h"
 #include "Spell.h"
 #include "Player.h"
 #include "WorldSession.h"
@@ -1357,49 +1358,86 @@ public :
     }
 };
 
-class go_panda_test : public GameObjectScript
+class go_invisibility_gen_7 : public GameObjectScript
 {
 public:
-    go_panda_test() : GameObjectScript("go_panda_test")
+    go_invisibility_gen_7() : GameObjectScript("go_invisibility_gen_7")
     {
-
     }
 
-    class go_panda_test_AI : public GameObjectAI
+    class go_invisibility_gen_7_AI : public GameObjectAI
     {
     public :
-        go_panda_test_AI(GameObject* gameObject) : GameObjectAI(gameObject)
-        {
-        }
-
-        uint32 ResetFlagTimer;
+        go_invisibility_gen_7_AI(GameObject* gameObject) : GameObjectAI(gameObject){}
 
         void Reset()
         {
-            ResetFlagTimer = 1000;
+            InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_7);
+            go->m_invisibility.AddFlag(type);
         }
 
-        void UpdateAI(uint32 const diff)
-        {
-            if (ResetFlagTimer <= diff)
-            {
-                go->SetSpellId(49414);
-                ResetFlagTimer = 10000;
-            }
-            else
-                ResetFlagTimer -= diff;
-        }
     };
 
     GameObjectAI* GetAI(GameObject *gameObject) const
     {
-        return new go_panda_test_AI(gameObject);
+        return new go_invisibility_gen_7_AI(gameObject);
+    }
+};
+
+class go_invisibility_gen_8 : public GameObjectScript
+{
+public:
+    go_invisibility_gen_8() : GameObjectScript("go_invisibility_gen_8")
+    {
+    }
+
+    class go_invisibility_gen_8_AI : public GameObjectAI
+    {
+    public :
+        go_invisibility_gen_8_AI(GameObject* gameObject) : GameObjectAI(gameObject){}
+
+        void Reset()
+        {
+            InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_8);
+            go->m_invisibility.AddFlag(type);
+        }
+
+    };
+
+    GameObjectAI* GetAI(GameObject *gameObject) const
+    {
+        return new go_invisibility_gen_8_AI(gameObject);
+    }
+};
+
+class go_invisibility_gen_9 : public GameObjectScript
+{
+public:
+    go_invisibility_gen_9() : GameObjectScript("go_invisibility_gen_9")
+    {
+    }
+
+    class go_invisibility_gen_9_AI : public GameObjectAI
+    {
+    public :
+        go_invisibility_gen_9_AI(GameObject* gameObject) : GameObjectAI(gameObject){}
+
+        void Reset()
+        {
+            InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_9);
+            go->m_invisibility.AddFlag(type);
+        }
+
+    };
+
+    GameObjectAI* GetAI(GameObject *gameObject) const
+    {
+        return new go_invisibility_gen_9_AI(gameObject);
     }
 };
 
 void AddSC_go_scripts()
 {
-    new go_panda_test;
     new go_cat_figurine;
     new go_northern_crystal_pylon;
     new go_eastern_crystal_pylon;
@@ -1441,4 +1479,7 @@ void AddSC_go_scripts()
     new go_frostblade_shrine;
     new go_midsummer_bonfire;
 	new go_bell_of_thousand_whispers();
+    new go_invisibility_gen_7;
+    new go_invisibility_gen_8;
+    new go_invisibility_gen_9;
 }

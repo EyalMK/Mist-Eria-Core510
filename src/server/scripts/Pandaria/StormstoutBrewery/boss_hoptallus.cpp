@@ -226,6 +226,7 @@ public :
                     break ;
                 }
             }
+			DoMeleeAttackIfReady();
         }
 
         bool DoCheckForPlayers()
@@ -406,57 +407,68 @@ public :
     public :
         stalker_carrot_breathAI(Creature* creature) : ScriptedAI(creature)
         {
-
+			instance = creature->GetInstanceScript();
         }
-
-        void DoAction(const int32 action)
-        {
+		
+		void Reset()
+		{
 			if(Unit* owner = me->ToTempSummon()->GetSummoner())
-			{
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "owner not null");
-				m_rayon = me->GetExactDist2d(owner->GetPositionX(), owner->GetPositionY());
-				center.Relocate(owner->GetPositionX(), owner->GetPositionY());
-				
-				me->SetSpeed(MOVE_RUN, 2 * M_PI * m_rayon / 15000, true);
-				me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * m_rayon / 15000, true);
-
-				me->SetFacingToObject(owner);
-				me->SetTarget(me->GetOwnerGUID());
-				angle = me->GetOrientation();
-				m_id = 0 ;
-			}
-        }
+				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "owner not null ; guid = %u ; hoptallus guid = %u", owner->GetGUID(), instance ? instance->GetData64(INSTANCE_DATA64_HOPTALLUS_GUID) : 0);
+					center.Relocate(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ());
+					m_rayon = me->GetExactDist2d(center.GetPositionX(), center.GetPositionY());
+					
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "rayon calculated %f", m_rayon);
+					
+					me->SetFacingToObject(owner);
+					me->SetTarget(me->GetOwnerGUID());
+					angle = me->GetOrientation();
+					m_id = 0 ;
+					
+					me->SetSpeed(MOVE_RUN, 2 * M_PI * m_rayon / 5000, true);
+					me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * m_rayon / 5000, true);
+					
+					msTimeDiff = 0 ;
+				}
+		}
 		
 		void MovementInform(uint32 type, uint32 id)
 		{
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : Entering MovementInform using type %u, id %u", type, id);
+			DoUpdatePosition(msTimeDiff) ;
 		}
-
-        void UpdateAI(const uint32 diff)
-        {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : UPDATEAI");
-            
+		
+		void DoUpdatePosition(const uint32 diff)
+		{
 			++m_id ;
-            angle -= (2 * M_PI / 15000)*diff ;
+            angle -= (2 * M_PI / 5000)*msTimeDiff ;
+			
+			msTimeDiff = 0 ;
 			
             x = center.GetPositionX() + cos(angle) * m_rayon ;
             y = center.GetPositionY() + sin(angle) * m_rayon ;
-            z = me->GetPositionZ() ;
+            z = center.GetPositionZ() ;
 			
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : actual coords : x = %f, y = %f, z= %f", me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : coords computed, x = %f, y = %f, z = %f", x, y, z);
-			
-            me->GetMotionMaster()->MovePoint(0, x, y, z);
-			
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "Carrot Breath Helper : MOTION MASTER");
-        }
+			
+            me->GetMotionMaster()->MovePoint(m_id, x, y, z);
+		}
+		
+		void UpdateAI(const uint32 diff)
+		{
+			msTimeDiff += diff ;
+		}
 
     private :
+		InstanceScript* instance ;
         Position center ;
         float m_rayon ;
         float x, y, z ;
         float angle ;
-        uint32 m_id ;
+        int m_id ;
+		uint32 msTimeDiff ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
@@ -494,19 +506,27 @@ public :
                 target = caster->getVictim();
 
                 Position posSummon ;
-                float x = 2 * cos(caster->GetOrientation());
-                float y = 2 * sin(caster->GetOrientation());
+                float x = 35 * cos(caster->GetOrientation());
+                float y = 35 * sin(caster->GetOrientation());
                 posSummon.Relocate(caster->GetPositionX() + x, caster->GetPositionY() + y, caster->GetPositionZ());
 
-                if(Creature* summon = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, posSummon))
+                if(TempSummon* summoned = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, posSummon, TEMPSUMMON_TIMED_DESPAWN, 15100))
                 {
-					summon->AI()->DoAction(0);
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "Summon Guid Is %u", summon->GetGUID());
-                    caster->SetTarget(summon->GetGUID());
-                    caster->SetFacingToObject(summon);
+					//summon = summoned ;
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "Summon Guid Is %u", summoned->GetGUID());
+                    caster->SetTarget(summoned->GetGUID());
+                    caster->SetFacingToObject(summoned);
                 }
             }
         }
+		
+		/*void HandlePeriodicTick(AuraEffect const* auraEff)
+        {
+            if(summon)
+            {
+                summon->AI()->DoAction(0);
+            }
+        }*/
 
         void HandleEffectRemove(AuraEffect const* auraEf, AuraEffectHandleModes mode)
         {
@@ -524,10 +544,12 @@ public :
         {
             OnEffectApply += AuraEffectApplyFn(spell_hoptallus_carrot_breath_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_hoptallus_carrot_breath_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+			// OnEffectPeriodic += AuraEffectPeriodicFn(spell_hoptallus_carrot_breath_AuraScript::HandlePeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
 
     private :
         Unit* target ;
+		//TempSummon* summon ;
     };
 
     AuraScript* GetAuraScript() const
