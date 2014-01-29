@@ -36,6 +36,7 @@ add_subdirectory(recastnavigation)
 
 if(SERVERS)
   add_subdirectory(gsoap)
+  add_subdirectory(cwebsocket)
 endif()
 
 if(TOOLS)
