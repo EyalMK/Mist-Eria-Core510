@@ -1374,6 +1374,7 @@ public:
         {
             InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_7);
             go->m_invisibility.AddFlag(type);
+            go->m_invisibility.AddValue(INVISIBILITY_QUEST_7, 7);
         }
 
     };
