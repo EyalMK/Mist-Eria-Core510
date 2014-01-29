@@ -27,14 +27,13 @@ enum Spells
 	SPELL_TRAUMATIC_BLOW				= 123655,
 };
 
+enum Npcs
+{
+	NPC_XIN_TRIGGER			= 400462,
+};
+
 enum Actions
 {
-	ACTION_KUAI_THE_BRUTE_RESET,
-	ACTION_KUAI_THE_BRUTE_DIED,
-	ACTION_MING_THE_CUNNING_RESET,
-	ACTION_MING_THE_CUNNING_DIED,
-	ACTION_HAIYAN_THE_UNSTOPPABLE_RESET,
-	ACTION_HAIYAN_THE_UNSTOPPABLE_DIED,
 	ACTION_BOSS_ENTER_COMBAT,
 };
 
@@ -92,11 +91,13 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 		bool intro;
+		bool xinTrigger;
 
 		void Reset()
 		{
 			events.Reset();
 			intro = false;
+			xinTrigger = false;
 
 			if (instance)
 				instance->SetData(DATA_NPC_XIN_THE_WEAPONMASTER, NOT_STARTED);
@@ -116,14 +117,15 @@ public:
 
 			if (who && who->GetTypeId() == TYPEID_PLAYER && !intro && !me->IsValidAttackTarget(who) && who->isAlive())
 			{
-				events.SetPhase(PHASE_XIN_COMBAT);
-				events.ScheduleEvent(EVENT_INTRO_1, 2*IN_MILLISECONDS, 0, PHASE_XIN_COMBAT);
+				me->StopMoving();
 				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 				DoZoneInCombat();
 
 				if (instance)
 					instance->SetData(DATA_NPC_XIN_THE_WEAPONMASTER, IN_PROGRESS);
 
+				events.SetPhase(PHASE_XIN_COMBAT);
+				events.ScheduleEvent(EVENT_INTRO_1, 2*IN_MILLISECONDS, 0, PHASE_XIN_COMBAT);
 				intro = true;
 			}
 		}
@@ -140,6 +142,14 @@ public:
 		{
 			events.Update(diff);
 
+			if (!xinTrigger)
+				if (Creature* trigger = me->FindNearestCreature(NPC_XIN_TRIGGER, 1.0f))
+				{
+					me->Relocate(trigger->GetHomePosition());
+					me->SetFacingTo(0.0f);
+					xinTrigger = true;
+				}
+
 			while(uint32 eventId = events.ExecuteEvent())
 			{
 				switch(eventId)
@@ -148,7 +158,7 @@ public:
 					{
 						case EVENT_INTRO_1:
 							Talk(SAY_INTRO_1);
-							me->HandleEmoteCommand(EMOTE_STATE_ROAR);
+							me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
 
 							events.ScheduleEvent(EVENT_INTRO_2, 12*IN_MILLISECONDS);
 							events.CancelEvent(EVENT_INTRO_1);
@@ -162,6 +172,7 @@ public:
 							break;
 
 						case EVENT_JUMP_BACK:
+							me->SetSpeed(MOVE_WALK, 5.0f);
 							me->GetMotionMaster()->MoveJump(XinJumpPosition, 5.0f, 7.5f);
 
 							events.ScheduleEvent(EVENT_CHOOSE_BOSS, 3*IN_MILLISECONDS);
@@ -206,17 +217,12 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 
-		bool checkKuaiTheBruteAlive;
-		bool checkMingTheCunningAlive;
-        bool checkHaiyanTheUnstoppableAlive;
-
 		void Reset()
 		{
 			events.Reset();
-			checkKuaiTheBruteAlive = true;
-			checkMingTheCunningAlive = true;
-			checkHaiyanTheUnstoppableAlive = true;
 
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetReactState(REACT_PASSIVE);
 
 			events.SetPhase(PHASE_BOSS_WAITING);
@@ -229,6 +235,7 @@ public:
 				case ACTION_BOSS_ENTER_COMBAT:
 					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+					me->SetReactState(REACT_AGGRESSIVE);
 					me->SetInCombatWithZone();
 			}
 		}
@@ -256,6 +263,14 @@ public:
 				instance->SetData(DATA_KUAI_THE_BRUTE, FAIL);
 
 			ScriptedAI::EnterEvadeMode();
+
+			if (Creature* xin = me->GetCreature(*me, instance->GetData64(DATA_NPC_XIN_THE_WEAPONMASTER)))
+			{
+				xin->Kill(xin);
+				xin->RemoveCorpse();
+				xin->Relocate(xin->GetHomePosition());
+				xin->Respawn(true);
+			}
 		}
 
 		void DamageTaken(Unit* who, uint32& damage)
@@ -308,6 +323,7 @@ public:
 					}
 				}
 			}
+
 			DoMeleeAttackIfReady();
 		}
 	};
@@ -339,11 +355,15 @@ public:
 			events.Reset();
 			ravageVictim = NULL;
 
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetReactState(REACT_PASSIVE);
 		}
 
 		void EnterCombat(Unit* /*who*/)
 		{
+			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 			me->SetReactState(REACT_AGGRESSIVE);
 			events.ScheduleEvent(EVENT_RAVAGE, 30*IN_MILLISECONDS);
 		}
@@ -374,7 +394,7 @@ public:
 					{
 						case EVENT_LEAP:
 						{
-							ravageVictim = SelectTarget(SELECT_TARGET_RANDOM, 1, 500, true);
+							ravageVictim = SelectTarget(SELECT_TARGET_RANDOM);//1, 500, true);
 
 							if (ravageVictim)
 								me->CastSpell(ravageVictim, SPELL_LEAP);
@@ -397,6 +417,7 @@ public:
 					}
 				}
 			}
+
 			DoMeleeAttackIfReady();
 		}
 	};
