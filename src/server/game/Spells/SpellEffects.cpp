@@ -362,10 +362,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
     {
         bool apply_direct_bonus = true;
 
-        int32 minMainHandDmg = m_caster->GetFloatValue(UNIT_FIELD_MINDAMAGE);
-        int32 maxMainHandDmg = m_caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE);
-        int32 minOffHandDmg = m_caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE);
-        int32 maxOffHandDmg = m_caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE);
         int32 attackPower = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
 
         switch (m_spellInfo->SpellFamilyName)
@@ -524,6 +520,16 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         damage += damage / 6;
                 }
             }
+
+			switch (m_spellInfo->Id)
+			{
+				case 116858: // Chaos Bolt
+					damage += int32(m_caster->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_NORMAL, false) * 2.25f * (m_caster->ToPlayer()->GetRatingBonusValue(CR_CRIT_SPELL) / 100));
+					break;
+
+				default:
+					break;
+			}
             break;
         }
         case SPELLFAMILY_PRIEST:

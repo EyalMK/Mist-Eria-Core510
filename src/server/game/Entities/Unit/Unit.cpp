@@ -9681,6 +9681,10 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                                     return true;
                             break;
                         }
+					case SPELLFAMILY_WARLOCK:
+						if (spellProto->Id == 116858) // Chaos Bolt
+							return 100.0f;
+						break;
                     break;
                 }
             }
