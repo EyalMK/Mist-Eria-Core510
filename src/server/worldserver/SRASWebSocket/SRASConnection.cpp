@@ -12,22 +12,47 @@ SRASConnection::SRASConnection(int socket) : m_socket(socket)
     m_currentSendFrame.clear();
 }
 
+SRASConnection::~SRASConnection()
+{
+    sLog->outDebug(LOG_FILTER_SRAS, "Closing a connection");
+
+    shutdown(m_socket, SHUT_RDWR);
+
+    /*if(close(m_socket) < 0)
+        sLog->outDebug(LOG_FILTER_SRAS, "Erreur closing socket");*/
+}
+
 int SRASConnection::ReadyRead()
 {
-    char buffer[BUFFER_SIZE];
+    uint8 buffer[BUFFER_SIZE];
     handshake hs;
+    nullHandshake(&hs);
 
-    uint8 *frameBuffer;
-    uint64 dataSize;
+    uint8 *frameBuffer = NULL;
+    uint64 dataSize = 0;
 
-    int received = recv(m_socket, &buffer, BUFFER_SIZE, 0);
+    int received = recv(m_socket, buffer, BUFFER_SIZE-1, 0);
 
     if(received == -1)
+    {
+        if(errno == EAGAIN || errno == EWOULDBLOCK)
+            return 0;
+
+        sLog->outDebug(LOG_FILTER_SRAS, "SRAS reading error");
+        return -1;
+    }
+
+    if(received == 0)
         return -1;
 
-    m_currentReceivedFrame.append(&buffer, received);
+    if(received > 0)
+        m_currentReceivedFrame.append(buffer, received);
 
-    if(m_ws_state = WS_STATE_OPENING)
+    //buffer[received] = 0;
+
+    //sLog->outInfo(LOG_FILTER_SRAS, "SRAS Data : %s", (char*)buffer);
+
+    if(m_ws_state == WS_STATE_OPENING)
     {
         m_ws_frameType = wsParseHandshake(m_currentReceivedFrame.contents(), m_currentReceivedFrame.size(), &hs);
 
@@ -44,10 +69,13 @@ int SRASConnection::ReadyRead()
     {
         if(m_ws_state == WS_STATE_OPENING)
         {
+            sLog->outDebug(LOG_FILTER_SRAS, "Bad handshake request (dropping)");
             ByteBuffer buff;
-            buff << "HTTP/1.1 400 Bad Request\r\n";
-            //TODO : Send the packet
+            buff << "HTTP/1.1 400 Bad Request\r\n" << versionField << version << "\r\n";
+            send(m_socket, buff.contents(), buff.size(), 0);
         }
+        else
+            sLog->outDebug(LOG_FILTER_SRAS, "Frame error");
 
         return -1;
     }
@@ -60,16 +88,13 @@ int SRASConnection::ReadyRead()
 
     if(m_ws_state == WS_STATE_OPENING)
     {
-        if(m_ws_frameType = WS_OPENING_FRAME)
+        if(m_ws_frameType == WS_OPENING_FRAME)
         {
-            uint8 *outBuffer;
+            uint8 outBuffer[BUFFER_SIZE];
             uint64 outLenght;
-            wsGetHandshakeAnswer(&hs, outBuffer, &outLenght);
+            wsGetHandshakeAnswer(&hs, (uint8*)&outBuffer, &outLenght);
 
-            ByteBuffer outPacket;
-            outPacket.append(outBuffer, outLenght);
-
-            //TODO : Send the packet
+            send(m_socket, outBuffer, outLenght, 0);
 
             m_ws_state = WS_STATE_NORMAL;
         }
@@ -78,16 +103,20 @@ int SRASConnection::ReadyRead()
     if(m_ws_frameType == WS_CLOSING_FRAME)
     {
         if(m_ws_state == WS_STATE_CLOSING)
+        {
+            sLog->outDebug(LOG_FILTER_SRAS, "Closing the connection");
             return -1; //Acquittement du client
+        }
         else
         {
-            uint8 *outBuffer;
+            uint8 outBuffer[BUFFER_SIZE];
             uint64 outLenght;
-            wsMakeFrame(0, 0, outBuffer, &outLenght, WS_CLOSING_FRAME);
-            ByteBuffer outPacket;
-            outPacket.append(outBuffer, outLenght);
+            uint16 error = 1000;
+            wsMakeFrame((uint8*)&error, sizeof(uint16), (uint8*)&outBuffer, &outLenght, WS_CLOSING_FRAME);
 
-            //TODO : Send the packet
+            send(m_socket, outBuffer, outLenght, 0);
+
+            m_ws_state = WS_STATE_CLOSING;
 
             return -1;
         }
@@ -124,7 +153,7 @@ int SRASConnection::ReadySend()
             return -1; //...on renvoie une erreur
     }
 
-    if(sentByte == m_currentSendFrame.size()) //Si le message a ete correctement envoye, alors on est pret a en envoyer un autre
+    if(sentByte >= m_currentSendFrame.size()) //Si le message a ete correctement envoye, alors on est pret a en envoyer un autre
     {
         m_currentSendFrame.clear();
     }
@@ -136,8 +165,6 @@ int SRASConnection::ReadySend()
         m_currentSendFrame.clear();
         m_currentSendFrame.append(&frameBuffer, bufferSize);
     }
-    else //This should never happen (on a envoye plus d'octet que le message n'en contient)
-        return -1;
 
     return 0;
 }

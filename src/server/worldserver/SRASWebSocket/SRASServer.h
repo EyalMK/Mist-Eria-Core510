@@ -4,6 +4,7 @@
 #include "Common.h"
 #include "SRASConnection.h"
 #include <ace/Reactor.h>
+#include <vector>
 
 class SRASServer : public ACE_Based::Runnable
 {
@@ -14,7 +15,7 @@ public:
     void run();
 
     private:
-    std::map<int, SRASConnection*> m_openedConnection;
+    std::list<SRASConnection*> m_openedConnection;
 };
 
 #endif

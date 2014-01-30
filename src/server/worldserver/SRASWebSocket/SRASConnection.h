@@ -6,10 +6,13 @@ class SRASConnection
 {
 public:
     SRASConnection(int socket);
+    ~SRASConnection();
 
     int ReadyRead(); //Called when new data are available for reading
     int ReadySend();
     void SendPacket(ByteBuffer buffer);
+
+    int getSocket() {return m_socket;}
 
 private:
 
