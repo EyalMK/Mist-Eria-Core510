@@ -10689,6 +10689,10 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
 
     SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
 
+	if (Player* player = ToPlayer())
+		if (player->getRace() == RACE_WORGEN)
+			player->CastSpell(player, 97709, true); // Worgen form
+
     if (Creature* creature = ToCreature())
     {
         // Set home position at place of engaging combat for escorted creatures

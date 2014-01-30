@@ -95,8 +95,9 @@ class boss_amethyst_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
 
-				if (instance)
-					instance->SetData(DATA_THE_STONE_GUARD, NOT_STARTED);
+				cobalt = NULL;
+				jade = NULL;
+				jasper = NULL;
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -118,6 +119,11 @@ class boss_amethyst_guardian : public CreatureScript
 							jasper->SetInCombatWithZone();
 				}
             }
+
+			void EnterEvadeMode()
+			{
+				ScriptedAI::EnterEvadeMode();
+			}
 
             void JustDied(Unit* /*killer*/)
             {
@@ -175,8 +181,9 @@ class boss_cobalt_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
 
-				if (instance)
-					instance->SetData(DATA_THE_STONE_GUARD, NOT_STARTED);
+				amethyst = NULL;
+				jade = NULL;
+				jasper = NULL;
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -198,6 +205,11 @@ class boss_cobalt_guardian : public CreatureScript
 							jasper->SetInCombatWithZone();
 				}
             }
+
+			void EnterEvadeMode()
+			{
+				ScriptedAI::EnterEvadeMode();
+			}
 
             void JustDied(Unit* /*killer*/)
             {
@@ -255,8 +267,9 @@ class boss_jade_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
 
-				if (instance)
-					instance->SetData(DATA_THE_STONE_GUARD, NOT_STARTED);
+				amethyst = NULL;
+				cobalt = NULL;
+				jasper = NULL;
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -278,6 +291,11 @@ class boss_jade_guardian : public CreatureScript
 							jasper->SetInCombatWithZone();
 				}
             }
+
+			void EnterEvadeMode()
+			{
+				ScriptedAI::EnterEvadeMode();
+			}
 
             void JustDied(Unit* /*killer*/)
             {
@@ -335,8 +353,9 @@ class boss_jasper_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
 
-				if (instance)
-					instance->SetData(DATA_THE_STONE_GUARD, NOT_STARTED);
+				amethyst = NULL;
+				cobalt = NULL;
+				jade = NULL;
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -358,6 +377,11 @@ class boss_jasper_guardian : public CreatureScript
 							jade->SetInCombatWithZone();
 				}
             }
+			
+			void EnterEvadeMode()
+			{
+				ScriptedAI::EnterEvadeMode();
+			}
 
             void JustDied(Unit* /*killer*/)
             {
