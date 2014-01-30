@@ -82,7 +82,6 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/server/game/Entities
   ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Creature
   ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Corpse
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/AreaTrigger
   ${CMAKE_SOURCE_DIR}/src/server/game/Entities/DynamicObject
   ${CMAKE_SOURCE_DIR}/src/server/game/Entities/GameObject
   ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Item

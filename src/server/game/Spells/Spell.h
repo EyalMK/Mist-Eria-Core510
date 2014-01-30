@@ -342,7 +342,6 @@ class Spell
         void EffectRechargeManaGem(SpellEffIndex effIndex);
         void EffectGiveCurrency(SpellEffIndex effIndex);
         void EffectResurrectWithAura(SpellEffIndex effIndex);
-		void EffectCreateAreatrigger(SpellEffIndex effIndex);
 
         typedef std::set<Aura*> UsedSpellMods;
 
