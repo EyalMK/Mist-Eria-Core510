@@ -20,11 +20,15 @@ class boss_the_spirit_kings : public CreatureScript
     public:
         boss_the_spirit_kings() : CreatureScript("boss_the_spirit_kings") { }
 
-        struct boss_the_spirit_kingsAI : public BossAI
+        struct boss_the_spirit_kingsAI : public ScriptedAI
         {
-            boss_the_spirit_kingsAI(Creature* creature) : BossAI(creature, DATA_THE_SPIRIT_KINGS)
+            boss_the_spirit_kingsAI(Creature* creature) : ScriptedAI(creature)
             {
+				instance = creature->GetInstanceScript();
             }
+
+			InstanceScript* instance;
+			EventMap events;
 
             void Reset()
             {
@@ -70,5 +74,5 @@ class boss_the_spirit_kings : public CreatureScript
 
 void AddSC_boss_the_spirit_kings()
 {
-    new boss_the_spirit_kings();
+	new boss_the_spirit_kings();
 }
