@@ -15664,13 +15664,16 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 	}
 	else
 	{
-		if (uint32 itemId = quest->RewardPackageChoiceItemId[reward])
+		if (quest->GetRewChoiceItemsCount() > 0)
 		{
-			ItemPosCountVec dest;
-			if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, quest->RewardPackageChoiceItemCount[reward]) == EQUIP_ERR_OK)
+			if (uint32 itemId = quest->RewardPackageChoiceItemId[reward])
 			{
-				Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
-				SendNewItem(item, quest->RewardPackageChoiceItemCount[reward], true, false);
+				ItemPosCountVec dest;
+				if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, quest->RewardPackageChoiceItemCount[reward]) == EQUIP_ERR_OK)
+				{
+					Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
+					SendNewItem(item, quest->RewardPackageChoiceItemCount[reward], true, false);
+				}
 			}
 		}
 
