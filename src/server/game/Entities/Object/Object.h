@@ -56,7 +56,6 @@ enum TypeMask
     TYPEMASK_GAMEOBJECT     = 0x0020,
     TYPEMASK_DYNAMICOBJECT  = 0x0040,
     TYPEMASK_CORPSE         = 0x0080,
-	TYPEMASK_AREATRIGGER    = 0x0100,
     TYPEMASK_SEER           = TYPEMASK_UNIT | TYPEMASK_DYNAMICOBJECT
 };
 
@@ -69,11 +68,10 @@ enum TypeID
     TYPEID_PLAYER        = 4,
     TYPEID_GAMEOBJECT    = 5,
     TYPEID_DYNAMICOBJECT = 6,
-    TYPEID_CORPSE        = 7,
-	TYPEID_AREATRIGGER   = 8
+    TYPEID_CORPSE        = 7
 };
 
-#define NUM_CLIENT_OBJECT_TYPES             9
+#define NUM_CLIENT_OBJECT_TYPES             8
 
 uint32 GuidHigh2TypeId(uint32 guid_hi);
 
@@ -809,7 +807,6 @@ class WorldObject : public Object, public WorldLocation
         bool isInBack(WorldObject const* target, float arc = M_PI) const;
 
         bool IsInBetween(const WorldObject* obj1, const WorldObject* obj2, float size = 0) const;
-		bool IsInAxe(const WorldObject* obj1, const WorldObject* obj2, float size = 0) const;
 
         virtual void CleanupsBeforeDelete(bool finalCleanup = true);  // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
 
