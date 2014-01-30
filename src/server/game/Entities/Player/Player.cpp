@@ -1763,7 +1763,7 @@ void Player::Update(uint32 p_time)
         uint32 newzone, newarea;
         GetZoneAndAreaId(newzone, newarea);
 
-        UpdateZoneDependentAuras(newzone);
+        UpdateAreaDependentAuras(newarea);
         m_auraAreaUpdateTimer = 1000;
     }
     else m_auraAreaUpdateTimer -= p_time;
