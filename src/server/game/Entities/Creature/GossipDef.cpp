@@ -490,6 +490,11 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
 				data << uint32(quest->RewardPackageChoiceItemId[i]);
 				data << uint32(quest->RewardPackageChoiceItemCount[i]);
 			}
+			else
+			{
+				data << uint32(0);
+				data << uint32(0);
+			}
         }
     }
 
