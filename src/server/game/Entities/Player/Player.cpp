@@ -720,6 +720,7 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this), m_battlePetMg
 
     m_zoneUpdateId = 0;
     m_zoneUpdateTimer = 0;
+    m_auraAreaUpdateTimer = 0;
 
     m_areaUpdateId = 0;
 
@@ -1756,6 +1757,17 @@ void Player::Update(uint32 p_time)
         else
             m_zoneUpdateTimer -= p_time;
     }
+
+    if (m_auraAreaUpdateTimer <= p_time)
+    {
+        uint32 newzone, newarea;
+        GetZoneAndAreaId(newzone, newarea);
+
+        UpdateAreaDependentAuras(newarea);
+        m_auraAreaUpdateTimer = 1000;
+    }
+    else m_auraAreaUpdateTimer -= p_time;
+
 
     if (m_timeSyncTimer > 0)
     {

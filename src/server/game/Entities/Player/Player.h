@@ -3092,6 +3092,7 @@ public:
         uint32 m_zoneUpdateId;
         uint32 m_zoneUpdateTimer;
         uint32 m_areaUpdateId;
+        uint32 m_auraAreaUpdateTimer;
 
         uint32 m_deathTimer;
         time_t m_deathExpireTime;
