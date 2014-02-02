@@ -1,7 +1,7 @@
 /* # Script de Sungis : Mogu'shan Vaults # */
 
-#ifndef DEF_MOGUSHAN_VAULTS_H_
-#define DEF_MOGUSHAN_VAULTS_H_
+#ifndef DEF_MOGUSHAN_VAULTS_H
+#define DEF_MOGUSHAN_VAULTS_H
 
 enum Creatures
 {

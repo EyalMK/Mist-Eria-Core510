@@ -80,13 +80,11 @@ class boss_amethyst_guardian : public CreatureScript
 				events.Reset();
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
-				me->CastSpell(me, SPELL_ANIM_SIT);
             }
 
             void EnterCombat(Unit* /*who*/)
             {
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
-				me->RemoveAurasDueToSpell(SPELL_ANIM_SIT, me->GetGUID());
 				
 				if (instance)
 				{
@@ -109,11 +107,6 @@ class boss_amethyst_guardian : public CreatureScript
 			{
 				ScriptedAI::EnterEvadeMode();
 			}
-
-            void JustDied(Unit* /*killer*/)
-            {
-
-            }
 
             void UpdateAI(uint32 const diff)
             {
@@ -161,13 +154,11 @@ class boss_cobalt_guardian : public CreatureScript
 				events.Reset();
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
-				me->CastSpell(me, SPELL_ANIM_SIT);
             }
 
             void EnterCombat(Unit* /*who*/)
             {
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
-				me->RemoveAurasDueToSpell(SPELL_ANIM_SIT, me->GetGUID());
 				
 				if (instance)
 				{
@@ -190,11 +181,6 @@ class boss_cobalt_guardian : public CreatureScript
 			{
 				ScriptedAI::EnterEvadeMode();
 			}
-
-            void JustDied(Unit* /*killer*/)
-            {
-
-            }
 
             void UpdateAI(uint32 const diff)
             {
@@ -242,13 +228,11 @@ class boss_jade_guardian : public CreatureScript
 				events.Reset();
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
-				me->CastSpell(me, SPELL_ANIM_SIT);
             }
 
             void EnterCombat(Unit* /*who*/)
             {
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
-				me->RemoveAurasDueToSpell(SPELL_ANIM_SIT, me->GetGUID());
 				
 				if (instance)
 				{
@@ -271,11 +255,6 @@ class boss_jade_guardian : public CreatureScript
 			{
 				ScriptedAI::EnterEvadeMode();
 			}
-
-            void JustDied(Unit* /*killer*/)
-            {
-
-            }
 
             void UpdateAI(uint32 const diff)
             {
@@ -323,13 +302,11 @@ class boss_jasper_guardian : public CreatureScript
 				events.Reset();
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
-				me->CastSpell(me, SPELL_ANIM_SIT);
             }
 
             void EnterCombat(Unit* /*who*/)
             {
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
-				me->RemoveAurasDueToSpell(SPELL_ANIM_SIT, me->GetGUID());
 				
 				if (instance)
 				{
@@ -353,14 +330,9 @@ class boss_jasper_guardian : public CreatureScript
 				ScriptedAI::EnterEvadeMode();
 			}
 
-            void JustDied(Unit* /*killer*/)
-            {
-
-            }
-
             void UpdateAI(uint32 const diff)
             {
-                if (!UpdateVictim())
+                if	(!UpdateVictim())
 					return;
 
                 events.Update(diff);
