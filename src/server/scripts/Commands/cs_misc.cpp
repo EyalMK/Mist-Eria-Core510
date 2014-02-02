@@ -82,7 +82,7 @@ public:
         {
             { "dev",                SEC_ADMINISTRATOR,      false, &HandleDevCommand,                   "", NULL },
             { "gps",                SEC_ADMINISTRATOR,      false, &HandleGPSCommand,                   "", NULL },
-            { "aura",               SEC_ADMINISTRATOR,      false, &HandleAuraCommand,                  "", NULL },
+            { "aura",               SEC_ADMINISTRATOR,      false, NULL,                    "", auraCommandTable },
             { "unaura",             SEC_ADMINISTRATOR,      false, &HandleUnAuraCommand,                "", NULL },
             { "appear",             SEC_MODERATOR,          false, &HandleAppearCommand,                "", NULL },
             { "summon",             SEC_MODERATOR,          false, &HandleSummonCommand,                "", NULL },
@@ -312,10 +312,7 @@ public:
         uint32 spellId = handler->extractSpellIdFromLink((char*)args);
 
         if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
-		{
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "AURA COMMAND SUNGIS SPELLID %u", spellId);
             Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, target, target);
-		}
 
         return true;
     }

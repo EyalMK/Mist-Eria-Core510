@@ -350,7 +350,6 @@ Aura* Aura::TryRefreshStackOrCreate(SpellInfo const* spellproto, uint32 tryEffMa
         return NULL;
     if (Aura* foundAura = owner->ToUnit()->_TryStackingOrRefreshingExistingAura(spellproto, effMask, caster, baseAmount, castItem, casterGUID))
     {
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "_TryStackingOrRefreshingExistingAura SUNGIS baseAmount %u", baseAmount);
         // we've here aura, which script triggered removal after modding stack amount
         // check the state here, so we won't create new Aura object
         if (foundAura->IsRemoved())
@@ -407,10 +406,7 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint32 effMask, WorldObject* own
     {
         case TYPEID_UNIT:
         case TYPEID_PLAYER:
-			aura = new UnitAura(spellproto, effMask, owner, caster, baseAmount, castItem, casterGUID);
-            aura->GetUnitOwner()->_AddAura((UnitAura*)aura, caster);
-            aura->LoadScripts();
-            aura->_InitEffects(effMask, caster, baseAmount);
+            aura = new UnitAura(spellproto, effMask, owner, caster, baseAmount, castItem, casterGUID);
             break;
         case TYPEID_DYNAMICOBJECT:
             aura = new DynObjAura(spellproto, effMask, owner, caster, baseAmount, castItem, casterGUID);

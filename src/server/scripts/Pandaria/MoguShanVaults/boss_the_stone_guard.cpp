@@ -110,6 +110,11 @@ class boss_amethyst_guardian : public CreatureScript
 				ScriptedAI::EnterEvadeMode();
 			}
 
+            void JustDied(Unit* /*killer*/)
+            {
+
+            }
+
             void UpdateAI(uint32 const diff)
             {
                 if (!UpdateVictim())
@@ -185,6 +190,11 @@ class boss_cobalt_guardian : public CreatureScript
 			{
 				ScriptedAI::EnterEvadeMode();
 			}
+
+            void JustDied(Unit* /*killer*/)
+            {
+
+            }
 
             void UpdateAI(uint32 const diff)
             {
@@ -262,6 +272,11 @@ class boss_jade_guardian : public CreatureScript
 				ScriptedAI::EnterEvadeMode();
 			}
 
+            void JustDied(Unit* /*killer*/)
+            {
+
+            }
+
             void UpdateAI(uint32 const diff)
             {
                 if (!UpdateVictim())
@@ -337,6 +352,11 @@ class boss_jasper_guardian : public CreatureScript
 			{
 				ScriptedAI::EnterEvadeMode();
 			}
+
+            void JustDied(Unit* /*killer*/)
+            {
+
+            }
 
             void UpdateAI(uint32 const diff)
             {
