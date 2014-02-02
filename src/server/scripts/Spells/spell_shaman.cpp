@@ -1227,13 +1227,11 @@ public :
     }
 };
 
-/*struct HealthOrderPred {
-	bool operator()(WorldObject* f, WorldObject* s) {
-		if(f->ToUnit() && s->ToUnit()) {
-			return (f->ToUnit()->GetHealth()) < (s->ToUnit()->GetHealth());
-		}
-	}
-} healthPred ;
+bool SortByHp(WorldObject* first, WorldObject* second) {
+	Unit* f = first->ToUnit();
+	Unit* s = second->ToUnit();
+	return f->GetHealth() < s->GetHealth();
+}
 
 class spell_sha_healing_tide_totem_heal : public SpellScriptLoader{
 public :
@@ -1255,7 +1253,7 @@ public :
 
 
         void FilterTarget(std::list<WorldObject*>& targets){
-            std::sort(targets.begin(), targets.end(), healthPred);
+            targets.sort(SortByHp);
             bool once = false ;
 
             if(targets.size() > 5){
@@ -1277,7 +1275,7 @@ public :
     SpellScript* GetSpellScript() const{
         return new spell_sha_healing_tide_totem_heal_SpellScript();
     }
-};*/
+};
 
 class npc_earthgrab_totem : public CreatureScript{
 public :
