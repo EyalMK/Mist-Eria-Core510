@@ -1325,7 +1325,7 @@ public :
     }
 };
 
-class EarthgrabTotemTargetSelectorPredicate{
+/*class EarthgrabTotemTargetSelectorPredicate{
 public :
     EarthgrabTotemTargetSelectorPredicate(std::set<Unit*> exclude, bool root) : i_exclude(exclude), m_bRoot(root){}
 
@@ -1427,7 +1427,7 @@ public :
     SpellScript* GetSpellScript() const{
         return new spell_sha_earthbind_SpellScript() ;
     }
-};
+};*/
 
 /*class npc_totem_stone_bulwark : public CreatureScript{
 public :
@@ -1535,8 +1535,8 @@ void AddSC_shaman_spell_scripts()
 	new npc_totem_healing_tide();
 	// new spell_sha_healing_tide_totem_heal();
 	new npc_earthgrab_totem();
-	new spell_sha_earthgrab_totem();
-	new spell_sha_earthbind();
+	// new spell_sha_earthgrab_totem();
+	// new spell_sha_earthbind();
 	//new npc_totem_stone_bulwark();
 	//new spell_sha_stone_bulwark_periodic();
 }
