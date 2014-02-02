@@ -20,7 +20,7 @@
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_sha_".
  */
-
+#include <algorithm>
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "GridNotifiers.h"
@@ -1226,8 +1226,18 @@ public :
         return new npc_totem_healing_tide_AI(creature);
     }
 };
+bool SortByHp(WorldObject* first, WorldObject* second){
+	if(first && second){
+		Unit* f = first->ToUnit();
+		Unit* s = second->ToUnit();
 
-/*class spell_sha_healing_tide_totem_heal : public SpellScriptLoader{
+		if(f && s)
+			return f->GetHealth() < s->GetHealth();
+	}
+	return false ;
+}
+
+class spell_sha_healing_tide_totem_heal : public SpellScriptLoader{
 public :
     spell_sha_healing_tide_totem_heal() : SpellScriptLoader("pell_sha_healing_tide_totem_heal"){}
 
@@ -1245,19 +1255,9 @@ public :
             return true ;
         }
 
-        bool SortByHp(WorldObject* first, WorldObject* second){
-            if(first && second){
-                Unit* f = first->ToUnit();
-                Unit* s = second->ToUnit();
-
-                if(f && s)
-                    return f->GetHealth() < s->GetHealth();
-            }
-            return false ;
-        }
 
         void FilterTarget(std::list<WorldObject*>& targets){
-            targets.sort(targets.begin(), targets.end(), SortByHp);
+            std::sort(targets.begin(), targets.end(), SortByHp);
             bool once = false ;
 
             if(targets.size() > 5){
@@ -1279,7 +1279,7 @@ public :
     SpellScript* GetSpellScript() const{
         return new spell_sha_healing_tide_totem_heal_SpellScript();
     }
-};*/
+};
 
 class npc_earthgrab_totem : public CreatureScript{
 public :
