@@ -359,7 +359,8 @@ public :
                             ++ count ; // Prevents infinite loop
                             std::list<Unit*>::iterator iter = targets.begin() ; // Reset the iterator
                             if(iter != targets.end()){ // Check it
-                                target = *std::advance(iter, urand(0, targets.size())); // Get a random element in the list
+                                std::advance(iter, urand(0, targets.size())); // Get a random element in the list
+								target = *iter ;
                                 break ;
                             }
                         }
