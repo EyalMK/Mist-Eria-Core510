@@ -1200,7 +1200,7 @@ public :
 
     class npc_totem_healing_tide_AI : public ScriptedAI{
     public :
-        npc_totel_healing_tide_AI(Creature* creature) : ScriptedAI(creature){
+        npc_totem_healing_tide_AI(Creature* creature) : ScriptedAI(creature){
             m_uiPulseTimer = 2000 ;
             if(i_owner = me->GetOwner())
                 me->SetHealth(i_owner->CountPctFromMaxHealth(10));
@@ -1429,7 +1429,7 @@ public :
     }
 };
 
-class npc_totem_stone_bulwark : public CreatureScript{
+/*class npc_totem_stone_bulwark : public CreatureScript{
 public :
     npc_totem_stone_bulwark() : CreatureScript("npc_totem_stone_bulwark"){}
 
@@ -1505,7 +1505,7 @@ public :
     AuraScript* GetAuraScript() const{
         return new spell_sha_stone_bulwark_periodic_AuraScript();
     }
-};
+};*/
 
 void AddSC_shaman_spell_scripts()
 {

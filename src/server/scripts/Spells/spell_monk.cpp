@@ -262,11 +262,11 @@ public :
 
     bool operator()(Unit* unit){
         if(m_bHostile){
-            if(unit->IsFriendlyTo(caster))
+            if(unit->IsFriendlyTo(i_source))
                 return true ;
             return false ;
         } else {
-            if(unit->IsFriendlyTo(caster))
+            if(unit->IsFriendlyTo(i_source))
                 return false ;
             return true ;
         }
@@ -289,7 +289,7 @@ private :
     Unit* i_originalCaster ;
 };
 
-class spell_monk_chi_wave_bolts : public SpellScriptLoader{
+/*class spell_monk_chi_wave_bolts : public SpellScriptLoader{
 public :
     spell_monk_chi_wave_bolts() : SpellScriptLoader("spell_monk_chi_wave_bolts"){
 
@@ -315,7 +315,7 @@ public :
         /// If so, std::sort will consider the first unit is more important than the second, and sort the list according to health
         bool SortByHp(Unit* first, Unit* second){
             if(first && second)
-                return (first->GetHealth < second->GetHealth());
+                return (first->GetHealth() < second->GetHealth());
         }
 
         void HandleAfterHitPhase(){
@@ -333,7 +333,7 @@ public :
 
                     std::list<Unit*> targets ; // Stores all the potential targets
 
-                    /** Search system **/
+                    // Search system 
                     CellCoord pair(Trinity::ComputeCellCoord(unit->GetPositionX(), unit->GetPositionY()));
                     Cell cell(pair);
 
@@ -390,7 +390,7 @@ public :
             AfterHit += SpellHitFn(spell_monk_chi_wave_bolts_SpellScript::HandleAfterHitPhase);
         }
     };
-};
+};*/
 
 // Grapple Weapon - 117368
 class spell_monk_grapple_weapon : public SpellScriptLoader
