@@ -1226,15 +1226,13 @@ public :
         return new npc_totem_healing_tide_AI(creature);
     }
 };
-bool SortByHp(WorldObject* first, WorldObject* second){
-	if(first && second){
-		Unit* f = first->ToUnit();
-		Unit* s = second->ToUnit();
 
-		if(f && s)
-			return f->GetHealth() < s->GetHealth();
+struct HealthOrderPred {
+	bool operator()(WorldObject* f, WorldObject* s) {
+		if(f->ToUnit() && s->ToUnit()) {
+			return (f->ToUnit()->GetHealth()) < (s->ToUnit()->GetHealth())
+		}
 	}
-	return false ;
 }
 
 class spell_sha_healing_tide_totem_heal : public SpellScriptLoader{
@@ -1257,7 +1255,7 @@ public :
 
 
         void FilterTarget(std::list<WorldObject*>& targets){
-            std::sort(targets.begin(), targets.end(), SortByHp);
+            std::sort(targets.begin(), targets.end(), HealthOrderPred);
             bool once = false ;
 
             if(targets.size() > 5){
