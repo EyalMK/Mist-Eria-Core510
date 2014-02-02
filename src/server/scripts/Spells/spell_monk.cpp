@@ -3202,8 +3202,8 @@ void AddSC_monk_spell_scripts()
 {
 	new spell_monk_fists_of_fury_stun();
     new spell_monk_expel_harm();
-	new spell_monk_chi_wave();
-	new spell_monk_chi_wave_bolts();
+	// new spell_monk_chi_wave();
+	// new spell_monk_chi_wave_bolts();
     new spell_monk_grapple_weapon();
     new spell_monk_serpents_zeal();
     new spell_monk_dampen_harm();

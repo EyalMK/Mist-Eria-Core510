@@ -1537,6 +1537,6 @@ void AddSC_shaman_spell_scripts()
 	new npc_earthgrab_totem();
 	new spell_sha_earthgrab_totem();
 	new spell_sha_earthbind();
-	new npc_totem_stone_bulwark();
-	new spell_sha_stone_bulwark_periodic();
+	//new npc_totem_stone_bulwark();
+	//new spell_sha_stone_bulwark_periodic();
 }
