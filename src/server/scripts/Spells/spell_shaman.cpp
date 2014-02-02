@@ -1329,7 +1329,7 @@ class EarthgrabTotemTargetSelectorPredicate{
 public :
     EarthgrabTotemTargetSelectorPredicate(std::set<Unit*> exclude, bool root) : i_exclude(exclude), m_bRoot(root){}
 
-    bool operator()(Unit* unit){
+    bool operator()(WorldObject* unit){
         std::set<Unit*>::iterator iter = i_exclude.find(unit);
         if(iter != i_exclude.end())
         {
