@@ -1227,7 +1227,7 @@ public :
     }
 };
 
-class spell_sha_healing_tide_totem_heal : public SpellScriptLoader{
+/*class spell_sha_healing_tide_totem_heal : public SpellScriptLoader{
 public :
     spell_sha_healing_tide_totem_heal() : SpellScriptLoader("pell_sha_healing_tide_totem_heal"){}
 
@@ -1279,7 +1279,7 @@ public :
     SpellScript* GetSpellScript() const{
         return new spell_sha_healing_tide_totem_heal_SpellScript();
     }
-};
+};*/
 
 class npc_earthgrab_totem : public CreatureScript{
 public :
@@ -1533,7 +1533,7 @@ void AddSC_shaman_spell_scripts()
 	new spell_sha_earthquake_tick();
 	new spell_sha_earthquake();
 	new npc_totem_healing_tide();
-	new spell_sha_healing_tide_totem_heal();
+	// new spell_sha_healing_tide_totem_heal();
 	new npc_earthgrab_totem();
 	new spell_sha_earthgrab_totem();
 	new spell_sha_earthbind();
