@@ -1233,7 +1233,7 @@ struct HealthOrderPred {
 			return (f->ToUnit()->GetHealth()) < (s->ToUnit()->GetHealth());
 		}
 	}
-}
+} healthPred ;
 
 class spell_sha_healing_tide_totem_heal : public SpellScriptLoader{
 public :
@@ -1255,7 +1255,7 @@ public :
 
 
         void FilterTarget(std::list<WorldObject*>& targets){
-            std::sort(targets.begin(), targets.end(), HealthOrderPred);
+            std::sort(targets.begin(), targets.end(), healthPred);
             bool once = false ;
 
             if(targets.size() > 5){
