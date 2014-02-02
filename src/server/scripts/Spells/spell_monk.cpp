@@ -95,11 +95,14 @@ enum MonkSpells
     SPELL_MONK_GRAPPLE_WEAPON_TANK_UPGRADE      = 123232,
     SPELL_MONK_GRAPPLE_WEAPON_HEAL_UPGRADE      = 123234,
     SPELL_MONK_GLYPH_OF_BLACKOUT_KICK           = 132005,
-    SPELL_MONK_CHI_WAVE_HEAL                    = 132463,
-    SPELL_MONK_CHI_WAVE_DAMAGE                  = 132467,
-    SPELL_MONK_CHI_WAVE_HEALING_BOLT            = 132464,
-    SPELL_MONK_CHI_WAVE_TALENT_AURA             = 115098,
     SPELL_MONK_ITEM_PVP_GLOVES_BONUS            = 124489,
+	// Chi Wave Spells
+    SPELL_MONK_CHI_WAVE                         = 115098, // This is the spell the player casts
+    SPELL_MONK_CHI_WAVE_DAMAGE                  = 132467, // This is the spell that targets only ennemies
+    SPELL_MONK_CHI_WAVE_HEAL                    = 132463, // This is the spell that targets only allies
+    SPELL_MONK_CHI_WAVE_TARGET_SELECTOR         = 132466, // I don't understand the purpose of this spell, looks like a target selector, but I'm unable to be sure ; handle the selection in the script
+    SPELL_MONK_CHI_WAVE_UNKNOWN_SCRIPT_EFFECT   = 132464, // This one is used to know how many targets have been it since the first cast
+
 };
 
 enum Monkspec
@@ -183,203 +186,210 @@ class spell_monk_expel_harm : public SpellScriptLoader
         }
 };
 
-// Chi Wave (healing bolt) - 132464
-class spell_monk_chi_wave_healing_bolt : public SpellScriptLoader
-{
-    public:
-        spell_monk_chi_wave_healing_bolt() : SpellScriptLoader("spell_monk_chi_wave_healing_bolt") { }
+/// Script for the "basic spell", aka 115098, the spell that starts all the mechanism
+class spell_monk_chi_wave : public SpellScriptLoader{
+public :
+    spell_monk_chi_wave() : SpellScriptLoader("spell_monk_chi_wave") {}
 
-        class spell_monk_chi_wave_healing_bolt_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_monk_chi_wave_healing_bolt_SpellScript);
+    SpellScript* GetSpellScript() const{
+        return new spell_monk_chi_wave_SpellScript();
+    }
 
-            void HandleOnHit()
-            {
-                if (!GetOriginalCaster())
-                    return;
+    class spell_monk_chi_wave_SpellScript : public SpellScript{
+        PrepareSpellScript(spell_monk_chi_wave_SpellScript);
 
-                if (Player* _player = GetOriginalCaster()->ToPlayer())
-                    if (Unit* target = GetHitUnit())
-                        _player->CastSpell(target, SPELL_MONK_CHI_WAVE_HEAL, true);
-            }
+        bool Validate(const SpellInfo *spellInfo){
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Chi Wave: Validate");
+            if(sSpellMgr->GetSpellInfo(SPELL_MONK_CHI_WAVE)
+                    && sSpellMgr->GetSpellInfo(SPELL_MONK_CHI_WAVE_DAMAGE)
+                    && sSpellMgr->GetSpellInfo(SPELL_MONK_CHI_WAVE_HEAL)
+                    && sSpellMgr->GetSpellInfo(SPELL_MONK_CHI_WAVE_TARGET_SELECTOR)
+                    && sSpellMgr->GetSpellInfo(SPELL_MONK_CHI_WAVE_UNKNOWN_SCRIPT_EFFECT))
+                return true ;
 
-            void Register()
-            {
-                OnHit += SpellHitFn(spell_monk_chi_wave_healing_bolt_SpellScript::HandleOnHit);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_monk_chi_wave_healing_bolt_SpellScript();
+            return false ;
         }
+
+        bool Load(){
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Chi Wave: Load");
+            if(GetCaster() && (GetCaster()->GetTypeId() == TYPEID_PLAYER) && GetCaster()->getClass() == CLASS_MONK)
+                return true ;
+
+            return false ;
+        }
+
+        /// Prevents casting spell on self
+        SpellCastResult CheckCast(){
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Chi Wave: CheckCast");
+            if(Player* caster = GetCaster()->ToPlayer())
+                if(Unit* target = GetExplTargetUnit())
+                    if(target == caster)
+                        return SPELL_FAILED_BAD_TARGETS ;
+
+            return SPELL_CAST_OK ;
+        }
+
+        /// Handle the mechanism
+        /// First get the caster
+        /// Then, get the explicit target, the unit currently being selected by the caster
+        void HandleDummy(SpellEffIndex effectIndex){
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Chi Wave: HandleDummy");
+            if(Player* caster = GetCaster()->ToPlayer()){
+                if(Unit* target = GetExplTargetUnit()){
+                    if(target->IsFriendlyTo(caster))
+                        caster->CastSpell(target, SPELL_MONK_CHI_WAVE_HEAL, true);
+                    else
+                        caster->CastSpell(target, SPELL_MONK_CHI_WAVE_DAMAGE, true);
+
+                    caster->CastSpell(target, SPELL_MONK_CHI_WAVE_UNKNOWN_SCRIPT_EFFECT, true);
+                    caster->CastSpell(caster, SPELL_MONK_CHI_WAVE_UNKNOWN_SCRIPT_EFFECT, true);
+                    if(Aura* counter = caster->GetAura(SPELL_MONK_CHI_WAVE_UNKNOWN_SCRIPT_EFFECT))
+                        if(AuraEffect* countEffect = counter->GetEffect(1))
+                            countEffect->SetAmount(1);
+                }
+            }
+        }
+
+        void Register(){
+            OnEffectHit += SpellEffectFn(spell_monk_chi_wave_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
 };
 
-// Chi Wave (damage) - 132467 and Chi Wave (heal) - 132463
-/*
-class spell_monk_chi_wave_bolt : public SpellScriptLoader
-{
-    public:
-        spell_monk_chi_wave_bolt() : SpellScriptLoader("spell_monk_chi_wave_bolt") { }
+class HostileCheckPredicate{
+public :
+    HostileCheckPredicate(Unit* caster, bool hostile) : i_source(caster), m_bHostile(hostile) {}
 
-        class spell_monk_chi_wave_bolt_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_monk_chi_wave_bolt_SpellScript);
+    bool operator()(Unit* unit){
+        if(m_bHostile){
+            if(unit->IsFriendlyTo(caster))
+                return true ;
+            return false ;
+        } else {
+            if(unit->IsFriendlyTo(caster))
+                return false ;
+            return true ;
+        }
+    }
 
-            void HandleOnHit()
-            {
-                if (!GetOriginalCaster())
-                    return;
+private :
+    Unit* i_source ;
+    bool m_bHostile ;
+};
 
-                if (Unit* _player = GetOriginalCaster()->ToPlayer())
-                {
-                    if (Unit* target = GetHitUnit())
-                    {
-                        uint8 count = 0;
-                        std::list<Unit*> targetList;
-                        std::vector<uint64> validTargets;
+class NotCasterSelectorPredicate{
+public :
+    NotCasterSelectorPredicate(Unit* oCaster) : i_originalCaster(oCaster) {}
 
-                        if (AuraEffect const* chiWave = _player->GetAuraEffect(SPELL_MONK_CHI_WAVE_TALENT_AURA, EFFECT_1))
-                        {
-                            count = chiWave->GetAmount();
+    bool operator()(Unit* unit){
+        return unit == i_originalCaster ;
+    }
 
-                            if (count >= 7)
-                            {
-                                _player->RemoveAura(SPELL_MONK_CHI_WAVE_TALENT_AURA);
-                                return;
-                            }
+private :
+    Unit* i_originalCaster ;
+};
 
-                            count++;
-                            chiWave->SetAmount(count);
-                        }
-                        else
-                            return;
+class spell_monk_chi_wave_bolts : public SpellScriptLoader{
+public :
+    spell_monk_chi_wave_bolts() : SpellScriptLoader("spell_monk_chi_wave_bolts"){
 
-                        CellCoord p(Trinity::ComputeCellCoord(target->GetPositionX(), target->GetPositionY()));
-                        Cell cell(p);
-                        cell.SetNoCreate();
+    }
 
-                        Trinity::AnyUnitInObjectRangeCheck u_check(_player, 20.0f);
-                        Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(_player, targetList, u_check);
+    SpellScript* GetSpellScript() const{
+        return new spell_monk_chi_wave_bolts_SpellScript() ;
+    }
 
-                        TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck>, WorldTypeMapContainer> world_unit_searcher(searcher);
-                        TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck>, GridTypeMapContainer>  grid_unit_searcher(searcher);
+    class spell_monk_chi_wave_bolts_SpellScript : public SpellScript{
+		PrepareSpellScript(spell_monk_chi_wave_bolts_SpellScript)
+	
+        bool Validate(const SpellInfo *spellInfo){
+            return true ;
+        }
 
-                        cell.Visit(p, world_unit_searcher, *_player->GetMap(), *_player, 20.0f);
-                        cell.Visit(p, grid_unit_searcher, *_player->GetMap(), *_player, 20.0f);
+        bool Load(){
+            return true ;
+        }
 
-                        for (auto itr : targetList)
-                        {
-                            if (!itr->IsWithinLOSInMap(_player))
-                                continue;
+        /// Basic function to be used with std::sort to sort the unit list if we have to deal with non hostile target
+        /// It compares two unit's health and return true if the first one has lower hp than the second one
+        /// If so, std::sort will consider the first unit is more important than the second, and sort the list according to health
+        bool SortByHp(Unit* first, Unit* second){
+            if(first && second)
+                return (first->GetHealth < second->GetHealth());
+        }
 
-                            if (itr == target)
-                                continue;
+        void HandleAfterHitPhase(){
+            Unit * target = NULL ;
+            uint8 count = 100 ; // Prevents infinite loop
 
-                            validTargets.push_back(itr->GetGUID());
-                        }
+            // Get the original caster : it is the player
+            if(Player* originalCaster = GetOriginalCaster()->ToPlayer()){
+                // Now get the unit hit by the spell
+                if(Unit* unit = GetHitUnit()){
+                    /// We determine if the unit hit is hostile or not to the original caster
+                    /// If it is, then we have to find an hostile creature to the original caster
+                    /// Else, we have to find a friendly unit
+                    bool hostile = unit->IsFriendlyTo(originalCaster);
 
-                        if (validTargets.empty())
-                        {
-                            _player->RemoveAurasDueToSpell(SPELL_MONK_CHI_WAVE_TALENT_AURA);
-                            return;
-                        }
+                    std::list<Unit*> targets ; // Stores all the potential targets
 
-                        std::random_shuffle(validTargets.begin(), validTargets.end());
+                    /** Search system **/
+                    CellCoord pair(Trinity::ComputeCellCoord(unit->GetPositionX(), unit->GetPositionY()));
+                    Cell cell(pair);
 
-                        if (Unit* newTarget = sObjectAccessor->FindUnit(validTargets.front()))
-                        {
-                            if (_player->IsValidAttackTarget(newTarget))
-                                target->CastSpell(newTarget, SPELL_MONK_CHI_WAVE_DAMAGE, true, NULL, NULLAURA_EFFECT, _player->GetGUID());
-                            else
-                            {
-                                std::list<Unit*> alliesList;
+                    Trinity::AnyUnitInObjectRangeCheck check(originalCaster, 25.0f);
+                    Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> > searcher(originalCaster, targets, check);
+                    TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck>, WorldTypeMapContainer> visitor(searcher);
 
-                                for (auto itr : validTargets)
-                                {
-                                    if (_player->IsValidAttackTarget(sObjectAccessor->FindUnit(itr)))
-                                        continue;
+                    cell.Visit(pair, visitor, *(originalCaster->GetMap()), *originalCaster, 25.0f);
 
-                                    alliesList.push_back(sObjectAccessor->FindUnit(itr));
-                                }
+                    /// Now we have to get a valid target
+                    /// Remove all the targets that do not fit the requirements == hotile / not hostile, unit with the preventing aura present, and of course the original caster
+                    targets.remove_if(HostileCheckPredicate(originalCaster, hostile));
+                    targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_MONK_CHI_WAVE_UNKNOWN_SCRIPT_EFFECT));
+                    targets.remove_if(NotCasterSelectorPredicate(originalCaster));
 
-                                if (alliesList.empty())
-                                    return;
-
-                                alliesList.sort(Trinity::HealthPctOrderPred());
-
-                                target->CastSpell(alliesList.front(), SPELL_MONK_CHI_WAVE_HEALING_BOLT, true, NULL, NULLAURA_EFFECT, _player->GetGUID());
+                    /// If the hit unit is not hostile to the original caster, we have to find the ally with the lowest hp
+                    if(!hostile){
+                        targets.sort(targets.begin(), targets.end(), SortByHp); // Sort targets
+                        target = *targets.begin(); // And get the first one == the one with the lowest hp
+                    } else {
+                        while(!target && count < 10){
+                            ++ count ; // Prevents infinite loop
+                            std::list<Unit*>::iterator iter = targets.begin() ; // Reset the iterator
+                            if(iter != targets.end()){ // Check it
+                                target = *std::advance(iter, urand(0, targets.size())); // Get a random element in the list
+                                break ;
                             }
                         }
                     }
-                }
-            }
 
-            void Register()
-            {
-                OnHit += SpellHitFn(spell_monk_chi_wave_bolt_SpellScript::HandleOnHit);
-            }
-        };
+                    if(target){ // pointer check
+                        if(Aura* aura = originalCaster->GetAura(SPELL_MONK_CHI_WAVE_UNKNOWN_SCRIPT_EFFECT)){ // If the caster no longer has the aura, it means we have to stop here
+                            if(AuraEffect* auraEff = aura->GetEffect(1)){ // Get the effect
+                                if(auraEff->GetAmount() < 7){ // Check the amount ; if lower than 7, then we can still cast the spell
+                                    originalCaster->CastSpell(target, hostile ? SPELL_MONK_CHI_WAVE_DAMAGE : SPELL_MONK_CHI_WAVE_HEAL, true); // So let's cast it
+									originalCaster->CastSpell(target, SPELL_MONK_CHI_WAVE_UNKNOWN_SCRIPT_EFFECT, true);
+                                    auraEff->SetAmount(auraEff->GetAmount() + 1); // Set the amount for the next
+                                } else originalCaster->RemoveAura(SPELL_MONK_CHI_WAVE_UNKNOWN_SCRIPT_EFFECT); // And if upper than 7, remove the aura to end the script
+                            }
+                        }
 
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_monk_chi_wave_bolt_SpellScript();
-        }
-};
-*/
-
-// Chi Wave (talent) - 115098
-class spell_monk_chi_wave : public SpellScriptLoader
-{
-    public:
-        spell_monk_chi_wave() : SpellScriptLoader("spell_monk_chi_wave") { }
-
-        class spell_monk_chi_wave_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_monk_chi_wave_SpellScript);
-
-            uint64 targetGUID;
-            bool done;
-
-            bool Load()
-            {
-                targetGUID = 0;
-                done = false;
-                return true;
-            }
-
-            void HandleDummy(SpellEffIndex effIndex)
-            {
-                if (Unit* target = GetHitUnit())
-                    targetGUID = target->GetGUID();
-            }
-
-            void HandleApplyAura()
-            {
-                if (!targetGUID || done)
-                    return;
-
-                if (Player* _player = GetCaster()->ToPlayer())
-                {
-                    if (Unit* target = sObjectAccessor->FindUnit(targetGUID))
-                    {
-                        _player->CastSpell(target, _player->IsValidAttackTarget(target) ? SPELL_MONK_CHI_WAVE_DAMAGE : SPELL_MONK_CHI_WAVE_HEALING_BOLT, true);
-                        done = true;
+                        return ; /// Prevents continuing
                     }
+
+                    /// If there is no target, then it means that all the targets were sorted so the script is ended
+                    /// Now, remove the aura on the original caster
+                    if(Aura* aura = originalCaster->GetAura(SPELL_MONK_CHI_WAVE_UNKNOWN_SCRIPT_EFFECT))
+                        originalCaster->RemoveAura(SPELL_MONK_CHI_WAVE_UNKNOWN_SCRIPT_EFFECT);
                 }
             }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_monk_chi_wave_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-                AfterHit += SpellHitFn(spell_monk_chi_wave_SpellScript::HandleApplyAura);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_monk_chi_wave_SpellScript();
         }
+
+        void Register(){
+            AfterHit += SpellHitFn(spell_monk_chi_wave_bolts_SpellScript::HandleAfterHitPhase);
+        }
+    };
 };
 
 // Grapple Weapon - 117368
@@ -3192,9 +3202,8 @@ void AddSC_monk_spell_scripts()
 {
 	new spell_monk_fists_of_fury_stun();
     new spell_monk_expel_harm();
-    new spell_monk_chi_wave_healing_bolt();
-    //new spell_monk_chi_wave_bolt();
-    new spell_monk_chi_wave();
+	new spell_monk_chi_wave();
+	new spell_monk_chi_wave_bolts();
     new spell_monk_grapple_weapon();
     new spell_monk_serpents_zeal();
     new spell_monk_dampen_harm();
