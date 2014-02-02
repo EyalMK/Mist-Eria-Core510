@@ -1230,7 +1230,7 @@ public :
 struct HealthOrderPred {
 	bool operator()(WorldObject* f, WorldObject* s) {
 		if(f->ToUnit() && s->ToUnit()) {
-			return (f->ToUnit()->GetHealth()) < (s->ToUnit()->GetHealth())
+			return (f->ToUnit()->GetHealth()) < (s->ToUnit()->GetHealth());
 		}
 	}
 }
