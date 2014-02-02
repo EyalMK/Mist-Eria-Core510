@@ -1488,9 +1488,8 @@ public :
             if(Unit* owner = GetOwner()->ToUnit()){
                 if(Player* i_owner = owner->ToPlayer()){
                     int32 amount = 0 ;
-                    amount += std::max(std::max(i_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.625f * 0.7f, float(i_owner->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_ALL, false))),
-                                                i_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.625f * 0.7f,
-                                                float(i_owner->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_ALL, false) * 0.7f)) ;
+                    amount += std::max(i_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.625f * 0.7f,
+                                       float(i_owner->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_ALL, false) * 0.7f)) ;
                     i_owner->CastCustomSpell(i_owner, SPELL_SHA_STONE_BULWARK_TOTEM_SHIELD, &amount, NULL, NULL, true);
                 }
             }
