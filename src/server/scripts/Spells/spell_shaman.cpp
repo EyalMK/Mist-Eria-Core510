@@ -1325,12 +1325,12 @@ public :
     }
 };
 
-/*class EarthgrabTotemTargetSelectorPredicate{
+class EarthgrabTotemTargetSelectorPredicate{
 public :
     EarthgrabTotemTargetSelectorPredicate(std::set<Unit*> exclude, bool root) : i_exclude(exclude), m_bRoot(root){}
 
     bool operator()(WorldObject* unit){
-        std::set<Unit*>::iterator iter = i_exclude.find(unit);
+        std::set<Unit*>::iterator iter = i_exclude.find(unit->ToUnit());
         if(iter != i_exclude.end())
         {
             return m_bRoot ? true : false ;
@@ -1427,9 +1427,9 @@ public :
     SpellScript* GetSpellScript() const{
         return new spell_sha_earthbind_SpellScript() ;
     }
-};*/
+};
 
-/*class npc_totem_stone_bulwark : public CreatureScript{
+class npc_totem_stone_bulwark : public CreatureScript{
 public :
     npc_totem_stone_bulwark() : CreatureScript("npc_totem_stone_bulwark"){}
 
@@ -1442,10 +1442,10 @@ public :
 
         void Reset(){
             if(i_owner){
-                uint32 amount = 0 ;
-                amount += std::max(std::max(i_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.625f * 0.7f, i_owner->GetTotalSpellPowerValue(0, false)),
+                int32 amount = 0 ;
+                amount += std::max(std::max(i_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.625f * 0.7f, i_owner->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_ALL, false)),
                                             i_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.625f * 0.7f,
-                                            i_owner->GetTotalSpellPowerValue(0, false) * 0.7f) ;
+                                            i_owner->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_ALL, false) * 0.7f) ;
                 amount *= 3 ;
                 me->CastCustomSpell(i_owner, SPELL_SHA_STONE_BULWARK_TOTEM_SHIELD, &amount, NULL, NULL, true);
             }
@@ -1489,9 +1489,9 @@ public :
             if(Unit* owner = GetOwner()){
                 if(Player* i_owner = owner->ToPlayer()){
                     uint32 amount = 0 ;
-                    amount += std::max(std::max(i_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.625f * 0.7f, i_owner->GetTotalSpellPowerValue(0, false)),
+                    amount += std::max(std::max(i_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.625f * 0.7f, i_owner->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_ALL, false)),
                                                 i_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.625f * 0.7f,
-                                                i_owner->GetTotalSpellPowerValue(0, false) * 0.7f) ;
+                                                i_owner->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_ALL false) * 0.7f) ;
                     i_owner->CastCustomSpell(i_owner, SPELL_SHA_STONE_BULWARK_TOTEM_SHIELD, &amount, NULL, NULL, true);
                 }
             }
@@ -1505,7 +1505,7 @@ public :
     AuraScript* GetAuraScript() const{
         return new spell_sha_stone_bulwark_periodic_AuraScript();
     }
-};*/
+};
 
 void AddSC_shaman_spell_scripts()
 {
