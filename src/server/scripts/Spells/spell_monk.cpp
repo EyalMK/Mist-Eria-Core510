@@ -289,7 +289,12 @@ private :
     Unit* i_originalCaster ;
 };
 
-/*class spell_monk_chi_wave_bolts : public SpellScriptLoader{
+bool SortByHp(Unit* first, Unit* second){
+	if(first && second)
+		return (first->GetHealth() < second->GetHealth());
+}
+
+class spell_monk_chi_wave_bolts : public SpellScriptLoader{
 public :
     spell_monk_chi_wave_bolts() : SpellScriptLoader("spell_monk_chi_wave_bolts"){
 
@@ -313,10 +318,6 @@ public :
         /// Basic function to be used with std::sort to sort the unit list if we have to deal with non hostile target
         /// It compares two unit's health and return true if the first one has lower hp than the second one
         /// If so, std::sort will consider the first unit is more important than the second, and sort the list according to health
-        bool SortByHp(Unit* first, Unit* second){
-            if(first && second)
-                return (first->GetHealth() < second->GetHealth());
-        }
 
         void HandleAfterHitPhase(){
             Unit * target = NULL ;
@@ -351,7 +352,7 @@ public :
 
                     /// If the hit unit is not hostile to the original caster, we have to find the ally with the lowest hp
                     if(!hostile){
-                        targets.sort(targets.begin(), targets.end(), SortByHp); // Sort targets
+                        targets.sort(SortByHp); // Sort targets
                         target = *targets.begin(); // And get the first one == the one with the lowest hp
                     } else {
                         while(!target && count < 10){
