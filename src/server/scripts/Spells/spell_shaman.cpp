@@ -1527,10 +1527,10 @@ void AddSC_shaman_spell_scripts()
 	new spell_sha_earthquake_tick();
 	new spell_sha_earthquake();
 	new npc_totem_healing_tide();
-	// new spell_sha_healing_tide_totem_heal();
+	new spell_sha_healing_tide_totem_heal();
 	new npc_earthgrab_totem();
-	// new spell_sha_earthgrab_totem();
-	// new spell_sha_earthbind();
-	//new npc_totem_stone_bulwark();
-	//new spell_sha_stone_bulwark_periodic();
+	new spell_sha_earthgrab_totem();
+	new spell_sha_earthbind();
+	new npc_totem_stone_bulwark();
+	new spell_sha_stone_bulwark_periodic();
 }
