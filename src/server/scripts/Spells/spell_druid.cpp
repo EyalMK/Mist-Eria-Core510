@@ -71,7 +71,8 @@ enum DruidSpells
     SPELL_DRUID_SOUL_OF_THE_FOREST_HASTE    = 114108,
 	
 	SPELL_DRUID_FRENZIED_REGENERAION        = 22842,
-    SPELL_DRUID_FRENZIED_REGENERATION_HEAL  = 122307
+    SPELL_DRUID_FRENZIED_REGENERATION_HEAL  = 122307,
+	SPELL_DRUID_ASTRAL_COMMUNION            = 127663,
 };
 
 // Mangle - 33917
@@ -2245,6 +2246,116 @@ public :
     }
 };
 
+class spell_dru_astral_communion : public SpellScriptLoader{
+public :
+    spell_dru_astral_communion() : SpellScriptLoader("spell_dru_astral_communion") {}
+
+    class spell_dru_astral_communion_AuraScript : public AuraScript{
+        PrepareAuraScript(spell_dru_astral_communion_AuraScript);
+
+        bool Validate(const SpellInfo *spellInfo){
+            if(!sSpellMgr->GetSpellInfo(SPELL_DRUID_ASTRAL_COMMUNION))
+                return false ;
+
+            return true ;
+        }
+
+        bool Load(){
+            if(GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER)
+                return true ;
+            return false ;
+        }
+
+        void ModEclipsePower(int32 val)
+        {
+            Player* caster = GetCaster()->ToPlayer();
+
+            if(!caster)
+                return;
+
+            //If the player has just logged in
+            if(!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER) && !caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
+            {
+                caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE_MARKER, true);
+                if (caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE))
+                    caster->RemoveAurasDueToSpell(SPELL_DRUID_LUNAR_ECLIPSE);
+                if (caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE))
+                    caster->RemoveAurasDueToSpell(SPELL_DRUID_SOLAR_ECLIPSE);
+            }
+
+            // Prevent eclipse to got in the wrong direction
+            if(caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER) && val < 0)
+                return;
+            if(caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER) && val > 0)
+                return;
+
+            caster->CastCustomSpell(caster, SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE, &val, 0, 0, true);
+            int32 eclipse = caster->GetPower(POWER_ECLIPSE);
+
+            //Removing eclipses auras when passing 0
+            if (eclipse >= 0)
+            {
+                if (caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE))
+                {
+                    caster->RemoveAurasDueToSpell(SPELL_DRUID_LUNAR_ECLIPSE);
+                    if(caster->HasAura(SPELL_DRUID_SOUL_OF_THE_FOREST))
+                        ModEclipsePower(20);
+                }
+            }
+            if (eclipse <= 0)
+            {
+                if (caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE))
+                {
+                    caster->RemoveAurasDueToSpell(SPELL_DRUID_SOLAR_ECLIPSE);
+                    if(caster->HasAura(SPELL_DRUID_SOUL_OF_THE_FOREST))
+                        ModEclipsePower(-20);
+                }
+            }
+
+            //Check if player has reached an eclipse
+            if (eclipse >= 100)
+            {
+                if (caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
+                    caster->RemoveAurasDueToSpell(SPELL_DRUID_SOLAR_ECLIPSE_MARKER);
+                caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE, true);
+                caster->CastSpell(caster, SPELL_DRUID_LUNAR_ECLIPSE_MARKER, true);
+            }
+            if (eclipse <= -100)
+            {
+                if (caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
+                    caster->RemoveAurasDueToSpell(SPELL_DRUID_LUNAR_ECLIPSE_MARKER);
+                caster->CastSpell(caster, SPELL_DRUID_LUNAR_ECLIPSE, true);
+                caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE_MARKER, true);
+            }
+
+        };
+
+        void HandlePeriodicDummyTick(AuraEffect const* auraEffect){
+            if(Unit* caster = GetCaster()){
+                if(Player* player = caster->ToPlayer()){
+                    if(player->GetPower(POWER_ECLIPSE) > 0)
+                        ModEclipsePower(25);
+                    else if(player->GetPower(POWER_ECLIPSE) < 0)
+                        ModEclipsePower(-25);
+                    else if(player->GetPower(POWER_ECLIPSE) == 0){
+                        if(caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
+                            ModEclipsePower(-25);
+                        else
+                            ModEclipsePower(25);
+                    }
+                }
+            }
+        }
+
+        void Register(){
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_dru_astral_communion_AuraScript::HandlePeriodicDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const{
+        return new spell_dru_astral_communion_AuraScript();
+    }
+};
 
 void AddSC_druid_spell_scripts()
 {
@@ -2290,4 +2401,5 @@ void AddSC_druid_spell_scripts()
 	*/
 	new spell_dru_soul_of_the_forest();
     new spell_dru_frenzied_regeneration();
+	new spell_dru_astral_communion();
 }
