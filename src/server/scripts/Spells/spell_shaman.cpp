@@ -1227,7 +1227,7 @@ public :
     }
 };
 
-struct HealthOrderPred {
+/*struct HealthOrderPred {
 	bool operator()(WorldObject* f, WorldObject* s) {
 		if(f->ToUnit() && s->ToUnit()) {
 			return (f->ToUnit()->GetHealth()) < (s->ToUnit()->GetHealth());
@@ -1277,7 +1277,7 @@ public :
     SpellScript* GetSpellScript() const{
         return new spell_sha_healing_tide_totem_heal_SpellScript();
     }
-};
+};*/
 
 class npc_earthgrab_totem : public CreatureScript{
 public :
