@@ -39,7 +39,6 @@ enum Spells
     SPELL_SOLID_STONE					= 115745,
 	SPELL_STONE_VISUAL					= 123947,
     SPELL_REND_FLESH					= 125206,
-    SPELL_ANIM_SIT						= 128886,
     SPELL_ZERO_ENERGY					= 72242,
     SPELL_TOTALY_PETRIFIED				= 115877,
 	SPELL_BERSERK						= 26662,
@@ -47,12 +46,27 @@ enum Spells
 
 enum Events
 {
+	/* Shared Guardian Events */
+	EVENT_REND_FLESH				= 1,
+	EVENT_PETRIFICATION_FIRST		= 2,
+	EVENT_PETRIFICATION_SET			= 3,
+	EVENT_PETRIFICATION_INCREASE_1	= 4,
+	EVENT_PETRIFICATION_INCREASE_2	= 5,
+	EVENT_PETRIFICATION_INCREASE_3	= 6,
 
+	/* The Stone Guard Tracker */
+	EVENT_CHOOSE_PETRIFICATION		= 1,
 };
 
-enum Phases
+enum Actions
 {
+	ACTION_CHOOSE_PETRIFICATION,
+	ACTION_PETRIFICATION_BAR,
+};
 
+enum Npcs
+{
+	NPC_THE_STONE_GUARD_TRACKER		= 400463,
 };
 
 class boss_amethyst_guardian : public CreatureScript
@@ -74,29 +88,44 @@ class boss_amethyst_guardian : public CreatureScript
 
 			InstanceScript* instance;
 			EventMap events;
+			Map* map;
+			bool solidStone;
 
             void Reset()
             {
 				events.Reset();
+				solidStone = false;
+				map = me->GetMap();
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
+				me->SetPower(POWER_ENERGY, 0);
             }
+
+			void DoAction(int32 action)
+			{
+				switch (action)
+				{
+					case ACTION_PETRIFICATION_BAR:
+						events.ScheduleEvent(EVENT_PETRIFICATION_SET, 0);
+						break;
+				}
+			}
 
             void EnterCombat(Unit* /*who*/)
             {
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
 				
+				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_PETRIFICATION_FIRST, 6*IN_MILLISECONDS);
+
 				if (instance)
 				{
 					if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
-						if (!cobalt->isInCombat())
-							cobalt->SetInCombatWithZone();
+						cobalt->SetInCombatWithZone();
 					if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
-						if (!jade->isInCombat())
-							jade->SetInCombatWithZone();
+						jade->SetInCombatWithZone();
 					if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
-						if (!jasper->isInCombat())
-							jasper->SetInCombatWithZone();
+						jasper->SetInCombatWithZone();
 
 					if (!me->isInCombat())
 						me->SetInCombatWithZone();
@@ -108,6 +137,23 @@ class boss_amethyst_guardian : public CreatureScript
 				ScriptedAI::EnterEvadeMode();
 			}
 
+			void DamageTaken(Unit* who, uint32& damage)
+			{
+				if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
+					if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
+						if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
+						{
+							if (cobalt->isAlive())
+								cobalt->SetHealth(cobalt->GetHealth() - damage);
+
+							if (jade->isAlive())
+								jade->SetHealth(jade->GetHealth() - damage);
+
+							if (jasper->isAlive())
+								jasper->SetHealth(jasper->GetHealth() - damage);
+						}
+			}
+
             void UpdateAI(uint32 const diff)
             {
                 if (!UpdateVictim())
@@ -115,15 +161,134 @@ class boss_amethyst_guardian : public CreatureScript
 
                 events.Update(diff);
                 
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        default:
-                            break;
-                    }
-                }
-                
+				if (instance)
+				{
+					if (!solidStone)
+						if (!me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 10.0f, true) &&
+							!me->FindNearestCreature(BOSS_JADE_GUARDIAN, 10.0f, true) &&
+							!me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 10.0f, true))
+						{
+							me->CastSpell(me, SPELL_SOLID_STONE);
+							solidStone = true;
+						}
+				
+					if (solidStone)
+						if (me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 10.0f, true) ||
+							me->FindNearestCreature(BOSS_JADE_GUARDIAN, 10.0f, true) ||
+							me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 10.0f, true))
+						{
+							if (me->HasAura(SPELL_SOLID_STONE))
+								me->RemoveAurasDueToSpell(SPELL_SOLID_STONE, me->GetGUID());
+
+							solidStone = false;
+						}
+
+					if (map && map->IsDungeon())
+					{
+						Map::PlayerList const &PlayerList = map->GetPlayers();
+
+						if (!PlayerList.isEmpty())
+							for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+								if (Player* player = i->getSource())
+									if (player->GetPower(POWER_ALTERNATE_POWER) == 100 && !player->HasAura(SPELL_TOTALY_PETRIFIED))
+										player->CastSpell(player, SPELL_TOTALY_PETRIFIED);
+					}
+
+					while (uint32 eventId = events.ExecuteEvent())
+					{
+						switch (eventId)
+						{
+							case EVENT_REND_FLESH:
+								me->CastSpell(me->getVictim(), SPELL_REND_FLESH);
+
+								events.ScheduleEvent(EVENT_REND_FLESH, 6*IN_MILLISECONDS);
+								break;
+
+							case EVENT_PETRIFICATION_FIRST:
+								if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f))
+									tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
+
+								events.CancelEvent(EVENT_PETRIFICATION_FIRST);
+								break;
+
+							case EVENT_PETRIFICATION_SET:
+							{
+								if (map && map->IsDungeon())
+								{
+									Map::PlayerList const &PlayerList = map->GetPlayers();
+
+									if (!PlayerList.isEmpty())
+										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+											if (Player* player = i->getSource())
+											{
+												player->CastSpell(player, SPELL_AMETHYST_PETRIFICATION_BAR);
+												player->SetMaxPower(POWER_ALTERNATE_POWER, 100);
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
+											}
+								}
+
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_PETRIFICATION_SET);
+								break;
+							}
+
+							case EVENT_PETRIFICATION_INCREASE_1:
+							{
+								if (map && map->IsDungeon())
+								{
+									Map::PlayerList const &PlayerList = map->GetPlayers();
+
+									if (!PlayerList.isEmpty())
+										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+											if (Player* player = i->getSource())
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
+								}
+								
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_2, 2*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_1);
+								break;
+							}
+
+							case EVENT_PETRIFICATION_INCREASE_2:
+							{
+								if (map && map->IsDungeon())
+								{
+									Map::PlayerList const &PlayerList = map->GetPlayers();
+
+									if (!PlayerList.isEmpty())
+										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+											if (Player* player = i->getSource())
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
+								}
+								
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_3, 2*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_2);
+								break;
+							}
+
+							case EVENT_PETRIFICATION_INCREASE_3:
+							{
+								if (map && map->IsDungeon())
+								{
+									Map::PlayerList const &PlayerList = map->GetPlayers();
+
+									if (!PlayerList.isEmpty())
+										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+											if (Player* player = i->getSource())
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
+								}
+								
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
+								break;
+							}
+
+							default:
+								break;
+						}
+					}
+				}
+
                 DoMeleeAttackIfReady();
             }
         };
@@ -148,30 +313,45 @@ class boss_cobalt_guardian : public CreatureScript
 
 			InstanceScript* instance;
 			EventMap events;
+			Map* map;
+			bool solidStone;
 
             void Reset()
             {
 				events.Reset();
+				solidStone = false;
+				map = me->GetMap();
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
+				me->SetPower(POWER_ENERGY, 0);
             }
+
+			void DoAction(int32 action)
+			{
+				switch (action)
+				{
+					case ACTION_PETRIFICATION_BAR:
+						events.ScheduleEvent(EVENT_PETRIFICATION_SET, 0);
+						break;
+				}
+			}
 
             void EnterCombat(Unit* /*who*/)
             {
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
 				
+				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_PETRIFICATION_FIRST, 6*IN_MILLISECONDS);
+
 				if (instance)
 				{
 					if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
-						if (!amethyst->isInCombat())
-							amethyst->SetInCombatWithZone();
+						amethyst->SetInCombatWithZone();
 					if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
-						if (!jade->isInCombat())
-							jade->SetInCombatWithZone();
+						jade->SetInCombatWithZone();
 					if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
-						if (!jasper->isInCombat())
-							jasper->SetInCombatWithZone();
-					
+						jasper->SetInCombatWithZone();
+
 					if (!me->isInCombat())
 						me->SetInCombatWithZone();
 				}
@@ -182,6 +362,23 @@ class boss_cobalt_guardian : public CreatureScript
 				ScriptedAI::EnterEvadeMode();
 			}
 
+			void DamageTaken(Unit* who, uint32& damage)
+			{
+				if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
+					if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
+						if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
+						{
+							if (amethyst->isAlive())
+								amethyst->SetHealth(amethyst->GetHealth() - damage);
+
+							if (jade->isAlive())
+								jade->SetHealth(jade->GetHealth() - damage);
+
+							if (jasper->isAlive())
+								jasper->SetHealth(jasper->GetHealth() - damage);
+						}
+			}
+
             void UpdateAI(uint32 const diff)
             {
                 if (!UpdateVictim())
@@ -189,15 +386,134 @@ class boss_cobalt_guardian : public CreatureScript
 
                 events.Update(diff);
                 
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        default:
-                            break;
-                    }
-                }
-                
+				if (instance)
+				{
+					if (!solidStone)
+						if (!me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 10.0f, true) &&
+							!me->FindNearestCreature(BOSS_JADE_GUARDIAN, 10.0f, true) &&
+							!me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 10.0f, true))
+						{
+							me->CastSpell(me, SPELL_SOLID_STONE);
+							solidStone = true;
+						}
+				
+					if (solidStone)
+						if (me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 10.0f, true) ||
+							me->FindNearestCreature(BOSS_JADE_GUARDIAN, 10.0f, true) ||
+							me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 10.0f, true))
+						{
+							if (me->HasAura(SPELL_SOLID_STONE))
+								me->RemoveAurasDueToSpell(SPELL_SOLID_STONE, me->GetGUID());
+
+							solidStone = false;
+						}
+
+					if (map && map->IsDungeon())
+					{
+						Map::PlayerList const &PlayerList = map->GetPlayers();
+
+						if (!PlayerList.isEmpty())
+							for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+								if (Player* player = i->getSource())
+									if (player->GetPower(POWER_ALTERNATE_POWER) == 100 && !player->HasAura(SPELL_TOTALY_PETRIFIED))
+										player->CastSpell(player, SPELL_TOTALY_PETRIFIED);
+					}
+
+					while (uint32 eventId = events.ExecuteEvent())
+					{
+						switch (eventId)
+						{
+							case EVENT_REND_FLESH:
+								me->CastSpell(me->getVictim(), SPELL_REND_FLESH);
+
+								events.ScheduleEvent(EVENT_REND_FLESH, 6*IN_MILLISECONDS);
+								break;
+
+							case EVENT_PETRIFICATION_FIRST:
+								if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f))
+									tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
+
+								events.CancelEvent(EVENT_PETRIFICATION_FIRST);
+								break;
+
+							case EVENT_PETRIFICATION_SET:
+							{
+								if (map && map->IsDungeon())
+								{
+									Map::PlayerList const &PlayerList = map->GetPlayers();
+
+									if (!PlayerList.isEmpty())
+										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+											if (Player* player = i->getSource())
+											{
+												player->CastSpell(player, SPELL_AMETHYST_PETRIFICATION_BAR);
+												player->SetMaxPower(POWER_ALTERNATE_POWER, 100);
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
+											}
+								}
+
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_PETRIFICATION_SET);
+								break;
+							}
+
+							case EVENT_PETRIFICATION_INCREASE_1:
+							{
+								if (map && map->IsDungeon())
+								{
+									Map::PlayerList const &PlayerList = map->GetPlayers();
+
+									if (!PlayerList.isEmpty())
+										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+											if (Player* player = i->getSource())
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
+								}
+								
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_2, 2*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_1);
+								break;
+							}
+
+							case EVENT_PETRIFICATION_INCREASE_2:
+							{
+								if (map && map->IsDungeon())
+								{
+									Map::PlayerList const &PlayerList = map->GetPlayers();
+
+									if (!PlayerList.isEmpty())
+										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+											if (Player* player = i->getSource())
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
+								}
+								
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_3, 2*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_2);
+								break;
+							}
+
+							case EVENT_PETRIFICATION_INCREASE_3:
+							{
+								if (map && map->IsDungeon())
+								{
+									Map::PlayerList const &PlayerList = map->GetPlayers();
+
+									if (!PlayerList.isEmpty())
+										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+											if (Player* player = i->getSource())
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
+								}
+								
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
+								break;
+							}
+
+							default:
+								break;
+						}
+					}
+				}
+
                 DoMeleeAttackIfReady();
             }
         };
@@ -222,30 +538,45 @@ class boss_jade_guardian : public CreatureScript
 
 			InstanceScript* instance;
 			EventMap events;
+			Map* map;
+			bool solidStone;
 
             void Reset()
             {
 				events.Reset();
+				solidStone = false;
+				map = me->GetMap();
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
+				me->SetPower(POWER_ENERGY, 0);
             }
+
+			void DoAction(int32 action)
+			{
+				switch (action)
+				{
+					case ACTION_PETRIFICATION_BAR:
+						events.ScheduleEvent(EVENT_PETRIFICATION_SET, 0);
+						break;
+				}
+			}
 
             void EnterCombat(Unit* /*who*/)
             {
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
 				
+				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_PETRIFICATION_FIRST, 6*IN_MILLISECONDS);
+
 				if (instance)
 				{
 					if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
-						if (!amethyst->isInCombat())
-							amethyst->SetInCombatWithZone();
+						amethyst->SetInCombatWithZone();
 					if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
-						if (!cobalt->isInCombat())
-							cobalt->SetInCombatWithZone();
+						cobalt->SetInCombatWithZone();
 					if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
-						if (!jasper->isInCombat())
-							jasper->SetInCombatWithZone();
-					
+						jasper->SetInCombatWithZone();
+
 					if (!me->isInCombat())
 						me->SetInCombatWithZone();
 				}
@@ -256,6 +587,23 @@ class boss_jade_guardian : public CreatureScript
 				ScriptedAI::EnterEvadeMode();
 			}
 
+			void DamageTaken(Unit* who, uint32& damage)
+			{
+				if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
+					if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
+						if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
+						{
+							if (amethyst->isAlive())
+								amethyst->SetHealth(amethyst->GetHealth() - damage);
+
+							if (cobalt->isAlive())
+								cobalt->SetHealth(cobalt->GetHealth() - damage);
+
+							if (jasper->isAlive())
+								jasper->SetHealth(jasper->GetHealth() - damage);
+						}
+			}
+
             void UpdateAI(uint32 const diff)
             {
                 if (!UpdateVictim())
@@ -263,15 +611,134 @@ class boss_jade_guardian : public CreatureScript
 
                 events.Update(diff);
                 
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        default:
-                            break;
-                    }
-                }
-                
+				if (instance)
+				{
+					if (!solidStone)
+						if (!me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 10.0f, true) &&
+							!me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 10.0f, true) &&
+							!me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 10.0f, true))
+						{
+							me->CastSpell(me, SPELL_SOLID_STONE);
+							solidStone = true;
+						}
+				
+					if (solidStone)
+						if (me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 10.0f, true) ||
+							me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 10.0f, true) ||
+							me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 10.0f, true))
+						{
+							if (me->HasAura(SPELL_SOLID_STONE))
+								me->RemoveAurasDueToSpell(SPELL_SOLID_STONE, me->GetGUID());
+
+							solidStone = false;
+						}
+
+					if (map && map->IsDungeon())
+					{
+						Map::PlayerList const &PlayerList = map->GetPlayers();
+
+						if (!PlayerList.isEmpty())
+							for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+								if (Player* player = i->getSource())
+									if (player->GetPower(POWER_ALTERNATE_POWER) == 100 && !player->HasAura(SPELL_TOTALY_PETRIFIED))
+										player->CastSpell(player, SPELL_TOTALY_PETRIFIED);
+					}
+
+					while (uint32 eventId = events.ExecuteEvent())
+					{
+						switch (eventId)
+						{
+							case EVENT_REND_FLESH:
+								me->CastSpell(me->getVictim(), SPELL_REND_FLESH);
+
+								events.ScheduleEvent(EVENT_REND_FLESH, 6*IN_MILLISECONDS);
+								break;
+
+							case EVENT_PETRIFICATION_FIRST:
+								if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f))
+									tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
+
+								events.CancelEvent(EVENT_PETRIFICATION_FIRST);
+								break;
+
+							case EVENT_PETRIFICATION_SET:
+							{
+								if (map && map->IsDungeon())
+								{
+									Map::PlayerList const &PlayerList = map->GetPlayers();
+
+									if (!PlayerList.isEmpty())
+										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+											if (Player* player = i->getSource())
+											{
+												player->CastSpell(player, SPELL_AMETHYST_PETRIFICATION_BAR);
+												player->SetMaxPower(POWER_ALTERNATE_POWER, 100);
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
+											}
+								}
+
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_PETRIFICATION_SET);
+								break;
+							}
+
+							case EVENT_PETRIFICATION_INCREASE_1:
+							{
+								if (map && map->IsDungeon())
+								{
+									Map::PlayerList const &PlayerList = map->GetPlayers();
+
+									if (!PlayerList.isEmpty())
+										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+											if (Player* player = i->getSource())
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
+								}
+								
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_2, 2*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_1);
+								break;
+							}
+
+							case EVENT_PETRIFICATION_INCREASE_2:
+							{
+								if (map && map->IsDungeon())
+								{
+									Map::PlayerList const &PlayerList = map->GetPlayers();
+
+									if (!PlayerList.isEmpty())
+										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+											if (Player* player = i->getSource())
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
+								}
+								
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_3, 2*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_2);
+								break;
+							}
+
+							case EVENT_PETRIFICATION_INCREASE_3:
+							{
+								if (map && map->IsDungeon())
+								{
+									Map::PlayerList const &PlayerList = map->GetPlayers();
+
+									if (!PlayerList.isEmpty())
+										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+											if (Player* player = i->getSource())
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
+								}
+								
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
+								break;
+							}
+
+							default:
+								break;
+						}
+					}
+				}
+
                 DoMeleeAttackIfReady();
             }
         };
@@ -296,59 +763,505 @@ class boss_jasper_guardian : public CreatureScript
 
 			InstanceScript* instance;
 			EventMap events;
+			Map* map;
+			bool solidStone;
 
             void Reset()
             {
 				events.Reset();
+				solidStone = false;
+				map = me->GetMap();
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
+				me->SetPower(POWER_ENERGY, 0);
             }
+
+			void DoAction(int32 action)
+			{
+				switch (action)
+				{
+					case ACTION_PETRIFICATION_BAR:
+						events.ScheduleEvent(EVENT_PETRIFICATION_SET, 0);
+						break;
+				}
+			}
 
             void EnterCombat(Unit* /*who*/)
             {
 				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
 				
+				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_PETRIFICATION_FIRST, 6*IN_MILLISECONDS);
+
 				if (instance)
 				{
 					if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
-						if (!amethyst->isInCombat())
-							amethyst->SetInCombatWithZone();
+						amethyst->SetInCombatWithZone();
 					if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
-						if (!cobalt->isInCombat())
-							cobalt->SetInCombatWithZone();
+						cobalt->SetInCombatWithZone();
 					if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
-						if (!jade->isInCombat())
-							jade->SetInCombatWithZone();
-					
+						jade->SetInCombatWithZone();
+
 					if (!me->isInCombat())
 						me->SetInCombatWithZone();
 				}
             }
-			
+
 			void EnterEvadeMode()
 			{
 				ScriptedAI::EnterEvadeMode();
 			}
 
+			void DamageTaken(Unit* who, uint32& damage)
+			{
+				if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
+					if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
+						if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
+						{
+							if (amethyst->isAlive())
+								amethyst->SetHealth(amethyst->GetHealth() - damage);
+
+							if (cobalt->isAlive())
+								cobalt->SetHealth(cobalt->GetHealth() - damage);
+
+							if (jade->isAlive())
+								jade->SetHealth(jade->GetHealth() - damage);
+						}
+			}
+
             void UpdateAI(uint32 const diff)
             {
-                if	(!UpdateVictim())
+                if (!UpdateVictim())
 					return;
 
                 events.Update(diff);
                 
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        default:
-                            break;
-                    }
-                }
-                
+				if (instance)
+				{
+					if (!solidStone)
+						if (!me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 10.0f, true) &&
+							!me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 10.0f, true) &&
+							!me->FindNearestCreature(BOSS_JADE_GUARDIAN, 10.0f, true))
+						{
+							me->CastSpell(me, SPELL_SOLID_STONE);
+							solidStone = true;
+						}
+				
+					if (solidStone)
+						if (me->FindNearestCreature(BOSS_AMETHYST_GUARDIAN, 10.0f, true) ||
+							me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 10.0f, true) ||
+							me->FindNearestCreature(BOSS_JADE_GUARDIAN, 10.0f, true))
+						{
+							if (me->HasAura(SPELL_SOLID_STONE))
+								me->RemoveAurasDueToSpell(SPELL_SOLID_STONE, me->GetGUID());
+
+							solidStone = false;
+						}
+
+					if (map && map->IsDungeon())
+					{
+						Map::PlayerList const &PlayerList = map->GetPlayers();
+
+						if (!PlayerList.isEmpty())
+							for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+								if (Player* player = i->getSource())
+									if (player->GetPower(POWER_ALTERNATE_POWER) == 100 && !player->HasAura(SPELL_TOTALY_PETRIFIED))
+										player->CastSpell(player, SPELL_TOTALY_PETRIFIED);
+					}
+
+					while (uint32 eventId = events.ExecuteEvent())
+					{
+						switch (eventId)
+						{
+							case EVENT_REND_FLESH:
+								me->CastSpell(me->getVictim(), SPELL_REND_FLESH);
+
+								events.ScheduleEvent(EVENT_REND_FLESH, 6*IN_MILLISECONDS);
+								break;
+
+							case EVENT_PETRIFICATION_FIRST:
+								if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f))
+									tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
+
+								events.CancelEvent(EVENT_PETRIFICATION_FIRST);
+								break;
+
+							case EVENT_PETRIFICATION_SET:
+							{
+								if (map && map->IsDungeon())
+								{
+									Map::PlayerList const &PlayerList = map->GetPlayers();
+
+									if (!PlayerList.isEmpty())
+										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+											if (Player* player = i->getSource())
+											{
+												player->CastSpell(player, SPELL_AMETHYST_PETRIFICATION_BAR);
+												player->SetMaxPower(POWER_ALTERNATE_POWER, 100);
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
+											}
+								}
+
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_PETRIFICATION_SET);
+								break;
+							}
+
+							case EVENT_PETRIFICATION_INCREASE_1:
+							{
+								if (map && map->IsDungeon())
+								{
+									Map::PlayerList const &PlayerList = map->GetPlayers();
+
+									if (!PlayerList.isEmpty())
+										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+											if (Player* player = i->getSource())
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
+								}
+								
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_2, 2*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_1);
+								break;
+							}
+
+							case EVENT_PETRIFICATION_INCREASE_2:
+							{
+								if (map && map->IsDungeon())
+								{
+									Map::PlayerList const &PlayerList = map->GetPlayers();
+
+									if (!PlayerList.isEmpty())
+										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+											if (Player* player = i->getSource())
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
+								}
+								
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_3, 2*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_2);
+								break;
+							}
+
+							case EVENT_PETRIFICATION_INCREASE_3:
+							{
+								if (map && map->IsDungeon())
+								{
+									Map::PlayerList const &PlayerList = map->GetPlayers();
+
+									if (!PlayerList.isEmpty())
+										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+											if (Player* player = i->getSource())
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
+								}
+								
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
+								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
+								break;
+							}
+
+							default:
+								break;
+						}
+					}
+				}
+
                 DoMeleeAttackIfReady();
             }
         };
+};
+
+class npc_the_stone_guard_tracker : public CreatureScript
+{
+public:
+	npc_the_stone_guard_tracker() : CreatureScript("npc_the_stone_guard_tracker") { }
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_the_stone_guard_trackerAI(creature);
+	}
+
+	struct npc_the_stone_guard_trackerAI : public ScriptedAI
+	{
+		npc_the_stone_guard_trackerAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
+
+		InstanceScript* instance;
+		EventMap events;
+		uint64 lastGuardianPetrificationGUID;
+
+		void Reset()
+        {
+			events.Reset();
+			lastGuardianPetrificationGUID = 0;
+        }
+
+		void DoAction(int32 action)
+        {
+            switch (action)
+            {
+				case ACTION_CHOOSE_PETRIFICATION:
+					events.ScheduleEvent(EVENT_CHOOSE_PETRIFICATION, 6*IN_MILLISECONDS);
+					break;
+			}
+		}
+
+		bool IsAmethystEligible()
+		{
+			if (instance)
+			{
+				if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
+				{
+					if (!amethyst->isAlive() || amethyst->GetGUID() == lastGuardianPetrificationGUID)
+						return false;
+				}
+				else return false;
+			}
+
+			return true;
+		}
+
+		bool IsCobaltEligible()
+		{
+			if (instance)
+			{
+				if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
+				{
+					if (!cobalt->isAlive() || cobalt->GetGUID() == lastGuardianPetrificationGUID)
+						return false;
+				}
+				else return false;
+			}
+
+			return true;
+		}
+
+		bool IsJadeEligible()
+		{
+			if (instance)
+			{
+				if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
+				{
+					if (!jade->isAlive() || jade->GetGUID() == lastGuardianPetrificationGUID)
+						return false;
+				}
+				else return false;
+			}
+
+			return true;
+		}
+
+		bool IsJasperEligible()
+		{
+			if (instance)
+			{
+				if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
+				{
+					if (!jasper->isAlive() || jasper->GetGUID() == lastGuardianPetrificationGUID)
+						return false;
+				}
+				else return false;
+			}
+
+			return true;
+		}
+
+		void UpdateAI(uint32 diff)
+		{
+			events.Update(diff);
+
+			if (instance)
+			{
+				while (uint32 eventId = events.ExecuteEvent())
+				{
+					switch (eventId)
+					{
+						case EVENT_CHOOSE_PETRIFICATION:
+							if (IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
+							{
+								if (Creature* guardian = RAND(
+									me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN))))
+								{
+									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
+									lastGuardianPetrificationGUID = guardian->GetGUID();
+								}
+							}
+
+							if (!IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
+							{
+								if (Creature* guardian = RAND(
+									me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN))))
+								{
+									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
+									lastGuardianPetrificationGUID = guardian->GetGUID();
+								}
+							}
+
+							if (IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
+							{
+								if (Creature* guardian = RAND(
+									me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN))))
+								{
+									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
+									lastGuardianPetrificationGUID = guardian->GetGUID();
+								}
+							}
+
+							if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
+							{
+								if (Creature* guardian = RAND(
+									me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN))))
+								{
+									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
+									lastGuardianPetrificationGUID = guardian->GetGUID();
+								}
+							}
+
+							if (IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
+							{
+								if (Creature* guardian = RAND(
+									me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN))))
+								{
+									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
+									lastGuardianPetrificationGUID = guardian->GetGUID();
+								}
+							}
+
+							if (!IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
+							{
+								if (Creature* guardian = RAND(
+									me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN))))
+								{
+									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
+									lastGuardianPetrificationGUID = guardian->GetGUID();
+								}
+							}
+
+
+							if (!IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
+							{
+								if (Creature* guardian = RAND(
+									me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN))))
+								{
+									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
+									lastGuardianPetrificationGUID = guardian->GetGUID();
+								}
+							}
+
+							if (!IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
+							{
+								if (Creature* guardian = RAND(
+									me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN))))
+								{
+									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
+									lastGuardianPetrificationGUID = guardian->GetGUID();
+								}
+							}
+
+							if (IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
+							{
+								if (Creature* guardian = RAND(
+									me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN))))
+								{
+									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
+									lastGuardianPetrificationGUID = guardian->GetGUID();
+								}
+							}
+
+							if (IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
+							{
+								if (Creature* guardian = RAND(
+									me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN))))
+								{
+									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
+									lastGuardianPetrificationGUID = guardian->GetGUID();
+								}
+							}
+
+							if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
+							{
+								if (Creature* guardian = RAND(
+									me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN))))
+								{
+									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
+									lastGuardianPetrificationGUID = guardian->GetGUID();
+								}
+							}
+
+							if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
+							{
+								if (Creature* guardian = RAND(
+									me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)),
+									me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN))))
+								{
+									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
+									lastGuardianPetrificationGUID = guardian->GetGUID();
+								}
+							}
+
+							if (IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
+							{
+								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
+								{
+									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
+									lastGuardianPetrificationGUID = guardian->GetGUID();
+								}
+							}
+
+							if (!IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
+							{
+								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
+								{
+									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
+									lastGuardianPetrificationGUID = guardian->GetGUID();
+								}
+							}
+
+							if (!IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
+							{
+								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
+								{
+									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
+									lastGuardianPetrificationGUID = guardian->GetGUID();
+								}
+							}
+
+							if (!IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
+							{
+								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
+								{
+									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
+									lastGuardianPetrificationGUID = guardian->GetGUID();
+								}
+							}
+
+							events.CancelEvent(EVENT_CHOOSE_PETRIFICATION);
+							break;
+
+						default:
+							break;
+					}
+				}
+			}
+		}
+	};
 };
 
 void AddSC_boss_the_stone_guard()
@@ -357,4 +1270,5 @@ void AddSC_boss_the_stone_guard()
 	new boss_cobalt_guardian();
 	new boss_jade_guardian();
 	new boss_jasper_guardian();
+	new npc_the_stone_guard_tracker();
 }
