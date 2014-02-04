@@ -150,11 +150,14 @@ public:
         uint32 AttackTimer;
         uint32 DespawnTimer;
         bool VerifPV;
+        bool Despawn;
 
         void Reset()
         {
             AttackTimer = 5000;
             VerifPV = true;
+            Despawn = false;
+            me->setFaction(31);
         }
 
         void DamageTaken(Unit* player, uint32 &damage)
@@ -188,9 +191,20 @@ public:
                 else AttackTimer -= diff;
             }
 
+            if(Despawn)
+            {
+                if(DespawnTimer <= diff)
+                {
+                    me->DisappearAndDie();
+                    Despawn = false;
+                }
+                else DespawnTimer -= diff;
+            }
+
             if (HealthBelowPct(20) && VerifPV)
             {
                 me->setFaction(35);
+                me->AttackStop();
                 me->InterruptNonMeleeSpells(false);
                 me->StopMoving();
                 me->ClearComboPointHolders();
@@ -199,7 +213,8 @@ public:
                 me->GetMotionMaster()->Clear();
                 me->GetMotionMaster()->MoveIdle();
                 Talk(SAY_LOOSE);
-               // DespawnTimer = 4000;
+                DespawnTimer = 4000;
+                Despawn = true;
 
                 Unit* player = me->getVictim();
                 if(player->GetTypeId() == TYPEID_PLAYER)
@@ -207,12 +222,6 @@ public:
 
                 VerifPV = false;
             }
-
-           /* if(DespawnTimer <= diff)
-            {
-                me->DisappearAndDie();
-            }
-            else DespawnTimer -= diff;*/
 
             DoMeleeAttackIfReady();
         }
