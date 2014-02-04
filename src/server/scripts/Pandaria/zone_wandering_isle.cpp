@@ -169,10 +169,16 @@ public:
             me->setFaction(7);
         }
 
-        void DamageTaken(Unit* player, uint32 &damage)
+        void DamageTaken(Unit* caster, uint32 &damage)
         {
-            if (damage < me->GetHealth())
-                return;
+            if(damage >= 1)
+            {
+                if(caster->GetTypeId() == TYPEID_PLAYER && !me->HasReactState(REACT_AGGRESSIVE))
+                {
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    ScriptedAI::AttackStart(caster);
+                }
+            }
 
             if (damage >= me->GetHealth())
             {
@@ -180,16 +186,6 @@ public:
                 me->SetHealth(0);
             }
 
-        }
-
-        void SpellHit(Unit *caster, const SpellInfo */*spellInfo*/)
-        {
-            if(caster->GetTypeId() == TYPEID_PLAYER && !me->HasReactState(REACT_AGGRESSIVE))
-            {
-                me->SetReactState(REACT_AGGRESSIVE);
-                ScriptedAI::AttackStart(caster);
-
-            }
         }
 
         void JustDied(Unit* /*killer*/)
