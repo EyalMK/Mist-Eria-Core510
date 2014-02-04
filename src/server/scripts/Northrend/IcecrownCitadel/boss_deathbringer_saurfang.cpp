@@ -258,6 +258,7 @@ class boss_deathbringer_saurfang : public CreatureScript
                 events.SetPhase(PHASE_COMBAT);
                 _frenzied = false;
                 _dead = false;
+				me->setPowerType(POWER_ENERGY);
                 me->SetPower(POWER_ENERGY, 0);
                 DoCast(me, SPELL_ZERO_POWER, true);
                 DoCast(me, SPELL_BLOOD_LINK, true);
