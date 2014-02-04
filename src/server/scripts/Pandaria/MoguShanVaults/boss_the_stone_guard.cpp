@@ -100,7 +100,8 @@ class boss_amethyst_guardian : public CreatureScript
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
-				me->SetPower(POWER_ENERGY, 0);
+				me->setPowerType(POWER_ENERGY); 
+				me->SetPower(POWER_ENERGY, 30);
             }
 
 			void DoAction(int32 action)
@@ -329,7 +330,8 @@ class boss_cobalt_guardian : public CreatureScript
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
-				me->SetPower(POWER_ENERGY, 0);
+				me->setPowerType(POWER_ENERGY); 
+				me->SetPower(POWER_ENERGY, 30);
             }
 
 			void DoAction(int32 action)
@@ -558,7 +560,8 @@ class boss_jade_guardian : public CreatureScript
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
-				me->SetPower(POWER_ENERGY, 0);
+				me->setPowerType(POWER_ENERGY); 
+				me->SetPower(POWER_ENERGY, 30);
             }
 
 			void DoAction(int32 action)
@@ -787,7 +790,8 @@ class boss_jasper_guardian : public CreatureScript
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
-				me->SetPower(POWER_ENERGY, 0);
+				me->setPowerType(POWER_ENERGY); 
+				me->SetPower(POWER_ENERGY, 30);
             }
 
 			void DoAction(int32 action)
