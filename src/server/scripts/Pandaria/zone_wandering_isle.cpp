@@ -24,8 +24,6 @@
 #include "SpellInfo.h"
 
 
-
-
 // npc_first_quest_pandaren
 class npc_first_quest_pandaren : public CreatureScript
 {
@@ -119,246 +117,137 @@ public:
 /**The Lesson of Stifled Pride**/
 /*******************************/
 
-class npc_trainee_stifled_pride : public CreatureScript
+enum Spells
 {
-public :
-    npc_trainee_stifled_pride() : CreatureScript("npc_trainee_stifled_pride")
+    SPELL_JAB               = 109079,
+    SPELL_BLACKOUT_KICK     = 109080
+};
+
+enum Texts
+{
+    SAY_LOOSE   = 0
+};
+
+enum Creatures
+{
+    NPC_ZHI    = 61411
+};
+
+class npc_trainee : public CreatureScript
+{
+public:
+    npc_trainee() : CreatureScript("npc_trainee") { }
+
+    CreatureAI* GetAI(Creature* creature) const
     {
-        m_gossipHelloMessage = "Null gossip option" ;
+        return new npc_traineeAI(creature);
     }
 
-    bool OnGossipHello(Player *p, Creature *c)
+    struct npc_traineeAI : public ScriptedAI
     {
-        if(p && p->hasQuest(QUEST_THE_LESSON_OF_STIFLED_PRIDE) && !p->isInCombat() && p->GetQuestStatus(QUEST_THE_LESSON_OF_STIFLED_PRIDE) == QUEST_STATUS_INCOMPLETE)
-        {
-            m_gossipHelloMessage = "Je vous defie !";
-            p->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, m_gossipHelloMessage, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-            p->PlayerTalkClass->SendGossipMenu(NPC_QUEST_REWARD, c->GetGUID());
-
-            return true ;
+        npc_traineeAI(Creature* creature) : ScriptedAI(creature) {
+            creature->SetReactState(REACT_PASSIVE); // Prevents from assisting other when EnterCombat() is called
         }
-        else if(p && (!p->hasQuest(QUEST_THE_LESSON_OF_STIFLED_PRIDE) || p->GetQuestStatus(QUEST_THE_LESSON_OF_STIFLED_PRIDE) != QUEST_STATUS_INCOMPLETE))
-        {
-            m_gossipHelloMessage = "Il y a erreur... je vous prie de m'excuser" ;
-            p->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, m_gossipHelloMessage, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 
-            p->PlayerTalkClass->SendGossipMenu(NPC_QUEST_REWARD, c->GetGUID());
-            return true ;
-        }
-        else if(!p)
-            return false;
-
-		return false ;
-    }
-
-    bool OnGossipSelect(Player *p, Creature *c, uint32 sender, uint32 action)
-    {
-        p->PlayerTalkClass->ClearMenus();
-
-        if(action == GOSSIP_ACTION_INFO_DEF + 1)
-            StartQuestEvent(c, p);
-
-        p->CLOSE_GOSSIP_MENU();
-
-		return true ;
-    }
-
-    struct npc_trainee_stifled_prideAI : public ScriptedAI
-    {
-    public :
-        npc_trainee_stifled_prideAI(Creature* c) : ScriptedAI(c)
-        {
-
-        }
+        uint32 AttackTimer;
+        uint32 DespawnTimer;
+        bool VerifPV;
+        bool Despawn;
+        bool Health;
 
         void Reset()
         {
-            events.Reset();
+            me->SetReactState(REACT_PASSIVE); // Just to prevent, after respawn by exemple
+            AttackTimer = 5000;
+            VerifPV = true;
+            Despawn = false;
+            Health = true;
+            me->setFaction(7);
         }
 
-        void EnterCombat(Unit *who)
+        void DamageTaken(Unit* player, uint32 &damage)
         {
-            ScheduleTraineeEvents();
+            if (damage < me->GetHealth())
+                return;
+
+            if (damage >= me->GetHealth())
+            {
+                damage = 0;
+                me->SetHealth(0);
+            }
+
+        }
+
+        /// I'm not really sure about this, maybe auto damage are not considered as spells
+        /// Very simple : if we are not aggressive, and the caster is a player, then we start attacking him
+        void SpellHit(Unit *caster, const SpellInfo *spellInfo) {
+            if(caster->GetTypeId() == TYPEID_PLAYER && !me->HasReactState(REACT_AGGRESSIVE)) { // Prevents infinite looping during the function's call
+                me->SetReactState(REACT_AGGRESSIVE); // Since the only time callAssist is called is during the engage, we don't risk anything (normally)
+                ScriptedAI::AttackStart(caster); // Attack the caster
+
+                /// @note : even with the aggressive react, this cannot be eligible during CallToAssist, because we are in combat
+            }
+        }
+
+        void JustDied(Unit *killer) {
+            me->SetReactState(REACT_PASSIVE);
         }
 
         void UpdateAI(uint32 diff)
         {
             if(!UpdateVictim())
+                return;
+
+            if(VerifPV)
             {
-                switch(me->getFaction())
+                if(AttackTimer <= diff)
                 {
-                case 14 :
-                    ResetToNormal(NULL);
-                    break ;
-                case 35 :
-                    return ;
+                    if(me->GetEntry() == 54586 || me->GetEntry() == 65470)
+                        me->CastSpell(me->getVictim(), SPELL_JAB);
+
+                    if(me->GetEntry() == 54587 || me->GetEntry() == 65471)
+                        me->CastSpell(me->getVictim(), SPELL_BLACKOUT_KICK);
+
+                    AttackTimer = 5000;
                 }
+                else AttackTimer -= diff;
             }
 
-            events.Update(diff);
-
-            if(me->HasUnitState(UNIT_STATE_CASTING))
-                return ;
-
-            if(events.ExecuteEvent() == EVENT_TRAINEE_SPELL)
+            if(Despawn)
             {
-                switch(me->GetEntry())
+                if(DespawnTimer <= diff)
                 {
-                case HUOJIN_TRAINEE_1 :
-                case HUOJIN_TRAINEE_2 :
-                    if(me->getVictim())
-                        DoCast(me->getVictim(), SPELL_JAB, true);
-                    break ;
-
-                case TUSHUI_TRAINEE_1 :
-                case TUSHUI_TRAINEE_2 :
-                    if(me->getVictim())
-                        DoCast(me->getVictim(), SPELL_BLACKOUT_KICK, true);
-                    break ;
-
+                    me->DisappearAndDie();
+                    Despawn = false;
                 }
-                ScheduleTraineeEvents();
+                else DespawnTimer -= diff;
             }
-        }
 
-        void DamageTaken(Unit *attacker, uint32 &amount)
-        {
-            float tenPercent = me->GetMaxHealth() / 10 ;
-            if((me->GetHealth() - amount) <= tenPercent)
+            if (me->GetHealthPct() <= 20 && Health)
             {
-                amount = 0 ;
-                me->SetHealth(uint32(tenPercent));
-                ResetToNormal(attacker);
+                VerifPV = false;
+
+                DespawnTimer = 4000;
+                Despawn = true;
+
+                if(Unit* player = me->getVictim())
+                    if(player->GetTypeId() == TYPEID_PLAYER)
+                        player->ToPlayer()->KilledMonsterCredit(54586, 0);
+
+                me->setFaction(35);
+                me->StopMoving();
+                me->RemoveAllAuras();
+                me->GetMotionMaster()->Clear();
+                me->CombatStop(true);
+                me->DeleteThreatList();
+                me->HandleEmoteCommand(EMOTE_ONESHOT_BOW);
+                Talk(SAY_LOOSE);
+                Health = false;
             }
-        }
 
-    private :
-        EventMap events;
-
-        inline void ScheduleTraineeEvents()
-        {
-            events.ScheduleEvent(EVENT_TRAINEE_SPELL, urand(3500, 5500));
-        }
-
-        void ResetToNormal(Unit* attacker)
-        {
-            switch(me->GetEntry())
-            {
-            case HUOJIN_TRAINEE_1 :
-            case HUOJIN_TRAINEE_2 :
-                if(attacker)
-                    me->Say(irand(SAY_HUOJIN_DEFEAT_1, SAY_HUOJIN_DEFEAT_8), LANG_COMMON, attacker->GetGUID());
-                break ;
-            case TUSHUI_TRAINEE_1 :
-            case TUSHUI_TRAINEE_2 :
-                if(attacker)
-                    me->Say(irand(SAY_TUSHUI_DEFEAT_1, SAY_TUSHUI_DEFEAT_8), LANG_COMMON, attacker->GetGUID());
-                break ;
-            }
-            events.Reset();
-            me->setFaction(35);
-            me->SetFullHealth();
-            me->DisappearAndDie();
+            DoMeleeAttackIfReady();
         }
     };
-
-    CreatureAI* GetAI(Creature *c) const
-    {
-        return new npc_trainee_stifled_prideAI(c);
-    }
-
-private :
-
-    // Enums
-    enum Quests
-    {
-        QUEST_THE_LESSON_OF_STIFLED_PRIDE = 29524
-    };
-
-    enum Npcs
-    {
-        HUOJIN_TRAINEE_1 = 54586,
-        HUOJIN_TRAINEE_2 = 65470,
-        TUSHUI_TRAINEE_1 = 54587,
-        TUSHUI_TRAINEE_2 = 65471,
-        NPC_QUEST_REWARD = 54789 // Spell 102384
-    };
-
-    enum Spells
-    {
-        SPELL_JAB               = 109079, // Huojin
-        SPELL_BLACKOUT_KICK     = 109080, // Tushui
-        SPELL_QUEST_KILL_CREDIT = 102384
-    };
-
-    enum Says
-    {
-        SAY_HUOJIN_DEFEAT_1 = -5458607,
-        SAY_HUOJIN_DEFEAT_2,
-        SAY_HUOJIN_DEFEAT_3,
-        SAY_HUOJIN_DEFEAT_4,
-        SAY_HUOJIN_DEFEAT_5,
-        SAY_HUOJIN_DEFEAT_6,
-        SAY_HUOJIN_DEFEAT_7,
-        SAY_HUOJIN_DEFEAT_8,
-
-        SAY_TUSHUI_DEFEAT_1 = -5458707,
-        SAY_TUSHUI_DEFEAT_2,
-        SAY_TUSHUI_DEFEAT_3,
-        SAY_TUSHUI_DEFEAT_4,
-        SAY_TUSHUI_DEFEAT_5,
-        SAY_TUSHUI_DEFEAT_6,
-        SAY_TUSHUI_DEFEAT_7,
-        SAY_TUSHUI_DEFEAT_8
-    };
-
-    enum Events
-    {
-        EVENT_TRAINEE_SPELL = 1
-    };
-
-    // Functions
-    void StartQuestEvent(Creature* me, Player* quester)
-    {
-        if(!me || !quester)
-            return ;
-
-        if(me->isInCombat())
-            return ;
-
-        me->setFaction(14);
-        if(me->GetAI())
-        {
-            me->SetInCombatWith(quester);
-            me->GetAI()->AttackStart(quester);
-        }
-    }
-
-    // Variables
-    const char* m_gossipHelloMessage;
-
-    // SQL
-    /* UPDATE creature_template SET npcflag = npcflag | 1, gossip_menu_id = 1, ScriptName = "npc_trainee_stifled_pride" WHERE entry IN (54586, 54587, 65470, 65471) ;
-     *
-     * INSERT INTO script_texts (npc_entry, entry, content_default, content_loc2, type, language, comment) VALUES
-     * (54586, -5458607, "I have never seen a trainee with skills such as yours. I must tell the others.", "Je n'ai jamais vu une recrue avant autant d'adresse que vous. Je dois prévenir les autres.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54586, -5458606, "My skills are no match for yours. I admit defeat.", "Mes capacites n'egalent pas les votres. J'admets ma defaite.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54586, -5458605, "Thank you for reminding me that I must train more diligently.", "Merci de m'avoir rappele que je dois m'entraîner avec discernement.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54586, -5458604, "That was a good match. Thank you.", "C'etait un bon combat. Merci a vous.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54586, -5458603, "You are an honorable opponent.", "Vous êtes un adversaire honorable.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54586, -5458602, "You fight honorably, friend.", "Vous avez combattu honorablement mon ami.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54586, -5458601, "You fought well. I must learn more from you in the future.", "Vous vous êtes bien battu. Je dois apprendre plus de vous dans l'avenir.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54586, -5458600, "Your skills are too great. I yield.", "Vos capacites sont impressionnantes. Je m'incline.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54587, -5458707, "I have never seen a trainee with skills such as yours. I must tell the others.", "Je n'ai jamais vu une recrue avant autant d'adresse que vous. Je dois prévenir les autres.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54587, -5458706, "My skills are no match for yours. I admit defeat.", "Mes capacites n'egalent pas les votres. J'admets ma defaite.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54587, -5458705, "Thank you for reminding me that I must train more diligently.", "Merci de m'avoir rappele que je dois m'entraîner avec discernement.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54587, -5458704, "That was a good match. Thank you.", "C'etait un bon combat. Merci a vous.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54587, -5458703, "You are an honorable opponent.", "Vous êtes un adversaire honorable.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54587, -5458702, "You fight honorably, friend.", "Vous avez combattu honorablement mon ami.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54587, -5458701, "You fought well. I must learn more from you in the future.", "Vous vous êtes bien battu. Je dois apprendre plus de vous dans l'avenir.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54587, -5458700, "Your skills are too great. I yield.", "Vos capacites sont impressionnantes. Je m'incline.", 1, 7, "Trainee of stifled pride - defeat") ;
-     */
 };
 
 
@@ -1216,9 +1105,8 @@ private:
 
 void AddSC_wandering_isle()
 {
-    new npc_first_quest_pandaren();
-	
-	new npc_trainee_stifled_pride();
+    new npc_first_quest_pandaren();	
+    new npc_trainee();
     new npc_aysa_cloudsinger_quest29414();
     new stalker_item_equiped();
     new mob_jaomin_ro();
