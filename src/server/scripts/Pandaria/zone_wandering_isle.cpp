@@ -199,7 +199,7 @@ public:
                 me->GetMotionMaster()->Clear();
                 me->GetMotionMaster()->MoveIdle();
                 Talk(SAY_LOOSE);
-                DespawnTimer = 4000;
+               // DespawnTimer = 4000;
 
                 Unit* player = me->getVictim();
                 if(player->GetTypeId() == TYPEID_PLAYER)
@@ -208,10 +208,11 @@ public:
                 VerifPV = false;
             }
 
-            if(DespawnTimer <= diff)
+           /* if(DespawnTimer <= diff)
+            {
                 me->DisappearAndDie();
-
-            else DespawnTimer -= diff;
+            }
+            else DespawnTimer -= diff;*/
 
             DoMeleeAttackIfReady();
         }
