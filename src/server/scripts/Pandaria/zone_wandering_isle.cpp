@@ -145,7 +145,9 @@ public:
 
     struct npc_traineeAI : public ScriptedAI
     {
-        npc_traineeAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_traineeAI(Creature* creature) : ScriptedAI(creature) {
+            creature->SetReactState(REACT_PASSIVE); // Prevents from assisting other when EnterCombat() is called
+        }
 
         uint32 AttackTimer;
         uint32 DespawnTimer;
@@ -155,6 +157,7 @@ public:
 
         void Reset()
         {
+            me->SetReactState(REACT_PASSIVE); // Just to prevent, after respawn by exemple
             AttackTimer = 5000;
             VerifPV = true;
             Despawn = false;
@@ -173,6 +176,21 @@ public:
                 me->SetHealth(0);
             }
 
+        }
+
+        /// I'm not really sure about this, maybe auto damage are not considered as spells
+        /// Very simple : if we are not aggressive, and the caster is a player, then we start attacking him
+        void SpellHit(Unit *caster, const SpellInfo *spellInfo) {
+            if(caster->GetTypeId() == TYPEID_PLAYER && !me->HasReactState(REACT_AGGRESSIVE)) { // Prevents infinite looping during the function's call
+                me->SetReactState(REACT_AGGRESSIVE); // Since the only time callAssist is called is during the engage, we don't risk anything (normally)
+                ScriptedAI::AttackStart(caster); // Attack the caster
+
+                /// @note : even with the aggressive react, this cannot be eligible during CallToAssist, because we are in combat
+            }
+        }
+
+        void JustDied(Unit *killer) {
+            me->SetReactState(REACT_PASSIVE);
         }
 
         void UpdateAI(uint32 diff)
