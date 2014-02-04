@@ -145,22 +145,26 @@ public:
 
     struct npc_traineeAI : public ScriptedAI
     {
-        npc_traineeAI(Creature* creature) : ScriptedAI(creature) {
-            creature->SetReactState(REACT_PASSIVE); // Prevents from assisting other when EnterCombat() is called
+        npc_traineeAI(Creature* creature) : ScriptedAI(creature)
+        {
+            creature->SetReactState(REACT_PASSIVE);
         }
 
         uint32 AttackTimer;
         uint32 DespawnTimer;
+        uint32 EmoteTimer;
         bool VerifPV;
         bool Despawn;
         bool Health;
+        bool EmoteSpeak;
 
         void Reset()
         {
-            me->SetReactState(REACT_PASSIVE); // Just to prevent, after respawn by exemple
+            me->SetReactState(REACT_PASSIVE);
             AttackTimer = 5000;
             VerifPV = true;
             Despawn = false;
+            EmoteSpeak = false;
             Health = true;
             me->setFaction(7);
         }
@@ -178,23 +182,44 @@ public:
 
         }
 
-        /// I'm not really sure about this, maybe auto damage are not considered as spells
-        /// Very simple : if we are not aggressive, and the caster is a player, then we start attacking him
-        void SpellHit(Unit *caster, const SpellInfo *spellInfo) {
-            if(caster->GetTypeId() == TYPEID_PLAYER && !me->HasReactState(REACT_AGGRESSIVE)) { // Prevents infinite looping during the function's call
-                me->SetReactState(REACT_AGGRESSIVE); // Since the only time callAssist is called is during the engage, we don't risk anything (normally)
-                ScriptedAI::AttackStart(caster); // Attack the caster
+        void SpellHit(Unit *caster, const SpellInfo */*spellInfo*/)
+        {
+            if(caster->GetTypeId() == TYPEID_PLAYER && !me->HasReactState(REACT_AGGRESSIVE))
+            {
+                me->SetReactState(REACT_AGGRESSIVE);
+                ScriptedAI::AttackStart(caster);
 
-                /// @note : even with the aggressive react, this cannot be eligible during CallToAssist, because we are in combat
             }
         }
 
-        void JustDied(Unit *killer) {
+        void JustDied(Unit* /*killer*/)
+        {
             me->SetReactState(REACT_PASSIVE);
         }
 
         void UpdateAI(uint32 diff)
         {
+            if(Despawn)
+            {
+                if(DespawnTimer <= diff)
+                {
+                    me->DisappearAndDie();
+                    Despawn = false;
+                }
+                else DespawnTimer -= diff;
+            }
+
+            if(EmoteSpeak)
+            {
+                if(EmoteTimer <= diff)
+                {
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_BOW);
+                    Talk(SAY_LOOSE);
+                    EmoteSpeak = false;
+                }
+                else EmoteTimer -= diff;
+            }
+
             if(!UpdateVictim())
                 return;
 
@@ -213,22 +238,15 @@ public:
                 else AttackTimer -= diff;
             }
 
-            if(Despawn)
-            {
-                if(DespawnTimer <= diff)
-                {
-                    me->DisappearAndDie();
-                    Despawn = false;
-                }
-                else DespawnTimer -= diff;
-            }
-
             if (me->GetHealthPct() <= 20 && Health)
             {
                 VerifPV = false;
 
-                DespawnTimer = 4000;
+                DespawnTimer = 5000;
                 Despawn = true;
+
+                EmoteTimer = 2000;
+                EmoteSpeak = true;
 
                 if(Unit* player = me->getVictim())
                     if(player->GetTypeId() == TYPEID_PLAYER)
@@ -240,8 +258,7 @@ public:
                 me->GetMotionMaster()->Clear();
                 me->CombatStop(true);
                 me->DeleteThreatList();
-                me->HandleEmoteCommand(EMOTE_ONESHOT_BOW);
-                Talk(SAY_LOOSE);
+
                 Health = false;
             }
 
