@@ -204,7 +204,7 @@ public:
             if (HealthBelowPct(20) && VerifPV)
             {
                 me->setFaction(35);
-                me->AttackStop();
+               // me->AttackStop();
                 me->InterruptNonMeleeSpells(false);
                 me->StopMoving();
                 me->ClearComboPointHolders();
