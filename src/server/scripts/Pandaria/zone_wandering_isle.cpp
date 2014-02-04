@@ -208,6 +208,14 @@ public:
             if (me->GetHealthPct() <= 20 && Health)
             {
                 VerifPV = false;
+
+                DespawnTimer = 4000;
+                Despawn = true;
+
+                if(Unit* player = me->getVictim())
+                    if(player->GetTypeId() == TYPEID_PLAYER)
+                        player->ToPlayer()->KilledMonsterCredit(54586, 0);
+
                 me->setFaction(35);
                 me->StopMoving();
                 me->RemoveAllAuras();
@@ -216,13 +224,6 @@ public:
                 me->DeleteThreatList();
                 me->HandleEmoteCommand(EMOTE_ONESHOT_BOW);
                 Talk(SAY_LOOSE);
-                DespawnTimer = 4000;
-                Despawn = true;
-
-                if(Unit* player = me->getVictim())
-                    if(player->GetTypeId() == TYPEID_PLAYER)
-                        player->ToPlayer()->KilledMonsterCredit(54586, 0);
-
                 Health = false;
             }
 
