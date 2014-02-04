@@ -162,31 +162,14 @@ public:
 
         void DamageTaken(Unit* player, uint32 &damage)
         {
+            if (damage < me->GetHealth())
+                return;
+
             if (damage >= me->GetHealth())
             {
                 damage = 0;
             }
 
-            if (HealthBelowPct(20) && VerifPV)
-            {
-                me->setFaction(35);
-                me->InterruptNonMeleeSpells(false);
-                me->StopMoving();
-                me->ClearComboPointHolders();
-                me->RemoveAllAurasOnDeath();
-                me->ClearAllReactives();
-                me->GetMotionMaster()->Clear();
-                me->GetMotionMaster()->MoveIdle();
-                me->SetTarget(0);
-                Talk(SAY_LOOSE);
-                DespawnTimer = 4000;
-                Despawn = true;
-
-                if(player->GetTypeId() == TYPEID_PLAYER)
-                    CAST_PLR(player)->KilledMonsterCredit(54586, 0);
-
-                VerifPV = false;
-            }
         }
 
         void UpdateAI(uint32 diff)
@@ -217,6 +200,28 @@ public:
                     Despawn = false;
                 }
                 else DespawnTimer -= diff;
+            }
+
+            if (HealthBelowPct(20) && VerifPV)
+            {
+                me->setFaction(35);
+                me->InterruptNonMeleeSpells(false);
+                me->StopMoving();
+                me->ClearComboPointHolders();
+                me->RemoveAllAurasOnDeath();
+                me->ClearAllReactives();
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveIdle();
+                me->SetTarget(0);
+                Talk(SAY_LOOSE);
+                DespawnTimer = 4000;
+                Despawn = true;
+
+                if(Unit* player = me->getVictim())
+                    if(player->GetTypeId() == TYPEID_PLAYER)
+                        CAST_PLR(player)->KilledMonsterCredit(54586, 0);
+
+                VerifPV = false;
             }
 
             DoMeleeAttackIfReady();
