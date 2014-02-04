@@ -162,9 +162,6 @@ public:
 
         void DamageTaken(Unit* player, uint32 &damage)
         {
-            if (damage < me->GetHealth())
-                return;
-
             if (damage >= me->GetHealth())
             {
                 damage = 0;
