@@ -209,21 +209,16 @@ public:
             {
                 VerifPV = false;
                 me->setFaction(35);
-                me->InterruptNonMeleeSpells(false);
                 me->StopMoving();
-                me->ClearComboPointHolders();
-                me->RemoveAllAurasOnDeath();
-                me->ClearAllReactives();
-                me->GetMotionMaster()->Clear();
-                me->GetMotionMaster()->MoveIdle();
-                me->SetTarget(0);
+                me->CombatStop(true);
                 Talk(SAY_LOOSE);
+                me->HandleEmoteCommand(2);
                 DespawnTimer = 4000;
                 Despawn = true;
 
                 if(Unit* player = me->getVictim())
                     if(player->GetTypeId() == TYPEID_PLAYER)
-                        CAST_PLR(player)->KilledMonsterCredit(54586, 0);
+                        player->ToPlayer()->KilledMonsterCredit(54586, 0);
 
                 Health = false;
             }
