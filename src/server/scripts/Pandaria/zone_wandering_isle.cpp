@@ -210,9 +210,12 @@ public:
                 VerifPV = false;
                 me->setFaction(35);
                 me->StopMoving();
+                me->RemoveAllAuras();
+                me->GetMotionMaster()->Clear();
                 me->CombatStop(true);
+                me->DeleteThreatList();
+                me->HandleEmoteCommand(EMOTE_ONESHOT_BOW);
                 Talk(SAY_LOOSE);
-                me->HandleEmoteCommand(2);
                 DespawnTimer = 4000;
                 Despawn = true;
 
