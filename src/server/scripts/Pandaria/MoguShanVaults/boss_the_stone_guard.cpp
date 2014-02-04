@@ -38,6 +38,7 @@ enum Spells
     /* Shared Guardian Spells */
     SPELL_SOLID_STONE					= 115745,
 	SPELL_STONE_VISUAL					= 123947,
+	SPELL_ANIM_SIT						= 128886,
     SPELL_REND_FLESH					= 125206,
     SPELL_ZERO_ENERGY					= 72242,
     SPELL_TOTALY_PETRIFIED				= 115877,
@@ -98,6 +99,7 @@ class boss_amethyst_guardian : public CreatureScript
 				map = me->GetMap();
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
+				me->CastSpell(me, SPELL_ANIM_SIT);
 				me->SetPower(POWER_ENERGY, 0);
             }
 
@@ -139,19 +141,22 @@ class boss_amethyst_guardian : public CreatureScript
 
 			void DamageTaken(Unit* who, uint32& damage)
 			{
-				if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
-					if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
-						if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
-						{
-							if (cobalt->isAlive())
-								cobalt->SetHealth(cobalt->GetHealth() - damage);
+				if (instance)
+				{
+					if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
+						if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
+							if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
+							{
+								if (cobalt->isAlive())
+									cobalt->SetHealth(cobalt->GetHealth() - damage);
 
-							if (jade->isAlive())
-								jade->SetHealth(jade->GetHealth() - damage);
+								if (jade->isAlive())
+									jade->SetHealth(jade->GetHealth() - damage);
 
-							if (jasper->isAlive())
-								jasper->SetHealth(jasper->GetHealth() - damage);
-						}
+								if (jasper->isAlive())
+									jasper->SetHealth(jasper->GetHealth() - damage);
+							}
+				}
 			}
 
             void UpdateAI(uint32 const diff)
@@ -323,6 +328,7 @@ class boss_cobalt_guardian : public CreatureScript
 				map = me->GetMap();
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
+				me->CastSpell(me, SPELL_ANIM_SIT);
 				me->SetPower(POWER_ENERGY, 0);
             }
 
@@ -364,19 +370,22 @@ class boss_cobalt_guardian : public CreatureScript
 
 			void DamageTaken(Unit* who, uint32& damage)
 			{
-				if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
-					if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
-						if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
-						{
-							if (amethyst->isAlive())
-								amethyst->SetHealth(amethyst->GetHealth() - damage);
+				if (instance)
+				{
+					if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
+						if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
+							if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
+							{
+								if (amethyst->isAlive())
+									amethyst->SetHealth(amethyst->GetHealth() - damage);
 
-							if (jade->isAlive())
-								jade->SetHealth(jade->GetHealth() - damage);
+								if (jade->isAlive())
+									jade->SetHealth(jade->GetHealth() - damage);
 
-							if (jasper->isAlive())
-								jasper->SetHealth(jasper->GetHealth() - damage);
-						}
+								if (jasper->isAlive())
+									jasper->SetHealth(jasper->GetHealth() - damage);
+							}
+				}
 			}
 
             void UpdateAI(uint32 const diff)
@@ -548,6 +557,7 @@ class boss_jade_guardian : public CreatureScript
 				map = me->GetMap();
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
+				me->CastSpell(me, SPELL_ANIM_SIT);
 				me->SetPower(POWER_ENERGY, 0);
             }
 
@@ -589,19 +599,22 @@ class boss_jade_guardian : public CreatureScript
 
 			void DamageTaken(Unit* who, uint32& damage)
 			{
-				if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
-					if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
-						if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
-						{
-							if (amethyst->isAlive())
-								amethyst->SetHealth(amethyst->GetHealth() - damage);
+				if (instance)
+				{
+					if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
+						if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
+							if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
+							{
+								if (amethyst->isAlive())
+									amethyst->SetHealth(amethyst->GetHealth() - damage);
 
-							if (cobalt->isAlive())
-								cobalt->SetHealth(cobalt->GetHealth() - damage);
+								if (cobalt->isAlive())
+									cobalt->SetHealth(cobalt->GetHealth() - damage);
 
-							if (jasper->isAlive())
-								jasper->SetHealth(jasper->GetHealth() - damage);
-						}
+								if (jasper->isAlive())
+									jasper->SetHealth(jasper->GetHealth() - damage);
+							}
+				}
 			}
 
             void UpdateAI(uint32 const diff)
@@ -773,6 +786,7 @@ class boss_jasper_guardian : public CreatureScript
 				map = me->GetMap();
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
+				me->CastSpell(me, SPELL_ANIM_SIT);
 				me->SetPower(POWER_ENERGY, 0);
             }
 
@@ -814,19 +828,22 @@ class boss_jasper_guardian : public CreatureScript
 
 			void DamageTaken(Unit* who, uint32& damage)
 			{
-				if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
-					if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
-						if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
-						{
-							if (amethyst->isAlive())
-								amethyst->SetHealth(amethyst->GetHealth() - damage);
+				if (instance)
+				{
+					if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
+						if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
+							if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
+							{
+								if (amethyst->isAlive())
+									amethyst->SetHealth(amethyst->GetHealth() - damage);
 
-							if (cobalt->isAlive())
-								cobalt->SetHealth(cobalt->GetHealth() - damage);
+								if (cobalt->isAlive())
+									cobalt->SetHealth(cobalt->GetHealth() - damage);
 
-							if (jade->isAlive())
-								jade->SetHealth(jade->GetHealth() - damage);
-						}
+								if (jade->isAlive())
+									jade->SetHealth(jade->GetHealth() - damage);
+							}
+				}
 			}
 
             void UpdateAI(uint32 const diff)

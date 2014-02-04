@@ -335,16 +335,18 @@ public:
 
 		void DamageTaken(Unit* who, uint32& damage)
 		{
-			if (damage >= me->GetHealth())
-			{
-				damage = 0;
-				me->SetHealth(1);
-
-				if (!oneHp)
+			if (instance){
+				if (damage >= me->GetHealth())
 				{
-					instance->DoCastSpellOnPlayers(SPELL_CAMERA_SHAKE);
-					events.ScheduleEvent(EVENT_SUMMON_BOSSES, 4*IN_MILLISECONDS);
-					oneHp = true;
+					damage = 0;
+					me->SetHealth(1);
+
+					if (!oneHp)
+					{
+						instance->DoCastSpellOnPlayers(SPELL_CAMERA_SHAKE);
+						events.ScheduleEvent(EVENT_SUMMON_BOSSES, 4*IN_MILLISECONDS);
+						oneHp = true;
+					}
 				}
 			}
 		}

@@ -4,6 +4,9 @@
 #include "InstanceScript.h"
 #include "mogushan_vaults.h"
 
+/* Notes : What is missing ? : - ...
+*/
+
 class instance_mogushan_vaults : public InstanceMapScript
 {
 	public:
