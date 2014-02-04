@@ -151,13 +151,15 @@ public:
         uint32 DespawnTimer;
         bool VerifPV;
         bool Despawn;
+        bool Health;
 
         void Reset()
         {
             AttackTimer = 5000;
             VerifPV = true;
             Despawn = false;
-            me->setFaction(31);
+            Health = true;
+            me->setFaction(7);
         }
 
         void DamageTaken(Unit* player, uint32 &damage)
@@ -168,6 +170,7 @@ public:
             if (damage >= me->GetHealth())
             {
                 damage = 0;
+                me->SetHealth(0);
             }
 
         }
@@ -202,8 +205,9 @@ public:
                 else DespawnTimer -= diff;
             }
 
-            if (HealthBelowPct(20) && VerifPV)
+            if (me->GetHealthPct() <= 20 && Health)
             {
+                VerifPV = false;
                 me->setFaction(35);
                 me->InterruptNonMeleeSpells(false);
                 me->StopMoving();
@@ -221,7 +225,7 @@ public:
                     if(player->GetTypeId() == TYPEID_PLAYER)
                         CAST_PLR(player)->KilledMonsterCredit(54586, 0);
 
-                VerifPV = false;
+                Health = false;
             }
 
             DoMeleeAttackIfReady();
