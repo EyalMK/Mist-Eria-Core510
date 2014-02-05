@@ -45,7 +45,7 @@ enum Spells
 	SPELL_STONE_VISUAL					= 123947,
 	SPELL_ANIM_SIT						= 128886,
     SPELL_REND_FLESH					= 125206,
-    SPELL_ZERO_ENERGY					= 72242,
+    SPELL_ZERO_POWER					= 118357,
     SPELL_TOTALY_PETRIFIED				= 115877,
 	SPELL_BERSERK						= 26662,
 };
@@ -105,11 +105,11 @@ class boss_amethyst_guardian : public CreatureScript
 				solidStone = false;
 				map = me->GetMap();
 
-				me->CastSpell(me, SPELL_STONE_VISUAL);
-				me->CastSpell(me, SPELL_ANIM_SIT);
-				me->setPowerType(POWER_MANA);
 				me->SetMaxPower(POWER_MANA, 100);
 				me->SetPower(POWER_MANA, 0);
+				me->CastSpell(me, SPELL_STONE_VISUAL);
+				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ZERO_POWER);
             }
 
 			void JustReachedHome()
@@ -373,11 +373,11 @@ class boss_cobalt_guardian : public CreatureScript
 				solidStone = false;
 				map = me->GetMap();
 
-				me->CastSpell(me, SPELL_STONE_VISUAL);
-				me->CastSpell(me, SPELL_ANIM_SIT);
-				me->setPowerType(POWER_MANA);
 				me->SetMaxPower(POWER_MANA, 100);
 				me->SetPower(POWER_MANA, 0);
+				me->CastSpell(me, SPELL_STONE_VISUAL);
+				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ZERO_POWER);
             }
 			
 			void JustReachedHome()
@@ -641,11 +641,11 @@ class boss_jade_guardian : public CreatureScript
 				solidStone = false;
 				map = me->GetMap();
 
-				me->CastSpell(me, SPELL_STONE_VISUAL);
-				me->CastSpell(me, SPELL_ANIM_SIT);
-				me->setPowerType(POWER_MANA);
 				me->SetMaxPower(POWER_MANA, 100);
 				me->SetPower(POWER_MANA, 0);
+				me->CastSpell(me, SPELL_STONE_VISUAL);
+				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ZERO_POWER);
             }
 			
 			void JustReachedHome()
@@ -909,11 +909,11 @@ class boss_jasper_guardian : public CreatureScript
 				solidStone = false;
 				map = me->GetMap();
 
-				me->CastSpell(me, SPELL_STONE_VISUAL);
-				me->CastSpell(me, SPELL_ANIM_SIT);
-				me->setPowerType(POWER_MANA);
 				me->SetMaxPower(POWER_MANA, 100);
 				me->SetPower(POWER_MANA, 0);
+				me->CastSpell(me, SPELL_STONE_VISUAL);
+				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ZERO_POWER);
             }
 			
 			void JustReachedHome()
