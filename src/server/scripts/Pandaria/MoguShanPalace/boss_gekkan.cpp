@@ -1,6 +1,6 @@
 /* # Script de Sungis : Gekkan # */
 
-/* Notes : What is missing ? : - ...
+/* Notes : What is missing ? : - Glintrok Ironhide doesn't attack (because of the channeled spell)
 */
 #include "ScriptPCH.h"
 #include "mogushan_palace.h"

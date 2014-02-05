@@ -1,5 +1,10 @@
 /* # Script de Sungis : The Stone Guard # */
 
+/* Notes : What is missing ? :	- Guardians personnal spells
+								- Overloads with power
+								- Anim sit fails after evade
+*/
+
 #include "ScriptPCH.h"
 #include "mogushan_vaults.h"
 
@@ -101,9 +106,14 @@ class boss_amethyst_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
 				me->setPowerType(POWER_ENERGY);
-				me->SetMaxPower(POWER_ENERGY, me->GetMaxPower(POWER_ENERGY));
+				me->SetMaxPower(POWER_ENERGY, 100);
 				me->SetPower(POWER_ENERGY, 0);
             }
+
+			void JustReachedHome()
+            {
+				me->CastSpell(me, SPELL_ANIM_SIT);
+			}
 
 			void DoAction(int32 action)
 			{
@@ -139,6 +149,22 @@ class boss_amethyst_guardian : public CreatureScript
 			void EnterEvadeMode()
 			{
 				ScriptedAI::EnterEvadeMode();
+
+				if (map)
+				{
+					Map::PlayerList const &PlayerList = map->GetPlayers();
+
+					if (!PlayerList.isEmpty())
+						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+							if (Player* player = i->getSource())
+							{
+								player->RemoveAurasDueToSpell(SPELL_AMETHYST_PETRIFICATION);
+								player->RemoveAurasDueToSpell(SPELL_COBALT_PETRIFICATION);
+								player->RemoveAurasDueToSpell(SPELL_JADE_PETRIFICATION);
+								player->RemoveAurasDueToSpell(SPELL_JASPER_PETRIFICATION);
+								player->SetPower(POWER_ALTERNATE_POWER, 0);
+							}
+				}
 			}
 
 			void DamageTaken(Unit* who, uint32& damage)
@@ -334,9 +360,14 @@ class boss_cobalt_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
 				me->setPowerType(POWER_ENERGY);
-				me->SetMaxPower(POWER_ENERGY, me->GetMaxPower(POWER_ENERGY));
+				me->SetMaxPower(POWER_ENERGY, 100);
 				me->SetPower(POWER_ENERGY, 0);
             }
+			
+			void JustReachedHome()
+            {
+				me->CastSpell(me, SPELL_ANIM_SIT);
+			}
 
 			void DoAction(int32 action)
 			{
@@ -372,6 +403,22 @@ class boss_cobalt_guardian : public CreatureScript
 			void EnterEvadeMode()
 			{
 				ScriptedAI::EnterEvadeMode();
+
+				if (map)
+				{
+					Map::PlayerList const &PlayerList = map->GetPlayers();
+
+					if (!PlayerList.isEmpty())
+						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+							if (Player* player = i->getSource())
+							{
+								player->RemoveAurasDueToSpell(SPELL_AMETHYST_PETRIFICATION);
+								player->RemoveAurasDueToSpell(SPELL_COBALT_PETRIFICATION);
+								player->RemoveAurasDueToSpell(SPELL_JADE_PETRIFICATION);
+								player->RemoveAurasDueToSpell(SPELL_JASPER_PETRIFICATION);
+								player->SetPower(POWER_ALTERNATE_POWER, 0);
+							}
+				}
 			}
 
 			void DamageTaken(Unit* who, uint32& damage)
@@ -567,9 +614,14 @@ class boss_jade_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
 				me->setPowerType(POWER_ENERGY);
-				me->SetMaxPower(POWER_ENERGY, me->GetMaxPower(POWER_ENERGY));
+				me->SetMaxPower(POWER_ENERGY, 100);
 				me->SetPower(POWER_ENERGY, 0);
             }
+			
+			void JustReachedHome()
+            {
+				me->CastSpell(me, SPELL_ANIM_SIT);
+			}
 
 			void DoAction(int32 action)
 			{
@@ -605,6 +657,22 @@ class boss_jade_guardian : public CreatureScript
 			void EnterEvadeMode()
 			{
 				ScriptedAI::EnterEvadeMode();
+
+				if (map)
+				{
+					Map::PlayerList const &PlayerList = map->GetPlayers();
+
+					if (!PlayerList.isEmpty())
+						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+							if (Player* player = i->getSource())
+							{
+								player->RemoveAurasDueToSpell(SPELL_AMETHYST_PETRIFICATION);
+								player->RemoveAurasDueToSpell(SPELL_COBALT_PETRIFICATION);
+								player->RemoveAurasDueToSpell(SPELL_JADE_PETRIFICATION);
+								player->RemoveAurasDueToSpell(SPELL_JASPER_PETRIFICATION);
+								player->SetPower(POWER_ALTERNATE_POWER, 0);
+							}
+				}
 			}
 
 			void DamageTaken(Unit* who, uint32& damage)
@@ -800,9 +868,14 @@ class boss_jasper_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
 				me->setPowerType(POWER_ENERGY);
-				me->SetMaxPower(POWER_ENERGY, me->GetMaxPower(POWER_ENERGY));
+				me->SetMaxPower(POWER_ENERGY, 100);
 				me->SetPower(POWER_ENERGY, 0);
             }
+			
+			void JustReachedHome()
+            {
+				me->CastSpell(me, SPELL_ANIM_SIT);
+			}
 
 			void DoAction(int32 action)
 			{
@@ -838,6 +911,22 @@ class boss_jasper_guardian : public CreatureScript
 			void EnterEvadeMode()
 			{
 				ScriptedAI::EnterEvadeMode();
+
+				if (map)
+				{
+					Map::PlayerList const &PlayerList = map->GetPlayers();
+
+					if (!PlayerList.isEmpty())
+						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+							if (Player* player = i->getSource())
+							{
+								player->RemoveAurasDueToSpell(SPELL_AMETHYST_PETRIFICATION);
+								player->RemoveAurasDueToSpell(SPELL_COBALT_PETRIFICATION);
+								player->RemoveAurasDueToSpell(SPELL_JADE_PETRIFICATION);
+								player->RemoveAurasDueToSpell(SPELL_JASPER_PETRIFICATION);
+								player->SetPower(POWER_ALTERNATE_POWER, 0);
+							}
+				}
 			}
 
 			void DamageTaken(Unit* who, uint32& damage)
