@@ -59,7 +59,8 @@ enum Events
 	EVENT_PETRIFICATION_INCREASE_1	= 4,
 	EVENT_PETRIFICATION_INCREASE_2	= 5,
 	EVENT_PETRIFICATION_INCREASE_3	= 6,
-	EVENT_INCREASE_POWER			= 7,
+	EVENT_INCREASE_POWER_1			= 7,
+	EVENT_INCREASE_POWER_2			= 8,
 
 	/* The Stone Guard Tracker */
 	EVENT_CHOOSE_PETRIFICATION		= 1,
@@ -106,9 +107,9 @@ class boss_amethyst_guardian : public CreatureScript
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
-				me->setPowerType(POWER_ENERGY);
-				me->SetMaxPower(POWER_ENERGY, 100);
-				me->SetPower(POWER_ENERGY, 0);
+				me->setPowerType(POWER_MANA);
+				me->SetMaxPower(POWER_MANA, 100);
+				me->SetPower(POWER_MANA, 0);
             }
 
 			void JustReachedHome()
@@ -132,7 +133,8 @@ class boss_amethyst_guardian : public CreatureScript
 				
 				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_PETRIFICATION_FIRST, 6*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_INCREASE_POWER, 3*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
 
 				if (instance)
 				{
@@ -319,11 +321,17 @@ class boss_amethyst_guardian : public CreatureScript
 								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
 								break;
 							}
+							
+							case EVENT_INCREASE_POWER_1:
+								me->ModifyPower(POWER_MANA, 2);
 
-							case EVENT_INCREASE_POWER:
-								me->ModifyPower(POWER_ENERGY, irand(1, 2));
+								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 950);
+								break;
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER, irand(750, 1750));
+							case EVENT_INCREASE_POWER_2:
+								me->ModifyPower(POWER_MANA, 3);
+
+								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1425);
 								break;
 
 							default:
@@ -367,9 +375,9 @@ class boss_cobalt_guardian : public CreatureScript
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
-				me->setPowerType(POWER_ENERGY);
-				me->SetMaxPower(POWER_ENERGY, 100);
-				me->SetPower(POWER_ENERGY, 0);
+				me->setPowerType(POWER_MANA);
+				me->SetMaxPower(POWER_MANA, 100);
+				me->SetPower(POWER_MANA, 0);
             }
 			
 			void JustReachedHome()
@@ -393,7 +401,8 @@ class boss_cobalt_guardian : public CreatureScript
 				
 				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_PETRIFICATION_FIRST, 6*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_INCREASE_POWER, 3*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
 
 				if (instance)
 				{
@@ -581,10 +590,16 @@ class boss_cobalt_guardian : public CreatureScript
 								break;
 							}
 							
-							case EVENT_INCREASE_POWER:
-								me->ModifyPower(POWER_ENERGY, irand(1, 2));
+							case EVENT_INCREASE_POWER_1:
+								me->ModifyPower(POWER_MANA, 2);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER, irand(750, 1750));
+								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 950);
+								break;
+
+							case EVENT_INCREASE_POWER_2:
+								me->ModifyPower(POWER_MANA, 3);
+
+								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1425);
 								break;
 
 							default:
@@ -628,9 +643,9 @@ class boss_jade_guardian : public CreatureScript
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
-				me->setPowerType(POWER_ENERGY);
-				me->SetMaxPower(POWER_ENERGY, 100);
-				me->SetPower(POWER_ENERGY, 0);
+				me->setPowerType(POWER_MANA);
+				me->SetMaxPower(POWER_MANA, 100);
+				me->SetPower(POWER_MANA, 0);
             }
 			
 			void JustReachedHome()
@@ -654,7 +669,8 @@ class boss_jade_guardian : public CreatureScript
 				
 				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_PETRIFICATION_FIRST, 6*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_INCREASE_POWER, 3*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
 
 				if (instance)
 				{
@@ -842,10 +858,16 @@ class boss_jade_guardian : public CreatureScript
 								break;
 							}
 							
-							case EVENT_INCREASE_POWER:
-								me->ModifyPower(POWER_ENERGY, irand(1, 2));
+							case EVENT_INCREASE_POWER_1:
+								me->ModifyPower(POWER_MANA, 2);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER, irand(750, 1750));
+								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 950);
+								break;
+
+							case EVENT_INCREASE_POWER_2:
+								me->ModifyPower(POWER_MANA, 3);
+
+								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1425);
 								break;
 
 							default:
@@ -889,9 +911,9 @@ class boss_jasper_guardian : public CreatureScript
 
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
-				me->setPowerType(POWER_ENERGY);
-				me->SetMaxPower(POWER_ENERGY, 100);
-				me->SetPower(POWER_ENERGY, 0);
+				me->setPowerType(POWER_MANA);
+				me->SetMaxPower(POWER_MANA, 100);
+				me->SetPower(POWER_MANA, 0);
             }
 			
 			void JustReachedHome()
@@ -915,7 +937,8 @@ class boss_jasper_guardian : public CreatureScript
 				
 				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_PETRIFICATION_FIRST, 6*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_INCREASE_POWER, 3*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
 
 				if (instance)
 				{
@@ -1103,10 +1126,16 @@ class boss_jasper_guardian : public CreatureScript
 								break;
 							}
 							
-							case EVENT_INCREASE_POWER:
-								me->ModifyPower(POWER_ENERGY, irand(1, 2));
+							case EVENT_INCREASE_POWER_1:
+								me->ModifyPower(POWER_MANA, 2);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER, irand(750, 1750));
+								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 950);
+								break;
+
+							case EVENT_INCREASE_POWER_2:
+								me->ModifyPower(POWER_MANA, 3);
+
+								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1425);
 								break;
 
 							default:
