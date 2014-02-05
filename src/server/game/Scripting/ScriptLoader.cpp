@@ -21,6 +21,7 @@ void AddSC_the_brawlers_guild();
 
 // Mogushan Vaults
 void AddSC_boss_the_stone_guard();
+void AddSC_instance_mogushan_vaults();
 
 // Mogushan Palace
 void AddSC_trial_of_the_king();
@@ -1354,6 +1355,7 @@ void AddPandariaScripts()
 
 	// Mogushan Vaults
 	AddSC_boss_the_stone_guard();
+	AddSC_instance_mogushan_vaults();
 
 	// Mogushan Palace
 	AddSC_trial_of_the_king();
