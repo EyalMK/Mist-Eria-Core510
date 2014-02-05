@@ -105,8 +105,6 @@ class boss_amethyst_guardian : public CreatureScript
 				solidStone = false;
 				map = me->GetMap();
 
-				me->SetMaxPower(POWER_MANA, 100);
-				me->SetPower(POWER_MANA, 0);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
 				me->CastSpell(me, SPELL_ZERO_POWER);
@@ -162,10 +160,11 @@ class boss_amethyst_guardian : public CreatureScript
 						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 							if (Player* player = i->getSource())
 							{
-								player->RemoveAurasDueToSpell(SPELL_AMETHYST_PETRIFICATION);
-								player->RemoveAurasDueToSpell(SPELL_COBALT_PETRIFICATION);
-								player->RemoveAurasDueToSpell(SPELL_JADE_PETRIFICATION);
-								player->RemoveAurasDueToSpell(SPELL_JASPER_PETRIFICATION);
+								player->RemoveAurasDueToSpell(SPELL_AMETHYST_PETRIFICATION_BAR);
+								player->RemoveAurasDueToSpell(SPELL_COBALT_PETRIFICATION_BAR);
+								player->RemoveAurasDueToSpell(SPELL_JADE_PETRIFICATION_BAR);
+								player->RemoveAurasDueToSpell(SPELL_JASPER_PETRIFICATION_BAR);
+								player->RemoveAurasDueToSpell(SPELL_TOTALY_PETRIFIED);
 								player->SetPower(POWER_ALTERNATE_POWER, 0);
 							}
 				}
@@ -323,15 +322,15 @@ class boss_amethyst_guardian : public CreatureScript
 							}
 							
 							case EVENT_INCREASE_POWER_1:
-								me->ModifyPower(POWER_MANA, 2);
+								me->ModifyPower(POWER_MANA, 1);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 950);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
 								break;
 
 							case EVENT_INCREASE_POWER_2:
-								me->ModifyPower(POWER_MANA, 3);
+								me->ModifyPower(POWER_MANA, 2);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1425);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1625);
 								break;
 
 							default:
@@ -373,8 +372,6 @@ class boss_cobalt_guardian : public CreatureScript
 				solidStone = false;
 				map = me->GetMap();
 
-				me->SetMaxPower(POWER_MANA, 100);
-				me->SetPower(POWER_MANA, 0);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
 				me->CastSpell(me, SPELL_ZERO_POWER);
@@ -430,10 +427,11 @@ class boss_cobalt_guardian : public CreatureScript
 						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 							if (Player* player = i->getSource())
 							{
-								player->RemoveAurasDueToSpell(SPELL_AMETHYST_PETRIFICATION);
-								player->RemoveAurasDueToSpell(SPELL_COBALT_PETRIFICATION);
-								player->RemoveAurasDueToSpell(SPELL_JADE_PETRIFICATION);
-								player->RemoveAurasDueToSpell(SPELL_JASPER_PETRIFICATION);
+								player->RemoveAurasDueToSpell(SPELL_AMETHYST_PETRIFICATION_BAR);
+								player->RemoveAurasDueToSpell(SPELL_COBALT_PETRIFICATION_BAR);
+								player->RemoveAurasDueToSpell(SPELL_JADE_PETRIFICATION_BAR);
+								player->RemoveAurasDueToSpell(SPELL_JASPER_PETRIFICATION_BAR);
+								player->RemoveAurasDueToSpell(SPELL_TOTALY_PETRIFIED);
 								player->SetPower(POWER_ALTERNATE_POWER, 0);
 							}
 				}
@@ -641,8 +639,6 @@ class boss_jade_guardian : public CreatureScript
 				solidStone = false;
 				map = me->GetMap();
 
-				me->SetMaxPower(POWER_MANA, 100);
-				me->SetPower(POWER_MANA, 0);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
 				me->CastSpell(me, SPELL_ZERO_POWER);
@@ -698,10 +694,11 @@ class boss_jade_guardian : public CreatureScript
 						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 							if (Player* player = i->getSource())
 							{
-								player->RemoveAurasDueToSpell(SPELL_AMETHYST_PETRIFICATION);
-								player->RemoveAurasDueToSpell(SPELL_COBALT_PETRIFICATION);
-								player->RemoveAurasDueToSpell(SPELL_JADE_PETRIFICATION);
-								player->RemoveAurasDueToSpell(SPELL_JASPER_PETRIFICATION);
+								player->RemoveAurasDueToSpell(SPELL_AMETHYST_PETRIFICATION_BAR);
+								player->RemoveAurasDueToSpell(SPELL_COBALT_PETRIFICATION_BAR);
+								player->RemoveAurasDueToSpell(SPELL_JADE_PETRIFICATION_BAR);
+								player->RemoveAurasDueToSpell(SPELL_JASPER_PETRIFICATION_BAR);
+								player->RemoveAurasDueToSpell(SPELL_TOTALY_PETRIFIED);
 								player->SetPower(POWER_ALTERNATE_POWER, 0);
 							}
 				}
@@ -909,8 +906,6 @@ class boss_jasper_guardian : public CreatureScript
 				solidStone = false;
 				map = me->GetMap();
 
-				me->SetMaxPower(POWER_MANA, 100);
-				me->SetPower(POWER_MANA, 0);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
 				me->CastSpell(me, SPELL_ZERO_POWER);
@@ -966,10 +961,11 @@ class boss_jasper_guardian : public CreatureScript
 						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 							if (Player* player = i->getSource())
 							{
-								player->RemoveAurasDueToSpell(SPELL_AMETHYST_PETRIFICATION);
-								player->RemoveAurasDueToSpell(SPELL_COBALT_PETRIFICATION);
-								player->RemoveAurasDueToSpell(SPELL_JADE_PETRIFICATION);
-								player->RemoveAurasDueToSpell(SPELL_JASPER_PETRIFICATION);
+								player->RemoveAurasDueToSpell(SPELL_AMETHYST_PETRIFICATION_BAR);
+								player->RemoveAurasDueToSpell(SPELL_COBALT_PETRIFICATION_BAR);
+								player->RemoveAurasDueToSpell(SPELL_JADE_PETRIFICATION_BAR);
+								player->RemoveAurasDueToSpell(SPELL_JASPER_PETRIFICATION_BAR);
+								player->RemoveAurasDueToSpell(SPELL_TOTALY_PETRIFIED);
 								player->SetPower(POWER_ALTERNATE_POWER, 0);
 							}
 				}
