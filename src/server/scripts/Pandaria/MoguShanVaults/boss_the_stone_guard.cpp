@@ -104,7 +104,12 @@ class boss_amethyst_guardian : public CreatureScript
 				events.Reset();
 				solidStone = false;
 				map = me->GetMap();
+				
+				if (uint32 vehicleId = me->GetVehicleKit()->GetVehicleInfo()->m_ID)
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "VEHICLE ID = %u.", vehicleId);
 
+				me->setPowerType(POWER_ENERGY);
+                me->SetPower(POWER_ENERGY, 0);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
 				me->CastSpell(me, SPELL_ZERO_POWER);
@@ -279,7 +284,7 @@ class boss_amethyst_guardian : public CreatureScript
 									if (!PlayerList.isEmpty())
 										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 											if (Player* player = i->getSource())
-												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
+												player->SetPower(POWER_ALTERNATE_POWER, int32(player->GetPower(POWER_ALTERNATE_POWER) + 5));
 								}
 								
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_2, 2*IN_MILLISECONDS);
@@ -296,7 +301,7 @@ class boss_amethyst_guardian : public CreatureScript
 									if (!PlayerList.isEmpty())
 										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 											if (Player* player = i->getSource())
-												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
+												player->SetPower(POWER_ALTERNATE_POWER, int32(player->GetPower(POWER_ALTERNATE_POWER) + 5));
 								}
 								
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_3, 2*IN_MILLISECONDS);
@@ -313,7 +318,7 @@ class boss_amethyst_guardian : public CreatureScript
 									if (!PlayerList.isEmpty())
 										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 											if (Player* player = i->getSource())
-												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
+												player->SetPower(POWER_ALTERNATE_POWER, int32(player->GetPower(POWER_ALTERNATE_POWER) + 5));
 								}
 								
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
@@ -322,13 +327,13 @@ class boss_amethyst_guardian : public CreatureScript
 							}
 							
 							case EVENT_INCREASE_POWER_1:
-								me->ModifyPower(POWER_MANA, 1);
+								me->SetPower(POWER_ENERGY, int32(me->GetPower(POWER_ENERGY) + 2));
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
 								break;
 
 							case EVENT_INCREASE_POWER_2:
-								me->ModifyPower(POWER_MANA, 2);
+								me->SetPower(POWER_ENERGY, int32(me->GetPower(POWER_ENERGY) + 3));
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1625);
 								break;
@@ -371,7 +376,9 @@ class boss_cobalt_guardian : public CreatureScript
 				events.Reset();
 				solidStone = false;
 				map = me->GetMap();
-
+				
+				me->setPowerType(POWER_ENERGY);
+                me->SetPower(POWER_ENERGY, 0);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
 				me->CastSpell(me, SPELL_ZERO_POWER);
@@ -546,7 +553,7 @@ class boss_cobalt_guardian : public CreatureScript
 									if (!PlayerList.isEmpty())
 										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 											if (Player* player = i->getSource())
-												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
+												player->SetPower(POWER_ALTERNATE_POWER, int32(player->GetPower(POWER_ALTERNATE_POWER) + 5));
 								}
 								
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_2, 2*IN_MILLISECONDS);
@@ -563,7 +570,7 @@ class boss_cobalt_guardian : public CreatureScript
 									if (!PlayerList.isEmpty())
 										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 											if (Player* player = i->getSource())
-												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
+												player->SetPower(POWER_ALTERNATE_POWER, int32(player->GetPower(POWER_ALTERNATE_POWER) + 5));
 								}
 								
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_3, 2*IN_MILLISECONDS);
@@ -580,7 +587,7 @@ class boss_cobalt_guardian : public CreatureScript
 									if (!PlayerList.isEmpty())
 										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 											if (Player* player = i->getSource())
-												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
+												player->SetPower(POWER_ALTERNATE_POWER, int32(player->GetPower(POWER_ALTERNATE_POWER) + 5));
 								}
 								
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
@@ -589,15 +596,15 @@ class boss_cobalt_guardian : public CreatureScript
 							}
 							
 							case EVENT_INCREASE_POWER_1:
-								me->ModifyPower(POWER_MANA, 2);
+								me->SetPower(POWER_ENERGY, int32(me->GetPower(POWER_ENERGY) + 2));
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 950);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
 								break;
 
 							case EVENT_INCREASE_POWER_2:
-								me->ModifyPower(POWER_MANA, 3);
+								me->SetPower(POWER_ENERGY, int32(me->GetPower(POWER_ENERGY) + 3));
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1425);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1625);
 								break;
 
 							default:
@@ -639,6 +646,8 @@ class boss_jade_guardian : public CreatureScript
 				solidStone = false;
 				map = me->GetMap();
 
+				me->setPowerType(POWER_ENERGY);
+                me->SetPower(POWER_ENERGY, 0);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
 				me->CastSpell(me, SPELL_ZERO_POWER);
@@ -813,7 +822,7 @@ class boss_jade_guardian : public CreatureScript
 									if (!PlayerList.isEmpty())
 										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 											if (Player* player = i->getSource())
-												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
+												player->SetPower(POWER_ALTERNATE_POWER, int32(player->GetPower(POWER_ALTERNATE_POWER) + 5));
 								}
 								
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_2, 2*IN_MILLISECONDS);
@@ -830,7 +839,7 @@ class boss_jade_guardian : public CreatureScript
 									if (!PlayerList.isEmpty())
 										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 											if (Player* player = i->getSource())
-												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
+												player->SetPower(POWER_ALTERNATE_POWER, int32(player->GetPower(POWER_ALTERNATE_POWER) + 5));
 								}
 								
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_3, 2*IN_MILLISECONDS);
@@ -847,7 +856,7 @@ class boss_jade_guardian : public CreatureScript
 									if (!PlayerList.isEmpty())
 										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 											if (Player* player = i->getSource())
-												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
+												player->SetPower(POWER_ALTERNATE_POWER, int32(player->GetPower(POWER_ALTERNATE_POWER) + 5));
 								}
 								
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
@@ -856,15 +865,15 @@ class boss_jade_guardian : public CreatureScript
 							}
 							
 							case EVENT_INCREASE_POWER_1:
-								me->ModifyPower(POWER_MANA, 2);
+								me->SetPower(POWER_ENERGY, int32(me->GetPower(POWER_ENERGY) + 2));
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 950);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
 								break;
 
 							case EVENT_INCREASE_POWER_2:
-								me->ModifyPower(POWER_MANA, 3);
+								me->SetPower(POWER_ENERGY, int32(me->GetPower(POWER_ENERGY) + 3));
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1425);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1625);
 								break;
 
 							default:
@@ -906,6 +915,8 @@ class boss_jasper_guardian : public CreatureScript
 				solidStone = false;
 				map = me->GetMap();
 
+				me->setPowerType(POWER_ENERGY);
+                me->SetPower(POWER_ENERGY, 0);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
 				me->CastSpell(me, SPELL_ANIM_SIT);
 				me->CastSpell(me, SPELL_ZERO_POWER);
@@ -1080,7 +1091,7 @@ class boss_jasper_guardian : public CreatureScript
 									if (!PlayerList.isEmpty())
 										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 											if (Player* player = i->getSource())
-												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
+												player->SetPower(POWER_ALTERNATE_POWER, int32(player->GetPower(POWER_ALTERNATE_POWER) + 5));
 								}
 								
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_2, 2*IN_MILLISECONDS);
@@ -1097,7 +1108,7 @@ class boss_jasper_guardian : public CreatureScript
 									if (!PlayerList.isEmpty())
 										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 											if (Player* player = i->getSource())
-												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
+												player->SetPower(POWER_ALTERNATE_POWER, int32(player->GetPower(POWER_ALTERNATE_POWER) + 5));
 								}
 								
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_3, 2*IN_MILLISECONDS);
@@ -1114,7 +1125,7 @@ class boss_jasper_guardian : public CreatureScript
 									if (!PlayerList.isEmpty())
 										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 											if (Player* player = i->getSource())
-												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
+												player->SetPower(POWER_ALTERNATE_POWER, 5);
 								}
 								
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
@@ -1123,15 +1134,15 @@ class boss_jasper_guardian : public CreatureScript
 							}
 							
 							case EVENT_INCREASE_POWER_1:
-								me->ModifyPower(POWER_MANA, 2);
+								me->SetPower(POWER_ENERGY, int32(me->GetPower(POWER_ENERGY) + 2));
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 950);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
 								break;
 
 							case EVENT_INCREASE_POWER_2:
-								me->ModifyPower(POWER_MANA, 3);
+								me->SetPower(POWER_ENERGY, int32(me->GetPower(POWER_ENERGY) + 3));
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1425);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1625);
 								break;
 
 							default:
