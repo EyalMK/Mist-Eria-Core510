@@ -777,6 +777,27 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
         m_respawnTime = 0;
     }
 
+    if (data->invisibility == 7)
+    {
+        InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_7);
+        m_invisibility.AddFlag(type);
+        m_invisibility.AddValue(INVISIBILITY_QUEST_7, 7);
+    }
+
+    if (data->invisibility == 8)
+    {
+        InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_8);
+        m_invisibility.AddFlag(type);
+        m_invisibility.AddValue(INVISIBILITY_QUEST_8, 8);
+    }
+
+    if (data->invisibility == 9)
+    {
+        InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_9);
+        m_invisibility.AddFlag(type);
+        m_invisibility.AddValue(INVISIBILITY_QUEST_9, 9);
+    }
+
     m_goData = data;
 
     if (addToMap && !GetMap()->AddToMap(this))
