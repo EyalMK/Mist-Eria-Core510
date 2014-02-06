@@ -1181,20 +1181,6 @@ void Creature::SelectLevel(const CreatureTemplate* cinfo)
     switch (getClass())
     {
         case CLASS_WARRIOR:
-			if (GetVehicleKit()->GetVehicleInfo()->m_ID > 0)
-				switch (GetEntry())
-				{
-					case 60043: // Jade Guardian
-					case 60047: // Jasper Guardian
-					case 60051: // Amethyst Guardian
-					case 59915: // Cobalt Guardian
-						setPowerType(POWER_ENERGY);
-						break;
-
-					default:
-						break;
-				}
-				
             //setPowerType(POWER_RAGE);
             break;
 		case CLASS_PALADIN:
