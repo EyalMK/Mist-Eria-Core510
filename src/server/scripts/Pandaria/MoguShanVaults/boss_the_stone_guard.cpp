@@ -54,13 +54,12 @@ enum Events
 {
 	/* Shared Guardian Events */
 	EVENT_REND_FLESH				= 1,
-	EVENT_PETRIFICATION_FIRST		= 2,
-	EVENT_PETRIFICATION_SET			= 3,
-	EVENT_PETRIFICATION_INCREASE_1	= 4,
-	EVENT_PETRIFICATION_INCREASE_2	= 5,
-	EVENT_PETRIFICATION_INCREASE_3	= 6,
-	EVENT_INCREASE_POWER_1			= 7,
-	EVENT_INCREASE_POWER_2			= 8,
+	EVENT_PETRIFICATION_SET			= 2,
+	EVENT_PETRIFICATION_INCREASE_1	= 3,
+	EVENT_PETRIFICATION_INCREASE_2	= 4,
+	EVENT_PETRIFICATION_INCREASE_3	= 5,
+	EVENT_INCREASE_POWER_1			= 6,
+	EVENT_INCREASE_POWER_2			= 7,
 
 	/* The Stone Guard Tracker */
 	EVENT_CHOOSE_PETRIFICATION		= 1,
@@ -70,6 +69,7 @@ enum Actions
 {
 	ACTION_CHOOSE_PETRIFICATION,
 	ACTION_PETRIFICATION_BAR,
+	ACTION_TRACKER_RESET,
 };
 
 enum Npcs
@@ -104,9 +104,6 @@ class boss_amethyst_guardian : public CreatureScript
 				events.Reset();
 				solidStone = false;
 				map = me->GetMap();
-				
-				if (uint32 vehicleId = me->GetVehicleKit()->GetVehicleInfo()->m_ID)
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "VEHICLE ID = %u.", vehicleId);
 
 				me->setPowerType(POWER_ENERGY);
                 me->SetPower(POWER_ENERGY, 0);
@@ -130,29 +127,6 @@ class boss_amethyst_guardian : public CreatureScript
 				}
 			}
 
-            void EnterCombat(Unit* /*who*/)
-            {
-				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
-				
-				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_PETRIFICATION_FIRST, 6*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
-
-				if (instance)
-				{
-					if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
-						cobalt->SetInCombatWithZone();
-					if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
-						jade->SetInCombatWithZone();
-					if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
-						jasper->SetInCombatWithZone();
-
-					if (!me->isInCombat())
-						me->SetInCombatWithZone();
-				}
-            }
-
 			void EnterEvadeMode()
 			{
 				ScriptedAI::EnterEvadeMode();
@@ -173,6 +147,9 @@ class boss_amethyst_guardian : public CreatureScript
 								player->SetPower(POWER_ALTERNATE_POWER, 0);
 							}
 				}
+
+				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
+					tracker->AI()->DoAction(ACTION_TRACKER_RESET);
 			}
 
 			void DamageTaken(Unit* who, uint32& damage)
@@ -184,16 +161,47 @@ class boss_amethyst_guardian : public CreatureScript
 							if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
 							{
 								if (cobalt->isAlive())
-									cobalt->SetHealth(cobalt->GetHealth() - damage);
+									if (cobalt->GetHealth() >= damage)
+										cobalt->SetHealth(cobalt->GetHealth() - damage);
+									else cobalt->Kill(jasper);
 
 								if (jade->isAlive())
-									jade->SetHealth(jade->GetHealth() - damage);
+									if (jade->GetHealth() >= damage)
+										jade->SetHealth(jade->GetHealth() - damage);
+									else jade->Kill(jasper);
 
 								if (jasper->isAlive())
-									jasper->SetHealth(jasper->GetHealth() - damage);
+									if (jasper->GetHealth() >= damage)
+										jasper->SetHealth(jasper->GetHealth() - damage);
+									else jasper->Kill(jasper);
 							}
 				}
 			}
+			
+            void EnterCombat(Unit* /*who*/)
+            {
+				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
+				
+				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
+
+				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
+					tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
+
+				if (instance)
+				{
+					if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
+						cobalt->SetInCombatWithZone();
+					if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
+						jade->SetInCombatWithZone();
+					if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
+						jasper->SetInCombatWithZone();
+
+					if (!me->isInCombat())
+						me->SetInCombatWithZone();
+				}
+            }
 
             void UpdateAI(uint32 const diff)
             {
@@ -244,15 +252,6 @@ class boss_amethyst_guardian : public CreatureScript
 
 								events.ScheduleEvent(EVENT_REND_FLESH, 6*IN_MILLISECONDS);
 								break;
-
-							case EVENT_PETRIFICATION_FIRST:
-							{
-								if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
-									tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
-
-								events.CancelEvent(EVENT_PETRIFICATION_FIRST);
-								break;
-							}
 
 							case EVENT_PETRIFICATION_SET:
 							{
@@ -399,29 +398,6 @@ class boss_cobalt_guardian : public CreatureScript
 				}
 			}
 
-            void EnterCombat(Unit* /*who*/)
-            {
-				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
-				
-				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_PETRIFICATION_FIRST, 6*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
-
-				if (instance)
-				{
-					if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
-						amethyst->SetInCombatWithZone();
-					if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
-						jade->SetInCombatWithZone();
-					if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
-						jasper->SetInCombatWithZone();
-
-					if (!me->isInCombat())
-						me->SetInCombatWithZone();
-				}
-            }
-
 			void EnterEvadeMode()
 			{
 				ScriptedAI::EnterEvadeMode();
@@ -442,6 +418,9 @@ class boss_cobalt_guardian : public CreatureScript
 								player->SetPower(POWER_ALTERNATE_POWER, 0);
 							}
 				}
+
+				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
+					tracker->AI()->DoAction(ACTION_TRACKER_RESET);
 			}
 
 			void DamageTaken(Unit* who, uint32& damage)
@@ -453,16 +432,47 @@ class boss_cobalt_guardian : public CreatureScript
 							if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
 							{
 								if (amethyst->isAlive())
-									amethyst->SetHealth(amethyst->GetHealth() - damage);
+									if (amethyst->GetHealth() >= damage)
+										amethyst->SetHealth(amethyst->GetHealth() - damage);
+									else amethyst->Kill(amethyst);
 
 								if (jade->isAlive())
-									jade->SetHealth(jade->GetHealth() - damage);
+									if (jade->GetHealth() >= damage)
+										jade->SetHealth(jade->GetHealth() - damage);
+									else jade->Kill(jade);
 
 								if (jasper->isAlive())
-									jasper->SetHealth(jasper->GetHealth() - damage);
+									if (jasper->GetHealth() >= damage)
+										jasper->SetHealth(jasper->GetHealth() - damage);
+									else jasper->Kill(jasper);
 							}
 				}
 			}
+			
+            void EnterCombat(Unit* /*who*/)
+            {
+				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
+				
+				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
+
+				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
+					tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
+
+				if (instance)
+				{
+					if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
+						amethyst->SetInCombatWithZone();
+					if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
+						jade->SetInCombatWithZone();
+					if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
+						jasper->SetInCombatWithZone();
+
+					if (!me->isInCombat())
+						me->SetInCombatWithZone();
+				}
+            }
 
             void UpdateAI(uint32 const diff)
             {
@@ -513,15 +523,6 @@ class boss_cobalt_guardian : public CreatureScript
 
 								events.ScheduleEvent(EVENT_REND_FLESH, 6*IN_MILLISECONDS);
 								break;
-
-							case EVENT_PETRIFICATION_FIRST:
-							{
-								if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
-									tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
-
-								events.CancelEvent(EVENT_PETRIFICATION_FIRST);
-								break;
-							}
 
 							case EVENT_PETRIFICATION_SET:
 							{
@@ -668,29 +669,6 @@ class boss_jade_guardian : public CreatureScript
 				}
 			}
 
-            void EnterCombat(Unit* /*who*/)
-            {
-				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
-				
-				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_PETRIFICATION_FIRST, 6*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
-
-				if (instance)
-				{
-					if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
-						amethyst->SetInCombatWithZone();
-					if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
-						cobalt->SetInCombatWithZone();
-					if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
-						jasper->SetInCombatWithZone();
-
-					if (!me->isInCombat())
-						me->SetInCombatWithZone();
-				}
-            }
-
 			void EnterEvadeMode()
 			{
 				ScriptedAI::EnterEvadeMode();
@@ -711,6 +689,9 @@ class boss_jade_guardian : public CreatureScript
 								player->SetPower(POWER_ALTERNATE_POWER, 0);
 							}
 				}
+
+				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
+					tracker->AI()->DoAction(ACTION_TRACKER_RESET);
 			}
 
 			void DamageTaken(Unit* who, uint32& damage)
@@ -722,16 +703,47 @@ class boss_jade_guardian : public CreatureScript
 							if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
 							{
 								if (amethyst->isAlive())
-									amethyst->SetHealth(amethyst->GetHealth() - damage);
+									if (amethyst->GetHealth() >= damage)
+										amethyst->SetHealth(amethyst->GetHealth() - damage);
+									else amethyst->Kill(jasper);
 
 								if (cobalt->isAlive())
-									cobalt->SetHealth(cobalt->GetHealth() - damage);
+									if (cobalt->GetHealth() >= damage)
+										cobalt->SetHealth(cobalt->GetHealth() - damage);
+									else cobalt->Kill(jasper);
 
 								if (jasper->isAlive())
-									jasper->SetHealth(jasper->GetHealth() - damage);
+									if (jasper->GetHealth() >= damage)
+										jasper->SetHealth(jasper->GetHealth() - damage);
+									else jasper->Kill(jasper);
 							}
 				}
 			}
+			
+            void EnterCombat(Unit* /*who*/)
+            {
+				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
+				
+				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
+
+				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
+					tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
+
+				if (instance)
+				{
+					if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
+						amethyst->SetInCombatWithZone();
+					if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
+						cobalt->SetInCombatWithZone();
+					if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
+						jasper->SetInCombatWithZone();
+
+					if (!me->isInCombat())
+						me->SetInCombatWithZone();
+				}
+            }
 
             void UpdateAI(uint32 const diff)
             {
@@ -782,15 +794,6 @@ class boss_jade_guardian : public CreatureScript
 
 								events.ScheduleEvent(EVENT_REND_FLESH, 6*IN_MILLISECONDS);
 								break;
-
-							case EVENT_PETRIFICATION_FIRST:
-							{
-								if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
-									tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
-
-								events.CancelEvent(EVENT_PETRIFICATION_FIRST);
-								break;
-							}
 
 							case EVENT_PETRIFICATION_SET:
 							{
@@ -937,29 +940,6 @@ class boss_jasper_guardian : public CreatureScript
 				}
 			}
 
-            void EnterCombat(Unit* /*who*/)
-            {
-				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
-				
-				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_PETRIFICATION_FIRST, 6*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
-
-				if (instance)
-				{
-					if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
-						amethyst->SetInCombatWithZone();
-					if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
-						cobalt->SetInCombatWithZone();
-					if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
-						jade->SetInCombatWithZone();
-
-					if (!me->isInCombat())
-						me->SetInCombatWithZone();
-				}
-            }
-
 			void EnterEvadeMode()
 			{
 				ScriptedAI::EnterEvadeMode();
@@ -980,6 +960,9 @@ class boss_jasper_guardian : public CreatureScript
 								player->SetPower(POWER_ALTERNATE_POWER, 0);
 							}
 				}
+
+				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
+					tracker->AI()->DoAction(ACTION_TRACKER_RESET);
 			}
 
 			void DamageTaken(Unit* who, uint32& damage)
@@ -991,16 +974,47 @@ class boss_jasper_guardian : public CreatureScript
 							if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
 							{
 								if (amethyst->isAlive())
-									amethyst->SetHealth(amethyst->GetHealth() - damage);
+									if (amethyst->GetHealth() >= damage)
+										amethyst->SetHealth(amethyst->GetHealth() - damage);
+									else amethyst->Kill(amethyst);
 
 								if (cobalt->isAlive())
-									cobalt->SetHealth(cobalt->GetHealth() - damage);
+									if (cobalt->GetHealth() >= damage)
+										cobalt->SetHealth(cobalt->GetHealth() - damage);
+									else cobalt->Kill(cobalt);
 
 								if (jade->isAlive())
-									jade->SetHealth(jade->GetHealth() - damage);
+									if (jade->GetHealth() >= damage)
+										jade->SetHealth(jade->GetHealth() - damage);
+									else jade->Kill(jade);
 							}
 				}
 			}
+
+			void EnterCombat(Unit* /*who*/)
+            {
+				me->RemoveAurasDueToSpell(SPELL_STONE_VISUAL, me->GetGUID());
+				
+				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
+
+				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
+					tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
+
+				if (instance)
+				{
+					if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
+						amethyst->SetInCombatWithZone();
+					if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
+						cobalt->SetInCombatWithZone();
+					if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
+						jade->SetInCombatWithZone();
+
+					if (!me->isInCombat())
+						me->SetInCombatWithZone();
+				}
+            }
 
             void UpdateAI(uint32 const diff)
             {
@@ -1051,15 +1065,6 @@ class boss_jasper_guardian : public CreatureScript
 
 								events.ScheduleEvent(EVENT_REND_FLESH, 6*IN_MILLISECONDS);
 								break;
-
-							case EVENT_PETRIFICATION_FIRST:
-							{
-								if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
-									tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
-
-								events.CancelEvent(EVENT_PETRIFICATION_FIRST);
-								break;
-							}
 
 							case EVENT_PETRIFICATION_SET:
 							{
@@ -1176,11 +1181,13 @@ public:
 		InstanceScript* instance;
 		EventMap events;
 		uint64 lastGuardianPetrificationGUID;
+		bool choiceDone;
 
 		void Reset()
         {
 			events.Reset();
 			lastGuardianPetrificationGUID = 0;
+			choiceDone = false;
         }
 
 		void DoAction(int32 action)
@@ -1188,8 +1195,21 @@ public:
             switch (action)
             {
 				case ACTION_CHOOSE_PETRIFICATION:
-					events.ScheduleEvent(EVENT_CHOOSE_PETRIFICATION, 6*IN_MILLISECONDS);
+				{
+					if (!choiceDone)
+					{
+						events.ScheduleEvent(EVENT_CHOOSE_PETRIFICATION, 6*IN_MILLISECONDS);
+						choiceDone = true;
+					}
 					break;
+				}
+
+				case ACTION_TRACKER_RESET:
+				{
+					events.Reset();
+					lastGuardianPetrificationGUID = 0;
+					break;
+				}
 			}
 		}
 
@@ -1274,6 +1294,7 @@ public:
 								{
 									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 									lastGuardianPetrificationGUID = guardian->GetGUID();
+									choiceDone = false;
 								}
 							}
 
@@ -1285,6 +1306,7 @@ public:
 								{
 									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 									lastGuardianPetrificationGUID = guardian->GetGUID();
+									choiceDone = false;
 								}
 							}
 
@@ -1296,6 +1318,7 @@ public:
 								{
 									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 									lastGuardianPetrificationGUID = guardian->GetGUID();
+									choiceDone = false;
 								}
 							}
 
@@ -1307,6 +1330,7 @@ public:
 								{
 									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 									lastGuardianPetrificationGUID = guardian->GetGUID();
+									choiceDone = false;
 								}
 							}
 
@@ -1318,6 +1342,7 @@ public:
 								{
 									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 									lastGuardianPetrificationGUID = guardian->GetGUID();
+									choiceDone = false;
 								}
 							}
 
@@ -1328,6 +1353,7 @@ public:
 								{
 									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 									lastGuardianPetrificationGUID = guardian->GetGUID();
+									choiceDone = false;
 								}
 							}
 
@@ -1339,6 +1365,7 @@ public:
 								{
 									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 									lastGuardianPetrificationGUID = guardian->GetGUID();
+									choiceDone = false;
 								}
 							}
 
@@ -1349,6 +1376,7 @@ public:
 								{
 									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 									lastGuardianPetrificationGUID = guardian->GetGUID();
+									choiceDone = false;
 								}
 							}
 
@@ -1359,6 +1387,7 @@ public:
 								{
 									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 									lastGuardianPetrificationGUID = guardian->GetGUID();
+									choiceDone = false;
 								}
 							}
 
@@ -1369,6 +1398,7 @@ public:
 								{
 									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 									lastGuardianPetrificationGUID = guardian->GetGUID();
+									choiceDone = false;
 								}
 							}
 
@@ -1379,6 +1409,7 @@ public:
 								{
 									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 									lastGuardianPetrificationGUID = guardian->GetGUID();
+									choiceDone = false;
 								}
 							}
 
@@ -1389,6 +1420,7 @@ public:
 								{
 									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 									lastGuardianPetrificationGUID = guardian->GetGUID();
+									choiceDone = false;
 								}
 							}
 
@@ -1398,6 +1430,7 @@ public:
 								{
 									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 									lastGuardianPetrificationGUID = guardian->GetGUID();
+									choiceDone = false;
 								}
 							}
 
@@ -1407,6 +1440,7 @@ public:
 								{
 									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 									lastGuardianPetrificationGUID = guardian->GetGUID();
+									choiceDone = false;
 								}
 							}
 
@@ -1416,6 +1450,7 @@ public:
 								{
 									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 									lastGuardianPetrificationGUID = guardian->GetGUID();
+									choiceDone = false;
 								}
 							}
 
@@ -1425,6 +1460,7 @@ public:
 								{
 									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 									lastGuardianPetrificationGUID = guardian->GetGUID();
+									choiceDone = false;
 								}
 							}
 
