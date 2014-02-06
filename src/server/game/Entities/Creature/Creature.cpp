@@ -1181,11 +1181,19 @@ void Creature::SelectLevel(const CreatureTemplate* cinfo)
     switch (getClass())
     {
         case CLASS_WARRIOR:
-            setPowerType(POWER_RAGE);
+            //setPowerType(POWER_RAGE);
             break;
+		case CLASS_PALADIN:
+			SetMaxPower(POWER_MANA, mana);
+            SetPower(POWER_MANA, mana);
+			break;
         case CLASS_ROGUE:
             setPowerType(POWER_ENERGY);
             break;
+		case CLASS_MAGE:
+			SetMaxPower(POWER_MANA, mana);
+            SetPower(POWER_MANA, mana);
+			break;
         default:
             SetMaxPower(POWER_MANA, mana);
             SetPower(POWER_MANA, mana);
