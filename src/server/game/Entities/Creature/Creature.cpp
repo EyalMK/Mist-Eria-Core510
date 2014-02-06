@@ -1181,6 +1181,8 @@ void Creature::SelectLevel(const CreatureTemplate* cinfo)
     switch (getClass())
     {
         case CLASS_WARRIOR:
+			if (GetVehicleKit()->GetVehicleInfo()->m_ID > 0)
+				setPowerType(POWER_ENERGY);
             //setPowerType(POWER_RAGE);
             break;
 		case CLASS_PALADIN:

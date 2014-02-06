@@ -105,6 +105,9 @@ class boss_amethyst_guardian : public CreatureScript
 				solidStone = false;
 				map = me->GetMap();
 				
+				if (uint32 vehicleId = me->GetVehicleKit()->GetVehicleInfo()->m_ID)
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "VEHICLE ID = %u.", vehicleId);
+
 				me->setPowerType(POWER_ENERGY);
                 me->SetPower(POWER_ENERGY, 0);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
