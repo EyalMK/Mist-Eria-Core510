@@ -580,6 +580,7 @@ struct GameObjectData
     uint8 spawnMask;
     uint8 artKit;
     bool dbData;
+    uint32 invisibility;
 };
 
 // For containers:  [GO_NOT_READY]->GO_READY (close)->GO_ACTIVATED (open) ->GO_JUST_DEACTIVATED->GO_READY        -> ...
