@@ -614,7 +614,12 @@ void Creature::Update(uint32 diff)
 
             if (getPowerType() == POWER_ENERGY)
             {
-                if (!IsVehicle() || GetVehicleKit()->GetVehicleInfo()->m_powerType != POWER_PYRITE)
+                if (!IsVehicle() ||
+					GetVehicleKit()->GetVehicleInfo()->m_powerType != POWER_PYRITE ||
+					GetVehicleKit()->GetVehicleInfo()->m_powerType != POWER_JADE ||
+					GetVehicleKit()->GetVehicleInfo()->m_powerType != POWER_COBALT ||
+					GetVehicleKit()->GetVehicleInfo()->m_powerType != POWER_AMETHYST ||
+					GetVehicleKit()->GetVehicleInfo()->m_powerType != POWER_JASPER)
                     Regenerate(POWER_ENERGY);
             }
             else

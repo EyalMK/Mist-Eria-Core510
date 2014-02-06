@@ -67,6 +67,10 @@ void Vehicle::Install()
             case POWER_BLOOD:
             case POWER_OOZE:
             case POWER_WRATH:
+			case POWER_JADE:
+			case POWER_COBALT:
+			case POWER_AMETHYST:
+			case POWER_JASPER:
                 _me->setPowerType(POWER_ENERGY);
                 _me->SetMaxPower(POWER_ENERGY, 100);
                 break;
