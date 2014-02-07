@@ -1087,12 +1087,12 @@ public :
                             if(Aura* base = auraApp->GetBase()) {
                                 // 1. Check the caster
                                 //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Checking casters : aura's caster == %u, caster == % u, auraName == %s",
-                                               base->GetCasterGUID(), caster->GetGUID(), base->GetSpellInfo()->SpellName);
+                                               //base->GetCasterGUID(), caster->GetGUID(), base->GetSpellInfo()->SpellName);
                                 if(base->GetCasterGUID() != caster->GetGUID())
                                     continue ;
 
                                 //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Checking mask : school mask == %u",
-                                               base->GetSpellInfo()->SchoolMask & SPELL_SCHOOL_MASK_SHADOW);
+                                               //base->GetSpellInfo()->SchoolMask & SPELL_SCHOOL_MASK_SHADOW);
                                 // 2. Caster is the same, now check if it is a shadow spell
                                 if(base->GetSpellInfo()->SchoolMask & SPELL_SCHOOL_MASK_SHADOW == 0)
                                     continue ;
@@ -1103,7 +1103,7 @@ public :
                                     if(AuraEffect* auraEff = base->GetEffect(i))
                                         if(auraEff->IsPeriodic()) {
                                             //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Found periodic effect, index == %u",
-                                                           uint32(i));
+                                                           //uint32(i));
                                             target->RemoveAura(base, AURA_REMOVE_BY_ENEMY_SPELL);
                                             break ; // We have found a periodic effect ; stop looping over effects, return looping over auras
                                         }
@@ -1166,16 +1166,16 @@ public :
                                 Trinity::AnyUnfriendlyUnitInObjectRangeCheck check(player, player, 84.0f); // 7 yards / s, so in 12 seconds = 84 yards
                                 Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(player, targets, check);
 
-                                TypeMapContainer<Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck>, GridTypeMapContainer> visitor(searcher);
-                                TypeMapContainer<Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck>, WorldTypeMapContainer> visitor2(searcher);
+                                TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck>, GridTypeMapContainer> visitor(searcher);
+                                TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck>, WorldTypeMapContainer> visitor2(searcher);
 
-                                cell.Visit(visitor);
-                                cell.Visit(visitor2);
+                                cell.Visit(p, visitor, creature->GetMap() ? *(creature->GetMap()), *creature, 84.0f);
+                                cell.Visit(p, visitor2, creature->GetMap() ? *(creature->GetMap()), *creature, 84.0f);
 
                                 if(!targets.empty()) {
                                     targets.sort(Trinity::DistanceCompareOrderPred(player, true));
-                                    std::list<Unit*>::iterator iter = targets.front();
-                                    AttackStart(*iter);
+                                    Unit* target = targets.front();
+                                    AttackStart(target);
                                 }
                                 else
                                     creature->DisappearAndDie();
@@ -1183,8 +1183,8 @@ public :
                                 // Threat List not empty, pick the closest unit and attack it
                                 std::list<HostileReference*> threatList = player->getThreatManager().getThreatList() ;
                                 threatList.sort(Trinity::DistanceCompareOrderPred(player, true));
-                                std::list<HostileReference*>::iterator iter = threatList.front();
-                                AttackStart((*iter->getTarget()));
+                                HostileRefrence* ref = threatList.front();
+                                AttackStart(ref->getTarget());
                             }
                         }
                     }
