@@ -1075,7 +1075,7 @@ public :
             if(Player* caster = GetCaster()->ToPlayer()) {// Since we checked caster during load, he will not be null
                 if(Unit* target = GetHitUnit()) {
                     Unit::AuraApplicationMap const& appliedAuras = target->GetAppliedAuras() ;
-                    for(auto iter = appliedAuras.begin() ; iter != appliedAuras.end() ; ++iter) {
+                    for(Unit::AuraApplicationMap::const_iterator iter = appliedAuras.begin() ; iter != appliedAuras.end() ; ++iter) {
                         if(AuraApplication* auraApp = iter->second) {
                             if(Aura* base = auraApp->GetBase()) {
                                 // 1. Check the caster
