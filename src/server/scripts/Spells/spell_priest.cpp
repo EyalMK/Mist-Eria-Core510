@@ -1182,9 +1182,13 @@ public :
                             } else {
                                 // Threat List not empty, pick the closest unit and attack it
                                 std::list<HostileReference*> threatList = player->getThreatManager().getThreatList() ;
-                                threatList.sort(Trinity::DistanceCompareOrderPred(player, true));
-                                HostileRefrence* ref = threatList.front();
-                                AttackStart(ref->getTarget());
+								std::list<Unit*> asUnit ;
+								for(std::list<HostileReference*>::const_iterator iter = threatList.begin() ; iter != threatList.end() ; ++iter) {
+									asUnit.push_back((*iter)->getTarget()) ;
+								}
+                                asUnit.sort(Trinity::DistanceCompareOrderPred(player, true));
+                                Unit* target = asUnit.front();
+                                AttackStart(asUnit);
                             }
                         }
                     }
