@@ -1169,8 +1169,8 @@ public :
                                 TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck>, GridTypeMapContainer> visitor(searcher);
                                 TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck>, WorldTypeMapContainer> visitor2(searcher);
 
-                                cell.Visit(p, visitor, creature->GetMap() ? *(creature->GetMap()), *creature, 84.0f);
-                                cell.Visit(p, visitor2, creature->GetMap() ? *(creature->GetMap()), *creature, 84.0f);
+                                cell.Visit(cell, visitor, creature->GetMap() ? *(creature->GetMap()) : NULL, *creature, 84.0f);
+                                cell.Visit(cell, visitor2, creature->GetMap() ? *(creature->GetMap()) : NULL, *creature, 84.0f);
 
                                 if(!targets.empty()) {
                                     targets.sort(Trinity::DistanceCompareOrderPred(player, true));
