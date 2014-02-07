@@ -1052,6 +1052,7 @@ public :
 
         /// Validate the spell
         bool Validate(const SpellInfo */*spellInfo*/) {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Validate");
             if(!sSpellMgr->GetSpellInfo(SPELL_PRIEST_MIND_SPIKE))
                 return false ;
 
@@ -1060,6 +1061,7 @@ public :
 
         /// Init everything
         bool Load() {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Load");
             // If no caster or caster is not a player, return ;
             if(GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER)
                 return true ;
@@ -1072,24 +1074,35 @@ public :
         /// 1) Shadow damage-over-time spell
         /// 2) Caster is the same caster as the one casting this spell
         void HandleDummy(SpellEffIndex effectIndex) {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: HandleDummy");
             if(Player* caster = GetCaster()->ToPlayer()) {// Since we checked caster during load, he will not be null
                 if(Unit* target = GetHitUnit()) {
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: caster && target not null");
                     Unit::AuraApplicationMap const& appliedAuras = target->GetAppliedAuras() ;
                     for(Unit::AuraApplicationMap::const_iterator iter = appliedAuras.begin() ; iter != appliedAuras.end() ; ++iter) {
+                        sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Looping in AuraApplicationMap");
                         if(AuraApplication* auraApp = iter->second) {
+                            sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Pointer to AuraApplication");
                             if(Aura* base = auraApp->GetBase()) {
                                 // 1. Check the caster
+                                sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Checking casters : aura's caster == %u, caster == % u, auraName == %s",
+                                               base->GetCasterGUID(), caster->GetGUID(), base->GetSpellInfo()->SpellName);
                                 if(base->GetCasterGUID() != caster->GetGUID())
                                     continue ;
 
+                                sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Checking mask : school mask == %u",
+                                               base->GetSpellInfo()->SchoolMask & SPELL_SCHOOL_MASK_SHADOW);
                                 // 2. Caster is the same, now check if it is a shadow spell
                                 if(base->GetSpellInfo()->SchoolMask & SPELL_SCHOOL_MASK_SHADOW == 0)
                                     continue ;
 
+                                sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: checking effects");
                                 // 3. Now check the effects ; it's a bit long, we have to loop over each effect to see if it is periodic, but we cannot do it another way
                                 for(uint8 i = 0 ; i < MAX_SPELL_EFFECTS ; ++i) {
                                     if(AuraEffect* auraEff = base->GetEffect(i))
                                         if(auraEff->IsPeriodic()) {
+                                            sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Found periodic effect, index == %u",
+                                                           uint32(i));
                                             target->RemoveAura(base, AURA_REMOVE_BY_ENEMY_SPELL);
                                             break ; // We have found a periodic effect ; stop looping over effects, return looping over auras
                                         }
@@ -1112,7 +1125,6 @@ public :
         return new spell_pri_mind_spike_SpellScript() ;
     }
 };
-
 
 void AddSC_priest_spell_scripts()
 {
