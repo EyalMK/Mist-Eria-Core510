@@ -52,6 +52,9 @@ enum PriestSpells
     SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL              = 64085,
 	SPELL_PRIEST_RENEW                              = 139,
 	SPELL_PRIEST_VOID_SHIFT                         = 108968,
+	
+	// Mind spike
+	SPELL_PRIEST_MIND_SPIKE							= 73510,
 };
 
 enum PriestSpellIcons
@@ -1032,6 +1035,85 @@ class spell_pri_void_shift : public SpellScriptLoader
         }
 };
 
+/**
+ * Shadow Priest Spell : Mind spike (73510)
+ * Updated 5.1.0
+ * SQL Query : INSERT INTO spell_script_names VALUES (73510, "spell_pri_mind_spike");
+ */
+class spell_pri_mind_spike : public SpellScriptLoader {
+public :
+    /// Constructor
+    spell_pri_mind_spike() : SpellScriptLoader("spell_pri_mind_spike") { }
+
+    /// Script
+    class spell_pri_mind_spike_SpellScript : public SpellScript {
+        /// Get everything we need
+        PrepareSpellScript(spell_pri_mind_spike_SpellScript)
+
+        /// Validate the spell
+        bool Validate(const SpellInfo */*spellInfo*/) {
+            if(!sSpellMgr->GetSpellInfo(SPELL_PRIEST_MIND_SPIKE))
+                return false ;
+
+            return true ;
+        }
+
+        /// Init everything
+        bool Load() {
+            // If no caster or caster is not a player, return ;
+            if(GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER)
+                return true ;
+
+            return false ;
+        }
+
+        /// The dummy effect handles the removal of Shadow damage-over-time spells on the target
+        /// We will get the target, then his auras, and then we will remove the ones that fit the following requirements :
+        /// 1) Shadow damage-over-time spell
+        /// 2) Caster is the same caster as the one casting this spell
+        void HandleDummy(SpellEffIndex effectIndex) {
+            if(Player* caster = GetCaster()->ToPlayer()) {// Since we checked caster during load, he will not be null
+                if(Unit* target = GetHitUnit()) {
+                    Unit::AuraApplicationMap const& appliedAuras = target->GetAppliedAuras() ;
+                    for(auto iter = appliedAuras.begin() ; iter != appliedAuras.end() ; ++iter) {
+                        if(AuraApplication* auraApp = iter->second) {
+                            if(Aura* base = auraApp->GetBase()) {
+                                // 1. Check the caster
+                                if(base->GetCasterGUID() != caster->GetGUID())
+                                    continue ;
+
+                                // 2. Caster is the same, now check if it is a shadow spell
+                                if(base->GetSpellInfo()->SchoolMask & SPELL_SCHOOL_MASK_SHADOW == 0)
+                                    continue ;
+
+                                // 3. Now check the effects ; it's a bit long, we have to loop over each effect to see if it is periodic, but we cannot do it another way
+                                for(uint8 i = 0 ; i < MAX_SPELL_EFFECTS ; ++i) {
+                                    if(AuraEffect* auraEff = base->GetEffect(i))
+                                        if(auraEff->IsPeriodic()) {
+                                            target->RemoveAura(base, AURA_REMOVE_BY_ENEMY_SPELL);
+                                            break ; // We have found a periodic effect ; stop looping over effects, return looping over auras
+                                        }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// Now register the spell
+        void Register() {
+            OnEffectHitTarget += SpellEffectFn(spell_pri_mind_spike_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    /// Get a pointer to the script as a pointer to SpellScript
+    SpellScript* GetSpellScript() const {
+        return new spell_pri_mind_spike_SpellScript() ;
+    }
+};
+
+
 void AddSC_priest_spell_scripts()
 {
     new spell_pri_divine_aegis();
@@ -1053,4 +1135,5 @@ void AddSC_priest_spell_scripts()
     new spell_pri_vampiric_touch();
 	new spell_pri_chakra_serenity_proc();
 	new spell_pri_void_shift();
+	new spell_pri_mind_spike();
 }
