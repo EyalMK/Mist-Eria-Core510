@@ -749,36 +749,72 @@ class spell_warr_heroic_leap_damage : public SpellScriptLoader
 
 
 /// Updated 5.1.0 : 86346 - Colossus Smash
-class spell_warr_colossus_smash : public SpellScriptLoader
-{
-    public:
-        spell_warr_colossus_smash() : SpellScriptLoader("spell_warr_colossus_smash") { }
+class spell_warr_colossus_smash : public SpellScriptLoader {
+public:
+    /// Constructor
+    spell_warr_colossus_smash() : SpellScriptLoader("spell_warr_colossus_smash") { }
 
-        class spell_warr_colossus_smash_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_warr_colossus_smash_SpellScript);
+    class spell_warr_colossus_smash_SpellScript : public SpellScript {
 
-            void HandleEffect(SpellEffIndex /*effIndex*/)
-            {
-				if (Unit* caster = GetCaster())
-				{
-					int32 damage = GetHitDamage();
+        /// Prepare what we need
+        PrepareSpellScript(spell_warr_colossus_smash_SpellScript);
 
-					SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 1.75f));
-					caster->CastSpell(GetHitUnit(), SPELL_WARRIOR_PHYSICAL_VULNERABILITY, true);
-				}
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_warr_colossus_smash_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_NORMALIZED_WEAPON_DMG);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_warr_colossus_smash_SpellScript();
+        /// Init what we need
+        bool Load() {
+            hitUnit = NULL ; /// Nullify the pointer to make sure it will not do something strange
+            return true ;
         }
+
+        /// Set damages
+        /// According to wowhead, we must add 175% of the total attack power
+        void HandleEffect(SpellEffIndex /*effIndex*/) {
+            if (Unit* caster = GetCaster()) {
+                int32 damage = GetHitDamage();
+
+                SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 1.75f));
+                hitUnit = GetHitUnit() ; /// Init the pointer to a potential non null target
+            }
+        }
+
+        /// Handle the auras
+        /// We must apply two auras : ignoring armor (108126) and physical vulnerability (81326)
+        void HandleAfterHit() {
+            if(hitUnit) {
+                int32 basePoint0 = 0 ;
+
+                // Ignore 65% on players and 100% on creatures
+                if(hitUnit->GetTypeId() == TYPEID_PLAYER)
+                    basePoint0 = 65 ;
+                else
+                    basePoint0 = 100 ;
+
+                Unit* caster = GetCaster();
+                if(caster) {
+                    caster->CastSpell(hitUnit, SPELL_WARRIOR_PHYSICAL_VULNERABILITY, true); // Physical vulnerability
+                    caster->CastCustomSpell(hitUnit, 108126, &basePoint0, NULL, NULL, true, NULL, NULL, caster->GetGUID()); // Armor ignoring
+                }
+            }
+        }
+
+        /// Since we handle this application in AfterHit, we must prevent it (otherwise, effects handling would call it first, and damages would be twiced
+        void PreventApplyAura() {
+            PreventHitAura();
+        }
+
+        /// Register the script
+        void Register() {
+            OnEffectHitTarget += SpellEffectFn(spell_warr_colossus_smash_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_NORMALIZED_WEAPON_DMG); // Damages
+            BeforeHit += SpellHitFn(spell_warr_colossus_smash_SpellScript::PreventApplyAura); // Prevents applying the aura ; before hit seemed to be the best
+            AfterHit += SpellHitFn(spell_warr_colossus_smash_SpellScript::HandleAfterHit); // Apply the auras ; after hit to be sure we won't deal more damages
+        }
+
+        Unit* hitUnit ; /// Pointer to the hit unit (since the implicit target is TARGET_ENEMY, we do not need a std::list)
+    };
+
+    /// Returns a pointer to the script as a pointer to SpellScript
+    SpellScript* GetSpellScript() const {
+        return new spell_warr_colossus_smash_SpellScript();
+    }
 };
 
 // 103840 - Impending victory
