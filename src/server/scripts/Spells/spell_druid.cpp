@@ -2357,12 +2357,12 @@ public :
     }
 };
 
-class spell_dru_nature_switfness : public SpellScriptLoader {
+class spell_dru_nature_swiftness : public SpellScriptLoader {
 public :
-    spell_dru_nature_switfness() : SpellScriptLoader("spell_dru_nature_swiftness") { }
+    spell_dru_nature_swiftness() : SpellScriptLoader("spell_dru_nature_swiftness") { }
 
-    class spell_dru_nature_swtifness_SpellScript : public SpellScript {
-        PrepareSpellScript(spell_dru_nature_swtifness_SpellScript) ;
+    class spell_dru_nature_swiftness_SpellScript : public SpellScript {
+        PrepareSpellScript(spell_dru_nature_swiftness_SpellScript) ;
 
         void HandleAfterHit() {
             if(GetCaster()) {
@@ -2372,12 +2372,12 @@ public :
         }
 
         void Register() {
-            AfterHit += SpellHitFn(spell_dru_nature_swtifness_SpellScript::HandleAfterHit);
+            AfterHit += SpellHitFn(spell_dru_nature_swiftness_SpellScript::HandleAfterHit);
         }
     };
 
     SpellScript* GetSpellScript() const {
-        return new spell_dru_nature_swtifness_SpellScript();
+        return new spell_dru_nature_swiftness_SpellScript();
     }
 };
 
