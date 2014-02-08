@@ -919,6 +919,7 @@ public :
 					if(player->GetPrimaryTalentTree(player->GetActiveSpec()) == TALENT_TREE_PRIEST_SHADOW
                                 && player->CanShadowWordDeathReset()) { // If we are a shadow priest and the spell can reset
                         player->CastSpell(player, SPELL_PRIEST_SHADOW_WORD_DEATH_ENERGIZE, true); // Add a shadow orb
+					}
 				}
             }
         }
