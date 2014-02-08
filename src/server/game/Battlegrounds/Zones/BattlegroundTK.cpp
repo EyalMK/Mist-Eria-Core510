@@ -520,10 +520,13 @@ void BattlegroundTK::EndBattleground(uint32 winner)
     if (winner == ALLIANCE)
 	{
         RewardHonorToTeam(GetBonusHonorFromKill(m_HonorWinKills), ALLIANCE);
-		RewardHonorToTeam(BG_TK_Honor[m_HonorMode][BG_TK_WIN], winner);
+		RewardHonorToTeam(BG_TK_Honor[m_HonorMode][BG_TK_WIN], ALLIANCE);
 	}
     if (winner == HORDE)
+	{
         RewardHonorToTeam(GetBonusHonorFromKill(m_HonorWinKills), HORDE);
+		RewardHonorToTeam(BG_TK_Honor[m_HonorMode][BG_TK_WIN], HORDE);
+	}
     // Complete map_end rewards (even if no team wins)
     RewardHonorToTeam(GetBonusHonorFromKill(m_HonorEndKills), ALLIANCE);
     RewardHonorToTeam(GetBonusHonorFromKill(m_HonorEndKills), HORDE);
