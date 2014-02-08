@@ -901,6 +901,8 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this), m_battlePetMg
     m_achievementMgr = new AchievementMgr<Player>(this);
     m_reputationMgr = new ReputationMgr(this);
 	transcendence_spirit = NULL;
+	
+	m_bCanShadowWordDeathReset = true ;
 }
 
 Player::~Player()
