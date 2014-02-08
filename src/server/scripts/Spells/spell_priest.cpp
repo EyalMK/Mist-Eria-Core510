@@ -916,9 +916,11 @@ public :
                             player->CastCustomSpell(player, SPELL_PRIEST_SHADOW_WORD_DEATH_DAMAGES, &damages, NULL, NULL, true, NULL, NULL, player->GetGUID());
                     }
                 } else {
-					if(player->GetPrimaryTalentTree(player->GetActiveSpec()) == TALENT_TREE_PRIEST_SHADOW
-                                && player->CanShadowWordDeathReset()) { // If we are a shadow priest and the spell can reset
-                        player->CastSpell(player, SPELL_PRIEST_SHADOW_WORD_DEATH_ENERGIZE, true); // Add a shadow orb
+					if(Player* player = GetCaster()->ToPlayer()) {
+						if(player->GetPrimaryTalentTree(player->GetActiveSpec()) == TALENT_TREE_PRIEST_SHADOW
+									&& player->CanShadowWordDeathReset()) { // If we are a shadow priest and the spell can reset
+							player->CastSpell(player, SPELL_PRIEST_SHADOW_WORD_DEATH_ENERGIZE, true); // Add a shadow orb
+						}
 					}
 				}
             }
