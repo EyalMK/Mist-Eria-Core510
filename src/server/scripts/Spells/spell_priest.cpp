@@ -811,6 +811,22 @@ class spell_pri_renew : public SpellScriptLoader
 };
 
 /**
+  * A BasicEvent to tell if yes or no we can reset the cooldown
+  */
+class ShadowWordDeathResetCooldownEvent : public BasicEvent {
+public :
+    ShadowWordDeathResetCooldownEvent(Player* player) : _player(player) {}
+
+    bool Execute(uint64 /*e_time*/, uint32 /*e_id*/) {
+        if(_player)
+            _player->SetCanShadowWordDeathReset(true);
+    }
+
+private :
+    Player* _player ;
+};
+
+/**
  * Script for Shadow Word : Death (32379 (base) and 129176 (override with the glyph)
  * SQL Query : DELETE FROM spell_script_names WHERE spell_id IN (32379, 129176) ;
  *             INSERT INTO spell_script_names VALUES (32379, "spell_pri_shadow_word_death"), (129176, "spell_pri_shadow_word_death");
@@ -916,22 +932,6 @@ public :
     SpellScript* GetSpellScript() const {
         return new spell_pri_shadow_word_death_SpellScript();
     }
-};
-
-/**
-  * A BasicEvent to tell if yes or no we can reset the cooldown
-  */
-class ShadowWordDeathResetCooldownEvent : public BasicEvent {
-public :
-    ShadowWordDeathResetCooldownEvent(Player* player) : _player(player) {}
-
-    bool Execute(uint64 /*e_time*/, uint32 /*e_id*/) {
-        if(_player)
-            _player->SetCanShadowWordDeathReset(true);
-    }
-
-private :
-    Player* _player ;
 };
 
 // 15473 - Shadowform
