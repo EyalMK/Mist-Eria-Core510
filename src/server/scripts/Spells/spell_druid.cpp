@@ -2357,6 +2357,31 @@ public :
     }
 };
 
+class spell_dru_nature_switfness : public SpellScriptLoader {
+public :
+    spell_dru_nature_switfness() : SpellScriptLoader("spell_dru_nature_swiftness") { }
+
+    class spell_dru_nature_swtifness_SpellScript : public SpellScript {
+        PrepareSpellScript(spell_dru_nature_swtifness_SpellScript) ;
+
+        void HandleAfterHit() {
+            if(GetCaster()) {
+                if(!GetCaster()->HasAura(29274))
+                    GetCaster()->CastSpell(GetCaster(), 29274, true);
+            }
+        }
+
+        void Register() {
+            AfterHit += SpellHitFn(spell_dru_nature_swtifness_SpellScript::HandleAfterHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const {
+        return new spell_dru_nature_swtifness_SpellScript();
+    }
+};
+
+
 void AddSC_druid_spell_scripts()
 {
     new spell_dru_bear_cat();
@@ -2402,4 +2427,5 @@ void AddSC_druid_spell_scripts()
 	new spell_dru_soul_of_the_forest();
     new spell_dru_frenzied_regeneration();
 	new spell_dru_astral_communion();
+	new spell_dru_nature_swiftness();
 }
