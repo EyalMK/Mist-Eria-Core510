@@ -890,7 +890,8 @@ public :
                                 && player->CanShadowWordDeathReset()) { // If we are a shadow priest and the spell can reset
                             player->CastSpell(player, SPELL_PRIEST_SHADOW_WORD_DEATH_ENERGIZE, true); // Add a shadow orb
                             player->SetCanShadowWordDeathReset(false); // Prevents multi-resetting
-                            player->m_Events.AddEvent(new ShadowWordDeathResetCooldownEvent(player), 9000); // Prepare next reset
+							BasicEvent* event = new ShadowWordDeathResetCooldownEvent(player) ;
+                            player->m_Events.AddEvent(event, 9000); // Prepare next reset
                             player->RemoveSpellCooldown(glyphed ? SPELL_PRIEST_SHADOW_WORD_DEATH_OVERRIDED : SPELL_PRIEST_SHADOW_WORD_DEATH_BASE); // Remove cooldown
                         }
 
