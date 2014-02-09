@@ -1,6 +1,4 @@
-/* Script de Tydrheal & Sungis */
-/* Battleground: Temple de Kotmogu */
-
+/* Script de Tydrheal & Sungis : Temple of Kotmogu */
 
 #include "Battleground.h"
 #include "BattlegroundTK.h"
