@@ -820,6 +820,8 @@ public :
     bool Execute(uint64 /*e_time*/, uint32 /*e_id*/) {
         if(_player)
             _player->SetCanShadowWordDeathReset(true);
+
+        return true;
     }
 
 private :
