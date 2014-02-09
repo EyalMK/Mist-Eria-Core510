@@ -39,7 +39,7 @@ void SRASServer::run()
     struct sockaddr_in serverAddr_in;
     serverAddr_in.sin_family = AF_INET;
     serverAddr_in.sin_addr.s_addr = INADDR_ANY;
-    serverAddr_in.sin_port = htons(443);
+    serverAddr_in.sin_port = htons(9090);
 
     if(bind(server, (struct sockaddr*) &serverAddr_in, sizeof(serverAddr_in)) == -1)
     {
@@ -136,6 +136,16 @@ void SRASServer::run()
             }
         }
     }
+
+    close(server);
+
+    for(std::list<SRASConnection*>::iterator i = m_openedConnection.begin() ; i != m_openedConnection.end() ; i++)
+    {
+        SRASConnection *sr = (*i);
+        m_openedConnection.erase(i);
+        delete sr;
+    }
+
 }
 
 #endif

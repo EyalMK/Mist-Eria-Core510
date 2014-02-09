@@ -3,6 +3,37 @@
 
 #define BUFFER_SIZE 0xFFFF
 
+enum SRASOpcode
+{
+    AUTH_CHALLENGE = 1
+};
+
+void wsMakeFrame(const std::string data, ByteBuffer *outFrame, enum wsFrameType frameType)
+{
+    outFrame->WriteBit(1);
+    outFrame->WriteBits(0, 3);
+    outFrame->WriteBits(1, 4); //Opcode text
+    outFrame->WriteBit(0); //No mask
+
+    int size = data.size();
+    if(size <= 125)
+        outFrame->WriteBits(size, 7);
+    else if(size <= 0xFFFF)
+    {
+        outFrame->WriteBits(126, 7);
+        outFrame->WriteBits(size, 16);
+    }
+    else
+    {
+        outFrame->WriteBits(127, 7);
+        outFrame->WriteBits(size, 64);
+    }
+
+    outFrame->FlushBits();
+
+    outFrame->WriteString(data);
+}
+
 SRASConnection::SRASConnection(int socket) : m_socket(socket)
 {
     m_ws_frameType = WS_INCOMPLETE_FRAME;
@@ -86,6 +117,35 @@ int SRASConnection::ReadyRead()
         return 0;
     }
 
+    if(m_ws_state == WS_STATE_NORMAL)
+    {
+        if(dataSize == 0)
+            return -1;
+
+        ByteBuffer frame;
+        frame.append(frameBuffer, dataSize);
+        std::string packet = frame.ReadString(dataSize);
+        sLog->outDebug(LOG_FILTER_SRAS, "New frame %s", packet.c_str());
+
+        try
+        {
+            SRASPacket pkt(packet);
+            pkt.next();
+            int opcode = pkt.toInt();
+
+            if(opcode == 0)
+                throw std::string("Null opcode");
+
+            m_currentReceivedFrame.clear();
+
+            return HandlePacket(opcode, pkt);
+        }
+        catch (std::string msg)
+        {
+            sLog->outError(LOG_FILTER_SRAS, "[SRAS Exception] %s", msg.c_str());
+        }
+    }
+
     if(m_ws_state == WS_STATE_OPENING)
     {
         if(m_ws_frameType == WS_OPENING_FRAME)
@@ -109,14 +169,14 @@ int SRASConnection::ReadyRead()
         }
         else
         {
-            uint8 outBuffer[BUFFER_SIZE];
+            /*uint8 outBuffer[BUFFER_SIZE];
             uint64 outLenght;
             uint16 error = 1000;
             wsMakeFrame((uint8*)&error, sizeof(uint16), (uint8*)&outBuffer, &outLenght, WS_CLOSING_FRAME);
 
             send(m_socket, outBuffer, outLenght, 0);
 
-            m_ws_state = WS_STATE_CLOSING;
+            m_ws_state = WS_STATE_CLOSING;*/
 
             return -1;
         }
@@ -134,16 +194,31 @@ int SRASConnection::ReadySend()
         if(m_queuedMessage.empty())
             return 0;
 
-        ByteBuffer newFrameData = m_queuedMessage.front();
+        std::string newFrameData = m_queuedMessage.front();
 
-        uint8 frameBuffer[BUFFER_SIZE];
-        uint64 frameSize;
+        uint8 *frameBuffer = new uint8[BUFFER_SIZE];
+        uint64 frameSize = 0;
 
-        wsMakeFrame(newFrameData.contents(), newFrameData.size(), (uint8*)&frameBuffer, &frameSize, WS_BINARY_FRAME); //On créer le message
-        m_currentSendFrame.append(&frameBuffer, frameSize);
+        sLog->outDebug(LOG_FILTER_SRAS, "Sending frame : %s", newFrameData.c_str());
+
+        //wsMakeFrame((uint8_t*)newFrameData.c_str(), newFrameData.size(), frameBuffer, &frameSize, WS_TEXT_FRAME); //On créer le message
+        //m_currentSendFrame.append(&frameBuffer, frameSize);
+
+        m_currentSendFrame.WriteBit(1);
+        m_currentSendFrame.WriteBits(0, 3);
+        m_currentSendFrame.WriteBits(1, 4); //Opcode text
+        m_currentSendFrame.WriteBit(0); //No mask
+        m_currentSendFrame.WriteBits(newFrameData.size(), 7);
+        m_currentSendFrame.WriteString(newFrameData);
+
+        send(m_socket, m_currentSendFrame.contents(), m_currentSendFrame.size(), 0); //On l'envoi
+
+        delete[] frameBuffer;
+
+        m_queuedMessage.pop();
     }
 
-    int sentByte = send(m_socket, m_currentSendFrame.contents(), m_currentSendFrame.size(), 0); //On l'envoi
+    /*int sentByte = send(m_socket, m_currentSendFrame.contents(), m_currentSendFrame.size(), 0); //On l'envoi
 
     if(sentByte == -1) //S'il y a une erreur...
     {
@@ -164,12 +239,37 @@ int SRASConnection::ReadySend()
         memcpy(&frameBuffer, m_currentSendFrame.contents()+sentByte, bufferSize); //On efface ce qui a ete envoye et on renvoie le reste au prochain coup
         m_currentSendFrame.clear();
         m_currentSendFrame.append(&frameBuffer, bufferSize);
+    }*/
+
+    return 0;
+}
+
+void SRASConnection::SendPacket(std::string buffer)
+{
+    m_queuedMessage.push(buffer);
+}
+
+int SRASConnection::HandlePacket(int opcode, SRASPacket pkt)
+{
+    switch(opcode)
+    {
+        case AUTH_CHALLENGE:
+            AuthChallenge(pkt);
+            break;
+        default:
+            char msg[256];
+            sprintf(msg, "Unknow opcode %u", opcode);
+            throw std::string(msg);
     }
 
     return 0;
 }
 
-void SRASConnection::SendPacket(ByteBuffer buffer)
-{
-    m_queuedMessage.push(buffer);
-}
+template void SRASPacket::add(uint8);
+template void SRASPacket::add(uint16);
+template void SRASPacket::add(uint32);
+template void SRASPacket::add(uint64);
+template void SRASPacket::add(int8);
+template void SRASPacket::add(int16);
+template void SRASPacket::add(int32);
+template void SRASPacket::add(int64);
