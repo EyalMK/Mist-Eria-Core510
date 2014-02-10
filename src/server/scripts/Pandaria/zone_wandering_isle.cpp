@@ -415,13 +415,13 @@ public:
                 case 2:
                     me->GetMotionMaster()->MoveJump(1197.14f, 3492.05f, 91.33f, 20, 20);
                     break;
-                case 3:
+                case 4:
                     me->GetMotionMaster()->MoveJump(1193.65f, 3478.94f, 108.50f, 20, 20);
                     break;
-                case 4:
+                case 6:
                     me->GetMotionMaster()->MoveJump(1188.2f, 3456.19f, 102.90f, 20, 20);
                     break;
-                case 8:
+                case 10:
                     me->DespawnOrUnsummon();
                     break;
 
