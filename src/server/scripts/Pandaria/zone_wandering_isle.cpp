@@ -22,6 +22,8 @@
 #include "ScriptedGossip.h"
 #include "Player.h"
 #include "SpellInfo.h"
+#include "GridNotifiers.h"
+#include "ScriptedEscortAI.h"
 
 
 // npc_first_quest_pandaren
@@ -262,6 +264,124 @@ public:
         }
     };
 };
+
+/*#####
+## at_The Missing Driver
+#####*/
+
+enum eTheMissingDriver
+{
+    QUEST_THE_MISSING_DRIVER    = 29419,
+    NPC_AMBERLEAF_SCAMP         = 54130,
+    NPC_MIN_DIMWIND             = 54855,
+    NPC_MIN_DIMWIND_POP         = 54855
+
+};
+
+class areatrigger_at_the_missing_driver : public AreaTriggerScript
+{
+    public:
+
+        areatrigger_at_the_missing_driver(): AreaTriggerScript("areatrigger_at_the_missing_driver")
+        {
+        }
+
+        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+        {
+            if (player->isAlive() && !player->isInCombat())
+            {
+                if (player->GetQuestStatus(QUEST_THE_MISSING_DRIVER) == QUEST_STATUS_INCOMPLETE)
+                {
+                    if(Creature* min = player->FindNearestCreature(NPC_MIN_DIMWIND, 20.0f))
+                    {
+                        std::list<Creature*> creatures;
+                        GetCreatureListWithEntryInGrid(creatures, player, NPC_AMBERLEAF_SCAMP, 20.0f);
+
+                        for(std::list<Creature*>::const_iterator iter = creatures.begin() ; iter != creatures.end() ; ++iter)
+                            (*iter)->GetMotionMaster()->MovePoint(1, 1381.40f, 3580.12f, 91.00f);
+
+                        player->SummonCreature(NPC_MIN_DIMWIND_POP, min->GetPositionX(), min->GetPositionY(), min->GetPositionZ(), 2.08);
+                        player->KilledMonsterCredit(54855);
+
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            return false;
+        }
+};
+
+/*######
+## npc_min_dimwind_pop
+######*/
+
+enum eMinDimwind
+{
+    SAY_DIMWIND1    = 0,
+    SAY_DIMWIND2    = 1,
+    SAY_DIMWIND3    = 2
+};
+
+class npc_min_dimwind_pop : public CreatureScript
+{
+public:
+    npc_min_dimwind_pop(): CreatureScript("npc_min_dimwind_pop") { }
+
+    struct npc_min_dimwind_popAI : public npc_escortAI
+    {
+        npc_min_dimwind_popAI(Creature* creature) : npc_escortAI(creature) {}
+
+        uint32 m_uiChatTimer;
+
+        void Reset()
+        {
+            Start(false, true);
+            m_uiChatTimer = 7000;
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+            if (!player)
+                return;
+
+            switch (waypointId)
+            {
+                case 1:
+                    Talk(SAY_DIMWIND1, player->GetGUID());
+                    m_uiChatTimer = 4000;
+                    break;
+                case 2:
+                    Talk(SAY_DIMWIND2, player->GetGUID());
+                    m_uiChatTimer = 4000;
+                    break;
+                case 3:
+                    Talk(SAY_DIMWIND3, player->GetGUID());
+                    m_uiChatTimer = 4000;
+                    break;
+                case 10:
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+            if (HasEscortState(STATE_ESCORT_ESCORTING))
+                m_uiChatTimer = 6000;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_min_dimwind_popAI(creature);
+    }
+};
+
 
 
 /*************************************/
@@ -1120,6 +1240,9 @@ void AddSC_wandering_isle()
 {
     new npc_first_quest_pandaren();	
     new npc_trainee();
+    new areatrigger_at_the_missing_driver();
+    new npc_min_dimwind_pop();
+
     new npc_aysa_cloudsinger_quest29414();
     new stalker_item_equiped();
     new mob_jaomin_ro();
