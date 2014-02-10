@@ -27,7 +27,6 @@
 #include "Unit.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
-#include "ScriptPCH.h"
 
 enum ShamanSpells
 {
