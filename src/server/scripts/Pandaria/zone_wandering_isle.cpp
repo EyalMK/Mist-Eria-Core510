@@ -324,9 +324,9 @@ class areatrigger_at_the_missing_driver : public AreaTriggerScript
 
 enum eMinDimwind
 {
-    SAY_DIMWIND1    = 0,
-    SAY_DIMWIND2    = 1,
-    SAY_DIMWIND3    = 2
+    SAY_DIMWIND_1    = 0,
+    SAY_DIMWIND_2    = 1,
+    SAY_DIMWIND_3    = 2
 };
 
 class npc_min_dimwind_pop : public CreatureScript
@@ -349,13 +349,13 @@ public:
             switch (waypointId)
             {
                 case 1:
-                    Talk(SAY_DIMWIND1);
+                    Talk(SAY_DIMWIND_1);
                     break;
                 case 2:
-                    Talk(SAY_DIMWIND2);
+                    Talk(SAY_DIMWIND_2);
                     break;
                 case 3:
-                    Talk(SAY_DIMWIND3);
+                    Talk(SAY_DIMWIND_3);
                     break;
                 case 10:
                     me->DespawnOrUnsummon();
@@ -378,6 +378,70 @@ public:
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_min_dimwind_popAI(creature);
+    }
+};
+
+/*######
+## npc_aysa_cloudsinger_pop
+######*/
+
+enum eAysaCloudsinger
+{
+    SAY_AYSA_1    = 0
+};
+
+class npc_aysa_cloudsinger_pop : public CreatureScript
+{
+public:
+    npc_aysa_cloudsinger_pop(): CreatureScript("npc_aysa_cloudsinger_pop") { }
+
+    struct npc_aysa_cloudsinger_popAI : public npc_escortAI
+    {
+        npc_aysa_cloudsinger_popAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    Talk(SAY_AYSA_1);
+                    break;
+                case 2:
+                    me->GetMotionMaster()->MoveJump(1197.14f, 3492.05f, 91.33f, 20, 20);
+                    break;
+                case 3:
+                    me->GetMotionMaster()->MoveJump(1193.65f, 3478.94f, 108.50f, 20, 20);
+                    break;
+                case 4:
+                    me->GetMotionMaster()->MoveJump(1188.2f, 3456.19f, 102.90f, 20, 20);
+                    break;
+                case 8:
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            if (UpdateVictim())
+                return;
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_aysa_cloudsinger_popAI(creature);
     }
 };
 
@@ -1241,6 +1305,7 @@ void AddSC_wandering_isle()
     new npc_trainee();
     new areatrigger_at_the_missing_driver();
     new npc_min_dimwind_pop();
+    new npc_aysa_cloudsinger_pop();
 
     new npc_aysa_cloudsinger_quest29414();
     new stalker_item_equiped();
