@@ -3945,10 +3945,13 @@ void SpellMgr::LoadSpellInfoCorrections()
 					spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
 					spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
 					break ;
-				case 73510 : // Mind spike
+				case 73510: // Mind spike
                     spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY); 
                     // Since we must have a target to enter the handler OnEffectHitTarget, we must redefine the implicit target
                     break ;
+				case 86346: // Colossus Smash
+					spellInfo->Effects[EFFECT_1].Effect = NULL;
+					break;
 				default:
 					break;
 			}
