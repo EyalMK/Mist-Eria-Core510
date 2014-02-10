@@ -4,6 +4,12 @@
 
 #define CHECK_SECURITY(sec) if (m_security < sec) {close(m_scoket); return;}
 
+enum SRASOpcode
+{
+    AUTH_CHALLENGE = 1,
+    TICKET_LIST = 2
+};
+
 class SRASPacket
 {
     //TODO : Add protection to prevent having the same packet in read and write mode
@@ -104,6 +110,7 @@ public:
     //Handlers
 
     void AuthChallenge(SRASPacket pkt);
+    void TicketList();
 
 private:
 

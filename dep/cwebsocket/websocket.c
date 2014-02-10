@@ -187,32 +187,7 @@ void wsGetHandshakeAnswer(const struct handshake *hs, uint8_t *outFrame,
     *outLength = written;
 }
 
-void wsMakeFrame(const uint8_t *data, size_t dataLength,
-                 uint8_t *outFrame, size_t *outLength, enum wsFrameType frameType)
-{
-    assert(outFrame && *outLength);
-    assert(frameType < 0x10);
-    if (dataLength > 0)
-        assert(data);
-	
-    outFrame[0] = 0x80 | frameType;
-    
-    if (dataLength <= 125) {
-        outFrame[1] = dataLength;
-        *outLength = 2;
-    } else if (dataLength <= 0xFFFF) {
-        outFrame[1] = 126;
-        uint16_t payloadLength16b = htons(dataLength);
-        memcpy(&outFrame[2], &payloadLength16b, 2);
-        *outLength = 4;
-    } else {
-        outFrame[1] = 127;
-        memcpy(&outFrame[2], &dataLength, 8);
-        *outLength = 10;
-    }
-    memcpy(&outFrame[*outLength], data, dataLength);
-    *outLength+= dataLength;
-}
+
 
 static size_t getPayloadLength(const uint8_t *inputFrame, size_t inputLength,
                                uint8_t *payloadFieldExtraBytes, enum wsFrameType *frameType) 

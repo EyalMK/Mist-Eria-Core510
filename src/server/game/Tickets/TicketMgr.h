@@ -208,6 +208,17 @@ public:
         return NULL;
     }
 
+    std::vector<GmTicket*> GetOpenedTicket()
+    {
+        std::vector<GmTicket*> openedTicket;
+
+        for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
+            if (itr->second && !itr->second->IsClosed() && !itr->second->IsCompleted())
+                openedTicket.push_back(itr->second);
+
+        return openedTicket;
+    }
+
     void AddTicket(GmTicket* ticket);
     void CloseTicket(uint32 ticketId, int64 source = -1);
     void RemoveTicket(uint32 ticketId);

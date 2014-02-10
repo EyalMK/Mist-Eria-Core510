@@ -3,11 +3,6 @@
 
 #define BUFFER_SIZE 0xFFFF
 
-enum SRASOpcode
-{
-    AUTH_CHALLENGE = 1
-};
-
 void wsMakeFrame(const std::string data, ByteBuffer *outFrame, enum wsFrameType frameType)
 {
     outFrame->WriteBit(1);
@@ -255,6 +250,9 @@ int SRASConnection::HandlePacket(int opcode, SRASPacket pkt)
     {
         case AUTH_CHALLENGE:
             AuthChallenge(pkt);
+            break;
+        case TICKET_LIST:
+            TicketList();
             break;
         default:
             char msg[256];
