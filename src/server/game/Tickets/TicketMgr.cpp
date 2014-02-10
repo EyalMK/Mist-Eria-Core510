@@ -405,21 +405,27 @@ void TicketMgr::SendTicket(WorldSession* session, GmTicket* ticket) const
     }
 
     WorldPacket data(SMSG_GMTICKET_GETTICKET, (4 + (ticket ? 4 + message.length() + 1 + 4 + 4 + 4 + 1 + 1 : 0)));
-    data.WriteBit(status == GMTICKET_STATUS_HASTEXT);                         // standard 0x0A, 0x06 if text present
 
-    if (ticket)
+    data <<uint32(status);
+    data.WriteBit(ticket != 0);
+    if(ticket)
     {
-        data.WriteBits(message.size(), 11);
-        data.WriteBits(message.size(), 7);
-        //data << uint32(ticket->GetId());            // ticketID
-        //data << message.c_str();                    // ticket text
-        //data << uint8(0x7);                         // ticket category; why is this hardcoded? does it make a diff re: client?
+        data.WriteBits(ticket->GetMessage().size(), 12);
+        data.WriteBits(0, 11); //Ticket wait time text override
+        data.FlushBits();
 
-        // we've got the easy stuff done by now.
-        // Now we need to go through the client logic for displaying various levels of ticket load
-        ticket->WritePacket(data);
+        data << uint8(1); // Category
+        data << uint32(ticket->GetId());
+        data << uint32(float(0)); //Wat time
+        data << uint32(float(0)); //Oldest wait time
+        data << uint32(ticket->GetLastModifiedTime());
+        data << uint8(ticket->GetAssignedToGUID() != 0 ? 1 : 0); //Assigned to GM
+        data << uint8(ticket->GetAssignedToGUID() != 0 ? 1 : 0); //Opened by GM
+        data << uint32(0); //Wait time override
+        //data.WriteString(waitTimeOverrideMessage);
+        data.WriteString(ticket->GetMessage());
     }
-    data << uint32(status);
+
     session->SendPacket(&data);
 }
 
