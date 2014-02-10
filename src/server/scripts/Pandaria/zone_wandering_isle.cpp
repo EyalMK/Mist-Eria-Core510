@@ -333,36 +333,24 @@ public:
     {
         npc_min_dimwind_popAI(Creature* creature) : npc_escortAI(creature) {}
 
-        uint32 m_uiChatTimer;
-        uint32 m_uiEscortTimer;
-        bool Escort;
-
         void Reset()
         {
-            m_uiChatTimer = 7000;
-            m_uiEscortTimer = 2000;
-            Escort = true;
         }
 
         void WaypointReached(uint32 waypointId)
         {
             Player* player = GetPlayerForEscort();
-            if (!player)
-                return;
 
             switch (waypointId)
             {
                 case 1:
-                    Talk(SAY_DIMWIND1, player->GetGUID());
-                    m_uiChatTimer = 4000;
+                    Talk(SAY_DIMWIND1);
                     break;
                 case 2:
-                    Talk(SAY_DIMWIND2, player->GetGUID());
-                    m_uiChatTimer = 4000;
+                    Talk(SAY_DIMWIND2);
                     break;
                 case 3:
-                    Talk(SAY_DIMWIND3, player->GetGUID());
-                    m_uiChatTimer = 4000;
+                    Talk(SAY_DIMWIND3);
                     break;
                 case 10:
                     me->DespawnOrUnsummon();
@@ -373,18 +361,12 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-            if(Escort)
-            {
-                if(m_uiEscortTimer <= uiDiff)
-                {
-                    Start(false, true);
-                    Escort = false;
-                }
-                else
-                    m_uiEscortTimer -= uiDiff;
-            }
-
             npc_escortAI::UpdateAI(uiDiff);
+
+            if (UpdateVictim())
+                return;
+
+            Start(false, true);
         }
     };
 
