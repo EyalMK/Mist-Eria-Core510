@@ -274,7 +274,8 @@ enum eTheMissingDriver
     QUEST_THE_MISSING_DRIVER    = 29419,
     NPC_AMBERLEAF_SCAMP         = 54130,
     NPC_MIN_DIMWIND             = 54855,
-    NPC_MIN_DIMWIND_POP         = 56503
+    NPC_MIN_DIMWIND_POP         = 56503,
+    SAY_1                       = 0
 
 };
 
@@ -297,9 +298,10 @@ class areatrigger_at_the_missing_driver : public AreaTriggerScript
                         std::list<Creature*> creatures;
                         GetCreatureListWithEntryInGrid(creatures, player, NPC_AMBERLEAF_SCAMP, 20.0f);
 
-                        /*for(std::list<Creature*>::const_iterator iter = creatures.begin() ; iter != creatures.end() ; ++iter)
-                            (*iter)->GetMotionMaster()->MovePoint(1, 1381.40f, 3580.12f, 91.00f);*/
+                        for(std::list<Creature*>::const_iterator iter = creatures.begin() ; iter != creatures.end() ; ++iter)
+                            (*iter)->AI()->Talk(SAY_1);
 
+                        min->DisappearAndDie();
                         player->SummonCreature(NPC_MIN_DIMWIND_POP, min->GetPositionX(), min->GetPositionY(), min->GetPositionZ(), 2.08f, TEMPSUMMON_TIMED_DESPAWN, 120000);
                         player->KilledMonsterCredit(54855);
 
