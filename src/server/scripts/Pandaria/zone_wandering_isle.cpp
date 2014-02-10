@@ -299,7 +299,10 @@ class areatrigger_at_the_missing_driver : public AreaTriggerScript
                         GetCreatureListWithEntryInGrid(creatures, player, NPC_AMBERLEAF_SCAMP, 20.0f);
 
                         for(std::list<Creature*>::const_iterator iter = creatures.begin() ; iter != creatures.end() ; ++iter)
+                        {
                             (*iter)->AI()->Talk(SAY_1);
+                            (*iter)->DespawnOrUnsummon(3000);
+                        }
 
                         min->DisappearAndDie();
                         player->SummonCreature(NPC_MIN_DIMWIND_POP, min->GetPositionX(), min->GetPositionY(), min->GetPositionZ(), 2.08f, TEMPSUMMON_TIMED_DESPAWN, 120000);
