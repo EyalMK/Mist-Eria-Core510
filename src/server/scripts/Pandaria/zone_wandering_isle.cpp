@@ -274,7 +274,7 @@ enum eTheMissingDriver
     QUEST_THE_MISSING_DRIVER    = 29419,
     NPC_AMBERLEAF_SCAMP         = 54130,
     NPC_MIN_DIMWIND             = 54855,
-    NPC_MIN_DIMWIND_POP         = 54855
+    NPC_MIN_DIMWIND_POP         = 56503
 
 };
 
@@ -373,8 +373,6 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-            npc_escortAI::UpdateAI(uiDiff);
-
             if(Escort)
             {
                 if(m_uiEscortTimer <= uiDiff)
@@ -385,6 +383,8 @@ public:
                 else
                     m_uiEscortTimer -= uiDiff;
             }
+
+            npc_escortAI::UpdateAI(uiDiff);
         }
     };
 
