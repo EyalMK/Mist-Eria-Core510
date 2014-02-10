@@ -297,10 +297,10 @@ class areatrigger_at_the_missing_driver : public AreaTriggerScript
                         std::list<Creature*> creatures;
                         GetCreatureListWithEntryInGrid(creatures, player, NPC_AMBERLEAF_SCAMP, 20.0f);
 
-                        for(std::list<Creature*>::const_iterator iter = creatures.begin() ; iter != creatures.end() ; ++iter)
-                            (*iter)->GetMotionMaster()->MovePoint(1, 1381.40f, 3580.12f, 91.00f);
+                        /*for(std::list<Creature*>::const_iterator iter = creatures.begin() ; iter != creatures.end() ; ++iter)
+                            (*iter)->GetMotionMaster()->MovePoint(1, 1381.40f, 3580.12f, 91.00f);*/
 
-                        player->SummonCreature(NPC_MIN_DIMWIND_POP, min->GetPositionX(), min->GetPositionY(), min->GetPositionZ(), 2.08);
+                        player->SummonCreature(NPC_MIN_DIMWIND_POP, min->GetPositionX(), min->GetPositionY(), min->GetPositionZ(), 2.08f, TEMPSUMMON_TIMED_DESPAWN, 120000);
                         player->KilledMonsterCredit(54855);
 
                         return true;
@@ -334,11 +334,14 @@ public:
         npc_min_dimwind_popAI(Creature* creature) : npc_escortAI(creature) {}
 
         uint32 m_uiChatTimer;
+        uint32 m_uiEscortTimer;
+        bool Escort;
 
         void Reset()
         {
-            Start(false, true);
             m_uiChatTimer = 7000;
+            m_uiEscortTimer = 2000;
+            Escort = true;
         }
 
         void WaypointReached(uint32 waypointId)
@@ -371,8 +374,17 @@ public:
         void UpdateAI(const uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
-            if (HasEscortState(STATE_ESCORT_ESCORTING))
-                m_uiChatTimer = 6000;
+
+            if(Escort)
+            {
+                if(m_uiEscortTimer <= uiDiff)
+                {
+                    Start(false, true);
+                    Escort = false;
+                }
+                else
+                    m_uiEscortTimer -= uiDiff;
+            }
         }
     };
 
