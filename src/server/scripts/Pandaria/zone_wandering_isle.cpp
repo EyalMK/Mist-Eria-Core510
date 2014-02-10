@@ -333,11 +333,8 @@ public:
     {
         npc_min_dimwind_popAI(Creature* creature) : npc_escortAI(creature) {}
 
-        uint32 m_uiChatTimer;
-
         void Reset()
         {
-            m_uiChatTimer = 7000;
         }
 
         void WaypointReached(uint32 waypointId)
@@ -348,15 +345,12 @@ public:
             {
                 case 1:
                     Talk(SAY_DIMWIND1);
-                    //m_uiChatTimer = 4000;
                     break;
                 case 2:
                     Talk(SAY_DIMWIND2);
-                    //m_uiChatTimer = 4000;
                     break;
                 case 3:
                     Talk(SAY_DIMWIND3);
-                   // m_uiChatTimer = 4000;
                     break;
                 case 10:
                     me->DespawnOrUnsummon();
@@ -372,9 +366,7 @@ public:
             if (UpdateVictim())
                 return;
 
-           // Start(false, true);
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_min_dimwind_pop::npc_min_dimwind_popAI, me->AI()))
-                pEscortAI->Start(true, true);
+            Start(false, true);
         }
     };
 
