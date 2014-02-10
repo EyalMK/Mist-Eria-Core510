@@ -160,7 +160,12 @@ void GmTicket::SendResponse(WorldSession* session) const
     data << uint32(_id);        // ticketID
     data << _message.c_str();
 
-    size_t len = _response.size();
+    data << _response.c_str();
+    data << uint8(0);
+    data << uint8(0);
+    data << uint8(0);
+
+    /*size_t len = _response.size();
     char const* s = _response.c_str();
 
     for (int i = 0; i < 4; i++)
@@ -175,7 +180,7 @@ void GmTicket::SendResponse(WorldSession* session) const
         }
 
         data << uint8(0);
-    }
+    }*/
 
     session->SendPacket(&data);
 }
