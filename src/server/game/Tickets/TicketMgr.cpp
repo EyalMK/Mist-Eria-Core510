@@ -410,8 +410,8 @@ void TicketMgr::SendTicket(WorldSession* session, GmTicket* ticket) const
     data.WriteBit(ticket != 0);
     if(ticket)
     {
-        data.WriteBits(ticket->GetMessage().size(), 8);
-        data.WriteBits(0, 6); //Ticket wait time text override
+        data.WriteBits(ticket->GetMessage().size(), 12);
+        data.WriteBits(0, 11); //Ticket wait time text override
         data.FlushBits();
 
         data << uint8(1); // Category
