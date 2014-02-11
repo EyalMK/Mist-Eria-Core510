@@ -597,7 +597,7 @@ public :
             events.ScheduleEvent(EVENT_INTRO, 3000);
             events.ScheduleEvent(EVENT_ADD_POWER, 2000);
             events.ScheduleEvent(EVENT_SUMMON_NPCS, 3000);
-            events.ScheduleEvent(EVENT_LOOK_PLAYERS, 1000);
+            events.ScheduleEvent(EVENT_LOOK_PLAYERS, 100);
         }
 
         void EndEvent()
@@ -644,7 +644,6 @@ public :
                         if (!player->IsInDist2d(me, 20) && player->HasAura(SPELL_MEDITATION_BAR))
                         {
                             player->RemoveAura(SPELL_MEDITATION_BAR);
-                            return false ;
                         }
                     }
                 }
