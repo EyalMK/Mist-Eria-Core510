@@ -647,7 +647,12 @@ public :
                     if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
                         if(player->GetAreaId() == AREA_MEDITATION)
                             if(player->HasAura(SPELL_MEDITATION_BAR))
-                                AddPower(player);
+                            {
+                                //AddPower(player);
+                                sLog->outDebug(LOG_FILTER_NETWORKIO, "COUUUUUUUUUUUUUUUUUUUUUUUUU");
+                                player->ModifyPower(POWER_ALTERNATE_POWER, +2);
+                            }
+
                 }
             }
         }
