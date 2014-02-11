@@ -513,17 +513,19 @@ public :
     struct npc_aysa_cloudsinger_meditation_AI : public ScriptedAI
     {
     public :
-        npc_aysa_cloudsinger_meditation_AI(Creature* c) : ScriptedAI(c)
+        npc_aysa_cloudsinger_meditation_AI(Creature* c) : ScriptedAI(c), Summons(me)
         {
         }
 
         bool isStarted ;
         EventMap events ;
         Creature* LiFei;
+        SummonList Summons;
 
         void Reset()
         {
             isStarted = false ;
+            Summons.DespawnAll();
         }
 
         void DamageTaken(Unit *doneby, uint32 &/*amount*/)
@@ -533,6 +535,15 @@ public :
                 events.RescheduleEvent(EVENT_ADD_POWER, 1300);
                 events.RescheduleEvent(EVENT_SUMMON_NPCS, 1500);
             }*/
+        }
+
+        void JustSummoned(Creature* Summoned)
+        {
+            Summons.Summon(Summoned);
+
+            if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
+                if(target && target->GetTypeId() == TYPEID_PLAYER)
+                    Summoned->AI()->AttackStart(target);
         }
 
         void UpdateAI(uint32 diff)
@@ -595,6 +606,7 @@ public :
             events.CancelEvent(EVENT_INTRO);
             events.CancelEvent(EVENT_SUMMON_NPCS);
             events.CancelEvent(EVENT_LOOK_PLAYERS);
+            Summons.DespawnAll();
             isStarted = false;
             if(LiFei)
                 LiFei->DespawnOrUnsummon();
