@@ -651,8 +651,7 @@ public :
                         {
                             if(player->HasAura(SPELL_MEDITATION_BAR))
                             {
-                                //AddPower(player);
-                                player->ModifyPower(POWER_ALTERNATE_POWER, +2);
+                                AddPower(player);
                             }
                         }
                     }
@@ -664,7 +663,7 @@ public :
         {
             if(player)
             {
-                player->SetPower(POWER_ALTERNATE_POWER, int32(player->GetPower(POWER_ALTERNATE_POWER) + 2));
+                player->ModifyPower(POWER_ALTERNATE_POWER, +2);
 
                 switch(player->GetPower(POWER_ALTERNATE_POWER))
                 {
