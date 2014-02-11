@@ -639,6 +639,11 @@ public :
                             return true;
                         }
                     }
+                    if (!player->IsInDist2d(me, 20) && player->HasAura(SPELL_MEDITATION_BAR))
+                    {
+                        player->RemoveAura(SPELL_MEDITATION_BAR);
+                        return false ;
+                    }
                 }
             }
             return false ;
@@ -716,9 +721,7 @@ public :
 
             for(uint8 i = 0 ; i < number ; ++i)
             {
-                Creature * scamp = me->SummonCreature(MOB_SCAMP, SummonPositions[i], TEMPSUMMON_TIMED_DESPAWN, 180000);
-                if(scamp)
-                    scamp->AI()->AttackStart(me);
+                me->SummonCreature(MOB_SCAMP, SummonPositions[i], TEMPSUMMON_TIMED_DESPAWN, 180000);
             }
         }
 
