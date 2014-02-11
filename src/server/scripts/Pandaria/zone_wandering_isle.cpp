@@ -451,53 +451,71 @@ public:
 /********The Way of the Tushui********/
 /*************************************/
 
-class CheckAysaQuestPredicate
-{
-public :
-    CheckAysaQuestPredicate(uint32 questId, uint32 spellId) : id(questId) { }
-
-    bool operator()(Player* p)
-    {
-        if(p)
-            return (p->HasAura(spell) && p->hasQuest(id)) ;
-        return false ;
-    }
-
-private:
-    uint32 id;
-    uint32 spell;
-};
-
 const Position SummonPositions[] =
 {
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f}
+    {1180.69f, 3450.00f, 103.00f, 3.50f},
+    {1181.10f, 3447.40f, 102.70f, 3.50f},
+    {1182.05f, 3444.38f, 102.70f, 3.50f},
+    {1183.14f, 3440.85f, 102.70f, 3.50f}
 };
 
-const Position MeditationPosition = {0.0f, 0.0f, 0.0f, 0.0f} ;
-const Position ShangXiPosition = {0.0f, 0.0f, 0.0f, 0.0f} ;
-
-const Position LiFeiPosition[2] =
+enum Quests
 {
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f}
+    QUEST_THE_WAY_OF_THE_TUSHUI     = 29414
 };
 
-class npc_aysa_cloudsinger_quest29414 : public CreatureScript
+enum Events
+{
+    EVENT_ADD_POWER     = 0,
+    EVENT_SUMMON_NPCS   = 1,
+    EVENT_INTRO         = 2,
+    EVENT_LOOK_PLAYERS  = 3
+};
+
+enum SpellsAysa
+{
+    SPELL_MEDITATION_BAR = 116421
+};
+
+enum Npcs
+{
+    NPC_MASTER_LI_FEI   = 54856,
+    MOB_SCAMP           = 59637
+};
+
+enum SaysLiFei
+{
+    LI_FEI_SPEECH_1     = 0,
+    LI_FEI_SPEECH_2     = 1,
+    LI_FEI_SPEECH_3     = 2,
+    LI_FEI_SPEECH_4     = 3,
+    LI_FEI_SPEECH_5     = 4,
+    LI_FEI_SPEECH_6     = 5,
+    LI_FEI_SPEECH_7     = 6
+};
+
+enum SaysAysa
+{
+    AYSA_SAY_INTRO  = 0,
+    AYSA_SAY_OUTRO  = 1
+};
+
+
+class npc_aysa_cloudsinger_meditation : public CreatureScript
 {
 public :
-    npc_aysa_cloudsinger_quest29414() : CreatureScript("npc_aysa_cloudsinger_29414") {    }
+    npc_aysa_cloudsinger_meditation() : CreatureScript("npc_aysa_cloudsinger_meditation") {    }
 
-    struct npc_aysa_cloudsinger_quest29414_AI : public ScriptedAI
+    struct npc_aysa_cloudsinger_meditation_AI : public ScriptedAI
     {
     public :
-        npc_aysa_cloudsinger_quest29414_AI(Creature* c) : ScriptedAI(c)
+        npc_aysa_cloudsinger_meditation_AI(Creature* c) : ScriptedAI(c)
         {
-
         }
+
+        bool isStarted ;
+        EventMap events ;
+        Creature* LiFei;
 
         void Reset()
         {
@@ -506,11 +524,11 @@ public :
 
         void DamageTaken(Unit *doneby, uint32 &/*amount*/)
         {
-            if(doneby->GetTypeId() != TYPEID_PLAYER)
+            /*if(doneby->GetTypeId() != TYPEID_PLAYER)
             {
                 events.RescheduleEvent(EVENT_ADD_POWER, 1300);
                 events.RescheduleEvent(EVENT_SUMMON_NPCS, 1500);
-            }
+            }*/
         }
 
         void UpdateAI(uint32 diff)
@@ -538,12 +556,12 @@ public :
 
                 case EVENT_ADD_POWER :
                     AddPowerToPlayersOnMap();
-                    events.ScheduleEvent(EVENT_ADD_POWER, 1300);
+                    events.ScheduleEvent(EVENT_ADD_POWER, 2000);
                     break ;
 
                 case EVENT_SUMMON_NPCS :
                     SummonNpcs();
-                    events.ScheduleEvent(EVENT_SUMMON_NPCS, 3500);
+                    events.ScheduleEvent(EVENT_SUMMON_NPCS, 7000);
                     break ;
 
                 case EVENT_LOOK_PLAYERS :
@@ -560,13 +578,11 @@ public :
 
         }
 
-    private :
-        // Functions
-        inline void StartEvent()
+        void StartEvent()
         {
             events.ScheduleEvent(EVENT_INTRO, 3000);
-            events.ScheduleEvent(EVENT_ADD_POWER, 1300);
-            events.ScheduleEvent(EVENT_SUMMON_NPCS, 5000);
+            events.ScheduleEvent(EVENT_ADD_POWER, 2000);
+            events.ScheduleEvent(EVENT_SUMMON_NPCS, 3000);
             events.ScheduleEvent(EVENT_LOOK_PLAYERS, 1000);
         }
 
@@ -576,7 +592,7 @@ public :
             events.CancelEvent(EVENT_INTRO);
             events.CancelEvent(EVENT_SUMMON_NPCS);
             events.CancelEvent(EVENT_LOOK_PLAYERS);
-            isStarted = false ;
+            isStarted = false;
             if(LiFei)
                 LiFei->DespawnOrUnsummon();
             Reset();
@@ -589,19 +605,21 @@ public :
             {
                 Map::PlayerList const& players = map->GetPlayers();
 
-                if(players.isEmpty()) return false ;
+                if(players.isEmpty())
+                    return false ;
 
-                CheckAysaQuestPredicate predicate((uint32)QUEST_THE_WAY_OF_THE_TUSHUI, (uint32)SPELL_PHASE);
                 for(Map::PlayerList::const_iterator iter = players.begin() ; iter != players.end() ; ++iter)
                 {
-                    if(Player* p = iter->getSource())
+                    Player *player = iter->getSource();
+                    if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
                     {
-                        if(predicate(p))
-                            return true ;
+                        if(!player->HasAura(SPELL_MEDITATION_BAR))
+                            player->CastSpell(player, SPELL_MEDITATION_BAR, true);
+
+                        return true;
                     }
                 }
             }
-
             return false ;
         }
 
@@ -609,51 +627,54 @@ public :
         {
             if(Map* map = me->GetMap())
             {
-                Map::PlayerList const& pl = map->GetPlayers();
+                Map::PlayerList const& players = map->GetPlayers();
 
-                if(pl.isEmpty()) return ;
+                if(players.isEmpty())
+                    return ;
 
-                CheckAysaQuestPredicate predi((uint32)QUEST_THE_WAY_OF_THE_TUSHUI, (uint32)SPELL_PHASE);
-
-                for(Map::PlayerList::const_iterator iter = pl.begin() ; iter != pl.end() ; ++iter)
-                    if(predi(iter->getSource()))
-                        AddPower(iter->getSource());
+                for(Map::PlayerList::const_iterator iter = players.begin() ; iter != players.end() ; ++iter)
+                {
+                    Player *player = iter->getSource();
+                    if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
+                        if(player->HasAura(SPELL_MEDITATION_BAR))
+                            AddPower(player);
+                }
             }
         }
 
-        void AddPower(Player* p)
+        void AddPower(Player* player)
         {
-            if(p)
+            if(player)
             {
-                p->ModifyPower(POWER_ALTERNATE_POWER, 1);
-                switch(p->GetPower(POWER_ALTERNATE_POWER))
+                player->SetMaxPower(POWER_ALTERNATE_POWER, 90);
+                player->SetPower(POWER_ALTERNATE_POWER, int32(player->GetPower(POWER_ALTERNATE_POWER) + 2));
+
+                switch(player->GetPower(POWER_ALTERNATE_POWER))
                 {
-                case 20 :
-                    LiFeiSpeech(LI_FEI_SPEECH_1, p);
-                    break;
-                case 40 :
-                    LiFeiSpeech(LI_FEI_SPEECH_2, p);
-                    break ;
-                case 60 :
-                    LiFeiSpeech(LI_FEI_SPEECH_3, p);
-                    break ;
-                case 70 :
-                    LiFeiSpeech(LI_FEI_SPEECH_4, p);
-                    break;
-                case 80 :
-                    LiFeiSpeech(LI_FEI_SPEECH_5, p);
-                    break ;
-                case 90 :
-                    LiFeiSpeech(LI_FEI_SPEECH_6, p);
-                    break ;
-                case 100 :
-                    p->KilledMonsterCredit(NPC_MASTER_LI_FEI);
-                    p->RemoveAura(SPELL_MEDITATION_BAR_2);
-                    me->PlayDirectSound(SOUND_END_CAVE, p);
-                    me->Say(AYSA_SAY_OUTRO, LANG_COMMON, p->GetGUID());
-                    p->RemoveAura(SPELL_PHASE);
-                    me->SummonCreature(NPC_MASTER_SHANG_XI, ShangXiPosition);
-                    break ;
+                    case 20 :
+                        LiFeiSpeech(LI_FEI_SPEECH_1, player);
+                        break;
+                    case 40 :
+                        LiFeiSpeech(LI_FEI_SPEECH_2, player);
+                        break ;
+                    case 50 :
+                        LiFeiSpeech(LI_FEI_SPEECH_3, player);
+                        break ;
+                    case 60 :
+                        LiFeiSpeech(LI_FEI_SPEECH_4, player);
+                        break;
+                    case 70 :
+                        LiFeiSpeech(LI_FEI_SPEECH_5, player);
+                        break ;
+                    case 80 :
+                        LiFeiSpeech(LI_FEI_SPEECH_6, player);
+                        break;
+                    case 90 :
+                        LiFeiSpeech(LI_FEI_SPEECH_7, player);
+                        player->KilledMonsterCredit(NPC_MASTER_LI_FEI);
+                        player->RemoveAura(SPELL_MEDITATION_BAR);
+                        Talk(AYSA_SAY_OUTRO, player->GetGUID());
+                        break ;
 
                 default :
                     break ;
@@ -669,7 +690,7 @@ public :
 
         void SummonNpcs()
         {
-            uint8 number = (1 + (rand() % 4));
+            uint8 number = (1 + (rand() % 3));
 
             for(uint8 i = 0 ; i < number ; ++i)
             {
@@ -681,83 +702,15 @@ public :
 
         void DoIntro()
         {
-            LiFei = me->SummonCreature(NPC_MASTER_LI_FEI, LiFeiPosition[0]);
-            if(LiFei)
-            {
-                LiFei->GetMotionMaster()->MovePoint(0, LiFeiPosition[1]);
-                LiFei->SetOrientation(me->GetOrientation() - M_PI);
-            }
+            LiFei = me->SummonCreature(NPC_MASTER_LI_FEI, 1130.19f, 3435.37f, 106.00f, 0.19f);
+            Talk(AYSA_SAY_INTRO);
         }
-
-        // Vars
-        bool isStarted ;
-        EventMap events ;
-        Creature* LiFei;
     };
 
     CreatureAI* GetAI(Creature *c) const
     {
-        return new npc_aysa_cloudsinger_quest29414_AI(c);
+        return new npc_aysa_cloudsinger_meditation_AI(c);
     }
-
-private :
-
-    // Enums
-    enum Quests
-    {
-        QUEST_THE_WAY_OF_THE_TUSHUI = 29414
-    };
-
-    enum Events
-    {
-        EVENT_ADD_POWER = 1,
-        EVENT_SUMMON_NPCS,
-        EVENT_INTRO,
-        EVENT_LOOK_PLAYERS
-    };
-
-    enum Sounds
-    {
-        SOUND_QUEST_ACCEPT = 0,
-        SOUND_START_CAVE = 0,
-        SOUND_END_CAVE = 0
-    };
-
-    enum Spells
-    {
-        SPELL_MEDITATION_BAR_2 = 105274,
-        SPELL_PHASE = 68243
-    };
-
-    enum Npcs
-    {
-        NPC_MASTER_LI_FEI = 54856,
-        NPC_MASTER_SHANG_XI = 54608,
-        MOB_SCAMP = 59637,
-        NPC_AYSA_QUESTENDER = 0
-    };
-
-    enum Areas
-    {
-        AREA_CAVERN_OF_MEDITATION = 5848
-    };
-
-    enum Says
-    {
-        LI_FEI_SPEECH_1 = -5485605,
-        LI_FEI_SPEECH_2,
-        LI_FEI_SPEECH_3,
-        LI_FEI_SPEECH_4,
-        LI_FEI_SPEECH_5,
-        LI_FEI_SPEECH_6,
-
-        AYSA_SAY_INTRO = -5964201,
-        AYSA_SAY_OUTRO = -5964200
-    };
-
-    // Functions
-
-    // Variables
 };
 
 /********************************/
@@ -1306,8 +1259,8 @@ void AddSC_wandering_isle()
     new areatrigger_at_the_missing_driver();
     new npc_min_dimwind_pop();
     new npc_aysa_cloudsinger_pop();
+    new npc_aysa_cloudsinger_meditation();
 
-    new npc_aysa_cloudsinger_quest29414();
     new stalker_item_equiped();
     new mob_jaomin_ro();
     new mob_amberleaf_scamp29419();
