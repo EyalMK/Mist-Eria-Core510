@@ -466,10 +466,10 @@ enum Quests
 
 enum Events
 {
-    EVENT_ADD_POWER     = 0,
-    EVENT_SUMMON_NPCS   = 1,
-    EVENT_INTRO         = 2,
-    EVENT_LOOK_PLAYERS  = 3
+    EVENT_ADD_POWER     = 1,
+    EVENT_SUMMON_NPCS   = 2,
+    EVENT_INTRO         = 3,
+    EVENT_LOOK_PLAYERS  = 4
 };
 
 enum SpellsAysa
@@ -634,7 +634,6 @@ public :
 
         void AddPowerToPlayersOnMap()
         {
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "MAUUUUUUUUUUUUUUUUUU");
             Map* map = me->GetMap();
             if(map)
             {
@@ -648,14 +647,11 @@ public :
                     Player* player = iter->getSource();
                     if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
                     {
-                        sLog->outDebug(LOG_FILTER_NETWORKIO, "AHHHHHHHHHHHHHHHH");
                         if(player->GetAreaId() == AREA_MEDITATION)
                         {
-                            sLog->outDebug(LOG_FILTER_NETWORKIO, "BIEEEEEEEEEEEEEEEEEEEEEE");
                             if(player->HasAura(SPELL_MEDITATION_BAR))
                             {
                                 //AddPower(player);
-                                sLog->outDebug(LOG_FILTER_NETWORKIO, "COUUUUUUUUUUUUUUUUUUUUUUUUU");
                                 player->ModifyPower(POWER_ALTERNATE_POWER, +2);
                             }
                         }
