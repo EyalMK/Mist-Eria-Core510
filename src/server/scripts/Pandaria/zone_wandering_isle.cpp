@@ -641,10 +641,10 @@ public :
                                 return true;
                             }
                         }
-                        if (!player->IsInDist2d(me, 20) && player->HasAura(SPELL_MEDITATION_BAR))
+                       /* if (!player->IsInDist2d(me, 20) && player->HasAura(SPELL_MEDITATION_BAR))
                         {
                             player->RemoveAura(SPELL_MEDITATION_BAR);
-                        }
+                        }*/
                     }
                 }
             }
