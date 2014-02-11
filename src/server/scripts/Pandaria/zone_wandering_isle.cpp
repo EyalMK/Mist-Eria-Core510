@@ -572,7 +572,7 @@ public :
 
                 case EVENT_LOOK_PLAYERS :
                     if(isAPlayerWithQuestInDist())
-                        events.ScheduleEvent(EVENT_LOOK_PLAYERS, 1000);
+                        events.ScheduleEvent(EVENT_LOOK_PLAYERS, 100);
                     else
                         EndEvent();
                     break ;
@@ -588,7 +588,7 @@ public :
             events.ScheduleEvent(EVENT_INTRO, 3000);
             events.ScheduleEvent(EVENT_ADD_POWER, 2000);
             events.ScheduleEvent(EVENT_SUMMON_NPCS, 3000);
-            events.ScheduleEvent(EVENT_LOOK_PLAYERS, 1000);
+            events.ScheduleEvent(EVENT_LOOK_PLAYERS, 100);
         }
 
         void EndEvent()
@@ -718,6 +718,9 @@ public :
 
         void SummonNpcs()
         {
+            if(!isStarted)
+                return ;
+
             uint8 number = (1 + (rand() % 3));
 
             for(uint8 i = 0 ; i < number ; ++i)
@@ -728,6 +731,9 @@ public :
 
         void DoIntro()
         {
+            if(!isStarted)
+                return ;
+
             LiFei = me->SummonCreature(NPC_MASTER_LI_FEI, 1130.19f, 3435.37f, 106.00f, 0.19f);
             Talk(AYSA_SAY_INTRO);
         }
