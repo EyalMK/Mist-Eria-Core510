@@ -643,6 +643,9 @@ public :
 
         void AddPowerToPlayersOnMap()
         {
+            if(!isStarted)
+                return ;
+
             Map* map = me->GetMap();
             if(map)
             {
@@ -658,7 +661,7 @@ public :
                     {
                         if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
                         {
-                            if(player->GetAreaId() == AREA_MEDITATION)
+                            if(player->GetAreaId() == AREA_MEDITATION && player->IsInDist2d(me, 20))
                             {
                                 if(player->HasAura(SPELL_MEDITATION_BAR))
                                 {
