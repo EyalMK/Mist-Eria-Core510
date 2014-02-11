@@ -616,11 +616,12 @@ public :
                     Player *player = iter->getSource();
                     if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
                     {
-                        if(player->GetAreaId() == AREA_MEDITATION)
+                        if(player->GetAreaId() == AREA_MEDITATION && player->IsInDist2d(me, 20))
+                        {
                             if(!player->HasAura(SPELL_MEDITATION_BAR))
                                 player->CastSpell(player, SPELL_MEDITATION_BAR, true);
-
-                        return true;
+                            return true;
+                        }
                     }
                 }
             }
@@ -699,7 +700,7 @@ public :
 
             for(uint8 i = 0 ; i < number ; ++i)
             {
-                Creature * scamp = me->SummonCreature(MOB_SCAMP, SummonPositions[i]);
+                Creature * scamp = me->SummonCreature(MOB_SCAMP, SummonPositions[i], TEMPSUMMON_TIMED_DESPAWN, 180000);
                 if(scamp)
                     scamp->AI()->AttackStart(me);
             }
