@@ -626,23 +626,26 @@ public :
                 for(Map::PlayerList::const_iterator iter = players.begin() ; iter != players.end() ; ++iter)
                 {
                     Player *player = iter->getSource();
-                    if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
+                    if(player)
                     {
-                        if(player->GetAreaId() == AREA_MEDITATION && player->IsInDist2d(me, 20))
+                        if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
                         {
-                            if(!player->HasAura(SPELL_MEDITATION_BAR))
+                            if(player->GetAreaId() == AREA_MEDITATION && player->IsInDist2d(me, 20))
                             {
-                                player->CastSpell(player, SPELL_MEDITATION_BAR, true);
-                                player->SetMaxPower(POWER_ALTERNATE_POWER, 90);
-                                player->SetPower(POWER_ALTERNATE_POWER, 0);
+                                if(!player->HasAura(SPELL_MEDITATION_BAR))
+                                {
+                                    player->CastSpell(player, SPELL_MEDITATION_BAR, true);
+                                    player->SetMaxPower(POWER_ALTERNATE_POWER, 90);
+                                    player->SetPower(POWER_ALTERNATE_POWER, 0);
+                                }
+                                return true;
                             }
-                            return true;
                         }
-                    }
-                    if (!player->IsInDist2d(me, 20) && player->HasAura(SPELL_MEDITATION_BAR))
-                    {
-                        player->RemoveAura(SPELL_MEDITATION_BAR);
-                        return false ;
+                        if (!player->IsInDist2d(me, 20) && player->HasAura(SPELL_MEDITATION_BAR))
+                        {
+                            player->RemoveAura(SPELL_MEDITATION_BAR);
+                            return false ;
+                        }
                     }
                 }
             }
@@ -662,13 +665,16 @@ public :
                 for(Map::PlayerList::const_iterator iter = players.begin() ; iter != players.end() ; ++iter)
                 {
                     Player* player = iter->getSource();
-                    if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
+                    if(player)
                     {
-                        if(player->GetAreaId() == AREA_MEDITATION)
+                        if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
                         {
-                            if(player->HasAura(SPELL_MEDITATION_BAR))
+                            if(player->GetAreaId() == AREA_MEDITATION)
                             {
-                                AddPower(player);
+                                if(player->HasAura(SPELL_MEDITATION_BAR))
+                                {
+                                    AddPower(player);
+                                }
                             }
                         }
                     }
