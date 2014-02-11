@@ -528,15 +528,6 @@ public :
             Summons.DespawnAll();
         }
 
-        void DamageTaken(Unit *doneby, uint32 &/*amount*/)
-        {
-            /*if(doneby->GetTypeId() != TYPEID_PLAYER)
-            {
-                events.RescheduleEvent(EVENT_ADD_POWER, 1300);
-                events.RescheduleEvent(EVENT_SUMMON_NPCS, 1500);
-            }*/
-        }
-
         void JustSummoned(Creature* Summoned)
         {
             Summons.Summon(Summoned);
@@ -597,7 +588,7 @@ public :
             events.ScheduleEvent(EVENT_INTRO, 3000);
             events.ScheduleEvent(EVENT_ADD_POWER, 2000);
             events.ScheduleEvent(EVENT_SUMMON_NPCS, 3000);
-            events.ScheduleEvent(EVENT_LOOK_PLAYERS, 100);
+            events.ScheduleEvent(EVENT_LOOK_PLAYERS, 1000);
         }
 
         void EndEvent()
@@ -606,7 +597,6 @@ public :
             events.CancelEvent(EVENT_INTRO);
             events.CancelEvent(EVENT_SUMMON_NPCS);
             events.CancelEvent(EVENT_LOOK_PLAYERS);
-            Summons.DespawnAll();
             isStarted = false;
             if(LiFei)
                 LiFei->DespawnOrUnsummon();
@@ -641,10 +631,10 @@ public :
                                 return true;
                             }
                         }
-                       /* if (!player->IsInDist2d(me, 20) && player->HasAura(SPELL_MEDITATION_BAR))
+                        if (!player->IsInDist2d(me, 20) && player->HasAura(SPELL_MEDITATION_BAR))
                         {
                             player->RemoveAura(SPELL_MEDITATION_BAR);
-                        }*/
+                        }
                     }
                 }
             }
@@ -683,6 +673,9 @@ public :
 
         void AddPower(Player* player)
         {
+            if(!isStarted)
+                return ;
+
             if(player)
             {
                 player->ModifyPower(POWER_ALTERNATE_POWER, +2);
