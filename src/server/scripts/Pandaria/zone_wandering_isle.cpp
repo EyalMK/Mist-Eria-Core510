@@ -500,6 +500,10 @@ enum SaysAysa
     AYSA_SAY_OUTRO  = 1
 };
 
+enum Area
+{
+    AREA_MEDITATION = 5848
+};
 
 class npc_aysa_cloudsinger_meditation : public CreatureScript
 {
@@ -575,7 +579,6 @@ public :
                     break ;
                 }
             }
-
         }
 
         void StartEvent()
@@ -613,8 +616,9 @@ public :
                     Player *player = iter->getSource();
                     if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
                     {
-                        if(!player->HasAura(SPELL_MEDITATION_BAR))
-                            player->CastSpell(player, SPELL_MEDITATION_BAR, true);
+                        if(player->GetAreaId() == AREA_MEDITATION)
+                            if(!player->HasAura(SPELL_MEDITATION_BAR))
+                                player->CastSpell(player, SPELL_MEDITATION_BAR, true);
 
                         return true;
                     }
@@ -636,8 +640,9 @@ public :
                 {
                     Player *player = iter->getSource();
                     if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
-                        if(player->HasAura(SPELL_MEDITATION_BAR))
-                            AddPower(player);
+                        if(player->GetAreaId() == AREA_MEDITATION)
+                            if(player->HasAura(SPELL_MEDITATION_BAR))
+                                AddPower(player);
                 }
             }
         }
@@ -647,7 +652,7 @@ public :
             if(player)
             {
                 player->SetMaxPower(POWER_ALTERNATE_POWER, 90);
-                player->SetPower(POWER_ALTERNATE_POWER, int32(player->GetPower(POWER_ALTERNATE_POWER) + 2));
+                player->ModifyPower(POWER_ALTERNATE_POWER, +2);
 
                 switch(player->GetPower(POWER_ALTERNATE_POWER))
                 {
