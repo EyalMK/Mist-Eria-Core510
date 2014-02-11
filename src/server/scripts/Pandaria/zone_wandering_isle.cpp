@@ -634,6 +634,7 @@ public :
 
         void AddPowerToPlayersOnMap()
         {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "MAUUUUUUUUUUUUUUUUUU");
             Map* map = me->GetMap();
             if(map)
             {
@@ -647,8 +648,10 @@ public :
                     Player* player = iter->getSource();
                     if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
                     {
+                        sLog->outDebug(LOG_FILTER_NETWORKIO, "AHHHHHHHHHHHHHHHH");
                         if(player->GetAreaId() == AREA_MEDITATION)
                         {
+                            sLog->outDebug(LOG_FILTER_NETWORKIO, "BIEEEEEEEEEEEEEEEEEEEEEE");
                             if(player->HasAura(SPELL_MEDITATION_BAR))
                             {
                                 //AddPower(player);
