@@ -619,7 +619,11 @@ public :
                         if(player->GetAreaId() == AREA_MEDITATION && player->IsInDist2d(me, 20))
                         {
                             if(!player->HasAura(SPELL_MEDITATION_BAR))
+                            {
                                 player->CastSpell(player, SPELL_MEDITATION_BAR, true);
+                                player->SetMaxPower(POWER_ALTERNATE_POWER, 90);
+                                player->SetPower(POWER_ALTERNATE_POWER, 0);
+                            }
                             return true;
                         }
                     }
@@ -652,8 +656,7 @@ public :
         {
             if(player)
             {
-                player->SetMaxPower(POWER_ALTERNATE_POWER, 90);
-                player->ModifyPower(POWER_ALTERNATE_POWER, +2);
+                player->SetPower(POWER_ALTERNATE_POWER, int32(player->GetPower(POWER_ALTERNATE_POWER) + 2));
 
                 switch(player->GetPower(POWER_ALTERNATE_POWER))
                 {
