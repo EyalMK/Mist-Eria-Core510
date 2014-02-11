@@ -668,25 +668,25 @@ public :
                 switch(player->GetPower(POWER_ALTERNATE_POWER))
                 {
                     case 20 :
-                        LiFeiSpeech(LI_FEI_SPEECH_1, player);
+                        LiFei->AI()->Talk(LI_FEI_SPEECH_1, player->GetGUID());
                         break;
                     case 40 :
-                        LiFeiSpeech(LI_FEI_SPEECH_2, player);
+                        LiFei->AI()->Talk(LI_FEI_SPEECH_2, player->GetGUID());
                         break ;
                     case 50 :
-                        LiFeiSpeech(LI_FEI_SPEECH_3, player);
+                        LiFei->AI()->Talk(LI_FEI_SPEECH_3, player->GetGUID());
                         break ;
                     case 60 :
-                        LiFeiSpeech(LI_FEI_SPEECH_4, player);
+                        LiFei->AI()->Talk(LI_FEI_SPEECH_4, player->GetGUID());
                         break;
                     case 70 :
-                        LiFeiSpeech(LI_FEI_SPEECH_5, player);
+                        LiFei->AI()->Talk(LI_FEI_SPEECH_5, player->GetGUID());
                         break ;
                     case 80 :
-                        LiFeiSpeech(LI_FEI_SPEECH_6, player);
+                        LiFei->AI()->Talk(LI_FEI_SPEECH_6, player->GetGUID());
                         break;
                     case 90 :
-                        LiFeiSpeech(LI_FEI_SPEECH_7, player);
+                        LiFei->AI()->Talk(LI_FEI_SPEECH_7, player->GetGUID());
                         player->KilledMonsterCredit(NPC_MASTER_LI_FEI);
                         player->RemoveAura(SPELL_MEDITATION_BAR);
                         Talk(AYSA_SAY_OUTRO, player->GetGUID());
@@ -696,12 +696,6 @@ public :
                     break ;
                 }
             }
-        }
-
-        void LiFeiSpeech(int32 id, Player* target)
-        {
-            if(LiFei && target)
-                LiFei->MonsterSay(id, LANG_COMMON, target->GetGUID());
         }
 
         void SummonNpcs()
