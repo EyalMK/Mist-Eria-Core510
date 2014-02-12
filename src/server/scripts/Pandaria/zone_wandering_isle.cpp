@@ -787,7 +787,10 @@ public:
                         if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
                             if(target && target->GetTypeId() == TYPEID_PLAYER)
                                 if(target->isAlive() && target->GetAreaId() == AREA_MEDITATION && target->HasAura(SPELL_MEDITATION_BAR))
+                                {
+                                    me->SetReactState(REACT_AGGRESSIVE);
                                     me->AI()->AttackStart(target);
+                                }
                         Test_timer = 1000;
                     }
                     else Test_timer -= diff;
