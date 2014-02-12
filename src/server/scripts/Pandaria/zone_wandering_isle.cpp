@@ -846,28 +846,28 @@ public:
 
                 if (Bolt1_timer <= diff)
                 {
-                    me->CastSpell(me->getVictim(), SPELL_LIGHTNING_BOLT, true);
+                    me->CastSpell(me->getVictim(), SPELL_LIGHTNING_BOLT, false);
                     Bolt1_timer = 14000;
                 }
                 else Bolt1_timer -= diff;
 
                 if (Bolt2_timer <= diff)
                 {
-                    me->CastSpell(me->getVictim(), SPELL_LIGHTNING_BOLT, true);
+                    me->CastSpell(me->getVictim(), SPELL_LIGHTNING_BOLT, false);
                     Bolt2_timer = 14000;
                 }
                 else Bolt2_timer -= diff;
 
                 if (Bolt3_timer <= diff)
                 {
-                    me->CastSpell(me->getVictim(), SPELL_LIGHTNING_BOLT, true);
+                    me->CastSpell(me->getVictim(), SPELL_LIGHTNING_BOLT, false);
                     Bolt3_timer = 14000;
                 }
                 else Bolt3_timer -= diff;
 
                 if (Cloud_timer <= diff)
                 {
-                    me->CastSpell(me->getVictim(), SPELL_LIGHTNING_CLOUD, true);
+                    me->CastSpell(me->getVictim(), SPELL_LIGHTNING_CLOUD, false);
                     Cloud_timer = 14000;
                 }
                 else Cloud_timer -= diff;
