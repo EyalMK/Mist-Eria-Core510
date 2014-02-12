@@ -801,6 +801,82 @@ public:
     };
 };
 
+
+/*************************************/
+/********Fanning the Flames********/
+/*************************************/
+
+enum SpellsAir
+{
+    SPELL_LIGHTNING_BOLT    = 73212,
+    SPELL_LIGHTNING_CLOUD   = 108693
+};
+
+class npc_living_air: public CreatureScript
+{
+public:
+    npc_living_air() : CreatureScript("npc_living_air") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_living_airAI(creature);
+    }
+
+    struct npc_living_airAI : public ScriptedAI
+    {
+            npc_living_airAI(Creature* creature) : ScriptedAI(creature) {}
+
+            uint32 Bolt1_timer;
+            uint32 Bolt2_timer;
+            uint32 Bolt3_timer;
+            uint32 Cloud_timer;
+
+            void Reset()
+            {
+                Bolt1_timer = 1000;
+                Bolt2_timer = 4200;
+                Bolt3_timer = 7400;
+                Cloud_timer = 10600;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if(!UpdateVictim())
+                    return;
+
+                if (Bolt1_timer <= diff)
+                {
+                    me->CastSpell(me->getVictim(), SPELL_LIGHTNING_BOLT, true);
+                    Bolt1_timer = 14000;
+                }
+                else Bolt1_timer -= diff;
+
+                if (Bolt2_timer <= diff)
+                {
+                    me->CastSpell(me->getVictim(), SPELL_LIGHTNING_BOLT, true);
+                    Bolt2_timer = 14000;
+                }
+                else Bolt2_timer -= diff;
+
+                if (Bolt3_timer <= diff)
+                {
+                    me->CastSpell(me->getVictim(), SPELL_LIGHTNING_BOLT, true);
+                    Bolt3_timer = 14000;
+                }
+                else Bolt3_timer -= diff;
+
+                if (Cloud_timer <= diff)
+                {
+                    me->CastSpell(me->getVictim(), SPELL_LIGHTNING_CLOUD, true);
+                    Cloud_timer = 14000;
+                }
+                else Cloud_timer -= diff;
+
+                DoMeleeAttackIfReady();
+            }
+    };
+};
+
 /********************************/
 /**The Lesson of the Iron Bough**/
 /********************************/
@@ -1349,6 +1425,7 @@ void AddSC_wandering_isle()
     new npc_aysa_cloudsinger_pop();
     new npc_aysa_cloudsinger_meditation();
     new npc_amberleaf_troublemaker();
+    new npc_living_air();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
