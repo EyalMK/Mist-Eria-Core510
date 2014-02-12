@@ -769,7 +769,7 @@ public:
             void Reset()
             {
                 me->SetReactState(REACT_PASSIVE);
-                Test_timer = 1000;
+                Test_timer = 500;
                 Test = true;
             }
 
@@ -784,14 +784,15 @@ public:
                 {
                     if (Test_timer <= diff)
                     {
-                        if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
-                            if(target && target->GetTypeId() == TYPEID_PLAYER)
-                                if(target->isAlive() && target->GetAreaId() == AREA_MEDITATION && target->HasAura(SPELL_MEDITATION_BAR))
-                                {
-                                    me->SetReactState(REACT_AGGRESSIVE);
-                                    me->AI()->AttackStart(target);
-                                }
-                        Test_timer = 1000;
+                        Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500, true);
+                        if(target && target->GetTypeId() == TYPEID_PLAYER)
+                            if(target->isAlive() && target->GetAreaId() == AREA_MEDITATION && target->HasAura(SPELL_MEDITATION_BAR))
+                            {
+                                me->SetReactState(REACT_AGGRESSIVE);
+                                me->AI()->AttackStart(target);
+                            }
+
+                        Test_timer = 500;
                     }
                     else Test_timer -= diff;
                 }
