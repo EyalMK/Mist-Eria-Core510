@@ -518,6 +518,7 @@ public :
         }
 
         bool isStarted ;
+        uint32 StartTimer;
         EventMap events ;
         Creature* LiFei;
         SummonList Summons;
@@ -526,6 +527,7 @@ public :
         {
             isStarted = false ;
             Summons.DespawnAll();
+            StartTimer = 1000;
         }
 
         void JustSummoned(Creature* Summoned)
@@ -539,16 +541,22 @@ public :
 
         void UpdateAI(uint32 diff)
         {
-            if(!isStarted)
+            if(StartTimer <= diff)
             {
-                if(isAPlayerWithQuestInDist())
+                if(!isStarted)
                 {
-                    StartEvent();
-                    isStarted = true ;
+                    if(isAPlayerWithQuestInDist())
+                    {
+                        StartEvent();
+                        isStarted = true ;
+                    }
+                    else
+                        return ;
                 }
-                else
-                    return ;
+
+                StartTimer = 1000;
             }
+            else StartTimer -= diff;
 
             events.Update(diff);
 
