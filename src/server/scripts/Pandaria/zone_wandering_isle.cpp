@@ -673,7 +673,7 @@ public :
                             {
                                 if(player->HasAura(SPELL_MEDITATION_BAR))
                                 {
-                                    AddPower(player);
+                                    //AddPower(player);
                                 }
                             }
                         }
