@@ -580,7 +580,7 @@ public :
 
                 case EVENT_LOOK_PLAYERS :
                     if(isAPlayerWithQuestInDist())
-                        events.ScheduleEvent(EVENT_LOOK_PLAYERS, 100);
+                        events.ScheduleEvent(EVENT_LOOK_PLAYERS, 2000);
                     else
                         EndEvent();
                     break ;
@@ -596,7 +596,7 @@ public :
             events.ScheduleEvent(EVENT_INTRO, 3000);
             events.ScheduleEvent(EVENT_ADD_POWER, 2000);
             events.ScheduleEvent(EVENT_SUMMON_NPCS, 3000);
-            events.ScheduleEvent(EVENT_LOOK_PLAYERS, 100);
+            events.ScheduleEvent(EVENT_LOOK_PLAYERS, 2000);
         }
 
         void EndEvent()
