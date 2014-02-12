@@ -682,7 +682,7 @@ public :
             }
         }
 
-        void AddPower(Player* player)
+        /*void AddPower(Player* player)
         {
             if(!isStarted)
                 return ;
@@ -722,7 +722,7 @@ public :
                     break ;
                 }
             }
-        }
+        }*/
 
         void SummonNpcs()
         {
