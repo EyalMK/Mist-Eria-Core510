@@ -580,7 +580,7 @@ public :
 
                 case EVENT_LOOK_PLAYERS :
                     if(isAPlayerWithQuestInDist())
-                        events.ScheduleEvent(EVENT_LOOK_PLAYERS, 2000);
+                        events.ScheduleEvent(EVENT_LOOK_PLAYERS, 1000);
                     else
                         EndEvent();
                     break ;
@@ -593,10 +593,10 @@ public :
 
         void StartEvent()
         {
-            events.ScheduleEvent(EVENT_INTRO, 3000);
-            events.ScheduleEvent(EVENT_ADD_POWER, 2000);
-            events.ScheduleEvent(EVENT_SUMMON_NPCS, 3000);
-            events.ScheduleEvent(EVENT_LOOK_PLAYERS, 2000);
+            events.ScheduleEvent(EVENT_INTRO, 2000);
+            events.ScheduleEvent(EVENT_ADD_POWER, 4000);
+            events.ScheduleEvent(EVENT_SUMMON_NPCS, 2000);
+            events.ScheduleEvent(EVENT_LOOK_PLAYERS, 3000);
         }
 
         void EndEvent()
@@ -673,7 +673,7 @@ public :
                             {
                                 if(player->HasAura(SPELL_MEDITATION_BAR))
                                 {
-                                    //AddPower(player);
+                                    AddPower(player);
                                 }
                             }
                         }
@@ -682,7 +682,7 @@ public :
             }
         }
 
-        /*void AddPower(Player* player)
+        void AddPower(Player* player)
         {
             if(!isStarted)
                 return ;
@@ -722,7 +722,7 @@ public :
                     break ;
                 }
             }
-        }*/
+        }
 
         void SummonNpcs()
         {
