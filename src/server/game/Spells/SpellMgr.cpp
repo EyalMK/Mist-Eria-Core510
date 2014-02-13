@@ -3955,6 +3955,10 @@ void SpellMgr::LoadSpellInfoCorrections()
                 case 114685:
                     spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_1_YARD);
                     break ;
+                case 102508:
+                    spellInfo->Effects[0].Effect = SPELL_EFFECT_APPLY_AURA;
+                    spellInfo->Effects[1].Effect = SPELL_EFFECT_APPLY_AURA;
+                    break;
 				default:
 					break;
 			}
