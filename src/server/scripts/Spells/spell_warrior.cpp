@@ -84,6 +84,7 @@ enum WarriorSpells
 	SPELL_WARRIOR_SWORD_AND_BOARD                   = 50227,
 	SPELL_WARRIOR_SHIELD_SLAM                       = 23922,
 	SPELL_WARRIOR_COLOSSUS_SMASH                    = 86346,
+	SPELL_WARRIOR_COLOSSUS_SMASH_TRIGGERED			= 108126,
 	SPELL_WARRIOR_TASTE_FOR_BLOOD_DAMAGE_DONE       = 125831,
 	SPELL_WARRIOR_DRAGON_ROAR_KNOCK_BACK            = 118895,
 	SPELL_WARRIOR_MEAT_CLEAVER_PROC                 = 85739,
@@ -760,15 +761,20 @@ public:
         PrepareSpellScript(spell_warr_colossus_smash_SpellScript);
 
         /// Init what we need
-        bool Load() {
+        bool Load()
+		{
             hitUnit = NULL ; /// Nullify the pointer to make sure it will not do something strange
             return true ;
         }
 
         /// Set damages
         /// According to wowhead, we must add 175% of the total attack power
-        void HandleEffect(SpellEffIndex /*effIndex*/) {
-            if (Unit* caster = GetCaster()) {
+        void HandleEffect(SpellEffIndex effIndex)
+		{
+			PreventHitDefaultEffect(effIndex);
+
+            if (Unit* caster = GetCaster())
+			{
                 int32 damage = GetHitDamage();
 
                 SetHitDamage(damage + (caster->GetTotalAttackPowerValue(BASE_ATTACK) * 1.75f));
@@ -778,41 +784,47 @@ public:
 
         /// Handle the auras
         /// We must apply two auras : ignoring armor (108126) and physical vulnerability (81326)
-        void HandleAfterHit() {
-            if(hitUnit) {
-                int32 basePoint0 = 0 ;
+        void HandleAfterHit()
+		{
+            if(hitUnit)
+			{
+                int32 basePoint0 = 0;
 
                 // Ignore 65% on players and 100% on creatures
                 if(hitUnit->GetTypeId() == TYPEID_PLAYER)
-                    basePoint0 = 65 ;
+                    basePoint0 = 65;
                 else
-                    basePoint0 = 100 ;
+                    basePoint0 = 100;
 
                 Unit* caster = GetCaster();
-                if(caster) {
+                if (caster && hitUnit)
+				{
                     caster->CastSpell(hitUnit, SPELL_WARRIOR_PHYSICAL_VULNERABILITY, true); // Physical vulnerability
-                    caster->CastCustomSpell(hitUnit, 108126, &basePoint0, NULL, NULL, true, NULL, NULL, caster->GetGUID()); // Armor ignoring
+                    caster->CastCustomSpell(hitUnit, SPELL_WARRIOR_COLOSSUS_SMASH_TRIGGERED, &basePoint0, NULL, NULL, true, NULL, NULL, caster->GetGUID()); // Armor ignoring
                 }
             }
         }
 
         /// Since we handle this application in AfterHit, we must prevent it (otherwise, effects handling would call it first, and damages would be twiced
-        void PreventApplyAura() {
+        void PreventApplyAura()
+		{
             PreventHitAura();
         }
 
         /// Register the script
-        void Register() {
+        void Register()
+		{
             OnEffectHitTarget += SpellEffectFn(spell_warr_colossus_smash_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_NORMALIZED_WEAPON_DMG); // Damages
             BeforeHit += SpellHitFn(spell_warr_colossus_smash_SpellScript::PreventApplyAura); // Prevents applying the aura ; before hit seemed to be the best
             AfterHit += SpellHitFn(spell_warr_colossus_smash_SpellScript::HandleAfterHit); // Apply the auras ; after hit to be sure we won't deal more damages
         }
 
-        Unit* hitUnit ; /// Pointer to the hit unit (since the implicit target is TARGET_ENEMY, we do not need a std::list)
+        Unit* hitUnit; /// Pointer to the hit unit (since the implicit target is TARGET_ENEMY, we do not need a std::list)
     };
 
     /// Returns a pointer to the script as a pointer to SpellScript
-    SpellScript* GetSpellScript() const {
+    SpellScript* GetSpellScript() const
+	{
         return new spell_warr_colossus_smash_SpellScript();
     }
 };

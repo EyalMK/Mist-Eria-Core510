@@ -1,6 +1,4 @@
-/* Script de Tydrheal & Sungis */
-/* Battleground: Temple de Kotmogu */
-
+/* Script de Tydrheal & Sungis : Temple of Kotmogu */
 
 #include "Battleground.h"
 #include "BattlegroundTK.h"
@@ -187,12 +185,14 @@ void BattlegroundTK::Reset()
     {
         m_HonorWinKills = 3;
         m_HonorEndKills = 4;
+		m_HonorMode		= BG_HOLIDAY;
     }
 
     else
     {
         m_HonorWinKills = 1;
         m_HonorEndKills = 2;
+		m_HonorMode		= BG_NORMAL;
     }
 
 	m_IsInformedNearVictory		= false;

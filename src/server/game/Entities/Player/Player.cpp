@@ -26738,6 +26738,7 @@ void Player::SendItemRefundResult(Item* item, ItemExtendedCostEntry const* iece,
     data.WriteBit(!error);
     data.WriteBit(item->GetPaidMoney() > 0);
     data.FlushBits();
+
     if (!error)
     {
         for (uint8 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
@@ -26757,14 +26758,14 @@ void Player::SendItemRefundResult(Item* item, ItemExtendedCostEntry const* iece,
         }
     }
 
-    data.WriteByteSeq(guid[0]);
-    data.WriteByteSeq(guid[3]);
-    data.WriteByteSeq(guid[1]);
-    data.WriteByteSeq(guid[6]);
-    data.WriteByteSeq(guid[4]);
-    data.WriteByteSeq(guid[2]);
-    data.WriteByteSeq(guid[7]);
-    data.WriteByteSeq(guid[5]);
+    data.WriteBit(guid[0]);
+    data.WriteBit(guid[3]);
+    data.WriteBit(guid[1]);
+    data.WriteBit(guid[6]);
+    data.WriteBit(guid[4]);
+    data.WriteBit(guid[2]);
+    data.WriteBit(guid[7]);
+    data.WriteBit(guid[5]);
 
     data << uint8(error);                              // error code
     GetSession()->SendPacket(&data);
@@ -27130,13 +27131,13 @@ void Player::SendMovementSetHover(bool apply)
 
         data.WriteByteSeq(guid[5]);
         data.WriteByteSeq(guid[4]);
-        data.WriteByteSeq(guid[1]);
+        data.WriteByteSeq(guid[2]);
         data.WriteByteSeq(guid[2]);
         data.WriteByteSeq(guid[3]);
         data.WriteByteSeq(guid[6]);
         data.WriteByteSeq(guid[0]);
         data.WriteByteSeq(guid[7]);
-        data << uint32(0);          // movement counter
+		data << uint32(0);          // movement counter
     }
     else
     {
@@ -27158,7 +27159,7 @@ void Player::SendMovementSetHover(bool apply)
         data.WriteByteSeq(guid[1]);
         data.WriteByteSeq(guid[2]);
         data.WriteByteSeq(guid[0]);
-        data << uint32(0);          // movement counter
+		data << uint32(0);          // movement counter
     }
 
     SendDirectMessage(&data);
@@ -27289,11 +27290,11 @@ void Player::SendMovementSetCollisionHeight(float height)
     data.WriteByteSeq(guid[4]);
     data.WriteByteSeq(guid[3]);
     data.WriteByteSeq(guid[5]);
-    data << uint32(sWorld->GetGameTime());   // Packet counter
+	data << uint32(sWorld->GetGameTime());   // Packet counter
     data.WriteByteSeq(guid[1]);
     data.WriteByteSeq(guid[2]);
     data.WriteByteSeq(guid[7]);
-    data << float(height);
+	data << float(height);
 
     SendDirectMessage(&data);
 }
