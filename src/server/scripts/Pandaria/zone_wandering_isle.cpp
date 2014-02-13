@@ -1515,10 +1515,10 @@ class spell_blessing_red : public SpellScriptLoader
             {
                 if(target)
                 {
-                    if(target->ToCreature()->GetEntry() == 54900)
+                    if(target->ToCreature() && target->ToCreature()->GetEntry() == 54900)
                         return true;
 
-                    if(target->ToPlayer()->GetQuestStatus(29421) == QUEST_STATUS_INCOMPLETE)
+                    if(target->ToPlayer() && target->ToPlayer()->GetQuestStatus(29421) == QUEST_STATUS_INCOMPLETE)
                         return true;
                 }
                 return false;
