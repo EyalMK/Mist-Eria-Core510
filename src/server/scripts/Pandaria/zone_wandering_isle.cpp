@@ -943,14 +943,11 @@ public:
                                         }
                                     }
                                 }
-                                if (player->GetQuestStatus(QUEST_ONLY_THE_WORTHY_SHALL_PASS) == QUEST_STATUS_COMPLETE || player->GetQuestStatus(QUEST_ONLY_THE_WORTHY_SHALL_PASS) == QUEST_STATUS_REWARDED)
+                                else
                                 {
-                                    if(player->HasAura(SPELL_BLESSING_OF_THE_BLUE_FLAME) || player->HasAura(SPELL_BLESSING_OF_THE_RED_FLAME) || player->HasAura(SPELL_BLESSING_OF_THE_PURPLE_FLAME))
-                                    {
-                                        player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_BLUE_FLAME);
-                                        player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_RED_FLAME);
-                                        player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_PURPLE_FLAME);
-                                    }
+                                    player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_BLUE_FLAME);
+                                    player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_RED_FLAME);
+                                    player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_PURPLE_FLAME);
                                 }
                             }
                         }
