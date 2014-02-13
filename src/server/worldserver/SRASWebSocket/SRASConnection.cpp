@@ -7,7 +7,7 @@ void wsMakeFrame(const std::string data, ByteBuffer *outFrame, enum wsFrameType 
 {
     outFrame->WriteBit(1);
     outFrame->WriteBits(0, 3);
-    outFrame->WriteBits(1, 4); //Opcode text
+    outFrame->WriteBits(frameType, 4); //Opcode text
     outFrame->WriteBit(0); //No mask
 
     int size = data.size();
@@ -196,19 +196,12 @@ int SRASConnection::ReadySend()
 
         sLog->outDebug(LOG_FILTER_SRAS, "Sending frame : %s", newFrameData.c_str());
 
-        //wsMakeFrame((uint8_t*)newFrameData.c_str(), newFrameData.size(), frameBuffer, &frameSize, WS_TEXT_FRAME); //On créer le message
-        //m_currentSendFrame.append(&frameBuffer, frameSize);
-
-        m_currentSendFrame.WriteBit(1);
-        m_currentSendFrame.WriteBits(0, 3);
-        m_currentSendFrame.WriteBits(1, 4); //Opcode text
-        m_currentSendFrame.WriteBit(0); //No mask
-        m_currentSendFrame.WriteBits(newFrameData.size(), 7);
-        m_currentSendFrame.WriteString(newFrameData);
+        wsMakeFrame(newFrameData, &m_currentSendFrame, WS_TEXT_FRAME);
 
         send(m_socket, m_currentSendFrame.contents(), m_currentSendFrame.size(), 0); //On l'envoi
 
         delete[] frameBuffer;
+        m_currentSendFrame.clear();
 
         m_queuedMessage.pop();
     }
@@ -253,6 +246,9 @@ int SRASConnection::HandlePacket(int opcode, SRASPacket pkt)
             break;
         case TICKET_LIST:
             TicketList();
+            break;
+        case SEARCH_QUERY:
+            SearchQuery(pkt);
             break;
         default:
             char msg[256];

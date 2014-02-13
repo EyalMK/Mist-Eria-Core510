@@ -4,10 +4,18 @@
 
 #define CHECK_SECURITY(sec) if (m_security < sec) {close(m_scoket); return;}
 
-enum SRASOpcode
+enum SRASOpcodeClient //Client => Server
 {
     AUTH_CHALLENGE = 1,
-    TICKET_LIST = 2
+    TICKET_LIST = 2,
+    SEARCH_QUERY = 3
+};
+
+enum SRASOpcodeServer //Server => Client
+{
+    AUTH_RESPONSE = 1,
+    TICKET_RESP = 2,
+    SEARCH_RESPONSE = 3
 };
 
 class SRASPacket
@@ -109,8 +117,11 @@ public:
 
     //Handlers
 
-    void AuthChallenge(SRASPacket pkt);
+    void AuthChallenge(SRASPacket pkt);    
+
     void TicketList();
+
+    void SearchQuery(SRASPacket pkt);
 
 private:
 
