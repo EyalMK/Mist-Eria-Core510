@@ -883,7 +883,7 @@ public:
 /****Only the Worthy Shall Pass****/
 /*************************************/
 
-/*enum SpellsTrigger
+enum SpellsTrigger
 {
     SPELL_BLESSING_OF_THE_RED_FLAME     = 102508,
     SPELL_BLESSING_OF_THE_BLUE_FLAME    = 102509,
@@ -912,14 +912,14 @@ public:
 
             void Reset()
             {
-                Test_timer = 1000;
+                Test_timer = 3000;
             }
 
             void UpdateAI(uint32 diff)
             {
                 if (Test_timer <= diff)
                 {
-                    Map* map = me->GetMap();
+                    /*Map* map = me->GetMap();
                     if(map)
                     {
                         Map::PlayerList const& players = map->GetPlayers();
@@ -955,13 +955,16 @@ public:
                                 }
                             }
                         }
-                    }
-                    Test_timer = 1000;
+                    }*/
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Casting spell");
+                    me->CastSpell(me, SPELL_BLESSING_OF_THE_RED_FLAME, true);
+                    Test_timer = 3000;
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Spell casted");
                 }
                 else Test_timer -= diff;
             }
     };
-};*/
+};
 
 /********************************/
 /**The Lesson of the Iron Bough**/
@@ -1547,7 +1550,7 @@ void AddSC_wandering_isle()
     new npc_aysa_cloudsinger_meditation();
     new npc_amberleaf_troublemaker();
     new npc_living_air();
-   // new npc_trigger_shall_pass();
+    new npc_trigger_shall_pass();
     new spell_blessing_red();
 
     new stalker_item_equiped();
