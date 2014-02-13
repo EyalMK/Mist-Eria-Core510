@@ -22,6 +22,8 @@ include(Commands/CMakeLists.txt)
 
 include(Examples/CMakeLists.txt)
 
+include(Custom/CMakeLists.txt)
+
 set(sources
   ${sources}
   ../game/AI/ScriptedAI/ScriptedEscortAI.cpp
@@ -29,8 +31,7 @@ set(sources
   ../game/AI/ScriptedAI/ScriptedFollowerAI.cpp
 )
 
-if(SCRIPTS)
-  include(Custom/CMakeLists.txt)
+if(SCRIPTS)  
   include(World/CMakeLists.txt)
   include(OutdoorPvP/CMakeLists.txt)
   include(EasternKingdoms/CMakeLists.txt)
