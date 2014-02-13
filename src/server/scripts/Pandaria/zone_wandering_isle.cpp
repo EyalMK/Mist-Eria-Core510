@@ -22,6 +22,7 @@
 #include "ScriptedGossip.h"
 #include "Player.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
 #include "GridNotifiers.h"
 #include "ScriptedEscortAI.h"
 
@@ -882,7 +883,7 @@ public:
 /****Only the Worthy Shall Pass****/
 /*************************************/
 
-enum SpellsTrigger
+/*enum SpellsTrigger
 {
     SPELL_BLESSING_OF_THE_RED_FLAME     = 102508,
     SPELL_BLESSING_OF_THE_BLUE_FLAME    = 102509,
@@ -960,7 +961,7 @@ public:
                 else Test_timer -= diff;
             }
     };
-};
+};*/
 
 /********************************/
 /**The Lesson of the Iron Bough**/
@@ -1501,6 +1502,41 @@ private:
 };
 
 
+class spell_blessing_red : public SpellScriptLoader
+{
+    public:
+        spell_blessing_red() : SpellScriptLoader("spell_blessing_red") { }
+
+        class spell_blessing_red_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_blessing_red_AuraScript);
+
+            bool DoCheckTarget(Unit* target)
+            {
+                if(target)
+                {
+                    if(target->GetTypeId() != TYPEID_PLAYER)
+                        return false ;
+
+                    if(target->ToPlayer()->GetQuestStatus(29421) == QUEST_STATUS_INCOMPLETE)
+                        return true ;
+                }
+                return false;
+            }
+
+            void Register()
+            {
+                DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_blessing_red_AuraScript::DoCheckTarget);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_blessing_red_AuraScript();
+        }
+};
+
+
 void AddSC_wandering_isle()
 {
     new npc_first_quest_pandaren();	
@@ -1511,7 +1547,8 @@ void AddSC_wandering_isle()
     new npc_aysa_cloudsinger_meditation();
     new npc_amberleaf_troublemaker();
     new npc_living_air();
-    new npc_trigger_shall_pass();
+   // new npc_trigger_shall_pass();
+    new spell_blessing_red();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
