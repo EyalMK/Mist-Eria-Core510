@@ -27,6 +27,8 @@
 #include "SpellAuraEffects.h"
 #include "GridNotifiers.h"
 #include "ScriptedCreature.h"
+#include "Cell.h"
+#include "CellImpl.h"
 
 enum PriestSpells
 {
