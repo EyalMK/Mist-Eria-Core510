@@ -1515,11 +1515,11 @@ class spell_blessing_red : public SpellScriptLoader
             {
                 if(target)
                 {
-                    if(target->GetTypeId() != TYPEID_PLAYER)
-                        return false ;
+                    if(target->ToCreature()->GetEntry() == 54900)
+                        return true;
 
                     if(target->ToPlayer()->GetQuestStatus(29421) == QUEST_STATUS_INCOMPLETE)
-                        return true ;
+                        return true;
                 }
                 return false;
             }
