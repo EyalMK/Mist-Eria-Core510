@@ -935,7 +935,7 @@ public:
                                 {
                                     if(player->GetAreaId() == AREA_SANCTUARY)
                                     {
-                                        if(!player->HasAura(SPELL_BLESSING_OF_THE_BLUE_FLAME) && !player->HasAura(SPELL_BLESSING_OF_THE_RED_FLAME) && !player->HasAura(SPELL_BLESSING_OF_THE_PURPLE_FLAME))
+                                        if(!player->HasAura(SPELL_BLESSING_OF_THE_BLUE_FLAME))
                                         {
                                             me->CastSpell(player, SPELL_BLESSING_OF_THE_BLUE_FLAME, true);
                                             me->CastSpell(player, SPELL_BLESSING_OF_THE_RED_FLAME, true);
@@ -943,12 +943,12 @@ public:
                                         }
                                     }
                                 }
-                                else
+                               /* else
                                 {
                                     player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_BLUE_FLAME);
                                     player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_RED_FLAME);
                                     player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_PURPLE_FLAME);
-                                }
+                                }*/
                             }
                         }
                     }
