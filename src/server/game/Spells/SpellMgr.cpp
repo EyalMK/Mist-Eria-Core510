@@ -3952,6 +3952,9 @@ void SpellMgr::LoadSpellInfoCorrections()
 				case 86346: // Colossus Smash
 					spellInfo->Effects[EFFECT_1].Effect = NULL;
 					break;
+                case 114685:
+                    spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_1_YARD);
+                    break ;
 				default:
 					break;
 			}
