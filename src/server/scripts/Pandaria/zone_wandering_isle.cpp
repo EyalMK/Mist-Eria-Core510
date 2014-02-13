@@ -883,87 +883,38 @@ public:
 /****Only the Worthy Shall Pass****/
 /*************************************/
 
-enum SpellsTrigger
+class spell_blessing_flamme_panda: public SpellScriptLoader
 {
-    SPELL_BLESSING_OF_THE_RED_FLAME     = 102508,
-    SPELL_BLESSING_OF_THE_BLUE_FLAME    = 102509,
-    SPELL_BLESSING_OF_THE_PURPLE_FLAME  = 102510,
+    public:
+        spell_blessing_flamme_panda() : SpellScriptLoader("spell_blessing_flamme_panda") { }
 
-    QUEST_ONLY_THE_WORTHY_SHALL_PASS    = 29421,
+        class spell_blessing_flamme_panda_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_blessing_flamme_panda_AuraScript);
 
-    AREA_SANCTUARY  = 5849
-};
-
-class npc_trigger_shall_pass: public CreatureScript
-{
-public:
-    npc_trigger_shall_pass() : CreatureScript("npc_trigger_shall_pass") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_trigger_shall_passAI(creature);
-    }
-
-    struct npc_trigger_shall_passAI : public ScriptedAI
-    {
-            npc_trigger_shall_passAI(Creature* creature) : ScriptedAI(creature) {}
-
-            uint32 Test_timer;
-
-            void Reset()
+            bool DoCheckTarget(Unit* target)
             {
-                Test_timer = 3000;
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (Test_timer <= diff)
+                if(target)
                 {
-                    /*Map* map = me->GetMap();
-                    if(map)
-                    {
-                        Map::PlayerList const& players = map->GetPlayers();
+                    if(target->ToCreature() && target->ToCreature()->GetEntry() == 54900)
+                        return true;
 
-                        if(players.isEmpty())
-                            return ;
-
-                        for(Map::PlayerList::const_iterator iter = players.begin() ; iter != players.end() ; ++iter)
-                        {
-                            Player* player = iter->getSource();
-                            if(player)
-                            {
-                                if (player->isAlive() && player->GetQuestStatus(QUEST_ONLY_THE_WORTHY_SHALL_PASS) == QUEST_STATUS_INCOMPLETE)
-                                {
-                                    if(player->GetAreaId() == AREA_SANCTUARY)
-                                    {
-                                        if(!player->HasAura(SPELL_BLESSING_OF_THE_RED_FLAME))
-                                        {
-                                            player->CastSpell(player, SPELL_BLESSING_OF_THE_BLUE_FLAME, true);
-                                            player->CastSpell(player, SPELL_BLESSING_OF_THE_RED_FLAME, true);
-                                            player->CastSpell(player, SPELL_BLESSING_OF_THE_PURPLE_FLAME, true);
-                                        }
-                                    }
-                                }
-                                if(player->GetQuestStatus(QUEST_ONLY_THE_WORTHY_SHALL_PASS) == QUEST_STATUS_COMPLETE)
-                                {
-                                    if(player->HasAura(SPELL_BLESSING_OF_THE_RED_FLAME))
-                                    {
-                                        player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_BLUE_FLAME);
-                                        player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_RED_FLAME);
-                                        player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_PURPLE_FLAME);
-                                    }
-                                }
-                            }
-                        }
-                    }*/
-                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Casting spell");
-                    me->CastSpell(me, SPELL_BLESSING_OF_THE_RED_FLAME, true);
-                    Test_timer = 3000;
-                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Spell casted");
+                    if(target->ToPlayer() && target->ToPlayer()->GetQuestStatus(29421) == QUEST_STATUS_INCOMPLETE)
+                        return true;
                 }
-                else Test_timer -= diff;
+                return false;
             }
-    };
+
+            void Register()
+            {
+                DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_blessing_flamme_panda_AuraScript::DoCheckTarget);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_blessing_flamme_panda_AuraScript();
+        }
 };
 
 /********************************/
@@ -1505,41 +1456,6 @@ private:
 };
 
 
-class spell_blessing_red : public SpellScriptLoader
-{
-    public:
-        spell_blessing_red() : SpellScriptLoader("spell_blessing_red") { }
-
-        class spell_blessing_red_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_blessing_red_AuraScript);
-
-            bool DoCheckTarget(Unit* target)
-            {
-                if(target)
-                {
-                    if(target->ToCreature() && target->ToCreature()->GetEntry() == 54900)
-                        return true;
-
-                    if(target->ToPlayer() && target->ToPlayer()->GetQuestStatus(29421) == QUEST_STATUS_INCOMPLETE)
-                        return true;
-                }
-                return false;
-            }
-
-            void Register()
-            {
-                DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_blessing_red_AuraScript::DoCheckTarget);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_blessing_red_AuraScript();
-        }
-};
-
-
 void AddSC_wandering_isle()
 {
     new npc_first_quest_pandaren();	
@@ -1550,8 +1466,7 @@ void AddSC_wandering_isle()
     new npc_aysa_cloudsinger_meditation();
     new npc_amberleaf_troublemaker();
     new npc_living_air();
-    new npc_trigger_shall_pass();
-    new spell_blessing_red();
+    new spell_blessing_flamme_panda();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
