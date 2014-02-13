@@ -1,6 +1,4 @@
-/* Script de Tydrheal & Sungis */
-/* Battleground: Temple de Kotmogu */
-
+/* Script de Tydrheal & Sungis : Temple of Kotmogu */
 
 #include "Battleground.h"
 #include "BattlegroundTK.h"
@@ -14,7 +12,19 @@
 #include "World.h"
 #include "WorldPacket.h"
 
-// Debuff spell
+enum BG_TK_Rewards
+{
+    BG_TK_WIN = 0,
+    BG_TK_FLAG_CAP,
+    BG_TK_MAP_COMPLETE,
+    BG_TK_REWARD_NUM
+};
+
+uint32 BG_TK_Honor[BG_HONOR_MODE_NUM][BG_TK_REWARD_NUM] =
+{
+    {20, 40, 40}, // normal honor
+    {60, 40, 80}  // holiday
+};
 
 BattlegroundTK::BattlegroundTK()
 {
@@ -175,12 +185,14 @@ void BattlegroundTK::Reset()
     {
         m_HonorWinKills = 3;
         m_HonorEndKills = 4;
+		m_HonorMode		= BG_HOLIDAY;
     }
 
     else
     {
         m_HonorWinKills = 1;
         m_HonorEndKills = 2;
+		m_HonorMode		= BG_NORMAL;
     }
 
 	m_IsInformedNearVictory		= false;
@@ -504,13 +516,20 @@ bool BattlegroundTK::SetupBattleground()
 
 void BattlegroundTK::EndBattleground(uint32 winner)
 {
+    // Win reward
     if (winner == ALLIANCE)
-        RewardHonorToTeam(GetBonusHonorFromKill(sBattlegroundMgr->IsBGWeekend(GetTypeID()) ? 3 : 1), ALLIANCE);
+	{
+        RewardHonorToTeam(GetBonusHonorFromKill(m_HonorWinKills), ALLIANCE);
+		RewardHonorToTeam(BG_TK_Honor[m_HonorMode][BG_TK_WIN], ALLIANCE);
+	}
     if (winner == HORDE)
-        RewardHonorToTeam(GetBonusHonorFromKill(sBattlegroundMgr->IsBGWeekend(GetTypeID()) ? 3 : 1), HORDE);
-
-    RewardHonorToTeam(GetBonusHonorFromKill(sBattlegroundMgr->IsBGWeekend(GetTypeID()) ? 4 : 2), HORDE);
-    RewardHonorToTeam(GetBonusHonorFromKill(sBattlegroundMgr->IsBGWeekend(GetTypeID()) ? 4 : 2), ALLIANCE);
+	{
+        RewardHonorToTeam(GetBonusHonorFromKill(m_HonorWinKills), HORDE);
+		RewardHonorToTeam(BG_TK_Honor[m_HonorMode][BG_TK_WIN], HORDE);
+	}
+    // Complete map_end rewards (even if no team wins)
+    RewardHonorToTeam(GetBonusHonorFromKill(m_HonorEndKills), ALLIANCE);
+    RewardHonorToTeam(GetBonusHonorFromKill(m_HonorEndKills), HORDE);
 
     Battleground::EndBattleground(winner);
 }

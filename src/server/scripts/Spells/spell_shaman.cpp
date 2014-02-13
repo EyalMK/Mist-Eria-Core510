@@ -20,13 +20,14 @@
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_sha_".
  */
-
+#include <algorithm>
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "GridNotifiers.h"
 #include "Unit.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
+#include "ScriptPCH.h"
 
 enum ShamanSpells
 {
@@ -68,6 +69,17 @@ enum ShamanSpells
 	SPELL_SHA_EARTHQUAKE                    = 61882,
     SPELL_SHA_EARTHQUAKE_TICK               = 77478,
     SPELL_SHA_EARTHQUAKE_KNOCKING_DOWN      = 77505,
+	// Healing tide totem
+	NPC_SHA_TOTEM_HEALING_TIDE              = 59764,
+	SPELL_SHA_HEALING_TIDE_TOTEM_HEAL       = 114942,
+    // Earthgrab totem
+    NPC_SHA_TOTEM_EARTHGRAB                 = 60561,
+    SPELL_SHA_EARTHGRAB_TOTEM_ROOT          = 64695,
+    SPELL_SHA_EARTHGRAB_TOTEM_SLOW          = 3600,
+	// Stone bulwark totem
+    NPC_SHA_TOTEM_STONE_BULWARK             = 59712,
+    SPELL_SHA_STONE_BULWARK_TOTEM_SHIELD    = 114893,
+    SPELL_SHA_STONE_BULWARK_TOTEM_PASSIVE   = 114889
 };
 
 enum ShamanSpellIcons
@@ -1183,6 +1195,313 @@ class spell_sha_earthquake : public SpellScriptLoader
         }
 };
 
+class npc_totem_healing_tide : public CreatureScript{
+public :
+    npc_totem_healing_tide() : CreatureScript("npc_totem_healing_tide"){}
+
+    class npc_totem_healing_tide_AI : public ScriptedAI{
+    public :
+        npc_totem_healing_tide_AI(Creature* creature) : ScriptedAI(creature){
+            m_uiPulseTimer = 2000 ;
+            if(i_owner = me->GetOwner())
+                me->SetHealth(i_owner->CountPctFromMaxHealth(10));
+        }
+
+        void Reset(){
+            m_uiPulseTimer = 2000 ;
+        }
+
+        void UpdateAI(const uint32 diff){
+            if(m_uiPulseTimer <= diff){
+                DoCast(114942);
+                m_uiPulseTimer = 2000 ;
+            } else m_uiPulseTimer -= diff ;
+        }
+
+    private :
+        uint32 m_uiPulseTimer ;
+        Unit* i_owner ;
+    };
+
+    CreatureAI* GetAI(Creature *creature) const{
+        return new npc_totem_healing_tide_AI(creature);
+    }
+};
+
+bool SortByHp(WorldObject* first, WorldObject* second) {
+	Unit* f = first->ToUnit();
+	Unit* s = second->ToUnit();
+	return f->GetHealth() < s->GetHealth();
+}
+
+class spell_sha_healing_tide_totem_heal : public SpellScriptLoader{
+public :
+    spell_sha_healing_tide_totem_heal() : SpellScriptLoader("pell_sha_healing_tide_totem_heal"){}
+
+    class spell_sha_healing_tide_totem_heal_SpellScript : public SpellScript{
+        PrepareSpellScript(spell_sha_healing_tide_totem_heal_SpellScript)
+
+        bool Validate(const SpellInfo *spellInfo){
+            if(!sSpellMgr->GetSpellInfo(SPELL_SHA_HEALING_TIDE_TOTEM_HEAL))
+                return false ;
+
+            return true ;
+        }
+
+        bool Load(){
+            return true ;
+        }
+
+
+        void FilterTarget(std::list<WorldObject*>& targets){
+            targets.sort(SortByHp);
+            bool once = false ;
+
+            if(targets.size() > 5){
+                for(std::list<WorldObject*>::const_iterator iter = targets.begin() ; iter != targets.end() ; ++iter){
+                    if(!once){
+                        std::advance(iter, 5);
+                        once = true ;
+                    }
+                    targets.remove(*iter);
+                }
+            }
+        }
+
+        void Register(){
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sha_healing_tide_totem_heal_SpellScript::FilterTarget, EFFECT_0, TARGET_UNIT_CASTER_AREA_RAID);
+        }
+    };
+
+    SpellScript* GetSpellScript() const{
+        return new spell_sha_healing_tide_totem_heal_SpellScript();
+    }
+};
+
+class npc_earthgrab_totem : public CreatureScript{
+public :
+    npc_earthgrab_totem() : CreatureScript("npc_earthgrab_totem"){}
+
+    class npc_earthgrab_totem_AI : public ScriptedAI{
+    public :
+        npc_earthgrab_totem_AI(Creature* creature) : ScriptedAI(creature){
+            i_owner = me->GetOwner();
+            m_uiPulseTimer = 2000 ;
+            i_setHitTargets.clear();
+        }
+
+        void Reset(){
+            i_owner = me->GetOwner();
+            m_uiPulseTimer = 2000 ;
+        }
+
+        void AddHitUnit(Unit* unit){
+            i_setHitTargets.insert(unit);
+        }
+
+        std::set<Unit*> GetHitUnits(){
+            return i_setHitTargets ;
+        }
+
+        void UpdateAI(const uint32 diff){
+            if(m_uiPulseTimer <= diff){
+                DoCastAOE(SPELL_SHA_EARTHGRAB_TOTEM_ROOT);
+                DoCastAOE(SPELL_SHA_EARTHGRAB_TOTEM_SLOW);
+                m_uiPulseTimer = 2000 ;
+            } else m_uiPulseTimer -= diff ;
+        }
+
+    private :
+        Unit* i_owner ;
+        std::set<Unit*> i_setHitTargets ;
+        uint32 m_uiPulseTimer ;
+    };
+
+    CreatureAI* GetAI(Creature *creature) const{
+        return new npc_earthgrab_totem_AI(creature);
+    }
+};
+
+class EarthgrabTotemTargetSelectorPredicate{
+public :
+    EarthgrabTotemTargetSelectorPredicate(std::set<Unit*> exclude, bool root) : i_exclude(exclude), m_bRoot(root){}
+
+    bool operator()(WorldObject* unit){
+        std::set<Unit*>::iterator iter = i_exclude.find(unit->ToUnit());
+        if(iter != i_exclude.end())
+        {
+            return m_bRoot ? true : false ;
+        }
+        return m_bRoot ? false : true ;
+    }
+
+private :
+    std::set<Unit*> i_exclude ;
+    bool m_bRoot;
+};
+
+class spell_sha_earthgrab_totem : public SpellScriptLoader{
+public :
+    spell_sha_earthgrab_totem() : SpellScriptLoader("spell_sha_earthgrab_totem") {}
+
+    class spell_sha_earthgrab_totem_SpellScript : public SpellScript{
+        PrepareSpellScript(spell_sha_earthgrab_totem_SpellScript)
+
+        bool Validate(const SpellInfo *spellInfo){
+            if(sSpellMgr->GetSpellInfo(SPELL_SHA_EARTHGRAB_TOTEM_ROOT)
+                    && sSpellMgr->GetSpellInfo(SPELL_SHA_EARTHGRAB_TOTEM_SLOW))
+                return true ;
+
+            return false ;
+        }
+
+        bool Load(){
+            return true ;
+        }
+
+        void FilterTargets(std::list<WorldObject*>& targets){
+            if(Unit* caster = GetCaster()){
+                if(Creature* creature = caster->ToCreature()){
+                    if(CreatureAI* ai = creature->AI()){
+                        targets.remove_if(EarthgrabTotemTargetSelectorPredicate(CAST_AI(npc_earthgrab_totem::npc_earthgrab_totem_AI, ai)->GetHitUnits(), true));
+                    }
+                }
+            }
+        }
+
+        void HandleHitTarget(SpellEffIndex effectIndex){
+            if(GetCaster() && GetCaster()->ToCreature() && GetCaster()->ToCreature()->AI()){
+                CAST_AI(npc_earthgrab_totem::npc_earthgrab_totem_AI, GetCaster()->ToCreature()->AI())->AddHitUnit(GetHitUnit());
+            }
+        }
+
+        void Register(){
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sha_earthgrab_totem_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+            OnEffectHitTarget += SpellEffectFn(spell_sha_earthgrab_totem_SpellScript::HandleHitTarget, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+        }
+    };
+
+    SpellScript* GetSpellScript() const{
+        return new spell_sha_earthgrab_totem_SpellScript();
+    }
+};
+
+class spell_sha_earthbind : public SpellScriptLoader{
+public :
+    spell_sha_earthbind() : SpellScriptLoader("spell_sha_earthbind"){
+
+    }
+
+    class spell_sha_earthbind_SpellScript : public SpellScript{
+        PrepareSpellScript(spell_sha_earthbind_SpellScript)
+
+        bool Validate(const SpellInfo *spellInfo){
+            return true ;
+        }
+
+        bool Load(){
+            return true ;
+        }
+
+        void FilterTargets(std::list<WorldObject*>& targets){
+            if(GetCaster() && GetCaster()->GetEntry() != NPC_SHA_TOTEM_EARTHGRAB)
+                return ;
+
+            if(Unit* caster = GetCaster()){
+                if(Creature* creature = caster->ToCreature()){
+                    if(CreatureAI* ai = creature->AI()){
+                        targets.remove_if(EarthgrabTotemTargetSelectorPredicate(CAST_AI(npc_earthgrab_totem::npc_earthgrab_totem_AI, ai)->GetHitUnits(), false));
+                    }
+                }
+            }
+        }
+
+        void Register(){
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sha_earthbind_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const{
+        return new spell_sha_earthbind_SpellScript() ;
+    }
+};
+
+class npc_totem_stone_bulwark : public CreatureScript{
+public :
+    npc_totem_stone_bulwark() : CreatureScript("npc_totem_stone_bulwark"){}
+
+    class npc_totem_stone_bulwark_AI : public ScriptedAI{
+    public :
+        npc_totem_stone_bulwark_AI(Creature* creature) : ScriptedAI(creature){
+            i_owner = me->GetOwner();
+            m_uiApplyPassiveTimer = 10000 ;
+        }
+
+        void Reset(){
+            if(i_owner){
+                int32 amount = 0 ;
+                amount += std::max(i_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.625f * 0.7f,
+                                   float(i_owner->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_ALL, false) * 0.7f)) ;
+                amount *= 3 ;
+                me->CastCustomSpell(i_owner, SPELL_SHA_STONE_BULWARK_TOTEM_SHIELD, &amount, NULL, NULL, true);
+            }
+        }
+
+        void UpdateAI(const uint32 diff){
+            if(m_uiApplyPassiveTimer <= diff){
+                DoCast(i_owner, SPELL_SHA_STONE_BULWARK_TOTEM_PASSIVE, true);
+            }
+            else m_uiApplyPassiveTimer -= diff ;
+        }
+
+    private :
+        Unit* i_owner ;
+        uint32 m_uiApplyPassiveTimer ;
+    };
+
+    CreatureAI* GetAI(Creature *creature) const{
+        return new npc_totem_stone_bulwark_AI(creature);
+    }
+};
+
+class spell_sha_stone_bulwark_periodic : public SpellScriptLoader{
+public :
+    spell_sha_stone_bulwark_periodic() : SpellScriptLoader("spell_sha_stone_bulwark_periodic"){}
+
+    class spell_sha_stone_bulwark_periodic_AuraScript : public AuraScript{
+        PrepareAuraScript(spell_sha_stone_bulwark_periodic_AuraScript);
+
+        bool Validate(const SpellInfo *spellInfo){
+            return true ;
+        }
+
+        bool Load(){
+            return true ;
+        }
+
+        void HandlePeriodicTick(AuraEffect const* auraEff){
+            PreventDefaultAction();
+
+            if(Unit* owner = GetOwner()->ToUnit()){
+                if(Player* i_owner = owner->ToPlayer()){
+                    int32 amount = 0 ;
+                    amount += std::max(i_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.625f * 0.7f,
+                                       float(i_owner->GetTotalSpellPowerValue(SPELL_SCHOOL_MASK_ALL, false) * 0.7f)) ;
+                    i_owner->CastCustomSpell(i_owner, SPELL_SHA_STONE_BULWARK_TOTEM_SHIELD, &amount, NULL, NULL, true);
+                }
+            }
+        }
+
+        void Register(){
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_sha_stone_bulwark_periodic_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const{
+        return new spell_sha_stone_bulwark_periodic_AuraScript();
+    }
+};
+
 void AddSC_shaman_spell_scripts()
 {
     new spell_sha_ancestral_awakening_proc();
@@ -1208,4 +1527,11 @@ void AddSC_shaman_spell_scripts()
 	new spell_sha_elemental_blast();
 	new spell_sha_earthquake_tick();
 	new spell_sha_earthquake();
+	new npc_totem_healing_tide();
+	new spell_sha_healing_tide_totem_heal();
+	new npc_earthgrab_totem();
+	new spell_sha_earthgrab_totem();
+	new spell_sha_earthbind();
+	new npc_totem_stone_bulwark();
+	new spell_sha_stone_bulwark_periodic();
 }

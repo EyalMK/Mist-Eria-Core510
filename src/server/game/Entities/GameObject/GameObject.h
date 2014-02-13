@@ -44,6 +44,8 @@ struct GameObjectTemplate
     uint32  flags;
     float   size;
     uint32  questItems[MAX_GAMEOBJECT_QUEST_ITEMS];
+    int32   mingold;
+    int32   maxgold;
     int32   unkInt32;
     union                                                   // different GO types have different data field
     {
@@ -580,6 +582,7 @@ struct GameObjectData
     uint8 spawnMask;
     uint8 artKit;
     bool dbData;
+    uint32 invisibility;
 };
 
 // For containers:  [GO_NOT_READY]->GO_READY (close)->GO_ACTIVATED (open) ->GO_JUST_DEACTIVATED->GO_READY        -> ...

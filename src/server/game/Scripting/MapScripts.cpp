@@ -919,6 +919,14 @@ void Map::ScriptsProcess()
                     player->SendMovieStart(step.script->PlayMovie.MovieID);
                 break;
 
+            case SCRIPT_COMMAND_TERRAINSWAP:
+                if (Player *pSource = _GetScriptPlayerSourceOrTarget(source, target, step.script))
+                {
+                    /*CharacterDatabase.PExecute("REPLACE INTO character_terrainswap(`guid`, `mapid`, `zoneid`, `terrainswapid`) VALUES (%u, %u, %u, %u)", pSource->GetGUIDLow(), pSource->GetMapId(), pSource->GetZoneId(), step.script->CallScript.ScriptType);
+                    pSource->UpdateTerrainSwap(step.script->CallScript.ScriptType);*/
+                }
+            break;
+
             default:
                 sLog->outError(LOG_FILTER_TSCR, "Unknown script command %s.", step.script->GetDebugInfo().c_str());
                 break;

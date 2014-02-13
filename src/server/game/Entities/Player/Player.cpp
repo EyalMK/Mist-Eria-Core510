@@ -720,6 +720,7 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this), m_battlePetMg
 
     m_zoneUpdateId = 0;
     m_zoneUpdateTimer = 0;
+    m_auraAreaUpdateTimer = 0;
 
     m_areaUpdateId = 0;
 
@@ -900,6 +901,8 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this), m_battlePetMg
     m_achievementMgr = new AchievementMgr<Player>(this);
     m_reputationMgr = new ReputationMgr(this);
 	transcendence_spirit = NULL;
+	
+	m_bCanShadowWordDeathReset = true ;
 }
 
 Player::~Player()
@@ -1756,6 +1759,17 @@ void Player::Update(uint32 p_time)
         else
             m_zoneUpdateTimer -= p_time;
     }
+
+    if (m_auraAreaUpdateTimer <= p_time)
+    {
+        uint32 newzone, newarea;
+        GetZoneAndAreaId(newzone, newarea);
+
+        UpdateAreaDependentAuras(newarea);
+        m_auraAreaUpdateTimer = 1000;
+    }
+    else m_auraAreaUpdateTimer -= p_time;
+
 
     if (m_timeSyncTimer > 0)
     {
@@ -9325,6 +9339,8 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
                     group->UpdateLooterGuid(go, true);
 
                 loot->FillLoot(lootid, LootTemplates_Gameobject, this, !groupRules, false, go->GetLootMode());
+
+                loot->generateMoneyLoot(go->GetGOInfo()->mingold, go->GetGOInfo()->maxgold);
 
                 // get next RR player (for next loot)
                 if (groupRules)
@@ -26722,6 +26738,7 @@ void Player::SendItemRefundResult(Item* item, ItemExtendedCostEntry const* iece,
     data.WriteBit(!error);
     data.WriteBit(item->GetPaidMoney() > 0);
     data.FlushBits();
+
     if (!error)
     {
         for (uint8 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
@@ -26741,14 +26758,14 @@ void Player::SendItemRefundResult(Item* item, ItemExtendedCostEntry const* iece,
         }
     }
 
-    data.WriteByteSeq(guid[0]);
-    data.WriteByteSeq(guid[3]);
-    data.WriteByteSeq(guid[1]);
-    data.WriteByteSeq(guid[6]);
-    data.WriteByteSeq(guid[4]);
-    data.WriteByteSeq(guid[2]);
-    data.WriteByteSeq(guid[7]);
-    data.WriteByteSeq(guid[5]);
+    data.WriteBit(guid[0]);
+    data.WriteBit(guid[3]);
+    data.WriteBit(guid[1]);
+    data.WriteBit(guid[6]);
+    data.WriteBit(guid[4]);
+    data.WriteBit(guid[2]);
+    data.WriteBit(guid[7]);
+    data.WriteBit(guid[5]);
 
     data << uint8(error);                              // error code
     GetSession()->SendPacket(&data);
@@ -27114,13 +27131,13 @@ void Player::SendMovementSetHover(bool apply)
 
         data.WriteByteSeq(guid[5]);
         data.WriteByteSeq(guid[4]);
-        data.WriteByteSeq(guid[1]);
+        data.WriteByteSeq(guid[2]);
         data.WriteByteSeq(guid[2]);
         data.WriteByteSeq(guid[3]);
         data.WriteByteSeq(guid[6]);
         data.WriteByteSeq(guid[0]);
         data.WriteByteSeq(guid[7]);
-        data << uint32(0);          // movement counter
+		data << uint32(0);          // movement counter
     }
     else
     {
@@ -27142,7 +27159,7 @@ void Player::SendMovementSetHover(bool apply)
         data.WriteByteSeq(guid[1]);
         data.WriteByteSeq(guid[2]);
         data.WriteByteSeq(guid[0]);
-        data << uint32(0);          // movement counter
+		data << uint32(0);          // movement counter
     }
 
     SendDirectMessage(&data);
@@ -27273,11 +27290,11 @@ void Player::SendMovementSetCollisionHeight(float height)
     data.WriteByteSeq(guid[4]);
     data.WriteByteSeq(guid[3]);
     data.WriteByteSeq(guid[5]);
-    data << uint32(sWorld->GetGameTime());   // Packet counter
+	data << uint32(sWorld->GetGameTime());   // Packet counter
     data.WriteByteSeq(guid[1]);
     data.WriteByteSeq(guid[2]);
     data.WriteByteSeq(guid[7]);
-    data << float(height);
+	data << float(height);
 
     SendDirectMessage(&data);
 }

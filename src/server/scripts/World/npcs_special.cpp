@@ -1972,36 +1972,6 @@ public:
 };
 
 /*######
-# npc_shadowfiend
-######*/
-#define GLYPH_OF_SHADOWFIEND_MANA         58227
-#define GLYPH_OF_SHADOWFIEND              58228
-
-class npc_shadowfiend : public CreatureScript
-{
-public:
-    npc_shadowfiend() : CreatureScript("npc_shadowfiend") { }
-
-    struct npc_shadowfiendAI : public PetAI
-    {
-        npc_shadowfiendAI(Creature* creature) : PetAI(creature) {}
-
-        void JustDied(Unit* /*killer*/)
-        {
-            if (me->isSummon())
-                if (Unit* owner = me->ToTempSummon()->GetSummoner())
-                    if (owner->HasAura(GLYPH_OF_SHADOWFIEND))
-                        owner->CastSpell(owner, GLYPH_OF_SHADOWFIEND_MANA, true);
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_shadowfiendAI(creature);
-    }
-};
-
-/*######
 # npc_fire_elemental
 ######*/
 #define SPELL_FIRENOVA        12470
@@ -3621,7 +3591,6 @@ void AddSC_npcs_special()
     new npc_lightwell();
     new mob_mojo();
     new npc_training_dummy();
-    new npc_shadowfiend();
     new npc_wormhole();
     new npc_pet_trainer();
     new npc_locksmith();

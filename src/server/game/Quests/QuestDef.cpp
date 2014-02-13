@@ -282,63 +282,29 @@ int32 Quest::GetRewOrReqMoney() const
 
 void Quest::BuildExtraQuestInfo(WorldPacket& data, Player* player) const
 {
-	if (RewardType == 0)
+	data << uint32(GetRewChoiceItemsCount());
+	for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
 	{
-		data << uint32(GetRewChoiceItemsCount());
-		for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
-		{
-			data << uint32(RewardChoiceItemId[i]);
-			data << uint32(RewardChoiceItemCount[i]);
-			if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(RewardChoiceItemId[i]))
-				data << uint32(itemTemplate->DisplayInfoID);
-			else
-				data << uint32(0);            
-		}
-
-		data << uint32(GetReqItemsCount());
-
-		for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
-			data << uint32(RewardItemId[i]);
-		for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
-			data << uint32(RewardItemIdCount[i]);
-		for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
-		{
-			if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(RewardItemId[i]))
-				data << uint32(itemTemplate->DisplayInfoID);
-			else
-				data << uint32(0);
-		}
+		data << uint32(RewardChoiceItemId[i]);
+		data << uint32(RewardChoiceItemCount[i]);
+		if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(RewardChoiceItemId[i]))
+			data << uint32(itemTemplate->DisplayInfoID);
+		else
+			data << uint32(0);            
 	}
-	else
+
+	data << uint32(GetReqItemsCount());
+
+	for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
+		data << uint32(RewardItemId[i]);
+	for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
+		data << uint32(RewardItemIdCount[i]);
+	for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
 	{
-		data << uint32(GetRewChoiceItemsCount());
-		for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
-		{
-			if (GetItemRewardGroup(RewardPackageChoiceItemId[i]) ==
-				GetItemRewardGroupFromSpec(player->GetPrimaryTalentTree(player->GetActiveSpec())))
-			{
-				data << uint32(RewardPackageChoiceItemId[i]);
-				data << uint32(RewardPackageChoiceItemCount[i]);
-				if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(RewardPackageChoiceItemId[i]))
-					data << uint32(itemTemplate->DisplayInfoID);
-				else
-					data << uint32(0);
-			}
-		}
-
-		data << uint32(GetReqItemsCount());
-
-		for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
-			data << uint32(0/*RewardItemId[i]*/);
-		for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
-			data << uint32(0/*RewardItemIdCount[i]*/);
-		for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
-		{
-			if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(RewardItemId[i]))
-				data << uint32(0/*itemTemplate->DisplayInfoID*/);
-			else
-				data << uint32(0);
-		}
+		if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(RewardItemId[i]))
+			data << uint32(itemTemplate->DisplayInfoID);
+		else
+			data << uint32(0);
 	}
 
     data << uint32(GetRewOrReqMoney());

@@ -1949,8 +1949,14 @@ class Player : public Unit, public GridObject<Player>
 			AlterTimeAuraApplicationMap m_alterTimeAuraApplicationMap ;
 		
 		/******* End of Alter Time System *******/
-		public :
+        /******* Shadow Word : Death ********/
+    public :
+        void SetCanShadowWordDeathReset(bool can) { m_bCanShadowWordDeathReset = can ; }
 
+        bool CanShadowWordDeathReset() { return m_bCanShadowWordDeathReset ; }
+    private :
+        bool m_bCanShadowWordDeathReset ;
+    public :
         SpellCooldowns const& GetSpellCooldownMap() const { return m_spellCooldowns; }
 
         void AddSpellMod(SpellModifier* mod, bool apply);
@@ -3092,6 +3098,7 @@ public:
         uint32 m_zoneUpdateId;
         uint32 m_zoneUpdateTimer;
         uint32 m_areaUpdateId;
+        uint32 m_auraAreaUpdateTimer;
 
         uint32 m_deathTimer;
         time_t m_deathExpireTime;

@@ -5959,6 +5959,14 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     CastCustomSpell(70691, SPELLVALUE_BASE_POINT0, damage, victim, true);
                     return true;
                 }
+				case 29274 :
+                {
+                    if(HasAura(132158))
+                        RemoveAura(132158);
+                    if(HasAura(29274))
+                        RemoveAura(29274);
+                    return true ;
+                }
             }
             break;
         }
@@ -10688,6 +10696,10 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
         return;
 
     SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+
+	if (Player* player = ToPlayer())
+		if (player->getRace() == RACE_WORGEN)
+			player->CastSpell(player, 97709, true); // Worgen form
 
     if (Creature* creature = ToCreature())
     {

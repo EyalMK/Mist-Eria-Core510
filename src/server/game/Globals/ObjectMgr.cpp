@@ -123,6 +123,7 @@ std::string GetScriptCommandName(ScriptCommands command)
         case SCRIPT_COMMAND_MODEL: res = "SCRIPT_COMMAND_MODEL"; break;
         case SCRIPT_COMMAND_CLOSE_GOSSIP: res = "SCRIPT_COMMAND_CLOSE_GOSSIP"; break;
         case SCRIPT_COMMAND_PLAYMOVIE: res = "SCRIPT_COMMAND_PLAYMOVIE"; break;
+        case SCRIPT_COMMAND_TERRAINSWAP: res = "SCRIPT_COMMAND_TERRAINSWAP"; break;
         default:
         {
             char sz[32];
@@ -1761,8 +1762,8 @@ void ObjectMgr::LoadGameobjects()
 
     //                                                0                1   2    3           4           5           6
     QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, id, map, position_x, position_y, position_z, orientation, "
-    //   7          8          9          10         11             12            13     14         15         16          17
-        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, eventEntry, pool_entry "
+    //   7          8          9          10         11             12            13     14         15         16          17           18
+        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, eventEntry, pool_entry, invisibility "
         "FROM gameobject LEFT OUTER JOIN game_event_gameobject ON gameobject.guid = game_event_gameobject.guid "
         "LEFT OUTER JOIN pool_gameobject ON gameobject.guid = pool_gameobject.guid");
 
@@ -1859,6 +1860,7 @@ void ObjectMgr::LoadGameobjects()
         data.phaseMask      = fields[15].GetUInt16();
         int16 gameEvent     = fields[16].GetInt8();
         uint32 PoolId        = fields[17].GetUInt32();
+        data.invisibility   = fields[18].GetUInt32();
 
         if (data.rotation2 < -1.0f || data.rotation2 > 1.0f)
         {
@@ -6303,8 +6305,8 @@ void ObjectMgr::LoadGameObjectTemplate()
                                              "questItem4, questItem5, questItem6, data0, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11, data12, "
     //                                          29      30      31      32      33      34      35      36      37      38      39      40      41      42      43      44
                                              "data13, data14, data15, data16, data17, data18, data19, data20, data21, data22, data23, data24, data25, data26, data27, data28, "
-    //                                          45      46      47       48       49        50
-                                             "data29, data30, data31, unkInt32, AIName, ScriptName "
+    //                                          45      46      47       48       49        50      51      52
+                                             "data29, data30, data31, mingold, maxgold, unkInt32, AIName, ScriptName "
                                              "FROM gameobject_template");
 
     if (!result)
@@ -6340,9 +6342,11 @@ void ObjectMgr::LoadGameObjectTemplate()
         for (uint8 i = 0; i < MAX_GAMEOBJECT_DATA; ++i)
             got.raw.data[i] = fields[16 + i].GetUInt32();
 
-        got.unkInt32 = fields[48].GetInt32();
-        got.AIName = fields[49].GetString();
-        got.ScriptId = GetScriptId(fields[50].GetCString());
+        got.mingold = fields[48].GetUInt32();
+        got.maxgold = fields[49].GetUInt32();
+        got.unkInt32 = fields[50].GetInt32();
+        got.AIName = fields[51].GetString();
+        got.ScriptId = GetScriptId(fields[52].GetCString());
 
         // Checks
 

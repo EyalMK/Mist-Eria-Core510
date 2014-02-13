@@ -462,7 +462,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
         for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
             data << uint32(0) << uint32(0);
     }
-	else if (quest->GetRewardType() == 0)
+	else
     {
         for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
         {
@@ -473,23 +473,6 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
         {
             data << uint32(quest->RewardChoiceItemId[i]);
             data << uint32(quest->RewardChoiceItemCount[i]);
-        }
-    }
-	else
-	{
-        for (uint8 i = 0; i < QUEST_MAX_REWARDS_COUNT; ++i)
-        {
-            data << uint32(/*quest->RewardPackageItemId[i]*/0);
-            data << uint32(/*quest->RewardItemIdCount[i]*/0);
-        }
-        for (uint8 i = 0; i < QUEST_MAX_REWARD_CHOICES_COUNT; ++i)
-        {
-			if (quest->GetItemRewardGroup(quest->RewardPackageChoiceItemId[i]) ==
-				quest->GetItemRewardGroupFromSpec(_session->GetPlayer()->GetPrimaryTalentTree(_session->GetPlayer()->GetActiveSpec())))
-			{
-				data << uint32(quest->RewardPackageChoiceItemId[i]);
-				data << uint32(quest->RewardPackageChoiceItemCount[i]);
-			}
         }
     }
 

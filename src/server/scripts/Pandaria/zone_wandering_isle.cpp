@@ -22,8 +22,8 @@
 #include "ScriptedGossip.h"
 #include "Player.h"
 #include "SpellInfo.h"
-
-
+#include "GridNotifiers.h"
+#include "ScriptedEscortAI.h"
 
 
 // npc_first_quest_pandaren
@@ -119,327 +119,440 @@ public:
 /**The Lesson of Stifled Pride**/
 /*******************************/
 
-class npc_trainee_stifled_pride : public CreatureScript
+enum Spells
 {
-public :
-    npc_trainee_stifled_pride() : CreatureScript("npc_trainee_stifled_pride")
+    SPELL_JAB               = 109079,
+    SPELL_BLACKOUT_KICK     = 109080
+};
+
+enum Texts
+{
+    SAY_LOOSE   = 0
+};
+
+enum Creatures
+{
+    NPC_ZHI    = 61411
+};
+
+class npc_trainee : public CreatureScript
+{
+public:
+    npc_trainee() : CreatureScript("npc_trainee") { }
+
+    CreatureAI* GetAI(Creature* creature) const
     {
-        m_gossipHelloMessage = "Null gossip option" ;
+        return new npc_traineeAI(creature);
     }
 
-    bool OnGossipHello(Player *p, Creature *c)
+    struct npc_traineeAI : public ScriptedAI
     {
-        if(p && p->hasQuest(QUEST_THE_LESSON_OF_STIFLED_PRIDE) && !p->isInCombat() && p->GetQuestStatus(QUEST_THE_LESSON_OF_STIFLED_PRIDE) == QUEST_STATUS_INCOMPLETE)
+        npc_traineeAI(Creature* creature) : ScriptedAI(creature)
         {
-            m_gossipHelloMessage = "Je vous defie !";
-            p->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, m_gossipHelloMessage, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-            p->PlayerTalkClass->SendGossipMenu(NPC_QUEST_REWARD, c->GetGUID());
-
-            return true ;
+            creature->SetReactState(REACT_PASSIVE);
         }
-        else if(p && (!p->hasQuest(QUEST_THE_LESSON_OF_STIFLED_PRIDE) || p->GetQuestStatus(QUEST_THE_LESSON_OF_STIFLED_PRIDE) != QUEST_STATUS_INCOMPLETE))
-        {
-            m_gossipHelloMessage = "Il y a erreur... je vous prie de m'excuser" ;
-            p->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, m_gossipHelloMessage, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 
-            p->PlayerTalkClass->SendGossipMenu(NPC_QUEST_REWARD, c->GetGUID());
-            return true ;
-        }
-        else if(!p)
-            return false;
-
-		return false ;
-    }
-
-    bool OnGossipSelect(Player *p, Creature *c, uint32 sender, uint32 action)
-    {
-        p->PlayerTalkClass->ClearMenus();
-
-        if(action == GOSSIP_ACTION_INFO_DEF + 1)
-            StartQuestEvent(c, p);
-
-        p->CLOSE_GOSSIP_MENU();
-
-		return true ;
-    }
-
-    struct npc_trainee_stifled_prideAI : public ScriptedAI
-    {
-    public :
-        npc_trainee_stifled_prideAI(Creature* c) : ScriptedAI(c)
-        {
-
-        }
+        uint32 AttackTimer;
+        uint32 DespawnTimer;
+        uint32 EmoteTimer;
+        bool VerifPV;
+        bool Despawn;
+        bool Health;
+        bool EmoteSpeak;
 
         void Reset()
         {
-            events.Reset();
+            me->SetReactState(REACT_PASSIVE);
+            AttackTimer = 5000;
+            VerifPV = true;
+            Despawn = false;
+            EmoteSpeak = false;
+            Health = true;
+            me->setFaction(7);
         }
 
-        void EnterCombat(Unit *who)
+        void DamageTaken(Unit* caster, uint32 &damage)
         {
-            ScheduleTraineeEvents();
+            if(damage >= 1)
+            {
+                if(caster->GetTypeId() == TYPEID_PLAYER && !me->HasReactState(REACT_AGGRESSIVE))
+                {
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    ScriptedAI::AttackStart(caster);
+                }
+            }
+
+            if (damage >= me->GetHealth())
+            {
+                damage = 0;
+                me->SetHealth(0);
+            }
+
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            me->SetReactState(REACT_PASSIVE);
         }
 
         void UpdateAI(uint32 diff)
         {
+            if(Despawn)
+            {
+                if(DespawnTimer <= diff)
+                {
+                    me->DisappearAndDie();
+                    Despawn = false;
+                }
+                else DespawnTimer -= diff;
+            }
+
+            if(EmoteSpeak)
+            {
+                if(EmoteTimer <= diff)
+                {
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_BOW);
+                    Talk(SAY_LOOSE);
+                    EmoteSpeak = false;
+                }
+                else EmoteTimer -= diff;
+            }
+
             if(!UpdateVictim())
+                return;
+
+            if(VerifPV)
             {
-                switch(me->getFaction())
+                if(AttackTimer <= diff)
                 {
-                case 14 :
-                    ResetToNormal(NULL);
-                    break ;
-                case 35 :
-                    return ;
+                    if(me->GetEntry() == 54586 || me->GetEntry() == 65470)
+                        me->CastSpell(me->getVictim(), SPELL_JAB);
+
+                    if(me->GetEntry() == 54587 || me->GetEntry() == 65471)
+                        me->CastSpell(me->getVictim(), SPELL_BLACKOUT_KICK);
+
+                    AttackTimer = 5000;
                 }
+                else AttackTimer -= diff;
             }
 
-            events.Update(diff);
-
-            if(me->HasUnitState(UNIT_STATE_CASTING))
-                return ;
-
-            if(events.ExecuteEvent() == EVENT_TRAINEE_SPELL)
+            if (me->GetHealthPct() <= 20 && Health)
             {
-                switch(me->GetEntry())
-                {
-                case HUOJIN_TRAINEE_1 :
-                case HUOJIN_TRAINEE_2 :
-                    if(me->getVictim())
-                        DoCast(me->getVictim(), SPELL_JAB, true);
-                    break ;
+                VerifPV = false;
 
-                case TUSHUI_TRAINEE_1 :
-                case TUSHUI_TRAINEE_2 :
-                    if(me->getVictim())
-                        DoCast(me->getVictim(), SPELL_BLACKOUT_KICK, true);
-                    break ;
+                DespawnTimer = 5000;
+                Despawn = true;
 
-                }
-                ScheduleTraineeEvents();
+                EmoteTimer = 2000;
+                EmoteSpeak = true;
+
+                if(Unit* player = me->getVictim())
+                    if(player->GetTypeId() == TYPEID_PLAYER)
+                        player->ToPlayer()->KilledMonsterCredit(54586, 0);
+
+                me->setFaction(35);
+                me->StopMoving();
+                me->RemoveAllAuras();
+                me->GetMotionMaster()->Clear();
+                me->CombatStop(true);
+                me->DeleteThreatList();
+
+                Health = false;
             }
-        }
 
-        void DamageTaken(Unit *attacker, uint32 &amount)
-        {
-            float tenPercent = me->GetMaxHealth() / 10 ;
-            if((me->GetHealth() - amount) <= tenPercent)
-            {
-                amount = 0 ;
-                me->SetHealth(uint32(tenPercent));
-                ResetToNormal(attacker);
-            }
-        }
-
-    private :
-        EventMap events;
-
-        inline void ScheduleTraineeEvents()
-        {
-            events.ScheduleEvent(EVENT_TRAINEE_SPELL, urand(3500, 5500));
-        }
-
-        void ResetToNormal(Unit* attacker)
-        {
-            switch(me->GetEntry())
-            {
-            case HUOJIN_TRAINEE_1 :
-            case HUOJIN_TRAINEE_2 :
-                if(attacker)
-                    me->Say(irand(SAY_HUOJIN_DEFEAT_1, SAY_HUOJIN_DEFEAT_8), LANG_COMMON, attacker->GetGUID());
-                break ;
-            case TUSHUI_TRAINEE_1 :
-            case TUSHUI_TRAINEE_2 :
-                if(attacker)
-                    me->Say(irand(SAY_TUSHUI_DEFEAT_1, SAY_TUSHUI_DEFEAT_8), LANG_COMMON, attacker->GetGUID());
-                break ;
-            }
-            events.Reset();
-            me->setFaction(35);
-            me->SetFullHealth();
-            me->DisappearAndDie();
+            DoMeleeAttackIfReady();
         }
     };
-
-    CreatureAI* GetAI(Creature *c) const
-    {
-        return new npc_trainee_stifled_prideAI(c);
-    }
-
-private :
-
-    // Enums
-    enum Quests
-    {
-        QUEST_THE_LESSON_OF_STIFLED_PRIDE = 29524
-    };
-
-    enum Npcs
-    {
-        HUOJIN_TRAINEE_1 = 54586,
-        HUOJIN_TRAINEE_2 = 65470,
-        TUSHUI_TRAINEE_1 = 54587,
-        TUSHUI_TRAINEE_2 = 65471,
-        NPC_QUEST_REWARD = 54789 // Spell 102384
-    };
-
-    enum Spells
-    {
-        SPELL_JAB               = 109079, // Huojin
-        SPELL_BLACKOUT_KICK     = 109080, // Tushui
-        SPELL_QUEST_KILL_CREDIT = 102384
-    };
-
-    enum Says
-    {
-        SAY_HUOJIN_DEFEAT_1 = -5458607,
-        SAY_HUOJIN_DEFEAT_2,
-        SAY_HUOJIN_DEFEAT_3,
-        SAY_HUOJIN_DEFEAT_4,
-        SAY_HUOJIN_DEFEAT_5,
-        SAY_HUOJIN_DEFEAT_6,
-        SAY_HUOJIN_DEFEAT_7,
-        SAY_HUOJIN_DEFEAT_8,
-
-        SAY_TUSHUI_DEFEAT_1 = -5458707,
-        SAY_TUSHUI_DEFEAT_2,
-        SAY_TUSHUI_DEFEAT_3,
-        SAY_TUSHUI_DEFEAT_4,
-        SAY_TUSHUI_DEFEAT_5,
-        SAY_TUSHUI_DEFEAT_6,
-        SAY_TUSHUI_DEFEAT_7,
-        SAY_TUSHUI_DEFEAT_8
-    };
-
-    enum Events
-    {
-        EVENT_TRAINEE_SPELL = 1
-    };
-
-    // Functions
-    void StartQuestEvent(Creature* me, Player* quester)
-    {
-        if(!me || !quester)
-            return ;
-
-        if(me->isInCombat())
-            return ;
-
-        me->setFaction(14);
-        if(me->GetAI())
-        {
-            me->SetInCombatWith(quester);
-            me->GetAI()->AttackStart(quester);
-        }
-    }
-
-    // Variables
-    const char* m_gossipHelloMessage;
-
-    // SQL
-    /* UPDATE creature_template SET npcflag = npcflag | 1, gossip_menu_id = 1, ScriptName = "npc_trainee_stifled_pride" WHERE entry IN (54586, 54587, 65470, 65471) ;
-     *
-     * INSERT INTO script_texts (npc_entry, entry, content_default, content_loc2, type, language, comment) VALUES
-     * (54586, -5458607, "I have never seen a trainee with skills such as yours. I must tell the others.", "Je n'ai jamais vu une recrue avant autant d'adresse que vous. Je dois prévenir les autres.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54586, -5458606, "My skills are no match for yours. I admit defeat.", "Mes capacites n'egalent pas les votres. J'admets ma defaite.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54586, -5458605, "Thank you for reminding me that I must train more diligently.", "Merci de m'avoir rappele que je dois m'entraîner avec discernement.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54586, -5458604, "That was a good match. Thank you.", "C'etait un bon combat. Merci a vous.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54586, -5458603, "You are an honorable opponent.", "Vous êtes un adversaire honorable.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54586, -5458602, "You fight honorably, friend.", "Vous avez combattu honorablement mon ami.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54586, -5458601, "You fought well. I must learn more from you in the future.", "Vous vous êtes bien battu. Je dois apprendre plus de vous dans l'avenir.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54586, -5458600, "Your skills are too great. I yield.", "Vos capacites sont impressionnantes. Je m'incline.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54587, -5458707, "I have never seen a trainee with skills such as yours. I must tell the others.", "Je n'ai jamais vu une recrue avant autant d'adresse que vous. Je dois prévenir les autres.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54587, -5458706, "My skills are no match for yours. I admit defeat.", "Mes capacites n'egalent pas les votres. J'admets ma defaite.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54587, -5458705, "Thank you for reminding me that I must train more diligently.", "Merci de m'avoir rappele que je dois m'entraîner avec discernement.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54587, -5458704, "That was a good match. Thank you.", "C'etait un bon combat. Merci a vous.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54587, -5458703, "You are an honorable opponent.", "Vous êtes un adversaire honorable.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54587, -5458702, "You fight honorably, friend.", "Vous avez combattu honorablement mon ami.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54587, -5458701, "You fought well. I must learn more from you in the future.", "Vous vous êtes bien battu. Je dois apprendre plus de vous dans l'avenir.", 1, 7, "Trainee of stifled pride - defeat"),
-     * (54587, -5458700, "Your skills are too great. I yield.", "Vos capacites sont impressionnantes. Je m'incline.", 1, 7, "Trainee of stifled pride - defeat") ;
-     */
 };
+
+/*#####
+## at_The Missing Driver
+#####*/
+
+enum eTheMissingDriver
+{
+    QUEST_THE_MISSING_DRIVER    = 29419,
+    NPC_AMBERLEAF_SCAMP         = 54130,
+    NPC_MIN_DIMWIND             = 54855,
+    NPC_MIN_DIMWIND_POP         = 56503,
+    SAY_1                       = 0
+
+};
+
+class areatrigger_at_the_missing_driver : public AreaTriggerScript
+{
+    public:
+
+        areatrigger_at_the_missing_driver(): AreaTriggerScript("areatrigger_at_the_missing_driver")
+        {
+        }
+
+        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+        {
+            if (player->isAlive() && !player->isInCombat())
+            {
+                if (player->GetQuestStatus(QUEST_THE_MISSING_DRIVER) == QUEST_STATUS_INCOMPLETE)
+                {
+                    if(Creature* min = player->FindNearestCreature(NPC_MIN_DIMWIND, 20.0f))
+                    {
+                        std::list<Creature*> creatures;
+                        GetCreatureListWithEntryInGrid(creatures, player, NPC_AMBERLEAF_SCAMP, 20.0f);
+
+                        for(std::list<Creature*>::const_iterator iter = creatures.begin() ; iter != creatures.end() ; ++iter)
+                        {
+                            (*iter)->AI()->Talk(SAY_1);
+                            (*iter)->DespawnOrUnsummon(3000);
+                        }
+
+                        min->DisappearAndDie();
+                        player->SummonCreature(NPC_MIN_DIMWIND_POP, min->GetPositionX(), min->GetPositionY(), min->GetPositionZ(), 2.08f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+                        player->KilledMonsterCredit(54855);
+
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            return false;
+        }
+};
+
+/*######
+## npc_min_dimwind_pop
+######*/
+
+enum eMinDimwind
+{
+    SAY_DIMWIND_1    = 0,
+    SAY_DIMWIND_2    = 1,
+    SAY_DIMWIND_3    = 2
+};
+
+class npc_min_dimwind_pop : public CreatureScript
+{
+public:
+    npc_min_dimwind_pop(): CreatureScript("npc_min_dimwind_pop") { }
+
+    struct npc_min_dimwind_popAI : public npc_escortAI
+    {
+        npc_min_dimwind_popAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    Talk(SAY_DIMWIND_1);
+                    break;
+                case 2:
+                    Talk(SAY_DIMWIND_2);
+                    break;
+                case 3:
+                    Talk(SAY_DIMWIND_3);
+                    break;
+                case 10:
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            if (UpdateVictim())
+                return;
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_min_dimwind_popAI(creature);
+    }
+};
+
+/*######
+## npc_aysa_cloudsinger_pop
+######*/
+
+enum eAysaCloudsinger
+{
+    SAY_AYSA_1    = 0
+};
+
+class npc_aysa_cloudsinger_pop : public CreatureScript
+{
+public:
+    npc_aysa_cloudsinger_pop(): CreatureScript("npc_aysa_cloudsinger_pop") { }
+
+    struct npc_aysa_cloudsinger_popAI : public npc_escortAI
+    {
+        npc_aysa_cloudsinger_popAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    Talk(SAY_AYSA_1);
+                    break;
+                case 2:
+                    me->GetMotionMaster()->MoveJump(1197.14f, 3492.05f, 91.33f, 20, 20);
+                    break;
+                case 4:
+                    me->GetMotionMaster()->MoveJump(1193.65f, 3478.94f, 108.50f, 20, 20);
+                    break;
+                case 6:
+                    me->GetMotionMaster()->MoveJump(1188.2f, 3456.19f, 102.90f, 20, 20);
+                    break;
+                case 10:
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            if (UpdateVictim())
+                return;
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_aysa_cloudsinger_popAI(creature);
+    }
+};
+
 
 
 /*************************************/
 /********The Way of the Tushui********/
 /*************************************/
 
-class CheckAysaQuestPredicate
-{
-public :
-    CheckAysaQuestPredicate(uint32 questId, uint32 spellId) : id(questId) { }
-
-    bool operator()(Player* p)
-    {
-        if(p)
-            return (p->HasAura(spell) && p->hasQuest(id)) ;
-        return false ;
-    }
-
-private:
-    uint32 id;
-    uint32 spell;
-};
-
 const Position SummonPositions[] =
 {
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f}
+    {1180.69f, 3450.00f, 103.00f, 3.50f},
+    {1181.10f, 3447.40f, 102.70f, 3.50f},
+    {1182.05f, 3444.38f, 102.70f, 3.50f},
+    {1183.14f, 3440.85f, 102.70f, 3.50f}
 };
 
-const Position MeditationPosition = {0.0f, 0.0f, 0.0f, 0.0f} ;
-const Position ShangXiPosition = {0.0f, 0.0f, 0.0f, 0.0f} ;
-
-const Position LiFeiPosition[2] =
+enum Quests
 {
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f}
+    QUEST_THE_WAY_OF_THE_TUSHUI     = 29414
 };
 
-class npc_aysa_cloudsinger_quest29414 : public CreatureScript
+enum Events
+{
+    EVENT_ADD_POWER     = 1,
+    EVENT_SUMMON_NPCS   = 2,
+    EVENT_INTRO         = 3,
+    EVENT_LOOK_PLAYERS  = 4
+};
+
+enum SpellsAysa
+{
+    SPELL_MEDITATION_BAR = 116421
+};
+
+enum Npcs
+{
+    NPC_MASTER_LI_FEI   = 54856,
+    MOB_SCAMP           = 59637
+};
+
+enum SaysLiFei
+{
+    LI_FEI_SPEECH_1     = 0,
+    LI_FEI_SPEECH_2     = 1,
+    LI_FEI_SPEECH_3     = 2,
+    LI_FEI_SPEECH_4     = 3,
+    LI_FEI_SPEECH_5     = 4,
+    LI_FEI_SPEECH_6     = 5,
+    LI_FEI_SPEECH_7     = 6
+};
+
+enum SaysAysa
+{
+    AYSA_SAY_INTRO  = 0,
+    AYSA_SAY_OUTRO  = 1
+};
+
+enum Area
+{
+    AREA_MEDITATION = 5848
+};
+
+class npc_aysa_cloudsinger_meditation : public CreatureScript
 {
 public :
-    npc_aysa_cloudsinger_quest29414() : CreatureScript("npc_aysa_cloudsinger_29414") {    }
+    npc_aysa_cloudsinger_meditation() : CreatureScript("npc_aysa_cloudsinger_meditation") {    }
 
-    struct npc_aysa_cloudsinger_quest29414_AI : public ScriptedAI
+    struct npc_aysa_cloudsinger_meditation_AI : public ScriptedAI
     {
     public :
-        npc_aysa_cloudsinger_quest29414_AI(Creature* c) : ScriptedAI(c)
+        npc_aysa_cloudsinger_meditation_AI(Creature* c) : ScriptedAI(c), Summons(me)
         {
-
         }
+
+        bool isStarted ;
+        uint32 StartTimer;
+        EventMap events ;
+        Creature* LiFei;
+        SummonList Summons;
 
         void Reset()
         {
             isStarted = false ;
+            Summons.DespawnAll();
+            StartTimer = 1000;
         }
 
-        void DamageTaken(Unit *doneby, uint32 &/*amount*/)
+        void JustSummoned(Creature* Summoned)
         {
-            if(doneby->GetTypeId() != TYPEID_PLAYER)
-            {
-                events.RescheduleEvent(EVENT_ADD_POWER, 1300);
-                events.RescheduleEvent(EVENT_SUMMON_NPCS, 1500);
-            }
+            Summons.Summon(Summoned);
         }
 
         void UpdateAI(uint32 diff)
         {
-            if(!isStarted)
+            if(StartTimer <= diff)
             {
-                if(isAPlayerWithQuestInDist())
+                if(!isStarted)
                 {
-                    StartEvent();
-                    isStarted = true ;
+                    if(isAPlayerWithQuestInDist())
+                    {
+                        StartEvent();
+                        isStarted = true ;
+                    }
+                    else
+                        return ;
                 }
-                else
-                    return ;
+
+                StartTimer = 1000;
             }
+            else StartTimer -= diff;
 
             events.Update(diff);
 
@@ -453,12 +566,12 @@ public :
 
                 case EVENT_ADD_POWER :
                     AddPowerToPlayersOnMap();
-                    events.ScheduleEvent(EVENT_ADD_POWER, 1300);
+                    events.ScheduleEvent(EVENT_ADD_POWER, 2000);
                     break ;
 
                 case EVENT_SUMMON_NPCS :
                     SummonNpcs();
-                    events.ScheduleEvent(EVENT_SUMMON_NPCS, 3500);
+                    events.ScheduleEvent(EVENT_SUMMON_NPCS, 7000);
                     break ;
 
                 case EVENT_LOOK_PLAYERS :
@@ -472,17 +585,14 @@ public :
                     break ;
                 }
             }
-
         }
 
-    private :
-        // Functions
-        inline void StartEvent()
+        void StartEvent()
         {
-            events.ScheduleEvent(EVENT_INTRO, 3000);
-            events.ScheduleEvent(EVENT_ADD_POWER, 1300);
-            events.ScheduleEvent(EVENT_SUMMON_NPCS, 5000);
-            events.ScheduleEvent(EVENT_LOOK_PLAYERS, 1000);
+            events.ScheduleEvent(EVENT_INTRO, 2000);
+            events.ScheduleEvent(EVENT_ADD_POWER, 4000);
+            events.ScheduleEvent(EVENT_SUMMON_NPCS, 2000);
+            events.ScheduleEvent(EVENT_LOOK_PLAYERS, 3000);
         }
 
         void EndEvent()
@@ -491,7 +601,7 @@ public :
             events.CancelEvent(EVENT_INTRO);
             events.CancelEvent(EVENT_SUMMON_NPCS);
             events.CancelEvent(EVENT_LOOK_PLAYERS);
-            isStarted = false ;
+            isStarted = false;
             if(LiFei)
                 LiFei->DespawnOrUnsummon();
             Reset();
@@ -504,71 +614,105 @@ public :
             {
                 Map::PlayerList const& players = map->GetPlayers();
 
-                if(players.isEmpty()) return false ;
+                if(players.isEmpty())
+                    return false ;
 
-                CheckAysaQuestPredicate predicate((uint32)QUEST_THE_WAY_OF_THE_TUSHUI, (uint32)SPELL_PHASE);
                 for(Map::PlayerList::const_iterator iter = players.begin() ; iter != players.end() ; ++iter)
                 {
-                    if(Player* p = iter->getSource())
+                    Player *player = iter->getSource();
+                    if(player)
                     {
-                        if(predicate(p))
-                            return true ;
+                        if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
+                        {
+                            if(player->GetAreaId() == AREA_MEDITATION && player->IsInDist2d(me, 20))
+                            {
+                                if(!player->HasAura(SPELL_MEDITATION_BAR))
+                                {
+                                    player->CastSpell(player, SPELL_MEDITATION_BAR, true);
+                                    player->SetMaxPower(POWER_ALTERNATE_POWER, 90);
+                                    player->SetPower(POWER_ALTERNATE_POWER, 0);
+                                }
+                                return true;
+                            }
+                        }
+                        if (!player->IsInDist2d(me, 20) && player->HasAura(SPELL_MEDITATION_BAR))
+                        {
+                            player->RemoveAura(SPELL_MEDITATION_BAR);
+                        }
                     }
                 }
             }
-
             return false ;
         }
 
         void AddPowerToPlayersOnMap()
         {
-            if(Map* map = me->GetMap())
+            if(!isStarted)
+                return ;
+
+            Map* map = me->GetMap();
+            if(map)
             {
-                Map::PlayerList const& pl = map->GetPlayers();
+                Map::PlayerList const& players = map->GetPlayers();
 
-                if(pl.isEmpty()) return ;
+                if(players.isEmpty())
+                    return ;
 
-                CheckAysaQuestPredicate predi((uint32)QUEST_THE_WAY_OF_THE_TUSHUI, (uint32)SPELL_PHASE);
-
-                for(Map::PlayerList::const_iterator iter = pl.begin() ; iter != pl.end() ; ++iter)
-                    if(predi(iter->getSource()))
-                        AddPower(iter->getSource());
+                for(Map::PlayerList::const_iterator iter = players.begin() ; iter != players.end() ; ++iter)
+                {
+                    Player* player = iter->getSource();
+                    if(player)
+                    {
+                        if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
+                        {
+                            if(player->GetAreaId() == AREA_MEDITATION && player->IsInDist2d(me, 20))
+                            {
+                                if(player->HasAura(SPELL_MEDITATION_BAR))
+                                {
+                                    AddPower(player);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        void AddPower(Player* p)
+        void AddPower(Player* player)
         {
-            if(p)
+            if(!isStarted)
+                return ;
+
+            if(player)
             {
-                p->ModifyPower(POWER_ALTERNATE_POWER, 1);
-                switch(p->GetPower(POWER_ALTERNATE_POWER))
+                player->ModifyPower(POWER_ALTERNATE_POWER, +2);
+
+                switch(player->GetPower(POWER_ALTERNATE_POWER))
                 {
-                case 20 :
-                    LiFeiSpeech(LI_FEI_SPEECH_1, p);
-                    break;
-                case 40 :
-                    LiFeiSpeech(LI_FEI_SPEECH_2, p);
-                    break ;
-                case 60 :
-                    LiFeiSpeech(LI_FEI_SPEECH_3, p);
-                    break ;
-                case 70 :
-                    LiFeiSpeech(LI_FEI_SPEECH_4, p);
-                    break;
-                case 80 :
-                    LiFeiSpeech(LI_FEI_SPEECH_5, p);
-                    break ;
-                case 90 :
-                    LiFeiSpeech(LI_FEI_SPEECH_6, p);
-                    break ;
-                case 100 :
-                    p->KilledMonsterCredit(NPC_MASTER_LI_FEI);
-                    p->RemoveAura(SPELL_MEDITATION_BAR_2);
-                    me->PlayDirectSound(SOUND_END_CAVE, p);
-                    me->Say(AYSA_SAY_OUTRO, LANG_COMMON, p->GetGUID());
-                    p->RemoveAura(SPELL_PHASE);
-                    me->SummonCreature(NPC_MASTER_SHANG_XI, ShangXiPosition);
-                    break ;
+                    case 20 :
+                        LiFei->AI()->Talk(LI_FEI_SPEECH_1, player->GetGUID());
+                        break;
+                    case 40 :
+                        LiFei->AI()->Talk(LI_FEI_SPEECH_2, player->GetGUID());
+                        break ;
+                    case 50 :
+                        LiFei->AI()->Talk(LI_FEI_SPEECH_3, player->GetGUID());
+                        break ;
+                    case 60 :
+                        LiFei->AI()->Talk(LI_FEI_SPEECH_4, player->GetGUID());
+                        break;
+                    case 70 :
+                        LiFei->AI()->Talk(LI_FEI_SPEECH_5, player->GetGUID());
+                        break ;
+                    case 80 :
+                        LiFei->AI()->Talk(LI_FEI_SPEECH_6, player->GetGUID());
+                        break;
+                    case 90 :
+                        LiFei->AI()->Talk(LI_FEI_SPEECH_7, player->GetGUID());
+                        player->KilledMonsterCredit(NPC_MASTER_LI_FEI);
+                        player->RemoveAura(SPELL_MEDITATION_BAR);
+                        Talk(AYSA_SAY_OUTRO, player->GetGUID());
+                        break ;
 
                 default :
                     break ;
@@ -576,103 +720,161 @@ public :
             }
         }
 
-        void LiFeiSpeech(int32 id, Player* target)
-        {
-            if(LiFei && target)
-                LiFei->MonsterSay(id, LANG_COMMON, target->GetGUID());
-        }
-
         void SummonNpcs()
         {
-            uint8 number = (1 + (rand() % 4));
+            if(!isStarted)
+                return ;
+
+            uint8 number = (1 + (rand() % 3));
 
             for(uint8 i = 0 ; i < number ; ++i)
             {
-                Creature * scamp = me->SummonCreature(MOB_SCAMP, SummonPositions[i]);
-                if(scamp)
-                    scamp->AI()->AttackStart(me);
+                me->SummonCreature(MOB_SCAMP, SummonPositions[i], TEMPSUMMON_TIMED_DESPAWN, 180000);
             }
         }
 
         void DoIntro()
         {
-            LiFei = me->SummonCreature(NPC_MASTER_LI_FEI, LiFeiPosition[0]);
-            if(LiFei)
-            {
-                LiFei->GetMotionMaster()->MovePoint(0, LiFeiPosition[1]);
-                LiFei->SetOrientation(me->GetOrientation() - M_PI);
-            }
-        }
+            if(!isStarted)
+                return ;
 
-        // Vars
-        bool isStarted ;
-        EventMap events ;
-        Creature* LiFei;
+            LiFei = me->SummonCreature(NPC_MASTER_LI_FEI, 1130.19f, 3435.37f, 106.00f, 0.19f);
+            Talk(AYSA_SAY_INTRO);
+        }
     };
 
     CreatureAI* GetAI(Creature *c) const
     {
-        return new npc_aysa_cloudsinger_quest29414_AI(c);
+        return new npc_aysa_cloudsinger_meditation_AI(c);
+    }
+};
+
+class npc_amberleaf_troublemaker: public CreatureScript
+{
+public:
+    npc_amberleaf_troublemaker() : CreatureScript("npc_amberleaf_troublemaker") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_amberleaf_troublemakerAI(creature);
     }
 
-private :
-
-    // Enums
-    enum Quests
+    struct npc_amberleaf_troublemakerAI : public ScriptedAI
     {
-        QUEST_THE_WAY_OF_THE_TUSHUI = 29414
-    };
+            npc_amberleaf_troublemakerAI(Creature* creature) : ScriptedAI(creature) {}
 
-    enum Events
+            uint32 Test_timer;
+            bool Test;
+
+            void Reset()
+            {
+                me->SetReactState(REACT_PASSIVE);
+                Test_timer = 500;
+                Test = true;
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+                Test = false;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if(Test)
+                {
+                    if (Test_timer <= diff)
+                    {
+                        Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500, true);
+                        if(target && target->GetTypeId() == TYPEID_PLAYER)
+                            if(target->isAlive() && target->GetAreaId() == AREA_MEDITATION && target->HasAura(SPELL_MEDITATION_BAR))
+                            {
+                                me->SetReactState(REACT_AGGRESSIVE);
+                                me->AI()->AttackStart(target);
+                            }
+
+                        Test_timer = 500;
+                    }
+                    else Test_timer -= diff;
+                }
+                DoMeleeAttackIfReady();
+            }
+    };
+};
+
+
+/*************************************/
+/********Fanning the Flames********/
+/*************************************/
+
+enum SpellsAir
+{
+    SPELL_LIGHTNING_BOLT    = 73212,
+    SPELL_LIGHTNING_CLOUD   = 108693
+};
+
+class npc_living_air: public CreatureScript
+{
+public:
+    npc_living_air() : CreatureScript("npc_living_air") { }
+
+    CreatureAI* GetAI(Creature* creature) const
     {
-        EVENT_ADD_POWER = 1,
-        EVENT_SUMMON_NPCS,
-        EVENT_INTRO,
-        EVENT_LOOK_PLAYERS
-    };
+        return new npc_living_airAI(creature);
+    }
 
-    enum Sounds
+    struct npc_living_airAI : public ScriptedAI
     {
-        SOUND_QUEST_ACCEPT = 0,
-        SOUND_START_CAVE = 0,
-        SOUND_END_CAVE = 0
+            npc_living_airAI(Creature* creature) : ScriptedAI(creature) {}
+
+            uint32 Bolt1_timer;
+            uint32 Bolt2_timer;
+            uint32 Bolt3_timer;
+            uint32 Cloud_timer;
+
+            void Reset()
+            {
+                Bolt1_timer = 1000;
+                Bolt2_timer = 4200;
+                Bolt3_timer = 7400;
+                Cloud_timer = 10600;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if(!UpdateVictim())
+                    return;
+
+                if (Bolt1_timer <= diff)
+                {
+                    me->CastSpell(me->getVictim(), SPELL_LIGHTNING_BOLT, false);
+                    Bolt1_timer = 14000;
+                }
+                else Bolt1_timer -= diff;
+
+                if (Bolt2_timer <= diff)
+                {
+                    me->CastSpell(me->getVictim(), SPELL_LIGHTNING_BOLT, false);
+                    Bolt2_timer = 14000;
+                }
+                else Bolt2_timer -= diff;
+
+                if (Bolt3_timer <= diff)
+                {
+                    me->CastSpell(me->getVictim(), SPELL_LIGHTNING_BOLT, false);
+                    Bolt3_timer = 14000;
+                }
+                else Bolt3_timer -= diff;
+
+                if (Cloud_timer <= diff)
+                {
+                    me->CastSpell(me->getVictim(), SPELL_LIGHTNING_CLOUD, false);
+                    Cloud_timer = 14000;
+                }
+                else Cloud_timer -= diff;
+
+                DoMeleeAttackIfReady();
+            }
     };
-
-    enum Spells
-    {
-        SPELL_MEDITATION_BAR_2 = 105274,
-        SPELL_PHASE = 68243
-    };
-
-    enum Npcs
-    {
-        NPC_MASTER_LI_FEI = 54856,
-        NPC_MASTER_SHANG_XI = 54608,
-        MOB_SCAMP = 59637,
-        NPC_AYSA_QUESTENDER = 0
-    };
-
-    enum Areas
-    {
-        AREA_CAVERN_OF_MEDITATION = 5848
-    };
-
-    enum Says
-    {
-        LI_FEI_SPEECH_1 = -5485605,
-        LI_FEI_SPEECH_2,
-        LI_FEI_SPEECH_3,
-        LI_FEI_SPEECH_4,
-        LI_FEI_SPEECH_5,
-        LI_FEI_SPEECH_6,
-
-        AYSA_SAY_INTRO = -5964201,
-        AYSA_SAY_OUTRO = -5964200
-    };
-
-    // Functions
-
-    // Variables
 };
 
 /********************************/
@@ -1216,10 +1418,15 @@ private:
 
 void AddSC_wandering_isle()
 {
-    new npc_first_quest_pandaren();
-	
-	new npc_trainee_stifled_pride();
-    new npc_aysa_cloudsinger_quest29414();
+    new npc_first_quest_pandaren();	
+    new npc_trainee();
+    new areatrigger_at_the_missing_driver();
+    new npc_min_dimwind_pop();
+    new npc_aysa_cloudsinger_pop();
+    new npc_aysa_cloudsinger_meditation();
+    new npc_amberleaf_troublemaker();
+    new npc_living_air();
+
     new stalker_item_equiped();
     new mob_jaomin_ro();
     new mob_amberleaf_scamp29419();

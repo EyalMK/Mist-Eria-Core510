@@ -137,6 +137,7 @@ enum BattlegroundBuffObjects
 /// Battleground currency rewards. Should be with precision mod.
 enum BattlegroundRandomRewards
 {
+	BG_REWARD_WINNER_ARENA			= 180,
     BG_REWARD_WINNER_HONOR_FIRST    = 150,
     BG_REWARD_WINNER_CONQUEST_FIRST = 25,
     BG_REWARD_WINNER_HONOR_LAST     = 100,

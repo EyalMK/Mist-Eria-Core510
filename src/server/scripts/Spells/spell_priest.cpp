@@ -26,6 +26,7 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "GridNotifiers.h"
+#include "ScriptedCreature.h"
 
 enum PriestSpells
 {
@@ -47,11 +48,20 @@ enum PriestSpells
     SPELL_PRIEST_REFLECTIVE_SHIELD_TRIGGERED        = 33619,
     SPELL_PRIEST_SHADOWFORM_VISUAL_WITHOUT_GLYPH    = 107903,
     SPELL_PRIEST_SHADOWFORM_VISUAL_WITH_GLYPH       = 107904,
-    SPELL_PRIEST_SHADOW_WORD_DEATH                  = 32409,
     SPELL_PRIEST_T9_HEALING_2P                      = 67201,
     SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL              = 64085,
 	SPELL_PRIEST_RENEW                              = 139,
 	SPELL_PRIEST_VOID_SHIFT                         = 108968,
+	
+	// Mind spike
+	SPELL_PRIEST_MIND_SPIKE							= 73510,
+	
+	// Shadow Word : Death
+    SPELL_PRIEST_SHADOW_WORD_DEATH_BASE            = 32379, // This one is the spell in the spellbook
+    SPELL_PRIEST_SHADOW_WORD_DEATH_GLYPH            = 120583, // WARNING : This one overrides the caster's spell's bar !
+    SPELL_PRIEST_SHADOW_WORD_DEATH_OVERRIDED        = 129176, // This one is the spell that overrides 32379
+    SPELL_PRIEST_SHADOW_WORD_DEATH_ENERGIZE         = 125927, // This one is the spell that add a shadow orb
+    SPELL_PRIEST_SHADOW_WORD_DEATH_DAMAGES          = 32409, // If target doesn't die, we damage the caster
 };
 
 enum PriestSpellIcons
@@ -800,37 +810,137 @@ class spell_pri_renew : public SpellScriptLoader
         }
 };
 
-// 32379 - Shadow Word Death
-class spell_pri_shadow_word_death : public SpellScriptLoader
-{
-    public:
-        spell_pri_shadow_word_death() : SpellScriptLoader("spell_pri_shadow_word_death") { }
+/**
+  * A BasicEvent to tell if yes or no we can reset the cooldown
+  */
+class ShadowWordDeathResetCooldownEvent : public BasicEvent {
+public :
+    ShadowWordDeathResetCooldownEvent(Player* player) : _player(player) {}
 
-        class spell_pri_shadow_word_death_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_pri_shadow_word_death_SpellScript);
+    bool Execute(uint64 /*e_time*/, uint32 /*e_id*/) {
+        if(_player)
+            _player->SetCanShadowWordDeathReset(true);
 
-            void HandleDamage()
-            {
-                int32 damage = GetHitDamage();
+        return true;
+    }
 
-                // Pain and Suffering reduces damage
-                if (AuraEffect* aurEff = GetCaster()->GetDummyAuraEffect(SPELLFAMILY_PRIEST, PRIEST_ICON_ID_PAIN_AND_SUFFERING, EFFECT_1))
-                    AddPct(damage, aurEff->GetAmount());
+private :
+    Player* _player ;
+};
 
-                GetCaster()->CastCustomSpell(GetCaster(), SPELL_PRIEST_SHADOW_WORD_DEATH, &damage, 0, 0, true);
+/**
+ * Script for Shadow Word : Death (32379 (base) and 129176 (override with the glyph)
+ * SQL Query : DELETE FROM spell_script_names WHERE spell_id IN (32379, 129176) ;
+ *             INSERT INTO spell_script_names VALUES (32379, "spell_pri_shadow_word_death"), (129176, "spell_pri_shadow_word_death");
+ * This spell is a bit complex, so let's go for some documentation :
+ *
+ * 32373 is the basic spell, the one the caster will always have in his bookspell while he has not chosen a specialisation
+ * The casting condition is the following : target must have less than 20% HP
+ * If the caster has the shadow specialisation, casting the spell will also energize the caster for ONE shadow orb (using the spell 125927)
+ * If the target doesn't die, the cooldown on the spell will be instantly reset, but the spell will not give a shadow orb to the caster for nine seconds
+ *
+ * 129176 is the spell that overrides 32379 (when the caster has the glyph of Shadow Word : Death
+ * This one is a bit more complicated : it's damages are the quarter of a normal Shadow Word : Death only if the target is upper 20% HP
+ * If the target is under 20% HP, damage are quadruplated
+ * Also, if the creature doesn't die, there are two type of events :
+ *  If the creature is below 20% HP, but not yet dead, the cooldown is reset BUT THE SPELL WILL NOT GENERATE A SHADOW ORB AFTER NEXT CAST (only every 9 seconds)
+ *  In all cases, we have to damage the caster for the amount (there is a periodic effect, spell 32409)
+ * If the creature dies, we do not damage the caster
+ */
+class spell_pri_shadow_word_death : public SpellScriptLoader {
+public :
+    /// Constructor for the loader
+    spell_pri_shadow_word_death() : SpellScriptLoader("spell_pri_shadow_word_death") { }
+
+    class spell_pri_shadow_word_death_SpellScript : public SpellScript {
+        PrepareSpellScript(spell_pri_shadow_word_death_SpellScript);
+
+        /// Make sure we have every spell loaded in memory
+        bool Validate(const SpellInfo */*spellInfo*/) {
+            if(sSpellMgr->GetSpellInfo(SPELL_PRIEST_SHADOW_WORD_DEATH_BASE)
+                    && sSpellMgr->GetSpellInfo(SPELL_PRIEST_SHADOW_WORD_DEATH_ENERGIZE)
+                    && sSpellMgr->GetSpellInfo(SPELL_PRIEST_SHADOW_WORD_DEATH_DAMAGES)
+                    && sSpellMgr->GetSpellInfo(SPELL_PRIEST_SHADOW_WORD_DEATH_OVERRIDED)
+                    && sSpellMgr->GetSpellInfo(SPELL_PRIEST_SHADOW_WORD_DEATH_GLYPH))
+                return true ;
+            else {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: SW : Death: Unable to get SpellInfo for at least one spell !");
+                return false ;
             }
-
-            void Register()
-            {
-                OnHit += SpellHitFn(spell_pri_shadow_word_death_SpellScript::HandleDamage);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_pri_shadow_word_death_SpellScript();
         }
+
+        /// Load everything
+        bool Load() {
+            // Check for the aura, to call the right script
+            if(Unit* caster = GetCaster()) {
+                if(Player* player = caster->ToPlayer()) {
+                    if(player->HasAura(SPELL_PRIEST_SHADOW_WORD_DEATH_GLYPH))
+                        glyphed = true ;
+                    else
+                        glyphed = false ;
+
+                    return true ;
+                }
+                return false ;
+            }
+            return false ;
+        }
+
+        /// This part of the script is only for the glyphed version of the spell
+        void HandleDamage(SpellEffIndex effectIndex) {
+            if(glyphed) {
+                if(Unit* hitUnit = GetHitUnit()) {
+                    damages = GetHitDamage() ;
+                    if(hitUnit->GetHealthPct() <= 20) {
+                        SetHitDamage(GetHitDamage() * 4);
+                        damages *= 4 ;
+                    }
+                }
+            }
+        }
+
+        /// Handle everything linked to after hit : damages to caster, shadow orbs etc...
+        void HandleAfterHit() {
+            if(Unit* hitUnit = GetHitUnit()) {
+                if(hitUnit->isAlive()) { // Everything works only if target is still alive
+                    if(Player* player = GetCaster()->ToPlayer()) {
+                        if(player->GetPrimaryTalentTree(player->GetActiveSpec()) == TALENT_TREE_PRIEST_SHADOW
+                                && player->CanShadowWordDeathReset()) { // If we are a shadow priest and the spell can reset
+                            player->CastSpell(player, SPELL_PRIEST_SHADOW_WORD_DEATH_ENERGIZE, true); // Add a shadow orb
+                            player->SetCanShadowWordDeathReset(false); // Prevents multi-resetting
+							BasicEvent* event = new ShadowWordDeathResetCooldownEvent(player) ;
+                            player->m_Events.AddEvent(event, 9000); // Prepare next reset
+                            player->RemoveSpellCooldown(glyphed ? SPELL_PRIEST_SHADOW_WORD_DEATH_OVERRIDED : SPELL_PRIEST_SHADOW_WORD_DEATH_BASE); // Remove cooldown
+                        }
+
+                        if(glyphed)
+                            // Deal damages since target is not dead
+                            player->CastCustomSpell(player, SPELL_PRIEST_SHADOW_WORD_DEATH_DAMAGES, &damages, NULL, NULL, true, NULL, NULL, player->GetGUID());
+                    }
+                } else {
+					if(Player* player = GetCaster()->ToPlayer()) {
+						if(player->GetPrimaryTalentTree(player->GetActiveSpec()) == TALENT_TREE_PRIEST_SHADOW
+									&& player->CanShadowWordDeathReset()) { // If we are a shadow priest and the spell can reset
+							player->CastSpell(player, SPELL_PRIEST_SHADOW_WORD_DEATH_ENERGIZE, true); // Add a shadow orb
+						}
+					}
+				}
+            }
+        }
+
+        /// Register everything
+        void Register() {
+            OnEffectHitTarget += SpellEffectFn(spell_pri_shadow_word_death_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            AfterHit += SpellHitFn(spell_pri_shadow_word_death_SpellScript::HandleAfterHit);
+        }
+
+        int32 damages ; /// Stores the amount of damages spell has done to the target, to damage the caster if target didn't die
+        bool glyphed ; /// Okay, we set this during Load(), so we call the right script
+    };
+
+    SpellScript* GetSpellScript() const {
+        return new spell_pri_shadow_word_death_SpellScript();
+    }
 };
 
 // 15473 - Shadowform
@@ -1032,6 +1142,212 @@ class spell_pri_void_shift : public SpellScriptLoader
         }
 };
 
+/**
+ * Shadow Priest Spell : Mind spike (73510)
+ * Updated 5.1.0
+ * SQL Query : INSERT INTO spell_script_names VALUES (73510, "spell_pri_mind_spike");
+ */
+class spell_pri_mind_spike : public SpellScriptLoader {
+public :
+    /// Constructor
+    spell_pri_mind_spike() : SpellScriptLoader("spell_pri_mind_spike") { }
+
+    /// Script
+    class spell_pri_mind_spike_SpellScript : public SpellScript {
+        /// Get everything we need
+        PrepareSpellScript(spell_pri_mind_spike_SpellScript)
+
+        /// Validate the spell
+        bool Validate(const SpellInfo */*spellInfo*/) {
+            //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Validate");
+            if(!sSpellMgr->GetSpellInfo(SPELL_PRIEST_MIND_SPIKE))
+                return false ;
+
+            return true ;
+        }
+
+        /// Init everything
+        bool Load() {
+            //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Load");
+            // If no caster or caster is not a player, return ;
+            if(GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER)
+                return true ;
+
+            return false ;
+        }
+
+        /// The dummy effect handles the removal of Shadow damage-over-time spells on the target
+        /// We will get the target, then his auras, and then we will remove the ones that fit the following requirements :
+        /// 1) Shadow damage-over-time spell
+        /// 2) Caster is the same caster as the one casting this spell
+        void HandleDummy(SpellEffIndex effectIndex) {
+            //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: HandleDummy");
+            if(Player* caster = GetCaster()->ToPlayer()) {// Since we checked caster during load, he will not be null
+                if(Unit* target = GetHitUnit()) {
+                    //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: caster && target not null");
+                    Unit::AuraApplicationMap const& appliedAuras = target->GetAppliedAuras() ;
+                    for(Unit::AuraApplicationMap::const_iterator iter = appliedAuras.begin() ; iter != appliedAuras.end() ; ++iter) {
+                        //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Looping in AuraApplicationMap");
+                        if(AuraApplication* auraApp = iter->second) {
+                            //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Pointer to AuraApplication");
+                            if(Aura* base = auraApp->GetBase()) {
+                                // 1. Check the caster
+                                //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Checking casters : aura's caster == %u, caster == % u, auraName == %s",
+                                               //base->GetCasterGUID(), caster->GetGUID(), base->GetSpellInfo()->SpellName);
+                                if(base->GetCasterGUID() != caster->GetGUID())
+                                    continue ;
+
+                                //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Checking mask : school mask == %u",
+                                               //base->GetSpellInfo()->SchoolMask & SPELL_SCHOOL_MASK_SHADOW);
+                                // 2. Caster is the same, now check if it is a shadow spell
+                                if(base->GetSpellInfo()->SchoolMask & SPELL_SCHOOL_MASK_SHADOW == 0)
+                                    continue ;
+
+                                //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: checking effects");
+                                // 3. Now check the effects ; it's a bit long, we have to loop over each effect to see if it is periodic, but we cannot do it another way
+                                for(uint8 i = 0 ; i < MAX_SPELL_EFFECTS ; ++i) {
+                                    if(AuraEffect* auraEff = base->GetEffect(i))
+                                        if(auraEff->IsPeriodic()) {
+                                            //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Found periodic effect, index == %u",
+                                                           //uint32(i));
+                                            target->RemoveAura(base, AURA_REMOVE_BY_ENEMY_SPELL);
+                                            break ; // We have found a periodic effect ; stop looping over effects, return looping over auras
+                                        }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// Now register the spell
+        void Register() {
+            OnEffectHitTarget += SpellEffectFn(spell_pri_mind_spike_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    /// Get a pointer to the script as a pointer to SpellScript
+    SpellScript* GetSpellScript() const {
+        return new spell_pri_mind_spike_SpellScript() ;
+    }
+};
+
+/**
+ * NPC summoned by Shadowfiend (34433)
+ * SQL Query : UPDATE creature_template SET ScriptName = "npc_shadowfiend" WHERE entry = 19668 ;
+ */
+class npc_shadowfiend : public CreatureScript {
+public :
+    /// Constructor of the CreatureScript
+    npc_shadowfiend() : CreatureScript("npc_shadowfiend") { }
+
+    /// Script
+    class npc_shadowfiend_AI : public ScriptedAI {
+    public :
+        /// Script's constructor
+        npc_shadowfiend_AI(Creature* creature) : ScriptedAI(creature) {
+            // We are a temp summon ; get the owner
+            if(TempSummon* summon = creature->ToTempSummon()) {
+                if(Unit* owner = summon->GetOwner()) {
+                    if(Player* player = owner->ToPlayer()) {
+                        // Attack the masters victim if any
+                        if(Unit* victim = player->GetSelectedUnit()) {
+                            AttackStart(victim);
+                        }
+                        // Master's don't have a selected target ; attack the victim
+                        else if(Unit* victim = player->getVictim()) {
+                            AttackStart(victim);
+                        }
+                        // Master's doesn't have a victim : find one !
+                        else {
+                            // ThreatList is empty, find the nearest unit and attack it
+                            if(player->getThreatManager().getThreatList().empty()) {
+                                CellCoord coords(Trinity::ComputeCellCoord(player->GetPositionX(), player->GetPositionY()));
+                                Cell cell(coords);
+                                cell.SetNoCreate();
+
+                                std::list<Unit*> targets ;
+
+                                Trinity::AnyUnfriendlyUnitInObjectRangeCheck check(player, player, 84.0f); // 7 yards / s, so in 12 seconds = 84 yards
+                                Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(player, targets, check);
+
+                                TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck>, GridTypeMapContainer> visitor(searcher);
+                                TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck>, WorldTypeMapContainer> visitor2(searcher);
+								
+								Map* map = creature->GetMap(); 
+                                cell.Visit(coords, visitor, *map, *creature, 84.0f);
+                                cell.Visit(coords, visitor2, *map, *creature, 84.0f);
+
+                                if(!targets.empty()) {
+                                    targets.sort(Trinity::DistanceCompareOrderPred(player, true));
+                                    Unit* target = targets.front();
+                                    AttackStart(target);
+                                }
+                                else
+                                    creature->DisappearAndDie();
+                            } else {
+                                // Threat List not empty, pick the closest unit and attack it
+                                std::list<HostileReference*> threatList = player->getThreatManager().getThreatList() ;
+								std::list<Unit*> asUnit ;
+								for(std::list<HostileReference*>::const_iterator iter = threatList.begin() ; iter != threatList.end() ; ++iter) {
+									asUnit.push_back((*iter)->getTarget()) ;
+								}
+                                asUnit.sort(Trinity::DistanceCompareOrderPred(player, true));
+                                Unit* target = asUnit.front();
+                                AttackStart(target);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        void UpdateAI(const uint32 diff) {
+            // Return since we have no target
+            if(!UpdateVictim())
+                return ;
+
+            DoRegenerateMana();
+        }
+
+        /// Replaces DoMeleeAttackIfReady()
+        /// There is no need to check unit state casting, since we never cast a spell
+        /// Everything is just a copy of DoMeleeAttackIfReady(), but we need it to handle regen
+        void DoRegenerateMana() {
+            bool canRegen = false ; // If set to false after every check, we are not ready to do a melee attack
+
+            Unit* victim = me->getVictim(); // Get the victim
+            if(!victim)
+                return ;
+
+            /// Checks
+            if (me->isAttackReady() && me->IsWithinMeleeRange(victim)) {
+                me->AttackerStateUpdate(victim);
+                me->resetAttackTimer();
+                canRegen = true ; // Okay, we area ready, so we can regen
+            }
+
+            if (me->haveOffhandWeapon() && me->isAttackReady(OFF_ATTACK) && me->IsWithinMeleeRange(victim)) {
+                me->AttackerStateUpdate(victim, OFF_ATTACK);
+                me->resetAttackTimer(OFF_ATTACK);
+                canRegen = true ;
+            }
+
+            if(canRegen) {
+                if(TempSummon* summon = me->ToTempSummon())
+                    if(Unit* owner = summon->GetOwner()) // Get owner
+                        DoCast(owner, 34650, true); // We are happy : there is spell, so cast it
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature *creature) const {
+        return new npc_shadowfiend_AI(creature);
+    }
+};
+
+
 void AddSC_priest_spell_scripts()
 {
     new spell_pri_divine_aegis();
@@ -1053,4 +1369,6 @@ void AddSC_priest_spell_scripts()
     new spell_pri_vampiric_touch();
 	new spell_pri_chakra_serenity_proc();
 	new spell_pri_void_shift();
+	new spell_pri_mind_spike();
+	new npc_shadowfiend();
 }
