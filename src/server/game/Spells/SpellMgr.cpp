@@ -3959,6 +3959,12 @@ void SpellMgr::LoadSpellInfoCorrections()
                     spellInfo->Effects[0].Effect = SPELL_EFFECT_APPLY_AURA;
                     spellInfo->Effects[1].Effect = SPELL_EFFECT_APPLY_AURA;
                     break;
+                case 102509:
+                    spellInfo->Effects[0].Effect = SPELL_EFFECT_APPLY_AURA;
+                    break;
+                case 102510:
+                    spellInfo->Effects[0].Effect = SPELL_EFFECT_APPLY_AURA;
+                    break;
 				default:
 					break;
 			}

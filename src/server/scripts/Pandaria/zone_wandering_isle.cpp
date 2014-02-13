@@ -937,17 +937,20 @@ public:
                                     {
                                         if(!player->HasAura(SPELL_BLESSING_OF_THE_RED_FLAME))
                                         {
-                                            //player->CastSpell(player, SPELL_BLESSING_OF_THE_BLUE_FLAME, true);
-                                            player->CastSpell(player, SPELL_BLESSING_OF_THE_RED_FLAME, true);
-                                            //player->CastSpell(player, SPELL_BLESSING_OF_THE_PURPLE_FLAME, true);
+                                            me->CastSpell(player, SPELL_BLESSING_OF_THE_BLUE_FLAME, true);
+                                            me->CastSpell(player, SPELL_BLESSING_OF_THE_RED_FLAME, true);
+                                            me->CastSpell(player, SPELL_BLESSING_OF_THE_PURPLE_FLAME, true);
                                         }
                                     }
                                 }
                                 if(player->GetQuestStatus(QUEST_ONLY_THE_WORTHY_SHALL_PASS) == QUEST_STATUS_COMPLETE)
                                 {
-                                    //player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_BLUE_FLAME);
-                                    player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_RED_FLAME);
-                                   // player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_PURPLE_FLAME);
+                                    if(player->HasAura(SPELL_BLESSING_OF_THE_RED_FLAME))
+                                    {
+                                        player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_BLUE_FLAME);
+                                        player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_RED_FLAME);
+                                        player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_PURPLE_FLAME);
+                                    }
                                 }
                             }
                         }
