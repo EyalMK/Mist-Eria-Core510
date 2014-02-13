@@ -937,9 +937,9 @@ public:
                                     {
                                         if(!player->HasAura(SPELL_BLESSING_OF_THE_BLUE_FLAME))
                                         {
-                                            me->CastSpell(player, SPELL_BLESSING_OF_THE_BLUE_FLAME, true);
-                                            me->CastSpell(player, SPELL_BLESSING_OF_THE_RED_FLAME, true);
-                                            me->CastSpell(player, SPELL_BLESSING_OF_THE_PURPLE_FLAME, true);
+                                            player->CastSpell(player, SPELL_BLESSING_OF_THE_BLUE_FLAME, true);
+                                            player->CastSpell(player, SPELL_BLESSING_OF_THE_RED_FLAME, true);
+                                            player->CastSpell(player, SPELL_BLESSING_OF_THE_PURPLE_FLAME, true);
                                         }
                                     }
                                 }
