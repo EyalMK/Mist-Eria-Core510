@@ -877,6 +877,91 @@ public:
     };
 };
 
+
+/*************************************/
+/****Only the Worthy Shall Pass****/
+/*************************************/
+
+enum SpellsTrigger
+{
+    SPELL_BLESSING_OF_THE_RED_FLAME     = 102508,
+    SPELL_BLESSING_OF_THE_BLUE_FLAME    = 102509,
+    SPELL_BLESSING_OF_THE_PURPLE_FLAME  = 102510,
+
+    QUEST_ONLY_THE_WORTHY_SHALL_PASS    = 29421,
+
+    AREA_SANCTUARY  = 5849
+};
+
+class npc_trigger_shall_pass: public CreatureScript
+{
+public:
+    npc_trigger_shall_pass() : CreatureScript("npc_trigger_shall_pass") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_trigger_shall_passAI(creature);
+    }
+
+    struct npc_trigger_shall_passAI : public ScriptedAI
+    {
+            npc_trigger_shall_passAI(Creature* creature) : ScriptedAI(creature) {}
+
+            uint32 Test_timer;
+
+            void Reset()
+            {
+                Test_timer = 1000;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if (Test_timer <= diff)
+                {
+                    Map* map = me->GetMap();
+                    if(map)
+                    {
+                        Map::PlayerList const& players = map->GetPlayers();
+
+                        if(players.isEmpty())
+                            return ;
+
+                        for(Map::PlayerList::const_iterator iter = players.begin() ; iter != players.end() ; ++iter)
+                        {
+                            Player* player = iter->getSource();
+                            if(player)
+                            {
+                                if (player->isAlive() && player->GetQuestStatus(QUEST_ONLY_THE_WORTHY_SHALL_PASS) == QUEST_STATUS_INCOMPLETE)
+                                {
+                                    if(player->GetAreaId() == AREA_SANCTUARY)
+                                    {
+                                        if(!player->HasAura(SPELL_BLESSING_OF_THE_BLUE_FLAME) && !player->HasAura(SPELL_BLESSING_OF_THE_RED_FLAME) && !player->HasAura(SPELL_BLESSING_OF_THE_PURPLE_FLAME))
+                                        {
+                                            me->CastSpell(player, SPELL_BLESSING_OF_THE_BLUE_FLAME, true);
+                                            me->CastSpell(player, SPELL_BLESSING_OF_THE_RED_FLAME, true);
+                                            me->CastSpell(player, SPELL_BLESSING_OF_THE_PURPLE_FLAME, true);
+                                        }
+                                    }
+                                }
+                                if (player->GetQuestStatus(QUEST_ONLY_THE_WORTHY_SHALL_PASS) == QUEST_STATUS_COMPLETE || player->GetQuestStatus(QUEST_ONLY_THE_WORTHY_SHALL_PASS) == QUEST_STATUS_REWARDED)
+                                {
+                                    if(player->HasAura(SPELL_BLESSING_OF_THE_BLUE_FLAME) || player->HasAura(SPELL_BLESSING_OF_THE_RED_FLAME) || player->HasAura(SPELL_BLESSING_OF_THE_PURPLE_FLAME))
+                                    {
+                                        player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_BLUE_FLAME);
+                                        player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_RED_FLAME);
+                                        player->RemoveAurasDueToSpell(SPELL_BLESSING_OF_THE_PURPLE_FLAME);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Test_timer = 1000;
+                }
+                else Test_timer -= diff;
+            }
+    };
+};
+
 /********************************/
 /**The Lesson of the Iron Bough**/
 /********************************/
@@ -1426,6 +1511,7 @@ void AddSC_wandering_isle()
     new npc_aysa_cloudsinger_meditation();
     new npc_amberleaf_troublemaker();
     new npc_living_air();
+    new npc_trigger_shall_pass();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
