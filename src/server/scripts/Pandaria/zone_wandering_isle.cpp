@@ -1533,7 +1533,7 @@ void AddSC_wandering_isle()
     new npc_min_dimwind_pop();
     new npc_aysa_cloudsinger_pop();
     new npc_aysa_cloudsinger_meditation();
-    new npc_amberleaf_troublemaker();
+   // new npc_amberleaf_troublemaker();
     new npc_living_air();
     new spell_blessing_flamme_panda();
     new npc_huo_escort();
