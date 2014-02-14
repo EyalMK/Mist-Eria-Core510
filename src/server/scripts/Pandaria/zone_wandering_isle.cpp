@@ -949,8 +949,11 @@ public:
     bool OnGossipHello(Player* player, GameObject* gob)
     {
         if(player->HasItemCount(ITEM_FLAMME, 1) && player->HasSpell(SPELL_FLAMME))
+        {
+            player->RemoveAurasDueToSpell(SPELL_FLAMME);
+            player->DestroyItemCount(ITEM_FLAMME, 1);
             return true;
-
+        }
         return false;
     }
 };
