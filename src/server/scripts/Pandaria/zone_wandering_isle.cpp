@@ -917,6 +917,44 @@ class spell_blessing_flamme_panda: public SpellScriptLoader
         }
 };
 
+
+/*************************************/
+/****The Passion of Shen-zin Su****/
+/*************************************/
+
+enum HuoEnum
+{
+};
+
+class npc_huo_escort: public CreatureScript
+{
+public:
+    npc_huo_escort() : CreatureScript("npc_huo_escort") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_huo_escortAI(creature);
+    }
+
+    struct npc_huo_escortAI : public ScriptedAI
+    {
+            npc_huo_escortAI(Creature* creature) : ScriptedAI(creature) {}
+
+
+            void Reset()
+            {
+                if (Unit* owner = me->GetOwner())
+                    me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if(!UpdateVictim())
+                    return;
+            }
+    };
+};
+
 /********************************/
 /**The Lesson of the Iron Bough**/
 /********************************/
@@ -1467,6 +1505,7 @@ void AddSC_wandering_isle()
     new npc_amberleaf_troublemaker();
     new npc_living_air();
     new spell_blessing_flamme_panda();
+    new npc_huo_escort();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
