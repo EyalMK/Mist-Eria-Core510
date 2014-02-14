@@ -1905,6 +1905,14 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
 
                 addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
             }
+		else if(m_spellInfo->Id == 19750) // Flash of light and selfless healer
+        {
+            if(Aura* selflessHealer = caster->GetAura(114250))
+            {
+                // Add 35% * stack amount to heal
+                AddPct(addhealth, selflessHealer->GetSpellInfo()->Effects[1].BasePoints * selflessHealer->GetStackAmount());
+            }
+        }
         else
             addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
 
