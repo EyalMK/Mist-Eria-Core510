@@ -924,6 +924,9 @@ class spell_blessing_flamme_panda: public SpellScriptLoader
 
 enum HuoEnum
 {
+    NPC_SHANG_XI        = 54786,
+    SAY_SHANG_XI        = 0,
+    QUEST_THE_PASSION   = 29423
 };
 
 class npc_huo_escort: public CreatureScript
@@ -940,17 +943,44 @@ public:
     {
             npc_huo_escortAI(Creature* creature) : ScriptedAI(creature) {}
 
+            uint32 TestTimer;
 
             void Reset()
             {
+                TestTimer = 1000;
                 if (Unit* owner = me->GetOwner())
                     me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
             }
 
+            void MoveInLineOfSight(Unit* who)
+            {
+                if (who->GetEntry() == NPC_SHANG_XI)
+                {
+                    if (me->IsWithinDistInMap(who, 10.0f))
+                    {
+                        if (Creature* talker = who->ToCreature())
+                            talker->AI()->Talk(SAY_SHANG_XI);
+
+                        if (Unit* owner = me->GetOwner())
+                            if(Player* player = owner->ToPlayer())
+                                player->KilledMonsterCredit(61128);
+
+                        me->DespawnOrUnsummon();
+                    }
+                }
+            }
+
             void UpdateAI(uint32 diff)
             {
-                if(!UpdateVictim())
-                    return;
+                if (TestTimer <= diff)
+                {
+                    if (Unit* owner = me->GetOwner())
+                        if(owner->ToPlayer() && owner->ToPlayer()->GetQuestStatus(QUEST_THE_PASSION) == QUEST_STATUS_NONE)
+                            me->DespawnOrUnsummon();
+
+                    TestTimer = 1000;
+                }
+                else TestTimer -= diff;
             }
     };
 };
