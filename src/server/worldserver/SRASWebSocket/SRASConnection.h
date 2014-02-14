@@ -8,7 +8,8 @@ enum SRASOpcodeClient //Client => Server
 {
     AUTH_CHALLENGE = 1,
     TICKET_LIST = 2,
-    SEARCH_QUERY = 3
+    SEARCH_QUERY = 3,
+    SERVER_ANNOUNCE = 4
 };
 
 enum SRASOpcodeServer //Server => Client
@@ -122,6 +123,8 @@ public:
     void TicketList();
 
     void SearchQuery(SRASPacket pkt);
+
+    void ServerAnnounce(SRASPacket pkt);
 
 private:
 

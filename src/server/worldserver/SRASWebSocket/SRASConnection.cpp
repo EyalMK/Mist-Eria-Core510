@@ -250,6 +250,9 @@ int SRASConnection::HandlePacket(int opcode, SRASPacket pkt)
         case SEARCH_QUERY:
             SearchQuery(pkt);
             break;
+        case SERVER_ANNOUNCE:
+            ServerAnnounce(pkt);
+            break;
         default:
             char msg[256];
             sprintf(msg, "Unknow opcode %u", opcode);
