@@ -572,7 +572,7 @@ public :
 
                 case EVENT_SUMMON_NPCS :
                     SummonNpcs();
-                    events.ScheduleEvent(EVENT_SUMMON_NPCS, 14000);
+                    events.ScheduleEvent(EVENT_SUMMON_NPCS, 10000);
                     break ;
 
                 case EVENT_LOOK_PLAYERS :
@@ -590,7 +590,7 @@ public :
 
         void StartEvent()
         {
-            events.ScheduleEvent(EVENT_INTRO, 2000);
+            events.ScheduleEvent(EVENT_INTRO, 3000);
             events.ScheduleEvent(EVENT_ADD_POWER, 4000);
             events.ScheduleEvent(EVENT_SUMMON_NPCS, 2000);
             events.ScheduleEvent(EVENT_LOOK_PLAYERS, 3000);
@@ -625,7 +625,7 @@ public :
                     {
                         if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
                         {
-                            if(player->GetAreaId() == AREA_MEDITATION && player->IsInDist2d(me, 20))
+                            if(player->GetAreaId() == AREA_MEDITATION && player->IsInDist2d(me, 30))
                             {
                                 if(!player->HasAura(SPELL_MEDITATION_BAR))
                                 {
@@ -666,7 +666,7 @@ public :
                     {
                         if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
                         {
-                            if(player->GetAreaId() == AREA_MEDITATION && player->IsInDist2d(me, 20))
+                            if(player->GetAreaId() == AREA_MEDITATION && player->IsInDist2d(me, 30))
                             {
                                 if(player->HasAura(SPELL_MEDITATION_BAR))
                                 {
