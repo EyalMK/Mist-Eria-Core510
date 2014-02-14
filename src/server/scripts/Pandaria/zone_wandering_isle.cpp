@@ -625,7 +625,7 @@ public :
                     {
                         if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
                         {
-                            if(player->GetAreaId() == AREA_MEDITATION && player->IsInDist2d(me, 30))
+                            if(player->GetAreaId() == AREA_MEDITATION && player->IsInDist2d(me, 35))
                             {
                                 if(!player->HasAura(SPELL_MEDITATION_BAR))
                                 {
@@ -636,7 +636,7 @@ public :
                                 return true;
                             }
                         }
-                        if (!player->IsInDist2d(me, 20) && player->HasAura(SPELL_MEDITATION_BAR))
+                        if (!player->IsInDist2d(me, 35) && player->HasAura(SPELL_MEDITATION_BAR))
                         {
                             player->RemoveAura(SPELL_MEDITATION_BAR);
                         }
@@ -666,7 +666,7 @@ public :
                     {
                         if (player->isAlive() && player->GetQuestStatus(QUEST_THE_WAY_OF_THE_TUSHUI) == QUEST_STATUS_INCOMPLETE)
                         {
-                            if(player->GetAreaId() == AREA_MEDITATION && player->IsInDist2d(me, 30))
+                            if(player->GetAreaId() == AREA_MEDITATION && player->IsInDist2d(me, 35))
                             {
                                 if(player->HasAura(SPELL_MEDITATION_BAR))
                                 {
