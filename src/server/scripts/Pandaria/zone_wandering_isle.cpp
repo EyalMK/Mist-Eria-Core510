@@ -934,6 +934,27 @@ public:
     };
 };
 
+enum enums
+{
+    ITEM_FLAMME     = 80212,
+    SPELL_FLAMME    = 114610
+
+};
+
+class gob_edict_of_temperance : public GameObjectScript
+{
+public:
+    gob_edict_of_temperance() : GameObjectScript("gob_edict_of_temperance") { }
+
+    bool OnGossipHello(Player* player, GameObject* gob)
+    {
+        if(player->HasItemCount(ITEM_FLAMME, 1) && player->HasSpell(SPELL_FLAMME))
+            return true;
+
+        return false;
+    }
+};
+
 /********************************/
 /**The Lesson of the Iron Bough**/
 /********************************/
@@ -1443,33 +1464,33 @@ private:
 class gob_edict_of_temperance_the_lesson_of_the_burning_scroll : public GameObjectScript
 {
 public:
-	gob_edict_of_temperance_the_lesson_of_the_burning_scroll() : GameObjectScript("gob_edict_of_temperance_the_lesson_of_the_burning_scroll") { }
+    gob_edict_of_temperance_the_lesson_of_the_burning_scroll() : GameObjectScript("gob_edict_of_temperance_the_lesson_of_the_burning_scroll") { }
 
-	bool OnGossipHello(Player* p, GameObject* gob)
-	{
-		if(p->HasItemCount(FLAMME, 1))
-		{
-			p->KilledMonsterCredit(KILL_CREDIT_BURN, 0);
-			p->CastSpell(p, SPELL_NEW_PHASE, true);
-			p->RemoveAura(p->GetAura(59073)); // Enlève la phase 2
+    bool OnGossipHello(Player* p, GameObject* gob)
+    {
+        if(p->HasItemCount(FLAMME, 1))
+        {
+            p->KilledMonsterCredit(KILL_CREDIT_BURN, 0);
+            p->CastSpell(p, SPELL_NEW_PHASE, true);
+            p->RemoveAura(p->GetAura(59073)); // Enlève la phase 2
 
-			p->DestroyItemCount(FLAMME, 1, true);
-			if(GameObject* go = ObjectAccessor::GetGameObject(*p, 400014))
-				if(Creature* npc = go->FindNearestCreature(TRACKER, 10, true))
-					npc->CastSpell(npc, SPELL_BURN, true);
-		}
+            p->DestroyItemCount(FLAMME, 1, true);
+            if(GameObject* go = ObjectAccessor::GetGameObject(*p, 400014))
+                if(Creature* npc = go->FindNearestCreature(TRACKER, 10, true))
+                    npc->CastSpell(npc, SPELL_BURN, true);
+        }
 
-		return true;
-	}
+        return true;
+    }
 private:
-	enum enums
-	{
-		TRACKER = 65490,
-		FLAMME = 80212,
-		SPELL_BURN = 88579,
-		SPELL_NEW_PHASE = 59074, // Tester si le changement de phase marche bien
-		KILL_CREDIT_BURN = 59570
-	};
+    enum enums
+    {
+        TRACKER = 65490,
+        FLAMME = 80212,
+        SPELL_BURN = 88579,
+        SPELL_NEW_PHASE = 59074, // Tester si le changement de phase marche bien
+        KILL_CREDIT_BURN = 59570
+    };
 };
 
 
@@ -1484,6 +1505,7 @@ void AddSC_wandering_isle()
     new npc_living_air();
     new spell_blessing_flamme_panda();
     new npc_huo_escort();
+    new gob_edict_of_temperance();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
