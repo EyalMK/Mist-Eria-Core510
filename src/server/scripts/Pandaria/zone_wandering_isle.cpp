@@ -953,9 +953,9 @@ public:
             player->RemoveAurasDueToSpell(SPELL_FLAMME);
             player->DestroyItemCount(ITEM_FLAMME, 1, true);
             player->KilledMonsterCredit(59570);
-            return true;
+
         }
-        return false;
+        return true;
     }
 };
 
