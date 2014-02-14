@@ -730,7 +730,8 @@ public :
 
             for(uint8 i = 0 ; i < number ; ++i)
             {
-                me->SummonCreature(MOB_SCAMP, SummonPositions[i], TEMPSUMMON_TIMED_DESPAWN, 180000);
+                Creature* scamp = me->SummonCreature(MOB_SCAMP, SummonPositions[i], TEMPSUMMON_TIMED_DESPAWN, 180000);
+                    scamp->GetMotionMaster()->MovePoint(1, 1144.12f, 3435.47f, 105.3f);
             }
         }
 
@@ -750,7 +751,7 @@ public :
     }
 };
 
-class npc_amberleaf_troublemaker: public CreatureScript
+/*class npc_amberleaf_troublemaker: public CreatureScript
 {
 public:
     npc_amberleaf_troublemaker() : CreatureScript("npc_amberleaf_troublemaker") { }
@@ -774,7 +775,7 @@ public:
                 Test = true;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* who)
             {
                 Test = false;
             }
@@ -800,7 +801,7 @@ public:
                 DoMeleeAttackIfReady();
             }
     };
-};
+};*/
 
 
 /*************************************/
