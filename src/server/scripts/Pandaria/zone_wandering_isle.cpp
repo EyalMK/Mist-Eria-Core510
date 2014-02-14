@@ -951,7 +951,7 @@ public:
         if(player->HasItemCount(ITEM_FLAMME, 1) && player->HasSpell(SPELL_FLAMME))
         {
             player->RemoveAurasDueToSpell(SPELL_FLAMME);
-            player->DestroyItemCount(ITEM_FLAMME, 1);
+            player->DestroyItemCount(ITEM_FLAMME, 1, true);
             return true;
         }
         return false;
