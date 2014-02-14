@@ -934,30 +934,6 @@ public:
     };
 };
 
-enum enums
-{
-    ITEM_FLAMME     = 80212,
-    SPELL_FLAMME    = 114610
-
-};
-
-class gob_edict_of_temperance : public GameObjectScript
-{
-public:
-    gob_edict_of_temperance() : GameObjectScript("gob_edict_of_temperance") { }
-
-    bool OnGossipHello(Player* player, GameObject* gob)
-    {
-        if(player->HasSpell(SPELL_FLAMME))
-        {
-            player->RemoveAurasDueToSpell(SPELL_FLAMME);
-            player->DestroyItemCount(ITEM_FLAMME, 1, true);
-            player->KilledMonsterCredit(59570);
-        }
-        return false;
-    }
-};
-
 /********************************/
 /**The Lesson of the Iron Bough**/
 /********************************/
@@ -1508,7 +1484,6 @@ void AddSC_wandering_isle()
     new npc_living_air();
     new spell_blessing_flamme_panda();
     new npc_huo_escort();
-    new gob_edict_of_temperance();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
