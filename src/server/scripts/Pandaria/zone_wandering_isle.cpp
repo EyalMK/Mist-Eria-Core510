@@ -572,7 +572,7 @@ public :
 
                 case EVENT_SUMMON_NPCS :
                     SummonNpcs();
-                    events.ScheduleEvent(EVENT_SUMMON_NPCS, 7000);
+                    events.ScheduleEvent(EVENT_SUMMON_NPCS, 14000);
                     break ;
 
                 case EVENT_LOOK_PLAYERS :
@@ -750,58 +750,6 @@ public :
         return new npc_aysa_cloudsinger_meditation_AI(c);
     }
 };
-
-/*class npc_amberleaf_troublemaker: public CreatureScript
-{
-public:
-    npc_amberleaf_troublemaker() : CreatureScript("npc_amberleaf_troublemaker") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_amberleaf_troublemakerAI(creature);
-    }
-
-    struct npc_amberleaf_troublemakerAI : public ScriptedAI
-    {
-            npc_amberleaf_troublemakerAI(Creature* creature) : ScriptedAI(creature) {}
-
-            uint32 Test_timer;
-            bool Test;
-
-            void Reset()
-            {
-                me->SetReactState(REACT_PASSIVE);
-                Test_timer = 500;
-                Test = true;
-            }
-
-            void EnterCombat(Unit* who)
-            {
-                Test = false;
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if(Test)
-                {
-                    if (Test_timer <= diff)
-                    {
-                        Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500, true);
-                        if(target && target->GetTypeId() == TYPEID_PLAYER)
-                            if(target->isAlive() && target->GetAreaId() == AREA_MEDITATION && target->HasAura(SPELL_MEDITATION_BAR))
-                            {
-                                me->SetReactState(REACT_AGGRESSIVE);
-                                me->AI()->AttackStart(target);
-                            }
-
-                        Test_timer = 500;
-                    }
-                    else Test_timer -= diff;
-                }
-                DoMeleeAttackIfReady();
-            }
-    };
-};*/
 
 
 /*************************************/
@@ -1533,7 +1481,6 @@ void AddSC_wandering_isle()
     new npc_min_dimwind_pop();
     new npc_aysa_cloudsinger_pop();
     new npc_aysa_cloudsinger_meditation();
-   // new npc_amberleaf_troublemaker();
     new npc_living_air();
     new spell_blessing_flamme_panda();
     new npc_huo_escort();
@@ -1542,8 +1489,7 @@ void AddSC_wandering_isle()
     new mob_jaomin_ro();
     new mob_amberleaf_scamp29419();
     new spell_summon_living_air();
-    new go_brazier_of_flickering_flames();
-	
+    new go_brazier_of_flickering_flames();	
 	new npc_shang_xi_the_lesson_of_the_burning_scroll();
 	new gob_edict_of_temperance_the_lesson_of_the_burning_scroll();
 }
