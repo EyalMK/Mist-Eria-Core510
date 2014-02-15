@@ -1004,7 +1004,7 @@ public :
     void Update(const uint32 uiDiff) {
         for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter) {
             if(iter->second <= uiDiff)
-                iter = forbiddenPlayers.erase(iter);
+                forbiddenPlayers.erase(iter);
             else
                 iter->second -= uiDiff ;
         }
