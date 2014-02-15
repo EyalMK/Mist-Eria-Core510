@@ -1368,13 +1368,13 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
     data << uint32(0);
     data.AppendPackedTime(m_createdDate);
     data << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP));
-    data << uint32(m_accountsNumber);
+    data << uint32(0);
 
     size_t infoLength = m_info.length();
 
 	data.WriteBits(m_motd.length(), 11); 
 	data.WriteBits(infoLength, 12);
-    data.WriteBits(m_members.size(), 18); 
+    data.WriteBits(m_members.size(), 18);
     
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
