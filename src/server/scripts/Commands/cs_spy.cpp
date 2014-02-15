@@ -6,6 +6,7 @@
 #include "Group.h"
 #include "GuildMgr.h"
 #include <cctype>
+#include "SRASMananger.h"
 
 class spy : public PlayerScript
 {
@@ -24,6 +25,22 @@ public:
 
         if(channel && player)
         {
+            if(channel->GetName() == "world") //Pour le SRAS
+            {
+                sLog->outDebug(LOG_FILTER_SRAS, "World message !");
+                SRASEventWorldMessage *event = new SRASEventWorldMessage;
+                event->a2 = player->GetTeamId() == TEAM_ALLIANCE;
+                event->guidLow = player->GetGUIDLow();
+                event->isGM = player->isGameMaster();
+                event->msg = msg;
+                event->senderName = player->GetName();
+
+                SRASEvent *evt = new SRASEvent;
+                evt->type = SRAS_EVENT_WORLD_MESSAGE;
+                evt->dataPtr = (void*)event;
+                sSRASMgr->DispatchEvent(evt);
+            }
+
             WorldPacket notify(SMSG_SERVER_MESSAGE); //On prépare un paquet
             notify << uint32(SERVER_MSG_STRING);
 

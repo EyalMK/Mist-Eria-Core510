@@ -33,6 +33,7 @@ void SRASServer::run()
     if(server == -1)
     {
         sLog->outError(LOG_FILTER_SRAS, "Can't create server socket");
+        ASSERT(false);
         return;
     }
 
@@ -43,13 +44,15 @@ void SRASServer::run()
 
     if(bind(server, (struct sockaddr*) &serverAddr_in, sizeof(serverAddr_in)) == -1)
     {
-        sLog->outError(LOG_FILTER_SRAS, "Can't bind SRAS socket to port 443");
+        sLog->outError(LOG_FILTER_SRAS, "Can't bind SRAS socket to port 9090");
+        ASSERT(false);
         return;
     }
 
     if(listen(server, 20) == -1)
     {
         sLog->outError(LOG_FILTER_SRAS, "Can't listen on port 443");
+        ASSERT(false);
         return;
     }
 
@@ -59,6 +62,12 @@ void SRASServer::run()
 
     while(!World::IsStopped())
     {
+        SRASEvent *event = NULL;
+        while(sSRASMgr->GetNextEvent(event))
+        {
+            ProcessEvent(event);
+        }
+
         //On remplie tout les ensemble de socket
 
         FD_ZERO(&readSet);
@@ -77,65 +86,62 @@ void SRASServer::run()
         timeout.tv_sec = 0;
         timeout.tv_usec = 0;
 
-        int resultat = select(ndfs, &readSet, NULL, NULL, &timeout);
+        select(ndfs, &readSet, NULL, NULL, &timeout);
 
         /*if(resultat < 0)
             break;*/
 
-        if(resultat > 0)
+        if(FD_ISSET(server, &readSet)) //Nouveau client
         {
-            //sLog->outInfo(LOG_FILTER_SRAS, "SRAS event");
-            if(FD_ISSET(server, &readSet)) //Nouveau client
+            sockaddr_in remoteAddr;
+
+            size_t sinSize = sizeof(remoteAddr);
+
+            SOCKET newClient = accept(server, (sockaddr*)&remoteAddr, (socklen_t*)&sinSize);
+            //fcntl(newClient, F_SETFL, O_NONBLOCK);
+
+            if(newClient == -1)
             {
-                sockaddr_in remoteAddr;
+                sLog->outError(LOG_FILTER_SRAS, "Nouvelle connexion invalide");                    ;
+            }
+            else
+            {
+                sLog->outDebug(LOG_FILTER_SRAS, "Nouvelle connexion");
+                SRASConnection *sras = new SRASConnection(newClient);
+                m_openedConnection.push_back(sras);
+            }
+        }
 
-                size_t sinSize = sizeof(remoteAddr);
+        for(std::list<SRASConnection*>::iterator i = m_openedConnection.begin() ; i != m_openedConnection.end() ; i++)
+        {
+            SOCKET cli = (*i)->getSocket();
 
-                SOCKET newClient = accept(server, (sockaddr*)&remoteAddr, (socklen_t*)&sinSize);
-                //fcntl(newClient, F_SETFL, O_NONBLOCK);
+            int err = 0;
 
-                if(newClient == -1)
-                {
-                    sLog->outError(LOG_FILTER_SRAS, "Nouvelle connexion invalide");                    ;
-                }
-                else
-                {
-                    sLog->outDebug(LOG_FILTER_SRAS, "Nouvelle connexion");
-                    SRASConnection *sras = new SRASConnection(newClient);
-                    m_openedConnection.push_back(sras);
-                }
+            if(FD_ISSET(cli, &readSet))
+            {
+                err = (*i)->ReadyRead();
+                if(err == -1)
+                    sLog->outDebug(LOG_FILTER_SRAS, "Erreur on receiving");
+            }
+            if(err != -1)
+            {
+                err = (*i)->ReadySend();
+                if(err == -1)
+                    sLog->outDebug(LOG_FILTER_SRAS, "Erreur on sending");
             }
 
-            for(std::list<SRASConnection*>::iterator i = m_openedConnection.begin() ; i != m_openedConnection.end() ; i++)
+            if(err == -1) //Erreur
             {
-                SOCKET cli = (*i)->getSocket();
-
-                int err = 0;
-
-                if(FD_ISSET(cli, &readSet))
-                {
-                    err = (*i)->ReadyRead();
-                    if(err == -1)
-                        sLog->outDebug(LOG_FILTER_SRAS, "Erreur on receiving");
-                }
-                if(err != -1 && FD_ISSET(cli, &writeSet))
-                {
-                    err = (*i)->ReadySend();
-                    if(err == -1)
-                        sLog->outDebug(LOG_FILTER_SRAS, "Erreur on sending");
-                }
-
-                if(err == -1) //Erreur
-                {
-                    sLog->outDebug(LOG_FILTER_SRAS, "Erreur on I/O");
-                    SRASConnection *sr = (*i);
-                    m_openedConnection.erase(i);
-                    delete sr;
-                    break;
-                }
+                sLog->outDebug(LOG_FILTER_SRAS, "Erreur on I/O");
+                SRASConnection *sr = (*i);
+                m_openedConnection.erase(i);
+                delete sr;
+                break;
             }
         }
     }
+
 
     close(server);
 
@@ -146,6 +152,46 @@ void SRASServer::run()
         delete sr;
     }
 
+}
+
+void SRASServer::ProcessEvent(SRASEvent *event)
+{
+    ASSERT(event);
+    sLog->outDebug(LOG_FILTER_SRAS, "Processin a SRAS Event (%u)", event->type);
+    switch (event->type)
+    {
+        case SRAS_EVENT_WORLD_MESSAGE:
+        {
+            SRASEventWorldMessage *msg = (SRASEventWorldMessage*)event->dataPtr;
+
+            SRASPacket pkt;
+            pkt.add(WORLD_MESSAGE_RECEIVED);
+            pkt.add(msg->guidLow);
+            pkt.add(msg->a2 == true ? 1 : 0);
+            pkt.add(msg->isGM == true ? 1 : 0);
+            pkt.add(msg->senderName);
+            pkt.add(msg->msg);
+
+            sLog->outDebug(LOG_FILTER_SRAS, "Processing a world message : %s", msg->msg.c_str());
+
+            SendToAll(pkt.finalize());
+            delete msg;
+            delete event;
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void SRASServer::SendToAll(std::string pkt)
+{
+    for(std::list<SRASConnection*>::iterator i = m_openedConnection.begin() ; i != m_openedConnection.end() ; i++)
+    {
+        sLog->outDebug(LOG_FILTER_SRAS, "SendToAll queued : %s", pkt.c_str());
+        SRASConnection *sr = (*i);
+        sr->SendPacket(pkt);
+    }
 }
 
 #endif

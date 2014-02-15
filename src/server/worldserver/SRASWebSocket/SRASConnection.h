@@ -16,7 +16,9 @@ enum SRASOpcodeServer //Server => Client
 {
     AUTH_RESPONSE = 1,
     TICKET_RESP = 2,
-    SEARCH_RESPONSE = 3
+    SEARCH_RESPONSE = 3,
+    SMSG_RESERVED_1 = 4,
+    WORLD_MESSAGE_RECEIVED = 5
 };
 
 class SRASPacket
