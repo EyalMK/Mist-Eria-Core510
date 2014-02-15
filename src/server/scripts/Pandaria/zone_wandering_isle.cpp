@@ -970,15 +970,15 @@ class at_pop_child_panda : public AreaTriggerScript
             return false;
         }
 
-        void UpdateAI(uint32 diff)
+        void Update(const uint32 uiDiff)
         {
             if(!Test)
             {
-                if (TestTimer <= diff)
+                if (TestTimer <= uiDiff)
                 {
                     Test = true;
                 }
-                else TestTimer -= diff;
+                else TestTimer -= uiDiff;
             }
         }
 };
