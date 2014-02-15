@@ -983,6 +983,37 @@ class at_pop_child_panda : public AreaTriggerScript
         }
 };
 
+class at_test : public AreaTriggerScript {
+public :
+    at_test() : AreaTriggerScript("at_test") {
+
+    }
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *at) {
+        std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
+        if(iter != forbiddenPlayers.end())
+            return false;
+        else {
+            forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 30000));
+            player->CastSpell(player, SPELL_SUMMON_CHILD, true);
+            return true;
+        }
+        return false;
+    }
+
+    void Update(const uint32 uiDiff) {
+        for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter) {
+            if(iter->second <= uiDiff)
+                forbiddenPlayers.erase(iter);
+            else
+                iter->second -= uiDiff ;
+        }
+    }
+
+private :
+    std::map<uint64, uint32> forbiddenPlayers ;
+};
+
 
 
 
@@ -1543,6 +1574,8 @@ void AddSC_wandering_isle()
     new spell_blessing_flamme_panda();
     new npc_huo_escort();
     new at_pop_child_panda();
+
+    new at_test();
 
 
     new stalker_item_equiped();
