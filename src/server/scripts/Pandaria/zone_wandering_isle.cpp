@@ -934,6 +934,64 @@ public:
     };
 };
 
+
+/*************************************/
+/******* The Singing Pools *******/
+/*************************************/
+
+enum SingingPoolsEnum
+{
+    QUEST_SINGING_POOLS = 29521,
+    SPELL_SUMMON_CHILD  = 116190
+};
+
+class at_pop_child_panda : public AreaTriggerScript
+{
+    public:
+        at_pop_child_panda () : AreaTriggerScript("at_pop_child_panda")
+        {
+            Test = true;
+        }
+
+        bool Test;
+        uint32 TestTimer;
+
+        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        {
+            if (player->GetQuestStatus(QUEST_SINGING_POOLS) == QUEST_STATUS_COMPLETE)
+                if(Test)
+                {
+                    player->CastSpell(player, SPELL_SUMMON_CHILD, true);
+                    TestTimer = 120000;
+                    Test = false;
+                    return true;
+                }
+
+            return false;
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if(!Test)
+            {
+                if (TestTimer <= diff)
+                {
+                    Test = true;
+                }
+                else TestTimer -= diff;
+            }
+        }
+};
+
+
+
+
+
+
+
+
+
+
 /********************************/
 /**The Lesson of the Iron Bough**/
 /********************************/
@@ -1484,6 +1542,8 @@ void AddSC_wandering_isle()
     new npc_living_air();
     new spell_blessing_flamme_panda();
     new npc_huo_escort();
+    new at_pop_child_panda();
+
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
