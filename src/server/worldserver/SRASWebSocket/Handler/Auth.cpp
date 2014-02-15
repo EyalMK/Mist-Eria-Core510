@@ -52,5 +52,37 @@ void SRASConnection::AuthChallenge(SRASPacket pkt)
     resp.add(0); //Error : Succes :-)
     SendPacket(resp.finalize());
 
+    QueryResult persoList = CharacterDatabase.PQuery("SELECT guid, name FROM characters WHERE account=%u", accountId);
+
+    if(!persoList)
+        return;
+
+    SRASPacket charList;
+    charList.add(CHAR_LIST);
+    charList.add(persoList->GetRowCount());
+
+    int i = 0;
+    do
+    {
+        Field *perso = persoList->Fetch();
+        std::string name = perso[1].GetString();
+        uint32 guid = perso[0].GetUInt32();
+
+        charList.add(guid);
+        charList.add(name);
+        if(i == 0)
+            m_currentGuid = guid;
+        i++;
+    }
+    while(persoList->NextRow());
+
+    SendPacket(charList.finalize());
+
     m_user = account;
+}
+
+void SRASConnection::SetCurrentGuid(SRASPacket pkt)
+{
+    pkt.next();
+    m_currentGuid = pkt.toInt();
 }

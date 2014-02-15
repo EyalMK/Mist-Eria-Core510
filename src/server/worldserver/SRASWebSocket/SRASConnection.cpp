@@ -253,6 +253,12 @@ int SRASConnection::HandlePacket(int opcode, SRASPacket pkt)
         case SERVER_ANNOUNCE:
             ServerAnnounce(pkt);
             break;
+        case SET_CURRENT_GUID:
+            SetCurrentGuid(pkt);
+            break;
+        case WOLRD_MSG_POSTED:
+            WorldMsgPosted(pkt);
+            break;
         default:
             char msg[256];
             sprintf(msg, "Unknow opcode %u", opcode);

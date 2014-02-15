@@ -639,6 +639,29 @@ void Channel::Say(uint64 guid, std::string const& what, uint32 lang)
     SendToAll(&data, !playersStore[guid].IsModerator() ? guid : false);
 }
 
+void Channel::SRASSay(uint64 guid, const std::string &what)
+{
+    if (what.empty())
+        return;
+
+    uint32 lang = LANG_UNIVERSAL;
+
+
+    WorldPacket data(SMSG_MESSAGECHAT, 1 + 4 + 8 + 4 + _name.size() + 8 + 4 + what.size() + 1);
+    data << uint8(CHAT_MSG_CHANNEL);
+    data << uint32(lang);
+    data << uint64(guid);
+    data << uint32(0);
+    data << _name;
+    data << uint64(guid);
+    data << uint32(what.size() + 1);
+    data << what;
+    Player* player = ObjectAccessor::FindPlayer(guid);
+    data << uint16(player ? player->GetChatTag() : CHAT_TAG_GM);
+
+    SendToAll(&data, 0);
+}
+
 void Channel::Invite(Player const* player, std::string const& newname)
 {
     uint64 guid = player->GetGUID();

@@ -179,6 +179,7 @@ class Channel
         void List(Player const* player);
         void Announce(Player const* player);
         void Say(uint64 guid, std::string const& what, uint32 lang);
+        void SRASSay(uint64 guid, std::string const &what); //Same as Say but with no verifications
         void Invite(Player const* player, std::string const& newp);
         void Voice(uint64 guid1, uint64 guid2);
         void DeVoice(uint64 guid1, uint64 guid2);

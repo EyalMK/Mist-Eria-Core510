@@ -9,7 +9,9 @@ enum SRASOpcodeClient //Client => Server
     AUTH_CHALLENGE = 1,
     TICKET_LIST = 2,
     SEARCH_QUERY = 3,
-    SERVER_ANNOUNCE = 4
+    SERVER_ANNOUNCE = 4,
+    SET_CURRENT_GUID = 5,
+    WOLRD_MSG_POSTED = 6
 };
 
 enum SRASOpcodeServer //Server => Client
@@ -17,7 +19,7 @@ enum SRASOpcodeServer //Server => Client
     AUTH_RESPONSE = 1,
     TICKET_RESP = 2,
     SEARCH_RESPONSE = 3,
-    SMSG_RESERVED_1 = 4,
+    CHAR_LIST = 4,
     WORLD_MESSAGE_RECEIVED = 5
 };
 
@@ -120,13 +122,16 @@ public:
 
     //Handlers
 
-    void AuthChallenge(SRASPacket pkt);    
+    void AuthChallenge(SRASPacket pkt);
+    void SetCurrentGuid(SRASPacket pkt);
 
     void TicketList();
 
     void SearchQuery(SRASPacket pkt);
 
     void ServerAnnounce(SRASPacket pkt);
+
+    void WorldMsgPosted(SRASPacket pkt);
 
 private:
 
@@ -142,6 +147,7 @@ private:
 
     std::string m_user;
     uint32 m_security;
+    uint32 m_currentGuid; //For chat
 };
 
 #endif
