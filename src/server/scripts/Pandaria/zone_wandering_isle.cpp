@@ -1575,6 +1575,8 @@ void AddSC_wandering_isle()
     new npc_huo_escort();
     new at_pop_child_panda();
 
+    new at_test();
+
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
