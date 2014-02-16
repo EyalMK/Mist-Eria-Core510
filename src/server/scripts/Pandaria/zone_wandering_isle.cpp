@@ -26,6 +26,56 @@
 #include "GridNotifiers.h"
 #include "ScriptedEscortAI.h"
 
+/*******************************/
+/********* AreaTrigger *********/
+/*******************************/
+
+enum Area7736
+{
+    NPC_HUOJIN_MONK             = 60176,
+    QUEST_THE_SPIRIT_GUARDIAN   = 29420,
+    SAY_HUOJIN                  = 0
+};
+
+class at_huojin_monk_talk : public AreaTriggerScript
+{
+public :
+    at_huojin_monk_talk() : AreaTriggerScript("at_huojin_monk_talk") {}
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *at)
+    {
+        std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
+        if(iter != forbiddenPlayers.end())
+            return false;
+        if(player->GetQuestStatus(QUEST_THE_SPIRIT_GUARDIAN) == QUEST_STATUS_COMPLETE)
+        {
+            Creature* huojin = player->FindNearestCreature(NPC_HUOJIN_MONK, 500.0f);
+            if(huojin)
+            {
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 30000));
+                huojin->AI()->Talk(SAY_HUOJIN);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void Update(const uint32 uiDiff)
+    {
+        for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter)
+        {
+            if(iter->second <= uiDiff)
+                forbiddenPlayers.erase(iter);
+            else
+                iter->second -= uiDiff ;
+        }
+    }
+
+private :
+    std::map<uint64, uint32> forbiddenPlayers ;
+};
+
+
 
 // npc_first_quest_pandaren
 class npc_first_quest_pandaren : public CreatureScript
@@ -1564,6 +1614,7 @@ private:
 
 void AddSC_wandering_isle()
 {
+    new at_huojin_monk_talk();
     new npc_first_quest_pandaren();	
     new npc_trainee();
     new areatrigger_at_the_missing_driver();
