@@ -154,7 +154,6 @@ class BattlegroundSM : public Battleground
         void RemovePlayer(Player* player, uint64 guid, uint32 team);
         void HandleBuffUse(uint64 buff_guid);
         void HandleKillPlayer(Player* player, Player* killer);
-        WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
         bool SetupBattleground();
         void Reset();
         void UpdateTeamScore(uint32 Team);
