@@ -2035,6 +2035,33 @@ private:
 };
 
 
+enum AreaTest
+{
+    SPELL_MALE  = 102938
+};
+
+class at_test_etang : public AreaTriggerScript
+{
+    public:
+
+        at_test_etang() : AreaTriggerScript("at_test_etang")
+        {
+        }
+
+        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+        {
+            if(player->HasAura(SPELL_MALE))
+                player->RemoveAurasDueToSpell(SPELL_MALE);
+
+            if(!player->HasAura(SPELL_MALE))
+                player->CastSpell(player, SPELL_MALE, true);
+
+            return true;
+        }
+};
+
+
+
 void AddSC_wandering_isle()
 {
     new at_huojin_monk_talk();
@@ -2056,6 +2083,7 @@ void AddSC_wandering_isle()
     new npc_huo_escort();
     new npc_deng_child();
     new npc_cai_child();
+    new at_test_etang();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
