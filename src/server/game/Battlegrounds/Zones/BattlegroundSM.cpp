@@ -551,16 +551,16 @@ void BattlegroundSM::RemovePlayer(Player* player, uint64 guid, uint32 /*team*/)
 
 bool BattlegroundSM::SetupBattleground()
 {
-    /*// doors
-    if (!AddObject(BG_SM_OBJECT_DOOR_A, BG_OBJECT_A_DOOR_SM_ENTRY, 2527.6f, 1596.91f, 1262.13f, -3.12414f, -0.173642f, -0.001515f, 0.98477f, -0.008594f, RESPAWN_IMMEDIATELY)
+    // doors
+    /*if (!AddObject(BG_SM_OBJECT_DOOR_A, BG_OBJECT_A_DOOR_SM_ENTRY, 2527.6f, 1596.91f, 1262.13f, -3.12414f, -0.173642f, -0.001515f, 0.98477f, -0.008594f, RESPAWN_IMMEDIATELY)
         || !AddObject(BG_SM_OBJECT_DOOR_H, BG_OBJECT_H_DOOR_SM_ENTRY, 1803.21f, 1539.49f, 1261.09f, 3.14159f, 0.173648f, 0, 0.984808f, 0, RESPAWN_IMMEDIATELY)
 		)
     {
         sLog->outError(LOG_FILTER_SQL, "BatteGroundEY: Failed to spawn some object Battleground not created!");
         return false;
-    }
+    }*/
 
-    //buffs
+    /*//buffs
     for (int i = 0; i < SM_MINE_CART_MAX; ++i)
     {
         AreaTriggerEntry const* at = sAreaTriggerStore.LookupEntry(m_Points_Trigger[i]);
@@ -574,22 +574,22 @@ bool BattlegroundSM::SetupBattleground()
             || !AddObject(BG_SM_OBJECT_SPEEDBUFF_FEL_REAVER + i * 3 + 2, Buff_Entries[2], at->x, at->y, at->z, 0.907571f, 0, 0, 0.438371f, 0.898794f, RESPAWN_ONE_DAY)
 )
             sLog->outError(LOG_FILTER_BATTLEGROUND, "BattlegroundSM: Cannot spawn buff");
-    }
+    }*/
 
     WorldSafeLocsEntry const* sg = NULL;
     sg = sWorldSafeLocsStore.LookupEntry(SM_GRAVEYARD_MAIN_ALLIANCE);
-    if (!sg || !AddSpiritGuide(SM_SPIRIT_MAIN_ALLIANCE, sg->x, sg->y, sg->z, 2.172720f, ALLIANCE))
+    if (!sg || !AddSpiritGuide(SM_SPIRIT_ALLIANCE, sg->x, sg->y, sg->z, 3.0f, ALLIANCE))
     {
         sLog->outError(LOG_FILTER_SQL, "BatteGroundEY: Failed to spawn spirit guide! Battleground not created!");
         return false;
     }
 
     sg = sWorldSafeLocsStore.LookupEntry(SM_GRAVEYARD_MAIN_HORDE);
-    if (!sg || !AddSpiritGuide(SM_SPIRIT_MAIN_HORDE, sg->x, sg->y, sg->z, 5.575674f, HORDE))
+    if (!sg || !AddSpiritGuide(SM_SPIRIT_HORDE, sg->x, sg->y, sg->z, 5.9f, HORDE))
     {
         sLog->outError(LOG_FILTER_SQL, "BatteGroundEY: Failed to spawn spirit guide! Battleground not created!");
         return false;
-    }*/
+    }
     return true;
 }
 
