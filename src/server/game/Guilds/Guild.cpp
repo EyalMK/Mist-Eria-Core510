@@ -1368,13 +1368,13 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
     data << uint32(0);
     data.AppendPackedTime(m_createdDate);
     data << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP));
-    data << uint32(m_accountsNumber);
+    data << uint32(0);
 
     size_t infoLength = m_info.length();
 
 	data.WriteBits(m_motd.length(), 11); 
 	data.WriteBits(infoLength, 12);
-    data.WriteBits(m_members.size(), 18); 
+    data.WriteBits(m_members.size(), 18);
     
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
@@ -1650,7 +1650,7 @@ void Guild::HandleSetNewGuildMaster(WorldSession* session, std::string const& na
         if (Member* newGuildMaster = GetMember(name))
         {
             _SetLeaderGUID(newGuildMaster);
-            oldGuildMaster->ChangeRank(GR_INITIATE);
+            oldGuildMaster->ChangeRank(GR_OFFICER);
             _BroadcastEvent(GE_LEADER_CHANGED, 0, player->GetName().c_str(), name.c_str());
         }
     }
@@ -3476,30 +3476,11 @@ void Guild::SendBankList(WorldSession* session, uint8 tabId, bool withContent, b
 
 	data.WriteBits(itemCount, 20);
 
-	if (withContent && _MemberHasTabRights(session->GetPlayer()->GetGUID(), tabId, GUILD_BANK_RIGHT_VIEW_TAB))
+    for(int i = 0 ; i < itemCount ; i++)
     {
-        if (BankTab const* tab = GetBankTab(tabId))
-        {
-            for (uint8 slotId = 0; slotId < GUILD_BANK_MAX_SLOTS; ++slotId)
-            {
-                if (Item* tabItem = tab->GetItem(slotId))
-                {
-                    uint32 enchants = 0;
-                    for (uint32 ench = 0; ench < MAX_ENCHANTMENT_SLOT; ++ench)
-                    {
-                        if (uint32 enchantId = tabItem->GetEnchantmentId(EnchantmentSlot(ench)))
-                        {
-                            ++enchants;
-                        }
-                    }
-
-                    data.WriteBits(enchants, 23);
-					data.WriteBit(0);
-                }
-            }
-        }
+        data.WriteBits(0, 23);
+        data.WriteBit(0);
     }
-
 
 	data.WriteBits(withTabInfo ? _GetPurchasedTabsSize() : 0, 22);
 	data.WriteBit(0);
@@ -3537,14 +3518,14 @@ void Guild::SendBankList(WorldSession* session, uint8 tabId, bool withContent, b
                     data << uint32(0);
                     data << uint32(slotId);
 
-					for (uint32 ench = 0; ench < MAX_ENCHANTMENT_SLOT; ++ench)
+                    /*for (uint32 ench = 0; ench < MAX_ENCHANTMENT_SLOT; ++ench)
                     {
                         if (uint32 enchantId = tabItem->GetEnchantmentId(EnchantmentSlot(ench)))
                         {
                             data << uint32(enchantId);
                             data << uint32(ench);
                         }
-                    }
+                    }*/
 
 					data << uint32(0); // GetDataInSitu with this size
 

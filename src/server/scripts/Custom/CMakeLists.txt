@@ -10,6 +10,7 @@
 
 set(sources
   ${sources}
+  Custom/boss_epouventard.cpp
 )
 
 message("  -> Prepared: Custom")

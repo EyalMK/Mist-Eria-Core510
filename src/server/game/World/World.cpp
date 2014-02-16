@@ -2135,6 +2135,9 @@ void World::Update(uint32 diff)
 
     sBattlefieldMgr->Update(diff);
     RecordTimeDiff("BattlefieldMgr");
+	
+    sScriptMgr->UpdateAreaTriggers(diff);
+    RecordTimeDiff("Updated AreaTriggers");
 
     ///- Delete all characters which have been deleted X days before
     if (m_timers[WUPDATE_DELETECHARS].Passed())

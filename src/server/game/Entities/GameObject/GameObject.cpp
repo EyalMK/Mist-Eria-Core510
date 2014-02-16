@@ -798,6 +798,69 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
         m_invisibility.AddValue(INVISIBILITY_QUEST_9, 9);
     }
 
+    if (data->invisibility == 12)
+    {
+        InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_12);
+        m_invisibility.AddFlag(type);
+        m_invisibility.AddValue(INVISIBILITY_QUEST_12, 12);
+    }
+
+    if (data->invisibility == 13)
+    {
+        InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_13);
+        m_invisibility.AddFlag(type);
+        m_invisibility.AddValue(INVISIBILITY_QUEST_13, 13);
+    }
+
+    if (data->invisibility == 14)
+    {
+        InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_14);
+        m_invisibility.AddFlag(type);
+        m_invisibility.AddValue(INVISIBILITY_QUEST_14, 14);
+    }
+
+    if (data->invisibility == 21)
+    {
+        InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_21);
+        m_invisibility.AddFlag(type);
+        m_invisibility.AddValue(INVISIBILITY_QUEST_21, 21);
+    }
+
+    if (data->invisibility == 22)
+    {
+        InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_22);
+        m_invisibility.AddFlag(type);
+        m_invisibility.AddValue(INVISIBILITY_QUEST_22, 22);
+    }
+
+    if (data->invisibility == 23)
+    {
+        InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_23);
+        m_invisibility.AddFlag(type);
+        m_invisibility.AddValue(INVISIBILITY_QUEST_23, 23);
+    }
+
+    if (data->invisibility == 24)
+    {
+        InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_24);
+        m_invisibility.AddFlag(type);
+        m_invisibility.AddValue(INVISIBILITY_QUEST_24, 24);
+    }
+
+    if (data->invisibility == 25)
+    {
+        InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_25);
+        m_invisibility.AddFlag(type);
+        m_invisibility.AddValue(INVISIBILITY_QUEST_25, 25);
+    }
+
+    if (data->invisibility == 26)
+    {
+        InvisibilityType type = InvisibilityType(INVISIBILITY_QUEST_26);
+        m_invisibility.AddFlag(type);
+        m_invisibility.AddValue(INVISIBILITY_QUEST_26, 26);
+    }
+
     m_goData = data;
 
     if (addToMap && !GetMap()->AddToMap(this))

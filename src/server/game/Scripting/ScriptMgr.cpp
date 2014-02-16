@@ -914,6 +914,11 @@ bool ScriptMgr::OnAreaTrigger(Player* player, AreaTriggerEntry const* trigger)
     return tmpscript->OnTrigger(player, trigger);
 }
 
+void ScriptMgr::UpdateAreaTriggers(const uint32 uiDiff)
+{
+	FOREACH_SCRIPT(AreaTriggerScript)->Update(uiDiff);
+}
+
 Battleground* ScriptMgr::CreateBattleground(BattlegroundTypeId /*typeId*/)
 {
     // TODO: Implement script-side battlegrounds.

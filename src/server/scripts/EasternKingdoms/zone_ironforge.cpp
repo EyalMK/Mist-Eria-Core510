@@ -31,6 +31,56 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "Player.h"
 
+/*************************************/
+/****** I Need to Cask a Favor ******/
+/*************************************/
+
+enum DarylEnum
+{
+    QUEST_I_NEED_TO_CASK    = 29356,
+    SPELL_BEER_DELIVERY     = 99491
+};
+
+class npc_daryl_riknussun: public CreatureScript
+{
+public:
+    npc_daryl_riknussun() : CreatureScript("npc_daryl_riknussun") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_daryl_riknussunAI(creature);
+    }
+
+    struct npc_daryl_riknussunAI : public ScriptedAI
+    {
+            npc_daryl_riknussunAI(Creature* creature) : ScriptedAI(creature) {}
+
+
+            void Reset()
+            {
+            }
+
+            void MoveInLineOfSight(Unit* who)
+            {
+                if (who->GetTypeId() == TYPEID_PLAYER)
+                {
+                    if(who->ToPlayer() && who->ToPlayer()->GetQuestStatus(QUEST_I_NEED_TO_CASK) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        if(who->HasAura(SPELL_BEER_DELIVERY))
+                        {
+                            if (me->IsWithinDistInMap(who, 5.0f))
+                            {
+                                who->ToPlayer()->KilledMonsterCredit(53574);
+                                who->RemoveAurasDueToSpell(SPELL_BEER_DELIVERY);
+                            }
+                        }
+                    }
+                }
+            }
+    };
+};
+
 void AddSC_ironforge()
 {
+    new npc_daryl_riknussun();
 }

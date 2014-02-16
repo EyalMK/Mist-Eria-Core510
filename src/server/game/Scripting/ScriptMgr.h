@@ -508,6 +508,9 @@ class AreaTriggerScript : public ScriptObject
 
         // Called when the area trigger is activated by a player.
         virtual bool OnTrigger(Player* /*player*/, AreaTriggerEntry const* /*trigger*/) { return false; }
+		
+		// Called when world ticks
+		virtual void Update(const uint32 uiDiff) { return ; }
 };
 
 class BattlegroundScript : public ScriptObject
@@ -944,6 +947,7 @@ class ScriptMgr
     public: /* AreaTriggerScript */
 
         bool OnAreaTrigger(Player* player, AreaTriggerEntry const* trigger);
+		void UpdateAreaTriggers(const uint32 uiDiff) ;
 
     public: /* BattlegroundScript */
 
