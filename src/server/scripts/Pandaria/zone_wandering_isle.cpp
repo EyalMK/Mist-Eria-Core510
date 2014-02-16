@@ -1329,6 +1329,165 @@ public:
 };
 
 
+/*************************************/
+/*********The Singing Pools**********/
+/*************************************/
+
+enum ChildDeng
+{
+    SAY_DENG_0      = 0,
+    SAY_DENG_1      = 1,
+    SAY_DENG_2      = 2
+};
+
+class npc_deng_child: public CreatureScript
+{
+public:
+    npc_deng_child() : CreatureScript("npc_deng_child") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_deng_childAI(creature);
+    }
+
+    struct npc_deng_childAI : public ScriptedAI
+    {
+            npc_deng_childAI(Creature* creature) : ScriptedAI(creature) {}
+
+            uint32 Say0_timer;
+            uint32 Say1_timer;
+            uint32 Say2_timer;
+            uint32 Despawn_timer;
+
+            void Reset()
+            {
+                Say0_timer = 6000;
+                Say1_timer = 16000;
+                Say2_timer = 30000;
+                Despawn_timer = 35000;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if (Say0_timer <= diff)
+                {
+                    Talk(SAY_DENG_0);
+                    Say0_timer = 60000;
+                }
+                else Say0_timer -= diff;
+
+                if (Say1_timer <= diff)
+                {
+                    Talk(SAY_DENG_1);
+                    Say1_timer = 60000;
+                }
+                else Say1_timer -= diff;
+
+                if (Say2_timer <= diff)
+                {
+                    Talk(SAY_DENG_2);
+                    Say2_timer = 60000;
+                }
+                else Say2_timer -= diff;
+
+                if (Despawn_timer <= diff)
+                {
+                    me->DespawnOrUnsummon();
+                    Despawn_timer = 60000;
+                }
+                else Despawn_timer -= diff;
+            }
+    };
+};
+
+enum ChildCai
+{
+    SAY_CAI_0      = 0,
+    SAY_CAI_1      = 1,
+    SAY_CAI_2      = 2,
+    SAY_CAI_3      = 3
+};
+
+class npc_cai_child: public CreatureScript
+{
+public:
+    npc_cai_child() : CreatureScript("npc_cai_child") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_cai_childAI(creature);
+    }
+
+    struct npc_cai_childAI : public ScriptedAI
+    {
+            npc_cai_childAI(Creature* creature) : ScriptedAI(creature) {}
+
+            uint32 Say0_timer;
+            uint32 Say1_timer;
+            uint32 Say2_timer;
+            uint32 Say3_timer;
+            uint32 Despawn_timer;
+
+            void Reset()
+            {
+                Say0_timer = 1000;
+                Say1_timer = 11000;
+                Say2_timer = 21000;
+                Say3_timer = 30000;
+                Despawn_timer = 35000;
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+                if (Say0_timer <= diff)
+                {
+                    Talk(SAY_CAI_0);
+                    Say0_timer = 60000;
+                }
+                else Say0_timer -= diff;
+
+                if (Say1_timer <= diff)
+                {
+                    Talk(SAY_CAI_1);
+                    Say1_timer = 60000;
+                }
+                else Say1_timer -= diff;
+
+                if (Say2_timer <= diff)
+                {
+                    Talk(SAY_CAI_2);
+                    Say2_timer = 60000;
+                }
+                else Say2_timer -= diff;
+
+                if (Say3_timer <= diff)
+                {
+                    Talk(SAY_CAI_3);
+                    Say3_timer = 60000;
+                }
+                else Say3_timer -= diff;
+
+                if (Despawn_timer <= diff)
+                {
+                    me->DespawnOrUnsummon();
+                    Despawn_timer = 60000;
+                }
+                else Despawn_timer -= diff;
+            }
+    };
+};
+
+
+
+
+
+
+
+
+
+
+
+
 /********************************/
 /**The Lesson of the Iron Bough**/
 /********************************/
@@ -1887,6 +2046,8 @@ void AddSC_wandering_isle()
     new npc_living_air();
     new spell_blessing_flamme_panda();
     new npc_huo_escort();
+    new npc_deng_child();
+    new npc_cai_child();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
