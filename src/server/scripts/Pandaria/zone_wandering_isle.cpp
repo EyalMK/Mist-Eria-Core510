@@ -1361,10 +1361,13 @@ public:
 
             void Reset()
             {
-                Say0_timer = 6000;
-                Say1_timer = 16000;
-                Say2_timer = 30000;
-                Despawn_timer = 35000;
+                Say0_timer = 9000;
+                Say1_timer = 25000;
+                Say2_timer = 41000;
+                Despawn_timer = 45000;
+
+                if (Unit* owner = me->GetOwner())
+                    me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
             }
 
             void UpdateAI(uint32 diff)
@@ -1431,10 +1434,13 @@ public:
             void Reset()
             {
                 Say0_timer = 1000;
-                Say1_timer = 11000;
-                Say2_timer = 21000;
-                Say3_timer = 30000;
-                Despawn_timer = 35000;
+                Say1_timer = 17000;
+                Say2_timer = 33000;
+                Say3_timer = 41000;
+                Despawn_timer = 45000;
+
+                if (Unit* owner = me->GetOwner())
+                    me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
             }
 
             void UpdateAI(uint32 diff)
