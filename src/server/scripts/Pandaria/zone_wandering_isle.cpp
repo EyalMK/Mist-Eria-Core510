@@ -53,7 +53,7 @@ public :
             if(huojin)
             {
                 forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
-                huojin->AI()->Talk(SAY_HUOJIN);
+                huojin->AI()->Talk(SAY_HUOJIN, player->GetGUID());
                 return true;
             }
         }
@@ -99,7 +99,7 @@ public :
             if(jaomin)
             {
                 forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
-                jaomin->AI()->Talk(SAY_JAOMIN);
+                jaomin->AI()->Talk(SAY_JAOMIN, player->GetGUID());
                 return true;
             }
         }
@@ -144,7 +144,7 @@ public :
             if(nim)
             {
                 forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
-                nim->AI()->Talk(SAY_NIM);
+                nim->AI()->Talk(SAY_NIM, player->GetGUID());
                 return true;
             }
         }
@@ -189,7 +189,7 @@ public :
             if(guang)
             {
                 forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
-                guang->AI()->Talk(SAY_GUANG);
+                guang->AI()->Talk(SAY_GUANG, player->GetGUID());
                 return true;
             }
         }
@@ -241,7 +241,7 @@ public :
             if(lorvo)
             {
                 forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
-                lorvo->AI()->Talk(SAY_LORVO);
+                lorvo->AI()->Talk(SAY_LORVO, player->GetGUID());
                 return true;
             }
         }
@@ -251,7 +251,7 @@ public :
             if(aysa)
             {
                 forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
-                aysa->AI()->Talk(SAY_AYSA);
+                aysa->AI()->Talk(SAY_AYSA, player->GetGUID());
                 return true;
             }
         }
@@ -297,7 +297,7 @@ public :
             if(ji)
             {
                 forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
-                ji->AI()->Talk(SAY_JI);
+                ji->AI()->Talk(SAY_JI, player->GetGUID());
                 return true;
             }
         }
@@ -350,7 +350,7 @@ public :
             if(lin)
                 lin->AI()->Talk(SAY_LIN, player->GetGUID());
             if(chia)
-                chia->AI()->Talk(SAY_CHIA);
+                chia->AI()->Talk(SAY_CHIA, player->GetGUID());
 
             forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
             return true;
