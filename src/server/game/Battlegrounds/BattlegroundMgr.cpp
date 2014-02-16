@@ -456,7 +456,8 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
         uint32 values;
         switch(bg->GetMapId())
         {
-			case 566: values = 1; break;
+			case 566:
+			case 727: values = 1; break;
 			case 489:
 			case 529:
 			case 607:

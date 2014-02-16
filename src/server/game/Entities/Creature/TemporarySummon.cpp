@@ -247,7 +247,17 @@ void TempSummon::UnSummon(uint32 msTime)
     Unit* owner = GetSummoner();
     if (owner && owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsAIEnabled)
         owner->ToCreature()->AI()->SummonedCreatureDespawn(this);
-
+	
+	// We do not remove the passengers, so maybe it will cause the destroyer of Vehicle to assert
+	// GetVehicleKit() returns a pointer to the Vehicle the TempSummon is ; we must remove all the passengers
+	if(GetVehicleKit())
+        GetVehicleKit()->RemoveAllPassengers();
+	
+	// But also, the TempSummon can be on a vehicle, so we need to remove this from the vehicle
+	// GetVehicle() returns a pointer to the Vehicle the TempSummon is IN
+    if(GetVehicle())
+        GetVehicle()->RemovePassenger(this);
+	
     AddObjectToRemoveList();
 }
 
