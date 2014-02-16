@@ -348,7 +348,7 @@ public :
             Creature* lin = player->FindNearestCreature(NPC_BREWER_LIN, 500.0f);
             Creature* chia = player->FindNearestCreature(NPC_CHIA, 500.0f);
             if(lin)
-                lin->AI()->Talk(SAY_LIN);
+                lin->AI()->Talk(SAY_LIN, player->GetGUID());
             if(chia)
                 chia->AI()->Talk(SAY_CHIA);
 
