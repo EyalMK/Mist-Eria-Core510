@@ -160,7 +160,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 
 					pointsTimer = 4000;
 			}
-		} else pointsTimer -= diff;
+	} else pointsTimer -= diff;
 }
 
 void BattlegroundTK::Reset()

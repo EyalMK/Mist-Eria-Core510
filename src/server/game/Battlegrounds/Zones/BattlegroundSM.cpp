@@ -86,6 +86,8 @@ void BattlegroundSM::StartingEventOpenDoors()
 							{
 								cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
 								cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+								cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+								cart->SetSpeed(MOVE_WALK, 0.4f);
 							}
 
 							m_LastMineCart = creatureId;
@@ -98,6 +100,8 @@ void BattlegroundSM::StartingEventOpenDoors()
 								{
 									cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
 									cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+									cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+									cart->SetSpeed(MOVE_WALK, 0.4f);
 								}
 						}
 					}
@@ -115,6 +119,8 @@ void BattlegroundSM::StartingEventOpenDoors()
 							{
 								cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
 								cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+								cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+								cart->SetSpeed(MOVE_WALK, 0.4f);
 							}
 
 							m_LastMineCart = creatureId;
@@ -127,6 +133,8 @@ void BattlegroundSM::StartingEventOpenDoors()
 								{
 									cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
 									cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+									cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+									cart->SetSpeed(MOVE_WALK, 0.4f);
 								}
 						}
 					}
@@ -144,6 +152,8 @@ void BattlegroundSM::StartingEventOpenDoors()
 							{
 								cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
 								cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+								cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+								cart->SetSpeed(MOVE_WALK, 0.4f);
 							}
 
 							m_LastMineCart = creatureId;
@@ -156,6 +166,8 @@ void BattlegroundSM::StartingEventOpenDoors()
 								{
 									cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
 									cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+									cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+									cart->SetSpeed(MOVE_WALK, 0.4f);
 								}
 						}
 					}
@@ -199,6 +211,8 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 								{
 									cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
 									cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+									cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+									cart->SetSpeed(MOVE_WALK, 0.4f);
 								}
 
 								m_LastMineCart = creatureNumber;
@@ -211,6 +225,8 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 									{
 										cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
 										cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+										cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+										cart->SetSpeed(MOVE_WALK, 0.4f);
 
 										if (chosenCart->GetEntry() == NPC_MINE_CART_2)
 											m_LastMineCart = 2;
@@ -232,6 +248,8 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 								{
 									cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
 									cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+									cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+									cart->SetSpeed(MOVE_WALK, 0.4f);
 								}
 
 								m_LastMineCart = creatureNumber;
@@ -244,6 +262,8 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 									{
 										cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
 										cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+										cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+										cart->SetSpeed(MOVE_WALK, 0.4f);
 
 										if (chosenCart->GetEntry() == NPC_MINE_CART_1)
 											m_LastMineCart = 1;
@@ -265,6 +285,8 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 								{
 									cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
 									cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+									cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+									cart->SetSpeed(MOVE_WALK, 0.4f);
 								}
 
 								m_LastMineCart = creatureNumber;
@@ -277,6 +299,8 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 									{
 										cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
 										cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+										cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+										cart->SetSpeed(MOVE_WALK, 0.4f);
 
 										if (chosenCart->GetEntry() == NPC_MINE_CART_1)
 											m_LastMineCart = 1;
@@ -691,8 +715,14 @@ void BattlegroundSM::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
 
 void BattlegroundSM::FillInitialWorldStates(WorldPacket& data)
 {
-    data << uint32(SM_ALLIANCE_RESOURCES) << uint32(m_TeamPointsCount[TEAM_ALLIANCE]);
+	data << uint32(SM_UNK6) << uint32(0x0);
+	data << uint32(SM_UNK5) << uint32(0x0);
+	data << uint32(SM_UNK4) << uint32(0x0);
+	data << uint32(SM_UNK3) << uint32(0x0);
+	data << uint32(SM_UNK2) << uint32(0x0);
     data << uint32(SM_HORDE_RESOURCES) << uint32(m_TeamPointsCount[TEAM_HORDE]);
+	data << uint32(SM_ALLIANCE_RESOURCES) << uint32(m_TeamPointsCount[TEAM_ALLIANCE]);
+	data << uint32(SM_UNK1) << uint32(0x0);
 }
 
 uint32 BattlegroundSM::GetPrematureWinner()
