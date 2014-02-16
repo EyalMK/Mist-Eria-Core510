@@ -52,7 +52,7 @@ public :
             Creature* huojin = player->FindNearestCreature(NPC_HUOJIN_MONK, 500.0f);
             if(huojin)
             {
-                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 30000));
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
                 huojin->AI()->Talk(SAY_HUOJIN);
                 return true;
             }
@@ -74,6 +74,350 @@ public :
 private :
     std::map<uint64, uint32> forbiddenPlayers ;
 };
+
+
+enum Area7737
+{
+    NPC_JAOMIN_RO                   = 54611,
+    QUEST_THE_DISCIPLE_CHALLENGE    = 29409,
+    SAY_JAOMIN                      = 0
+};
+
+class at_jaomin_ro_talk : public AreaTriggerScript
+{
+public :
+    at_jaomin_ro_talk() : AreaTriggerScript("at_jaomin_ro_talk") {}
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *at)
+    {
+        std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
+        if(iter != forbiddenPlayers.end())
+            return false;
+        if(player->GetQuestStatus(QUEST_THE_DISCIPLE_CHALLENGE) == QUEST_STATUS_INCOMPLETE)
+        {
+            Creature* jaomin = player->FindNearestCreature(NPC_JAOMIN_RO, 500.0f);
+            if(jaomin)
+            {
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+                jaomin->AI()->Talk(SAY_JAOMIN);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void Update(const uint32 uiDiff)
+    {
+        for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter)
+        {
+            if(iter->second <= uiDiff)
+                forbiddenPlayers.erase(iter);
+            else
+                iter->second -= uiDiff ;
+        }
+    }
+
+private :
+    std::map<uint64, uint32> forbiddenPlayers ;
+};
+
+
+enum Area7746
+{
+    NPC_TRAINEE_NIM = 60183,
+    SAY_NIM         = 0
+};
+
+class at_trainee_nim_talk : public AreaTriggerScript
+{
+public :
+    at_trainee_nim_talk() : AreaTriggerScript("at_trainee_nim_talk") {}
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *at)
+    {
+        std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
+        if(iter != forbiddenPlayers.end())
+            return false;
+        if(player->GetQuestStatus(QUEST_THE_DISCIPLE_CHALLENGE) == QUEST_STATUS_INCOMPLETE)
+        {
+            Creature* nim = player->FindNearestCreature(NPC_TRAINEE_NIM, 500.0f);
+            if(nim)
+            {
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+                nim->AI()->Talk(SAY_NIM);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void Update(const uint32 uiDiff)
+    {
+        for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter)
+        {
+            if(iter->second <= uiDiff)
+                forbiddenPlayers.erase(iter);
+            else
+                iter->second -= uiDiff ;
+        }
+    }
+
+private :
+    std::map<uint64, uint32> forbiddenPlayers ;
+};
+
+enum Area7747
+{
+    NPC_TRAINEE_GUANG           = 60244,
+    SAY_GUANG                   = 0,
+    QUEST_AYSA_OF_THE_TUSHUI    = 29410
+};
+
+class at_trainee_guang_talk : public AreaTriggerScript
+{
+public :
+    at_trainee_guang_talk() : AreaTriggerScript("at_trainee_guang_talk") {}
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *at)
+    {
+        std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
+        if(iter != forbiddenPlayers.end())
+            return false;
+        if(player->GetQuestStatus(QUEST_AYSA_OF_THE_TUSHUI) == QUEST_STATUS_COMPLETE)
+        {
+            Creature* guang = player->FindNearestCreature(NPC_TRAINEE_GUANG, 500.0f);
+            if(guang)
+            {
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+                guang->AI()->Talk(SAY_GUANG);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void Update(const uint32 uiDiff)
+    {
+        for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter)
+        {
+            if(iter->second <= uiDiff)
+                forbiddenPlayers.erase(iter);
+            else
+                iter->second -= uiDiff ;
+        }
+    }
+
+private :
+    std::map<uint64, uint32> forbiddenPlayers ;
+};
+
+
+enum AreaLorvo
+{
+    NPC_LORVO   = 54943,
+    SAY_LORVO   = 0
+};
+
+enum AreaAysa
+{
+    NPC_AYSA                        = 54567,
+    QUEST_THE_MISSING_DRIVER_AREA   = 29419,
+    SAY_AYSA                        = 0
+};
+
+class at_area_7748_talk : public AreaTriggerScript
+{
+public :
+    at_area_7748_talk() : AreaTriggerScript("at_area_7748_talk") {}
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *at)
+    {
+        std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
+        if(iter != forbiddenPlayers.end())
+            return false;
+        if(player->GetQuestStatus(QUEST_AYSA_OF_THE_TUSHUI) == QUEST_STATUS_COMPLETE)
+        {
+            Creature* lorvo = player->FindNearestCreature(NPC_LORVO, 500.0f);
+            if(lorvo)
+            {
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+                lorvo->AI()->Talk(SAY_LORVO);
+                return true;
+            }
+        }
+        if(player->GetQuestStatus(QUEST_THE_MISSING_DRIVER_AREA) == QUEST_STATUS_COMPLETE)
+        {
+            Creature* aysa = player->FindNearestCreature(NPC_AYSA, 500.0f);
+            if(aysa)
+            {
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+                aysa->AI()->Talk(SAY_AYSA);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void Update(const uint32 uiDiff)
+    {
+        for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter)
+        {
+            if(iter->second <= uiDiff)
+                forbiddenPlayers.erase(iter);
+            else
+                iter->second -= uiDiff ;
+        }
+    }
+
+private :
+    std::map<uint64, uint32> forbiddenPlayers ;
+};
+
+
+enum Area7749
+{
+    NPC_JI_FIREPAW          = 54568,
+    SAY_JI                  = 0,
+    QUEST_JI_OF_THE_HUOJIN  = 29522
+};
+
+class at_ji_firepaw_talk : public AreaTriggerScript
+{
+public :
+    at_ji_firepaw_talk() : AreaTriggerScript("at_ji_firepaw_talk") {}
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *at)
+    {
+        std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
+        if(iter != forbiddenPlayers.end())
+            return false;
+        if(player->GetQuestStatus(QUEST_JI_OF_THE_HUOJIN) == QUEST_STATUS_COMPLETE)
+        {
+            Creature* ji = player->FindNearestCreature(NPC_JI_FIREPAW, 500.0f);
+            if(ji)
+            {
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+                ji->AI()->Talk(SAY_JI);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void Update(const uint32 uiDiff)
+    {
+        for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter)
+        {
+            if(iter->second <= uiDiff)
+                forbiddenPlayers.erase(iter);
+            else
+                iter->second -= uiDiff ;
+        }
+    }
+
+private :
+    std::map<uint64, uint32> forbiddenPlayers ;
+};
+
+
+enum AreaChia
+{
+    NPC_CHIA    = 60248,
+    SAY_CHIA    = 0
+};
+
+enum AreaBrewerLin
+{
+    NPC_BREWER_LIN          = 60253,
+    QUEST_THE_PASSION_AREA  = 29423,
+    SAY_LIN                 = 0
+};
+
+class at_area_7750_talk : public AreaTriggerScript
+{
+public :
+    at_area_7750_talk() : AreaTriggerScript("at_area_7750_talk") {}
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *at)
+    {
+        std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
+        if(iter != forbiddenPlayers.end())
+            return false;
+        if(player->GetQuestStatus(QUEST_THE_PASSION_AREA) == QUEST_STATUS_INCOMPLETE)
+        {
+            Creature* lin = player->FindNearestCreature(NPC_BREWER_LIN, 500.0f);
+            Creature* chia = player->FindNearestCreature(NPC_CHIA, 500.0f);
+            if(lin)
+                lin->AI()->Talk(SAY_LIN);
+            if(chia)
+                chia->AI()->Talk(SAY_CHIA);
+
+            forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+            return true;
+        }
+        return false;
+    }
+
+    void Update(const uint32 uiDiff)
+    {
+        for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter)
+        {
+            if(iter->second <= uiDiff)
+                forbiddenPlayers.erase(iter);
+            else
+                iter->second -= uiDiff ;
+        }
+    }
+
+private :
+    std::map<uint64, uint32> forbiddenPlayers ;
+};
+
+
+enum Area7784
+{
+    QUEST_SINGING_POOLS     = 29521,
+    SPELL_SUMMON_CHILD      = 116190
+};
+
+class at_pop_child_panda : public AreaTriggerScript
+{
+public :
+    at_pop_child_panda() : AreaTriggerScript("at_pop_child_panda") {}
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *at)
+    {
+        std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
+        if(iter != forbiddenPlayers.end())
+            return false;
+        if(player->GetQuestStatus(QUEST_SINGING_POOLS) == QUEST_STATUS_COMPLETE)
+        {
+            forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 120000));
+            player->CastSpell(player, SPELL_SUMMON_CHILD, true);
+            return true;
+        }
+        return false;
+    }
+
+    void Update(const uint32 uiDiff)
+    {
+        for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter)
+        {
+            if(iter->second <= uiDiff)
+                forbiddenPlayers.erase(iter);
+            else
+                iter->second -= uiDiff ;
+        }
+    }
+
+private :
+    std::map<uint64, uint32> forbiddenPlayers ;
+};
+
+
+/************************************/
+/******* FIN AREATRIGGER ************/
+/************************************/
 
 
 
@@ -985,94 +1329,6 @@ public:
 };
 
 
-/*************************************/
-/******* The Singing Pools *******/
-/*************************************/
-
-enum SingingPoolsEnum
-{
-    QUEST_SINGING_POOLS = 29521,
-    SPELL_SUMMON_CHILD  = 116190
-};
-
-class at_pop_child_panda : public AreaTriggerScript
-{
-    public:
-        at_pop_child_panda () : AreaTriggerScript("at_pop_child_panda")
-        {
-            Test = true;
-        }
-
-        bool Test;
-        uint32 TestTimer;
-
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
-        {
-            if (player->GetQuestStatus(QUEST_SINGING_POOLS) == QUEST_STATUS_COMPLETE)
-                if(Test)
-                {
-                    player->CastSpell(player, SPELL_SUMMON_CHILD, true);
-                    TestTimer = 120000;
-                    Test = false;
-                    return true;
-                }
-
-            return false;
-        }
-
-        void Update(const uint32 uiDiff)
-        {
-            if(!Test)
-            {
-                if (TestTimer <= uiDiff)
-                {
-                    Test = true;
-                }
-                else TestTimer -= uiDiff;
-            }
-        }
-};
-
-class at_test : public AreaTriggerScript {
-public :
-    at_test() : AreaTriggerScript("at_test") {
-
-    }
-
-    bool OnTrigger(Player *player, const AreaTriggerEntry *at) {
-        std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
-        if(iter != forbiddenPlayers.end())
-            return false;
-        else {
-            forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 30000));
-            player->CastSpell(player, SPELL_SUMMON_CHILD, true);
-            return true;
-        }
-        return false;
-    }
-
-    void Update(const uint32 uiDiff) {
-        for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter) {
-            if(iter->second <= uiDiff)
-                forbiddenPlayers.erase(iter);
-            else
-                iter->second -= uiDiff ;
-        }
-    }
-
-private :
-    std::map<uint64, uint32> forbiddenPlayers ;
-};
-
-
-
-
-
-
-
-
-
-
 /********************************/
 /**The Lesson of the Iron Bough**/
 /********************************/
@@ -1615,6 +1871,13 @@ private:
 void AddSC_wandering_isle()
 {
     new at_huojin_monk_talk();
+    new at_jaomin_ro_talk();
+    new at_trainee_nim_talk();
+    new at_trainee_guang_talk();
+    new at_area_7748_talk();
+    new at_ji_firepaw_talk();
+    new at_area_7750_talk();
+    new at_pop_child_panda();
     new npc_first_quest_pandaren();	
     new npc_trainee();
     new areatrigger_at_the_missing_driver();
@@ -1624,10 +1887,6 @@ void AddSC_wandering_isle()
     new npc_living_air();
     new spell_blessing_flamme_panda();
     new npc_huo_escort();
-    new at_pop_child_panda();
-
-    new at_test();
-
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
