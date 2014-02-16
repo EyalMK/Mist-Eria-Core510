@@ -625,6 +625,8 @@ void BattlegroundSM::Reset()
     m_TeamScores[TEAM_ALLIANCE] = 0;
     m_TeamScores[TEAM_HORDE] = 0;
     m_HonorScoreTics[TEAM_ALLIANCE] = 0;
+	m_TeamPointsCount[TEAM_ALLIANCE] = 0;
+    m_TeamPointsCount[TEAM_HORDE] = 0;
     m_HonorScoreTics[TEAM_HORDE] = 0;
 	mineCartCheckTimer = MINE_CART_CHECK_TIMER;
     bool isBGWeekend = sBattlegroundMgr->IsBGWeekend(GetTypeID());
@@ -715,14 +717,14 @@ void BattlegroundSM::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
 
 void BattlegroundSM::FillInitialWorldStates(WorldPacket& data)
 {
-	data << uint32(SM_UNK6) << uint32(0x0);
-	data << uint32(SM_UNK5) << uint32(0x0);
-	data << uint32(SM_UNK4) << uint32(0x0);
-	data << uint32(SM_UNK3) << uint32(0x0);
-	data << uint32(SM_UNK2) << uint32(0x0);
+	data << uint32(SM_UNK6) << uint32(40); //
+	data << uint32(SM_UNK5) << uint32(20); //
+	data << uint32(SM_UNK4) << uint32(60); // Testing values...
+	data << uint32(SM_UNK3) << uint32(80); //
+	data << uint32(SM_UNK2) << uint32(5);  // 
     data << uint32(SM_HORDE_RESOURCES) << uint32(m_TeamPointsCount[TEAM_HORDE]);
 	data << uint32(SM_ALLIANCE_RESOURCES) << uint32(m_TeamPointsCount[TEAM_ALLIANCE]);
-	data << uint32(SM_UNK1) << uint32(0x0);
+	data << uint32(SM_UNK1) << uint32(1); // 
 }
 
 uint32 BattlegroundSM::GetPrematureWinner()
