@@ -3478,7 +3478,7 @@ void Guild::SendBankList(WorldSession* session, uint8 tabId, bool withContent, b
 
     for(int i = 0 ; i < itemCount ; i++)
     {
-        data.WriteBits(enchants, 23);
+        data.WriteBits(0, 23);
         data.WriteBit(0);
     }
 
