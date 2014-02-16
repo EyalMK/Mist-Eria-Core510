@@ -377,7 +377,8 @@ private :
 enum Area7784
 {
     QUEST_SINGING_POOLS     = 29521,
-    SPELL_SUMMON_CHILD      = 116190
+    NPC_DENG                = 60249,
+    NPC_CAI                 = 60250
 };
 
 class at_pop_child_panda : public AreaTriggerScript
@@ -393,7 +394,8 @@ public :
         if(player->GetQuestStatus(QUEST_SINGING_POOLS) == QUEST_STATUS_COMPLETE)
         {
             forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 120000));
-            player->CastSpell(player, SPELL_SUMMON_CHILD, true);
+            player->SummonCreature(NPC_DENG, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+            player->SummonCreature(NPC_CAI, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
             return true;
         }
         return false;
