@@ -394,8 +394,8 @@ public :
         if(player->GetQuestStatus(QUEST_SINGING_POOLS) == QUEST_STATUS_COMPLETE)
         {
             forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 120000));
-            player->SummonCreature(NPC_DENG, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
-            player->SummonCreature(NPC_CAI, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+            player->SummonCreature(NPC_DENG, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
+            player->SummonCreature(NPC_CAI, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
             return true;
         }
         return false;
@@ -1368,8 +1368,8 @@ public:
                 Say2_timer = 41000;
                 Despawn_timer = 45000;
 
-                if (Unit* owner = me->GetOwner())
-                    me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    me->GetMotionMaster()->MoveFollow(summoner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
             }
 
             void UpdateAI(uint32 diff)
@@ -1441,8 +1441,8 @@ public:
                 Say3_timer = 41000;
                 Despawn_timer = 45000;
 
-                if (Unit* owner = me->GetOwner())
-                    me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    me->GetMotionMaster()->MoveFollow(summoner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
             }
 
             void UpdateAI(uint32 diff)
