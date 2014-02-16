@@ -2066,6 +2066,34 @@ class at_test_etang : public AreaTriggerScript
         }
 };
 
+class npc_balance_pole: public CreatureScript
+{
+public:
+    npc_balance_pole() : CreatureScript("npc_balance_pole") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_balance_poleAI(creature);
+    }
+
+    struct npc_balance_poleAI : public ScriptedAI
+    {
+            npc_balance_poleAI(Creature* creature) : ScriptedAI(creature) {}
+
+
+            void Reset()
+            {
+                me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 10);
+                me->SetFloatValue(UNIT_FIELD_COMBATREACH, 10);
+            }
+
+            void UpdateAI(uint32 diff)
+            {
+
+            }
+    };
+};
+
 
 
 void AddSC_wandering_isle()
@@ -2090,6 +2118,7 @@ void AddSC_wandering_isle()
     new npc_deng_child();
     new npc_cai_child();
     new at_test_etang();
+    new npc_balance_pole();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
