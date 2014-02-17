@@ -2131,10 +2131,6 @@ class at_test_etang : public AreaTriggerScript
 
         bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
         {
-            Vehicle* vehicle = player->GetVehicleKit();
-
-            if(player->IsOnVehicle(vehicle->GetBase()))
-                return false;
 
             if(player->HasAura(SPELL_MALE))
             {
