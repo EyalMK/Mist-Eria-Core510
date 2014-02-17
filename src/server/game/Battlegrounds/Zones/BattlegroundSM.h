@@ -31,7 +31,17 @@ enum BG_SM_WorldStates
 	SM_UNK3							= 6440,
 	SM_UNK4							= 6441,
 	SM_UNK5							= 6442,
-	SM_UNK6							= 6443
+	SM_UNK6							= 6443,
+	SM_UNK7							= 6875,
+	SM_UNK8							= 6876,
+	SM_UNK9							= 6877
+};
+
+enum BG_SM_MineCarts
+{
+	BG_SM_MINE_CART_1		= 1,
+	BG_SM_MINE_CART_2		= 2,
+	BG_SM_MINE_CART_3		= 3
 };
 
 enum BG_SM_ProgressBarConsts
@@ -63,7 +73,7 @@ enum BG_SM_Spells
 
 enum SMBattlegroundObjectEntry
 {
-
+	BG_SM_MINE_DEPOT			= 400433,
 };
 
 enum SMBattlegroundGaveyards
@@ -89,7 +99,11 @@ enum SMBattlegroundObjectTypes
     BG_SM_OBJECT_DOOR_H_2			= 3,
 	BG_SM_OBJECT_NEEDLE_INDICATOR_1	= 4,
 	BG_SM_OBJECT_NEEDLE_INDICATOR_2	= 5,
-	BG_SM_OBJECT_MAX				= 6
+	BG_SM_OBJECT_MINE_DEPOT_1		= 6,
+	BG_SM_OBJECT_MINE_DEPOT_2		= 7,
+	BG_SM_OBJECT_MINE_DEPOT_3		= 8,
+	BG_SM_OBJECT_MINE_DEPOT_4		= 9,
+	BG_SM_OBJECT_MAX				= 10
 };
 
 enum BG_SM_Score
@@ -105,20 +119,20 @@ enum SMBattlegroundMineCartState
     SM_MINE_CART_CONTROL_HORDE		= 2,
 };
 
-const float BG_SM_TriggerPositions[4][3] =
-{
-    {566.950562f, 337.057861f, 346.712219f},   // Waterfall
-    {619.470337f, 79.719612f, 298.262085f},   // Lava
-    {895.925598f, 27.365923f, 364.005798f},   // Diamond
-    {779.437683f, 499.856049f, 359.337891f}   // Troll
-};
-
 enum BG_SM_CreatureIds
 {
 	NPC_MINE_CART_1			= 60378,
 	NPC_MINE_CART_2			= 60379,
 	NPC_MINE_CART_3			= 60380,
 	NPC_MINE_CART_TRIGGER	= 400464,
+};
+
+const float BG_SM_DepotPos[4][4] =
+{
+    {566.950989f, 337.05801f, 347.295013f, 1.559089f},   // Waterfall
+    {619.469971f, 79.719597f, 299.067993f, 1.625564f},   // Lava
+    {895.974426f, 27.210802f, 364.390991f, 3.445790f},   // Diamond
+    {778.444946f, 500.949707f, 359.738983f, 0.737040f}   // Troll
 };
 
 #define MINE_CART_CHECK_TIMER		1000
@@ -183,13 +197,14 @@ class BattlegroundSM : public Battleground
         void RemovePoint(uint32 TeamID, uint32 Points = 1) { m_TeamScores[GetTeamIndexByTeamId(TeamID)] -= Points; }
         void SetTeamPoint(uint32 TeamID, uint32 Points = 0) { m_TeamScores[GetTeamIndexByTeamId(TeamID)] = Points; }
 		void CheckPlayerNearMineCart(uint32 diff);
+		uint32 GetMineCartTeamKeeper(uint8 mineCart);
         uint32 m_HonorScoreTics[2];
         uint32 m_TeamPointsCount[2];
 
         uint32 m_MineCartsTrigger[SM_MINE_CART_MAX];
 		uint8 m_LastMineCart; // 0 = Reset, 1 = First Mine Cart, 2 = Second Mine Cart, 3 = Third Mine Cart
-
-        uint32 m_MineCartKeeper; // keepers team
+		uint32 m_MineCartTeamKeeper[SM_MINE_CART_MAX]; // keepers team
+        
 		uint32 m_MineCartSpawnTimer;
 
         uint32 m_MineCartOwnedByTeam[SM_MINE_CART_MAX];
