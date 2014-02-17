@@ -1522,23 +1522,56 @@ public:
     {
             npc_balance_pole_finishAI(Creature* creature) : ScriptedAI(creature) {}
 
+            uint32 TestTimer;
+
             void Reset()
             {
+                TestTimer = 0;
                 me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 10);
                 me->SetFloatValue(UNIT_FIELD_COMBATREACH, 10);
             }
 
-            void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
+            void OnAddPassenger(Vehicle* veh, Unit* /*passenger*/, int8 /*seatId*/)
+            {
+                if (veh->GetBase())
+                    if (veh->GetBase()->ToCreature())
+                        if (veh->GetBase()->ToCreature()->AI())
+                            veh->GetBase()->ToCreature()->AI()->DoAction(0);
+            }
+
+           /* void PassengerBoarded(Unit* who, int8 seatId, bool apply)
             {
                 if (who->GetTypeId() == TYPEID_PLAYER)
                 {
-                    who->ExitVehicle();
-                    who->GetMotionMaster()->MoveJump(935.44f, 3341.04f, 124.00f, 10, 10);
+                    if(apply)
+                        TestTimer = 2000;
                 }
+            }*/
+
+            void DoAction(int32 const action)
+            {
+                TestTimer = 2000;
             }
 
             void OnCharmed(bool /*apply*/)
             {
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if (TestTimer <= diff)
+                {
+                    if (me->GetVehicleKit())
+                    {
+                        if (Unit* passenger = me->GetVehicleKit()->GetPassenger(0))
+                        {
+                            passenger->ExitVehicle();
+                            passenger->GetMotionMaster()->MoveJump(935.44f, 3341.04f, 124.00f, 10, 10);
+                        }
+                    }
+                    TestTimer = 0;
+                }
+                else TestTimer -= diff;
             }
     };
 };
