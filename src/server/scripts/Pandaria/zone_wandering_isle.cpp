@@ -1505,14 +1505,14 @@ public:
                 me->SetFloatValue(UNIT_FIELD_COMBATREACH, 15);
             }
 
-            void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
+            /*void PassengerBoarded(Unit* who, int8 seatId, bool apply)
             {
                 if (who->GetTypeId() == TYPEID_PLAYER)
                 {
                     if(who->HasAura(102938))
                         who->RemoveAurasDueToSpell(102938);
                 }
-            }
+            }*/
     };
 };
 
