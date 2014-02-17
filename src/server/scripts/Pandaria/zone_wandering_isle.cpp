@@ -1508,29 +1508,19 @@ public:
 };
 
 
-class npc_balance_pole_finish: public VehicleScript
+class npc_balance_pole_finish: public CreatureScript
 {
 public:
-    npc_balance_pole_finish() : VehicleScript("npc_balance_pole_finish") { }
+    npc_balance_pole_finish() : CreatureScript("npc_balance_pole_finish") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_balance_pole_finishAI(creature);
     }
 
-    void OnAddPassenger(Vehicle* veh, Unit* /*passenger*/, int8 /*seatId*/)
-    {
-        if (veh->GetBase())
-            if (veh->GetBase()->ToCreature())
-                if (veh->GetBase()->ToCreature()->AI())
-                    veh->GetBase()->ToCreature()->AI()->DoAction(0);
-    }
-
     struct npc_balance_pole_finishAI : public ScriptedAI
     {
             npc_balance_pole_finishAI(Creature* creature) : ScriptedAI(creature) {}
-
-            uint32 TestTimer;
 
             void Reset()
             {
@@ -1539,30 +1529,19 @@ public:
                 me->SetFloatValue(UNIT_FIELD_COMBATREACH, 10);
             }
 
-            void DoAction(int32 const action)
-            {
-                TestTimer = 2000;
-            }
-
-            void OnCharmed(bool /*apply*/)
-            {
-            }
-
             void UpdateAI(const uint32 diff)
             {
-                if (TestTimer <= diff)
+                if (me->GetVehicleKit())
                 {
-                    if (me->GetVehicleKit())
+                    if (Unit* passenger = me->GetVehicleKit()->GetPassenger(0))
                     {
-                        if (Unit* passenger = me->GetVehicleKit()->GetPassenger(0))
+                        if(passenger->GetTypeId() == TYPEID_PLAYER)
                         {
                             passenger->ExitVehicle();
                             passenger->GetMotionMaster()->MoveJump(935.44f, 3341.04f, 124.00f, 10, 10);
                         }
                     }
-                    TestTimer = 0;
                 }
-                else TestTimer -= diff;
             }
     };
 };
