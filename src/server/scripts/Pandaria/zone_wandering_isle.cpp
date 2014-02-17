@@ -1504,15 +1504,6 @@ public:
                 me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 15);
                 me->SetFloatValue(UNIT_FIELD_COMBATREACH, 15);
             }
-
-            /*void PassengerBoarded(Unit* who, int8 seatId, bool apply)
-            {
-                if (who->GetTypeId() == TYPEID_PLAYER)
-                {
-                    if(who->HasAura(102938))
-                        who->RemoveAurasDueToSpell(102938);
-                }
-            }*/
     };
 };
 
@@ -1541,11 +1532,8 @@ public:
             {
                 if (who->GetTypeId() == TYPEID_PLAYER)
                 {
-                    if(who->HasAura(102938))
-                        who->RemoveAurasDueToSpell(102938);
-
-                    if (apply)
-                        who->GetMotionMaster()->MoveJump(935.44f, 3341.04f, 124.00f, 10, 10);
+                    who->ExitVehicle();
+                    who->GetMotionMaster()->MoveJump(935.44f, 3341.04f, 124.00f, 10, 10);
                 }
             }
 
@@ -2129,7 +2117,7 @@ class at_test_etang : public AreaTriggerScript
         {
         }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+        bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
         {
 
             if(player->HasAura(SPELL_MALE))
