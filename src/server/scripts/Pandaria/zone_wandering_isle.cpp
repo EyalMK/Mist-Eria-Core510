@@ -1485,6 +1485,11 @@ public:
     };
 };
 
+
+/*************************************/
+/************** Etang ****************/
+/*************************************/
+
 class npc_balance_pole: public CreatureScript
 {
 public:
@@ -1575,19 +1580,18 @@ public:
 
         uint32 AttackTimer;
         uint32 DespawnTimer;
-        uint32 EmoteTimer;
         bool VerifPV;
         bool Despawn;
         bool Health;
-        bool EmoteSpeak;
 
         void Reset()
         {
+            me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 5);
+            me->SetFloatValue(UNIT_FIELD_COMBATREACH, 5);
             me->SetReactState(REACT_PASSIVE);
-            AttackTimer = 5000;
+            AttackTimer = 1000;
             VerifPV = true;
             Despawn = false;
-            EmoteSpeak = false;
             Health = true;
             me->setFaction(7);
         }
@@ -1628,17 +1632,6 @@ public:
                 else DespawnTimer -= diff;
             }
 
-            if(EmoteSpeak)
-            {
-                if(EmoteTimer <= diff)
-                {
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_BOW);
-                    Talk(SAY_MONK);
-                    EmoteSpeak = false;
-                }
-                else EmoteTimer -= diff;
-            }
-
             if(!UpdateVictim())
                 return;
 
@@ -1646,8 +1639,8 @@ public:
             {
                 if(AttackTimer <= diff)
                 {
-                   me->CastSpell(me->getVictim(), SPELL_THROW_ROCK);
-                    AttackTimer = 5000;
+                    me->CastSpell(me->getVictim(), SPELL_THROW_ROCK);
+                    AttackTimer = 3000;
                 }
                 else AttackTimer -= diff;
             }
@@ -1656,11 +1649,8 @@ public:
             {
                 VerifPV = false;
 
-                DespawnTimer = 5000;
+                DespawnTimer = 2000;
                 Despawn = true;
-
-                EmoteTimer = 2000;
-                EmoteSpeak = true;
 
                 if(Unit* player = me->getVictim())
                     if(player->GetTypeId() == TYPEID_PLAYER)
