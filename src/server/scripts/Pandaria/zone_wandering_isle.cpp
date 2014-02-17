@@ -1508,14 +1508,22 @@ public:
 };
 
 
-class npc_balance_pole_finish: public CreatureScript
+class npc_balance_pole_finish: public VehicleScript
 {
 public:
-    npc_balance_pole_finish() : CreatureScript("npc_balance_pole_finish") { }
+    npc_balance_pole_finish() : VehicleScript("npc_balance_pole_finish") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_balance_pole_finishAI(creature);
+    }
+
+    void OnAddPassenger(Vehicle* veh, Unit* /*passenger*/, int8 /*seatId*/)
+    {
+        if (veh->GetBase())
+            if (veh->GetBase()->ToCreature())
+                if (veh->GetBase()->ToCreature()->AI())
+                    veh->GetBase()->ToCreature()->AI()->DoAction(0);
     }
 
     struct npc_balance_pole_finishAI : public ScriptedAI
@@ -1530,23 +1538,6 @@ public:
                 me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 10);
                 me->SetFloatValue(UNIT_FIELD_COMBATREACH, 10);
             }
-
-            void OnAddPassenger(Vehicle* veh, Unit* /*passenger*/, int8 /*seatId*/)
-            {
-                if (veh->GetBase())
-                    if (veh->GetBase()->ToCreature())
-                        if (veh->GetBase()->ToCreature()->AI())
-                            veh->GetBase()->ToCreature()->AI()->DoAction(0);
-            }
-
-           /* void PassengerBoarded(Unit* who, int8 seatId, bool apply)
-            {
-                if (who->GetTypeId() == TYPEID_PLAYER)
-                {
-                    if(apply)
-                        TestTimer = 2000;
-                }
-            }*/
 
             void DoAction(int32 const action)
             {
