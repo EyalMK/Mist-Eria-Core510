@@ -1541,7 +1541,7 @@ public:
                     {
                         if(passenger->GetTypeId() == TYPEID_PLAYER)
                         {
-                            passenger->ExitVehicle();
+                            passenger->ExitVehicle( 0 );
                             passenger->GetMotionMaster()->MoveJump(935.44f, 3341.04f, 124.00f, 10, 10);
                         }
                     }
@@ -1620,7 +1620,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
         {
             if(Despawn)
             {
