@@ -961,9 +961,6 @@ void Player::CleanupsBeforeDelete(bool finalCleanup)
     TradeCancel(false);
     DuelComplete(DUEL_INTERRUPTED);
 
-    if(this->HasAura(102938))
-        this->RemoveAurasDueToSpell(102938);
-
     Unit::CleanupsBeforeDelete(finalCleanup);
 
     if (m_transport)
