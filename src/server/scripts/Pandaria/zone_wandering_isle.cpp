@@ -1485,6 +1485,87 @@ public:
     };
 };
 
+class npc_balance_pole: public CreatureScript
+{
+public:
+    npc_balance_pole() : CreatureScript("npc_balance_pole") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_balance_poleAI(creature);
+    }
+
+    struct npc_balance_poleAI : public ScriptedAI
+    {
+            npc_balance_poleAI(Creature* creature) : ScriptedAI(creature) {}
+
+            void Reset()
+            {
+                me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 15);
+                me->SetFloatValue(UNIT_FIELD_COMBATREACH, 15);
+            }
+
+            void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
+            {
+                if (who->GetTypeId() == TYPEID_PLAYER)
+                {
+                    if(who->HasAura(102938))
+                        who->RemoveAurasDueToSpell(102938);
+                }
+            }
+    };
+};
+
+
+class npc_balance_pole_finish: public CreatureScript
+{
+public:
+    npc_balance_pole_finish() : CreatureScript("npc_balance_pole_finish") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_balance_pole_finishAI(creature);
+    }
+
+    struct npc_balance_pole_finishAI : public ScriptedAI
+    {
+            npc_balance_pole_finishAI(Creature* creature) : ScriptedAI(creature) {}
+
+            void Reset()
+            {
+                me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 10);
+                me->SetFloatValue(UNIT_FIELD_COMBATREACH, 10);
+            }
+
+            void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
+            {
+                if (who->GetTypeId() == TYPEID_PLAYER)
+                {
+                    if(who->HasAura(102938))
+                        who->RemoveAurasDueToSpell(102938);
+
+                    if (apply)
+                        who->GetMotionMaster()->MoveJump(935.44f, 3341.04f, 124.00f, 10, 10);
+                }
+            }
+
+            void OnCharmed(bool /*apply*/)
+            {
+            }
+    };
+};
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2050,6 +2131,11 @@ class at_test_etang : public AreaTriggerScript
 
         bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
         {
+            Vehicle* vehicle = player->GetVehicleKit();
+
+            if(player->IsOnVehicle(vehicle->GetBase()))
+                return false;
+
             if(player->HasAura(SPELL_MALE))
             {
                 player->RemoveAurasDueToSpell(SPELL_MALE);
@@ -2066,33 +2152,6 @@ class at_test_etang : public AreaTriggerScript
         }
 };
 
-class npc_balance_pole: public CreatureScript
-{
-public:
-    npc_balance_pole() : CreatureScript("npc_balance_pole") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_balance_poleAI(creature);
-    }
-
-    struct npc_balance_poleAI : public ScriptedAI
-    {
-            npc_balance_poleAI(Creature* creature) : ScriptedAI(creature) {}
-
-
-            void Reset()
-            {
-                me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 10);
-                me->SetFloatValue(UNIT_FIELD_COMBATREACH, 10);
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-
-            }
-    };
-};
 
 
 
@@ -2119,6 +2178,7 @@ void AddSC_wandering_isle()
     new npc_cai_child();
     new at_test_etang();
     new npc_balance_pole();
+    new npc_balance_pole_finish();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
