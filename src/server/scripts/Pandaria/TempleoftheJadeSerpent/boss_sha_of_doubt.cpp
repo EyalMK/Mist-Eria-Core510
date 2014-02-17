@@ -167,7 +167,7 @@ public:
 			Talk(SAY_DEATH);
 		}
 
-		void DoAction(int32 action)
+		void DoAction(const int32 action)
         {
             switch (action)
             {
@@ -253,7 +253,7 @@ public:
 			Talk(SAY_AGGRO);
 		}
 		
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			if (!UpdateVictim())
 				return;
@@ -420,7 +420,7 @@ public:
 			}
 		}
 
-		void DoAction(int32 action)
+		void DoAction(const int32 action)
         {
             switch (action)
             {
@@ -461,7 +461,7 @@ public:
 			}
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
         {
             events.Update(diff);
 

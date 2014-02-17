@@ -592,7 +592,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
         {
             if(Despawn)
             {
@@ -932,7 +932,7 @@ public :
             Summons.Summon(Summoned);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
         {
             if(StartTimer <= diff)
             {
@@ -1185,7 +1185,7 @@ public:
                 Cloud_timer = 10600;
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(const uint32 diff)
             {
                 if(!UpdateVictim())
                     return;
@@ -1315,7 +1315,7 @@ public:
                 }
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (TestTimer <= diff)
                 {
@@ -1372,7 +1372,7 @@ public:
                     me->GetMotionMaster()->MoveFollow(summoner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (Say0_timer <= diff)
                 {
@@ -1445,7 +1445,7 @@ public:
                     me->GetMotionMaster()->MoveFollow(summoner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(const uint32 diff)
             {
                 if (Say0_timer <= diff)
                 {
@@ -1836,7 +1836,7 @@ public :
             checkTimer = 1000 ;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
         {
             if(checkTimer <= diff)
             {
@@ -1946,7 +1946,7 @@ public :
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
         {
             if(!UpdateVictim())
                 return ;
@@ -2089,7 +2089,7 @@ public :
             returnTimer = 7500 ;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
         {
             if(!UpdateVictim() && canAttack) return ;
 

@@ -229,7 +229,7 @@ public:
 			events.SetPhase(PHASE_BOSS_WAITING);
 		}
 
-		void DoAction(int32 action)
+		void DoAction(const int32 action)
         {
             switch (action)
             {

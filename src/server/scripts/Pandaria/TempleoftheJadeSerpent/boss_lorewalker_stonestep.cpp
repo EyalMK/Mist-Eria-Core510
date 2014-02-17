@@ -179,7 +179,7 @@ public:
 				instance->SetBossState(DATA_BOSS_LOREWALKER_STONESTEP, IN_PROGRESS);
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			events.Update(diff);
 
@@ -351,7 +351,7 @@ public:
 			}
 		}
 
-		void UpdateAI(uint32 diff) 
+		void UpdateAI(const uint32 diff) 
 		{
 			events.Update(diff);
 
@@ -506,7 +506,7 @@ public:
 			ScriptedAI::EnterEvadeMode();
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			events.Update(diff);
 
@@ -714,7 +714,7 @@ public:
 			ScriptedAI::EnterEvadeMode();
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			events.Update(diff);
 
@@ -835,7 +835,7 @@ public:
 			events.ScheduleEvent(EVENT_AGGRO, 5500);
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			events.Update(diff);
 

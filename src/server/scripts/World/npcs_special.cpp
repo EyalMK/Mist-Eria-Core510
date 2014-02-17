@@ -3238,7 +3238,7 @@ public :
             m_uiCheckPlayersTimer = 1000 ;
         }
         
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
         {
             if(m_uiCheckPlayersTimer <= diff)
             {

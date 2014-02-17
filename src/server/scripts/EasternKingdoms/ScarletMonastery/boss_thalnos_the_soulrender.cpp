@@ -190,7 +190,7 @@ public:
         }
 
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
         {
             if(!UpdateVictim())
                 return;
@@ -302,7 +302,7 @@ public:
                 me->CastSpell(me, SPELL_EVICTED_SOUL);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(const uint32 diff)
             {
                 if(!UpdateVictim())
                     return;
@@ -347,7 +347,7 @@ public:
                 me->CastSpell(me, SPELL_EMPOWERING_SPIRIT);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(const uint32 diff)
             {
                 if(!UpdateVictim())
                     return;
@@ -395,7 +395,7 @@ public:
                 m_uiCheckTimer = 250;
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(const uint32 diff)
             {
                 if(m_uiCheckTimer <= diff)
                 {

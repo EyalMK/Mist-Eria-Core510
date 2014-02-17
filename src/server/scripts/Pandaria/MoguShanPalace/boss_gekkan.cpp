@@ -175,7 +175,7 @@ public:
 			}
 		}
 
-		void DoAction(int32 action)
+		void DoAction(const int32 action)
         {
             switch (action)
             {
@@ -291,7 +291,7 @@ public:
 			events.ScheduleEvent(EVENT_RECKLESS_INSPIRATION_GLINTROK, 16*IN_MILLISECONDS, 0, PHASE_NO_RECKLESS_INSPIRATION_DONE);
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
@@ -631,7 +631,7 @@ public:
 			events.ScheduleEvent(EVENT_FIRE_BOLT, 2*IN_MILLISECONDS);
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
@@ -784,7 +784,7 @@ public:
 			events.ScheduleEvent(EVENT_DARK_BOLT, 2*IN_MILLISECONDS, 0);
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
@@ -932,7 +932,7 @@ public:
 			events.ScheduleEvent(EVENT_SHANK, 3*IN_MILLISECONDS, 0);
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
@@ -1052,7 +1052,7 @@ public:
 			}
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			if (!UpdateVictim())
 				return;
@@ -1103,7 +1103,7 @@ public:
 			events.ScheduleEvent(EVENT_DARK_BOLT, 2*IN_MILLISECONDS, 0);
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
@@ -1170,7 +1170,7 @@ public:
 
 		InstanceScript* instance;
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			if (instance)
 				if (me->isAlive())

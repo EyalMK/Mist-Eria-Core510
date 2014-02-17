@@ -287,7 +287,7 @@ public:
 			}
 		}
 
-		void UpdateAI(uint32 diff) 
+		void UpdateAI(const uint32 diff) 
 		{
 			if(!UpdateVictim())
 				return;
@@ -680,7 +680,7 @@ public:
 			me->CastSpell(me, SPELL_SHA_RESIDUE);
 		}
 
-		void UpdateAI(uint32 diff) 
+		void UpdateAI(const uint32 diff) 
 		{
 			if(!UpdateVictim())
 				return;
@@ -768,7 +768,7 @@ public:
 			me->CastSpell(me, SPELL_SHA_RESIDUE);
 		}
 
-		void UpdateAI(uint32 diff) 
+		void UpdateAI(const uint32 diff) 
 		{
 			if(!UpdateVictim())
 				return;
@@ -842,7 +842,7 @@ public:
 			ScriptedAI::EnterEvadeMode();
 		}
 
-		void UpdateAI(uint32 diff) 
+		void UpdateAI(const uint32 diff) 
 		{
 			if(!UpdateVictim())
 				return;

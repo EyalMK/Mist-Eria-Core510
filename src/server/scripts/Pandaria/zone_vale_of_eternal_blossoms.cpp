@@ -48,7 +48,7 @@ public:
                 who->CastSpell(who, SPELL_CYCLONIC_INSPIRATION);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
 		{
 			events.Update(diff);
 

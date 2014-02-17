@@ -93,7 +93,7 @@ public:
 			
 		}
 
-		void DoAction(int32 action)
+		void DoAction(const int32 action)
         {
             switch (action)
             {
@@ -146,7 +146,7 @@ public:
 			events.ScheduleEvent(EVENT_SHA_SPIKE_1, 14*IN_MILLISECONDS);
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;

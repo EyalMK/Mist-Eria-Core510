@@ -157,7 +157,7 @@ public:
 			}
 		}
 
-		void DoAction(int32 action)
+		void DoAction(const int32 action)
         {
             switch (action)
             {
@@ -222,7 +222,7 @@ public:
 			events.ScheduleEvent(EVENT_SHA_BLAST, 180*IN_MILLISECONDS, 0, PHASE_COMBAT);
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
@@ -338,7 +338,7 @@ public:
 
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{	
 			if(checkTrigger)
 			{
@@ -405,7 +405,7 @@ public:
 			events.ScheduleEvent(EVENT_GRIP_OF_HATE, 10*IN_MILLISECONDS);
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{	
 			if(!UpdateVictim())
 				return;

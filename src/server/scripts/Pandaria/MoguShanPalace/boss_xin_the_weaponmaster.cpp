@@ -129,7 +129,7 @@ public:
 			events.ScheduleEvent(EVENT_GROUND_SLAM, 20*IN_MILLISECONDS);
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;

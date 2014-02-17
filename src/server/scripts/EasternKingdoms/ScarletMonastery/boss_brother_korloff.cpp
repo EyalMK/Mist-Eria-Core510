@@ -172,7 +172,7 @@ public:
         }
 
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
         {
             if(!UpdateVictim())
                 return;
@@ -256,7 +256,7 @@ public:
                 m_uiCheckTimer = 2000;
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(const uint32 diff)
             {
                 if(m_uiCheckTimer <= diff)
                 {

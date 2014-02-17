@@ -117,7 +117,7 @@ class boss_amethyst_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_ANIM_SIT);
 			}
 
-			void DoAction(int32 action)
+			void DoAction(const int32 action)
 			{
 				switch (action)
 				{
@@ -388,7 +388,7 @@ class boss_cobalt_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_ANIM_SIT);
 			}
 
-			void DoAction(int32 action)
+			void DoAction(const int32 action)
 			{
 				switch (action)
 				{
@@ -659,7 +659,7 @@ class boss_jade_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_ANIM_SIT);
 			}
 
-			void DoAction(int32 action)
+			void DoAction(const int32 action)
 			{
 				switch (action)
 				{
@@ -930,7 +930,7 @@ class boss_jasper_guardian : public CreatureScript
 				me->CastSpell(me, SPELL_ANIM_SIT);
 			}
 
-			void DoAction(int32 action)
+			void DoAction(const int32 action)
 			{
 				switch (action)
 				{
@@ -1190,7 +1190,7 @@ public:
 			choiceDone = false;
         }
 
-		void DoAction(int32 action)
+		void DoAction(const int32 action)
         {
             switch (action)
             {
@@ -1273,7 +1273,7 @@ public:
 			return true;
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			events.Update(diff);
 

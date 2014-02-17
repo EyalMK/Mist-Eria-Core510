@@ -268,6 +268,8 @@ public :
             case INSTANCE_DATA64_KILLED_HOZENS :
                 return m_uiKilledHozens ;
             }
+
+			return 0 ;
         }
 
         void SetData64(uint32 uiData, uint64 uiValue)

@@ -270,7 +270,7 @@ public:
                 m_uiDespawnTimer = 20000;
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(const uint32 diff)
             {
                 if(m_uiCheckTimer <= diff)
                 {
@@ -330,7 +330,7 @@ public:
         bool Intro;
 
 
-        void DoAction(int32 action)
+        void DoAction(const int32 action)
         {
             switch (action)
             {

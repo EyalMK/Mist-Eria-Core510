@@ -121,7 +121,7 @@ public:
             events.ScheduleEvent(EVENT_GREATER_DRAGONS_BREATH, 31*IN_MILLISECONDS);
         }
 
-        void DoAction(int32 action)
+        void DoAction(const int32 action)
         {
             switch (action)
             {
@@ -165,7 +165,7 @@ public:
 
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
         {
             if(!UpdateVictim())
                 return;
@@ -239,7 +239,7 @@ public:
             {
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(const uint32 diff)
             {
                 if(!UpdateVictim())
                     return;

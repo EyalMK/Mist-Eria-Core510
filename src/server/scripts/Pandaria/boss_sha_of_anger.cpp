@@ -101,7 +101,7 @@ public:
             events.ScheduleEvent(EVENT_BERSERK, 900*IN_MILLISECONDS);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
         {
             if(!UpdateVictim())
                 return;

@@ -125,7 +125,7 @@ public:
 			me->Mount(DISPLAYID_GYROCOPTER);
         }
 
-		void DoAction(int32 action)
+		void DoAction(const int32 action)
         {
             switch (action)
             {

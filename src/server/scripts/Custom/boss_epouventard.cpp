@@ -132,7 +132,7 @@ class boss_epouventard : public CreatureScript
             addDead = false; //Phase trognepus
             m_phase = PHASE_LA_BELLE;
             me->DeMorph();
-            for(int i = 0 ; i < vent.size() ; i++)
+            for(size_t i = 0 ; i < vent.size() ; i++)
             {
                 Creature *cVent = ObjectAccessor::GetCreature(*me, vent[i]);
                 if(cVent)
@@ -157,10 +157,10 @@ class boss_epouventard : public CreatureScript
                 gvert->Delete();
         }
 
-        void JustDied(Unit */*who*/)
+        void JustDied(Unit* /*who*/)
         {
-            Talk(-1397008);
-            for(int i = 0 ; i < vent.size() ; i++)
+            //Talk(-1397008);
+            for(size_t i = 0 ; i < vent.size() ; i++)
             {
                 Creature *cVent = ObjectAccessor::GetCreature(*me, vent[i]);
                 if(cVent)
@@ -262,7 +262,7 @@ class boss_epouventard : public CreatureScript
             {
                 if(m_phaseHello <= uiDiff)
                 {
-                    Talk(-1397001);
+                    //Talk(-1397001);
                     m_phaseHello = 200000;
                 }
                 else
@@ -270,7 +270,7 @@ class boss_epouventard : public CreatureScript
 
                 if(m_phaseAnnounceLaBelle <= uiDiff)
                 {
-                    Talk(-1397002);
+                    //Talk(-1397002);
                     m_phaseAnnounceLaBelle = 20000;
                 }
                 else
@@ -284,7 +284,7 @@ class boss_epouventard : public CreatureScript
                     me->Attack(SelectTarget(SELECT_TARGET_RANDOM), true);
                     m_phase = PHASE_LA_BELLE;
 
-                    Talk(-1397009);
+                    //Talk(-1397009);
 
                     m_phase1LavaDrool = 5000;
                     m_phase1BerserkCharge = 15000;
@@ -341,13 +341,13 @@ class boss_epouventard : public CreatureScript
                         if(couleur)
                         {
                             me->AddAura(SPELL_VERT, me);
-                            Talk(-1397010);
+                            //Talk(-1397010);
                             gbleu->AI()->DoAction(1);
                         }
                         else
                         {
                             gvert->AI()->DoAction(1);
-                            Talk(-1397011);
+                            //Talk(-1397011);
                             me->AddAura(SPELL_BLEU, me);
                         }
                     }
@@ -375,7 +375,7 @@ class boss_epouventard : public CreatureScript
                 {
                     m_phase = PHASE_NAZJAR;
                     m_phase2SwitchToNazjar = 5000;
-                    Talk(-1397003);
+                    //Talk(-1397003);
                 }
             }
 
@@ -385,7 +385,7 @@ class boss_epouventard : public CreatureScript
                 {
                     me->SetDisplayId(DISPLAYID_NAZJAR);
                     me->SetControlled(false, UNIT_STATE_ROOT);
-                    Talk(-1405860);
+                    //Talk(-1405860);
                     m_phase2Geyser = 5000;
                     m_phase2SummonAdds = 30000;
                     m_phase2ZoneOmbre = 10000;
@@ -407,7 +407,7 @@ class boss_epouventard : public CreatureScript
 
                     if(m_phase2SummonAdds <= uiDiff && !addSpawn)
                     {
-                        Talk(-1405864);
+                        //Talk(-1405864);
                         me->SummonCreature(406330, me->GetPositionX() + 10, me->GetPositionY(), me->GetPositionZ()+1, me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
                         me->SummonCreature(444040, me->GetPositionX() - 10, me->GetPositionY(), me->GetPositionZ()+1, me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
                         addSpawn = true;
@@ -438,7 +438,7 @@ class boss_epouventard : public CreatureScript
                         DoStopAttack();
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                         vent = SpawnInCircle(10.0f, 5, 51672, TEMPSUMMON_MANUAL_DESPAWN, 0);
-                        for(int i = 0 ; i < vent.size() ; i++)
+                        for(size_t i = 0 ; i < vent.size() ; i++)
                         {
                             Creature *c = ObjectAccessor::GetCreature(*me, vent[i]);
                             if(c)
@@ -458,7 +458,7 @@ class boss_epouventard : public CreatureScript
                     {
                         m_phase = PHASE_TROGNEPUS;
                         m_phase3SwitchToTrognepus = 5000;
-                        Talk(-1397004);
+                        //Talk(-1397004);
                     }
                 }
 
@@ -470,7 +470,7 @@ class boss_epouventard : public CreatureScript
                 {
                     me->SetDisplayId(DISPLAYID_TROGNEPUS);
                     me->SetControlled(false, UNIT_STATE_ROOT);
-                    Talk(-1397005);
+                    //Talk(-1397005);
                     m_phase3Fracasser = 20000;
                     m_phase3Englue = 26000;
                     m_phase3Meteore = m_isHeroic ? urand(11000, 13000) : urand(27000, 29000);
@@ -539,7 +539,7 @@ class boss_epouventard : public CreatureScript
                 {
                     if(m_phase3Fracasser <= uiDiff)
                     {
-                        Talk(-1397007);
+                        //Talk(-1397007);
                         m_phase3Fracasser = 20000;
                         DoCastAOE(92662);
                     }
@@ -548,7 +548,7 @@ class boss_epouventard : public CreatureScript
 
                     if(m_phase3Englue <= uiDiff)
                     {
-                        Talk(-1397006);
+                        //Talk(-1397006);
                         m_phase3Englue = 20000;
                     }
                     else
@@ -656,7 +656,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 uiDiff)
         {
             if(m_removeBouclierTimer <= uiDiff)
             {

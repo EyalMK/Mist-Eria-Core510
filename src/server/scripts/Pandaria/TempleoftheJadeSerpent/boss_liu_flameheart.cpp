@@ -165,7 +165,7 @@ public:
 
 				me->SummonCreature(NPC_MINION_OF_DOUBT, 924.604553f, -2597.958008f, 181.292480f, 1.256927f);
 				me->SummonCreature(NPC_MINION_OF_DOUBT, 918.139648f, -2595.859375f, 181.288773f, 1.256927f);
-				me->SummonCreature(NPC_MINION_OF_DOUBT, 911.711853, -2593.772705, 181.288895, 1.256927f);
+				me->SummonCreature(NPC_MINION_OF_DOUBT, 911.711853f, -2593.772705f, 181.288895f, 1.256927f);
 
 				if (Creature* trigger = me->FindNearestCreature(NPC_LIU_TRIGGER, 99999.0f, true))
 					trigger->Kill(trigger);
@@ -255,7 +255,7 @@ public:
 			events.ScheduleEvent(EVENT_SUMMON_SERPENT_WAVE, 14*IN_MILLISECONDS, 0, PHASE_LIU_SERPENT_DANCE);
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			if	(!UpdateVictim())
 			{
@@ -361,7 +361,7 @@ public:
 						{
 							x = me->GetPositionX();
 							y = me->GetPositionY();
-							z = 179.821503; // To prevent undermap
+							z = 179.821503f; // To prevent undermap
 
 							if (Creature* firstTracker = me->SummonCreature(NPC_WAVE_TRACKER, x + 100.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
 								if (firstWave = me->SummonCreature(NPC_SERPENT_WAVE_TRIGGER, x + 10.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
@@ -401,7 +401,7 @@ public:
 						{
 							x = me->GetPositionX();
 							y = me->GetPositionY();
-							z = 179.821503; // To prevent undermap
+							z = 179.821503f; // To prevent undermap
 
 							if (Creature* firstTracker = me->SummonCreature(NPC_WAVE_TRACKER, x + 100.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
 								if (firstWave = me->SummonCreature(NPC_JADE_SERPENT_WAVE_TRIGGER, x + 10.0f, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10*IN_MILLISECONDS))
@@ -576,7 +576,7 @@ public:
 				me->DespawnOrUnsummon();
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{	
 			if(!UpdateVictim())
 				return;
@@ -673,7 +673,7 @@ public:
 			events.ScheduleEvent(EVENT_SERPENT_WAVE, 1*IN_MILLISECONDS);
         }
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			events.Update(diff);
 
@@ -731,7 +731,7 @@ public:
 			events.ScheduleEvent(EVENT_JADE_SERPENT_WAVE, 1*IN_MILLISECONDS);
         }
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			events.Update(diff);
 
@@ -781,7 +781,7 @@ public:
 			liuSummoned = false;
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			if (!me->isAlive())
 				return;

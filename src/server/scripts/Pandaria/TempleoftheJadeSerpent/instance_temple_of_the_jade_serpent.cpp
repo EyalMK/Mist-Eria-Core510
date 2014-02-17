@@ -53,11 +53,11 @@ class instance_temple_of_the_jade_serpent : public InstanceMapScript
 						break;
 				}
 
-				switch (creature->GetGUID())
+				/*switch (creature->GetGUID())
 				{
 					default:
 						break;
-				}
+				}*/
 			}
 			
 			void OnGameObjectCreate(GameObject* go) 
@@ -72,9 +72,9 @@ class instance_temple_of_the_jade_serpent : public InstanceMapScript
 			
 			void OnGameObjectRemove(GameObject* go) 
             {
-                switch (go->GetEntry())
+                /*switch (go->GetEntry())
                 {
-				}
+				}*/
 			}
 
 			uint64 GetData64(uint32 id) const 

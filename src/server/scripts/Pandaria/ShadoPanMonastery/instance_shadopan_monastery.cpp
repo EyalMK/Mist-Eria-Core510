@@ -56,16 +56,16 @@ class instance_shado_pan_monastery : public InstanceMapScript
 			
 			void OnGameObjectCreate(GameObject* go)
             {
-                switch (go->GetEntry())
+                /*switch (go->GetEntry())
                 {
-				}
+				}*/
 			}
 			
 			void OnGameObjectRemove(GameObject* go)
             {
-                switch (go->GetEntry())
+                /*switch (go->GetEntry())
                 {
-				}
+				}*/
 			}
 
 			uint64 GetData64(uint32 id) const

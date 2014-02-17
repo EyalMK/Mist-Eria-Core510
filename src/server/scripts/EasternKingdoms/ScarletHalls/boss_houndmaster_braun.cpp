@@ -251,7 +251,7 @@ public:
             Summons.Summon(Summoned);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
         {
             if(!UpdateVictim())
                 return;
@@ -353,7 +353,7 @@ public:
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             }
 
-            void DoAction(int32 action)
+            void DoAction(const int32 action)
             {
                 switch (action)
                 {
@@ -367,7 +367,7 @@ public:
                 }
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(const uint32 diff)
             {
                 DoMeleeAttackIfReady();
             }
