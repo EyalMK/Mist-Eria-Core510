@@ -1524,7 +1524,6 @@ public:
 
             void Reset()
             {
-                TestTimer = 0;
                 me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 10);
                 me->SetFloatValue(UNIT_FIELD_COMBATREACH, 10);
             }
