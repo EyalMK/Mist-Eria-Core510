@@ -1485,6 +1485,277 @@ public:
     };
 };
 
+class npc_balance_pole: public CreatureScript
+{
+public:
+    npc_balance_pole() : CreatureScript("npc_balance_pole") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_balance_poleAI(creature);
+    }
+
+    struct npc_balance_poleAI : public ScriptedAI
+    {
+            npc_balance_poleAI(Creature* creature) : ScriptedAI(creature) {}
+
+            void Reset()
+            {
+                me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 15);
+                me->SetFloatValue(UNIT_FIELD_COMBATREACH, 15);
+            }
+    };
+};
+
+
+class npc_balance_pole_finish: public CreatureScript
+{
+public:
+    npc_balance_pole_finish() : CreatureScript("npc_balance_pole_finish") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_balance_pole_finishAI(creature);
+    }
+
+    struct npc_balance_pole_finishAI : public ScriptedAI
+    {
+            npc_balance_pole_finishAI(Creature* creature) : ScriptedAI(creature) {}
+
+            void Reset()
+            {
+                me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 10);
+                me->SetFloatValue(UNIT_FIELD_COMBATREACH, 10);
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if (me->GetVehicleKit())
+                {
+                    if (Unit* passenger = me->GetVehicleKit()->GetPassenger(0))
+                    {
+                        if(passenger->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            passenger->ExitVehicle();
+                            passenger->GetMotionMaster()->MoveJump(935.44f, 3341.04f, 124.00f, 10, 10);
+                        }
+                    }
+                }
+            }
+    };
+};
+
+
+enum SpellMonk
+{
+    SPELL_THROW_ROCK    = 109308
+};
+
+enum TextMonk
+{
+    SAY_MONK   = 0
+};
+
+class npc_tushui_monk : public CreatureScript
+{
+public:
+    npc_tushui_monk() : CreatureScript("npc_tushui_monk") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_tushui_monkAI(creature);
+    }
+
+    struct npc_tushui_monkAI : public ScriptedAI
+    {
+        npc_tushui_monkAI(Creature* creature) : ScriptedAI(creature)
+        {
+            creature->SetReactState(REACT_PASSIVE);
+        }
+
+        uint32 AttackTimer;
+        uint32 DespawnTimer;
+        uint32 EmoteTimer;
+        bool VerifPV;
+        bool Despawn;
+        bool Health;
+        bool EmoteSpeak;
+
+        void Reset()
+        {
+            me->SetReactState(REACT_PASSIVE);
+            AttackTimer = 5000;
+            VerifPV = true;
+            Despawn = false;
+            EmoteSpeak = false;
+            Health = true;
+            me->setFaction(7);
+        }
+
+        void DamageTaken(Unit* caster, uint32 &damage)
+        {
+            if(damage >= 1)
+            {
+                if(caster->GetTypeId() == TYPEID_PLAYER && !me->HasReactState(REACT_AGGRESSIVE))
+                {
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    ScriptedAI::AttackStart(caster);
+                }
+            }
+
+            if (damage >= me->GetHealth())
+            {
+                damage = 0;
+                me->SetHealth(0);
+            }
+
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if(Despawn)
+            {
+                if(DespawnTimer <= diff)
+                {
+                    me->DisappearAndDie();
+                    Despawn = false;
+                }
+                else DespawnTimer -= diff;
+            }
+
+            if(EmoteSpeak)
+            {
+                if(EmoteTimer <= diff)
+                {
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_BOW);
+                    Talk(SAY_MONK);
+                    EmoteSpeak = false;
+                }
+                else EmoteTimer -= diff;
+            }
+
+            if(!UpdateVictim())
+                return;
+
+            if(VerifPV)
+            {
+                if(AttackTimer <= diff)
+                {
+                   me->CastSpell(me->getVictim(), SPELL_THROW_ROCK);
+                    AttackTimer = 5000;
+                }
+                else AttackTimer -= diff;
+            }
+
+            if (me->GetHealthPct() <= 20 && Health)
+            {
+                VerifPV = false;
+
+                DespawnTimer = 5000;
+                Despawn = true;
+
+                EmoteTimer = 2000;
+                EmoteSpeak = true;
+
+                if(Unit* player = me->getVictim())
+                    if(player->GetTypeId() == TYPEID_PLAYER)
+                        player->ToPlayer()->KilledMonsterCredit(55019, 0);
+
+                me->setFaction(35);
+                me->StopMoving();
+                me->RemoveAllAuras();
+                me->GetMotionMaster()->Clear();
+                me->CombatStop(true);
+                me->DeleteThreatList();
+
+                Health = false;
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+};
+
+
+/*######
+## npc_jojo_ironbrow
+######*/
+
+enum JojoIronbrow
+{
+    SPELL_REEDS_CAST    = 129272,
+    SAY_JOJO_1          = 0,
+    SAY_JOJO_2          = 1
+};
+
+class npc_jojo_ironbrow : public CreatureScript
+{
+public:
+    npc_jojo_ironbrow(): CreatureScript("npc_jojo_ironbrow") { }
+
+    struct npc_jojo_ironbrowAI : public npc_escortAI
+    {
+        npc_jojo_ironbrowAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    Talk(SAY_JOJO_1);
+                    break;
+                case 2:
+                    me->CastSpell(me, SPELL_REEDS_CAST, true);
+                    break;
+                case 3:
+                    Talk(SAY_JOJO_2);
+                    break;
+                case 10:
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            if (UpdateVictim())
+                return;
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_jojo_ironbrowAI(creature);
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2048,8 +2319,9 @@ class at_test_etang : public AreaTriggerScript
         {
         }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+        bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
         {
+
             if(player->HasAura(SPELL_MALE))
             {
                 player->RemoveAurasDueToSpell(SPELL_MALE);
@@ -2065,7 +2337,6 @@ class at_test_etang : public AreaTriggerScript
             return true;
         }
 };
-
 
 
 void AddSC_wandering_isle()
@@ -2090,6 +2361,10 @@ void AddSC_wandering_isle()
     new npc_deng_child();
     new npc_cai_child();
     new at_test_etang();
+    new npc_balance_pole();
+    new npc_balance_pole_finish();
+    new npc_tushui_monk();
+    new npc_jojo_ironbrow();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
