@@ -1577,6 +1577,142 @@ public:
 };
 
 
+enum SpellMonk
+{
+    SPELL_THROW_ROCK    = 109308
+};
+
+enum TextMonk
+{
+    SAY_MONK   = 0
+};
+
+class npc_tushui_monk : public CreatureScript
+{
+public:
+    npc_tushui_monk() : CreatureScript("npc_tushui_monk") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_tushui_monkAI(creature);
+    }
+
+    struct npc_tushui_monkAI : public ScriptedAI
+    {
+        npc_tushui_monkAI(Creature* creature) : ScriptedAI(creature)
+        {
+            creature->SetReactState(REACT_PASSIVE);
+        }
+
+        uint32 AttackTimer;
+        uint32 DespawnTimer;
+        uint32 EmoteTimer;
+        bool VerifPV;
+        bool Despawn;
+        bool Health;
+        bool EmoteSpeak;
+
+        void Reset()
+        {
+            me->SetReactState(REACT_PASSIVE);
+            AttackTimer = 5000;
+            VerifPV = true;
+            Despawn = false;
+            EmoteSpeak = false;
+            Health = true;
+            me->setFaction(7);
+        }
+
+        void DamageTaken(Unit* caster, uint32 &damage)
+        {
+            if(damage >= 1)
+            {
+                if(caster->GetTypeId() == TYPEID_PLAYER && !me->HasReactState(REACT_AGGRESSIVE))
+                {
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    ScriptedAI::AttackStart(caster);
+                }
+            }
+
+            if (damage >= me->GetHealth())
+            {
+                damage = 0;
+                me->SetHealth(0);
+            }
+
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if(Despawn)
+            {
+                if(DespawnTimer <= diff)
+                {
+                    me->DisappearAndDie();
+                    Despawn = false;
+                }
+                else DespawnTimer -= diff;
+            }
+
+            if(EmoteSpeak)
+            {
+                if(EmoteTimer <= diff)
+                {
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_BOW);
+                    Talk(SAY_MONK);
+                    EmoteSpeak = false;
+                }
+                else EmoteTimer -= diff;
+            }
+
+            if(!UpdateVictim())
+                return;
+
+            if(VerifPV)
+            {
+                if(AttackTimer <= diff)
+                {
+                   me->CastSpell(me->getVictim(), SPELL_THROW_ROCK);
+                    AttackTimer = 5000;
+                }
+                else AttackTimer -= diff;
+            }
+
+            if (me->GetHealthPct() <= 20 && Health)
+            {
+                VerifPV = false;
+
+                DespawnTimer = 5000;
+                Despawn = true;
+
+                EmoteTimer = 2000;
+                EmoteSpeak = true;
+
+                if(Unit* player = me->getVictim())
+                    if(player->GetTypeId() == TYPEID_PLAYER)
+                        player->ToPlayer()->KilledMonsterCredit(55019, 0);
+
+                me->setFaction(35);
+                me->StopMoving();
+                me->RemoveAllAuras();
+                me->GetMotionMaster()->Clear();
+                me->CombatStop(true);
+                me->DeleteThreatList();
+
+                Health = false;
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+};
+
+
 
 
 
@@ -2196,6 +2332,7 @@ void AddSC_wandering_isle()
     new at_test_etang();
     new npc_balance_pole();
     new npc_balance_pole_finish();
+    new npc_tushui_monk();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
