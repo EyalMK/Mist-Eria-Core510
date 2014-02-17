@@ -1682,6 +1682,70 @@ public:
 };
 
 
+/*######
+## npc_jojo_ironbrow
+######*/
+
+enum JojoIronbrow
+{
+    SPELL_REEDS_CAST    = 129272,
+    SAY_JOJO_1          = 0,
+    SAY_JOJO_2          = 1
+};
+
+class npc_jojo_ironbrow : public CreatureScript
+{
+public:
+    npc_jojo_ironbrow(): CreatureScript("npc_jojo_ironbrow") { }
+
+    struct npc_jojo_ironbrowAI : public npc_escortAI
+    {
+        npc_jojo_ironbrowAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    Talk(SAY_JOJO_1);
+                    break;
+                case 2:
+                    me->CastSpell(me, SPELL_REEDS_CAST, true);
+                    break;
+                case 3:
+                    Talk(SAY_JOJO_2);
+                    break;
+                case 10:
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            if (UpdateVictim())
+                return;
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_jojo_ironbrowAI(creature);
+    }
+};
+
+
 
 
 
@@ -2275,8 +2339,6 @@ class at_test_etang : public AreaTriggerScript
 };
 
 
-
-
 void AddSC_wandering_isle()
 {
     new at_huojin_monk_talk();
@@ -2302,6 +2364,7 @@ void AddSC_wandering_isle()
     new npc_balance_pole();
     new npc_balance_pole_finish();
     new npc_tushui_monk();
+    new npc_jojo_ironbrow();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
