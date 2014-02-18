@@ -1844,8 +1844,8 @@ enum NewFriend
 
     SPELL_AURA_GEYSER       = 117057,
     SPELL_WARNING_GEYSER    = 116695,
-    SPELL_BURST_GEYSER      = 116696
-
+    SPELL_BURST_GEYSER      = 116696,
+    NPC_WATER_BUNNY         = 60488
 };
 
 class npc_shu_reflexion : public CreatureScript
@@ -1870,7 +1870,7 @@ public:
 
         void Reset()
         {
-            WaterTimer = 2000;
+            WaterTimer = 3000;
             Jump1Timer = 10000;
             Jump2Timer = 20000;
             Jump3Timer = 30000;
@@ -1889,28 +1889,32 @@ public:
             if(Jump1Timer <= diff)
             {
                 me->GetMotionMaster()->MoveJump(1120.23f, 2883.21f, 96.50f, 10, 10);
-                Jump1Timer = 50000;
+                me->SummonCreature(NPC_WATER_BUNNY, 1117.72f, 2875.84f, 92.18f, 0, TEMPSUMMON_TIMED_DESPAWN, 20000);
+                Jump1Timer = 40000;
             }
             else Jump1Timer -= diff;
 
             if(Jump2Timer <= diff)
             {
                 me->GetMotionMaster()->MoveJump(1127.46f, 2859.07f, 97.60f, 10, 10);
-                Jump2Timer = 50000;
+                me->SummonCreature(NPC_WATER_BUNNY, 1131.24f, 2866.60f, 92.18f, 0, TEMPSUMMON_TIMED_DESPAWN, 20000);
+                Jump2Timer = 40000;
             }
             else Jump2Timer -= diff;
 
             if(Jump3Timer <= diff)
             {
                 me->GetMotionMaster()->MoveJump(1111.08f, 2850.20f, 94.70f, 10, 10);
-                Jump3Timer = 50000;
+                me->SummonCreature(NPC_WATER_BUNNY, 1110.47f, 2858.06f, 92.18f, 0, TEMPSUMMON_TIMED_DESPAWN, 20000);
+                Jump3Timer = 40000;
             }
             else Jump3Timer -= diff;
 
             if(Jump4Timer <= diff)
             {
                 me->GetMotionMaster()->MoveJump(1100.69f, 2881.31f, 94.00f, 10, 10);
-                Jump4Timer = 50000;
+                me->SummonCreature(NPC_WATER_BUNNY, 1097.62f, 2875.08f, 92.18f, 0, TEMPSUMMON_TIMED_DESPAWN, 20000);
+                Jump4Timer = 40000;
             }
             else Jump4Timer -= diff;
         }
@@ -1937,8 +1941,8 @@ public:
 
         void Reset()
         {
-            WarningTimer = 500;
-            AuraTimer = 4000;
+            WarningTimer = 3000;
+            AuraTimer = 7000;
         }
 
         void UpdateAI(const uint32 diff)
@@ -1954,6 +1958,7 @@ public:
             {
                 me->CastSpell(me, SPELL_AURA_GEYSER, true);
                 me->CastSpell(me, SPELL_BURST_GEYSER, true);
+                me->RemoveAurasDueToSpell(SPELL_WARNING_GEYSER);
                 AuraTimer = 40000;
             }
             else AuraTimer -= diff;
