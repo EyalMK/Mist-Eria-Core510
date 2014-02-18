@@ -2310,8 +2310,20 @@ class at_test_etang : public AreaTriggerScript
         {
         }
 
+        Transport* m_transport;
+
         bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
         {
+            if(m_transport)
+            {
+                if(player->HasAura(SPELL_MALE))
+                {
+                    player->RemoveAurasDueToSpell(SPELL_MALE);
+                    return true;
+                }
+                return false;
+            }
+
             if(player->GetPositionZ() <= 116.7)
             {
                 if(!player->HasAura(SPELL_MALE))
