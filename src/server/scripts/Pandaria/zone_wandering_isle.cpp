@@ -2045,7 +2045,7 @@ public:
                 case 1:
                     SetRun();
                     break;
-                case 27:
+                case 29:
                     if (Creature* chariot = me->FindNearestCreature(57208, 20.00f, true))
                         chariot->DespawnOrUnsummon();
 
@@ -2099,7 +2099,7 @@ public:
             if(Follow)
                 if (Unit* owner = me->FindNearestCreature(57207, 20.00f, true))
                 {
-                    me->GetMotionMaster()->MoveFollow(owner, 1.0f, 0);
+                    me->GetMotionMaster()->MoveFollow(owner, 0.5f, 0);
                     Follow = false;
                 }
         }
