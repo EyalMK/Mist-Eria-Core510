@@ -2312,6 +2312,15 @@ class at_test_etang : public AreaTriggerScript
 
         bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
         {
+            if(player->GetPositionZ() <= 116.7)
+            {
+                if(!player->HasAura(SPELL_MALE))
+                {
+                    player->CastSpell(player, SPELL_MALE, true);
+                    return true;
+                }
+                return false;
+            }
 
             if(player->HasAura(SPELL_MALE))
             {
