@@ -1984,59 +1984,34 @@ public:
     {
             npc_shu_escortAI(Creature* creature) : ScriptedAI(creature) {}
 
-            bool TestTalk;
-            bool Test;
-            bool Talk;
             uint32 Talk1Timer;
             uint32 Talk2Timer;
 
             void Reset()
             {
-                TestTalk = false;
-                Test = false;
-                Talk = true;
-            }
-
-            void MoveInLineOfSight(Unit* who)
-            {
-                if (who->GetEntry() == NPC_AYSA_REFLEXION)
-                    if (me->IsWithinDistInMap(who, 30.0f))
-                        if(!TestTalk)
-                            TestTalk = true;
+                Talk1Timer = 1000;
+                Talk2Timer = 6000;
             }
 
             void UpdateAI(const uint32 diff)
             {
-                if(TestTalk && !Test)
+                if (Talk1Timer <= diff)
                 {
-                    Talk1Timer = 1000;
-                    Talk2Timer = 6000;
-                    Test = true;
+                    if(Creature* aysa = me->FindNearestCreature(NPC_AYSA_REFLEXION, 100.00f, true))
+                        aysa->AI()->Talk(SAY_AYSA_REFLEXION_1);
+
+                    Talk1Timer = 120000;
                 }
+                else Talk1Timer -= diff;
 
-                Creature* aysa = me->FindNearestCreature(NPC_AYSA_REFLEXION, 100.00f, true);
-
-                if(Talk)
+                if (Talk2Timer <= diff)
                 {
-                    if (Talk1Timer <= diff)
-                    {
-                        if(aysa)
-                            aysa->AI()->Talk(SAY_AYSA_REFLEXION_1);
+                    if(Creature* aysa = me->FindNearestCreature(NPC_AYSA_REFLEXION, 100.00f, true))
+                        aysa->AI()->Talk(SAY_AYSA_REFLEXION_2);
 
-                        Talk1Timer = 50000;
-                    }
-                    else Talk1Timer -= diff;
-
-                    if (Talk2Timer <= diff)
-                    {
-                        if(aysa)
-                            aysa->AI()->Talk(SAY_AYSA_REFLEXION_2);
-
-                        Talk2Timer = 50000;
-                        Talk = false;
-                    }
-                    else Talk2Timer -= diff;
+                    Talk2Timer = 120000;
                 }
+                else Talk2Timer -= diff;
             }
     };
 };
