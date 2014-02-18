@@ -2036,15 +2036,6 @@ public:
         {
         }
 
-        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
-        {
-            if (who->GetTypeId() == TYPEID_PLAYER)
-            {
-                if (apply)
-                    Start(false, true, who->GetGUID());
-            }
-        }
-
         void WaypointReached(uint32 waypointId)
         {
             Player* player = GetPlayerForEscort();
@@ -2067,8 +2058,7 @@ public:
         {
             npc_escortAI::UpdateAI(uiDiff);
 
-            if (UpdateVictim())
-                return;
+            Start(false, true, who->GetGUID());
         }
     };
 
