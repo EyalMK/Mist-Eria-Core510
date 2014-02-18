@@ -1986,6 +1986,7 @@ public:
 
             bool TestTalk;
             bool Test;
+            bool Talk;
             uint32 Talk1Timer;
             uint32 Talk2Timer;
 
@@ -1993,6 +1994,7 @@ public:
             {
                 TestTalk = false;
                 Test = false;
+                Talk = true;
             }
 
             void MoveInLineOfSight(Unit* who)
@@ -2014,19 +2016,27 @@ public:
 
                 Creature* aysa = me->FindNearestCreature(NPC_AYSA_REFLEXION, 100.00f, true);
 
-                if (Talk1Timer <= diff)
+                if(Talk)
                 {
-                    if(aysa)
-                        aysa->AI()->Talk(SAY_AYSA_REFLEXION_1);
-                }
-                else Talk1Timer -= diff;
+                    if (Talk1Timer <= diff)
+                    {
+                        if(aysa)
+                            aysa->AI()->Talk(SAY_AYSA_REFLEXION_1);
 
-                if (Talk2Timer <= diff)
-                {
-                    if(aysa)
-                        aysa->AI()->Talk(SAY_AYSA_REFLEXION_2);
+                        Talk1Timer = 50000;
+                    }
+                    else Talk1Timer -= diff;
+
+                    if (Talk2Timer <= diff)
+                    {
+                        if(aysa)
+                            aysa->AI()->Talk(SAY_AYSA_REFLEXION_2);
+
+                        Talk2Timer = 50000;
+                        Talk = false;
+                    }
+                    else Talk2Timer -= diff;
                 }
-                else Talk2Timer -= diff;
             }
     };
 };
