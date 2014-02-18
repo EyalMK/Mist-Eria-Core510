@@ -417,6 +417,50 @@ private :
 };
 
 
+
+enum Area7258
+{
+    NPC_DELIVERY_CART_TENDER    = 57712,
+    SAY_DELIVERY_CART_TENDER    = 0
+};
+
+class at_delivery_cart_talk : public AreaTriggerScript
+{
+public :
+    at_delivery_cart_talk() : AreaTriggerScript("at_delivery_cart_talk") {}
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *at)
+    {
+        std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
+        if(iter != forbiddenPlayers.end())
+            return false;
+
+        Creature* delivery = player->FindNearestCreature(NPC_DELIVERY_CART_TENDER, 500.0f);
+        if(delivery)
+        {
+            forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+            delivery->AI()->Talk(SAY_DELIVERY_CART_TENDER, player->GetGUID());
+            return true;
+        }
+        return false;
+    }
+
+    void Update(const uint32 uiDiff)
+    {
+        for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter)
+        {
+            if(iter->second <= uiDiff)
+                forbiddenPlayers.erase(iter);
+            else
+                iter->second -= uiDiff ;
+        }
+    }
+
+private :
+    std::map<uint64, uint32> forbiddenPlayers ;
+};
+
+
 /************************************/
 /******* FIN AREATRIGGER ************/
 /************************************/
@@ -1790,6 +1834,85 @@ class at_the_spirit_of_water : public AreaTriggerScript
 };
 
 
+/*************************************/
+/********* A New Friend ***********/
+/*************************************/
+
+enum NewFriend
+{
+    SPELL_WATER_SPOUT   = 117063
+};
+
+class npc_shu_reflexion : public CreatureScript
+{
+public:
+    npc_shu_reflexion() : CreatureScript("npc_shu_reflexion") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_shu_reflexionAI(creature);
+    }
+
+    struct npc_shu_reflexionAI : public ScriptedAI
+    {
+        npc_shu_reflexionAI(Creature* creature) : ScriptedAI(creature){}
+
+        uint32 WaterTimer;
+        uint32 Jump1Timer;
+        uint32 Jump2Timer;
+        uint32 Jump3Timer;
+        uint32 Jump4Timer;
+
+        void Reset()
+        {
+            WaterTimer = 2000;
+            Jump1Timer = 10000;
+            Jump2Timer = 20000;
+            Jump3Timer = 30000;
+            Jump4Timer = 40000;
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if(WaterTimer <= diff)
+            {
+                me->CastSpell(me, SPELL_WATER_SPOUT, false);
+                WaterTimer = 10000;
+            }
+            else WaterTimer -= diff;
+
+            if(Jump1Timer <= diff)
+            {
+                me->GetMotionMaster()->MoveJump(1120.23f, 2883.21f, 96.50f, 10, 10);
+                Jump1Timer = 50000;
+            }
+            else Jump1Timer -= diff;
+
+            if(Jump2Timer <= diff)
+            {
+                me->GetMotionMaster()->MoveJump(1127.46f, 2859.07f, 97.60f, 10, 10);
+                Jump2Timer = 50000;
+            }
+            else Jump2Timer -= diff;
+
+            if(Jump3Timer <= diff)
+            {
+                me->GetMotionMaster()->MoveJump(1111.08f, 2850.20f, 94.70f, 10, 10);
+                Jump3Timer = 50000;
+            }
+            else Jump3Timer -= diff;
+
+            if(Jump4Timer <= diff)
+            {
+                me->GetMotionMaster()->MoveJump(1100.69f, 2881.31f, 94.00f, 10, 10);
+                Jump4Timer = 50000;
+            }
+            else Jump4Timer -= diff;
+        }
+    };
+};
+
+
 
 
 
@@ -2401,6 +2524,7 @@ void AddSC_wandering_isle()
     new at_ji_firepaw_talk();
     new at_area_7750_talk();
     new at_pop_child_panda();
+    new at_delivery_cart_talk();
     new npc_first_quest_pandaren();	
     new npc_trainee();
     new areatrigger_at_the_missing_driver();
@@ -2418,6 +2542,7 @@ void AddSC_wandering_isle()
     new npc_tushui_monk();
     new npc_jojo_ironbrow();
     new at_the_spirit_of_water();
+    new npc_shu_reflexion();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
