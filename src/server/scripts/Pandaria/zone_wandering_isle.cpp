@@ -1840,7 +1840,12 @@ class at_the_spirit_of_water : public AreaTriggerScript
 
 enum NewFriend
 {
-    SPELL_WATER_SPOUT   = 117063
+    SPELL_WATER_SPOUT       = 117063,
+
+    SPELL_AURA_GEYSER       = 117057,
+    SPELL_WARNING_GEYSER    = 116695,
+    SPELL_BURST_GEYSER      = 116696
+
 };
 
 class npc_shu_reflexion : public CreatureScript
@@ -1908,6 +1913,50 @@ public:
                 Jump4Timer = 50000;
             }
             else Jump4Timer -= diff;
+        }
+    };
+};
+
+
+class npc_water_spout_bunny : public CreatureScript
+{
+public:
+    npc_water_spout_bunny() : CreatureScript("npc_water_spout_bunny") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_water_spout_bunnyAI(creature);
+    }
+
+    struct npc_water_spout_bunnyAI : public ScriptedAI
+    {
+        npc_water_spout_bunnyAI(Creature* creature) : ScriptedAI(creature){}
+
+        uint32 WarningTimer;
+        uint32 AuraTimer;
+
+        void Reset()
+        {
+            WarningTimer = 500;
+            AuraTimer = 4000;
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if(WarningTimer <= diff)
+            {
+                me->CastSpell(me, SPELL_WARNING_GEYSER, true);
+                WarningTimer = 40000;
+            }
+            else WarningTimer -= diff;
+
+            if(AuraTimer <= diff)
+            {
+                me->CastSpell(me, SPELL_AURA_GEYSER, true);
+                me->CastSpell(me, SPELL_BURST_GEYSER, true);
+                AuraTimer = 40000;
+            }
+            else AuraTimer -= diff;
         }
     };
 };
@@ -2543,6 +2592,7 @@ void AddSC_wandering_isle()
     new npc_jojo_ironbrow();
     new at_the_spirit_of_water();
     new npc_shu_reflexion();
+    new npc_water_spout_bunny();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
