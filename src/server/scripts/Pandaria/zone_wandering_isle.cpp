@@ -2010,7 +2010,7 @@ public:
                 if(TestTalk && !Test)
                 {
                     Talk1Timer = 1000;
-                    Talk1Timer = 6000;
+                    Talk2Timer = 6000;
                     Test = true;
                 }
 
