@@ -1997,8 +1997,9 @@ public:
             {
                 if (Talk1Timer <= diff)
                 {
-                    if(Creature* aysa = me->FindNearestCreature(NPC_AYSA_REFLEXION, 100.00f, true))
-                        aysa->AI()->Talk(SAY_AYSA_REFLEXION_1);
+                    if(me->GetAreaId() == 5862)
+                        if(Creature* aysa = me->FindNearestCreature(NPC_AYSA_REFLEXION, 100.00f, true))
+                            aysa->AI()->Talk(SAY_AYSA_REFLEXION_1);
 
                     Talk1Timer = 120000;
                 }
@@ -2006,8 +2007,9 @@ public:
 
                 if (Talk2Timer <= diff)
                 {
-                    if(Creature* aysa = me->FindNearestCreature(NPC_AYSA_REFLEXION, 100.00f, true))
-                        aysa->AI()->Talk(SAY_AYSA_REFLEXION_2);
+                    if(me->GetAreaId() == 5862)
+                        if(Creature* aysa = me->FindNearestCreature(NPC_AYSA_REFLEXION, 100.00f, true))
+                            aysa->AI()->Talk(SAY_AYSA_REFLEXION_2);
 
                     Talk2Timer = 120000;
                 }
@@ -2016,6 +2018,105 @@ public:
     };
 };
 
+
+/*######
+## npc_nourished_yak_escort
+######*/
+
+class npc_nourished_yak_escort : public CreatureScript
+{
+public:
+    npc_nourished_yak_escort(): CreatureScript("npc_nourished_yak_escort") { }
+
+    struct npc_nourished_yak_escortAI : public npc_escortAI
+    {
+        npc_nourished_yak_escortAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
+        {
+            if (who->GetTypeId() == TYPEID_PLAYER)
+            {
+                if (apply)
+                    Start(false, true, who->GetGUID());
+            }
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    break;
+                case 27:
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void OnCharmed(bool /*apply*/){}
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            if (UpdateVictim())
+                return;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_nourished_yak_escortAI(creature);
+    }
+};
+
+/*######
+## npc_delivery_cart_escort
+######*/
+
+class npc_delivery_cart_escort : public CreatureScript
+{
+public:
+    npc_delivery_cart_escort(): CreatureScript("npc_delivery_cart_escort") { }
+
+    struct npc_delivery_cart_escortAI : public ScriptedAI
+    {
+        npc_delivery_cart_escortAI(Creature* creature) : ScriptedAI(creature) {}
+
+        bool Follow;
+
+        void Reset()
+        {
+            me->CastSpell(me, 108692, true);
+            me->CastSpell(me, 111810, true);
+            me->CastSpell(me, 108627, true);
+            Follow = true;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(Follow)
+                if (Unit* owner = me->FindNearestCreature(57207, 10.00f, true))
+                {
+                    me->GetMotionMaster()->MoveFollow(owner, 5.0f, 0);
+                    Follow = false;
+                }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_delivery_cart_escortAI(creature);
+    }
+};
 
 
 
@@ -2649,6 +2750,8 @@ void AddSC_wandering_isle()
     new npc_shu_reflexion();
     new npc_water_spout_bunny();
     new npc_shu_escort();
+    new npc_nourished_yak_escort();
+    new npc_delivery_cart_escort();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
