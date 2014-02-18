@@ -2046,6 +2046,9 @@ public:
                     SetRun();
                     break;
                 case 27:
+                    if (Creature* chariot = me->FindNearestCreature(57208, 20.00f, true))
+                        chariot->DespawnOrUnsummon();
+
                     me->DespawnOrUnsummon();
                     break;
 
@@ -2094,9 +2097,9 @@ public:
         void UpdateAI(const uint32 uiDiff)
         {
             if(Follow)
-                if (Unit* owner = me->FindNearestCreature(57207, 10.00f, true))
+                if (Unit* owner = me->FindNearestCreature(57207, 20.00f, true))
                 {
-                    me->GetMotionMaster()->MoveFollow(owner, 5.0f, 0);
+                    me->GetMotionMaster()->MoveFollow(owner, 1.0f, 0);
                     Follow = false;
                 }
         }
