@@ -1490,6 +1490,11 @@ public:
 /************** Etang ****************/
 /*************************************/
 
+enum AreaPole
+{
+    SPELL_TEST  = 102938
+};
+
 class npc_balance_pole: public CreatureScript
 {
 public:
@@ -1508,6 +1513,21 @@ public:
             {
                 me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 15);
                 me->SetFloatValue(UNIT_FIELD_COMBATREACH, 15);
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if (me->GetVehicleKit())
+                {
+                    if (Unit* passenger = me->GetVehicleKit()->GetPassenger(0))
+                    {
+                        if (passenger->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            if(passenger->HasAura(SPELL_TEST))
+                                passenger->RemoveAurasDueToSpell(SPELL_TEST);
+                        }
+                    }
+                }
             }
     };
 };
@@ -2310,20 +2330,8 @@ class at_test_etang : public AreaTriggerScript
         {
         }
 
-        Transport* m_transport;
-
         bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
         {
-            if(m_transport)
-            {
-                if(player->HasAura(SPELL_MALE))
-                {
-                    player->RemoveAurasDueToSpell(SPELL_MALE);
-                    return true;
-                }
-                return false;
-            }
-
             if(player->GetPositionZ() <= 116.7)
             {
                 if(!player->HasAura(SPELL_MALE))
