@@ -2058,7 +2058,7 @@ public:
         {
             npc_escortAI::UpdateAI(uiDiff);
 
-            Start(false, true, who->GetGUID());
+            Start(false, true);
         }
     };
 
