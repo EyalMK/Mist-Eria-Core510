@@ -1756,6 +1756,38 @@ public:
     }
 };
 
+/*#####
+## at_the_spirit_of_water
+#####*/
+
+enum eSpiritofwater
+{
+    QUEST_THE_SPIRIT_OF_WATER   = 29678,
+    SPELL_REFLECTION_CREDIT     = 108590
+};
+
+class at_the_spirit_of_water : public AreaTriggerScript
+{
+    public:
+
+        at_the_spirit_of_water(): AreaTriggerScript("at_the_spirit_of_water")
+        {
+        }
+
+        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+        {
+            if (player->isAlive())
+            {
+                if (player->GetQuestStatus(QUEST_THE_SPIRIT_OF_WATER) == QUEST_STATUS_INCOMPLETE)
+                {
+                    player->CastSpell(player, SPELL_REFLECTION_CREDIT, true);
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+};
 
 
 
@@ -2385,6 +2417,7 @@ void AddSC_wandering_isle()
     new npc_balance_pole_finish();
     new npc_tushui_monk();
     new npc_jojo_ironbrow();
+    new at_the_spirit_of_water();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
