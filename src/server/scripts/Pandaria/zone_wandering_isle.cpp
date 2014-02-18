@@ -1845,7 +1845,11 @@ enum NewFriend
     SPELL_AURA_GEYSER       = 117057,
     SPELL_WARNING_GEYSER    = 116695,
     SPELL_BURST_GEYSER      = 116696,
-    NPC_WATER_BUNNY         = 60488
+    NPC_WATER_BUNNY         = 60488,
+
+    NPC_AYSA_REFLEXION      = 54975,
+    SAY_AYSA_REFLEXION_1    = 0,
+    SAY_AYSA_REFLEXION_2    = 1
 };
 
 class npc_shu_reflexion : public CreatureScript
@@ -1963,6 +1967,67 @@ public:
             }
             else AuraTimer -= diff;
         }
+    };
+};
+
+class npc_shu_escort: public CreatureScript
+{
+public:
+    npc_shu_escort() : CreatureScript("npc_shu_escort") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_shu_escortAI(creature);
+    }
+
+    struct npc_shu_escortAI : public ScriptedAI
+    {
+            npc_shu_escortAI(Creature* creature) : ScriptedAI(creature) {}
+
+            bool TestTalk;
+            bool Test;
+            uint32 Talk1Timer;
+            uint32 Talk2Timer;
+
+            void Reset()
+            {
+                TestTalk = false;
+                Test = false;
+            }
+
+            void MoveInLineOfSight(Unit* who)
+            {
+                if (who->GetEntry() == NPC_AYSA_REFLEXION)
+                    if (me->IsWithinDistInMap(who, 30.0f))
+                        if(!TestTalk)
+                            TestTalk = true;
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if(TestTalk && !Test)
+                {
+                    Talk1Timer = 1000;
+                    Talk1Timer = 6000;
+                    Test = true;
+                }
+
+                Creature* aysa = me->FindNearestCreature(NPC_AYSA_REFLEXION, 100.00f, true);
+
+                if (Talk1Timer <= diff)
+                {
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_REFLEXION_1);
+                }
+                else Talk1Timer -= diff;
+
+                if (Talk2Timer <= diff)
+                {
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_REFLEXION_2);
+                }
+                else Talk2Timer -= diff;
+            }
     };
 };
 
@@ -2598,6 +2663,7 @@ void AddSC_wandering_isle()
     new at_the_spirit_of_water();
     new npc_shu_reflexion();
     new npc_water_spout_bunny();
+    new npc_shu_escort();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
