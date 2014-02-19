@@ -402,12 +402,21 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 			{
 				if (player->GetTeam() == ALLIANCE)
 				{
-					if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_1, 24.0f, true))
+					if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_1, 22.0f, true))
 					{
 						UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_SHOW, player);
-						m_MineCartsProgressBar[BG_SM_MINE_CART_1]++;
-						UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_1], player);
 
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_1] >= 100)
+						{
+							m_MineCartsProgressBar[BG_SM_MINE_CART_1] = 100;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_1], player);
+						}
+						else
+						{
+							m_MineCartsProgressBar[BG_SM_MINE_CART_1]++;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_1], player);
+						}
+						
 						if (m_MineCartsProgressBar[BG_SM_MINE_CART_1] > BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
 							if (cart->HasAura(BG_SM_CONTROL_VISUAL_NEUTRAL))
@@ -433,11 +442,20 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 						}
 					}
 
-					else if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_2, 24.0f, true))
+					else if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_2, 22.0f, true))
 					{
 						UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_SHOW, player);
-						m_MineCartsProgressBar[BG_SM_MINE_CART_2]++;
-						UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_2], player);
+
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_2] >= 100)
+						{
+							m_MineCartsProgressBar[BG_SM_MINE_CART_2] = 100;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_2], player);
+						}
+						else
+						{
+							m_MineCartsProgressBar[BG_SM_MINE_CART_2]++;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_2], player);
+						}
 
 						if (m_MineCartsProgressBar[BG_SM_MINE_CART_2] > BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
@@ -464,11 +482,20 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 						}
 					}
 
-					else if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_3, 24.0f, true))
+					else if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_3, 22.0f, true))
 					{
 						UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_SHOW, player);
-						m_MineCartsProgressBar[BG_SM_MINE_CART_3]++;
-						UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_3], player);
+
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_3] >= 100)
+						{
+							m_MineCartsProgressBar[BG_SM_MINE_CART_3] = 100;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_3], player);
+						}
+						else
+						{
+							m_MineCartsProgressBar[BG_SM_MINE_CART_3]++;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_3], player);
+						}
 
 						if (m_MineCartsProgressBar[BG_SM_MINE_CART_3] > BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
@@ -499,11 +526,20 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 				}
 				else // for GetTeam() == HORDE
 				{
-					if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_1, 24.0f, true))
+					if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_1, 22.0f, true))
 					{
 						UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_SHOW, player);
-						m_MineCartsProgressBar[BG_SM_MINE_CART_1]--;
-						UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_1], player);
+
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_1] <= 0)
+						{
+							m_MineCartsProgressBar[BG_SM_MINE_CART_1] = 0;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_1], player);
+						}
+						else
+						{
+							m_MineCartsProgressBar[BG_SM_MINE_CART_1]--;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_1], player);
+						}
 
 						if (m_MineCartsProgressBar[BG_SM_MINE_CART_1] < BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
@@ -530,11 +566,20 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 						}
 					}
 
-					else if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_2, 24.0f, true))
+					else if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_2, 22.0f, true))
 					{
 						UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_SHOW, player);
-						m_MineCartsProgressBar[BG_SM_MINE_CART_2]--;
-						UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_2], player);
+
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_2] <= 0)
+						{
+							m_MineCartsProgressBar[BG_SM_MINE_CART_2] = 0;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_2], player);
+						}
+						else
+						{
+							m_MineCartsProgressBar[BG_SM_MINE_CART_2]--;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_2], player);
+						}
 
 						if (m_MineCartsProgressBar[BG_SM_MINE_CART_2] < BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
@@ -561,11 +606,20 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 						}
 					}
 
-					else if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_3, 24.0f, true))
+					else if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_3, 22.0f, true))
 					{
 						UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_SHOW, player);
-						m_MineCartsProgressBar[BG_SM_MINE_CART_3]--;
-						UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_3], player);
+
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_3] <= 0)
+						{
+							m_MineCartsProgressBar[BG_SM_MINE_CART_3] = 0;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_3], player);
+						}
+						else
+						{
+							m_MineCartsProgressBar[BG_SM_MINE_CART_3]--;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_3], player);
+						}
 						
 						if (m_MineCartsProgressBar[BG_SM_MINE_CART_3] < BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
