@@ -2791,6 +2791,76 @@ class at_test_etang : public AreaTriggerScript
         }
 };
 
+/**
+ * Simple class to handle the scripting of the npc 55556 for the quest 29774, because it is not possible to dot this in DB
+ * SQL Query : UPDATE creature_template SET ScriptName = "npc_shu_quest_29774" WHERE entry = 55556 ;
+ */
+class npc_shu_quest_29774 : public CreatureScript
+{
+public :
+    /// Constructor (using CreatureScript constructor)
+    npc_shu_quest_29774() : CreatureScript("npc_shu_quest_29774")
+    {
+        
+    }
+    
+    /// Returns false in case a pointer is null, or if the player doesn't have the quest
+    /// Returns true otherwise
+    /// Adds a gossip item on the player, to end a quest
+    bool OnGossipHello(Player *pPlayer, Creature *pCreature)
+    {
+        // Pointer check
+        if(!pPlayer || pCreature)
+            return false ;
+        
+        // Quest check
+        if(!pPlayer->hasQuest(QUEST_NOT_IN_THE_FACE))
+        {
+            pPlayer->PlayerTalkClass->SendCloseGossip();
+            return false ;
+        }
+        
+        // Add the item
+        pPlayer->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_CHAT, "Shu, pouvez-vous réveiller Wugou pour moi ?", 
+                                                              pCreature->GetGUID(), GOSSIP_ACTION_INFO_DEF + 1, "", 0, false);
+        // Send it
+        pPlayer->PlayerTalkClass->SendGossipMenu(pPlayer->GetDefaultGossipMenuForSource(pCreature), pCreature->GetGUID());
+    }
+    
+    /// Returns false in case a pointer is null, or if the action is not the good one
+    /// Returns true otherwise
+    /// Basically, the purpose of this is to cast the spell 104017 on the player, due to SpellImplicitTargets restrictions
+    bool OnGossipSelect(Player *pPlayer, Creature *pCreature, uint32 sender, uint32 action)
+    {
+        // Pointer check
+        if(!pPlayer || !pCreature)
+            return false ;
+        
+        // Check for the right action
+        if(action == GOSSIP_ACTION_INFO_DEF + 1)
+        {
+            // Clear the menus
+            pPlayer->PlayerTalkClass->ClearMenus();
+            // Cast the spell
+            pPlayer->CastSpell(pPlayer, SPELL_SUMMON_SPIRIT_OF_WATER, true);
+            // Close the menu
+            pPlayer->PlayerTalkClass->SendCloseGossip();
+            return true ;
+        }
+        
+    }
+    
+private :
+    /// Miscellanous values
+    enum NotInTheFaceQuest
+    {
+        // Quest
+        QUEST_NOT_IN_THE_FACE = 29774,
+        
+        // Spell
+        SPELL_SUMMON_SPIRIT_OF_WATER = 104017, // Summons 55558, Remove Aura 104018, Kill Credit 55548, Trigger Spell 118036, Apply Aura : Dummy
+    };
+};
 
 void AddSC_wandering_isle()
 {
@@ -2826,6 +2896,7 @@ void AddSC_wandering_isle()
     new npc_nourished_yak_escort();
     new npc_delivery_cart_escort();
     new npc_jojo_ironbrow_plank();
+	new npc_shu_quest_29774();
 
 
     new stalker_item_equiped();
