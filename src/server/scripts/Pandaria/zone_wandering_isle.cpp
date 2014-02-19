@@ -1849,7 +1849,9 @@ enum NewFriend
 
     NPC_AYSA_REFLEXION      = 54975,
     SAY_AYSA_REFLEXION_1    = 0,
-    SAY_AYSA_REFLEXION_2    = 1
+    SAY_AYSA_REFLEXION_2    = 1,
+
+    QUEST_THE_SOURCE        = 29680
 };
 
 class npc_shu_reflexion : public CreatureScript
@@ -1986,11 +1988,13 @@ public:
 
             uint32 Talk1Timer;
             uint32 Talk2Timer;
+            uint32 DespawnTimer;
 
             void Reset()
             {
                 Talk1Timer = 1000;
                 Talk2Timer = 6000;
+                DespawnTimer = 1000;
             }
 
             void UpdateAI(const uint32 diff)
@@ -2014,6 +2018,16 @@ public:
                     Talk2Timer = 120000;
                 }
                 else Talk2Timer -= diff;
+
+                if (DespawnTimer <= diff)
+                {
+                    if(Unit* owner = me->GetOwner())
+                        if(owner->ToPlayer() && owner->ToPlayer()->GetQuestStatus(QUEST_THE_SOURCE) == QUEST_STATUS_REWARDED)
+                            me->DespawnOrUnsummon();
+
+                    DespawnTimer = 1000;
+                }
+                else DespawnTimer -= diff;
             }
     };
 };
@@ -2173,6 +2187,7 @@ public:
         return new npc_jojo_ironbrow_plankAI(creature);
     }
 };
+
 
 
 
@@ -2811,6 +2826,7 @@ void AddSC_wandering_isle()
     new npc_nourished_yak_escort();
     new npc_delivery_cart_escort();
     new npc_jojo_ironbrow_plank();
+
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
