@@ -2188,6 +2188,41 @@ public:
     }
 };
 
+#define GOSSIP_SHU      "Shu, pouvez-vous réveiller Wugou pour moi ?"
+
+enum NotInTheFaceQuest
+{
+    QUEST_NOT_IN_THE_FACE           = 29774,
+    SPELL_SUMMON_SPIRIT_OF_WATER    = 104017
+};
+
+class npc_shu_quest_29774 : public CreatureScript
+{
+public :
+    npc_shu_quest_29774() : CreatureScript("npc_shu_quest_29774"){}
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    {
+        player->PlayerTalkClass->ClearMenus();
+        if (action == GOSSIP_ACTION_INFO_DEF+1)
+        {
+            player->CastSpell(player, SPELL_SUMMON_SPIRIT_OF_WATER, true);
+            player->CLOSE_GOSSIP_MENU();
+        }
+        return true;
+    }
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        if (player->GetQuestStatus(QUEST_NOT_IN_THE_FACE) == QUEST_STATUS_INCOMPLETE)
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SHU, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+
+        player->SEND_GOSSIP_MENU(55556, creature->GetGUID());
+        return true;
+    }
+};
+
+
 enum ShuWougou
 {
     SPELL_SHUS_WATER_SPLASH = 118027,
@@ -2219,10 +2254,12 @@ public:
 
                 switch (waypointId)
                 {
-                    case 5:
+                    case 7:
                         DoCast(SPELL_SHUS_WATER_SPLASH);
                         break;
-                    case 6:
+                    case 8:
+                        SetEscortPaused(true);
+
                         if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                             me->GetMotionMaster()->MoveFollow(summoner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
                         break;
@@ -2888,78 +2925,6 @@ class at_test_etang : public AreaTriggerScript
         }
 };
 
-/**
- * Simple class to handle the scripting of the npc 55556 for the quest 29774, because it is not possible to dot this in DB
- * SQL Query : UPDATE creature_template SET ScriptName = "npc_shu_quest_29774" WHERE entry = 55556 ;
- */
-class npc_shu_quest_29774 : public CreatureScript
-{
-public :
-    /// Constructor (using CreatureScript constructor)
-    npc_shu_quest_29774() : CreatureScript("npc_shu_quest_29774")
-    {
-        
-    }
-    
-    /// Returns false in case a pointer is null, or if the player doesn't have the quest
-    /// Returns true otherwise
-    /// Adds a gossip item on the player, to end a quest
-    bool OnGossipHello(Player *pPlayer, Creature *pCreature)
-    {
-        // Pointer check
-        if(!pPlayer || pCreature)
-            return false ;
-        
-        // Quest check
-        if(!pPlayer->hasQuest(QUEST_NOT_IN_THE_FACE))
-        {
-            pPlayer->PlayerTalkClass->SendCloseGossip();
-            return false ;
-        }
-        
-        // Add the item
-        pPlayer->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_CHAT, "Shu, pouvez-vous réveiller Wugou pour moi ?", 
-                                                              GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1, "", 0, false);
-        // Send it
-        pPlayer->PlayerTalkClass->SendGossipMenu(55556, pCreature->GetGUID());
-		
-		return true ;
-    }
-    
-    /// Returns false in case a pointer is null, or if the action is not the good one
-    /// Returns true otherwise
-    /// Basically, the purpose of this is to cast the spell 104017 on the player, due to SpellImplicitTargets restrictions
-    bool OnGossipSelect(Player *pPlayer, Creature *pCreature, uint32 sender, uint32 action)
-    {
-        // Pointer check
-        if(!pPlayer || !pCreature)
-            return false ;
-        
-        // Check for the right action
-        if(action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            // Clear the menus
-            pPlayer->PlayerTalkClass->ClearMenus();
-            // Cast the spell
-            pPlayer->CastSpell(pPlayer, SPELL_SUMMON_SPIRIT_OF_WATER, true);
-            // Close the menu
-            pPlayer->PlayerTalkClass->SendCloseGossip();
-            return true ;
-        }
-        
-    }
-    
-private :
-    /// Miscellanous values
-    enum NotInTheFaceQuest
-    {
-        // Quest
-        QUEST_NOT_IN_THE_FACE = 29774,
-        
-        // Spell
-        SPELL_SUMMON_SPIRIT_OF_WATER = 104017, // Summons 55558, Remove Aura 104018, Kill Credit 55548, Trigger Spell 118036, Apply Aura : Dummy
-    };
-};
 
 void AddSC_wandering_isle()
 {
