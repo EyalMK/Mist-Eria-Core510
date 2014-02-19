@@ -46,7 +46,7 @@ void BattlegroundSM::Reset()
 	m_TeamPointsCount[TEAM_ALLIANCE] = 0;
     m_TeamPointsCount[TEAM_HORDE] = 0;
     m_HonorScoreTics[TEAM_HORDE] = 0;
-	m_mineCartCheckTimer = MINE_CART_CHECK_TIMER;
+	m_mineCartCheckTimer = 1000;
     bool isBGWeekend = sBattlegroundMgr->IsBGWeekend(GetTypeID());
     m_HonorTics = (isBGWeekend) ? BG_SM_SMWeekendHonorTicks : BG_SM_NotSMWeekendHonorTicks;
 	m_IsInformedNearVictory = false;
@@ -54,13 +54,7 @@ void BattlegroundSM::Reset()
 	m_LastMineCart = 0;
 
     for (uint8 i = 0; i < SM_MINE_CART_MAX; ++i)
-    {
 		m_MineCartsProgressBar[i] = BG_SM_PROGRESS_BAR_NEUTRAL;
-        m_MineCartOwnedByTeam[i] = NEUTRAL;
-        m_MineCartState[i] = NEUTRAL;
-        m_PlayersNearMineCart[i].clear();
-        m_PlayersNearMineCart[i].reserve(15);                  //tip size
-    }
 }
 
 void BattlegroundSM::PostUpdateImpl(uint32 diff)
@@ -402,14 +396,10 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 {
 	if (m_mineCartCheckTimer <= 0)
 	{
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "CheckPlayerNearMineCart : m_mineCartCheckTimer <= 0");
-
 		for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
 		{
 			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
 			{
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "CheckPlayerNearMineCart : Player found !");
-
 				if (player->GetTeam() == ALLIANCE)
 				{
 					if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_1, 24.0f, true))
@@ -509,12 +499,8 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 				}
 				else // for GetTeam() == HORDE
 				{
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "CheckPlayerNearMineCart : HORDE Player");
-
 					if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_1, 24.0f, true))
 					{
-						sLog->outDebug(LOG_FILTER_NETWORKIO, "CheckPlayerNearMineCart : MINE CART FOUND");
-
 						UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_SHOW, player);
 						m_MineCartsProgressBar[BG_SM_MINE_CART_1]--;
 						UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_1], player);
@@ -609,7 +595,7 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 					else UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_DONT_SHOW, player);
 				}
 
-					m_mineCartCheckTimer = MINE_CART_CHECK_TIMER;
+					m_mineCartCheckTimer = 1000;
 			}
 		}
 	} else m_mineCartCheckTimer -= diff;

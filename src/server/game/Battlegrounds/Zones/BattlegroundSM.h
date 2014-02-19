@@ -194,18 +194,9 @@ class BattlegroundSM : public Battleground
 		uint32 m_MineCartsProgressBar[SM_MINE_CART_MAX];
 		uint8 m_LastMineCart; // 0 = Reset, 1 = First Mine Cart, 2 = Second Mine Cart, 3 = Third Mine Cart
 		uint32 m_MineCartTeamKeeper[SM_MINE_CART_MAX]; // keepers team
-        
 		uint32 m_MineCartSpawnTimer;
+		int32 m_mineCartCheckTimer;
 
-        uint32 m_MineCartOwnedByTeam[SM_MINE_CART_MAX];
-        uint8 m_MineCartState[SM_MINE_CART_MAX];
-        int32 m_MineCartBarStatus[SM_MINE_CART_MAX];
-		uint32 m_mineCartCheckTimer;
-        typedef std::vector<uint64> PlayersNearMineCartType;
-        PlayersNearMineCartType m_PlayersNearMineCart[SM_MINE_CART_MAX + 1];
-        uint8 m_CurrentMineCartPlayersCount[2*SM_MINE_CART_MAX];
-
-        int32 m_MineCartAddingTimer;
         uint32 m_HonorTics;
 		bool m_IsInformedNearVictory;
 };
