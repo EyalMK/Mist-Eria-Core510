@@ -572,14 +572,14 @@ bool BattlegroundSM::SetupBattleground()
 
     WorldSafeLocsEntry const* sg = NULL;
     sg = sWorldSafeLocsStore.LookupEntry(SM_GRAVEYARD_MAIN_ALLIANCE);
-    if (!sg || !AddSpiritGuide(SM_SPIRIT_ALLIANCE, sg->x, sg->y, sg->z, 3.0f, ALLIANCE))
+    if (!sg || !AddSpiritGuide(SM_SPIRIT_ALLIANCE, sg->x, sg->y, sg->z, 2.138462f, ALLIANCE))
     {
         sLog->outError(LOG_FILTER_SQL, "BatteGroundEY: Failed to spawn spirit guide! Battleground not created!");
         return false;
     }
 
     sg = sWorldSafeLocsStore.LookupEntry(SM_GRAVEYARD_MAIN_HORDE);
-    if (!sg || !AddSpiritGuide(SM_SPIRIT_HORDE, sg->x, sg->y, sg->z, 5.9f, HORDE))
+    if (!sg || !AddSpiritGuide(SM_SPIRIT_HORDE, sg->x, sg->y, sg->z, 5.570653f, HORDE))
     {
         sLog->outError(LOG_FILTER_SQL, "BatteGroundEY: Failed to spawn spirit guide! Battleground not created!");
         return false;
@@ -649,7 +649,7 @@ void BattlegroundSM::FillInitialWorldStates(WorldPacket& data)
 	data << uint32(SM_ALLIANCE_RESOURCES) << uint32(m_TeamPointsCount[TEAM_HORDE]);
 	data << uint32(SM_HORDE_RESOURCES) << uint32(m_TeamPointsCount[TEAM_ALLIANCE]);
 	data << uint32(SM_UNK2) << uint32(1);
-	data << uint32(SM_UNK3) << uint32(0);
+	data << uint32(SM_UNK3) << uint32(1);
 	data << uint32(SM_UNK4) << uint32(0);
 	data << uint32(SM_UNK5) << uint32(0);
 	data << uint32(SM_UNK6) << uint32(0);
