@@ -614,7 +614,10 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint32 mineCart[SM_M
 				if (player->FindNearestCreature(NPC_MINE_CART_1, 24.0f) ||
 					player->FindNearestCreature(NPC_MINE_CART_2, 24.0f) ||
 					player->FindNearestCreature(NPC_MINE_CART_3, 24.0f))
+				{
 					UpdatePlayerScore(player, SCORE_CART_CONTROLLED, 1);
+					player->RewardHonor(player, 1, irand(10, 12));
+				}
 		}
 }
 
@@ -642,17 +645,17 @@ void BattlegroundSM::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
 
 void BattlegroundSM::FillInitialWorldStates(WorldPacket& data)
 {
-	data << uint32(SM_UNK9) << uint32(0);
-	data << uint32(SM_UNK8) << uint32(0);
-	data << uint32(SM_UNK7) << uint32(0);
-	data << uint32(SM_UNK6) << uint32(0);
-	data << uint32(SM_UNK5) << uint32(0);
-	data << uint32(SM_UNK4) << uint32(0);
-	data << uint32(SM_UNK3) << uint32(0);
-	data << uint32(SM_UNK2) << uint32(0);
-    data << uint32(SM_HORDE_RESOURCES) << uint32(m_TeamPointsCount[TEAM_HORDE]);
-	data << uint32(SM_ALLIANCE_RESOURCES) << uint32(m_TeamPointsCount[TEAM_ALLIANCE]);
 	data << uint32(SM_UNK1) << uint32(0);
+	data << uint32(SM_ALLIANCE_RESOURCES) << uint32(m_TeamPointsCount[TEAM_HORDE]);
+	data << uint32(SM_HORDE_RESOURCES) << uint32(m_TeamPointsCount[TEAM_ALLIANCE]);
+	data << uint32(SM_UNK2) << uint32(0);
+	data << uint32(SM_UNK3) << uint32(0);
+	data << uint32(SM_UNK4) << uint32(0);
+	data << uint32(SM_UNK5) << uint32(0);
+	data << uint32(SM_UNK6) << uint32(0);
+	data << uint32(SM_UNK7) << uint32(0);
+	data << uint32(SM_UNK8) << uint32(0);
+	data << uint32(SM_UNK9) << uint32(0);
 }
 
 uint32 BattlegroundSM::GetPrematureWinner()
