@@ -2188,6 +2188,103 @@ public:
     }
 };
 
+enum ShuWougou
+{
+    SPELL_SHUS_WATER_SPLASH = 118027,
+    SPELL_WATER_CREDIT      = 104023,
+    SPELL_SLEEP             = 52742
+};
+
+class npc_shu_escort_wugou: public CreatureScript
+{
+public:
+    npc_shu_escort_wugou() : CreatureScript("npc_shu_escort_wugou") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_shu_escort_wugouAI(creature);
+    }
+
+    struct npc_shu_escort_wugouAI : public npc_escortAI
+    {
+            npc_shu_escort_wugouAI(Creature* creature) : npc_escortAI(creature) {}
+
+            void Reset()
+            {
+            }
+
+            void WaypointReached(uint32 waypointId)
+            {
+                Player* player = GetPlayerForEscort();
+
+                switch (waypointId)
+                {
+                    case 5:
+                        DoCast(SPELL_SHUS_WATER_SPLASH);
+                        break;
+                    case 6:
+                        if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                            me->GetMotionMaster()->MoveFollow(summoner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                        break;
+                }
+            }
+
+            void UpdateAI(const uint32 uiDiff)
+            {
+                npc_escortAI::UpdateAI(uiDiff);
+
+                if (UpdateVictim())
+                    return;
+
+                Start(false, true);
+            }
+    };
+};
+
+class npc_wugou_escort: public CreatureScript
+{
+public:
+    npc_wugou_escort() : CreatureScript("npc_wugou_escort") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_wugou_escortAI(creature);
+    }
+
+    struct npc_wugou_escortAI : public ScriptedAI
+    {
+            npc_wugou_escortAI(Creature* creature) : ScriptedAI(creature) {}
+
+            void Reset()
+            {
+                me->CastSpell(me, SPELL_SLEEP, true);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                me->SetStandState(UNIT_STAND_STATE_SIT);
+            }
+
+            void SpellHit(Unit* caster, const SpellInfo* spell)
+            {
+                if (spell->Id == SPELL_SHUS_WATER_SPLASH)
+                {
+                    me->RemoveAurasDueToSpell(SPELL_SLEEP);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    {
+                        me->GetMotionMaster()->MoveFollow(summoner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                        me->CastSpell(summoner, SPELL_WATER_CREDIT, true);
+                    }
+                }
+            }
+
+            void UpdateAI(const uint32 uiDiff)
+            {
+            }
+    };
+};
+
+
 
 
 
@@ -2899,6 +2996,8 @@ void AddSC_wandering_isle()
     new npc_delivery_cart_escort();
     new npc_jojo_ironbrow_plank();
 	new npc_shu_quest_29774();
+    new npc_shu_escort_wugou();
+    new npc_wugou_escort();
 
 
     new stalker_item_equiped();
