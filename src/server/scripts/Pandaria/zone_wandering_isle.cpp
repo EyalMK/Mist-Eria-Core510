@@ -2188,6 +2188,103 @@ public:
     }
 };
 
+enum ShuWougou
+{
+    SPELL_SHUS_WATER_SPLASH = 118027,
+    SPELL_WATER_CREDIT      = 104023,
+    SPELL_SLEEP             = 52742
+};
+
+class npc_shu_escort_wugou: public CreatureScript
+{
+public:
+    npc_shu_escort_wugou() : CreatureScript("npc_shu_escort_wugou") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_shu_escort_wugouAI(creature);
+    }
+
+    struct npc_shu_escort_wugouAI : public npc_escortAI
+    {
+            npc_shu_escort_wugouAI(Creature* creature) : npc_escortAI(creature) {}
+
+            void Reset()
+            {
+            }
+
+            void WaypointReached(uint32 waypointId)
+            {
+                Player* player = GetPlayerForEscort();
+
+                switch (waypointId)
+                {
+                    case 5:
+                        DoCast(SPELL_SHUS_WATER_SPLASH);
+                        break;
+                    case 6:
+                        if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                            me->GetMotionMaster()->MoveFollow(summoner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                        break;
+                }
+            }
+
+            void UpdateAI(const uint32 uiDiff)
+            {
+                npc_escortAI::UpdateAI(uiDiff);
+
+                if (UpdateVictim())
+                    return;
+
+                Start(false, true);
+            }
+    };
+};
+
+class npc_wugou_escort: public CreatureScript
+{
+public:
+    npc_wugou_escort() : CreatureScript("npc_wugou_escort") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_wugou_escortAI(creature);
+    }
+
+    struct npc_wugou_escortAI : public ScriptedAI
+    {
+            npc_wugou_escortAI(Creature* creature) : ScriptedAI(creature) {}
+
+            void Reset()
+            {
+                me->CastSpell(me, SPELL_SLEEP, true);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                me->SetStandState(UNIT_STAND_STATE_SIT);
+            }
+
+            void SpellHit(Unit* caster, const SpellInfo* spell)
+            {
+                if (spell->Id == SPELL_SHUS_WATER_SPLASH)
+                {
+                    me->RemoveAurasDueToSpell(SPELL_SLEEP);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    {
+                        me->GetMotionMaster()->MoveFollow(summoner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                        me->CastSpell(summoner, SPELL_WATER_CREDIT, true);
+                    }
+                }
+            }
+
+            void UpdateAI(const uint32 uiDiff)
+            {
+            }
+    };
+};
+
+
 
 
 
@@ -2791,6 +2888,78 @@ class at_test_etang : public AreaTriggerScript
         }
 };
 
+/**
+ * Simple class to handle the scripting of the npc 55556 for the quest 29774, because it is not possible to dot this in DB
+ * SQL Query : UPDATE creature_template SET ScriptName = "npc_shu_quest_29774" WHERE entry = 55556 ;
+ */
+class npc_shu_quest_29774 : public CreatureScript
+{
+public :
+    /// Constructor (using CreatureScript constructor)
+    npc_shu_quest_29774() : CreatureScript("npc_shu_quest_29774")
+    {
+        
+    }
+    
+    /// Returns false in case a pointer is null, or if the player doesn't have the quest
+    /// Returns true otherwise
+    /// Adds a gossip item on the player, to end a quest
+    bool OnGossipHello(Player *pPlayer, Creature *pCreature)
+    {
+        // Pointer check
+        if(!pPlayer || pCreature)
+            return false ;
+        
+        // Quest check
+        if(!pPlayer->hasQuest(QUEST_NOT_IN_THE_FACE))
+        {
+            pPlayer->PlayerTalkClass->SendCloseGossip();
+            return false ;
+        }
+        
+        // Add the item
+        pPlayer->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_CHAT, "Shu, pouvez-vous réveiller Wugou pour moi ?", 
+                                                              GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1, "", 0, false);
+        // Send it
+        pPlayer->PlayerTalkClass->SendGossipMenu(55556, pCreature->GetGUID());
+		
+		return true ;
+    }
+    
+    /// Returns false in case a pointer is null, or if the action is not the good one
+    /// Returns true otherwise
+    /// Basically, the purpose of this is to cast the spell 104017 on the player, due to SpellImplicitTargets restrictions
+    bool OnGossipSelect(Player *pPlayer, Creature *pCreature, uint32 sender, uint32 action)
+    {
+        // Pointer check
+        if(!pPlayer || !pCreature)
+            return false ;
+        
+        // Check for the right action
+        if(action == GOSSIP_ACTION_INFO_DEF + 1)
+        {
+            // Clear the menus
+            pPlayer->PlayerTalkClass->ClearMenus();
+            // Cast the spell
+            pPlayer->CastSpell(pPlayer, SPELL_SUMMON_SPIRIT_OF_WATER, true);
+            // Close the menu
+            pPlayer->PlayerTalkClass->SendCloseGossip();
+            return true ;
+        }
+        
+    }
+    
+private :
+    /// Miscellanous values
+    enum NotInTheFaceQuest
+    {
+        // Quest
+        QUEST_NOT_IN_THE_FACE = 29774,
+        
+        // Spell
+        SPELL_SUMMON_SPIRIT_OF_WATER = 104017, // Summons 55558, Remove Aura 104018, Kill Credit 55548, Trigger Spell 118036, Apply Aura : Dummy
+    };
+};
 
 void AddSC_wandering_isle()
 {
@@ -2826,6 +2995,9 @@ void AddSC_wandering_isle()
     new npc_nourished_yak_escort();
     new npc_delivery_cart_escort();
     new npc_jojo_ironbrow_plank();
+	new npc_shu_quest_29774();
+    new npc_shu_escort_wugou();
+    new npc_wugou_escort();
 
 
     new stalker_item_equiped();
