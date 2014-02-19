@@ -30,7 +30,7 @@ enum BG_SM_WorldStates
 	SM_UNK2							= 6439,
 	SM_UNK3							= 6440,
 	SM_UNK4							= 6441,
-	SM_UNK5							= 6442,
+	SM_DISPLAY_ALLIANCE_RESSOURCES	= 6442,
 	SM_UNK6							= 6443,
 	SM_UNK7							= 6875,
 	SM_UNK8							= 6876,
