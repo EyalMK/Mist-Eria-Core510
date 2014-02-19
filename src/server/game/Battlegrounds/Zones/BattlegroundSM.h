@@ -33,8 +33,8 @@ enum BG_SM_WorldStates
 	SM_DISPLAY_ALLIANCE_RESSOURCES	= 6442,
 	SM_DISPLAY_HORDE_RESSOURCES		= 6443,
 	SM_DISPLAY_PROGRESS_BAR			= 6875, // 0 = false, 1 = true
-	SM_UNK8							= 6876,
-	SM_UNK9							= 6877
+	SM_PROGRESS_BAR_STATUS			= 6876, // 0 = Horde max, 50 = Neutral, 100 = Alliance max
+	SM_UNK5							= 6877
 };
 
 enum BG_SM_MineCarts
@@ -46,15 +46,9 @@ enum BG_SM_MineCarts
 
 enum BG_SM_ProgressBarConsts
 {
-    BG_SM_MINE_CART_RADIUS                  = 24,
     BG_SM_PROGRESS_BAR_DONT_SHOW			= 0,
     BG_SM_PROGRESS_BAR_SHOW					= 1,
-    BG_SM_PROGRESS_BAR_PERCENT_GREY			= 40,
-    BG_SM_PROGRESS_BAR_STATE_MIDDLE			= 50,
-    BG_SM_PROGRESS_BAR_HORDE_CONTROLLED		= 0,
-    BG_SM_PROGRESS_BAR_NEUTRAL_LOW			= 30,
-    BG_SM_PROGRESS_BAR_NEUTRAL_HIGH			= 70,
-    BG_SM_PROGRESS_BAR_ALLI_CONTROLLED		= 100
+    BG_SM_PROGRESS_BAR_NEUTRAL				= 50,
 };
 
 enum BG_SM_Sounds
@@ -186,11 +180,6 @@ class BattlegroundSM : public Battleground
         void UpdatePointsCount(uint32 Team);
 		void SummonMineCart(uint32 diff);
 
-        /* Point status updating procedures */
-        void CheckSomeoneLeftMineCartArea();
-        void CheckSomeoneJoinedMineCartArea();
-        void UpdateMineCartStatuses();
-
         /* Scorekeeping */
         void AddPoints(uint32 Team, uint32 Points);
 
@@ -202,6 +191,7 @@ class BattlegroundSM : public Battleground
         uint32 m_TeamPointsCount[2];
 
         uint32 m_MineCartsTrigger[SM_MINE_CART_MAX];
+		uint32 m_MineCartsProgressBar[SM_MINE_CART_MAX];
 		uint8 m_LastMineCart; // 0 = Reset, 1 = First Mine Cart, 2 = Second Mine Cart, 3 = Third Mine Cart
 		uint32 m_MineCartTeamKeeper[SM_MINE_CART_MAX]; // keepers team
         
@@ -210,7 +200,7 @@ class BattlegroundSM : public Battleground
         uint32 m_MineCartOwnedByTeam[SM_MINE_CART_MAX];
         uint8 m_MineCartState[SM_MINE_CART_MAX];
         int32 m_MineCartBarStatus[SM_MINE_CART_MAX];
-		uint32 mineCartCheckTimer;
+		uint32 m_mineCartCheckTimer;
         typedef std::vector<uint64> PlayersNearMineCartType;
         PlayersNearMineCartType m_PlayersNearMineCart[SM_MINE_CART_MAX + 1];
         uint8 m_CurrentMineCartPlayersCount[2*SM_MINE_CART_MAX];
