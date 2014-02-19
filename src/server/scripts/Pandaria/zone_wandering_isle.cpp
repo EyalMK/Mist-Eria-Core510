@@ -2822,9 +2822,9 @@ public :
         
         // Add the item
         pPlayer->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_CHAT, "Shu, pouvez-vous réveiller Wugou pour moi ?", 
-                                                              pCreature->GetGUID(), GOSSIP_ACTION_INFO_DEF + 1, "", 0, false);
+                                                              GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1, "", 0, false);
         // Send it
-        pPlayer->PlayerTalkClass->SendGossipMenu(pPlayer->GetDefaultGossipMenuForSource(pCreature), pCreature->GetGUID());
+        pPlayer->PlayerTalkClass->SendGossipMenu(55556, pCreature->GetGUID());
     }
     
     /// Returns false in case a pointer is null, or if the action is not the good one
