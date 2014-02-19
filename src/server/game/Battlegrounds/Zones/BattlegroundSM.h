@@ -32,7 +32,7 @@ enum BG_SM_WorldStates
 	SM_UNK4							= 6441,
 	SM_DISPLAY_ALLIANCE_RESSOURCES	= 6442,
 	SM_DISPLAY_HORDE_RESSOURCES		= 6443,
-	SM_UNK7							= 6875,
+	SM_DISPLAY_PROGRESS_BAR			= 6875, // 0 = false, 1 = true
 	SM_UNK8							= 6876,
 	SM_UNK9							= 6877
 };
