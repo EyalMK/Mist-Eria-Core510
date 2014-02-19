@@ -69,8 +69,8 @@ void BattlegroundSM::PostUpdateImpl(uint32 diff)
 void BattlegroundSM::StartingEventCloseDoors()
 {
     SpawnBGObject(BG_SM_OBJECT_DOOR_A_1, RESPAWN_IMMEDIATELY);
-	SpawnBGObject(BG_SM_OBJECT_DOOR_A_2, RESPAWN_IMMEDIATELY);
     SpawnBGObject(BG_SM_OBJECT_DOOR_H_1, RESPAWN_IMMEDIATELY);
+	SpawnBGObject(BG_SM_OBJECT_DOOR_A_2, RESPAWN_IMMEDIATELY);
 	SpawnBGObject(BG_SM_OBJECT_DOOR_H_2, RESPAWN_IMMEDIATELY);
 
     for (uint8 i = BG_SM_OBJECT_MINE_DEPOT_1; i < BG_SM_OBJECT_MINE_DEPOT_4 + 1; ++i)
@@ -79,10 +79,11 @@ void BattlegroundSM::StartingEventCloseDoors()
 
 void BattlegroundSM::StartingEventOpenDoors()
 {
-    SpawnBGObject(BG_SM_OBJECT_DOOR_A_1, RESPAWN_ONE_DAY);
-    SpawnBGObject(BG_SM_OBJECT_DOOR_A_2, RESPAWN_ONE_DAY);
-	SpawnBGObject(BG_SM_OBJECT_DOOR_H_1, RESPAWN_ONE_DAY);
-	SpawnBGObject(BG_SM_OBJECT_DOOR_H_2, RESPAWN_ONE_DAY);
+	for (uint8 i = BG_SM_OBJECT_DOOR_A_1; i < BG_SM_OBJECT_DOOR_H_2 + 1; ++i)
+	{
+		DoorOpen(i);
+		SpawnBGObject(i, RESPAWN_ONE_DAY);
+	}
 	
 	for (uint8 i = BG_SM_OBJECT_MINE_DEPOT_1; i < BG_SM_OBJECT_MINE_DEPOT_4 + 1; ++i)
 		SpawnBGObject(i, RESPAWN_IMMEDIATELY);
@@ -736,10 +737,14 @@ void BattlegroundSM::RemovePlayer(Player* player, uint64 guid, uint32 /*team*/)
 bool BattlegroundSM::SetupBattleground()
 {
     // doors
-    if (!AddObject(BG_SM_OBJECT_MINE_DEPOT_1, BG_SM_MINE_DEPOT, BG_SM_DepotPos[0][0], BG_SM_DepotPos[0][1], BG_SM_DepotPos[0][2], BG_SM_DepotPos[0][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY) // Waterfall
+    if (!AddObject(BG_SM_OBJECT_MINE_DEPOT_1, BG_SM_MINE_DEPOT, BG_SM_DepotPos[0][0], BG_SM_DepotPos[0][1], BG_SM_DepotPos[0][2], BG_SM_DepotPos[0][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)    // Waterfall
 		|| !AddObject(BG_SM_OBJECT_MINE_DEPOT_2, BG_SM_MINE_DEPOT, BG_SM_DepotPos[1][0], BG_SM_DepotPos[1][1], BG_SM_DepotPos[1][2], BG_SM_DepotPos[1][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY) // Lava
 		|| !AddObject(BG_SM_OBJECT_MINE_DEPOT_3, BG_SM_MINE_DEPOT, BG_SM_DepotPos[2][0], BG_SM_DepotPos[2][1], BG_SM_DepotPos[2][2], BG_SM_DepotPos[2][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY) // Diamond
-		|| !AddObject(BG_SM_OBJECT_MINE_DEPOT_4, BG_SM_MINE_DEPOT, BG_SM_DepotPos[3][0], BG_SM_DepotPos[3][1], BG_SM_DepotPos[3][2], BG_SM_DepotPos[3][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)) // Troll
+		|| !AddObject(BG_SM_OBJECT_MINE_DEPOT_4, BG_SM_MINE_DEPOT, BG_SM_DepotPos[3][0], BG_SM_DepotPos[3][1], BG_SM_DepotPos[3][2], BG_SM_DepotPos[3][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY) // Troll
+		|| !AddObject(BG_SM_OBJECT_DOOR_A_1, BG_SM_DOOR, BG_SM_DoorPos[0][0], BG_SM_DoorPos[0][1], BG_SM_DoorPos[0][2], BG_SM_DoorPos[0][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
+		|| !AddObject(BG_SM_OBJECT_DOOR_A_2, BG_SM_DOOR, BG_SM_DoorPos[1][0], BG_SM_DoorPos[1][1], BG_SM_DoorPos[1][2], BG_SM_DoorPos[1][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
+		|| !AddObject(BG_SM_OBJECT_DOOR_H_1, BG_SM_DOOR, BG_SM_DoorPos[2][0], BG_SM_DoorPos[2][1], BG_SM_DoorPos[2][2], BG_SM_DoorPos[2][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
+		|| !AddObject(BG_SM_OBJECT_DOOR_H_1, BG_SM_DOOR, BG_SM_DoorPos[3][0], BG_SM_DoorPos[3][1], BG_SM_DoorPos[3][2], BG_SM_DoorPos[3][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY))
     {
         sLog->outError(LOG_FILTER_SQL, "BatteGroundSM: Failed to spawn some object Battleground not created!");
         return false;
