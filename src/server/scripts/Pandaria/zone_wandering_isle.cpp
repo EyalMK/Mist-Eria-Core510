@@ -2400,9 +2400,9 @@ public:
         void UpdateAI(const uint32 uiDiff)
         {
             if(Follow)
-                if (Unit* owner = me->FindNearestCreature(59498, 5.00f, true))
+                if (Unit* owner = me->FindNearestCreature(59498, 30.00f, true))
                 {
-                    me->GetMotionMaster()->MoveFollow(owner, 30.00f, 0);
+                    me->GetMotionMaster()->MoveFollow(owner, 0.05f, 0);
                     Follow = false;
                 }
         }
