@@ -400,7 +400,6 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 
 void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "CheckPlayerNearMineCart : ENTERING");
 	if (m_mineCartCheckTimer <= 0)
 	{
 		sLog->outDebug(LOG_FILTER_NETWORKIO, "CheckPlayerNearMineCart : m_mineCartCheckTimer <= 0");
