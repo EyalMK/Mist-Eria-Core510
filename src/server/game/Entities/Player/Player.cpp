@@ -10246,16 +10246,16 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
 			else
 			{
 				data << uint32(0x1924) << uint32(1);
-				data << uint32(0x1925) << uint32(50);
-				data << uint32(0x1926) << uint32(60);
-				data << uint32(0x1927) << uint32(1);
-				data << uint32(0x1928) << uint32(1);
-				data << uint32(0x1929) << uint32(1);
-				data << uint32(0x192a) << uint32(1);
-				data << uint32(0x192b) << uint32(1);
-				data << uint32(0x1adb) << uint32(1);
-				data << uint32(0x1adc) << uint32(1);
-				data << uint32(0x1add) << uint32(1);
+				data << uint32(0x1925) << uint32(0);
+				data << uint32(0x1926) << uint32(0);
+				data << uint32(0x1927) << uint32(0);
+				data << uint32(0x1928) << uint32(0);
+				data << uint32(0x1929) << uint32(0);
+				data << uint32(0x192a) << uint32(0);
+				data << uint32(0x192b) << uint32(0);
+				data << uint32(0x1adb) << uint32(0);
+				data << uint32(0x1adc) << uint32(0);
+				data << uint32(0x1add) << uint32(0);
 			}
 			break;
 		// Tol'Viron Arena
