@@ -2112,6 +2112,71 @@ public:
 };
 
 
+/*######
+## npc_jojo_ironbrow_plank
+######*/
+
+enum JojoIronbrowPlank
+{
+    SPELL_PLANK_CAST    = 129293,
+    SAY_JOJO_PLANK_1    = 0,
+    SAY_JOJO_PLANK_2    = 1
+};
+
+class npc_jojo_ironbrow_plank : public CreatureScript
+{
+public:
+    npc_jojo_ironbrow_plank(): CreatureScript("npc_jojo_ironbrow_plank") { }
+
+    struct npc_jojo_ironbrow_plankAI : public npc_escortAI
+    {
+        npc_jojo_ironbrow_plankAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    Talk(SAY_JOJO_PLANK_1);
+                    break;
+                case 2:
+                    me->CastSpell(me, SPELL_PLANK_CAST, true);
+                    break;
+                case 3:
+                    Talk(SAY_JOJO_PLANK_2);
+                    break;
+                case 12:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            if (UpdateVictim())
+                return;
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_jojo_ironbrow_plankAI(creature);
+    }
+};
+
+
+
+
 
 
 
@@ -2745,6 +2810,7 @@ void AddSC_wandering_isle()
     new npc_shu_escort();
     new npc_nourished_yak_escort();
     new npc_delivery_cart_escort();
+    new npc_jojo_ironbrow_plank();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
