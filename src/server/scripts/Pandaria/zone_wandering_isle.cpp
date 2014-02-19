@@ -2060,7 +2060,7 @@ public:
                     SetRun();
                     break;
                 case 29:
-                    if (Creature* chariot = me->FindNearestCreature(57208, 20.00f, true))
+                    if (Creature* chariot = me->FindNearestCreature(57208, 50.00f, true))
                         chariot->DespawnOrUnsummon();
 
                     me->DespawnOrUnsummon();
@@ -2111,7 +2111,7 @@ public:
         void UpdateAI(const uint32 uiDiff)
         {
             if(Follow)
-                if (Unit* owner = me->FindNearestCreature(57207, 20.00f, true))
+                if (Unit* owner = me->FindNearestCreature(57207, 100.00f, true))
                 {
                     me->GetMotionMaster()->MoveFollow(owner, 0.5f, 0);
                     Follow = false;
@@ -2309,7 +2309,7 @@ public:
 
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     {
-                        me->GetMotionMaster()->MoveFollow(summoner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                        me->GetMotionMaster()->MoveFollow(summoner, PET_FOLLOW_DIST, M_PI);
                         me->CastSpell(summoner, SPELL_WATER_CREDIT, true);
                     }
                 }
@@ -2319,6 +2319,99 @@ public:
             {
             }
     };
+};
+
+
+/*######
+## npc_nourished_yak_escort_2
+######*/
+
+class npc_nourished_yak_escort_2 : public CreatureScript
+{
+public:
+    npc_nourished_yak_escort_2(): CreatureScript("npc_nourished_yak_escort_2") { }
+
+    struct npc_nourished_yak_escort_2AI : public npc_escortAI
+    {
+        npc_nourished_yak_escort_2AI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    break;
+                case 31:
+                    if (Creature* chariot = me->FindNearestCreature(59496, 50.00f, true))
+                        chariot->DespawnOrUnsummon();
+
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void OnCharmed(bool /*apply*/){}
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_nourished_yak_escort_2AI(creature);
+    }
+};
+
+/*######
+## npc_delivery_cart_escort_2
+######*/
+
+class npc_delivery_cart_escort_2 : public CreatureScript
+{
+public:
+    npc_delivery_cart_escort_2(): CreatureScript("npc_delivery_cart_escort_2") { }
+
+    struct npc_delivery_cart_escort_2AI : public ScriptedAI
+    {
+        npc_delivery_cart_escort_2AI(Creature* creature) : ScriptedAI(creature) {}
+
+        bool Follow;
+
+        void Reset()
+        {
+            me->CastSpell(me, 108692, true);
+            me->CastSpell(me, 111810, true);
+            me->CastSpell(me, 108627, true);
+            Follow = true;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(Follow)
+                if (Unit* owner = me->FindNearestCreature(59498, 100.00f, true))
+                {
+                    me->GetMotionMaster()->MoveFollow(owner, 0.5f, 0);
+                    Follow = false;
+                }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_delivery_cart_escort_2AI(creature);
+    }
 };
 
 
@@ -2963,6 +3056,8 @@ void AddSC_wandering_isle()
 	new npc_shu_quest_29774();
     new npc_shu_escort_wugou();
     new npc_wugou_escort();
+    new npc_nourished_yak_escort_2();
+    new npc_delivery_cart_escort_2();
 
 
     new stalker_item_equiped();
