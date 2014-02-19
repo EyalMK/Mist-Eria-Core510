@@ -671,20 +671,12 @@ void BattlegroundSM::AddPlayer(Player* player)
     //create score and add it to map
     BattlegroundSMScore* sc = new BattlegroundSMScore;
 
-    m_PlayersNearMineCart[SM_MINE_CART_MAX].push_back(player->GetGUID());
-
     PlayerScores[player->GetGUID()] = sc;
 }
 
 void BattlegroundSM::RemovePlayer(Player* player, uint64 guid, uint32 /*team*/)
 {
-    // sometimes flag aura not removed :(
-    for (int j = SM_MINE_CART_MAX; j >= 0; --j)
-    {
-        for (size_t i = 0; i < m_PlayersNearMineCart[j].size(); ++i)
-            if (m_PlayersNearMineCart[j][i] == guid)
-                m_PlayersNearMineCart[j].erase(m_PlayersNearMineCart[j].begin() + i);
-    }
+
 }
 
 bool BattlegroundSM::SetupBattleground()
