@@ -652,8 +652,8 @@ void BattlegroundSM::FillInitialWorldStates(WorldPacket& data)
 	data << uint32(SM_UNK3) << uint32(1);
 	data << uint32(SM_UNK4) << uint32(1);
 	data << uint32(SM_DISPLAY_ALLIANCE_RESSOURCES) << uint32(1);
-	data << uint32(SM_UNK6) << uint32(1);
-	data << uint32(SM_UNK7) << uint32(0);
+	data << uint32(SM_DISPLAY_HORDE_RESSOURCES) << uint32(1);
+	data << uint32(SM_UNK7) << uint32(1);
 	data << uint32(SM_UNK8) << uint32(0);
 	data << uint32(SM_UNK9) << uint32(0);
 }

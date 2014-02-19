@@ -31,7 +31,7 @@ enum BG_SM_WorldStates
 	SM_UNK3							= 6440,
 	SM_UNK4							= 6441,
 	SM_DISPLAY_ALLIANCE_RESSOURCES	= 6442,
-	SM_UNK6							= 6443,
+	SM_DISPLAY_HORDE_RESSOURCES		= 6443,
 	SM_UNK7							= 6875,
 	SM_UNK8							= 6876,
 	SM_UNK9							= 6877
