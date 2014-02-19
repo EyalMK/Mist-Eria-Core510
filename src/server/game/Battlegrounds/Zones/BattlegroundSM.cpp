@@ -365,39 +365,39 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff) // Testing all worldst
 			{
 				if (player->GetTeam() == ALLIANCE)
 				{
-					if (player->FindNearestCreature(NPC_MINE_CART_1, 24.0f))
+					if (player->FindNearestCreature(NPC_MINE_CART_1, 24.0f, true))
 					{
 						UpdateWorldStateForPlayer(SM_UNK1, 1, player);
 						UpdateWorldStateForPlayer(SM_ALLIANCE_RESOURCES, 1, player);
 					}
 
-					if (player->FindNearestCreature(NPC_MINE_CART_2, 24.0f))
+					if (player->FindNearestCreature(NPC_MINE_CART_2, 24.0f, true))
 						UpdateWorldStateForPlayer(SM_UNK2, 1, player);
 
-					if (player->FindNearestCreature(NPC_MINE_CART_3, 24.0f))
+					if (player->FindNearestCreature(NPC_MINE_CART_3, 24.0f, true))
 						UpdateWorldStateForPlayer(SM_UNK3, 1, player);
 				}
 				else
 				{
-					if (player->FindNearestCreature(NPC_MINE_CART_1, 24.0f))
+					if (player->FindNearestCreature(NPC_MINE_CART_1, 24.0f, true))
 					{
 						UpdateWorldStateForPlayer(SM_UNK4, 1, player);
 						UpdateWorldStateForPlayer(SM_HORDE_RESOURCES, 1, player);
 					}
 
-					if (player->FindNearestCreature(NPC_MINE_CART_2, 24.0f))
+					if (player->FindNearestCreature(NPC_MINE_CART_2, 24.0f, true))
 						UpdateWorldStateForPlayer(SM_UNK5, 1, player);
 
-					if (player->FindNearestCreature(NPC_MINE_CART_3, 24.0f))
+					if (player->FindNearestCreature(NPC_MINE_CART_3, 24.0f, true))
 						UpdateWorldStateForPlayer(SM_UNK6, 1, player);
 
-					if (player->FindNearestCreature(64048, 24.0f))
+					if (player->FindNearestCreature(64048, 24.0f, true))
 						UpdateWorldStateForPlayer(SM_UNK7, 1, player);
 
-					if (player->FindNearestCreature(64049, 24.0f))
+					if (player->FindNearestCreature(64049, 24.0f, true))
 						UpdateWorldStateForPlayer(SM_UNK8, 1, player);
 
-					if (player->FindNearestCreature(64050, 24.0f))
+					if (player->FindNearestCreature(64050, 24.0f, true))
 					{
 						UpdateWorldStateForPlayer(SM_UNK9, 1, player);
 						UpdatePlayerScore(player, SCORE_CART_CONTROLLED, 1); // TEST

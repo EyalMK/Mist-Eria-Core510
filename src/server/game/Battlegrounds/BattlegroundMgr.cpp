@@ -551,9 +551,12 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
 
         switch(bg->GetMapId())
         {
+		case 727:
+			*data << uint32(((BattlegroundSMScore*)itr->second)->MineCartCaptures);    // mine carts captured
+			break;
         case 998:
-            *data << uint32(((BattlegroundTKScore*)itr->second)->OrbPossesions);
-			*data << uint32(((BattlegroundTKScore*)itr->second)->PointsScored);
+            *data << uint32(((BattlegroundTKScore*)itr->second)->OrbPossesions);       // orbs owned
+			*data << uint32(((BattlegroundTKScore*)itr->second)->PointsScored);        // points gained by orbs
             break;
         case 566:
             *data << uint32(((BattlegroundEYScore*)itr->second)->FlagCaptures);        // flag captures
@@ -567,8 +570,8 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
             *data << uint32(((BattlegroundABScore*)itr->second)->BasesDefended);       // bases defended
             break;
         case 607:
-            *data << uint32(((BattlegroundSAScore*)itr->second)->demolishers_destroyed);
-            *data << uint32(((BattlegroundSAScore*)itr->second)->gates_destroyed);
+            *data << uint32(((BattlegroundSAScore*)itr->second)->demolishers_destroyed);// demolishers destroyed
+            *data << uint32(((BattlegroundSAScore*)itr->second)->gates_destroyed);      // gates destroyed
             break;
         case 628:
             *data << uint32(((BattlegroundICScore*)itr->second)->BasesAssaulted);       // bases assaulted
@@ -583,11 +586,11 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
             *data << uint32(((BattlegroundBFGScore*)itr->second)->BasesDefended);       // bases defended
             break;
         case 30:
-            *data << uint32(((BattlegroundAVScore*)itr->second)->GraveyardsAssaulted); // GraveyardsAssaulted
-            *data << uint32(((BattlegroundAVScore*)itr->second)->GraveyardsDefended);  // GraveyardsDefended
-            *data << uint32(((BattlegroundAVScore*)itr->second)->TowersAssaulted);     // TowersAssaulted
-            *data << uint32(((BattlegroundAVScore*)itr->second)->TowersDefended);      // TowersDefended
-            *data << uint32(((BattlegroundAVScore*)itr->second)->MinesCaptured);       // MinesCaptured
+            *data << uint32(((BattlegroundAVScore*)itr->second)->GraveyardsAssaulted); // graveyards assaulted
+            *data << uint32(((BattlegroundAVScore*)itr->second)->GraveyardsDefended);  // graveyards defended
+            *data << uint32(((BattlegroundAVScore*)itr->second)->TowersAssaulted);     // towers assaulted
+            *data << uint32(((BattlegroundAVScore*)itr->second)->TowersDefended);      // towers defended
+            *data << uint32(((BattlegroundAVScore*)itr->second)->MinesCaptured);       // mines captured
             break;
         default:
             break;
@@ -596,7 +599,6 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
 
     if(bg->GetStatus() == STATUS_WAIT_LEAVE)
         *data << uint8(bg->GetWinner());
-
 
     if(isRated)
     {
