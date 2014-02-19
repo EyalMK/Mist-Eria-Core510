@@ -365,7 +365,7 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff) // Testing all worldst
 			{
 				if (player->GetTeam() == ALLIANCE)
 				{
-					if (player->FindNearestCreature(NPC_MINE_CART_1, 24.0f, true))
+					/*if (player->FindNearestCreature(NPC_MINE_CART_1, 24.0f, true))
 					{
 						UpdateWorldStateForPlayer(SM_UNK1, 1, player);
 						UpdateWorldStateForPlayer(SM_ALLIANCE_RESOURCES, 1, player);
@@ -375,11 +375,11 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff) // Testing all worldst
 						UpdateWorldStateForPlayer(SM_UNK2, 1, player);
 
 					if (player->FindNearestCreature(NPC_MINE_CART_3, 24.0f, true))
-						UpdateWorldStateForPlayer(SM_UNK3, 1, player);
+						UpdateWorldStateForPlayer(SM_UNK3, 1, player);*/
 				}
 				else
 				{
-					if (player->FindNearestCreature(NPC_MINE_CART_1, 24.0f, true))
+					/*if (player->FindNearestCreature(NPC_MINE_CART_1, 24.0f, true))
 					{
 						UpdateWorldStateForPlayer(SM_UNK4, 1, player);
 						UpdateWorldStateForPlayer(SM_HORDE_RESOURCES, 1, player);
@@ -401,7 +401,7 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff) // Testing all worldst
 					{
 						UpdateWorldStateForPlayer(SM_UNK9, 1, player);
 						UpdatePlayerScore(player, SCORE_CART_CONTROLLED, 1); // TEST
-					}
+					}*/
 				}
 
 					mineCartCheckTimer = MINE_CART_CHECK_TIMER;
@@ -652,7 +652,7 @@ void BattlegroundSM::FillInitialWorldStates(WorldPacket& data)
 	data << uint32(SM_UNK3) << uint32(1);
 	data << uint32(SM_UNK4) << uint32(1);
 	data << uint32(SM_DISPLAY_ALLIANCE_RESSOURCES) << uint32(1);
-	data << uint32(SM_UNK6) << uint32(0);
+	data << uint32(SM_UNK6) << uint32(1);
 	data << uint32(SM_UNK7) << uint32(0);
 	data << uint32(SM_UNK8) << uint32(0);
 	data << uint32(SM_UNK9) << uint32(0);
