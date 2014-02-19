@@ -46,7 +46,7 @@ void BattlegroundSM::Reset()
 	m_TeamPointsCount[TEAM_ALLIANCE] = 0;
     m_TeamPointsCount[TEAM_HORDE] = 0;
     m_HonorScoreTics[TEAM_HORDE] = 0;
-	mineCartCheckTimer = MINE_CART_CHECK_TIMER;
+	m_mineCartCheckTimer = MINE_CART_CHECK_TIMER;
     bool isBGWeekend = sBattlegroundMgr->IsBGWeekend(GetTypeID());
     m_HonorTics = (isBGWeekend) ? BG_SM_SMWeekendHonorTicks : BG_SM_NotSMWeekendHonorTicks;
 	m_IsInformedNearVictory = false;
@@ -400,11 +400,17 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 
 void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 {
-	if (mineCartCheckTimer <= 0)
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "CheckPlayerNearMineCart : ENTERING");
+	if (m_mineCartCheckTimer <= 0)
 	{
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "CheckPlayerNearMineCart : m_mineCartCheckTimer <= 0");
+
 		for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+		{
 			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
 			{
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "CheckPlayerNearMineCart : Player found !");
+
 				if (player->GetTeam() == ALLIANCE)
 				{
 					if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_1, 24.0f, true))
@@ -504,8 +510,12 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 				}
 				else // for GetTeam() == HORDE
 				{
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "CheckPlayerNearMineCart : HORDE Player");
+
 					if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_1, 24.0f, true))
 					{
+						sLog->outDebug(LOG_FILTER_NETWORKIO, "CheckPlayerNearMineCart : MINE CART FOUND");
+
 						UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_SHOW, player);
 						m_MineCartsProgressBar[BG_SM_MINE_CART_1]--;
 						UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_1], player);
@@ -600,9 +610,10 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 					else UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_DONT_SHOW, player);
 				}
 
-					mineCartCheckTimer = MINE_CART_CHECK_TIMER;
+					m_mineCartCheckTimer = MINE_CART_CHECK_TIMER;
 			}
-	} else mineCartCheckTimer -= diff;
+		}
+	} else m_mineCartCheckTimer -= diff;
 }
 
 void BattlegroundSM::AddPoints(uint32 Team, uint32 Points)

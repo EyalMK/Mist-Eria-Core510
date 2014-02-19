@@ -200,7 +200,7 @@ class BattlegroundSM : public Battleground
         uint32 m_MineCartOwnedByTeam[SM_MINE_CART_MAX];
         uint8 m_MineCartState[SM_MINE_CART_MAX];
         int32 m_MineCartBarStatus[SM_MINE_CART_MAX];
-		uint32 mineCartCheckTimer;
+		uint32 m_mineCartCheckTimer;
         typedef std::vector<uint64> PlayersNearMineCartType;
         PlayersNearMineCartType m_PlayersNearMineCart[SM_MINE_CART_MAX + 1];
         uint8 m_CurrentMineCartPlayersCount[2*SM_MINE_CART_MAX];
