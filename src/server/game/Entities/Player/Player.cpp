@@ -10248,7 +10248,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
 				data << uint32(0x1924) << uint32(1);
 				data << uint32(0x1925) << uint32(0);
 				data << uint32(0x1926) << uint32(0);
-				data << uint32(0x1927) << uint32(0);
+				data << uint32(0x1927) << uint32(1);
 				data << uint32(0x1928) << uint32(0);
 				data << uint32(0x1929) << uint32(0);
 				data << uint32(0x192a) << uint32(0);
