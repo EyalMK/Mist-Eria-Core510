@@ -2825,6 +2825,8 @@ public :
                                                               GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1, "", 0, false);
         // Send it
         pPlayer->PlayerTalkClass->SendGossipMenu(55556, pCreature->GetGUID());
+		
+		return true ;
     }
     
     /// Returns false in case a pointer is null, or if the action is not the good one
