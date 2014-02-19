@@ -2254,11 +2254,12 @@ public:
 
                 switch (waypointId)
                 {
-                    case 5:
+                    case 7:
                         DoCast(SPELL_SHUS_WATER_SPLASH);
                         break;
-                    case 6:
+                    case 8:
                         SetEscortPaused(true);
+
                         if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                             me->GetMotionMaster()->MoveFollow(summoner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
                         break;
