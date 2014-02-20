@@ -2145,8 +2145,8 @@ public:
         {
             me->CastSpell(me, 108692, true);
             me->CastSpell(me, 111810, true);
-            me->CastSpell(me, 108627, true);
-            StartTimer = 1000;
+            me->CastSpell(me, 120795, true);
+            StartTimer = 800;
         }
 
         void WaypointReached(uint32 waypointId)
@@ -2453,9 +2453,9 @@ public:
         void Reset()
         {
             me->CastSpell(me, 108692, true);
-            me->CastSpell(me, 111810, true);
-            me->CastSpell(me, 108627, true);
-            StartTimer = 1000;
+            me->CastSpell(me, 108878, true);
+            me->CastSpell(me, 111809, true);
+            StartTimer = 800;
         }
 
         void WaypointReached(uint32 waypointId)
