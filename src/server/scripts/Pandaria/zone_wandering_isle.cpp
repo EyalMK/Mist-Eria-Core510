@@ -2288,7 +2288,9 @@ enum ShuWougou
 {
     SPELL_SHUS_WATER_SPLASH = 118027,
     SPELL_WATER_CREDIT      = 104023,
-    SPELL_SLEEP             = 52742
+    SPELL_SLEEP             = 52742,
+
+    QUEST_THE_SPIRIT_AND_BODY   = 29775
 };
 
 class npc_shu_escort_wugou: public CreatureScript
@@ -2305,8 +2307,11 @@ public:
     {
             npc_shu_escort_wugouAI(Creature* creature) : npc_escortAI(creature) {}
 
+            uint32 DespawnTimer;
+
             void Reset()
             {
+                DespawnTimer = 1000;
             }
 
             void WaypointReached(uint32 waypointId)
@@ -2335,6 +2340,16 @@ public:
                     return;
 
                 Start(false, true);
+
+                if (DespawnTimer <= uiDiff)
+                {
+                    if(Unit* owner = me->GetOwner())
+                        if(owner->ToPlayer() && owner->ToPlayer()->GetQuestStatus(QUEST_THE_SPIRIT_AND_BODY) == QUEST_STATUS_REWARDED)
+                            me->DespawnOrUnsummon();
+
+                    DespawnTimer = 1000;
+                }
+                else DespawnTimer -= uiDiff;
             }
     };
 };
@@ -2353,11 +2368,14 @@ public:
     {
             npc_wugou_escortAI(Creature* creature) : ScriptedAI(creature) {}
 
+            uint32 DespawnTimer;
+
             void Reset()
             {
                 me->CastSpell(me, SPELL_SLEEP, true);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                 me->SetStandState(UNIT_STAND_STATE_SIT);
+                DespawnTimer = 1000;
             }
 
             void SpellHit(Unit* caster, const SpellInfo* spell)
@@ -2378,6 +2396,15 @@ public:
 
             void UpdateAI(const uint32 uiDiff)
             {
+                if (DespawnTimer <= uiDiff)
+                {
+                    if(Unit* owner = me->GetOwner())
+                        if(owner->ToPlayer() && owner->ToPlayer()->GetQuestStatus(QUEST_THE_SPIRIT_AND_BODY) == QUEST_STATUS_REWARDED)
+                            me->DespawnOrUnsummon();
+
+                    DespawnTimer = 1000;
+                }
+                else DespawnTimer -= uiDiff;
             }
     };
 };
