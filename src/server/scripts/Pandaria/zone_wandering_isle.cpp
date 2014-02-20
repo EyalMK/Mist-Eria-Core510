@@ -2550,7 +2550,7 @@ public:
                 case 1:
                     SetRun();
                     break;
-                case 12:
+                case 13:
                     me->DespawnOrUnsummon();
                     break;
 
@@ -2658,6 +2658,66 @@ public:
         return new npc_master_shang_xi_templeAI(creature);
     }
 };
+
+
+/*######
+## npc_ji_firepaw_escort
+######*/
+
+enum JiFirepaw
+{
+    SAY_FIREPAW    = 0
+};
+
+
+class npc_ji_firepaw_escort : public CreatureScript
+{
+public:
+    npc_ji_firepaw_escort(): CreatureScript("npc_ji_firepaw_escort") { }
+
+    struct npc_ji_firepaw_escortAI : public npc_escortAI
+    {
+        npc_ji_firepaw_escortAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    break;
+                case 2:
+                    Talk(SAY_FIREPAW, player->GetGUID());
+                    break;
+                case 73:
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void OnCharmed(bool /*apply*/){}
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ji_firepaw_escortAI(creature);
+    }
+};
+
 
 
 
@@ -3307,6 +3367,7 @@ void AddSC_wandering_isle()
     new npc_delivery_cart_escort_2();
     new npc_uplifting_draft();
     new npc_master_shang_xi_temple();
+    new npc_ji_firepaw_escort();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
