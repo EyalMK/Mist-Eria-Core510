@@ -2693,7 +2693,7 @@ public:
                     SetRun();
                     break;
                 case 2:
-                    Talk(SAY_FIREPAW, player->GetGUID());
+                    Talk(SAY_FIREPAW);
                     break;
                 case 73:
                     me->DespawnOrUnsummon();
