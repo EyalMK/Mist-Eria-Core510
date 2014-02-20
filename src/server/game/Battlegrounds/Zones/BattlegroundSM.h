@@ -68,6 +68,7 @@ enum BG_SM_Spells
 enum SMBattlegroundObjectEntry
 {
 	BG_SM_MINE_DEPOT			= 400433,
+	BG_SM_DOOR					= 400434,
 };
 
 enum SMBattlegroundGaveyards
@@ -129,7 +130,14 @@ const float BG_SM_DepotPos[4][4] =
     {778.444946f, 500.949707f, 359.738983f, 0.737040f}   // Troll
 };
 
-#define MINE_CART_CHECK_TIMER		1000
+const float BG_SM_DoorPos[4][4] =
+{
+    {852.0289952f, 158.216003f, 326.761011f, 0.031073f},  // Alliance 1
+    {830.092102f, 143.925507f, 326.5f, 3.130245f},       // Alliance 2
+    {652.177612f, 228.493423f, 326.917480f, 0.163844f},  // Horde 1
+    {635.622925f, 208.220886f, 326.648315f, 3.717332f}   // Horde 2
+};
+
 #define MINE_CART_RESPAWN_TIME		10000
 #define MINE_CART_SPAWN_INTERVAL	30000
 
