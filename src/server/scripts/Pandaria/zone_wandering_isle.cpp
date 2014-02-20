@@ -2523,6 +2523,141 @@ public:
 };
 
 
+/*######
+## npc_uplifting_draft
+######*/
+
+class npc_uplifting_draft : public CreatureScript
+{
+public:
+    npc_uplifting_draft(): CreatureScript("npc_uplifting_draft") { }
+
+    struct npc_uplifting_draftAI : public npc_escortAI
+    {
+        npc_uplifting_draftAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+            me->CastSpell(me, 86134, true);
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    break;
+                case 12:
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void OnCharmed(bool /*apply*/){}
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_uplifting_draftAI(creature);
+    }
+};
+
+
+enum MasterShangXi
+{
+    SAY_MASTER_1    = 1,
+    SAY_MASTER_2    = 2,
+    SAY_MASTER_3    = 3,
+    SAY_MASTER_4    = 4
+};
+
+class npc_master_shang_xi_temple: public CreatureScript
+{
+public:
+    npc_master_shang_xi_temple() : CreatureScript("npc_master_shang_xi_temple") { }
+
+    bool OnQuestReward(Player* /*player*/, Creature* creature, const Quest* quest, uint32 /*slot*/)
+    {
+        if (quest->GetQuestId() == 29775)
+        {
+            creature->CastSpell(creature, 106667, true);
+            CAST_AI(npc_master_shang_xi_temple::npc_master_shang_xi_templeAI, creature->AI())->StartEvent2 = true;
+        }
+        return true;
+    }
+
+    struct npc_master_shang_xi_templeAI : public ScriptedAI
+    {
+            npc_master_shang_xi_templeAI(Creature* creature) : ScriptedAI(creature) {}
+
+            bool StartEvent2;
+            uint32 Talk_1_Timer;
+            uint32 Talk_2_Timer;
+            uint32 Talk_3_Timer;
+            uint32 Talk_4_Timer;
+
+            void Reset()
+            {
+                StartEvent2 = false;
+                Talk_1_Timer = 1000;
+                Talk_2_Timer = 11000;
+                Talk_3_Timer = 21000;
+                Talk_4_Timer = 30000;
+            }
+
+            void UpdateAI(const uint32 uiDiff)
+            {
+                if(StartEvent2)
+                {
+                    if (Talk_1_Timer <= uiDiff)
+                    {
+                        Talk(SAY_MASTER_1);
+                        Talk_1_Timer = 50000;
+                    }
+                    else Talk_1_Timer -= uiDiff;
+
+                    if (Talk_2_Timer <= uiDiff)
+                    {
+                        Talk(SAY_MASTER_2);
+                        Talk_2_Timer = 50000;
+                    }
+                    else Talk_2_Timer -= uiDiff;
+
+                    if (Talk_3_Timer <= uiDiff)
+                    {
+                        Talk(SAY_MASTER_3);
+                        Talk_3_Timer = 50000;
+                    }
+                    else Talk_3_Timer -= uiDiff;
+
+                    if (Talk_4_Timer <= uiDiff)
+                    {
+                        Talk(SAY_MASTER_4);
+                        Talk_4_Timer = 50000;
+                        StartEvent2 = false;
+                    }
+                    else Talk_4_Timer -= uiDiff;
+                }
+            }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_master_shang_xi_templeAI(creature);
+    }
+};
+
+
+
 
 
 
@@ -3167,7 +3302,8 @@ void AddSC_wandering_isle()
     new npc_wugou_escort();
     new npc_nourished_yak_escort_2();
     new npc_delivery_cart_escort_2();
-
+    new npc_uplifting_draft();
+    new npc_master_shang_xi_temple();
 
     new stalker_item_equiped();
     new mob_jaomin_ro();
