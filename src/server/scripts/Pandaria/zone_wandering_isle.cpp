@@ -2393,38 +2393,40 @@ class npc_delivery_cart_escort_2 : public CreatureScript
 public:
     npc_delivery_cart_escort_2(): CreatureScript("npc_delivery_cart_escort_2") { }
 
-    struct npc_delivery_cart_escort_2AI : public ScriptedAI
+    struct npc_delivery_cart_escort_2AI : public npc_escortAI
     {
-        npc_delivery_cart_escort_2AI(Creature* creature) : ScriptedAI(creature) {}
-
-        bool Follow;
-        uint32 TestTimer;
+        npc_delivery_cart_escort_2AI(Creature* creature) : npc_escortAI(creature) {}
 
         void Reset()
         {
             me->CastSpell(me, 108692, true);
             me->CastSpell(me, 111810, true);
             me->CastSpell(me, 108627, true);
-            Follow = true;
-            TestTimer = 1000;
         }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    break;
+                case 31:
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void OnCharmed(bool /*apply*/){}
 
         void UpdateAI(const uint32 uiDiff)
         {
-            if(Follow)
-            {
-                if (TestTimer <= uiDiff)
-                {
-                    if (Creature* yack = me->FindNearestCreature(59498, 100.00f, true))
-                    {
-                        me->GetMotionMaster()->MoveFollow(yack, 1.00f, 0);
-                        Follow = false;
-                    }
+            npc_escortAI::UpdateAI(uiDiff);
 
-                    TestTimer = 2000;
-                }
-                else TestTimer -= uiDiff;
-            }
+            Start(false, true);
         }
     };
 
