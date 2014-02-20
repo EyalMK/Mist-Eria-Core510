@@ -2562,6 +2562,8 @@ public:
         void UpdateAI(const uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
         }
     };
 
@@ -2585,11 +2587,11 @@ class npc_master_shang_xi_temple: public CreatureScript
 public:
     npc_master_shang_xi_temple() : CreatureScript("npc_master_shang_xi_temple") { }
 
-    bool OnQuestReward(Player* /*player*/, Creature* creature, const Quest* quest, uint32 /*slot*/)
+    bool OnQuestReward(Player* player, Creature* creature, const Quest* quest, uint32 /*slot*/)
     {
         if (quest->GetQuestId() == 29775)
         {
-            creature->CastSpell(creature, 106667, true);
+            player->CastSpell(player, 106667, true);
             CAST_AI(npc_master_shang_xi_temple::npc_master_shang_xi_templeAI, creature->AI())->StartEvent2 = true;
         }
         return true;
@@ -2643,6 +2645,7 @@ public:
                     {
                         Talk(SAY_MASTER_4);
                         Talk_4_Timer = 50000;
+                        Reset();
                         StartEvent2 = false;
                     }
                     else Talk_4_Timer -= uiDiff;
