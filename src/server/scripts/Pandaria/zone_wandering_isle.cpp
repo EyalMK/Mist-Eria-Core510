@@ -2099,6 +2099,7 @@ public:
         npc_delivery_cart_escortAI(Creature* creature) : ScriptedAI(creature) {}
 
         bool Follow;
+        uint32 TestTimer;
 
         void Reset()
         {
@@ -2106,16 +2107,25 @@ public:
             me->CastSpell(me, 111810, true);
             me->CastSpell(me, 108627, true);
             Follow = true;
+            TestTimer = 1000;
         }
 
         void UpdateAI(const uint32 uiDiff)
         {
             if(Follow)
-                if (Unit* owner = me->FindNearestCreature(57207, 100.00f, true))
+            {
+                if (TestTimer <= uiDiff)
                 {
-                    me->GetMotionMaster()->MoveFollow(owner, 0.5f, 0);
-                    Follow = false;
+                    if (Creature* yack = me->FindNearestCreature(57207, 100.00f, true))
+                    {
+                        me->GetMotionMaster()->MoveFollow(yack, 1.00f, 0);
+                        Follow = false;
+                    }
+
+                    TestTimer = 2000;
                 }
+                else TestTimer -= uiDiff;
+            }
         }
     };
 
@@ -2388,6 +2398,7 @@ public:
         npc_delivery_cart_escort_2AI(Creature* creature) : ScriptedAI(creature) {}
 
         bool Follow;
+        uint32 TestTimer;
 
         void Reset()
         {
@@ -2395,16 +2406,25 @@ public:
             me->CastSpell(me, 111810, true);
             me->CastSpell(me, 108627, true);
             Follow = true;
+            TestTimer = 1000;
         }
 
         void UpdateAI(const uint32 uiDiff)
         {
             if(Follow)
-                if (Unit* owner = me->FindNearestCreature(59498, 100.00f, true))
+            {
+                if (TestTimer <= uiDiff)
                 {
-                    me->GetMotionMaster()->MoveFollow(owner, 0.5f, 0);
-                    Follow = false;
+                    if (Creature* yack = me->FindNearestCreature(59498, 100.00f, true))
+                    {
+                        me->GetMotionMaster()->MoveFollow(yack, 1.00f, 0);
+                        Follow = false;
+                    }
+
+                    TestTimer = 2000;
                 }
+                else TestTimer -= uiDiff;
+            }
         }
     };
 
