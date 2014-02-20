@@ -2094,38 +2094,48 @@ class npc_delivery_cart_escort : public CreatureScript
 public:
     npc_delivery_cart_escort(): CreatureScript("npc_delivery_cart_escort") { }
 
-    struct npc_delivery_cart_escortAI : public ScriptedAI
+    struct npc_delivery_cart_escortAI : public npc_escortAI
     {
-        npc_delivery_cart_escortAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_delivery_cart_escortAI(Creature* creature) : npc_escortAI(creature) {}
 
-        bool Follow;
-        uint32 TestTimer;
+        uint32 StartTimer;
 
         void Reset()
         {
             me->CastSpell(me, 108692, true);
             me->CastSpell(me, 111810, true);
             me->CastSpell(me, 108627, true);
-            Follow = true;
-            TestTimer = 1000;
+            StartTimer = 500;
         }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    break;
+                case 29:
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void OnCharmed(bool /*apply*/){}
 
         void UpdateAI(const uint32 uiDiff)
         {
-            if(Follow)
-            {
-                if (TestTimer <= uiDiff)
-                {
-                    if (Creature* yack = me->FindNearestCreature(57207, 100.00f, true))
-                    {
-                        me->GetMotionMaster()->MoveFollow(yack, 1.00f, 0);
-                        Follow = false;
-                    }
+            npc_escortAI::UpdateAI(uiDiff);
 
-                    TestTimer = 2000;
-                }
-                else TestTimer -= uiDiff;
+            if (StartTimer <= uiDiff)
+            {
+                Start(false, true);
+                StartTimer  = 300000;
             }
+            else StartTimer -= uiDiff;
         }
     };
 
@@ -2397,11 +2407,14 @@ public:
     {
         npc_delivery_cart_escort_2AI(Creature* creature) : npc_escortAI(creature) {}
 
+        uint32 StartTimer;
+
         void Reset()
         {
             me->CastSpell(me, 108692, true);
             me->CastSpell(me, 111810, true);
             me->CastSpell(me, 108627, true);
+            StartTimer = 500;
         }
 
         void WaypointReached(uint32 waypointId)
@@ -2426,7 +2439,12 @@ public:
         {
             npc_escortAI::UpdateAI(uiDiff);
 
-            Start(false, true);
+            if (StartTimer <= uiDiff)
+            {
+                Start(false, true);
+                StartTimer  = 300000;
+            }
+            else StartTimer -= uiDiff;
         }
     };
 
