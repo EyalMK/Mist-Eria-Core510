@@ -52,7 +52,7 @@ public :
             Creature* huojin = player->FindNearestCreature(NPC_HUOJIN_MONK, 500.0f);
             if(huojin)
             {
-                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 120000));
                 huojin->AI()->Talk(SAY_HUOJIN, player->GetGUID());
                 return true;
             }
@@ -98,7 +98,7 @@ public :
             Creature* jaomin = player->FindNearestCreature(NPC_JAOMIN_RO, 500.0f);
             if(jaomin)
             {
-                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 120000));
                 jaomin->AI()->Talk(SAY_JAOMIN, player->GetGUID());
                 return true;
             }
@@ -143,7 +143,7 @@ public :
             Creature* nim = player->FindNearestCreature(NPC_TRAINEE_NIM, 500.0f);
             if(nim)
             {
-                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 120000));
                 nim->AI()->Talk(SAY_NIM, player->GetGUID());
                 return true;
             }
@@ -188,7 +188,7 @@ public :
             Creature* guang = player->FindNearestCreature(NPC_TRAINEE_GUANG, 500.0f);
             if(guang)
             {
-                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 120000));
                 guang->AI()->Talk(SAY_GUANG, player->GetGUID());
                 return true;
             }
@@ -240,7 +240,7 @@ public :
             Creature* lorvo = player->FindNearestCreature(NPC_LORVO, 500.0f);
             if(lorvo)
             {
-                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 120000));
                 lorvo->AI()->Talk(SAY_LORVO, player->GetGUID());
                 return true;
             }
@@ -250,7 +250,7 @@ public :
             Creature* aysa = player->FindNearestCreature(NPC_AYSA, 500.0f);
             if(aysa)
             {
-                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 120000));
                 aysa->AI()->Talk(SAY_AYSA, player->GetGUID());
                 return true;
             }
@@ -296,7 +296,7 @@ public :
             Creature* ji = player->FindNearestCreature(NPC_JI_FIREPAW, 500.0f);
             if(ji)
             {
-                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 120000));
                 ji->AI()->Talk(SAY_JI, player->GetGUID());
                 return true;
             }
@@ -352,7 +352,7 @@ public :
             if(chia)
                 chia->AI()->Talk(SAY_CHIA, player->GetGUID());
 
-            forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+            forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 120000));
             return true;
         }
         return false;
@@ -438,8 +438,49 @@ public :
         Creature* delivery = player->FindNearestCreature(NPC_DELIVERY_CART_TENDER, 500.0f);
         if(delivery)
         {
-            forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+            forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 120000));
             delivery->AI()->Talk(SAY_DELIVERY_CART_TENDER, player->GetGUID());
+            return true;
+        }
+        return false;
+    }
+
+    void Update(const uint32 uiDiff)
+    {
+        for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter)
+        {
+            if(iter->second <= uiDiff)
+                forbiddenPlayers.erase(iter);
+            else
+                iter->second -= uiDiff ;
+        }
+    }
+
+private :
+    std::map<uint64, uint32> forbiddenPlayers ;
+};
+
+enum Area7822
+{
+    SAY_DELIVERY_CART_TENDER_1    = 1
+};
+
+class at_delivery_cart_talk_2 : public AreaTriggerScript
+{
+public :
+    at_delivery_cart_talk_2() : AreaTriggerScript("at_delivery_cart_talk_2") {}
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *at)
+    {
+        std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
+        if(iter != forbiddenPlayers.end())
+            return false;
+
+        Creature* delivery = player->FindNearestCreature(NPC_DELIVERY_CART_TENDER, 500.0f);
+        if(delivery)
+        {
+            forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 120000));
+            delivery->AI()->Talk(SAY_DELIVERY_CART_TENDER_1, player->GetGUID());
             return true;
         }
         return false;
@@ -2105,7 +2146,7 @@ public:
             me->CastSpell(me, 108692, true);
             me->CastSpell(me, 111810, true);
             me->CastSpell(me, 108627, true);
-            StartTimer = 500;
+            StartTimer = 1000;
         }
 
         void WaypointReached(uint32 waypointId)
@@ -2414,7 +2455,7 @@ public:
             me->CastSpell(me, 108692, true);
             me->CastSpell(me, 111810, true);
             me->CastSpell(me, 108627, true);
-            StartTimer = 500;
+            StartTimer = 1000;
         }
 
         void WaypointReached(uint32 waypointId)
@@ -3070,6 +3111,7 @@ void AddSC_wandering_isle()
     new at_area_7750_talk();
     new at_pop_child_panda();
     new at_delivery_cart_talk();
+    new at_delivery_cart_talk_2();
     new npc_first_quest_pandaren();	
     new npc_trainee();
     new areatrigger_at_the_missing_driver();
