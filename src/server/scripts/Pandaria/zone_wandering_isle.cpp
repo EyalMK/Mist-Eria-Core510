@@ -26,6 +26,591 @@
 #include "GridNotifiers.h"
 #include "ScriptedEscortAI.h"
 
+/***** Script Non Twwex ******/
+
+/********************************/
+/**The Lesson of the Iron Bough**/
+/********************************/
+
+class EquippedItemCheckPredicate
+{
+public :
+    EquippedItemCheckPredicate(uint32 questId, uint32 itemId, uint32 itemId2) : item1(itemId), item2(itemId2), quest(questId)
+    {
+        if(itemId2) twice = true ;
+    }
+
+    bool operator()(Player* p)
+    {
+        if(!p) return false ;
+
+        if(!twice)
+        {
+            if(p->hasQuest(quest) && p->GetQuestStatus(quest) == QUEST_STATUS_INCOMPLETE && p->GetItemByEntry(item1))
+                return(p->GetItemByEntry(item1)->IsEquipped());
+        }
+        else
+        {
+            if(p->hasQuest(quest) && p->GetQuestStatus(quest) == QUEST_STATUS_INCOMPLETE && p->GetItemByEntry(item1) && p->GetItemByEntry(item2))
+                return(p->GetItemByEntry(item1)->IsEquipped() && p->GetItemByEntry(item2)->IsEquipped());
+        }
+
+        return false ;
+    }
+
+    bool isTwiced()
+    {
+        return twice;
+    }
+
+private :
+    uint32 item1, item2, quest ;
+    bool twice ;
+};
+
+struct QuestAndItems
+{
+    uint8 playerClass;
+    uint32 quest;
+    uint32 questItems[2];
+};
+
+QuestAndItems items[] =
+{
+    {1, 30037, 76391, 72313},
+    {2, 30038, 73210, 0},
+    {3, 30034, 73211, 0},
+    {4, 30036, 73208, 73212},
+    {5, 30035, 73207, 76393},
+    {8, 30033, 76390, 76392},
+    {10, 30027, 73209, 0}
+};
+
+class stalker_item_equiped : public CreatureScript
+{
+public :
+    stalker_item_equiped() : CreatureScript("stalker_item_equipped")
+    {
+
+    }
+
+    struct stalker_item_equipedAI : public ScriptedAI
+    {
+    public :
+        stalker_item_equipedAI(Creature* c) : ScriptedAI(c)
+        {
+
+        }
+
+        void Reset()
+        {
+            checkTimer = 1000 ;
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if(checkTimer <= diff)
+            {
+                Check();
+                checkTimer = 1000 ;
+            }
+            else checkTimer -= diff ;
+        }
+
+    private :
+        uint32 checkTimer;
+
+        void Check()
+        {
+            Map* map = me->GetMap();
+            if(!map) return ;
+
+            Map::PlayerList const& pl = map->GetPlayers();
+
+            if(pl.isEmpty()) return ;
+
+
+            for(Map::PlayerList::const_iterator iter = pl.begin() ; iter != pl.end() ; ++iter)
+            {
+                if(Player* p = iter->getSource())
+                {
+                    uint8 pClass = p->getClass();
+                    uint8 i = 0 ;
+                    for(; i < 7 ; ++i)
+                    {
+                        if(pClass = items[i].playerClass)
+                        {
+                            EquippedItemCheckPredicate predicate(items[i].quest, items[i].questItems[0], items[i].questItems[1]);
+                            if(predicate(p))
+                            {
+                                p->KilledMonsterCredit(REWARD_1);
+                                if(predicate.isTwiced())
+                                        p->KilledMonsterCredit(REWARD_2);
+                            }
+                            break ;
+                        }
+                    }
+                }
+            }
+        }
+
+        enum NPCS
+        {
+            REWARD_1 = 0,
+            REWARD_2 = 0
+        };
+    };
+
+    CreatureAI* GetAI(Creature *c) const
+    {
+        return new stalker_item_equipedAI(c);
+    }
+};
+
+/**********************************/
+/*****The Disciple's Challenge*****/
+/**********************************/
+
+class mob_jaomin_ro : public CreatureScript
+{
+public :
+    mob_jaomin_ro() : CreatureScript("mob_jaomin_ro")
+    {
+
+    }
+
+    struct mob_jaomin_roAI : public ScriptedAI
+    {
+    public :
+        mob_jaomin_roAI(Creature* c) : ScriptedAI(c)
+        {
+
+        }
+
+        void Reset()
+        {
+            events.Reset();
+        }
+
+        void EnterCombat(Unit *pWho)
+        {
+            if(pWho->GetTypeId() != TYPEID_PLAYER)
+            {
+                me->Kill(pWho, false);
+                EnterEvadeMode();
+            }
+
+            ScheduleEvents();
+        }
+
+        void DamageTaken(Unit *attacker, uint32 &amount)
+        {
+            if(me->GetHealth() < amount)
+            {
+                amount = 0 ;
+                me->SetHealth(me->GetMaxHealth()/10);
+                me->CombatStop(true);
+                EnterEvadeMode();
+                if(attacker->ToPlayer())
+                    attacker->ToPlayer()->KilledMonsterCredit(me->GetEntry(), 0);
+                me->Say(irand(SAY_DEFEAT_1, SAY_DEFEAT_7), LANG_COMMON, attacker->GetGUID());
+            }
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if(!UpdateVictim())
+                return ;
+
+            events.Update(diff);
+
+            if(me->HasUnitState(UNIT_STATE_CASTING))
+                return ;
+
+            while(uint32 eventId = events.ExecuteEvent())
+            {
+                switch(eventId)
+                {
+                case EVENT_HAWK :
+                    if(me->getVictim())
+                        DoCast(me->getVictim(), SPELL_HAWK, false);
+                    events.ScheduleEvent(EVENT_ELEPHANT, 3000);;
+                    break ;
+
+                case EVENT_ELEPHANT :
+                    if(me->getVictim())
+                        DoCast(me->getVictim(), SPELL_ELEPHANT, false);
+                    events.ScheduleEvent(EVENT_HAWK, 3000);
+                    break;
+
+                case EVENT_ROUNDHOUSE :
+                    DoCastAOE(SPELL_ROUNDHOUSE, false);
+                    events.ScheduleEvent(EVENT_ROUNDHOUSE, 5000);
+                    break;
+
+                default :
+                    break ;
+                }
+            }
+            DoMeleeAttackIfReady();
+        }
+
+    private :
+        EventMap events ;
+
+        inline void ScheduleEvents()
+        {
+            events.ScheduleEvent(RAND(EVENT_HAWK, EVENT_ELEPHANT), 3000);
+            events.ScheduleEvent(EVENT_ROUNDHOUSE, 5000);
+        }
+
+        enum Events
+        {
+            EVENT_HAWK = 1,
+            EVENT_ELEPHANT,
+            EVENT_ROUNDHOUSE
+        };
+
+        enum Spells
+        {
+            SPELL_HAWK = 108955,
+            SPELL_ELEPHANT = 108938,
+            SPELL_ROUNDHOUSE = 119301
+        };
+
+        enum Says
+        {
+            SAY_DEFEAT_1 = -5461106,
+            SAY_DEFEAT_2,
+            SAY_DEFEAT_3,
+            SAY_DEFEAT_4,
+            SAY_DEFEAT_5,
+            SAY_DEFEAT_6,
+            SAY_DEFEAT_7
+        };
+    };
+
+    CreatureAI* GetAI(Creature *c) const
+    {
+        return new mob_jaomin_roAI(c);
+    }
+
+private :
+};
+
+/****************************/
+/*****The Missing Driver*****/
+/****************************/
+
+class MissingDriverCheckPredicate
+{
+public :
+    MissingDriverCheckPredicate(uint32 questId) : quest(questId)
+    {
+
+    }
+
+    bool operator()(Player* p)
+    {
+        if(!p) return false ;
+
+        return(p->hasQuest(quest) && p->GetQuestStatus(quest) == QUEST_STATUS_INCOMPLETE);
+    }
+
+private :
+    uint32 quest;
+};
+
+class mob_amberleaf_scamp29419 : public CreatureScript
+{
+public :
+    mob_amberleaf_scamp29419() : CreatureScript("mob_amberleaf_scamp29419")
+    {
+
+    }
+
+    struct mob_amberleaf_scamp29419_AI : public ScriptedAI
+    {
+    public :
+        mob_amberleaf_scamp29419_AI(Creature* c) : ScriptedAI(c)
+        {
+
+        }
+
+        void EnterCombat(Unit* who)
+        {
+            me->GetPosition(&homePosition);
+            MissingDriverCheckPredicate predicate(29419);
+            if(who->ToPlayer() && predicate(who->ToPlayer()))
+            {
+                me->GetMotionMaster()->MoveFleeing(who, 0);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                me->Yell(RAND(YELL_FLEE_1, YELL_FLEE_2), LANG_COMMON, who->GetGUID());
+                canAttack = false ;
+                who->ToPlayer()->KilledMonsterCredit(me->GetEntry(), 0);
+            }
+            else
+                me->AI()->AttackStart(who);
+        }
+
+        void Reset()
+        {
+            canAttack = true ;
+            takeThisTimer = 3500 ;
+            returnTimer = 7500 ;
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if(!UpdateVictim() && canAttack) return ;
+
+            if(!canAttack)
+            {
+                if(returnTimer <= diff)
+                {
+                    me->GetMotionMaster()->MovePoint(0, homePosition);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                    canAttack = true ;
+                    returnTimer = 7500 ;
+                }
+                else returnTimer -= diff ;
+            }
+            else
+            {
+                if(takeThisTimer <= diff)
+                {
+                    if(me->getVictim())
+                        DoCast(me->getVictim(), 109081, false);
+                    takeThisTimer = 3000;
+                }
+                else takeThisTimer -= diff ;
+            }
+        }
+
+    private :
+        uint32 takeThisTimer;
+        uint32 returnTimer;
+        Position homePosition;
+        bool canAttack;
+
+        enum Yells
+        {
+            YELL_FLEE_1 = -5413001,
+            YELL_FLEE_2
+        };
+    };
+
+    CreatureAI* GetAI(Creature *c) const
+    {
+        return new mob_amberleaf_scamp29419_AI(c);
+    }
+};
+
+/****************************/
+/*****Fanning the Flames*****/
+/****************************/
+
+class spell_summon_living_air : public SpellScriptLoader
+{
+public :
+    spell_summon_living_air() : SpellScriptLoader("spell_quest29523_summon_living_air")
+    {
+
+    }
+
+    class spell_summon_living_airSpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_summon_living_airSpellScript)
+
+        bool Validate(const SpellInfo *spellInfo)
+        {
+            if(!sSpellMgr->GetSpellInfo(106999) || !sSpellMgr->GetSpellInfo(102207))
+                return false ;
+
+            return true ;
+        }
+
+        void HandleDummy(SpellEffIndex effIndex)
+        {
+            if(Unit* caster = GetCaster())
+            {
+                caster->CastSpell((Unit*)NULL, 102207, true);
+            }
+        }
+
+        void Register()
+        {
+            OnEffectLaunch += SpellEffectFn(spell_summon_living_airSpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_summon_living_airSpellScript();
+    }
+};
+
+/********************************/
+/*****The Challenger's Fires*****/
+/********************************/
+
+class TorchEquippedPredicate
+{
+public :
+    TorchEquippedPredicate(uint32 questId, uint32 itemId) : quest(questId), item(itemId)
+    {
+
+    }
+
+    bool operator()(Player* p)
+    {
+        if(!p || !p->GetItemByEntry(item) || !p->hasQuest(quest) || p->GetQuestStatus(quest) != QUEST_STATUS_INCOMPLETE)
+            return false ;
+
+        return(p->GetItemByEntry(item)->IsInBag());
+    }
+
+private:
+    uint32 quest, item;
+};
+
+class go_brazier_of_flickering_flames : public GameObjectScript
+{
+public :
+    go_brazier_of_flickering_flames() : GameObjectScript("go_brazier_of_flickering_flames")
+    {
+
+    }
+
+    bool OnGossipHello(Player *p, GameObject *go)
+    {
+        if(!p->hasQuest(29664) || p->GetQuestStatus(29664) != QUEST_STATUS_INCOMPLETE)
+            return false ;
+        else if(p->hasQuest(29664) && p->GetQuestStatus(29664) == QUEST_STATUS_INCOMPLETE)
+        {
+            go->CastSpell(p, 105151);
+            return true;
+        }
+
+        return false ;
+    }
+};
+
+
+class npc_shang_xi_the_lesson_of_the_burning_scroll : public CreatureScript
+{
+public:
+    npc_shang_xi_the_lesson_of_the_burning_scroll() : CreatureScript("npc_shang_xi_the_lesson_of_the_burning_scroll") { }
+
+    bool OnGossipHello(Player *p, Creature *c)
+    {
+        if(p->hasQuest(QUEST_THE_LESSON_OF_THE_BURNING_SCROLL))
+        {
+            if(!p->HasItemCount(FLAMME, 1))
+            {
+                p->CastSpell(p, SPELL_ANIM_TAKE_FLAME, true);
+                p->CastSpell(p, SPELL_CREATE_THE_FLAMME, true);
+                p->KilledMonsterCredit(KILL_CREDIT_FLAMME, 0);
+                c->MonsterSay(SHANG_XI_TALK, 0, p->GetGUID());
+            }
+
+        } else if(p->GetQuestStatus(QUEST_THE_LESSON_OF_THE_BURNING_SCROLL) == QUEST_STATUS_COMPLETE) {
+            if (c->isQuestGiver())
+                p->PrepareQuestMenu(c->GetGUID());
+                p->PlayerTalkClass->SendGossipMenu(1,  c->GetGUID());
+        }
+
+        return true;
+    }
+private:
+    enum enums
+    {
+        QUEST_THE_LESSON_OF_THE_BURNING_SCROLL = 29408,
+        SPELL_ANIM_TAKE_FLAME = 114746,
+        FLAMME = 80212,
+        SPELL_CREATE_THE_FLAMME = 114611,
+        SHANG_XI_TALK = 0,
+        KILL_CREDIT_FLAMME = 59591
+    };
+};
+
+class gob_edict_of_temperance_the_lesson_of_the_burning_scroll : public GameObjectScript
+{
+public:
+    gob_edict_of_temperance_the_lesson_of_the_burning_scroll() : GameObjectScript("gob_edict_of_temperance_the_lesson_of_the_burning_scroll") { }
+
+    bool OnGossipHello(Player* p, GameObject* gob)
+    {
+        if(p->HasItemCount(FLAMME, 1))
+        {
+            p->KilledMonsterCredit(KILL_CREDIT_BURN, 0);
+            p->CastSpell(p, SPELL_NEW_PHASE, true);
+            p->RemoveAura(p->GetAura(59073)); // Enlève la phase 2
+
+            p->DestroyItemCount(FLAMME, 1, true);
+            if(GameObject* go = ObjectAccessor::GetGameObject(*p, 400014))
+                if(Creature* npc = go->FindNearestCreature(TRACKER, 10, true))
+                    npc->CastSpell(npc, SPELL_BURN, true);
+        }
+
+        return true;
+    }
+private:
+    enum enums
+    {
+        TRACKER = 65490,
+        FLAMME = 80212,
+        SPELL_BURN = 88579,
+        SPELL_NEW_PHASE = 59074, // Tester si le changement de phase marche bien
+        KILL_CREDIT_BURN = 59570
+    };
+};
+
+
+enum AreaTest
+{
+    SPELL_MALE  = 102938
+};
+
+class at_test_etang : public AreaTriggerScript
+{
+    public:
+
+        at_test_etang() : AreaTriggerScript("at_test_etang")
+        {
+        }
+
+        bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
+        {
+            if(player->GetPositionZ() <= 116.7)
+            {
+                if(!player->HasAura(SPELL_MALE))
+                {
+                    player->CastSpell(player, SPELL_MALE, true);
+                    return true;
+                }
+                return false;
+            }
+
+            if(player->HasAura(SPELL_MALE))
+            {
+                player->RemoveAurasDueToSpell(SPELL_MALE);
+                return true;
+            }
+
+            if(!player->HasAura(SPELL_MALE))
+            {
+                player->CastSpell(player, SPELL_MALE, true);
+                return true;
+            }
+
+            return true;
+        }
+};
+
+/**** Fin Script Non Tweex *****/
+
+
 /*******************************/
 /********* AreaTrigger *********/
 /*******************************/
@@ -2718,615 +3303,106 @@ public:
     }
 };
 
+/*#####
+## at_pop_zhao_ren
+#####*/
 
+enum PopZhaoRen
+{
+    NPC_ZHAO_REN_POP                = 64554,
+    QUEST_MORMING_BREEZE_VILLAGE    = 29776
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/********************************/
-/**The Lesson of the Iron Bough**/
-/********************************/
-
-class EquippedItemCheckPredicate
+class at_pop_zhao_ren : public AreaTriggerScript
 {
 public :
-    EquippedItemCheckPredicate(uint32 questId, uint32 itemId, uint32 itemId2) : item1(itemId), item2(itemId2), quest(questId)
+    at_pop_zhao_ren() : AreaTriggerScript("at_pop_zhao_ren") {}
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *at)
     {
-        if(itemId2) twice = true ;
-    }
-
-    bool operator()(Player* p)
-    {
-        if(!p) return false ;
-
-        if(!twice)
+        std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
+        if(iter != forbiddenPlayers.end())
+            return false;
+        if (player->GetQuestStatus(QUEST_MORMING_BREEZE_VILLAGE) == QUEST_STATUS_INCOMPLETE)
         {
-            if(p->hasQuest(quest) && p->GetQuestStatus(quest) == QUEST_STATUS_INCOMPLETE && p->GetItemByEntry(item1))
-                return(p->GetItemByEntry(item1)->IsEquipped());
-        }
-        else
-        {
-            if(p->hasQuest(quest) && p->GetQuestStatus(quest) == QUEST_STATUS_INCOMPLETE && p->GetItemByEntry(item1) && p->GetItemByEntry(item2))
-                return(p->GetItemByEntry(item1)->IsEquipped() && p->GetItemByEntry(item2)->IsEquipped());
-        }
-
-		return false ;
-    }
-
-    bool isTwiced()
-    {
-        return twice;
-    }
-
-private :
-    uint32 item1, item2, quest ;
-    bool twice ;
-};
-
-struct QuestAndItems
-{
-    uint8 playerClass;
-    uint32 quest;
-    uint32 questItems[2];
-};
-
-QuestAndItems items[] =
-{
-    {1, 30037, 76391, 72313},
-    {2, 30038, 73210, 0},
-    {3, 30034, 73211, 0},
-    {4, 30036, 73208, 73212},
-    {5, 30035, 73207, 76393},
-    {8, 30033, 76390, 76392},
-    {10, 30027, 73209, 0}
-};
-
-class stalker_item_equiped : public CreatureScript
-{
-public :
-    stalker_item_equiped() : CreatureScript("stalker_item_equipped")
-    {
-
-    }
-
-    struct stalker_item_equipedAI : public ScriptedAI
-    {
-    public :
-        stalker_item_equipedAI(Creature* c) : ScriptedAI(c)
-        {
-
-        }
-
-        void Reset()
-        {
-            checkTimer = 1000 ;
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if(checkTimer <= diff)
-            {
-                Check();
-                checkTimer = 1000 ;
-            }
-            else checkTimer -= diff ;
-        }
-
-    private :
-        uint32 checkTimer;
-
-        void Check()
-        {
-            Map* map = me->GetMap();
-            if(!map) return ;
-
-            Map::PlayerList const& pl = map->GetPlayers();
-
-            if(pl.isEmpty()) return ;
-
-
-            for(Map::PlayerList::const_iterator iter = pl.begin() ; iter != pl.end() ; ++iter)
-            {
-                if(Player* p = iter->getSource())
-                {
-                    uint8 pClass = p->getClass();
-                    uint8 i = 0 ;
-                    for(; i < 7 ; ++i)
-                    {
-                        if(pClass = items[i].playerClass)
-                        {
-                            EquippedItemCheckPredicate predicate(items[i].quest, items[i].questItems[0], items[i].questItems[1]);
-                            if(predicate(p))
-                            {
-                                p->KilledMonsterCredit(REWARD_1);
-                                if(predicate.isTwiced())
-                                        p->KilledMonsterCredit(REWARD_2);
-                            }
-                            break ;
-                        }
-                    }
-                }
-            }
-        }
-
-        enum NPCS
-        {
-            REWARD_1 = 0,
-            REWARD_2 = 0
-        };
-    };
-
-    CreatureAI* GetAI(Creature *c) const
-    {
-        return new stalker_item_equipedAI(c);
-    }
-};
-
-/**********************************/
-/*****The Disciple's Challenge*****/
-/**********************************/
-
-class mob_jaomin_ro : public CreatureScript
-{
-public :
-    mob_jaomin_ro() : CreatureScript("mob_jaomin_ro")
-    {
-
-    }
-
-    struct mob_jaomin_roAI : public ScriptedAI
-    {
-    public :
-        mob_jaomin_roAI(Creature* c) : ScriptedAI(c)
-        {
-
-        }
-
-        void Reset()
-        {
-            events.Reset();
-        }
-
-        void EnterCombat(Unit *pWho)
-        {
-            if(pWho->GetTypeId() != TYPEID_PLAYER)
-            {
-                me->Kill(pWho, false);
-                EnterEvadeMode();
-            }
-
-            ScheduleEvents();
-        }
-
-        void DamageTaken(Unit *attacker, uint32 &amount)
-        {
-            if(me->GetHealth() < amount)
-            {
-                amount = 0 ;
-                me->SetHealth(me->GetMaxHealth()/10);
-                me->CombatStop(true);
-                EnterEvadeMode();
-                if(attacker->ToPlayer())
-                    attacker->ToPlayer()->KilledMonsterCredit(me->GetEntry(), 0);
-                me->Say(irand(SAY_DEFEAT_1, SAY_DEFEAT_7), LANG_COMMON, attacker->GetGUID());
-            }
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if(!UpdateVictim())
-                return ;
-
-            events.Update(diff);
-
-            if(me->HasUnitState(UNIT_STATE_CASTING))
-                return ;
-
-            while(uint32 eventId = events.ExecuteEvent())
-            {
-                switch(eventId)
-                {
-                case EVENT_HAWK :
-                    if(me->getVictim())
-                        DoCast(me->getVictim(), SPELL_HAWK, false);
-                    events.ScheduleEvent(EVENT_ELEPHANT, 3000);;
-                    break ;
-
-                case EVENT_ELEPHANT :
-                    if(me->getVictim())
-                        DoCast(me->getVictim(), SPELL_ELEPHANT, false);
-                    events.ScheduleEvent(EVENT_HAWK, 3000);
-                    break;
-
-                case EVENT_ROUNDHOUSE :
-                    DoCastAOE(SPELL_ROUNDHOUSE, false);
-                    events.ScheduleEvent(EVENT_ROUNDHOUSE, 5000);
-                    break;
-
-                default :
-                    break ;
-                }
-            }
-            DoMeleeAttackIfReady();
-        }
-
-    private :
-        EventMap events ;
-
-        inline void ScheduleEvents()
-        {
-            events.ScheduleEvent(RAND(EVENT_HAWK, EVENT_ELEPHANT), 3000);
-            events.ScheduleEvent(EVENT_ROUNDHOUSE, 5000);
-        }
-
-        enum Events
-        {
-            EVENT_HAWK = 1,
-            EVENT_ELEPHANT,
-            EVENT_ROUNDHOUSE
-        };
-
-        enum Spells
-        {
-            SPELL_HAWK = 108955,
-            SPELL_ELEPHANT = 108938,
-            SPELL_ROUNDHOUSE = 119301
-        };
-
-        enum Says
-        {
-            SAY_DEFEAT_1 = -5461106,
-            SAY_DEFEAT_2,
-            SAY_DEFEAT_3,
-            SAY_DEFEAT_4,
-            SAY_DEFEAT_5,
-            SAY_DEFEAT_6,
-            SAY_DEFEAT_7
-        };
-    };
-
-    CreatureAI* GetAI(Creature *c) const
-    {
-        return new mob_jaomin_roAI(c);
-    }
-
-private :
-};
-
-/****************************/
-/*****The Missing Driver*****/
-/****************************/
-
-class MissingDriverCheckPredicate
-{
-public :
-    MissingDriverCheckPredicate(uint32 questId) : quest(questId)
-    {
-
-    }
-
-    bool operator()(Player* p)
-    {
-        if(!p) return false ;
-
-        return(p->hasQuest(quest) && p->GetQuestStatus(quest) == QUEST_STATUS_INCOMPLETE);
-    }
-
-private :
-    uint32 quest;
-};
-
-class mob_amberleaf_scamp29419 : public CreatureScript
-{
-public :
-    mob_amberleaf_scamp29419() : CreatureScript("mob_amberleaf_scamp29419")
-    {
-
-    }
-
-    struct mob_amberleaf_scamp29419_AI : public ScriptedAI
-    {
-    public :
-        mob_amberleaf_scamp29419_AI(Creature* c) : ScriptedAI(c)
-        {
-
-        }
-
-        void EnterCombat(Unit* who)
-        {
-            me->GetPosition(&homePosition);
-            MissingDriverCheckPredicate predicate(29419);
-            if(who->ToPlayer() && predicate(who->ToPlayer()))
-            {
-                me->GetMotionMaster()->MoveFleeing(who, 0);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                me->Yell(RAND(YELL_FLEE_1, YELL_FLEE_2), LANG_COMMON, who->GetGUID());
-                canAttack = false ;
-                who->ToPlayer()->KilledMonsterCredit(me->GetEntry(), 0);
-            }
-            else
-                me->AI()->AttackStart(who);
-        }
-
-        void Reset()
-        {
-            canAttack = true ;
-            takeThisTimer = 3500 ;
-            returnTimer = 7500 ;
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if(!UpdateVictim() && canAttack) return ;
-
-            if(!canAttack)
-            {
-                if(returnTimer <= diff)
-                {
-                    me->GetMotionMaster()->MovePoint(0, homePosition);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                    canAttack = true ;
-                    returnTimer = 7500 ;
-                }
-                else returnTimer -= diff ;
-            }
-            else
-            {
-                if(takeThisTimer <= diff)
-                {
-                    if(me->getVictim())
-                        DoCast(me->getVictim(), 109081, false);
-                    takeThisTimer = 3000;
-                }
-                else takeThisTimer -= diff ;
-            }
-        }
-
-    private :
-        uint32 takeThisTimer;
-        uint32 returnTimer;
-        Position homePosition;
-        bool canAttack;
-
-        enum Yells
-        {
-            YELL_FLEE_1 = -5413001,
-            YELL_FLEE_2
-        };
-    };
-
-    CreatureAI* GetAI(Creature *c) const
-    {
-        return new mob_amberleaf_scamp29419_AI(c);
-    }
-};
-
-/****************************/
-/*****Fanning the Flames*****/
-/****************************/
-
-class spell_summon_living_air : public SpellScriptLoader
-{
-public :
-    spell_summon_living_air() : SpellScriptLoader("spell_quest29523_summon_living_air")
-    {
-
-    }
-
-    class spell_summon_living_airSpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_summon_living_airSpellScript)
-
-        bool Validate(const SpellInfo *spellInfo)
-        {
-            if(!sSpellMgr->GetSpellInfo(106999) || !sSpellMgr->GetSpellInfo(102207))
-                return false ;
-
-            return true ;
-        }
-
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            if(Unit* caster = GetCaster())
-            {
-                caster->CastSpell((Unit*)NULL, 102207, true);
-            }
-        }
-
-        void Register()
-        {
-            OnEffectLaunch += SpellEffectFn(spell_summon_living_airSpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_summon_living_airSpellScript();
-    }
-};
-
-/********************************/
-/*****The Challenger's Fires*****/
-/********************************/
-
-class TorchEquippedPredicate
-{
-public :
-    TorchEquippedPredicate(uint32 questId, uint32 itemId) : quest(questId), item(itemId)
-    {
-
-    }
-
-    bool operator()(Player* p)
-    {
-        if(!p || !p->GetItemByEntry(item) || !p->hasQuest(quest) || p->GetQuestStatus(quest) != QUEST_STATUS_INCOMPLETE)
-            return false ;
-
-        return(p->GetItemByEntry(item)->IsInBag());
-    }
-
-private:
-    uint32 quest, item;
-};
-
-class go_brazier_of_flickering_flames : public GameObjectScript
-{
-public :
-    go_brazier_of_flickering_flames() : GameObjectScript("go_brazier_of_flickering_flames")
-    {
-
-    }
-
-    bool OnGossipHello(Player *p, GameObject *go)
-    {
-        if(!p->hasQuest(29664) || p->GetQuestStatus(29664) != QUEST_STATUS_INCOMPLETE)
-            return false ;
-        else if(p->hasQuest(29664) && p->GetQuestStatus(29664) == QUEST_STATUS_INCOMPLETE)
-        {
-            go->CastSpell(p, 105151);
+            forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
+            player->SummonCreature(NPC_ZHAO_REN_POP, 823.51f, 3941.58f, 273.00f, 0);
             return true;
         }
-
-		return false ;
+        return false;
     }
-};
 
-
-class npc_shang_xi_the_lesson_of_the_burning_scroll : public CreatureScript
-{
-public:
-    npc_shang_xi_the_lesson_of_the_burning_scroll() : CreatureScript("npc_shang_xi_the_lesson_of_the_burning_scroll") { }
-    
-    bool OnGossipHello(Player *p, Creature *c)
+    void Update(const uint32 uiDiff)
     {
-        if(p->hasQuest(QUEST_THE_LESSON_OF_THE_BURNING_SCROLL))
-		{
-			if(!p->HasItemCount(FLAMME, 1))
-			{
-				p->CastSpell(p, SPELL_ANIM_TAKE_FLAME, true);
-				p->CastSpell(p, SPELL_CREATE_THE_FLAMME, true);
-				p->KilledMonsterCredit(KILL_CREDIT_FLAMME, 0);
-				c->MonsterSay(SHANG_XI_TALK, 0, p->GetGUID());
-			}
-
-		} else if(p->GetQuestStatus(QUEST_THE_LESSON_OF_THE_BURNING_SCROLL) == QUEST_STATUS_COMPLETE) {
-			if (c->isQuestGiver())
-				p->PrepareQuestMenu(c->GetGUID());
-				p->PlayerTalkClass->SendGossipMenu(1,  c->GetGUID());
-		}
-
-		return true;
-    }
-private: 
-	enum enums
-	{
-		QUEST_THE_LESSON_OF_THE_BURNING_SCROLL = 29408,
-		SPELL_ANIM_TAKE_FLAME = 114746,
-		FLAMME = 80212,
-		SPELL_CREATE_THE_FLAMME = 114611,
-		SHANG_XI_TALK = 0,
-		KILL_CREDIT_FLAMME = 59591
-	};
-};
-
-class gob_edict_of_temperance_the_lesson_of_the_burning_scroll : public GameObjectScript
-{
-public:
-    gob_edict_of_temperance_the_lesson_of_the_burning_scroll() : GameObjectScript("gob_edict_of_temperance_the_lesson_of_the_burning_scroll") { }
-
-    bool OnGossipHello(Player* p, GameObject* gob)
-    {
-        if(p->HasItemCount(FLAMME, 1))
+        for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter)
         {
-            p->KilledMonsterCredit(KILL_CREDIT_BURN, 0);
-            p->CastSpell(p, SPELL_NEW_PHASE, true);
-            p->RemoveAura(p->GetAura(59073)); // Enlève la phase 2
-
-            p->DestroyItemCount(FLAMME, 1, true);
-            if(GameObject* go = ObjectAccessor::GetGameObject(*p, 400014))
-                if(Creature* npc = go->FindNearestCreature(TRACKER, 10, true))
-                    npc->CastSpell(npc, SPELL_BURN, true);
+            if(iter->second <= uiDiff)
+                forbiddenPlayers.erase(iter);
+            else
+                iter->second -= uiDiff ;
         }
-
-        return true;
     }
-private:
-    enum enums
+
+private :
+    std::map<uint64, uint32> forbiddenPlayers ;
+};
+
+enum Area8287
+{
+    NPC_ZAN     = 64885,
+    SAY_ZAN     = 0
+};
+
+class at_zan_talk : public AreaTriggerScript
+{
+public :
+    at_zan_talk() : AreaTriggerScript("at_zan_talk") {}
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *at)
     {
-        TRACKER = 65490,
-        FLAMME = 80212,
-        SPELL_BURN = 88579,
-        SPELL_NEW_PHASE = 59074, // Tester si le changement de phase marche bien
-        KILL_CREDIT_BURN = 59570
-    };
-};
-
-
-enum AreaTest
-{
-    SPELL_MALE  = 102938
-};
-
-class at_test_etang : public AreaTriggerScript
-{
-    public:
-
-        at_test_etang() : AreaTriggerScript("at_test_etang")
+        std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
+        if(iter != forbiddenPlayers.end())
+            return false;
+        if(player->GetQuestStatus(QUEST_MORMING_BREEZE_VILLAGE) == QUEST_STATUS_INCOMPLETE)
         {
-        }
-
-        bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
-        {
-            if(player->GetPositionZ() <= 116.7)
+            Creature* zan = player->FindNearestCreature(NPC_ZAN, 500.0f);
+            if(zan)
             {
-                if(!player->HasAura(SPELL_MALE))
-                {
-                    player->CastSpell(player, SPELL_MALE, true);
-                    return true;
-                }
-                return false;
-            }
-
-            if(player->HasAura(SPELL_MALE))
-            {
-                player->RemoveAurasDueToSpell(SPELL_MALE);
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 120000));
+                zan->AI()->Talk(SAY_ZAN, player->GetGUID());
                 return true;
             }
-
-            if(!player->HasAura(SPELL_MALE))
-            {
-                player->CastSpell(player, SPELL_MALE, true);
-                return true;
-            }
-
-            return true;
         }
+        return false;
+    }
+
+    void Update(const uint32 uiDiff)
+    {
+        for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter)
+        {
+            if(iter->second <= uiDiff)
+                forbiddenPlayers.erase(iter);
+            else
+                iter->second -= uiDiff ;
+        }
+    }
+
+private :
+    std::map<uint64, uint32> forbiddenPlayers ;
 };
 
 
 void AddSC_wandering_isle()
 {
+
+    new stalker_item_equiped();
+    new mob_jaomin_ro();
+    new mob_amberleaf_scamp29419();
+    new spell_summon_living_air();
+    new go_brazier_of_flickering_flames();
+    new npc_shang_xi_the_lesson_of_the_burning_scroll();
+    new gob_edict_of_temperance_the_lesson_of_the_burning_scroll();
+
     new at_huojin_monk_talk();
     new at_jaomin_ro_talk();
     new at_trainee_nim_talk();
@@ -3368,12 +3444,6 @@ void AddSC_wandering_isle()
     new npc_uplifting_draft();
     new npc_master_shang_xi_temple();
     new npc_ji_firepaw_escort();
-
-    new stalker_item_equiped();
-    new mob_jaomin_ro();
-    new mob_amberleaf_scamp29419();
-    new spell_summon_living_air();
-    new go_brazier_of_flickering_flames();	
-	new npc_shang_xi_the_lesson_of_the_burning_scroll();
-	new gob_edict_of_temperance_the_lesson_of_the_burning_scroll();
+    new at_pop_zhao_ren();
+    new at_zan_talk();
 }
