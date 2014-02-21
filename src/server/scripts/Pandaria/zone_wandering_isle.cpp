@@ -3326,7 +3326,7 @@ public :
         if (player->GetQuestStatus(QUEST_MORMING_BREEZE_VILLAGE) == QUEST_STATUS_COMPLETE)
         {
             forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
-            player->SummonCreature(NPC_ZHAO_REN_POP, 823.51f, 3941.58f, 273.00f, 0);
+            player->SummonCreature(NPC_ZHAO_REN_POP, 823.51f, 3941.58f, 273.00f, 4.89f);
             return true;
         }
         return false;
@@ -3391,6 +3391,56 @@ private :
     std::map<uint64, uint32> forbiddenPlayers ;
 };
 
+/*######
+## npc_zhao_ren_pop
+######*/
+
+class npc_zhao_ren_pop : public CreatureScript
+{
+public:
+    npc_zhao_ren_pop(): CreatureScript("npc_zhao_ren_pop") { }
+
+    struct npc_zhao_ren_popAI : public npc_escortAI
+    {
+        npc_zhao_ren_popAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+            me->setActive(true);
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    break;
+                case 11:
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void OnCharmed(bool /*apply*/){}
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_zhao_ren_popAI(creature);
+    }
+};
+
 
 void AddSC_wandering_isle()
 {
@@ -3446,4 +3496,5 @@ void AddSC_wandering_isle()
     new npc_ji_firepaw_escort();
     new at_pop_zhao_ren();
     new at_zan_talk();
+    new npc_zhao_ren_pop();
 }
