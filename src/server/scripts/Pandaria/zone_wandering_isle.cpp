@@ -3417,6 +3417,7 @@ public:
             {
                 case 1:
                     SetRun();
+                    me->SetSpeed(MOVE_FLIGHT, 7.0f);
                     break;
                 case 11:
                     me->DespawnOrUnsummon();
@@ -3441,6 +3442,34 @@ public:
     }
 };
 
+/*######
+## npc_head_shen_zin_su
+######*/
+
+class npc_head_shen_zin_su : public CreatureScript
+{
+public:
+    npc_head_shen_zin_su(): CreatureScript("npc_head_shen_zin_su") { }
+
+    struct npc_head_shen_zin_suAI : public ScriptedAI
+    {
+        npc_head_shen_zin_suAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void Reset()
+        {
+            me->setActive(true);
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_head_shen_zin_suAI(creature);
+    }
+};
 
 void AddSC_wandering_isle()
 {
@@ -3497,4 +3526,5 @@ void AddSC_wandering_isle()
     new at_pop_zhao_ren();
     new at_zan_talk();
     new npc_zhao_ren_pop();
+    new npc_head_shen_zin_su();
 }
