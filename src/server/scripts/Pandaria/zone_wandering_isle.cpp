@@ -26,7 +26,7 @@
 #include "GridNotifiers.h"
 #include "ScriptedEscortAI.h"
 
-/***** Script Non Twwex ******/
+/***** Script Non Tweex ******/
 
 /********************************/
 /**The Lesson of the Iron Bough**/
@@ -3471,6 +3471,68 @@ public:
     }
 };
 
+/*######
+## npc_jojo_ironbrow_stack
+######*/
+
+enum JojoIronbrowStack
+{
+    SPELL_STACK_CAST    = 129294,
+    SAY_JOJO_STACK_1    = 0,
+    SAY_JOJO_STACK_2    = 1
+};
+
+class npc_jojo_ironbrow_stack : public CreatureScript
+{
+public:
+    npc_jojo_ironbrow_stack(): CreatureScript("npc_jojo_ironbrow_stack") { }
+
+    struct npc_jojo_ironbrow_stackAI : public npc_escortAI
+    {
+        npc_jojo_ironbrow_stackAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    Talk(SAY_JOJO_STACK_1);
+                    break;
+                case 2:
+                    me->CastSpell(me, SPELL_STACK_CAST, true);
+                    break;
+                case 3:
+                    Talk(SAY_JOJO_STACK_2);
+                    break;
+                case 4:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            if (UpdateVictim())
+                return;
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_jojo_ironbrow_stackAI(creature);
+    }
+};
+
 void AddSC_wandering_isle()
 {
 
@@ -3527,4 +3589,5 @@ void AddSC_wandering_isle()
     new at_zan_talk();
     new npc_zhao_ren_pop();
     new npc_head_shen_zin_su();
+    new npc_jojo_ironbrow_stack();
 }
