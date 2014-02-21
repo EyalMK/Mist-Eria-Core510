@@ -3417,7 +3417,7 @@ public:
             {
                 case 1:
                     SetRun();
-                    me->SetSpeed(MOVE_FLIGHT, 7.0f);
+                    me->SetSpeed(MOVE_FLIGHT, 3.0f);
                     break;
                 case 11:
                     me->DespawnOrUnsummon();
