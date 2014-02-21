@@ -3323,7 +3323,7 @@ public :
         std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
         if(iter != forbiddenPlayers.end())
             return false;
-        if (player->GetQuestStatus(QUEST_MORMING_BREEZE_VILLAGE) == QUEST_STATUS_INCOMPLETE)
+        if (player->GetQuestStatus(QUEST_MORMING_BREEZE_VILLAGE) == QUEST_STATUS_COMPLETE)
         {
             forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 60000));
             player->SummonCreature(NPC_ZHAO_REN_POP, 823.51f, 3941.58f, 273.00f, 0);
@@ -3363,7 +3363,7 @@ public :
         std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
         if(iter != forbiddenPlayers.end())
             return false;
-        if(player->GetQuestStatus(QUEST_MORMING_BREEZE_VILLAGE) == QUEST_STATUS_INCOMPLETE)
+        if(player->GetQuestStatus(QUEST_MORMING_BREEZE_VILLAGE) == QUEST_STATUS_COMPLETE)
         {
             Creature* zan = player->FindNearestCreature(NPC_ZAN, 500.0f);
             if(zan)
