@@ -3956,6 +3956,7 @@ void SpellMgr::LoadSpellInfoCorrections()
                     spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_1_YARD);
                     break ;
                 case 109104:
+                    spellInfo->ExplicitTargetMask |= TARGET_FLAG_UNIT_MASK;
                     spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
                     break;
 				default:
