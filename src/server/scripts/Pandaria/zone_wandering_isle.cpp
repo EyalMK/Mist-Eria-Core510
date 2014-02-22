@@ -3605,6 +3605,55 @@ public:
     }
 };
 
+class spell_shoot_all_the_fireworks_periodic : public SpellScriptLoader
+{
+public :
+    spell_shoot_all_the_fireworks_periodic() : SpellScriptLoader("spell_shoot_all_the_fireworks")
+    {
+
+    }
+
+    class spell_shoot_all_the_fireworks_periodic_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_shoot_all_the_fireworks_periodic_SpellScript)
+
+        bool Validate(const SpellInfo *spellInfo)
+        {
+            if(!sSpellMgr->GetSpellInfo(109103))
+                return false;
+
+            return true ;
+        }
+
+        bool Load()
+        {
+            return GetCaster() != NULL;
+        }
+
+        void SetTarget(WorldObject*& target)
+        {
+            if(Unit* caster = GetCaster())
+            {
+                if(caster->getVictim())
+                    target = caster->getVictim();
+                else
+                    target = NULL ;
+            }
+        }
+
+        void Register()
+        {
+            OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_shoot_all_the_fireworks_periodic_SpellScript::SetTarget, EFFECT_0, TARGET_UNIT_TARGET_ANY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_shoot_all_the_fireworks_periodic_SpellScript();
+    }
+};
+
+
 void AddSC_wandering_isle()
 {
 
@@ -3663,4 +3712,5 @@ void AddSC_wandering_isle()
     new npc_head_shen_zin_su();
     new npc_jojo_ironbrow_stack();
     new npc_jojo_ironbrow_pillar();
+	new spell_shoot_all_the_fireworks_periodic();
 }
