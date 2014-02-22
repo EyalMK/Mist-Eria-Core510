@@ -886,7 +886,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 						{
 							cart->GetMotionMaster()->Clear(true);
 							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-							m_mineCartReachedDepot[0] = true;
+							m_mineCartReachedDepot[BG_SM_MINE_CART_1 - 1] = true;
 						}
 					}
 
@@ -896,7 +896,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 						{
 							cart->GetMotionMaster()->Clear(true);
 							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-							m_mineCartReachedDepot[0] = true;
+							m_mineCartReachedDepot[BG_SM_MINE_CART_1 - 1] = true;
 						}
 					}
 				}
@@ -913,7 +913,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 						{
 							cart->GetMotionMaster()->Clear(true);
 							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-							m_mineCartReachedDepot[1] = true;
+							m_mineCartReachedDepot[BG_SM_MINE_CART_2 - 1] = true;
 						}
 					}
 				}
@@ -930,7 +930,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 						{
 							cart->GetMotionMaster()->Clear(true);
 							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-							m_mineCartReachedDepot[2] = true;
+							m_mineCartReachedDepot[BG_SM_MINE_CART_3 - 1] = true;
 						}
 					}
 
@@ -940,7 +940,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 						{
 							cart->GetMotionMaster()->Clear(true);
 							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-							m_mineCartReachedDepot[2] = true;
+							m_mineCartReachedDepot[BG_SM_MINE_CART_3 - 1] = true;
 						}
 					}
 				}
@@ -954,7 +954,7 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 {
 	Creature* trigger = NULL;
 
-	if (m_mineCartReachedDepot[0])
+	if (m_mineCartReachedDepot[BG_SM_MINE_CART_1 - 1])
 	{
 		if (m_Depot[SM_LAVA_DEPOT])
 		{
@@ -968,8 +968,8 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
 							depot->SetGoState(GO_STATE_READY);
-							cart->DespawnOrUnsummon();
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_LAVA_DEPOT, BG_SM_MINE_CART_1);
+							cart->DespawnOrUnsummon();
 						}
 					}
 				}
@@ -988,8 +988,8 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
 							depot->SetGoState(GO_STATE_READY);
-							cart->DespawnOrUnsummon();
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_DIAMOND_DEPOT, BG_SM_MINE_CART_1);
+							cart->DespawnOrUnsummon();
 						}
 					}
 				}
@@ -997,7 +997,7 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 		}
 	}
 
-	if (m_mineCartReachedDepot[1])
+	if (m_mineCartReachedDepot[BG_SM_MINE_CART_2 - 1])
 	{
 		if (m_Depot[SM_WATERFALL_DEPOT])
 		{
@@ -1011,8 +1011,8 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_2), POINTS_PER_MINE_CART);
 							depot->SetGoState(GO_STATE_READY);
-							cart->DespawnOrUnsummon();
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_WATERFALL_DEPOT, BG_SM_MINE_CART_2);
+							cart->DespawnOrUnsummon();
 						}
 					}
 				}
@@ -1020,7 +1020,7 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 		}
 	}
 
-	if (m_mineCartReachedDepot[2])
+	if (m_mineCartReachedDepot[BG_SM_MINE_CART_3 - 1])
 	{
 		if (m_Depot[SM_DIAMOND_DEPOT])
 		{
@@ -1034,8 +1034,8 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
 							depot->SetGoState(GO_STATE_READY);
-							cart->DespawnOrUnsummon();
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_DIAMOND_DEPOT, BG_SM_MINE_CART_3);
+							cart->DespawnOrUnsummon();
 						}
 					}
 				}
@@ -1054,8 +1054,8 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
 							depot->SetGoState(GO_STATE_READY);
-							cart->DespawnOrUnsummon();
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_TROLL_DEPOT, BG_SM_MINE_CART_3);
+							cart->DespawnOrUnsummon();
 						}
 					}
 				}
