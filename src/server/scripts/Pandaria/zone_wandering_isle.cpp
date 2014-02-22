@@ -3693,6 +3693,7 @@ public:
         void Reset()
         {
             me->SetReactState(REACT_PASSIVE);
+            me->SetMaxHealth(me->GetMaxHealth());
             TestAreaTimer = 1000;
             CombatTimer = 1000;
             JabTimer = 2000;
@@ -3709,7 +3710,7 @@ public:
         {
             if (TestAreaTimer <= uiDiff)
             {
-                if(!me->GetAreaId() == 5831)
+                if(me->GetAreaId() != 5831)
                     me->DespawnOrUnsummon();
 
                 TestAreaTimer = 1000;
@@ -3738,21 +3739,21 @@ public:
             if (JabTimer <= uiDiff)
             {
                 me->CastSpell(me->getVictim(), SPELL_JAB_HUOJIN, false);
-                JabTimer = 6000;
+                JabTimer = 12000;
             }
             else JabTimer -= uiDiff;
 
             if (BlackoutTimer <= uiDiff)
             {
                 me->CastSpell(me->getVictim(), SPELL_BLACKOUT_KICK_HUOJIN, false);
-                BlackoutTimer = 6000;
+                BlackoutTimer = 12000;
             }
             else BlackoutTimer -= uiDiff;
 
             if (CraneTimer <= uiDiff)
             {
-                me->CastSpell(me, SPELL_JAB_HUOJIN, false);
-                CraneTimer = 6000;
+                me->CastSpell(me, SPELL_CRANE_KICK, false);
+                CraneTimer = 12000;
             }
             else CraneTimer -= uiDiff;
 
