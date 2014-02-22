@@ -3212,7 +3212,6 @@ public:
                 }
             }
 
-
             void UpdateAI(const uint32 uiDiff)
             {
                 if(StartEvent2)
@@ -3694,33 +3693,42 @@ public:
         void Reset()
         {
             me->SetReactState(REACT_PASSIVE);
-            TestAreaTimer = 1000;
+            me->SetHealth(me->GetMaxHealth());
+            TestAreaTimer = 5000;
             CombatTimer = 1000;
             JabTimer = 2000;
             BlackoutTimer = 4000;
             CraneTimer = 6000;
         }
 
+        void DamageTaken(Unit* attacker, uint32 &amount)
+        {
+            me->SetReactState(REACT_AGGRESSIVE);
+        }
+
         void UpdateAI(const uint32 uiDiff)
         {
             if (TestAreaTimer <= uiDiff)
             {
-                if(!me->GetAreaId() == 5831)
+                if(me->GetAreaId() != 5831)
                     me->DespawnOrUnsummon();
+
+                TestAreaTimer = 1000;
             }
             else TestAreaTimer -= uiDiff;
 
             if (CombatTimer <= uiDiff)
             {
-                if(Unit* owner = me->GetOwner())
+                if(Unit* summoner = me->ToTempSummon()->GetSummoner())
                 {
-                    if(owner->ToPlayer())
-                        if(owner->isInCombat())
-                            me->SetReactState(REACT_AGGRESSIVE);
-                        if(!owner->isInCombat())
+                    if(summoner->ToPlayer())
+                    {
+                        if(!summoner->isInCombat())
                             me->SetReactState(REACT_PASSIVE);
+                        if(summoner->isInCombat())
+                            me->SetReactState(REACT_AGGRESSIVE);
+                    }
                 }
-
                 CombatTimer = 1000;
             }
             else CombatTimer -= uiDiff;
@@ -3731,21 +3739,21 @@ public:
             if (JabTimer <= uiDiff)
             {
                 me->CastSpell(me->getVictim(), SPELL_JAB_HUOJIN, false);
-                JabTimer = 6000;
+                JabTimer = 12000;
             }
             else JabTimer -= uiDiff;
 
             if (BlackoutTimer <= uiDiff)
             {
                 me->CastSpell(me->getVictim(), SPELL_BLACKOUT_KICK_HUOJIN, false);
-                BlackoutTimer = 6000;
+                BlackoutTimer = 12000;
             }
             else BlackoutTimer -= uiDiff;
 
             if (CraneTimer <= uiDiff)
             {
-                me->CastSpell(me, SPELL_JAB_HUOJIN, false);
-                CraneTimer = 6000;
+                me->CastSpell(me, SPELL_CRANE_KICK, false);
+                CraneTimer = 12000;
             }
             else CraneTimer -= uiDiff;
 
