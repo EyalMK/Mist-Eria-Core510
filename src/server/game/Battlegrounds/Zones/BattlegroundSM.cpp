@@ -48,7 +48,7 @@ void BattlegroundSM::Reset()
     bool isBGWeekend = sBattlegroundMgr->IsBGWeekend(GetTypeID());
     m_HonorTics = (isBGWeekend) ? BG_SM_SMWeekendHonorTicks : BG_SM_NotSMWeekendHonorTicks;
 	m_IsInformedNearVictory = false;
-	m_MineCartSpawnTimer = 90*IN_MILLISECONDS; // Firt value
+	m_MineCartSpawnTimer = 30*IN_MILLISECONDS;
 	m_LastMineCart = 0;
 	m_MineCartAddPointsTimer = 2000;
 
@@ -1219,7 +1219,7 @@ void BattlegroundSM::ResetDepotsAndMineCarts(uint8 depot, uint8 mineCart)
 	m_MineCartsProgressBar[mineCart - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 	m_mineCartNearDepot[mineCart - 1] = false;
 	m_mineCartReachedDepot[mineCart - 1] = false;
-	m_MineCartSpawned[mineCart - 1] = true;
+	m_MineCartSpawned[mineCart - 1] = false;
 }
 void BattlegroundSM::UpdatePlayerScore(Player* Source, uint32 type, uint32 value, bool doAddHonor)
 {
