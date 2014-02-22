@@ -86,6 +86,14 @@ enum SMBattlegroundCreaturesTypes
     BG_SM_CREATURES_MAX		= 3
 };
 
+enum SMDepots
+{
+	SM_WATERFALL_DEPOT,
+	SM_LAVA_DEPOT,
+	SM_DIAMOND_DEPOT,
+	SM_TROLL_DEPOT,
+};
+
 enum SMBattlegroundObjectTypes
 {
 	BG_SM_OBJECT_DOOR_A_1			= 0,
@@ -94,10 +102,10 @@ enum SMBattlegroundObjectTypes
     BG_SM_OBJECT_DOOR_H_2			= 3,
 	BG_SM_OBJECT_NEEDLE_INDICATOR_1	= 4,
 	BG_SM_OBJECT_NEEDLE_INDICATOR_2	= 5,
-	BG_SM_OBJECT_MINE_DEPOT_1		= 6,
-	BG_SM_OBJECT_MINE_DEPOT_2		= 7,
-	BG_SM_OBJECT_MINE_DEPOT_3		= 8,
-	BG_SM_OBJECT_MINE_DEPOT_4		= 9,
+	BG_SM_OBJECT_WATERFALL_DEPOT	= 6,
+	BG_SM_OBJECT_LAVA_DEPOT			= 7,
+	BG_SM_OBJECT_DIAMOND_DEPOT		= 8,
+	BG_SM_OBJECT_TROLL_DEPOT		= 9,
 	BG_SM_OBJECT_MAX				= 10
 };
 
@@ -205,8 +213,10 @@ class BattlegroundSM : public Battleground
 		uint32 m_MineCartTeamKeeper[SM_MINE_CART_MAX]; // keepers team
 		uint32 m_MineCartSpawnTimer;
 		int32 m_mineCartCheckTimer;
-		int32 m_DepotCloseTimer[SM_MINE_CART_MAX];
+		int32 m_DepotCloseTimer[4];
+		bool m_Depot[4]; // 0 = Waterfall, 1 = Lava, 2 = Diamond, 3 = Troll
 		bool m_mineCartReachedDepot[SM_MINE_CART_MAX];
+		bool m_mineCartNearDepot[SM_MINE_CART_MAX];
 
         uint32 m_HonorTics;
 		bool m_IsInformedNearVictory;
