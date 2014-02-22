@@ -3152,11 +3152,16 @@ public :
 
         void HandleTargetSelect(std::list<WorldObject*>& targets)
         {
+			std::list<Unit*> temp ;
+			for(std::list<WorldObject*>::iterator iter = targets.begin() ; iter != targets.end() ; ++iter)
+				temp.push_back((*iter)->ToUnit());
             // Sort targets according to the distance, in order to find the nearest
-            targets.sort(Trinity::DistanceCompareOrderPred(GetCaster()));
-            targets.remove_if(InLineCheckPredicate(GetCaster()));
+            temp.sort(Trinity::DistanceCompareOrderPred(GetCaster()));
+            temp.remove_if(InLineCheckPredicate(GetCaster()));
 
-
+			targets.clear();
+			for(std::list<Unit*>::iterator iter = temp.begin() ; iter != temp.end() ; ++iter)
+				targets.push_back(*iter);
             // If the closest target is far away (10 yards ++), then the spell will also root it and damages will be duplicated
             if(GetCaster()->GetExactDist2d(targets.front()->GetPositionX(), targets.front()->GetPositionY()) > 10.0f)
                 root = true ;
