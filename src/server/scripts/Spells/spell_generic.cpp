@@ -3852,6 +3852,9 @@ private :
                 case GEM_YELLOW :
                     pointer = &yellowGems[0];
                     break ;
+					
+				case GEM_RANDOM :
+					break ;
 
                 default :
                     ASSERT(false && "SPELLS: Jewelcrafting Research: Received non implemanted GemsColors type in InitPointers");
