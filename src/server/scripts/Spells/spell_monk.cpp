@@ -23,7 +23,6 @@ enum MonkSpells
     SPELL_MONK_PROVOKE                          = 118635,
     SPELL_MONK_BLACKOUT_KICK_DOT                = 128531,
     SPELL_MONK_BLACKOUT_KICK_HEAL               = 128591,
-    SPELL_MONK_SHUFFLE                          = 115307,
     SPELL_MONK_ZEN_PILGRIMAGE                   = 126892,
     SPELL_MONK_ZEN_PILGRIMAGE_RETURN            = 126895,
     SPELL_MONK_DISABLE_ROOT                     = 116706,
@@ -73,9 +72,6 @@ enum MonkSpells
     SPELL_MONK_UPLIFT_ALLOWING_CAST             = 123757,
     SPELL_MONK_THUNDER_FOCUS_TEA                = 116680,
     SPELL_MONK_PATH_OF_BLOSSOM_AREATRIGGER      = 122035,
-    SPELL_MONK_SPINNING_FIRE_BLOSSOM_DAMAGE     = 123408,
-    SPELL_MONK_SPINNING_FIRE_BLOSSOM_MISSILE    = 118852,
-    SPELL_MONK_SPINNING_FIRE_BLOSSOM_ROOT       = 123407,
     SPELL_MONK_TOUCH_OF_KARMA_REDIRECT_DAMAGE   = 124280,
     SPELL_MONK_JADE_LIGHTNING_ENERGIZE          = 123333,
     SPELL_MONK_CRACKLING_JADE_SHOCK_BUMP        = 117962,
@@ -102,7 +98,22 @@ enum MonkSpells
     SPELL_MONK_CHI_WAVE_HEAL                    = 132463, // This is the spell that targets only allies
     SPELL_MONK_CHI_WAVE_TARGET_SELECTOR         = 132466, // I don't understand the purpose of this spell, looks like a target selector, but I'm unable to be sure ; handle the selection in the script
     SPELL_MONK_CHI_WAVE_UNKNOWN_SCRIPT_EFFECT   = 132464, // This one is used to know how many targets have been it since the first cast
+	
+	// Spinning fire blossom
+    SPELL_MONK_SPINNING_FIRE_BLOSSOM            = 115073, // Player's spell
+    SPELL_MONK_SPINNING_FIRE_BLOSSOM_VISUAL     = 118852, // Visual that targets nothing
+    SPELL_MONK_SPINNING_FIRE_BLOSSOM_DAMAGE_EN  = 123408, // Damager, this one overrides the player action bar
+    SPELL_MONK_SPINNING_FIRE_BLOSSOM_ROOT       = 123407, // This one roots the player (only if player doesn't have the glyph)
 
+    // Rushing Jade Wind Spells
+    SPELL_MONK_RUSHING_JADE_WIND                = 116847, // Player's spell
+    SPELL_MONK_RUSHING_JADE_WIND_DUMMY          = 123659, // I don't know
+    SPELL_MONK_RUSHING_JADE_WIND_SPINNING       = 123664, // Increases the healing done by spinning crane kick by 50% for 12 seconds (dummy aura)
+    SPELL_MONK_SHUFFLE                          = 115307, // Triggered by the spell
+
+    // Charging Ox Wave
+    SPELL_MONK_CHARGING_OX_WAVE                 = 119392, // Player's spell
+    SPELL_MONK_CHARGING_OX_WAVE_DUMMY           = 125084, // Strange
 };
 
 enum Monkspec
@@ -1217,114 +1228,6 @@ class spell_monk_touch_of_karma : public SpellScriptLoader
         AuraScript* GetAuraScript() const
         {
             return new spell_monk_touch_of_karma_AuraScript();
-        }
-};
-
-// Spinning Fire Blossom - 123408
-class spell_monk_spinning_fire_blossom_damage : public SpellScriptLoader
-{
-    public:
-        spell_monk_spinning_fire_blossom_damage() : SpellScriptLoader("spell_monk_spinning_fire_blossom_damage") { }
-
-        class spell_monk_spinning_fire_blossom_damage_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_monk_spinning_fire_blossom_damage_SpellScript);
-
-            SpellCastResult CheckTarget()
-            {
-                if (Player* _player = GetCaster()->ToPlayer())
-                    if (Unit* target = GetExplTargetUnit())
-                        if (_player->IsFriendlyTo(target))
-                            return SPELL_FAILED_BAD_TARGETS;
-
-                return SPELL_CAST_OK;
-            }
-
-            void HandleAfterHit()
-            {
-                if (Player* _player = GetCaster()->ToPlayer())
-                {
-                    if (Unit* target = GetHitUnit())
-                    {
-                        if (target->GetDistance(_player) > 10.0f)
-                        {
-                            SetHitDamage(int32(GetHitDamage() * 1.5f));
-                            _player->CastSpell(target, SPELL_MONK_SPINNING_FIRE_BLOSSOM_ROOT, true);
-                        }
-                    }
-                }
-            }
-
-            void Register()
-            {
-                OnCheckCast += SpellCheckCastFn(spell_monk_spinning_fire_blossom_damage_SpellScript::CheckTarget);
-                AfterHit += SpellHitFn(spell_monk_spinning_fire_blossom_damage_SpellScript::HandleAfterHit);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_monk_spinning_fire_blossom_damage_SpellScript();
-        }
-};
-
-// Spinning Fire Blossom - 115073
-class spell_monk_spinning_fire_blossom : public SpellScriptLoader
-{
-    public:
-        spell_monk_spinning_fire_blossom() : SpellScriptLoader("spell_monk_spinning_fire_blossom") { }
-
-        class spell_monk_spinning_fire_blossom_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_monk_spinning_fire_blossom_SpellScript)
-
-            void HandleAfterCast()
-            {
-                if (Player* _player = GetCaster()->ToPlayer())
-                {
-                    std::list<Unit*> tempList;
-                    std::list<Unit*> targetList;
-
-                    _player->GetAttackableUnitListInRange(tempList, 50.0f);
-
-					for (std::list<Unit*>::const_iterator i = tempList.begin(); i != tempList.end(); ++i)
-                    {
-                        if (!_player->IsValidAttackTarget((*i)))
-                            continue;
-
-                        if (!_player->isInFront((*i)))
-                            continue;
-
-                        if (!(*i)->IsWithinLOSInMap(_player))
-                            continue;
-
-                        if ((*i)->GetGUID() == _player->GetGUID())
-                            continue;
-
-                        targetList.push_back((*i));
-                    }
-
-                    if (!targetList.empty())
-                    {
-                        Trinity::Containers::RandomResizeList(targetList, 1);
-
-						for (std::list<Unit*>::const_iterator i = targetList.begin(); i != targetList.end(); ++i)
-                            _player->CastSpell((*i), SPELL_MONK_SPINNING_FIRE_BLOSSOM_DAMAGE, true);
-                    }
-                    else
-                        _player->CastSpell(_player, SPELL_MONK_SPINNING_FIRE_BLOSSOM_MISSILE, true);
-                }
-            }
-
-            void Register()
-            {
-                AfterCast += SpellCastFn(spell_monk_spinning_fire_blossom_SpellScript::HandleAfterCast);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_monk_spinning_fire_blossom_SpellScript();
         }
 };
 
@@ -3203,6 +3106,235 @@ class spell_monk_tigereye_brew_stacks : public SpellScriptLoader
         }
 };
 
+class InLineCheckPredicate
+{
+public :
+    InLineCheckPredicate(Unit* caster) : _caster(caster)
+    {
+
+    }
+
+    bool operator()(WorldObject * target)
+    {
+        return !(_caster->HasInLine(target, 0.0f));
+    }
+
+private :
+    Unit* _caster ;
+};
+
+class spell_monk_spinning_fire_blossom : public SpellScriptLoader
+{
+public :
+    spell_monk_spinning_fire_blossom() : SpellScriptLoader("spell_monk_spinning_fire_blossom")
+    {
+
+    }
+
+    class spell_monk_spinning_fire_blossom_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_monk_spinning_fire_blossom_SpellScript)
+
+        bool Validate(const SpellInfo* /*spellInfo*/)
+        {
+            if(sSpellMgr->GetSpellInfo(SPELL_MONK_SPINNING_FIRE_BLOSSOM)
+                    && sSpellMgr->GetSpellInfo(SPELL_MONK_SPINNING_FIRE_BLOSSOM_ROOT))
+                return true ;
+
+            return false ;
+        }
+
+        bool Load()
+        {
+            root = false ;
+            return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER ;
+        }
+
+        void HandleTargetSelect(std::list<WorldObject*>& targets)
+        {
+            // Sort targets according to the distance, in order to find the nearest
+            targets.sort(Trinity::DistanceCompareOrderPred(GetCaster()));
+            targets.remove_if(InLineCheckPredicate(GetCaster()));
+
+
+            // If the closest target is far away (10 yards ++), then the spell will also root it and damages will be duplicated
+            if(GetCaster()->GetExactDist2d(targets.front()->GetPositionX(), targets.front()->GetPositionY()) > 10.0f)
+                root = true ;
+
+            if(targets.size() > 1)
+                targets.resize(1);
+        }
+
+        void HandleEffectOnHit(SpellEffIndex effIndex)
+        {
+            if(Unit* hit = GetHitUnit())
+                if(root && GetSpellInfo()->Id == 115073) // Can root
+                {
+                    GetCaster()->CastSpell(hit, SPELL_MONK_SPINNING_FIRE_BLOSSOM_ROOT, true);
+                    SetHitDamage(GetHitDamage() * 2);
+                }
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_monk_spinning_fire_blossom_SpellScript::HandleEffectOnHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_monk_spinning_fire_blossom_SpellScript::HandleTargetSelect, EFFECT_0, TARGET_UNIT_ENNEMY_INLINE_FRONT);
+        }
+
+        bool root ;
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_monk_spinning_fire_blossom_SpellScript() ;
+    }
+};
+
+class spell_monk_spinning_fire_blossom_glyphed : public SpellScriptLoader
+{
+public :
+    spell_monk_spinning_fire_blossom_glyphed() : SpellScriptLoader("spell_monk_spinning_fire_blossom_glyphed")
+    {
+
+    }
+
+    class spell_monk_spinning_fire_blossom_glyphed_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_monk_spinning_fire_blossom_glyphed_SpellScript)
+
+        bool Validate(const SpellInfo* /*spellInfo*/)
+        {
+            if(sSpellMgr->GetSpellInfo(SPELL_MONK_SPINNING_FIRE_BLOSSOM_VISUAL)
+                    && sSpellMgr->GetSpellInfo(SPELL_MONK_SPINNING_FIRE_BLOSSOM_DAMAGE_EN))
+                return true ;
+
+            return false ;
+        }
+
+        void HandleCast()
+        {
+            if(GetExplTargetUnit() && GetCaster())
+                GetCaster()->CastSpell(GetExplTargetUnit(), SPELL_MONK_SPINNING_FIRE_BLOSSOM_VISUAL, true);
+        }
+
+        void HandleOnEffectHit(SpellEffIndex effIndex)
+        {
+            if(GetHitUnit())
+                SetHitDamage(GetHitDamage() * 2);
+        }
+
+        void Register()
+        {
+            OnCast += SpellCastFn(spell_monk_spinning_fire_blossom_glyphed_SpellScript::HandleCast);
+            OnEffectHitTarget += SpellEffectFn(spell_monk_spinning_fire_blossom_glyphed_SpellScript::HandleOnEffectHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_monk_spinning_fire_blossom_glyphed_SpellScript() ;
+    }
+};
+
+class spell_monk_rushing_jade_wind : public SpellScriptLoader
+{
+public :
+    spell_monk_rushing_jade_wind() : SpellScriptLoader("spell_monk_rushing_jade_wind")
+    {
+
+    }
+
+    class spell_monk_rushing_jade_wind_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_monk_rushing_jade_wind_SpellScript)
+
+        bool Validate(const SpellInfo* /*spellInfo*/)
+        {
+            if(sSpellMgr->GetSpellInfo(SPELL_MONK_RUSHING_JADE_WIND)
+                    && sSpellMgr->GetSpellInfo(SPELL_MONK_RUSHING_JADE_WIND_SPINNING)
+                    && sSpellMgr->GetSpellInfo(SPELL_MONK_RUSHING_JADE_WIND_DUMMY))
+                return true ;
+
+            return false ;
+        }
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            targets.remove_if(InLineCheckPredicate(GetCaster()));
+        }
+
+        void HandleAfterCast()
+        {
+            if(Unit* caster = GetCaster())
+            {
+                switch(caster->ToPlayer()->GetPrimaryTalentTree(caster->ToPlayer()->GetActiveSpec()))
+                {
+                    case SPEC_MONK_BREWMASTER :
+                        GetCaster()->CastSpell(GetCaster(), SPELL_MONK_SHUFFLE, true);
+                        break;
+
+                    case SPEC_MONK_MISTWEAVER :
+                        GetCaster()->CastSpell(GetCaster(), SPELL_MONK_RUSHING_JADE_WIND_SPINNING, true);
+                        break;
+
+                    default :
+                        break ;
+                }
+            }
+        }
+
+        void Register()
+        {
+            AfterCast += SpellCastFn(spell_monk_rushing_jade_wind_SpellScript::HandleAfterCast);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_monk_rushing_jade_wind_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_ENNEMY_INLINE_FRONT);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_monk_rushing_jade_wind_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_ENNEMY_INLINE_FRONT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_monk_rushing_jade_wind_SpellScript();
+    }
+};
+
+class spell_monk_charging_ox_wave : public SpellScriptLoader
+{
+public :
+    spell_monk_charging_ox_wave() : SpellScriptLoader("spell_monk_charging_ox_wave")
+    {
+
+    }
+
+    class spell_monk_charging_ox_wave_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_monk_charging_ox_wave_SpellScript);
+
+        bool Validate(const SpellInfo* /*spellInfo*/)
+        {
+            if(sSpellMgr->GetSpellInfo(SPELL_MONK_CHARGING_OX_WAVE)
+                    && sSpellMgr->GetSpellInfo(SPELL_MONK_CHARGING_OX_WAVE_DUMMY))
+                return true ;
+
+            return false ;
+        }
+
+        void FilterTargets(std::list<WorldObject*>& targets)
+        {
+            targets.remove_if(InLineCheckPredicate(GetCaster()));
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_monk_charging_ox_wave_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_ENNEMY_INLINE_FRONT);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_monk_charging_ox_wave_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_ENNEMY_INLINE_FRONT);
+        }
+    };
+
+    SpellScript* GetSpellScript () const
+    {
+        return new spell_monk_charging_ox_wave_SpellScript() ;
+    }
+};
 void AddSC_monk_spell_scripts()
 {
 	new spell_monk_fists_of_fury_stun();
@@ -3222,8 +3354,6 @@ void AddSC_monk_spell_scripts()
     new spell_monk_power_strikes();
     new spell_monk_crackling_jade_lightning();
     new spell_monk_touch_of_karma();
-    new spell_monk_spinning_fire_blossom_damage();
-    new spell_monk_spinning_fire_blossom();
     new spell_monk_path_of_blossom();
     new spell_monk_thunder_focus_tea();
     new spell_monk_jade_serpent_statue();
@@ -3261,4 +3391,8 @@ void AddSC_monk_spell_scripts()
     new spell_monk_elevation();
     new spell_monk_touch_of_death();
 	new spell_monk_legacy_of_the_white_tiger();
+	new spell_monk_spinning_fire_blossom();
+	new spell_monk_spinning_fire_blossom_glyphed();
+	new spell_monk_rushing_jade_wind();
+	new spell_monk_charging_ox_wave();
 }
