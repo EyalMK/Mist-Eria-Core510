@@ -140,9 +140,9 @@ const float BG_SM_DoorPos[4][4] =
 
 #define MINE_CART_RESPAWN_TIME		10000
 #define MINE_CART_SPAWN_INTERVAL	30000
-
+#define MINE_CART_AT_DEPOT_POINTS	200
 #define POINTS_PER_KILL			0
-#define POINTS_PER_MINE_CART	0
+#define POINTS_PER_MINE_CART	150
 #define NEUTRAL					0
 
 #define BG_SM_NotSMWeekendHonorTicks    260
@@ -179,12 +179,13 @@ class BattlegroundSM : public Battleground
 
         /* Battleground Events */
         void EventPlayerClickedOnNeedle(Player* Source, GameObject* target_obj);
+		void EventCloseDepot(uint32 diff);
 
         uint32 GetPrematureWinner();
     private:
         void PostUpdateImpl(uint32 diff);
 
-        void EventTeamCapturedMineCart(uint32 team, uint32 mineCart[SM_MINE_CART_MAX]);
+        void EventTeamCapturedMineCart(uint32 team, uint8 mineCart);
         void UpdatePointsCount(uint32 Team);
 		void SummonMineCart(uint32 diff);
 
@@ -194,9 +195,9 @@ class BattlegroundSM : public Battleground
         void RemovePoint(uint32 TeamID, uint32 Points = 1) { m_TeamScores[GetTeamIndexByTeamId(TeamID)] -= Points; }
         void SetTeamPoint(uint32 TeamID, uint32 Points = 0) { m_TeamScores[GetTeamIndexByTeamId(TeamID)] = Points; }
 		void CheckPlayerNearMineCart(uint32 diff);
+		void CheckMineCartNearDepot(uint32 diff);
 		uint32 GetMineCartTeamKeeper(uint8 mineCart);
         uint32 m_HonorScoreTics[2];
-        uint32 m_TeamPointsCount[2];
 
         uint32 m_MineCartsTrigger[SM_MINE_CART_MAX];
 		int32 m_MineCartsProgressBar[SM_MINE_CART_MAX];
@@ -204,6 +205,8 @@ class BattlegroundSM : public Battleground
 		uint32 m_MineCartTeamKeeper[SM_MINE_CART_MAX]; // keepers team
 		uint32 m_MineCartSpawnTimer;
 		int32 m_mineCartCheckTimer;
+		int32 m_DepotCloseTimer[SM_MINE_CART_MAX];
+		bool m_mineCartReachedDepot[SM_MINE_CART_MAX];
 
         uint32 m_HonorTics;
 		bool m_IsInformedNearVictory;
