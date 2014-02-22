@@ -3672,7 +3672,12 @@ enum HuojinMonk
 {
     SPELL_JAB_HUOJIN            = 128630,
     SPELL_BLACKOUT_KICK_HUOJIN  = 128631,
-    SPELL_CRANE_KICK            = 128632
+    SPELL_CRANE_KICK            = 128632,
+
+    SAY_HUOJIN_MONK_1           = 0,
+    SAY_HUOJIN_MONK_2           = 1,
+    SAY_HUOJIN_MONK_3           = 2,
+    SAY_HUOJIN_MONK_4           = 3
 };
 
 class npc_huojin_monk_escort : public CreatureScript
@@ -3682,7 +3687,14 @@ public:
 
     struct npc_huojin_monk_escortAI : public ScriptedAI
     {
-        npc_huojin_monk_escortAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_huojin_monk_escortAI(Creature* creature) : ScriptedAI(creature)
+        {
+            SayIntro = true;
+        }
+
+        bool SayIntro;
+        bool Ruk50;
+        bool Ruk25;
 
         uint32 TestAreaTimer;
         uint32 CombatTimer;
@@ -3699,6 +3711,8 @@ public:
             JabTimer = 2000;
             BlackoutTimer = 4000;
             CraneTimer = 6000;
+            Ruk50 = true;
+            Ruk25 = true;
         }
 
         void DamageTaken(Unit* attacker, uint32 &amount)
@@ -3708,6 +3722,12 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
+            if(SayIntro)
+            {
+                Talk(SAY_HUOJIN_MONK_1);
+                SayIntro = false;
+            }
+
             if (TestAreaTimer <= uiDiff)
             {
                 if(me->GetAreaId() != 5831)
@@ -3757,6 +3777,18 @@ public:
             }
             else CraneTimer -= uiDiff;
 
+            if(me->getVictim()->GetEntry() == 55634)
+            {
+                if(me->getVictim()->GetHealthPct() <= 50 && Ruk50)
+                    Talk(SAY_HUOJIN_MONK_2);
+
+                if(me->getVictim()->GetHealthPct() <= 25 && Ruk25)
+                    Talk(SAY_HUOJIN_MONK_3);
+
+                if(me->getVictim()->isDead())
+                    Talk(SAY_HUOJIN_MONK_4);
+            }
+
             DoMeleeAttackIfReady();
         }
     };
@@ -3770,7 +3802,6 @@ public:
 
 void AddSC_wandering_isle()
 {
-
     new stalker_item_equiped();
     new mob_jaomin_ro();
     new mob_amberleaf_scamp29419();
