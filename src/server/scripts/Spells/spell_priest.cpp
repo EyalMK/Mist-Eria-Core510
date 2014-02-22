@@ -858,7 +858,7 @@ public :
         PrepareSpellScript(spell_pri_shadow_word_death_SpellScript);
 
         /// Make sure we have every spell loaded in memory
-        bool Validate(const SpellInfo */*spellInfo*/) {
+        bool Validate(const SpellInfo* /*spellInfo*/) {
             if(sSpellMgr->GetSpellInfo(SPELL_PRIEST_SHADOW_WORD_DEATH_BASE)
                     && sSpellMgr->GetSpellInfo(SPELL_PRIEST_SHADOW_WORD_DEATH_ENERGIZE)
                     && sSpellMgr->GetSpellInfo(SPELL_PRIEST_SHADOW_WORD_DEATH_DAMAGES)
@@ -1160,7 +1160,7 @@ public :
         PrepareSpellScript(spell_pri_mind_spike_SpellScript)
 
         /// Validate the spell
-        bool Validate(const SpellInfo */*spellInfo*/) {
+        bool Validate(const SpellInfo* /*spellInfo*/) {
             //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Validate");
             if(!sSpellMgr->GetSpellInfo(SPELL_PRIEST_MIND_SPIKE))
                 return false ;
@@ -1202,7 +1202,7 @@ public :
                                 //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Checking mask : school mask == %u",
                                                //base->GetSpellInfo()->SchoolMask & SPELL_SCHOOL_MASK_SHADOW);
                                 // 2. Caster is the same, now check if it is a shadow spell
-                                if(base->GetSpellInfo()->SchoolMask & SPELL_SCHOOL_MASK_SHADOW == 0)
+                                if(((base->GetSpellInfo()->SchoolMask) & (SPELL_SCHOOL_MASK_SHADOW)) == 0)
                                     continue ;
 
                                 //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: checking effects");
