@@ -183,7 +183,7 @@ class BattlegroundSM : public Battleground
 
         /* Battleground Events */
         void EventPlayerClickedOnNeedle(Player* Source, GameObject* target_obj);
-		void EventCloseDepot(uint32 diff);
+		void EventReopenDepot(uint32 diff);
 
         uint32 GetPrematureWinner();
     private:
@@ -216,6 +216,7 @@ class BattlegroundSM : public Battleground
 		bool m_Depot[4]; // 0 = Waterfall, 1 = Lava, 2 = Diamond, 3 = Troll
 		bool m_mineCartReachedDepot[SM_MINE_CART_MAX];
 		bool m_mineCartNearDepot[SM_MINE_CART_MAX];
+		bool m_MineCartSpawned[SM_MINE_CART_MAX];
 
         uint32 m_HonorTics;
 		bool m_IsInformedNearVictory;
