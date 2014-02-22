@@ -3799,7 +3799,7 @@ private :
                 break ;
 
             case SPELL_RANDOM :
-                break ;
+                return true ;
 
             default :
                 // We could directly return false, but it would mean thaht something is not correctly linked in database, so it is a good way to discover errors
