@@ -3694,7 +3694,7 @@ public:
         {
             me->SetReactState(REACT_PASSIVE);
             me->SetHealth(me->GetMaxHealth());
-            TestAreaTimer = 1000;
+            TestAreaTimer = 5000;
             CombatTimer = 1000;
             JabTimer = 2000;
             BlackoutTimer = 4000;
