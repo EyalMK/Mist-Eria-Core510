@@ -50,6 +50,7 @@ void BattlegroundSM::Reset()
 	m_IsInformedNearVictory = false;
 	m_MineCartSpawnTimer = 90*IN_MILLISECONDS; // Firt value
 	m_LastMineCart = 0;
+	m_MineCartAddPointsTimer = 2000;
 
     for (uint8 i = 0; i < SM_MINE_CART_MAX; ++i)
 	{
@@ -73,6 +74,7 @@ void BattlegroundSM::PostUpdateImpl(uint32 diff)
 		BattlegroundSM::CheckPlayerNearMineCart(diff);
 		BattlegroundSM::CheckMineCartNearDepot(diff);
 		BattlegroundSM::EventCloseDepot(diff);
+		BattlegroundSM::MineCartAddPoints(diff);
     }
 }
 
@@ -249,7 +251,7 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 	if (m_MineCartSpawnTimer <= 0)
 	{
 		Creature* trigger = NULL;
-		if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
+		if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
 		{
 			if (uint8 mineCart = urand(BG_SM_MINE_CART_1, BG_SM_MINE_CART_3))
 			{
@@ -395,7 +397,7 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 				}
 			}
 		}
-		m_MineCartSpawnTimer = MINE_CART_SPAWN_INTERVAL;
+		m_MineCartSpawnTimer = 30000;
 
 	} else m_MineCartSpawnTimer -= diff;
 }
@@ -792,21 +794,20 @@ void BattlegroundSM::EventPlayerClickedOnNeedle(Player* Source, GameObject* targ
 void BattlegroundSM::CheckMineCartNearDepot(uint32 diff)
 {
 	Creature* trigger = NULL;
-	if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
+	if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
 	{
 		if (!m_mineCartNearDepot[0])
 		{
 			if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f, true))
 			{
-				if (cart->GetExactDist2d(BG_SM_DepotPos[1][0], BG_SM_DepotPos[1][1]) < 5.0f)
+				if (cart->GetExactDist2d(BG_SM_DepotPos[1][0], BG_SM_DepotPos[1][1]) <= 8.0f)
 				{
 					m_Depot[SM_LAVA_DEPOT] = true;
 					BattlegroundSM::EventTeamCapturedMineCart(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), BG_SM_MINE_CART_1);
 					m_mineCartNearDepot[0] = true;
-
 				}
 
-				if (cart->GetExactDist2d(BG_SM_DepotPos[2][0], BG_SM_DepotPos[2][1]) < 5.0f)
+				if (cart->GetExactDist2d(BG_SM_DepotPos[2][0], BG_SM_DepotPos[2][1]) <= 8.0f)
 				{
 					m_Depot[SM_DIAMOND_DEPOT] = true;
 					BattlegroundSM::EventTeamCapturedMineCart(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), BG_SM_MINE_CART_1);
@@ -819,7 +820,7 @@ void BattlegroundSM::CheckMineCartNearDepot(uint32 diff)
 		{
 			if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_2, 99999.0f, true))
 			{
-				if (cart->GetExactDist2d(BG_SM_DepotPos[0][0], BG_SM_DepotPos[0][1]) < 5.0f)
+				if (cart->GetExactDist2d(BG_SM_DepotPos[0][0], BG_SM_DepotPos[0][1]) <= 8.0f)
 				{
 					m_Depot[SM_WATERFALL_DEPOT] = true;
 					BattlegroundSM::EventTeamCapturedMineCart(GetMineCartTeamKeeper(BG_SM_MINE_CART_2), BG_SM_MINE_CART_2);
@@ -832,14 +833,14 @@ void BattlegroundSM::CheckMineCartNearDepot(uint32 diff)
 		{
 			if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_3, 99999.0f, true))
 			{
-				if (cart->GetExactDist2d(BG_SM_DepotPos[2][0], BG_SM_DepotPos[2][1]) < 5.0f)
+				if (cart->GetExactDist2d(BG_SM_DepotPos[2][0], BG_SM_DepotPos[2][1]) <= 8.0f)
 				{
 					m_Depot[SM_DIAMOND_DEPOT] = true;
 					BattlegroundSM::EventTeamCapturedMineCart(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), BG_SM_MINE_CART_3);
 					m_mineCartNearDepot[2] = true;
 				}
 
-				if (cart->GetExactDist2d(BG_SM_DepotPos[3][0], BG_SM_DepotPos[3][1]) < 5.0f)
+				if (cart->GetExactDist2d(BG_SM_DepotPos[3][0], BG_SM_DepotPos[3][1]) <= 8.0f)
 				{
 					m_Depot[SM_TROLL_DEPOT] = true;
 					BattlegroundSM::EventTeamCapturedMineCart(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), BG_SM_MINE_CART_3);
@@ -871,7 +872,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 	}
 
 	Creature* trigger = NULL;
-	if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
+	if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
 	{
 		switch (mineCart)
 		{
@@ -881,21 +882,21 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 				{
 					if (m_Depot[SM_LAVA_DEPOT])
 					{
-						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_LAVA_DEPOT))
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_LAVA_DEPOT]))
 						{
 							cart->GetMotionMaster()->Clear(true);
 							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-							m_mineCartReachedDepot[0] = true;
+							m_mineCartReachedDepot[BG_SM_MINE_CART_1 - 1] = true;
 						}
 					}
 
 					if (m_Depot[SM_DIAMOND_DEPOT])
 					{
-						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_DIAMOND_DEPOT))
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_DIAMOND_DEPOT]))
 						{
 							cart->GetMotionMaster()->Clear(true);
 							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-							m_mineCartReachedDepot[0] = true;
+							m_mineCartReachedDepot[BG_SM_MINE_CART_1 - 1] = true;
 						}
 					}
 				}
@@ -908,11 +909,11 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 				{
 					if (m_Depot[SM_WATERFALL_DEPOT])
 					{
-						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_WATERFALL_DEPOT))
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_WATERFALL_DEPOT]))
 						{
 							cart->GetMotionMaster()->Clear(true);
 							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-							m_mineCartReachedDepot[1] = true;
+							m_mineCartReachedDepot[BG_SM_MINE_CART_2 - 1] = true;
 						}
 					}
 				}
@@ -925,21 +926,21 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 				{
 					if (m_Depot[SM_DIAMOND_DEPOT])
 					{
-						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_DIAMOND_DEPOT))
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_DIAMOND_DEPOT]))
 						{
 							cart->GetMotionMaster()->Clear(true);
 							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-							m_mineCartReachedDepot[2] = true;
+							m_mineCartReachedDepot[BG_SM_MINE_CART_3 - 1] = true;
 						}
 					}
 
 					if (m_Depot[SM_TROLL_DEPOT])
 					{
-						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_TROLL_DEPOT))
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_TROLL_DEPOT]))
 						{
 							cart->GetMotionMaster()->Clear(true);
 							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-							m_mineCartReachedDepot[2] = true;
+							m_mineCartReachedDepot[BG_SM_MINE_CART_3 - 1] = true;
 						}
 					}
 				}
@@ -953,25 +954,22 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 {
 	Creature* trigger = NULL;
 
-	if (m_mineCartReachedDepot[0])
+	if (m_mineCartReachedDepot[BG_SM_MINE_CART_1 - 1])
 	{
 		if (m_Depot[SM_LAVA_DEPOT])
 		{
 			if (m_DepotCloseTimer[SM_LAVA_DEPOT] <= 0)
 			{
-				if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
+				if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
 				{
 					if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f, true))
 					{
-						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_LAVA_DEPOT))
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_LAVA_DEPOT]))
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
 							depot->SetGoState(GO_STATE_READY);
+							BattlegroundSM::ResetDepotsAndMineCarts(SM_LAVA_DEPOT, BG_SM_MINE_CART_1);
 							cart->DespawnOrUnsummon();
-							m_DepotCloseTimer[SM_LAVA_DEPOT] = 3000;
-							m_mineCartNearDepot[0] = false;
-							m_Depot[SM_LAVA_DEPOT] = false;
-							m_mineCartReachedDepot[0] = false;
 						}
 					}
 				}
@@ -982,19 +980,16 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 		{
 			if (m_DepotCloseTimer[SM_DIAMOND_DEPOT] <= 0)
 			{
-				if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
+				if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
 				{
 					if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f, true))
 					{
-						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_DIAMOND_DEPOT))
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_DIAMOND_DEPOT]))
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
 							depot->SetGoState(GO_STATE_READY);
+							BattlegroundSM::ResetDepotsAndMineCarts(SM_DIAMOND_DEPOT, BG_SM_MINE_CART_1);
 							cart->DespawnOrUnsummon();
-							m_DepotCloseTimer[SM_DIAMOND_DEPOT] = 3000;
-							m_mineCartNearDepot[0] = false;
-							m_Depot[SM_LAVA_DEPOT] = false;
-							m_mineCartReachedDepot[0] = false;
 						}
 					}
 				}
@@ -1002,25 +997,22 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 		}
 	}
 
-	if (m_mineCartReachedDepot[1])
+	if (m_mineCartReachedDepot[BG_SM_MINE_CART_2 - 1])
 	{
 		if (m_Depot[SM_WATERFALL_DEPOT])
 		{
 			if (m_DepotCloseTimer[SM_WATERFALL_DEPOT] <= 0)
 			{
-				if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
+				if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
 				{
 					if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_2, 99999.0f, true))
 					{
-						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_WATERFALL_DEPOT))
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_WATERFALL_DEPOT]))
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_2), POINTS_PER_MINE_CART);
 							depot->SetGoState(GO_STATE_READY);
+							BattlegroundSM::ResetDepotsAndMineCarts(SM_WATERFALL_DEPOT, BG_SM_MINE_CART_2);
 							cart->DespawnOrUnsummon();
-							m_DepotCloseTimer[SM_WATERFALL_DEPOT] = 3000;
-							m_mineCartNearDepot[1] = false;
-							m_Depot[SM_WATERFALL_DEPOT] = false;
-							m_mineCartReachedDepot[1] = false;
 						}
 					}
 				}
@@ -1028,25 +1020,22 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 		}
 	}
 
-	if (m_mineCartReachedDepot[2])
+	if (m_mineCartReachedDepot[BG_SM_MINE_CART_3 - 1])
 	{
 		if (m_Depot[SM_DIAMOND_DEPOT])
 		{
 			if (m_DepotCloseTimer[SM_DIAMOND_DEPOT] <= 0)
 			{
-				if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
+				if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
 				{
 					if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_3, 99999.0f, true))
 					{
-						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_DIAMOND_DEPOT))
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_DIAMOND_DEPOT]))
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
 							depot->SetGoState(GO_STATE_READY);
+							BattlegroundSM::ResetDepotsAndMineCarts(SM_DIAMOND_DEPOT, BG_SM_MINE_CART_3);
 							cart->DespawnOrUnsummon();
-							m_DepotCloseTimer[SM_DIAMOND_DEPOT] = 3000;
-							m_mineCartNearDepot[2] = false;
-							m_Depot[SM_DIAMOND_DEPOT] = false;
-							m_mineCartReachedDepot[2] = false;
 						}
 					}
 				}
@@ -1057,19 +1046,16 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 		{
 			if (m_DepotCloseTimer[SM_TROLL_DEPOT] <= 0)
 			{
-				if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
+				if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
 				{
 					if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_3, 99999.0f, true))
 					{
-						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_TROLL_DEPOT))
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_TROLL_DEPOT]))
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
 							depot->SetGoState(GO_STATE_READY);
+							BattlegroundSM::ResetDepotsAndMineCarts(SM_TROLL_DEPOT, BG_SM_MINE_CART_3);
 							cart->DespawnOrUnsummon();
-							m_DepotCloseTimer[SM_TROLL_DEPOT] = 3000;
-							m_mineCartNearDepot[2] = false;
-							m_Depot[SM_TROLL_DEPOT] = false;
-							m_mineCartReachedDepot[2] = false;
 						}
 					}
 				}
@@ -1089,6 +1075,94 @@ uint32 BattlegroundSM::GetMineCartTeamKeeper(uint8 mineCart)
 	else return 0;
 }
 
+void BattlegroundSM::MineCartAddPoints(uint32 diff)
+{
+	if (m_MineCartAddPointsTimer <= 0)
+	{
+		   /* ==================  ALLIANCE  ================== */
+		if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == ALLIANCE)
+			BattlegroundSM::AddPoints(ALLIANCE, 5);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) != ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == ALLIANCE)
+			BattlegroundSM::AddPoints(ALLIANCE, 3);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) != ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == ALLIANCE)
+			BattlegroundSM::AddPoints(ALLIANCE, 3);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) != ALLIANCE)
+			BattlegroundSM::AddPoints(ALLIANCE, 3);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) != ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) != ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == ALLIANCE)
+			BattlegroundSM::AddPoints(ALLIANCE, 2);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) != ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) != ALLIANCE)
+			BattlegroundSM::AddPoints(ALLIANCE, 2);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) != ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) != ALLIANCE)
+			BattlegroundSM::AddPoints(ALLIANCE, 2);
+
+		    /* ==================  HORDE  ================== */
+		if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == HORDE)
+			BattlegroundSM::AddPoints(HORDE, 5);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) != HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == HORDE)
+			BattlegroundSM::AddPoints(HORDE, 3);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) != HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == HORDE)
+			BattlegroundSM::AddPoints(HORDE, 3);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) != HORDE)
+			BattlegroundSM::AddPoints(HORDE, 3);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) != HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) != HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == HORDE)
+			BattlegroundSM::AddPoints(HORDE, 2);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) != HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) != HORDE)
+			BattlegroundSM::AddPoints(HORDE, 2);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) != HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) != HORDE)
+			BattlegroundSM::AddPoints(HORDE, 2);
+
+		m_MineCartAddPointsTimer = 2000;
+	} else m_MineCartAddPointsTimer -= diff;
+}
+
+void BattlegroundSM::ResetDepotsAndMineCarts(uint8 depot, uint8 mineCart)
+{
+	m_DepotCloseTimer[depot] = 3000;
+	m_Depot[depot] = false;
+	m_MineCartsProgressBar[mineCart - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+	m_mineCartNearDepot[mineCart - 1] = false;
+	m_mineCartReachedDepot[mineCart - 1] = false;
+}
 void BattlegroundSM::UpdatePlayerScore(Player* Source, uint32 type, uint32 value, bool doAddHonor)
 {
     BattlegroundScoreMap::iterator itr = PlayerScores.find(Source->GetGUID());
