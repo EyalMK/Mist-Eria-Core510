@@ -140,7 +140,7 @@ const float BG_SM_DepotPos[4][4] =
 
 const float BG_SM_DoorPos[4][4] =
 {
-    {852.0289952f, 158.216003f, 326.761011f, 0.240758f}, // Alliance 1
+    {852.0289952f, 158.216003f, 326.761011f, 0.200758f}, // Alliance 1
     {830.092102f, 143.925507f, 326.5f, 3.130245f},       // Alliance 2
     {652.177612f, 228.493423f, 326.917480f, 0.163844f},  // Horde 1
     {635.622925f, 208.220886f, 326.648315f, 3.717332f}   // Horde 2
@@ -209,7 +209,7 @@ class BattlegroundSM : public Battleground
 		int32 m_MineCartsProgressBar[SM_MINE_CART_MAX];
 		uint8 m_LastMineCart; // 0 = Reset, 1 = First Mine Cart, 2 = Second Mine Cart, 3 = Third Mine Cart
 		uint32 m_MineCartTeamKeeper[SM_MINE_CART_MAX]; // keepers team
-		uint32 m_MineCartSpawnTimer;
+		int32 m_MineCartSpawnTimer;
 		int32 m_mineCartCheckTimer;
 		int32 m_DepotCloseTimer[4];
 		int32 m_MineCartAddPointsTimer;
