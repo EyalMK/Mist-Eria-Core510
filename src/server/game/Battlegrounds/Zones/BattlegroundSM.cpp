@@ -397,7 +397,7 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 				}
 			}
 		}
-		m_MineCartSpawnTimer = MINE_CART_SPAWN_INTERVAL;
+		m_MineCartSpawnTimer = 30000;
 
 	} else m_MineCartSpawnTimer -= diff;
 }
@@ -886,7 +886,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 						{
 							cart->GetMotionMaster()->Clear(true);
 							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-							m_mineCartReachedDepot[0] = true;
+							m_mineCartReachedDepot[BG_SM_MINE_CART_1 - 1] = true;
 						}
 					}
 
@@ -896,7 +896,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 						{
 							cart->GetMotionMaster()->Clear(true);
 							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-							m_mineCartReachedDepot[0] = true;
+							m_mineCartReachedDepot[BG_SM_MINE_CART_1 - 1] = true;
 						}
 					}
 				}
@@ -913,7 +913,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 						{
 							cart->GetMotionMaster()->Clear(true);
 							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-							m_mineCartReachedDepot[1] = true;
+							m_mineCartReachedDepot[BG_SM_MINE_CART_2 - 1] = true;
 						}
 					}
 				}
@@ -930,7 +930,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 						{
 							cart->GetMotionMaster()->Clear(true);
 							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-							m_mineCartReachedDepot[2] = true;
+							m_mineCartReachedDepot[BG_SM_MINE_CART_3 - 1] = true;
 						}
 					}
 
@@ -940,7 +940,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 						{
 							cart->GetMotionMaster()->Clear(true);
 							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-							m_mineCartReachedDepot[2] = true;
+							m_mineCartReachedDepot[BG_SM_MINE_CART_3 - 1] = true;
 						}
 					}
 				}
@@ -954,7 +954,7 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 {
 	Creature* trigger = NULL;
 
-	if (m_mineCartReachedDepot[0])
+	if (m_mineCartReachedDepot[BG_SM_MINE_CART_1 - 1])
 	{
 		if (m_Depot[SM_LAVA_DEPOT])
 		{
@@ -968,12 +968,8 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
 							depot->SetGoState(GO_STATE_READY);
+							BattlegroundSM::ResetDepotsAndMineCarts(SM_LAVA_DEPOT, BG_SM_MINE_CART_1);
 							cart->DespawnOrUnsummon();
-							m_DepotCloseTimer[SM_LAVA_DEPOT] = 3000;
-							m_MineCartsProgressBar[0] = BG_SM_PROGRESS_BAR_NEUTRAL;
-							m_mineCartNearDepot[0] = false;
-							m_Depot[SM_LAVA_DEPOT] = false;
-							m_mineCartReachedDepot[0] = false;
 						}
 					}
 				}
@@ -992,12 +988,8 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
 							depot->SetGoState(GO_STATE_READY);
+							BattlegroundSM::ResetDepotsAndMineCarts(SM_DIAMOND_DEPOT, BG_SM_MINE_CART_1);
 							cart->DespawnOrUnsummon();
-							m_DepotCloseTimer[SM_DIAMOND_DEPOT] = 3000;
-							m_MineCartsProgressBar[0] = BG_SM_PROGRESS_BAR_NEUTRAL;
-							m_mineCartNearDepot[0] = false;
-							m_Depot[SM_LAVA_DEPOT] = false;
-							m_mineCartReachedDepot[0] = false;
 						}
 					}
 				}
@@ -1005,7 +997,7 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 		}
 	}
 
-	if (m_mineCartReachedDepot[1])
+	if (m_mineCartReachedDepot[BG_SM_MINE_CART_2 - 1])
 	{
 		if (m_Depot[SM_WATERFALL_DEPOT])
 		{
@@ -1019,12 +1011,8 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_2), POINTS_PER_MINE_CART);
 							depot->SetGoState(GO_STATE_READY);
+							BattlegroundSM::ResetDepotsAndMineCarts(SM_WATERFALL_DEPOT, BG_SM_MINE_CART_2);
 							cart->DespawnOrUnsummon();
-							m_DepotCloseTimer[SM_WATERFALL_DEPOT] = 3000;
-							m_MineCartsProgressBar[1] = BG_SM_PROGRESS_BAR_NEUTRAL;
-							m_mineCartNearDepot[1] = false;
-							m_Depot[SM_WATERFALL_DEPOT] = false;
-							m_mineCartReachedDepot[1] = false;
 						}
 					}
 				}
@@ -1032,7 +1020,7 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 		}
 	}
 
-	if (m_mineCartReachedDepot[2])
+	if (m_mineCartReachedDepot[BG_SM_MINE_CART_3 - 1])
 	{
 		if (m_Depot[SM_DIAMOND_DEPOT])
 		{
@@ -1046,12 +1034,8 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
 							depot->SetGoState(GO_STATE_READY);
+							BattlegroundSM::ResetDepotsAndMineCarts(SM_DIAMOND_DEPOT, BG_SM_MINE_CART_3);
 							cart->DespawnOrUnsummon();
-							m_DepotCloseTimer[SM_DIAMOND_DEPOT] = 3000;
-							m_MineCartsProgressBar[2] = BG_SM_PROGRESS_BAR_NEUTRAL;
-							m_mineCartNearDepot[2] = false;
-							m_Depot[SM_DIAMOND_DEPOT] = false;
-							m_mineCartReachedDepot[2] = false;
 						}
 					}
 				}
@@ -1070,12 +1054,8 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
 							depot->SetGoState(GO_STATE_READY);
+							BattlegroundSM::ResetDepotsAndMineCarts(SM_TROLL_DEPOT, BG_SM_MINE_CART_3);
 							cart->DespawnOrUnsummon();
-							m_DepotCloseTimer[SM_TROLL_DEPOT] = 3000;
-							m_MineCartsProgressBar[2] = BG_SM_PROGRESS_BAR_NEUTRAL;
-							m_mineCartNearDepot[2] = false;
-							m_Depot[SM_TROLL_DEPOT] = false;
-							m_mineCartReachedDepot[2] = false;
 						}
 					}
 				}
@@ -1175,6 +1155,14 @@ void BattlegroundSM::MineCartAddPoints(uint32 diff)
 	} else m_MineCartAddPointsTimer -= diff;
 }
 
+void BattlegroundSM::ResetDepotsAndMineCarts(uint8 depot, uint8 mineCart)
+{
+	m_DepotCloseTimer[depot] = 3000;
+	m_Depot[depot] = false;
+	m_MineCartsProgressBar[mineCart - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+	m_mineCartNearDepot[mineCart - 1] = false;
+	m_mineCartReachedDepot[mineCart - 1] = false;
+}
 void BattlegroundSM::UpdatePlayerScore(Player* Source, uint32 type, uint32 value, bool doAddHonor)
 {
     BattlegroundScoreMap::iterator itr = PlayerScores.find(Source->GetGUID());

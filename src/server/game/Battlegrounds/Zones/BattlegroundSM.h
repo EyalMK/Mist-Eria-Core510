@@ -140,18 +140,14 @@ const float BG_SM_DepotPos[4][4] =
 
 const float BG_SM_DoorPos[4][4] =
 {
-    {852.0289952f, 158.216003f, 326.761011f, 0.280758f}, // Alliance 1
+    {852.0289952f, 158.216003f, 326.761011f, 0.240758f}, // Alliance 1
     {830.092102f, 143.925507f, 326.5f, 3.130245f},       // Alliance 2
     {652.177612f, 228.493423f, 326.917480f, 0.163844f},  // Horde 1
     {635.622925f, 208.220886f, 326.648315f, 3.717332f}   // Horde 2
 };
 
-#define MINE_CART_RESPAWN_TIME		10000
-#define MINE_CART_SPAWN_INTERVAL	30000
-#define MINE_CART_AT_DEPOT_POINTS	200
-#define POINTS_PER_KILL			0
-#define POINTS_PER_MINE_CART	150
-#define NEUTRAL					0
+#define MINE_CART_AT_DEPOT_POINTS		200
+#define POINTS_PER_MINE_CART			150
 
 #define BG_SM_NotSMWeekendHonorTicks    260
 #define BG_SM_SMWeekendHonorTicks       160
@@ -205,6 +201,7 @@ class BattlegroundSM : public Battleground
 		void CheckPlayerNearMineCart(uint32 diff);
 		void CheckMineCartNearDepot(uint32 diff);
 		void MineCartAddPoints(uint32 diff);
+		void ResetDepotsAndMineCarts(uint8 depot, uint8 mineCart);
 		uint32 GetMineCartTeamKeeper(uint8 mineCart);
         uint32 m_HonorScoreTics[2];
 
