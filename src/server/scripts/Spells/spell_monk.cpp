@@ -3397,8 +3397,8 @@ void AddSC_monk_spell_scripts()
     new spell_monk_elevation();
     new spell_monk_touch_of_death();
 	new spell_monk_legacy_of_the_white_tiger();
-	new spell_monk_spinning_fire_blossom();
-	new spell_monk_spinning_fire_blossom_glyphed();
+	//new spell_monk_spinning_fire_blossom();
+	//new spell_monk_spinning_fire_blossom_glyphed();
 	new spell_monk_rushing_jade_wind();
 	new spell_monk_charging_ox_wave();
 }
