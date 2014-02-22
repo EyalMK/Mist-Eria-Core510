@@ -3164,7 +3164,8 @@ enum MasterShangXi
     SAY_MASTER_1    = 1,
     SAY_MASTER_2    = 2,
     SAY_MASTER_3    = 3,
-    SAY_MASTER_4    = 4
+    SAY_MASTER_4    = 4,
+    ACTION_SAY      = 1
 };
 
 class npc_master_shang_xi_temple: public CreatureScript
@@ -3177,7 +3178,7 @@ public:
         if (quest->GetQuestId() == 29775)
         {
             player->CastSpell(player, 106667, true);
-            CAST_AI(npc_master_shang_xi_temple::npc_master_shang_xi_templeAI, creature->AI())->StartEvent2 = true;
+            creature->AI()->DoAction(ACTION_SAY);
         }
         return true;
     }
@@ -3200,6 +3201,17 @@ public:
                 Talk_3_Timer = 21000;
                 Talk_4_Timer = 30000;
             }
+
+            void DoAction(int32 const action)
+            {
+                switch (action)
+                {
+                    case ACTION_SAY:
+                        StartEvent2 = true;
+                        break;
+                }
+            }
+
 
             void UpdateAI(const uint32 uiDiff)
             {
@@ -3653,6 +3665,100 @@ public :
     }
 };
 
+/*######
+## npc_huojin_monk_escort
+######*/
+
+enum HuojinMonk
+{
+    SPELL_JAB_HUOJIN            = 128630,
+    SPELL_BLACKOUT_KICK_HUOJIN  = 128631,
+    SPELL_CRANE_KICK            = 128632
+};
+
+class npc_huojin_monk_escort : public CreatureScript
+{
+public:
+    npc_huojin_monk_escort(): CreatureScript("npc_huojin_monk_escort") { }
+
+    struct npc_huojin_monk_escortAI : public ScriptedAI
+    {
+        npc_huojin_monk_escortAI(Creature* creature) : ScriptedAI(creature) {}
+
+        uint32 TestAreaTimer;
+        uint32 CombatTimer;
+        uint32 JabTimer;
+        uint32 BlackoutTimer;
+        uint32 CraneTimer;
+
+        void Reset()
+        {
+            me->SetReactState(REACT_PASSIVE);
+            TestAreaTimer = 1000;
+            CombatTimer = 1000;
+            JabTimer = 2000;
+            BlackoutTimer = 4000;
+            CraneTimer = 6000;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if (TestAreaTimer <= uiDiff)
+            {
+                if(!me->GetAreaId() == 5831)
+                    me->DespawnOrUnsummon();
+            }
+            else TestAreaTimer -= uiDiff;
+
+            if (CombatTimer <= uiDiff)
+            {
+                if(Unit* owner = me->GetOwner())
+                {
+                    if(owner->ToPlayer())
+                        if(owner->isInCombat())
+                            me->SetReactState(REACT_AGGRESSIVE);
+                        if(!owner->isInCombat())
+                            me->SetReactState(REACT_PASSIVE);
+                }
+
+                CombatTimer = 1000;
+            }
+            else CombatTimer -= uiDiff;
+
+            if (!UpdateVictim())
+                return;
+
+            if (JabTimer <= uiDiff)
+            {
+                me->CastSpell(me->getVictim(), SPELL_JAB_HUOJIN, false);
+                JabTimer = 6000;
+            }
+            else JabTimer -= uiDiff;
+
+            if (BlackoutTimer <= uiDiff)
+            {
+                me->CastSpell(me->getVictim(), SPELL_BLACKOUT_KICK_HUOJIN, false);
+                BlackoutTimer = 6000;
+            }
+            else BlackoutTimer -= uiDiff;
+
+            if (CraneTimer <= uiDiff)
+            {
+                me->CastSpell(me, SPELL_JAB_HUOJIN, false);
+                CraneTimer = 6000;
+            }
+            else CraneTimer -= uiDiff;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_huojin_monk_escortAI(creature);
+    }
+};
+
 
 void AddSC_wandering_isle()
 {
@@ -3713,4 +3819,5 @@ void AddSC_wandering_isle()
     new npc_jojo_ironbrow_stack();
     new npc_jojo_ironbrow_pillar();
 	new spell_shoot_all_the_fireworks_periodic();
+    new npc_huojin_monk_escort();
 }
