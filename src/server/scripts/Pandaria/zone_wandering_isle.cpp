@@ -3533,6 +3533,78 @@ public:
     }
 };
 
+
+/*######
+## npc_jojo_ironbrow_pillar
+######*/
+
+enum JojoIronbrowPillar
+{
+    SPELL_PILLAR_CAST       = 129297,
+    SAY_JOJO_PILLAR_1       = 0,
+    SAY_JOJO_PILLAR_2       = 1,
+    SAY_JOJO_PILLAR_3       = 2,
+    SAY_JOJO_PILLAR_4       = 3
+};
+
+class npc_jojo_ironbrow_pillar : public CreatureScript
+{
+public:
+    npc_jojo_ironbrow_pillar(): CreatureScript("npc_jojo_ironbrow_pillar") { }
+
+    struct npc_jojo_ironbrow_pillarAI : public npc_escortAI
+    {
+        npc_jojo_ironbrow_pillarAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    Talk(SAY_JOJO_PILLAR_1);
+                    break;
+                case 2:
+                    Talk(SAY_JOJO_PILLAR_2);
+                    break;
+                case 3:
+                    me->CastSpell(me, SPELL_PILLAR_CAST, true);
+                    break;
+                case 4:
+                    Talk(SAY_JOJO_PILLAR_3);
+                    break;
+                case 5:
+                    Talk(SAY_JOJO_PILLAR_4);
+                    me->SetStandState(UNIT_STAND_STATE_SLEEP);
+                    break;
+                case 6:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            if (UpdateVictim())
+                return;
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_jojo_ironbrow_pillarAI(creature);
+    }
+};
+
 void AddSC_wandering_isle()
 {
 
@@ -3590,4 +3662,5 @@ void AddSC_wandering_isle()
     new npc_zhao_ren_pop();
     new npc_head_shen_zin_su();
     new npc_jojo_ironbrow_stack();
+    new npc_jojo_ironbrow_pillar();
 }
