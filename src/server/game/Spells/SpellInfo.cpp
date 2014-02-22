@@ -374,11 +374,11 @@ SpellEffectInfo::SpellEffectInfo(SpellEntry const* /*spellEntry*/, SpellInfo con
 
 bool SpellEffectInfo::IsAPSPModified() const
 {
-    switch(Effect)
+    /*switch(Effect)
     {
         default:
             break;
-    }
+    }*/
 
     if(Effect == SPELL_EFFECT_APPLY_AURA)
     {

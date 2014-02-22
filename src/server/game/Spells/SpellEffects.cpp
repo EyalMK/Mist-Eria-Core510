@@ -987,11 +987,11 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             break;
         case SPELLFAMILY_DRUID:
 		{
-            switch(m_spellInfo->Id)
+            /*switch(m_spellInfo->Id)
             {
                 default:
                     break;
-            }
+            }*/
             break;
 		}
         case SPELLFAMILY_MONK:
@@ -1073,11 +1073,11 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             break;
         case SPELLFAMILY_WARRIOR:
         {
-            switch(m_spellInfo->Id)
+            /*switch(m_spellInfo->Id)
             {
                 default:
                     break;
-            }
+            }*/
             break;
         }
         default:

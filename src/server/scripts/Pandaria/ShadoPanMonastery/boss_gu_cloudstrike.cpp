@@ -161,7 +161,7 @@ public:
 			}
 		}
 
-		void DoAction(int32 action)
+		void DoAction(const int32 action)
         {
             switch (action)
             {
@@ -225,7 +225,7 @@ public:
 
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
@@ -374,7 +374,7 @@ public:
 			events.Reset();
 		}
 
-		void DoAction(int32 action)
+		void DoAction(const int32 action)
         {
             switch (action)
             {
@@ -399,7 +399,7 @@ public:
 			events.ScheduleEvent(EVENT_STATIC_FIELD, 1*IN_MILLISECONDS, 0, PHASE_1);
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{
 			if(!UpdateVictim())
 				return;
@@ -507,7 +507,7 @@ public:
 
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{	
 			if(checkTrigger)
 			{

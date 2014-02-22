@@ -9691,7 +9691,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                         }
 					case SPELLFAMILY_WARLOCK:
 						if (spellProto->Id == 116858) // Chaos Bolt
-							return 100.0f;
+							return true ;
 						break;
                     break;
                 }
@@ -9736,7 +9736,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                                 break;
                             case 118000:// Dragon Roar ...
                                 // ... is always a critical hit
-                                return 100.0f;
+                                return true;
                             default:
                                 break;
                         }

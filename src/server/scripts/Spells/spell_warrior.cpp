@@ -1790,7 +1790,7 @@ public:
 			events.ScheduleEvent(EVENT_HEROIC_LEAP, IN_MILLISECONDS);
 		}
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
 		{
 			events.Update(diff);
 
