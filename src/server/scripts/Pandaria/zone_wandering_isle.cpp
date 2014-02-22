@@ -3693,7 +3693,7 @@ public:
         void Reset()
         {
             me->SetReactState(REACT_PASSIVE);
-            me->SetMaxHealth(me->GetMaxHealth());
+            me->SetHealth(me->GetMaxHealth());
             TestAreaTimer = 1000;
             CombatTimer = 1000;
             JabTimer = 2000;
