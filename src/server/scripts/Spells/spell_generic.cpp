@@ -3684,6 +3684,323 @@ class spell_gen_sylvanas_musix_box : public SpellScriptLoader
         }
 };
 
+// Defines
+#define MAX_BLUE_GEMS 4
+#define MAX_YELLOW_GEMS 5
+#define MAX_GREEN_GEMS 18
+#define MAX_ORANGE_GEMS 22
+#define MAX_PURPLE_GEMS 14
+#define MAX_RED_GEMS 5
+
+#define MAX_DIFFERENT_GEMS_COLORS 6 // This one represents the max size of the array of pointers used in the script
+
+// Arrays of spells identifiers
+const uint32 blueGems[MAX_BLUE_GEMS] = {106947, 106950, 106949, 106948};
+const uint32 yellowGems[MAX_YELLOW_GEMS] = {107710, 107711, 107712, 107713, 107714};
+const uint32 greenGems[MAX_GREEN_GEMS] = {106960, 106957, 107737, 107738, 107739, 106955, 106953, 107740, 106954,
+                                          107742, 107743, 107744, 106956, 107745, 107746, 106962, 106961, 106958};
+const uint32 orangeGems[MAX_ORANGE_GEMS] = {107715, 107716, 107717, 107718, 107719, 107720, 107721, 107722, 107723, 107724, 107725,
+                                            107726, 107727, 107728, 107729, 107730, 107731, 107732, 107733, 107734, 107735, 107736};
+const uint32 purpleGems[MAX_PURPLE_GEMS] = {107693, 107694, 107695, 107696, 107697, 107698, 107699, 107700, 107701, 107702, 107703, 107704, 130657, 130658};
+const uint32 redGems[MAX_RED_GEMS] = {107705, 107706, 107707, 107708, 107709};
+
+// Generic class script for the spells added in Mists of Pandaria
+class spell_gen_jewelcrafting_research : public SpellScriptLoader
+{
+public :
+    spell_gen_jewelcrafting_research() : SpellScriptLoader("spell_gen_jewelcrafting_research")
+    {
+        // We are in the constructor of SpellScriptLoader, so we cannot init the pointers correctly here, we must enter the SpellScript to do that
+    }
+	
+private :
+    // Gems color, can be usefull
+    enum GemsColors
+    {
+        GEM_BLUE    = 0,
+        GEM_YELLOW  = 1,
+        GEM_GREEN   = 2,
+        GEM_ORANGE  = 3,
+        GEM_PURPLE  = 4,
+        GEM_RED     = 5,
+        GEM_RANDOM  = 6
+    };
+
+    // Spells that creates gems
+    enum GemsCreateSpells
+    {
+        SPELL_BLUE      = 131593,
+        SPELL_YELLOW    = 131695,
+        SPELL_GREEN     = 131688,
+        SPELL_ORANGE    = 131690,
+        SPELL_PURPLE    = 131691,
+        SPELL_RED       = 131686,
+        SPELL_RANDOM    = 131759
+    };
+
+    class spell_gen_jewelcrafting_research_SpellScript : public SpellScript
+    {
+    private :
+		PrepareSpellScript(spell_gen_jewelcrafting_research_SpellScript);
+		
+        bool Validate(const SpellInfo *spellInfo)
+        {
+            // We do not know which spell is currently being checked, so we will check all the spells
+            // Also, there is no reason for SpellMgr to return false...
+            if(sSpellMgr->GetSpellInfo(SPELL_BLUE)
+                    && sSpellMgr->GetSpellInfo(SPELL_YELLOW)
+                    && sSpellMgr->GetSpellInfo(SPELL_GREEN)
+                    && sSpellMgr->GetSpellInfo(SPELL_ORANGE)
+                    && sSpellMgr->GetSpellInfo(SPELL_PURPLE)
+                    && sSpellMgr->GetSpellInfo(SPELL_RED)
+                    && sSpellMgr->GetSpellInfo(SPELL_RANDOM))
+                return true ;
+
+            return false ;
+        }
+
+        /****************************************************/
+        /***                Prepare Script                ***/
+        /****************************************************/
+
+        // Prepare and initialize correctly all the pointers
+        bool Load()
+        {
+			// Initialize all the pointers to null, to prevent strange things happening
+			memset(&i_auiGemsArray, NULL, sizeof(i_auiGemsArray));
+
+            uint32 colors[6]; // Array to be filled ; remember that array always are passed as references in functions parameters
+
+            // Fill the array in an arbitrary order
+            switch(GetSpellInfo()->Id)
+            {
+            case SPELL_BLUE :
+                PreparePointers(GEM_BLUE, GEM_GREEN, GEM_ORANGE, GEM_PURPLE, GEM_RED, GEM_YELLOW, colors);
+                break ;
+
+            case SPELL_GREEN :
+                PreparePointers(GEM_GREEN, GEM_ORANGE, GEM_PURPLE, GEM_RED, GEM_YELLOW, GEM_BLUE, colors);
+                break ;
+
+            case SPELL_ORANGE :
+                PreparePointers(GEM_ORANGE, GEM_PURPLE, GEM_RED, GEM_YELLOW, GEM_BLUE, GEM_GREEN, colors);
+                break ;
+
+            case SPELL_PURPLE :
+                PreparePointers(GEM_PURPLE, GEM_RED, GEM_YELLOW, GEM_BLUE, GEM_GREEN, GEM_ORANGE, colors);
+                break ;
+
+            case SPELL_RED :
+                PreparePointers(GEM_RED, GEM_YELLOW, GEM_BLUE, GEM_GREEN, GEM_ORANGE, GEM_PURPLE, colors);
+                break ;
+
+            case SPELL_YELLOW :
+                PreparePointers(GEM_YELLOW, GEM_BLUE, GEM_GREEN, GEM_ORANGE, GEM_PURPLE, GEM_RED, colors);
+                break ;
+
+            case SPELL_RANDOM :
+                break ;
+
+            default :
+                // We could directly return false, but it would mean thaht something is not correctly linked in database, so it is a good way to discover errors
+                ASSERT(false && "SPELLS: Jewelcrafting Research: Received non implemetended spell in Load");
+                return false ;
+            }
+
+            // Now init correctly erverything
+            InitPointers(colors);
+
+            // Current pointer is the array storing the main spells
+            currentArray = i_auiGemsArray[0];
+
+            // And our index, to know which array we are working on
+            arrayIndex = 0 ;
+        }
+
+        // Init correctly all the pointers
+        void InitPointers(uint32 colors[])
+        {
+            const uint32* pointer ;
+            for(uint8 i = 0 ; i < 6 ; ++i)
+            {
+                pointer = NULL ;
+
+                switch(colors[i])
+                {
+                case GEM_BLUE :
+                    pointer = &blueGems[0];
+                    break ;
+
+                case GEM_GREEN :
+                    pointer = &greenGems[0];
+                    break ;
+
+                case GEM_ORANGE :
+                    pointer = &orangeGems[0];
+                    break ;
+
+                case GEM_PURPLE :
+                    pointer = &purpleGems[0];
+                    break ;
+
+                case GEM_RED :
+                    pointer = &redGems[0];
+                    break ;
+
+                case GEM_YELLOW :
+                    pointer = &yellowGems[0];
+                    break ;
+
+                default :
+                    ASSERT(false && "SPELLS: Jewelcrafting Research: Received non implemanted GemsColors type in InitPointers");
+                    break ;
+                }
+
+                i_auiGemsArray[i] = pointer ;
+            }
+        }
+
+        // We init the array of GemsColors, to prepare the array of pointer
+        void PreparePointers(uint32 first, uint32 second, uint32 third, uint32 fourth, uint32 fifth, uint32 sixth, uint32 array[])
+        {
+            // Arbitrary order
+            array[0] = first ;
+            array[1] = second ;
+            array[2] = third ;
+            array[3] = fourth ;
+            array[4] = fifth ;
+            array[5] = sixth ;
+        }
+
+        /***************************************/
+        /***          Script System          ***/
+        /***************************************/
+
+        // Get a valid spellId, beginning by checking the current color, then all the others (arbitrary order)
+        uint32 GetFirstValidSpellForPlayer(Player* player)
+        {
+            // Loop over current array
+            for(uint8 i = 0 ; i < GetSizeOfCurrentArray() ; ++i)
+                if(player)
+                    if(!player->HasSpell(currentArray[i]))
+                        return currentArray[i];
+
+            // Check pointer, before switching to a new array
+            if(!DoCheckPointer())
+                return 0;
+
+            // Move pointer to the new array
+            ++arrayIndex;
+            currentArray = i_auiGemsArray[arrayIndex];
+
+            // Recursively return a valid spell
+            return GetFirstValidSpellForPlayer(player);
+        }
+
+        // If arrayIndex equals five, then increasing it would put currentArray out of the range of the array, resulting in segmentation fault
+        // Returns the opposite of arrayIndex equaling five, meaning : if arrayIndex == 5, we return false, else we return true
+        bool DoCheckPointer()
+        {
+            return !(arrayIndex == 5);
+        }
+
+        // Hack function, but we do not have any other way to know the limit of the current array, vectors or lists don't have this problem, but arrays are better here I think
+        // Just compares two memory refs
+        uint8 GetSizeOfCurrentArray()
+        {
+            if(currentArray == &blueGems[0])
+                return MAX_BLUE_GEMS;
+            else if(currentArray == &greenGems[0])
+                return MAX_GREEN_GEMS ;
+            else if(currentArray == &orangeGems[0])
+                return MAX_ORANGE_GEMS ;
+            else if(currentArray == &purpleGems[0])
+                return MAX_PURPLE_GEMS ;
+            else if(currentArray == &redGems[0])
+                return MAX_RED_GEMS ;
+            else if(currentArray == &yellowGems[0])
+                return MAX_YELLOW_GEMS ;
+            else
+            {
+                // This is not supposed to happen : currentArray moves only one time at one time, and GetSizeOfCurrentArray is called after each move of the pointer,
+                // so if it points to something wrong, it means we have a big problem ; so, ASSERT
+                ASSERT(false && "SPELLS: Jewelcrafting reasearch: currentArray doesn't point on any array !");
+                return 0 ;
+            }
+        }
+
+        // Get a spell in case the spell casted is random
+        uint32 GetFirstRandomValidSpellForPlayer(std::vector<const uint32*> const& pointers, Player* player)
+        {
+            for(uint8 i = 0 ; i < pointers.size() ; ++i)
+            {
+                currentArray = pointers[i]; // Only for GetSizeOfCurrentArray()
+                for(uint8 j = 0 ; j < GetSizeOfCurrentArray() ; ++j)
+                    if(player && !player->HasSpell(currentArray[i]))
+                        return currentArray[i];
+            }
+        }
+
+        // Main scripting function
+        void HandleScriptEffect(SpellEffIndex effectIndex)
+        {
+            if(Unit* caster = GetCaster())
+                if(caster->GetTypeId() == TYPEID_PLAYER)
+                    if(Player* player = caster->ToPlayer())
+                    {
+                        // Some declarations and stuff
+                        bool random = false ;
+                        std::vector<const uint32*> randomizer(6);
+
+                        // Randomize the order of elements in case the spell casted is Random
+                        if(GetSpellInfo()->Id == SPELL_RANDOM)
+                        {
+                            random = true ;
+
+                            // Order is not important, since we will randomize the order right after
+                            randomizer[0] = &blueGems[0];
+                            randomizer[1] = &greenGems[0];
+                            randomizer[2] = &orangeGems[0];
+                            randomizer[3] = &purpleGems[0];
+                            randomizer[4] = &redGems[0];
+                            randomizer[5] = &yellowGems[0];
+
+                            std::random_shuffle(randomizer.begin(), randomizer.end());
+                        }
+
+                        // Then get a spell
+                        uint32 spellId = random ? GetFirstRandomValidSpellForPlayer(randomizer, player) : GetFirstValidSpellForPlayer(player);
+                        if(spellId)
+                            player->learnSpell(spellId, false);
+                        else // We shouldn't learn player spell 0... client really doesn't like that
+                            return ;
+                    }
+
+            return ;
+        }
+
+        // Then register the whole thing
+        void Register()
+        {
+            // Note : should we use OnEffectHitTarget ? I don't really know
+            OnEffectHit += SpellEffectFn(spell_gen_jewelcrafting_research_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+
+    private :
+        const uint32* currentArray ; // A pointer to an array of uint32, in this case, the six arrays that stores spells
+        uint8 arrayIndex ; // An unsigned char representing the current index in the array storing all the pointers to arrays
+
+		// Since we must loop over each array if the previous contains all the spells player already learned, it's better to use an array of pointer
+		const uint32* i_auiGemsArray[MAX_DIFFERENT_GEMS_COLORS] ;
+    };
+	
+	SpellScript* GetSpellScript() const
+	{
+		return new spell_gen_jewelcrafting_research_SpellScript();
+	}
+};
+
+
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_absorb0_hitlimit1();
