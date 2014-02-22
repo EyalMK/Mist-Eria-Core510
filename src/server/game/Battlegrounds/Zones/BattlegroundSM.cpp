@@ -50,6 +50,7 @@ void BattlegroundSM::Reset()
 	m_IsInformedNearVictory = false;
 	m_MineCartSpawnTimer = 90*IN_MILLISECONDS; // Firt value
 	m_LastMineCart = 0;
+	m_MineCartAddPointsTimer = 2000;
 
     for (uint8 i = 0; i < SM_MINE_CART_MAX; ++i)
 	{
@@ -73,6 +74,7 @@ void BattlegroundSM::PostUpdateImpl(uint32 diff)
 		BattlegroundSM::CheckPlayerNearMineCart(diff);
 		BattlegroundSM::CheckMineCartNearDepot(diff);
 		BattlegroundSM::EventCloseDepot(diff);
+		BattlegroundSM::MineCartAddPoints(diff);
     }
 }
 
@@ -803,7 +805,6 @@ void BattlegroundSM::CheckMineCartNearDepot(uint32 diff)
 					m_Depot[SM_LAVA_DEPOT] = true;
 					BattlegroundSM::EventTeamCapturedMineCart(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), BG_SM_MINE_CART_1);
 					m_mineCartNearDepot[0] = true;
-
 				}
 
 				if (cart->GetExactDist2d(BG_SM_DepotPos[2][0], BG_SM_DepotPos[2][1]) < 5.0f)
@@ -1087,6 +1088,86 @@ uint32 BattlegroundSM::GetMineCartTeamKeeper(uint8 mineCart)
 		return HORDE;
 
 	else return 0;
+}
+
+void BattlegroundSM::MineCartAddPoints(uint32 diff)
+{
+	if (m_MineCartAddPointsTimer <= 0)
+	{
+		   /* ==================  ALLIANCE  ================== */
+		if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == ALLIANCE)
+			BattlegroundSM::AddPoints(ALLIANCE, 5);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) != ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == ALLIANCE)
+			BattlegroundSM::AddPoints(ALLIANCE, 3);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) != ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == ALLIANCE)
+			BattlegroundSM::AddPoints(ALLIANCE, 3);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) != ALLIANCE)
+			BattlegroundSM::AddPoints(ALLIANCE, 3);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) != ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) != ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == ALLIANCE)
+			BattlegroundSM::AddPoints(ALLIANCE, 2);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) != ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) != ALLIANCE)
+			BattlegroundSM::AddPoints(ALLIANCE, 2);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) != ALLIANCE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) != ALLIANCE)
+			BattlegroundSM::AddPoints(ALLIANCE, 2);
+
+		    /* ==================  HORDE  ================== */
+		if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == HORDE)
+			BattlegroundSM::AddPoints(HORDE, 5);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) != HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == HORDE)
+			BattlegroundSM::AddPoints(HORDE, 3);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) != HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == HORDE)
+			BattlegroundSM::AddPoints(HORDE, 3);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) != HORDE)
+			BattlegroundSM::AddPoints(HORDE, 3);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) != HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) != HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == HORDE)
+			BattlegroundSM::AddPoints(HORDE, 2);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) != HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) != HORDE)
+			BattlegroundSM::AddPoints(HORDE, 2);
+
+		else if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_2) != HORDE &&
+			GetMineCartTeamKeeper(BG_SM_MINE_CART_3) != HORDE)
+			BattlegroundSM::AddPoints(HORDE, 2);
+
+		m_MineCartAddPointsTimer = 2000;
+	} else m_MineCartAddPointsTimer -= diff;
 }
 
 void BattlegroundSM::UpdatePlayerScore(Player* Source, uint32 type, uint32 value, bool doAddHonor)

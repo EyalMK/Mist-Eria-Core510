@@ -204,6 +204,7 @@ class BattlegroundSM : public Battleground
         void SetTeamPoint(uint32 TeamID, uint32 Points = 0) { m_TeamScores[GetTeamIndexByTeamId(TeamID)] = Points; }
 		void CheckPlayerNearMineCart(uint32 diff);
 		void CheckMineCartNearDepot(uint32 diff);
+		void MineCartAddPoints(uint32 diff);
 		uint32 GetMineCartTeamKeeper(uint8 mineCart);
         uint32 m_HonorScoreTics[2];
 
@@ -214,6 +215,7 @@ class BattlegroundSM : public Battleground
 		uint32 m_MineCartSpawnTimer;
 		int32 m_mineCartCheckTimer;
 		int32 m_DepotCloseTimer[4];
+		int32 m_MineCartAddPointsTimer;
 		bool m_Depot[4]; // 0 = Waterfall, 1 = Lava, 2 = Diamond, 3 = Troll
 		bool m_mineCartReachedDepot[SM_MINE_CART_MAX];
 		bool m_mineCartNearDepot[SM_MINE_CART_MAX];
