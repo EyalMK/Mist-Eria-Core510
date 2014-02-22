@@ -3695,6 +3695,7 @@ public:
         bool SayIntro;
         bool Ruk50;
         bool Ruk25;
+        bool RukDeath;
 
         uint32 TestAreaTimer;
         uint32 CombatTimer;
@@ -3713,6 +3714,7 @@ public:
             CraneTimer = 6000;
             Ruk50 = true;
             Ruk25 = true;
+            RukDeath = true;
         }
 
         void DamageTaken(Unit* attacker, uint32 &amount)
@@ -3780,13 +3782,22 @@ public:
             if(me->getVictim()->GetEntry() == 55634)
             {
                 if(me->getVictim()->GetHealthPct() <= 50 && Ruk50)
+                {
                     Talk(SAY_HUOJIN_MONK_2);
+                    Ruk50 = false;
+                }
 
                 if(me->getVictim()->GetHealthPct() <= 25 && Ruk25)
+                {
                     Talk(SAY_HUOJIN_MONK_3);
+                    Ruk25 = false;
+                }
 
-                if(me->getVictim()->isDead())
+                if(me->getVictim()->GetHealthPct() <= 1 && RukDeath)
+                {
                     Talk(SAY_HUOJIN_MONK_4);
+                    RukDeath = false;
+                }
             }
 
             DoMeleeAttackIfReady();
