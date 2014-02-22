@@ -4090,4 +4090,5 @@ void AddSC_generic_spell_scripts()
     new spell_gen_two_forms();
     new spell_gen_darkflight();
 	new spell_gen_sylvanas_musix_box();
+	new spell_gen_jewelcrafting_research();
 }
