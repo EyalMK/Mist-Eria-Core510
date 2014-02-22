@@ -943,7 +943,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_LAVA_DEPOT]))
 						{
 							cart->GetMotionMaster()->Clear(true);
-							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+							depot->UseDoorOrButton();
 							m_mineCartReachedDepot[BG_SM_MINE_CART_1 - 1] = true;
 						}
 					}
@@ -953,7 +953,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_DIAMOND_DEPOT]))
 						{
 							cart->GetMotionMaster()->Clear(true);
-							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+							depot->UseDoorOrButton();
 							m_mineCartReachedDepot[BG_SM_MINE_CART_1 - 1] = true;
 						}
 					}
@@ -970,7 +970,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_WATERFALL_DEPOT]))
 						{
 							cart->GetMotionMaster()->Clear(true);
-							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+							depot->UseDoorOrButton();
 							m_mineCartReachedDepot[BG_SM_MINE_CART_2 - 1] = true;
 						}
 					}
@@ -987,7 +987,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_DIAMOND_DEPOT]))
 						{
 							cart->GetMotionMaster()->Clear(true);
-							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+							depot->UseDoorOrButton();
 							m_mineCartReachedDepot[BG_SM_MINE_CART_3 - 1] = true;
 						}
 					}
@@ -997,7 +997,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_TROLL_DEPOT]))
 						{
 							cart->GetMotionMaster()->Clear(true);
-							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+							depot->UseDoorOrButton();
 							m_mineCartReachedDepot[BG_SM_MINE_CART_3 - 1] = true;
 						}
 					}
