@@ -3163,7 +3163,7 @@ public :
 			for(std::list<Unit*>::iterator iter = temp.begin() ; iter != temp.end() ; ++iter)
 				targets.push_back(*iter);
             // If the closest target is far away (10 yards ++), then the spell will also root it and damages will be duplicated
-			if(WorldObject* frontObj = target.front())
+			if(WorldObject* frontObj = targets.front())
 				if(GetCaster()->GetExactDist2d(frontObj->GetPositionX(), frontObj->GetPositionY()) > 10.0f)
 					root = true ;
 
