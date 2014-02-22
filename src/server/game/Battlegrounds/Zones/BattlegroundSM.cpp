@@ -57,6 +57,7 @@ void BattlegroundSM::Reset()
 		m_MineCartsProgressBar[i] = BG_SM_PROGRESS_BAR_NEUTRAL;
 		m_mineCartReachedDepot[i] = false;
 		m_mineCartNearDepot[i] = false;
+		m_MineCartSpawned[i] = false;
 	}
 
 	for (uint8 i = 0; i < 4; ++i)
@@ -70,10 +71,10 @@ void BattlegroundSM::PostUpdateImpl(uint32 diff)
 {
     if (GetStatus() == STATUS_IN_PROGRESS)
     {
-		//BattlegroundSM::SummonMineCart(diff);
+		BattlegroundSM::SummonMineCart(diff);
 		BattlegroundSM::CheckPlayerNearMineCart(diff);
 		BattlegroundSM::CheckMineCartNearDepot(diff);
-		BattlegroundSM::EventCloseDepot(diff);
+		BattlegroundSM::EventReopenDepot(diff);
 		BattlegroundSM::MineCartAddPoints(diff);
     }
 }
@@ -111,6 +112,8 @@ void BattlegroundSM::StartingEventOpenDoors()
 						if (m_LastMineCart != BG_SM_MINE_CART_1)
 						{
 							trigger->SummonCreature(NPC_MINE_CART_1, 744.542053f, 183.545883f, 319.658203f, 4.356342f);
+							m_MineCartSpawned[BG_SM_MINE_CART_1 - 1] = true;
+
 							if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f))
 							{
 								cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
@@ -137,11 +140,13 @@ void BattlegroundSM::StartingEventOpenDoors()
 									{
 										m_LastMineCart = BG_SM_MINE_CART_2;
 										m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartSpawned[BG_SM_MINE_CART_2 - 1] = true;
 									}
 									else
 									{
 										m_LastMineCart = BG_SM_MINE_CART_3;
 										m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartSpawned[BG_SM_MINE_CART_3 - 1] = true;
 									}
 								}
 						}
@@ -156,6 +161,8 @@ void BattlegroundSM::StartingEventOpenDoors()
 						if (m_LastMineCart != BG_SM_MINE_CART_2)
 						{
 							trigger->SummonCreature(NPC_MINE_CART_2, 739.400330f, 203.598511f, 319.603333f, 2.308198f);
+							m_MineCartSpawned[BG_SM_MINE_CART_2 - 1] = true;
+
 							if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_2, 99999.0f))
 							{
 								cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
@@ -182,11 +189,13 @@ void BattlegroundSM::StartingEventOpenDoors()
 									{
 										m_LastMineCart = BG_SM_MINE_CART_1;
 										m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartSpawned[BG_SM_MINE_CART_1 - 1] = true;
 									}
 									else
 									{
 										m_LastMineCart = BG_SM_MINE_CART_3;
 										m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartSpawned[BG_SM_MINE_CART_3 - 1] = true;
 									}
 								}
 						}
@@ -201,6 +210,8 @@ void BattlegroundSM::StartingEventOpenDoors()
 						if (m_LastMineCart != BG_SM_MINE_CART_3)
 						{
 							trigger->SummonCreature(NPC_MINE_CART_3, 760.184509f, 198.844742f, 319.446655f, 0.351249f);
+							m_MineCartSpawned[BG_SM_MINE_CART_3 - 1] = true;
+
 							if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f))
 							{
 								cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
@@ -227,11 +238,13 @@ void BattlegroundSM::StartingEventOpenDoors()
 									{
 										m_LastMineCart = BG_SM_MINE_CART_1;
 										m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartSpawned[BG_SM_MINE_CART_1 - 1] = true;
 									}
 									else
 									{
 										m_LastMineCart = BG_SM_MINE_CART_2;
 										m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartSpawned[BG_SM_MINE_CART_2 - 1] = true;
 									}
 								}
 						}
@@ -251,154 +264,199 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 	if (m_MineCartSpawnTimer <= 0)
 	{
 		Creature* trigger = NULL;
+		uint8 mineCart = 0;
+
+		if (m_MineCartSpawned[BG_SM_MINE_CART_1 - 1] &&
+			m_MineCartSpawned[BG_SM_MINE_CART_2 - 1] &&
+			m_MineCartSpawned[BG_SM_MINE_CART_3 - 1])
+			mineCart = 0;
+
+		else if (m_MineCartSpawned[BG_SM_MINE_CART_1 - 1] &&
+			!m_MineCartSpawned[BG_SM_MINE_CART_2 - 1] &&
+			!m_MineCartSpawned[BG_SM_MINE_CART_3 - 1])
+			mineCart = RAND(BG_SM_MINE_CART_2, BG_SM_MINE_CART_3);
+
+		else if (!m_MineCartSpawned[BG_SM_MINE_CART_1 - 1] &&
+			m_MineCartSpawned[BG_SM_MINE_CART_2 - 1] &&
+			!m_MineCartSpawned[BG_SM_MINE_CART_3 - 1])
+			mineCart = RAND(BG_SM_MINE_CART_1, BG_SM_MINE_CART_3);
+
+		else if (!m_MineCartSpawned[BG_SM_MINE_CART_1 - 1] &&
+			!m_MineCartSpawned[BG_SM_MINE_CART_2 - 1] &&
+			m_MineCartSpawned[BG_SM_MINE_CART_3 - 1])
+			mineCart = RAND(BG_SM_MINE_CART_1, BG_SM_MINE_CART_2);
+
+		else if (m_MineCartSpawned[BG_SM_MINE_CART_1 - 1] &&
+			m_MineCartSpawned[BG_SM_MINE_CART_2 - 1] &&
+			!m_MineCartSpawned[BG_SM_MINE_CART_3 - 1])
+			mineCart = BG_SM_MINE_CART_3;
+
+		else if (m_MineCartSpawned[BG_SM_MINE_CART_1 - 1] &&
+			!m_MineCartSpawned[BG_SM_MINE_CART_2 - 1] &&
+			m_MineCartSpawned[BG_SM_MINE_CART_3 - 1])
+			mineCart = BG_SM_MINE_CART_2;
+
+		else if (!m_MineCartSpawned[BG_SM_MINE_CART_1 - 1] &&
+			m_MineCartSpawned[BG_SM_MINE_CART_2 - 1] &&
+			m_MineCartSpawned[BG_SM_MINE_CART_3 - 1])
+			mineCart = BG_SM_MINE_CART_1;
+
 		if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
 		{
-			if (uint8 mineCart = urand(BG_SM_MINE_CART_1, BG_SM_MINE_CART_3))
+			switch (mineCart)
 			{
-				switch (mineCart)
+				case BG_SM_MINE_CART_1:
 				{
-					case BG_SM_MINE_CART_1:
+					if (trigger)
 					{
-						if (trigger)
+						if (m_LastMineCart != BG_SM_MINE_CART_1)
 						{
-							if (m_LastMineCart != BG_SM_MINE_CART_1)
+							trigger->SummonCreature(NPC_MINE_CART_1, 744.542053f, 183.545883f, 319.658203f, 4.356342f);
+							m_MineCartSpawned[BG_SM_MINE_CART_1 - 1] = true;
+
+							if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f))
 							{
-								trigger->SummonCreature(NPC_MINE_CART_1, 744.542053f, 183.545883f, 319.658203f, 4.356342f);
-								if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f))
+								cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
+								cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+								cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+								cart->SetSpeed(MOVE_WALK, 0.4f);
+								m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+							}
+
+							m_LastMineCart = BG_SM_MINE_CART_1;
+						}
+						else
+						{
+							if (Creature* chosenCart = RAND(trigger->SummonCreature(NPC_MINE_CART_2, 739.400330f, 203.598511f, 319.603333f, 2.308198f),
+															trigger->SummonCreature(NPC_MINE_CART_3, 760.184509f, 198.844742f, 319.446655f, 0.351249f)))
+								if (Creature* cart = trigger->FindNearestCreature(chosenCart->GetEntry(), 99999.0f))
 								{
 									cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
 									cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
 									cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 									cart->SetSpeed(MOVE_WALK, 0.4f);
-									m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
-								}
 
-								m_LastMineCart = BG_SM_MINE_CART_1;
-							}
-							else
-							{
-								if (Creature* chosenCart = RAND(trigger->SummonCreature(NPC_MINE_CART_2, 739.400330f, 203.598511f, 319.603333f, 2.308198f),
-																trigger->SummonCreature(NPC_MINE_CART_3, 760.184509f, 198.844742f, 319.446655f, 0.351249f)))
-									if (Creature* cart = trigger->FindNearestCreature(chosenCart->GetEntry(), 99999.0f))
+									if (chosenCart->GetEntry() == NPC_MINE_CART_2)
 									{
-										cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
-										cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
-										cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-										cart->SetSpeed(MOVE_WALK, 0.4f);
-
-										if (chosenCart->GetEntry() == NPC_MINE_CART_2)
-										{
-											m_LastMineCart = BG_SM_MINE_CART_2;
-											m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
-										}
-										else
-										{
-											m_LastMineCart = BG_SM_MINE_CART_3;
-											m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
-										}
+										m_LastMineCart = BG_SM_MINE_CART_2;
+										m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartSpawned[BG_SM_MINE_CART_2 - 1] = true;
 									}
-							}
-						}
-						break;
-					}
-
-					case BG_SM_MINE_CART_2:
-					{
-						if (trigger)
-						{
-							if (m_LastMineCart != BG_SM_MINE_CART_2)
-							{
-								trigger->SummonCreature(NPC_MINE_CART_2, 739.400330f, 203.598511f, 319.603333f, 2.308198f);
-								if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_2, 99999.0f))
-								{
-									cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
-									cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
-									cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-									cart->SetSpeed(MOVE_WALK, 0.4f);
-									m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
-								}
-
-								m_LastMineCart = BG_SM_MINE_CART_2;
-							}
-							else
-							{
-								if (Creature* chosenCart = RAND(trigger->SummonCreature(NPC_MINE_CART_1, 744.542053f, 183.545883f, 319.658203f, 4.356342f),
-																trigger->SummonCreature(NPC_MINE_CART_3, 760.184509f, 198.844742f, 319.446655f, 0.351249f)))
-									if (Creature* cart = trigger->FindNearestCreature(chosenCart->GetEntry(), 99999.0f))
+									else
 									{
-										cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
-										cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
-										cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-										cart->SetSpeed(MOVE_WALK, 0.4f);
-
-										if (chosenCart->GetEntry() == NPC_MINE_CART_1)
-										{
-											m_LastMineCart = BG_SM_MINE_CART_1;
-											m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
-										}
-										else
-										{
-											m_LastMineCart = BG_SM_MINE_CART_3;
-											m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
-										}
+										m_LastMineCart = BG_SM_MINE_CART_3;
+										m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartSpawned[BG_SM_MINE_CART_3 - 1] = true;
 									}
-							}
-						}
-						break;
-					}
-
-					case BG_SM_MINE_CART_3:
-					{
-						if (trigger)
-						{
-							if (m_LastMineCart != BG_SM_MINE_CART_3)
-							{
-								trigger->SummonCreature(NPC_MINE_CART_3, 760.184509f, 198.844742f, 319.446655f, 0.351249f);
-								if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f))
-								{
-									cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
-									cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
-									cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-									cart->SetSpeed(MOVE_WALK, 0.4f);
-									m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 								}
-
-								m_LastMineCart = BG_SM_MINE_CART_3;
-							}
-							else
-							{
-								if (Creature* chosenCart = RAND(trigger->SummonCreature(NPC_MINE_CART_1, 744.542053f, 183.545883f, 319.658203f, 4.356342f),
-																trigger->SummonCreature(NPC_MINE_CART_2, 739.400330f, 203.598511f, 319.603333f, 2.308198f)))
-									if (Creature* cart = trigger->FindNearestCreature(chosenCart->GetEntry(), 99999.0f))
-									{
-										cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
-										cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
-										cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-										cart->SetSpeed(MOVE_WALK, 0.4f);
-
-										if (chosenCart->GetEntry() == NPC_MINE_CART_1)
-										{
-											m_LastMineCart = BG_SM_MINE_CART_1;
-											m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
-										}
-										else
-										{
-											m_LastMineCart = BG_SM_MINE_CART_2;
-											m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
-										}
-									}
-							}
 						}
-						break;
 					}
-
-					default:
-						break;
+					break;
 				}
+
+				case BG_SM_MINE_CART_2:
+				{
+					if (trigger)
+					{
+						if (m_LastMineCart != BG_SM_MINE_CART_2)
+						{
+							trigger->SummonCreature(NPC_MINE_CART_2, 739.400330f, 203.598511f, 319.603333f, 2.308198f);
+							m_MineCartSpawned[BG_SM_MINE_CART_2 - 1] = true;
+
+							if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_2, 99999.0f))
+							{
+								cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
+								cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+								cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+								cart->SetSpeed(MOVE_WALK, 0.4f);
+								m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+							}
+
+							m_LastMineCart = BG_SM_MINE_CART_2;
+						}
+						else
+						{
+							if (Creature* chosenCart = RAND(trigger->SummonCreature(NPC_MINE_CART_1, 744.542053f, 183.545883f, 319.658203f, 4.356342f),
+															trigger->SummonCreature(NPC_MINE_CART_3, 760.184509f, 198.844742f, 319.446655f, 0.351249f)))
+								if (Creature* cart = trigger->FindNearestCreature(chosenCart->GetEntry(), 99999.0f))
+								{
+									cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
+									cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+									cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+									cart->SetSpeed(MOVE_WALK, 0.4f);
+
+									if (chosenCart->GetEntry() == NPC_MINE_CART_1)
+									{
+										m_LastMineCart = BG_SM_MINE_CART_1;
+										m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartSpawned[BG_SM_MINE_CART_1 - 1] = true;
+									}
+									else
+									{
+										m_LastMineCart = BG_SM_MINE_CART_3;
+										m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartSpawned[BG_SM_MINE_CART_3 - 1] = true;
+									}
+								}
+						}
+					}
+					break;
+				}
+
+				case BG_SM_MINE_CART_3:
+				{
+					if (trigger)
+					{
+						if (m_LastMineCart != BG_SM_MINE_CART_3)
+						{
+							trigger->SummonCreature(NPC_MINE_CART_3, 760.184509f, 198.844742f, 319.446655f, 0.351249f);
+							m_MineCartSpawned[BG_SM_MINE_CART_3 - 1] = true;
+
+							if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f))
+							{
+								cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
+								cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+								cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+								cart->SetSpeed(MOVE_WALK, 0.4f);
+								m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+							}
+
+							m_LastMineCart = BG_SM_MINE_CART_3;
+						}
+						else
+						{
+							if (Creature* chosenCart = RAND(trigger->SummonCreature(NPC_MINE_CART_1, 744.542053f, 183.545883f, 319.658203f, 4.356342f),
+															trigger->SummonCreature(NPC_MINE_CART_2, 739.400330f, 203.598511f, 319.603333f, 2.308198f)))
+								if (Creature* cart = trigger->FindNearestCreature(chosenCart->GetEntry(), 99999.0f))
+								{
+									cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_NEUTRAL, true);
+									cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
+									cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+									cart->SetSpeed(MOVE_WALK, 0.4f);
+
+									if (chosenCart->GetEntry() == NPC_MINE_CART_1)
+									{
+										m_LastMineCart = BG_SM_MINE_CART_1;
+										m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartSpawned[BG_SM_MINE_CART_1 - 1] = true;
+									}
+									else
+									{
+										m_LastMineCart = BG_SM_MINE_CART_2;
+										m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartSpawned[BG_SM_MINE_CART_2 - 1] = true;
+									}
+								}
+						}
+					}
+					break;
+				}
+
+				default:
+					break;
 			}
 		}
 		m_MineCartSpawnTimer = 30000;
-
 	} else m_MineCartSpawnTimer -= diff;
 }
 
@@ -950,10 +1008,9 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 	}
 }
 
-void BattlegroundSM::EventCloseDepot(uint32 diff)
+void BattlegroundSM::EventReopenDepot(uint32 diff)
 {
 	Creature* trigger = NULL;
-
 	if (m_mineCartReachedDepot[BG_SM_MINE_CART_1 - 1])
 	{
 		if (m_Depot[SM_LAVA_DEPOT])
@@ -1162,6 +1219,7 @@ void BattlegroundSM::ResetDepotsAndMineCarts(uint8 depot, uint8 mineCart)
 	m_MineCartsProgressBar[mineCart - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 	m_mineCartNearDepot[mineCart - 1] = false;
 	m_mineCartReachedDepot[mineCart - 1] = false;
+	m_MineCartSpawned[mineCart - 1] = true;
 }
 void BattlegroundSM::UpdatePlayerScore(Player* Source, uint32 type, uint32 value, bool doAddHonor)
 {
