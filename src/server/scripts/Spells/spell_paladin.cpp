@@ -1416,7 +1416,7 @@ public:
 							player->CastSpell(player, SPELL_PALADIN_ANCIENT_POWER, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
 		{
 			if (UpdateVictim() || !UpdateVictim())
 				events.Update(diff);

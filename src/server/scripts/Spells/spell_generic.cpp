@@ -3815,6 +3815,8 @@ private :
 
             // And our index, to know which array we are working on
             arrayIndex = 0 ;
+
+			return true ;
         }
 
         // Init correctly all the pointers
@@ -3939,6 +3941,8 @@ private :
                     if(player && !player->HasSpell(currentArray[i]))
                         return currentArray[i];
             }
+
+			return 0 ;
         }
 
         // Main scripting function

@@ -292,6 +292,7 @@ private :
 bool SortByHp(Unit* first, Unit* second){
 	if(first && second)
 		return (first->GetHealth() < second->GetHealth());
+	return false ;
 }
 
 class spell_monk_chi_wave_bolts : public SpellScriptLoader{
@@ -2855,6 +2856,8 @@ public:
                     return SPELL_FAILED_OUT_OF_RANGE;
 
             }
+			else
+				return SPELL_FAILED_UNKNOWN ;
         }
 
         void Cast()
@@ -2983,7 +2986,7 @@ public:
 
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(const uint32 diff)
         {
             events.Update(diff);
 

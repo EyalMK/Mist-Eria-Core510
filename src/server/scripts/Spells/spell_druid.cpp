@@ -1880,7 +1880,7 @@ public:
 			DoZoneInCombat();			
 		}
 
-		void UpdateAI(uint32 diff)
+		void UpdateAI(const uint32 diff)
 		{	
 			if(needVictim && !UpdateVictim())
 				return;

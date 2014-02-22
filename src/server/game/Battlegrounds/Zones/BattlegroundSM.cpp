@@ -54,7 +54,13 @@ void BattlegroundSM::Reset()
     for (uint8 i = 0; i < SM_MINE_CART_MAX; ++i)
 	{
 		m_MineCartsProgressBar[i] = BG_SM_PROGRESS_BAR_NEUTRAL;
-		m_mineCartReachedDepot[i] = false;;
+		m_mineCartReachedDepot[i] = false;
+		m_mineCartNearDepot[i] = false;
+	}
+
+	for (uint8 i = 0; i < 4; ++i)
+	{
+		m_Depot[i] = false;
 		m_DepotCloseTimer[i] = 3000;
 	}
 }
@@ -77,7 +83,7 @@ void BattlegroundSM::StartingEventCloseDoors()
 	SpawnBGObject(BG_SM_OBJECT_DOOR_A_2, RESPAWN_IMMEDIATELY);
 	SpawnBGObject(BG_SM_OBJECT_DOOR_H_2, RESPAWN_IMMEDIATELY);
 
-    for (uint8 i = BG_SM_OBJECT_MINE_DEPOT_1; i < BG_SM_OBJECT_MINE_DEPOT_4 + 1; ++i)
+    for (uint8 i = BG_SM_OBJECT_WATERFALL_DEPOT; i < (BG_SM_OBJECT_TROLL_DEPOT + 1); ++i)
         SpawnBGObject(i, RESPAWN_ONE_DAY);
 }
 
@@ -86,7 +92,7 @@ void BattlegroundSM::StartingEventOpenDoors()
 	for (uint8 i = BG_SM_OBJECT_DOOR_A_1; i < (BG_SM_OBJECT_DOOR_H_2 + 1); ++i)
 		SpawnBGObject(i, RESPAWN_ONE_DAY);
 	
-	for (uint8 i = BG_SM_OBJECT_MINE_DEPOT_1; i < (BG_SM_OBJECT_MINE_DEPOT_4 + 1); ++i)
+	for (uint8 i = BG_SM_OBJECT_WATERFALL_DEPOT; i < (BG_SM_OBJECT_TROLL_DEPOT + 1); ++i)
 		SpawnBGObject(i, RESPAWN_IMMEDIATELY);
 
 	Creature* trigger = NULL;
@@ -738,10 +744,10 @@ void BattlegroundSM::RemovePlayer(Player* player, uint64 guid, uint32 /*team*/)
 bool BattlegroundSM::SetupBattleground()
 {
     // doors
-    if (!AddObject(BG_SM_OBJECT_MINE_DEPOT_1, BG_SM_MINE_DEPOT, BG_SM_DepotPos[0][0], BG_SM_DepotPos[0][1], BG_SM_DepotPos[0][2], BG_SM_DepotPos[0][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)    // Waterfall
-		|| !AddObject(BG_SM_OBJECT_MINE_DEPOT_2, BG_SM_MINE_DEPOT, BG_SM_DepotPos[1][0], BG_SM_DepotPos[1][1], BG_SM_DepotPos[1][2], BG_SM_DepotPos[1][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY) // Lava
-		|| !AddObject(BG_SM_OBJECT_MINE_DEPOT_3, BG_SM_MINE_DEPOT, BG_SM_DepotPos[2][0], BG_SM_DepotPos[2][1], BG_SM_DepotPos[2][2], BG_SM_DepotPos[2][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY) // Diamond
-		|| !AddObject(BG_SM_OBJECT_MINE_DEPOT_4, BG_SM_MINE_DEPOT, BG_SM_DepotPos[3][0], BG_SM_DepotPos[3][1], BG_SM_DepotPos[3][2], BG_SM_DepotPos[3][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY) // Troll
+    if (!AddObject(BG_SM_OBJECT_WATERFALL_DEPOT, BG_SM_MINE_DEPOT, BG_SM_DepotPos[0][0], BG_SM_DepotPos[0][1], BG_SM_DepotPos[0][2], BG_SM_DepotPos[0][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)    // Waterfall
+		|| !AddObject(BG_SM_OBJECT_LAVA_DEPOT, BG_SM_MINE_DEPOT, BG_SM_DepotPos[1][0], BG_SM_DepotPos[1][1], BG_SM_DepotPos[1][2], BG_SM_DepotPos[1][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY) // Lava
+		|| !AddObject(BG_SM_OBJECT_DIAMOND_DEPOT, BG_SM_MINE_DEPOT, BG_SM_DepotPos[2][0], BG_SM_DepotPos[2][1], BG_SM_DepotPos[2][2], BG_SM_DepotPos[2][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY) // Diamond
+		|| !AddObject(BG_SM_OBJECT_TROLL_DEPOT, BG_SM_MINE_DEPOT, BG_SM_DepotPos[3][0], BG_SM_DepotPos[3][1], BG_SM_DepotPos[3][2], BG_SM_DepotPos[3][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY) // Troll
 		|| !AddObject(BG_SM_OBJECT_DOOR_A_1, BG_SM_DOOR, BG_SM_DoorPos[0][0], BG_SM_DoorPos[0][1], BG_SM_DoorPos[0][2], BG_SM_DoorPos[0][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
 		|| !AddObject(BG_SM_OBJECT_DOOR_A_2, BG_SM_DOOR, BG_SM_DoorPos[1][0], BG_SM_DoorPos[1][1], BG_SM_DoorPos[1][2], BG_SM_DoorPos[1][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
 		|| !AddObject(BG_SM_OBJECT_DOOR_H_1, BG_SM_DOOR, BG_SM_DoorPos[2][0], BG_SM_DoorPos[2][1], BG_SM_DoorPos[2][2], BG_SM_DoorPos[2][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
@@ -788,26 +794,59 @@ void BattlegroundSM::CheckMineCartNearDepot(uint32 diff)
 	Creature* trigger = NULL;
 	if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
 	{
-		if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f, true))
-			if (cart->GetExactDist2d(BG_SM_DepotPos[0][0], BG_SM_DepotPos[0][1]) < 5.0f ||
-				cart->GetExactDist2d(BG_SM_DepotPos[1][0], BG_SM_DepotPos[1][1]) < 5.0f ||
-				cart->GetExactDist2d(BG_SM_DepotPos[2][0], BG_SM_DepotPos[2][1]) < 5.0f ||
-				cart->GetExactDist2d(BG_SM_DepotPos[3][0], BG_SM_DepotPos[3][1]) < 5.0f)
-				BattlegroundSM::EventTeamCapturedMineCart(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), BG_SM_MINE_CART_1);
+		if (!m_mineCartNearDepot[0])
+		{
+			if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f, true))
+			{
+				if (cart->GetExactDist2d(BG_SM_DepotPos[1][0], BG_SM_DepotPos[1][1]) < 5.0f)
+				{
+					m_Depot[SM_LAVA_DEPOT] = true;
+					BattlegroundSM::EventTeamCapturedMineCart(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), BG_SM_MINE_CART_1);
+					m_mineCartNearDepot[0] = true;
 
-		if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_2, 99999.0f, true))
-			if (cart->GetExactDist2d(BG_SM_DepotPos[0][0], BG_SM_DepotPos[0][1]) < 5.0f ||
-				cart->GetExactDist2d(BG_SM_DepotPos[1][0], BG_SM_DepotPos[1][1]) < 5.0f ||
-				cart->GetExactDist2d(BG_SM_DepotPos[2][0], BG_SM_DepotPos[2][1]) < 5.0f ||
-				cart->GetExactDist2d(BG_SM_DepotPos[3][0], BG_SM_DepotPos[3][1]) < 5.0f)
-				BattlegroundSM::EventTeamCapturedMineCart(GetMineCartTeamKeeper(BG_SM_MINE_CART_2), BG_SM_MINE_CART_2);
+				}
 
-		if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_3, 99999.0f, true))
-			if (cart->GetExactDist2d(BG_SM_DepotPos[0][0], BG_SM_DepotPos[0][1]) < 5.0f ||
-				cart->GetExactDist2d(BG_SM_DepotPos[1][0], BG_SM_DepotPos[1][1]) < 5.0f ||
-				cart->GetExactDist2d(BG_SM_DepotPos[2][0], BG_SM_DepotPos[2][1]) < 5.0f ||
-				cart->GetExactDist2d(BG_SM_DepotPos[3][0], BG_SM_DepotPos[3][1]) < 5.0f)
-				BattlegroundSM::EventTeamCapturedMineCart(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), BG_SM_MINE_CART_3);
+				if (cart->GetExactDist2d(BG_SM_DepotPos[2][0], BG_SM_DepotPos[2][1]) < 5.0f)
+				{
+					m_Depot[SM_DIAMOND_DEPOT] = true;
+					BattlegroundSM::EventTeamCapturedMineCart(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), BG_SM_MINE_CART_1);
+					m_mineCartNearDepot[0] = true;
+				}
+			}
+		}
+
+		if (!m_mineCartNearDepot[1])
+		{
+			if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_2, 99999.0f, true))
+			{
+				if (cart->GetExactDist2d(BG_SM_DepotPos[0][0], BG_SM_DepotPos[0][1]) < 5.0f)
+				{
+					m_Depot[SM_WATERFALL_DEPOT] = true;
+					BattlegroundSM::EventTeamCapturedMineCart(GetMineCartTeamKeeper(BG_SM_MINE_CART_2), BG_SM_MINE_CART_2);
+					m_mineCartNearDepot[1] = true;
+				}
+			}
+		}
+
+		if (!m_mineCartNearDepot[2])
+		{
+			if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_3, 99999.0f, true))
+			{
+				if (cart->GetExactDist2d(BG_SM_DepotPos[2][0], BG_SM_DepotPos[2][1]) < 5.0f)
+				{
+					m_Depot[SM_DIAMOND_DEPOT] = true;
+					BattlegroundSM::EventTeamCapturedMineCart(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), BG_SM_MINE_CART_3);
+					m_mineCartNearDepot[2] = true;
+				}
+
+				if (cart->GetExactDist2d(BG_SM_DepotPos[3][0], BG_SM_DepotPos[3][1]) < 5.0f)
+				{
+					m_Depot[SM_TROLL_DEPOT] = true;
+					BattlegroundSM::EventTeamCapturedMineCart(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), BG_SM_MINE_CART_3);
+					m_mineCartNearDepot[2] = true;
+				}
+			}
+		}
 	}
 }
 
@@ -839,36 +878,71 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 			case BG_SM_MINE_CART_1:
 			{
 				if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f, true))
-					if (GameObject * depot = cart->FindNearestGameObject(BG_SM_MINE_DEPOT, 99999.0f))
+				{
+					if (m_Depot[SM_LAVA_DEPOT])
 					{
-						cart->GetMotionMaster()->Clear(true);
-						depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-						m_mineCartReachedDepot[0] = true;
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_LAVA_DEPOT))
+						{
+							cart->GetMotionMaster()->Clear(true);
+							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+							m_mineCartReachedDepot[0] = true;
+						}
 					}
+
+					if (m_Depot[SM_DIAMOND_DEPOT])
+					{
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_DIAMOND_DEPOT))
+						{
+							cart->GetMotionMaster()->Clear(true);
+							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+							m_mineCartReachedDepot[0] = true;
+						}
+					}
+				}
 				break;
 			}
 
 			case BG_SM_MINE_CART_2:
 			{
 				if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_2, 99999.0f, true))
-					if (GameObject * depot = cart->FindNearestGameObject(BG_SM_MINE_DEPOT, 99999.0f))
+				{
+					if (m_Depot[SM_WATERFALL_DEPOT])
 					{
-						cart->GetMotionMaster()->Clear(true);
-						depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-						m_mineCartReachedDepot[1] = true;
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_WATERFALL_DEPOT))
+						{
+							cart->GetMotionMaster()->Clear(true);
+							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+							m_mineCartReachedDepot[1] = true;
+						}
 					}
+				}
 				break;
 			}
 
 			case BG_SM_MINE_CART_3:
 			{
 				if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_3, 99999.0f, true))
-					if (GameObject * depot = cart->FindNearestGameObject(BG_SM_MINE_DEPOT, 99999.0f))
+				{
+					if (m_Depot[SM_DIAMOND_DEPOT])
 					{
-						cart->GetMotionMaster()->Clear(true);
-						depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-						m_mineCartReachedDepot[2] = true;
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_DIAMOND_DEPOT))
+						{
+							cart->GetMotionMaster()->Clear(true);
+							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+							m_mineCartReachedDepot[2] = true;
+						}
 					}
+
+					if (m_Depot[SM_TROLL_DEPOT])
+					{
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_TROLL_DEPOT))
+						{
+							cart->GetMotionMaster()->Clear(true);
+							depot->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+							m_mineCartReachedDepot[2] = true;
+						}
+					}
+				}
 				break;
 			}
 		}
@@ -877,70 +951,130 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 
 void BattlegroundSM::EventCloseDepot(uint32 diff)
 {
+	Creature* trigger = NULL;
+
 	if (m_mineCartReachedDepot[0])
 	{
-		if (m_DepotCloseTimer[0] <= 0)
+		if (m_Depot[SM_LAVA_DEPOT])
 		{
-			Creature* trigger = NULL;
-			if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
+			if (m_DepotCloseTimer[SM_LAVA_DEPOT] <= 0)
 			{
-				if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f, true))
+				if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
 				{
-					if (GameObject * depot = cart->FindNearestGameObject(BG_SM_MINE_DEPOT, 99999.0f))
+					if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f, true))
 					{
-						BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
-						depot->SetGoState(GO_STATE_READY);
-						cart->DespawnOrUnsummon();
-						m_DepotCloseTimer[0] = 3000;
-						m_mineCartReachedDepot[0] = false;
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_LAVA_DEPOT))
+						{
+							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
+							depot->SetGoState(GO_STATE_READY);
+							cart->DespawnOrUnsummon();
+							m_DepotCloseTimer[SM_LAVA_DEPOT] = 3000;
+							m_mineCartNearDepot[0] = false;
+							m_Depot[SM_LAVA_DEPOT] = false;
+							m_mineCartReachedDepot[0] = false;
+						}
 					}
 				}
-			}
-		} else m_DepotCloseTimer[0] -= diff;
+			} else m_DepotCloseTimer[SM_LAVA_DEPOT] -= diff;
+		}
+
+		if (m_Depot[SM_DIAMOND_DEPOT])
+		{
+			if (m_DepotCloseTimer[SM_DIAMOND_DEPOT] <= 0)
+			{
+				if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
+				{
+					if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f, true))
+					{
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_DIAMOND_DEPOT))
+						{
+							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
+							depot->SetGoState(GO_STATE_READY);
+							cart->DespawnOrUnsummon();
+							m_DepotCloseTimer[SM_DIAMOND_DEPOT] = 3000;
+							m_mineCartNearDepot[0] = false;
+							m_Depot[SM_LAVA_DEPOT] = false;
+							m_mineCartReachedDepot[0] = false;
+						}
+					}
+				}
+			} else m_DepotCloseTimer[SM_LAVA_DEPOT] -= diff;
+		}
 	}
 
 	if (m_mineCartReachedDepot[1])
 	{
-		if (m_DepotCloseTimer[1] <= 0)
+		if (m_Depot[SM_WATERFALL_DEPOT])
 		{
-			Creature* trigger = NULL;
-			if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
+			if (m_DepotCloseTimer[SM_WATERFALL_DEPOT] <= 0)
 			{
-				if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_2, 99999.0f, true))
+				if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
 				{
-					if (GameObject * depot = cart->FindNearestGameObject(BG_SM_MINE_DEPOT, 99999.0f))
+					if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_2, 99999.0f, true))
 					{
-						BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_2), POINTS_PER_MINE_CART);
-						depot->SetGoState(GO_STATE_READY);
-						cart->DespawnOrUnsummon();
-						m_DepotCloseTimer[1] = 3000;
-						m_mineCartReachedDepot[1] = false;
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_WATERFALL_DEPOT))
+						{
+							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_2), POINTS_PER_MINE_CART);
+							depot->SetGoState(GO_STATE_READY);
+							cart->DespawnOrUnsummon();
+							m_DepotCloseTimer[SM_WATERFALL_DEPOT] = 3000;
+							m_mineCartNearDepot[1] = false;
+							m_Depot[SM_WATERFALL_DEPOT] = false;
+							m_mineCartReachedDepot[1] = false;
+						}
 					}
 				}
-			}
-		} else m_DepotCloseTimer[1] -= diff;
+			} else m_DepotCloseTimer[SM_WATERFALL_DEPOT] -= diff;
+		}
 	}
 
 	if (m_mineCartReachedDepot[2])
 	{
-		if (m_DepotCloseTimer[2] <= 0)
+		if (m_Depot[SM_DIAMOND_DEPOT])
 		{
-			Creature* trigger = NULL;
-			if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
+			if (m_DepotCloseTimer[SM_DIAMOND_DEPOT] <= 0)
 			{
-				if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_3, 99999.0f, true))
+				if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
 				{
-					if (GameObject * depot = cart->FindNearestGameObject(BG_SM_MINE_DEPOT, 99999.0f))
+					if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_3, 99999.0f, true))
 					{
-						BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
-						depot->SetGoState(GO_STATE_READY);
-						cart->DespawnOrUnsummon();
-						m_DepotCloseTimer[2] = 3000;
-						m_mineCartReachedDepot[2] = false;
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_DIAMOND_DEPOT))
+						{
+							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
+							depot->SetGoState(GO_STATE_READY);
+							cart->DespawnOrUnsummon();
+							m_DepotCloseTimer[SM_DIAMOND_DEPOT] = 3000;
+							m_mineCartNearDepot[2] = false;
+							m_Depot[SM_DIAMOND_DEPOT] = false;
+							m_mineCartReachedDepot[2] = false;
+						}
 					}
 				}
-			}
-		} else m_DepotCloseTimer[2] -= diff;
+			} else m_DepotCloseTimer[SM_DIAMOND_DEPOT] -= diff;
+		}
+
+		if (m_Depot[SM_TROLL_DEPOT])
+		{
+			if (m_DepotCloseTimer[SM_TROLL_DEPOT] <= 0)
+			{
+				if (trigger = HashMapHolder<Creature>::Find(SM_MINE_CART_TRIGGER))
+				{
+					if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_3, 99999.0f, true))
+					{
+						if (GameObject* depot = HashMapHolder<GameObject>::Find(BG_SM_OBJECT_TROLL_DEPOT))
+						{
+							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
+							depot->SetGoState(GO_STATE_READY);
+							cart->DespawnOrUnsummon();
+							m_DepotCloseTimer[SM_TROLL_DEPOT] = 3000;
+							m_mineCartNearDepot[2] = false;
+							m_Depot[SM_TROLL_DEPOT] = false;
+							m_mineCartReachedDepot[2] = false;
+						}
+					}
+				}
+			} else m_DepotCloseTimer[SM_TROLL_DEPOT] -= diff;
+		}
 	}
 }
 

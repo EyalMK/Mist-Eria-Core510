@@ -1611,7 +1611,8 @@ public :
 
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "Inferno Blast Spreader : glyph test done ; resizing list (actual size : %u)", (uint32)targets.size());
                 // Do not resize if the target's list's size is too low ;
-				if(targets.size() < caster->HasAura(89926) ? 5 : 4)
+				uint32 sizeToCheck = (caster->HasAura(89926) ? 5 : 4);
+				if(targets.size() < sizeToCheck)
 					return ;
 
 				// Else resize it ;

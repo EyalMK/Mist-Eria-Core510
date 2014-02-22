@@ -211,16 +211,16 @@ public:
         std::wstring message;
         if(!Utf8toWStr(utfmsg, message))
             return false;
-        for(int i = 0 ; i < message.size() ; i++) //On remplace les caractère accentué par des non accentué
+        for(uint32 i = 0 ; i < message.size() ; i++) //On remplace les caractère accentué par des non accentué
         {
-            for(int j = 0 ; j < m_accent_char.size() ; j++)
+            for(uint32 j = 0 ; j < m_accent_char.size() ; j++)
             {
                 //sLog->outString("%c <=> %c", message[i], m_accent_char[j]);
                 if(message[i] == m_accent_char[j])
                     message[i] = m_normal_char[j];
             }
 
-            for(int j = 0 ; j < m_separator.size() ; j++)
+            for(uint32 j = 0 ; j < m_separator.size() ; j++)
             {
                 if(message[i] == m_separator[j])
                     message[i] = ' ';
@@ -240,7 +240,7 @@ public:
 
         bool found = false;
 
-        for (int i = 0 ; i < m_worldList.size() ; i++)
+        for (uint32 i = 0 ; i < m_worldList.size() ; i++)
         {
             if(sSpyMgr->IsWordBlackListed(m_worldList[i]))
             {
@@ -432,7 +432,7 @@ public:
             resultList = wordList;
         else
         {
-            for(int i = 0 ; i < wordList.size() ; i++)
+            for(uint32 i = 0 ; i < wordList.size() ; i++)
             {
                 std::string begin = wordList[i].substr(0, strlen(args));
                 if(begin == args)
@@ -442,7 +442,7 @@ public:
 
         handler->PSendSysMessage("Liste de résultat :");
 
-        for(int i = 0 ; i < resultList.size() ; i++)
+        for(uint32 i = 0 ; i < resultList.size() ; i++)
             handler->PSendSysMessage("%s", resultList[i].c_str());
 
         return true;
@@ -457,10 +457,10 @@ public:
 
         std::string word(args);
 
-        for(int i = 0 ; i < word.size() ; i++)
+        for(uint32 i = 0 ; i < word.size() ; i++)
         {
             bool found = false;
-            for(int j = 0 ; j < acceptedChar.size() ; j++)
+            for(uint32 j = 0 ; j < acceptedChar.size() ; j++)
             {
                 if(word[i] == acceptedChar[j])
                     found = true;
@@ -492,10 +492,10 @@ public:
 
         std::string word(args);
 
-        for(int i = 0 ; i < word.size() ; i++)
+        for(uint32 i = 0 ; i < word.size() ; i++)
         {
             bool found = false;
-            for(int j = 0 ; j < acceptedChar.size() ; j++)
+            for(uint32 j = 0 ; j < acceptedChar.size() ; j++)
             {
                 if(word[i] == acceptedChar[j])
                     found = true;
