@@ -716,9 +716,9 @@ void BattlegroundSM::EndBattleground(uint32 winner)
 void BattlegroundSM::UpdatePointsCount(uint32 Team)
 {
     if (Team == ALLIANCE)
-        UpdateWorldState(SM_ALLIANCE_RESOURCES, m_TeamPointsCount[TEAM_ALLIANCE]);
+        UpdateWorldState(SM_ALLIANCE_RESOURCES, m_TeamScores[TEAM_ALLIANCE]);
     else
-        UpdateWorldState(SM_HORDE_RESOURCES, m_TeamPointsCount[TEAM_HORDE]);
+        UpdateWorldState(SM_HORDE_RESOURCES, m_TeamScores[TEAM_HORDE]);
 }
 
 void BattlegroundSM::AddPlayer(Player* player)
