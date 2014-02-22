@@ -109,7 +109,7 @@ void BattlegroundSM::StartingEventOpenDoors()
 								cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
 								cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 								cart->SetSpeed(MOVE_WALK, 0.4f);
-								m_MineCartsProgressBar[BG_SM_MINE_CART_1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+								m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 							}
 
 							m_LastMineCart = BG_SM_MINE_CART_1;
@@ -128,12 +128,12 @@ void BattlegroundSM::StartingEventOpenDoors()
 									if (chosenCart->GetEntry() == NPC_MINE_CART_2)
 									{
 										m_LastMineCart = BG_SM_MINE_CART_2;
-										m_MineCartsProgressBar[BG_SM_MINE_CART_2] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 									}
 									else
 									{
 										m_LastMineCart = BG_SM_MINE_CART_3;
-										m_MineCartsProgressBar[BG_SM_MINE_CART_3] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 									}
 								}
 						}
@@ -154,7 +154,7 @@ void BattlegroundSM::StartingEventOpenDoors()
 								cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
 								cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 								cart->SetSpeed(MOVE_WALK, 0.4f);
-								m_MineCartsProgressBar[BG_SM_MINE_CART_2] = BG_SM_PROGRESS_BAR_NEUTRAL;
+								m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 							}
 
 							m_LastMineCart = BG_SM_MINE_CART_2;
@@ -173,12 +173,12 @@ void BattlegroundSM::StartingEventOpenDoors()
 									if (chosenCart->GetEntry() == NPC_MINE_CART_1)
 									{
 										m_LastMineCart = BG_SM_MINE_CART_1;
-										m_MineCartsProgressBar[BG_SM_MINE_CART_1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 									}
 									else
 									{
 										m_LastMineCart = BG_SM_MINE_CART_3;
-										m_MineCartsProgressBar[BG_SM_MINE_CART_3] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 									}
 								}
 						}
@@ -199,7 +199,7 @@ void BattlegroundSM::StartingEventOpenDoors()
 								cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
 								cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 								cart->SetSpeed(MOVE_WALK, 0.4f);
-								m_MineCartsProgressBar[BG_SM_MINE_CART_3] = BG_SM_PROGRESS_BAR_NEUTRAL;
+								m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 							}
 
 							m_LastMineCart = BG_SM_MINE_CART_3;
@@ -218,12 +218,12 @@ void BattlegroundSM::StartingEventOpenDoors()
 									if (chosenCart->GetEntry() == NPC_MINE_CART_1)
 									{
 										m_LastMineCart = BG_SM_MINE_CART_1;
-										m_MineCartsProgressBar[BG_SM_MINE_CART_1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 									}
 									else
 									{
 										m_LastMineCart = BG_SM_MINE_CART_2;
-										m_MineCartsProgressBar[BG_SM_MINE_CART_2] = BG_SM_PROGRESS_BAR_NEUTRAL;
+										m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 									}
 								}
 						}
@@ -262,7 +262,7 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 									cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
 									cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 									cart->SetSpeed(MOVE_WALK, 0.4f);
-									m_MineCartsProgressBar[BG_SM_MINE_CART_1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+									m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 								}
 
 								m_LastMineCart = BG_SM_MINE_CART_1;
@@ -281,12 +281,12 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 										if (chosenCart->GetEntry() == NPC_MINE_CART_2)
 										{
 											m_LastMineCart = BG_SM_MINE_CART_2;
-											m_MineCartsProgressBar[BG_SM_MINE_CART_2] = BG_SM_PROGRESS_BAR_NEUTRAL;
+											m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 										}
 										else
 										{
 											m_LastMineCart = BG_SM_MINE_CART_3;
-											m_MineCartsProgressBar[BG_SM_MINE_CART_3] = BG_SM_PROGRESS_BAR_NEUTRAL;
+											m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 										}
 									}
 							}
@@ -307,7 +307,7 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 									cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
 									cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 									cart->SetSpeed(MOVE_WALK, 0.4f);
-									m_MineCartsProgressBar[BG_SM_MINE_CART_2] = BG_SM_PROGRESS_BAR_NEUTRAL;
+									m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 								}
 
 								m_LastMineCart = BG_SM_MINE_CART_2;
@@ -326,12 +326,12 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 										if (chosenCart->GetEntry() == NPC_MINE_CART_1)
 										{
 											m_LastMineCart = BG_SM_MINE_CART_1;
-											m_MineCartsProgressBar[BG_SM_MINE_CART_1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+											m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 										}
 										else
 										{
 											m_LastMineCart = BG_SM_MINE_CART_3;
-											m_MineCartsProgressBar[BG_SM_MINE_CART_3] = BG_SM_PROGRESS_BAR_NEUTRAL;
+											m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 										}
 									}
 							}
@@ -352,7 +352,7 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 									cart->SetUnitMovementFlags(MOVEMENTFLAG_BACKWARD);
 									cart->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 									cart->SetSpeed(MOVE_WALK, 0.4f);
-									m_MineCartsProgressBar[BG_SM_MINE_CART_3] = BG_SM_PROGRESS_BAR_NEUTRAL;
+									m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 								}
 
 								m_LastMineCart = BG_SM_MINE_CART_3;
@@ -371,12 +371,12 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 										if (chosenCart->GetEntry() == NPC_MINE_CART_1)
 										{
 											m_LastMineCart = BG_SM_MINE_CART_1;
-											m_MineCartsProgressBar[BG_SM_MINE_CART_1] = BG_SM_PROGRESS_BAR_NEUTRAL;
+											m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 										}
 										else
 										{
 											m_LastMineCart = BG_SM_MINE_CART_2;
-											m_MineCartsProgressBar[BG_SM_MINE_CART_2] = BG_SM_PROGRESS_BAR_NEUTRAL;
+											m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 										}
 									}
 							}
@@ -408,18 +408,18 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 					{
 						UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_SHOW, player);
 
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_1] >= 100)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] >= 100)
 						{
-							m_MineCartsProgressBar[BG_SM_MINE_CART_1] = 100;
-							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_1], player);
+							m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] = 100;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1], player);
 						}
 						else
 						{
-							m_MineCartsProgressBar[BG_SM_MINE_CART_1]++;
-							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_1], player);
+							m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1]++;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1], player);
 						}
 						
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_1] > BG_SM_PROGRESS_BAR_NEUTRAL)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] > BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
 							if (cart->HasAura(BG_SM_CONTROL_VISUAL_NEUTRAL))
 								cart->RemoveAurasDueToSpell(BG_SM_CONTROL_VISUAL_NEUTRAL, cart->GetGUID());
@@ -431,7 +431,7 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 								cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_ALLIANCE, true);
 						}
 
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_1] == BG_SM_PROGRESS_BAR_NEUTRAL)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] == BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
 							if (cart->HasAura(BG_SM_CONTROL_VISUAL_ALLIANCE))
 								cart->RemoveAurasDueToSpell(BG_SM_CONTROL_VISUAL_ALLIANCE, cart->GetGUID());
@@ -448,18 +448,18 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 					{
 						UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_SHOW, player);
 
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_2] >= 100)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] >= 100)
 						{
-							m_MineCartsProgressBar[BG_SM_MINE_CART_2] = 100;
-							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_2], player);
+							m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] = 100;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1], player);
 						}
 						else
 						{
-							m_MineCartsProgressBar[BG_SM_MINE_CART_2]++;
-							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_2], player);
+							m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1]++;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1], player);
 						}
 
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_2] > BG_SM_PROGRESS_BAR_NEUTRAL)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] > BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
 							if (cart->HasAura(BG_SM_CONTROL_VISUAL_NEUTRAL))
 								cart->RemoveAurasDueToSpell(BG_SM_CONTROL_VISUAL_NEUTRAL, cart->GetGUID());
@@ -471,7 +471,7 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 								cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_ALLIANCE, true);
 						}
 
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_2] == BG_SM_PROGRESS_BAR_NEUTRAL)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] == BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
 							if (cart->HasAura(BG_SM_CONTROL_VISUAL_ALLIANCE))
 								cart->RemoveAurasDueToSpell(BG_SM_CONTROL_VISUAL_ALLIANCE, cart->GetGUID());
@@ -488,18 +488,18 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 					{
 						UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_SHOW, player);
 
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_3] >= 100)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] >= 100)
 						{
-							m_MineCartsProgressBar[BG_SM_MINE_CART_3] = 100;
-							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_3], player);
+							m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] = 100;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1], player);
 						}
 						else
 						{
-							m_MineCartsProgressBar[BG_SM_MINE_CART_3]++;
-							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_3], player);
+							m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1]++;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1], player);
 						}
 
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_3] > BG_SM_PROGRESS_BAR_NEUTRAL)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] > BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
 							if (cart->HasAura(BG_SM_CONTROL_VISUAL_NEUTRAL))
 								cart->RemoveAurasDueToSpell(BG_SM_CONTROL_VISUAL_NEUTRAL, cart->GetGUID());
@@ -511,7 +511,7 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 								cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_ALLIANCE, true);
 						}
 
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_3] == BG_SM_PROGRESS_BAR_NEUTRAL)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] == BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
 							if (cart->HasAura(BG_SM_CONTROL_VISUAL_ALLIANCE))
 								cart->RemoveAurasDueToSpell(BG_SM_CONTROL_VISUAL_ALLIANCE, cart->GetGUID());
@@ -532,18 +532,18 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 					{
 						UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_SHOW, player);
 
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_1] <= 0)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] <= 0)
 						{
-							m_MineCartsProgressBar[BG_SM_MINE_CART_1] = 0;
-							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_1], player);
+							m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] = 0;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1], player);
 						}
 						else
 						{
-							m_MineCartsProgressBar[BG_SM_MINE_CART_1]--;
-							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_1], player);
+							m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1]--;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1], player);
 						}
 
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_1] < BG_SM_PROGRESS_BAR_NEUTRAL)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] < BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
 							if (cart->HasAura(BG_SM_CONTROL_VISUAL_NEUTRAL))
 								cart->RemoveAurasDueToSpell(BG_SM_CONTROL_VISUAL_NEUTRAL, cart->GetGUID());
@@ -555,7 +555,7 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 								cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_HORDE, true);
 						}
 
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_1] == BG_SM_PROGRESS_BAR_NEUTRAL)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] == BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
 							if (cart->HasAura(BG_SM_CONTROL_VISUAL_ALLIANCE))
 								cart->RemoveAurasDueToSpell(BG_SM_CONTROL_VISUAL_ALLIANCE, cart->GetGUID());
@@ -572,18 +572,18 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 					{
 						UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_SHOW, player);
 
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_2] <= 0)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] <= 0)
 						{
-							m_MineCartsProgressBar[BG_SM_MINE_CART_2] = 0;
-							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_2], player);
+							m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] = 0;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1], player);
 						}
 						else
 						{
-							m_MineCartsProgressBar[BG_SM_MINE_CART_2]--;
-							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_2], player);
+							m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1]--;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1], player);
 						}
 
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_2] < BG_SM_PROGRESS_BAR_NEUTRAL)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] < BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
 							if (cart->HasAura(BG_SM_CONTROL_VISUAL_NEUTRAL))
 								cart->RemoveAurasDueToSpell(BG_SM_CONTROL_VISUAL_NEUTRAL, cart->GetGUID());
@@ -595,7 +595,7 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 								cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_HORDE, true);
 						}
 
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_2] == BG_SM_PROGRESS_BAR_NEUTRAL)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] == BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
 							if (cart->HasAura(BG_SM_CONTROL_VISUAL_ALLIANCE))
 								cart->RemoveAurasDueToSpell(BG_SM_CONTROL_VISUAL_ALLIANCE, cart->GetGUID());
@@ -612,18 +612,18 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 					{
 						UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_SHOW, player);
 
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_3] <= 0)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] <= 0)
 						{
-							m_MineCartsProgressBar[BG_SM_MINE_CART_3] = 0;
-							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_3], player);
+							m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] = 0;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1], player);
 						}
 						else
 						{
-							m_MineCartsProgressBar[BG_SM_MINE_CART_3]--;
-							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_3], player);
+							m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1]--;
+							UpdateWorldStateForPlayer(SM_PROGRESS_BAR_STATUS, m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1], player);
 						}
 						
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_3] < BG_SM_PROGRESS_BAR_NEUTRAL)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] < BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
 							if (cart->HasAura(BG_SM_CONTROL_VISUAL_NEUTRAL))
 								cart->RemoveAurasDueToSpell(BG_SM_CONTROL_VISUAL_NEUTRAL, cart->GetGUID());
@@ -635,7 +635,7 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 								cart->CastSpell(cart, BG_SM_CONTROL_VISUAL_HORDE, true);
 						}
 
-						if (m_MineCartsProgressBar[BG_SM_MINE_CART_3] == BG_SM_PROGRESS_BAR_NEUTRAL)
+						if (m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] == BG_SM_PROGRESS_BAR_NEUTRAL)
 						{
 							if (cart->HasAura(BG_SM_CONTROL_VISUAL_ALLIANCE))
 								cart->RemoveAurasDueToSpell(BG_SM_CONTROL_VISUAL_ALLIANCE, cart->GetGUID());
@@ -890,8 +890,8 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 					{
 						BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
 						depot->SetGoState(GO_STATE_READY);
-						m_DepotCloseTimer[0] = 3000;
 						cart->DespawnOrUnsummon();
+						m_DepotCloseTimer[0] = 3000;
 						m_mineCartReachedDepot[0] = false;
 					}
 				}
@@ -912,8 +912,8 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 					{
 						BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_2), POINTS_PER_MINE_CART);
 						depot->SetGoState(GO_STATE_READY);
-						m_DepotCloseTimer[1] = 3000;
 						cart->DespawnOrUnsummon();
+						m_DepotCloseTimer[1] = 3000;
 						m_mineCartReachedDepot[1] = false;
 					}
 				}
@@ -934,8 +934,8 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 					{
 						BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
 						depot->SetGoState(GO_STATE_READY);
-						m_DepotCloseTimer[2] = 3000;
 						cart->DespawnOrUnsummon();
+						m_DepotCloseTimer[2] = 3000;
 						m_mineCartReachedDepot[2] = false;
 					}
 				}
@@ -946,10 +946,10 @@ void BattlegroundSM::EventCloseDepot(uint32 diff)
 
 uint32 BattlegroundSM::GetMineCartTeamKeeper(uint8 mineCart)
 {
-	if (m_MineCartsProgressBar[mineCart] > BG_SM_PROGRESS_BAR_NEUTRAL)
+	if (m_MineCartsProgressBar[mineCart - 1] > BG_SM_PROGRESS_BAR_NEUTRAL)
 		return ALLIANCE;
 
-	else if (m_MineCartsProgressBar[mineCart] < BG_SM_PROGRESS_BAR_NEUTRAL)
+	else if (m_MineCartsProgressBar[mineCart - 1] < BG_SM_PROGRESS_BAR_NEUTRAL)
 		return HORDE;
 
 	else return 0;
