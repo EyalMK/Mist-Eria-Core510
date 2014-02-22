@@ -3212,7 +3212,6 @@ public:
                 }
             }
 
-
             void UpdateAI(const uint32 uiDiff)
             {
                 if(StartEvent2)
@@ -3701,26 +3700,34 @@ public:
             CraneTimer = 6000;
         }
 
+        void DamageTaken(Unit* attacker, uint32 &amount)
+        {
+            me->SetReactState(REACT_AGGRESSIVE);
+        }
+
         void UpdateAI(const uint32 uiDiff)
         {
             if (TestAreaTimer <= uiDiff)
             {
                 if(!me->GetAreaId() == 5831)
                     me->DespawnOrUnsummon();
+
+                TestAreaTimer = 1000;
             }
             else TestAreaTimer -= uiDiff;
 
             if (CombatTimer <= uiDiff)
             {
-                if(Unit* owner = me->GetOwner())
+                if(Unit* summoner = me->ToTempSummon()->GetSummoner())
                 {
-                    if(owner->ToPlayer())
-                        if(owner->isInCombat())
-                            me->SetReactState(REACT_AGGRESSIVE);
-                        if(!owner->isInCombat())
+                    if(summoner->ToPlayer())
+                    {
+                        if(!summoner->isInCombat())
                             me->SetReactState(REACT_PASSIVE);
+                        if(summoner->isInCombat())
+                            me->SetReactState(REACT_AGGRESSIVE);
+                    }
                 }
-
                 CombatTimer = 1000;
             }
             else CombatTimer -= uiDiff;
