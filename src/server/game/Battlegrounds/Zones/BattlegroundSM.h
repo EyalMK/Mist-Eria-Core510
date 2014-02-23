@@ -171,7 +171,6 @@ class BattlegroundSM : public Battleground
         void StartingEventCloseDoors();
         void StartingEventOpenDoors();
 
-        void RemovePlayer(Player* player, uint64 guid, uint32 team);
         void HandleBuffUse(uint64 buff_guid);
         void HandleKillPlayer(Player* player, Player* killer);
         bool SetupBattleground();
@@ -192,6 +191,7 @@ class BattlegroundSM : public Battleground
         void EventTeamCapturedMineCart(uint32 team, uint8 mineCart);
         void UpdatePointsCount(uint32 Team);
 		void SummonMineCart(uint32 diff);
+		void FirstMineCartSummon(uint32 diff);
 
         /* Scorekeeping */
         void AddPoints(uint32 Team, uint32 Points);
@@ -210,13 +210,15 @@ class BattlegroundSM : public Battleground
 		uint8 m_LastMineCart; // 0 = Reset, 1 = First Mine Cart, 2 = Second Mine Cart, 3 = Third Mine Cart
 		uint32 m_MineCartTeamKeeper[SM_MINE_CART_MAX]; // keepers team
 		int32 m_MineCartSpawnTimer;
-		int32 m_mineCartCheckTimer;
+		int32 m_FirstMineCartSummonTimer;
+		int32 m_MineCartCheckTimer;
 		int32 m_DepotCloseTimer[4];
 		int32 m_MineCartAddPointsTimer;
 		bool m_Depot[4]; // 0 = Waterfall, 1 = Lava, 2 = Diamond, 3 = Troll
-		bool m_mineCartReachedDepot[SM_MINE_CART_MAX];
-		bool m_mineCartNearDepot[SM_MINE_CART_MAX];
+		bool m_MineCartReachedDepot[SM_MINE_CART_MAX];
+		bool m_MineCartNearDepot[SM_MINE_CART_MAX];
 		bool m_MineCartSpawned[SM_MINE_CART_MAX];
+		bool m_FirstMineCartSpawned;
 
         uint32 m_HonorTics;
 		bool m_IsInformedNearVictory;
