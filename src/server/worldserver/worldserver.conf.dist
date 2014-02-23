@@ -2968,3 +2968,28 @@ Currency.ConquestPointsArenaReward = 180
 
 #
 ###################################################################################################
+
+###################################################################################################
+# MULTIPLICATEUR DE RATE PAR FACTION
+#
+#    Multiplicateur de rate Alliance.
+#       Default: 1
+#    Exemple = Pour augmenter le rate de l'alliance de 50%, mettre les rates multiplicateurs voulus à 1.5
+#
+
+Multiplicateur.Rate.Drop.Money.Alliance = 1
+Multiplicateur.Rate.Xp.Quest.Alliance = 1
+Multiplicateur.Rate.Honor.Alliance = 1
+
+#
+#    Multiplicateur de rate Horde.
+#       Default: 1
+#    Exemple = Pour augmenter le rate de la horde de 50%, mettre les rates multiplicateurs voulus à 1.5
+#
+
+Multiplicateur.Rate.Drop.Money.Horde = 1
+Multiplicateur.Rate.Xp.Quest.Horde = 1
+Multiplicateur.Rate.Honor.Horde = 1
+
+#
+###################################################################################################
