@@ -3152,24 +3152,22 @@ public :
 
         void HandleTargetSelect(std::list<WorldObject*>& targets)
         {
-			// Sort targets according to the distance, in order to find the nearest
-			if(targets.size() >= 2)
-			{
-				targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster()));
-				targets.remove_if(InLineCheckPredicate(GetCaster()));
-				
-				if(targets.empty())
-					return ;
-				
-				if(WorldObject* frontObj = targets.front())
-					if(GetCaster()->GetExactDist2d(frontObj->GetPositionX(), frontObj->GetPositionY()) > 10.0f)
-						root = true ;
-
-				if(targets.size() > 1)
-					targets.resize(1);
-			}
-			else 
+			if(targets.empty())
 				return ;
+				
+			// Sort targets according to the distance, in order to find the nearest
+			targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster()));
+			targets.remove_if(InLineCheckPredicate(GetCaster()));
+			
+			if(targets.empty())
+				return ;
+			
+			if(WorldObject* frontObj = targets.front())
+				if(GetCaster()->GetExactDist2d(frontObj->GetPositionX(), frontObj->GetPositionY()) > 10.0f)
+					root = true ;
+
+			if(targets.size() > 1)
+				targets.resize(1);
         }
 
         void HandleEffectOnHit(SpellEffIndex effIndex)
