@@ -3822,6 +3822,51 @@ public:
     }
 };
 
+class spell_ruk_ruk_ooksplosions : public SpellScriptLoader
+{
+public :
+    spell_ruk_ruk_ooksplosions() : SpellScriptLoader("spell_ruk_ruk_ooksplosions")
+    {
+        
+    }
+    
+    class spell_ruk_ruk_ooksplosions_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_ruk_ruk_ooksplosions_AuraScript)
+        
+        bool Validate(const SpellInfo* /*spellInfo*/)
+        {
+            if(sSpellMgr->GetSpellInfo(125699)
+                    && sSpellMgr->GetSpellInfo(125885)
+                    && sSpellMgr->GetSpellInfo(125887))
+                return true ;
+            
+            return false ;
+        }
+        
+        bool Load()
+        {
+            return true ;
+        }
+        
+        void HandlePeriodicDummyTick(AuraEffect const* auraEff)
+        {
+            if(GetCaster())
+                GetCaster()->CastSpell(GetCaster(), GetSpellInfo()->Effects[0].BasePoints, true);
+        }
+        
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_ruk_ruk_ooksplosions_AuraScript::HandlePeriodicDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+    
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_ruk_ruk_ooksplosions_AuraScript() ;
+    }
+};
+
 void AddSC_wandering_isle()
 {
     new stalker_item_equiped();
