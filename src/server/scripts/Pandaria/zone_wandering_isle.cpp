@@ -4060,11 +4060,9 @@ public:
             switch (waypointId)
             {
                 case 1:
+                    Talk(SAY_AYSA_WIND_CHAMBER_2);
                     SetEscortPaused(true);
                     VerifPlayer = true;
-                    break;
-                case 2:
-                    Talk(SAY_AYSA_WIND_CHAMBER_2);
                     break;
                 case 5:
                     SetEscortPaused(true);
