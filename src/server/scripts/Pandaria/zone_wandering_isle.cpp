@@ -3802,7 +3802,7 @@ public:
 
         void Reset()
         {
-
+            m_uiRocketTimer = 4500 ;
         }
 
         void DamageTaken(Unit* attacker, uint32 &amount)
@@ -3812,13 +3812,107 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
+            if(!UpdateVictim())
+                return ;
+            
+            if(m_uiRocketTimer <= diff)
+            {
+                if(Unit* unit = SelectTarget(SELECT_ARGET_RANDOM, 0, 40.0f, true))
+                {
+                    Position pos ; unit->GetPosition(&pos);
+                    if(Creature* summon = me->SummonCreature(64322, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
+                    {
+                        summon->GetMotionMaster()->MovePoint(0, pos);
+                        summon->AI()->SetData(0, 1);
+                    }
+                }
+                m_uiRocketTimer = 4500 ;
+            }
+            else
+                m_uiRocketTimer -= diff ;
+            
             DoMeleeAttackIfReady();
         }
+        
+    private :
+        uint32 m_uiRocketTimer ;
     };
 
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_ruk_rukAI(creature);
+    }
+};
+
+
+class mob_ruk_ruk_rocket : public CreatureScript
+{
+public :
+    mob_ruk_ruk_rocket() : CreatureScript("mob_ruk_ruk_rocket")
+    {
+        
+    }
+    
+    class mob_ruk_ruk_rocket_AIScript : public ScriptedAI
+    {
+    public :
+        mob_ruk_ruk_rocket_AIScript(Creature* creature) : ScriptedAI(creature)
+        {
+            initialized = false ;
+            m_uiCheckTimer = 10000 ;
+        }
+        
+        void SetData(uint32 index, uint32 value)
+        {
+            if(index == 0)
+                initialized = true ;
+        }
+        
+        void MovementInform(uint32 motionType, uint32 id)
+        {
+            if(motionType == POINT_MOTION_TYPE && id == 0)
+            {
+                DoCastAOE(125619, true);
+                me->DisappearAndDie();
+            }
+        }
+        
+        void UpdateAI(const uint32 diff)
+        {
+            if(!initialized)
+                return ;
+            
+            if(m_uiCheckTimer <= diff)
+            {
+                CheckForPlayers();
+                m_uiCheckTimer = 500 ;
+            }
+            else
+                m_uiCheckTimer -= diff ;
+        }
+        
+        void CheckForPlayers()
+        {
+            Trinity::AllWorldObjectsInRange u_check(me, 2.0f);
+            std::list<Player*> players ;
+            Trinity::PlayerListSearcher<Trinity::AllWorldObjectsInRange> searcher(me, players, u_check);
+            me->VisitNearbyObject(2.0f, searcher);
+            
+            for(std::list<Player*>::iterator iter = players.begin() ; iter != players.end() ; ++iter)
+            {
+                if(Player* player = *iter)
+                    DoCast(player, 125612, true);
+            }
+        }
+        
+    private :
+        bool initialized ;
+        uint32 m_uiCheckTimer ;
+    };
+    
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new mob_ruk_ruk_rocket_AIScript(creature);
     }
 };
 
@@ -3928,4 +4022,5 @@ void AddSC_wandering_isle()
     new npc_huojin_monk_escort();
 	new spell_ruk_ruk_ooksplosions();
     new npc_ruk_ruk();
+	new mob_ruk_ruk_rocket();
 }
