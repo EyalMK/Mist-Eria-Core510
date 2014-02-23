@@ -3996,6 +3996,122 @@ public :
     }
 };
 
+/*#####
+## at_wind_chamber
+#####*/
+
+enum eWindChamber
+{
+    QUEST_DAFENG_AIR            = 29785,
+    SPELL_SUMMON_AYSA_CHAMBER   = 104571,
+
+    SAY_AYSA_WIND_CHAMBER_1     = 0,
+    SAY_AYSA_WIND_CHAMBER_2     = 1,
+    SAY_AYSA_WIND_CHAMBER_3     = 2,
+    SAY_AYSA_WIND_CHAMBER_4     = 3
+};
+
+class at_wind_chamber : public AreaTriggerScript
+{
+    public:
+
+        at_wind_chamber(): AreaTriggerScript("at_wind_chamber")
+        {
+        }
+
+        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+        {
+            if (player->isAlive())
+            {
+                if (player->GetQuestStatus(QUEST_DAFENG_AIR) == QUEST_STATUS_INCOMPLETE)
+                {
+                    if(!player->HasAura(SPELL_SUMMON_AYSA_CHAMBER))
+                    {
+                        player->CastSpell(player, SPELL_SUMMON_AYSA_CHAMBER, true);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+};
+
+class npc_aysa_wind_escort : public CreatureScript
+{
+public:
+    npc_aysa_wind_escort(): CreatureScript("npc_aysa_wind_escort") { }
+
+    struct npc_aysa_wind_escortAI : public npc_escortAI
+    {
+        npc_aysa_wind_escortAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+            Talk(SAY_AYSA_WIND_CHAMBER_1);
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetEscortPaused(true);
+
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if(summoner->ToPlayer())
+                            if(summoner->IsInDist2d(me, 3.00f))
+                                SetEscortPaused(false);
+                    break;
+                case 2:
+                    Talk(SAY_AYSA_WIND_CHAMBER_2);
+                    break;
+                case 5:
+                    SetEscortPaused(true);
+
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if(summoner->ToPlayer())
+                            if(summoner->IsInDist2d(me, 3.00f))
+                                SetEscortPaused(false);
+                    break;
+                case 6:
+                    Talk(SAY_AYSA_WIND_CHAMBER_3);
+                    break;
+                case 10:
+                    SetEscortPaused(true);
+
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if(summoner->ToPlayer())
+                            if(summoner->IsInDist2d(me, 3.00f))
+                                SetEscortPaused(false);
+                    break;
+                case 11:
+                    Talk(SAY_AYSA_WIND_CHAMBER_4);
+                    break;
+                case 12:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            if (UpdateVictim())
+                return;
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_aysa_wind_escortAI(creature);
+    }
+};
+
 void AddSC_wandering_isle()
 {
     new stalker_item_equiped();
@@ -4058,4 +4174,6 @@ void AddSC_wandering_isle()
 	new spell_ruk_ruk_ooksplosions();
     new npc_ruk_ruk();
 	new mob_ruk_ruk_rocket();
+    new at_wind_chamber();
+    new npc_aysa_wind_escort();
 }
