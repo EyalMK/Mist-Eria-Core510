@@ -3158,6 +3158,9 @@ public :
 				targets.sort(Trinity::DistanceCompareOrderPred(GetCaster()));
 				targets.remove_if(InLineCheckPredicate(GetCaster()));
 				
+				if(targets.empty())
+					return ;
+				
 				if(WorldObject* frontObj = targets.front())
 					if(GetCaster()->GetExactDist2d(frontObj->GetPositionX(), frontObj->GetPositionY()) > 10.0f)
 						root = true ;
