@@ -148,7 +148,7 @@ const float BG_SM_DoorPos[4][4] =
 
 #define MINE_CART_AT_DEPOT_POINTS		200
 #define POINTS_PER_MINE_CART			150
-#define DISPALY_WORDLSTATE				1
+#define DISPLAY_WORLDSTATE				1
 #define BG_SM_NotSMWeekendHonorTicks    260
 #define BG_SM_SMWeekendHonorTicks       160
 #define SM_MINE_CART_MAX				3
