@@ -4045,8 +4045,11 @@ public:
     {
         npc_aysa_wind_escortAI(Creature* creature) : npc_escortAI(creature) {}
 
+        bool VerifPlayer;
+
         void Reset()
         {
+            VerifPlayer = false;
             Talk(SAY_AYSA_WIND_CHAMBER_1);
         }
 
@@ -4058,36 +4061,27 @@ public:
             {
                 case 1:
                     SetEscortPaused(true);
-
-                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                        if(summoner->ToPlayer())
-                            if(summoner->IsInDist2d(me, 3.00f))
-                                SetEscortPaused(false);
+                    VerifPlayer = true;
                     break;
                 case 2:
                     Talk(SAY_AYSA_WIND_CHAMBER_2);
                     break;
                 case 5:
                     SetEscortPaused(true);
-
-                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                        if(summoner->ToPlayer())
-                            if(summoner->IsInDist2d(me, 3.00f))
-                                SetEscortPaused(false);
+                    VerifPlayer = true;
                     break;
                 case 6:
                     Talk(SAY_AYSA_WIND_CHAMBER_3);
                     break;
                 case 10:
                     SetEscortPaused(true);
-
-                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                        if(summoner->ToPlayer())
-                            if(summoner->IsInDist2d(me, 3.00f))
-                                SetEscortPaused(false);
+                    VerifPlayer = true;
                     break;
                 case 11:
                     Talk(SAY_AYSA_WIND_CHAMBER_4);
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if(summoner->ToPlayer())
+                            summoner->ToPlayer()->KilledMonsterCredit(55666);
                     break;
                 case 12:
                     me->DespawnOrUnsummon();
@@ -4099,8 +4093,16 @@ public:
         {
             npc_escortAI::UpdateAI(uiDiff);
 
-            if (UpdateVictim())
-                return;
+            if (VerifPlayer)
+            {
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if(summoner->ToPlayer())
+                        if(summoner->IsInDist2d(me, 3.00f))
+                        {
+                            SetEscortPaused(false);
+                            VerifPlayer = false;
+                        }
+            }
 
             Start(false, true);
         }
