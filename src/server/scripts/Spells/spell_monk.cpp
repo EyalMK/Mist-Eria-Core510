@@ -3374,7 +3374,7 @@ public :
                 master = summoner->ToPlayer();
                 if(master->getVictim() && master->GetPrimaryTalentTree(master->GetActiveSpec()) == SPEC_MONK_BREWMASTER)
                 {
-                    DoCast(master->getVictim(), SPELL_MONK_PROVOKE, true);
+                    DoCast(master->getVictim(), SPELL_XUEN_PROVOKE, true);
                     canProvoke = true ;
                 }
                 m_uiProvokeTimer = 6000 ;
@@ -3391,7 +3391,7 @@ public :
             {
                 if(master && master->IsInWorld() && master->getVictim())
                 {
-                    DoCast(master->getVictim(), SPELL_MONK_PROVOKE, true);
+                    DoCast(master->getVictim(), SPELL_XUEN_PROVOKE, true);
                     m_uiProvokeTimer = 6000 ;
                 }
                 else
