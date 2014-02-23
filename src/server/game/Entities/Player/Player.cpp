@@ -9346,7 +9346,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
 
                 loot->FillLoot(lootid, LootTemplates_Gameobject, this, !groupRules, false, go->GetLootMode());
 
-                loot->generateMoneyLoot(go->GetGOInfo()->mingold, go->GetGOInfo()->maxgold);
+				loot->generateMoneyLoot(go->GetGOInfo()->mingold, go->GetGOInfo()->mingold, this);
 
                 // get next RR player (for next loot)
                 if (groupRules)
