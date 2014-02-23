@@ -3129,7 +3129,7 @@ class ObjectDistanceOrderPred
     {
         public:
             ObjectDistanceOrderPred(const Unit* pRefObj, bool ascending = true) : m_refObj(pRefObj), m_ascending(ascending) {}
-            bool operator()(const WorldObject* pLeft, const WorldObject* pRight) const
+            bool operator()(const Unit* pLeft, const Unit* pRight) const
             {
                 return m_ascending ? m_refObj->GetDistanceOrder(pLeft, pRight) : !m_refObj->GetDistanceOrder(pLeft, pRight);
             }
