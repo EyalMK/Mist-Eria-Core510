@@ -481,6 +481,11 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 		{
 			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
 			{
+				UpdateWorldStateForPlayer(SM_MINE_CARTS_DISPLAY, DISPALY_WORDLSTATE, player);
+				UpdateWorldStateForPlayer(SM_MINE_CART_1, DISPALY_WORDLSTATE, player);
+				UpdateWorldStateForPlayer(SM_MINE_CART_2, DISPALY_WORDLSTATE, player);
+				UpdateWorldStateForPlayer(SM_MINE_CART_3, DISPALY_WORDLSTATE, player);
+
 				if (player->GetTeam() == ALLIANCE)
 				{
 					if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_1, 22.0f, true))
@@ -1267,17 +1272,17 @@ void BattlegroundSM::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
 
 void BattlegroundSM::FillInitialWorldStates(WorldPacket& data)
 {
-	data << uint32(SM_UNK1) << uint32(1);
+	data << uint32(SM_MINE_CARTS_DISPLAY) << uint32(0);
 	data << uint32(SM_ALLIANCE_RESOURCES) << uint32(m_TeamScores[TEAM_HORDE]);
 	data << uint32(SM_HORDE_RESOURCES) << uint32(m_TeamScores[TEAM_ALLIANCE]);
-	data << uint32(SM_UNK2) << uint32(1);
-	data << uint32(SM_UNK3) << uint32(0);
-	data << uint32(SM_UNK4) << uint32(1);
-	data << uint32(SM_DISPLAY_ALLIANCE_RESSOURCES) << uint32(1);
-	data << uint32(SM_DISPLAY_HORDE_RESSOURCES) << uint32(1);
+	data << uint32(SM_MINE_CART_1) << uint32(0);
+	data << uint32(SM_MINE_CART_2) << uint32(0);
+	data << uint32(SM_MINE_CART_3) << uint32(0);
+	data << uint32(SM_DISPLAY_ALLIANCE_RESSOURCES) << uint32(DISPALY_WORDLSTATE);
+	data << uint32(SM_DISPLAY_HORDE_RESSOURCES) << uint32(DISPALY_WORDLSTATE);
 	data << uint32(SM_DISPLAY_PROGRESS_BAR) << uint32(BG_SM_PROGRESS_BAR_DONT_SHOW); // This shows the mine cart control bar
 	data << uint32(SM_PROGRESS_BAR_STATUS) << uint32(BG_SM_PROGRESS_BAR_NEUTRAL); // Neutral
-	data << uint32(SM_UNK5) << uint32(0);
+	data << uint32(SM_UNK) << uint32(0);
 }
 
 uint32 BattlegroundSM::GetPrematureWinner()

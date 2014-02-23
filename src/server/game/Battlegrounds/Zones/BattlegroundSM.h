@@ -24,17 +24,17 @@
 
 enum BG_SM_WorldStates
 {
-	SM_UNK1							= 6436,
+	SM_MINE_CARTS_DISPLAY			= 6436,
     SM_ALLIANCE_RESOURCES           = 6437,
     SM_HORDE_RESOURCES              = 6438,
-	SM_UNK2							= 6439,
-	SM_UNK3							= 6440,
-	SM_UNK4							= 6441,
+	SM_MINE_CART_1					= 6439,
+	SM_MINE_CART_2					= 6440,
+	SM_MINE_CART_3					= 6441,
 	SM_DISPLAY_ALLIANCE_RESSOURCES	= 6442,
 	SM_DISPLAY_HORDE_RESSOURCES		= 6443,
 	SM_DISPLAY_PROGRESS_BAR			= 6875, // 0 = false, 1 = true
 	SM_PROGRESS_BAR_STATUS			= 6876, // 0 = Horde max, 50 = Neutral, 100 = Alliance max
-	SM_UNK5							= 6877
+	SM_UNK							= 6877
 };
 
 enum BG_SM_MineCarts
@@ -148,7 +148,7 @@ const float BG_SM_DoorPos[4][4] =
 
 #define MINE_CART_AT_DEPOT_POINTS		200
 #define POINTS_PER_MINE_CART			150
-
+#define DISPALY_WORDLSTATE				1
 #define BG_SM_NotSMWeekendHonorTicks    260
 #define BG_SM_SMWeekendHonorTicks       160
 #define SM_MINE_CART_MAX				3
