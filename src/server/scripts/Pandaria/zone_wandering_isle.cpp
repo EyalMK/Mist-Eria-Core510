@@ -3815,9 +3815,9 @@ public:
             if(!UpdateVictim())
                 return ;
             
-            if(m_uiRocketTimer <= diff)
+            if(m_uiRocketTimer <= uiDiff)
             {
-                if(Unit* unit = SelectTarget(SELECT_ARGET_RANDOM, 0, 40.0f, true))
+                if(Unit* unit = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
                 {
                     Position pos ; unit->GetPosition(&pos);
                     if(Creature* summon = me->SummonCreature(64322, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
