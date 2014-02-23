@@ -469,7 +469,21 @@ enum AuraType
 	SPELL_AURA_410                                          = 410,
 	SPELL_AURA_411                                          = 411,
 	SPELL_AURA_MOD_MANA_REGEN_BY_HASTE                      = 412,
-    TOTAL_AURAS                                             = 413   // 5.1.0a
+    SPELL_AURA_413                                          = 413,
+    SPELL_AURA_414                                          = 414,
+    SPELL_AURA_415                                          = 415,
+    SPELL_AURA_416                                          = 416,
+    SPELL_AURA_417                                          = 417,
+    SPELL_AURA_418                                          = 418,
+    SPELL_AURA_419                                          = 419,
+    SPELL_AURA_420                                          = 420,
+    SPELL_AURA_421                                          = 421,
+    SPELL_AURA_422                                          = 422,
+    SPELL_AURA_423                                          = 423,
+    SPELL_AURA_424                                          = 424,
+    SPELL_AURA_425                                          = 425,
+    SPELL_AURA_426                                          = 426,
+    TOTAL_AURAS                                             = 427   // 5.1.0a // Quand on le met, autant s'assurer que c'est la bonne valeur...
 };
 
 enum AuraObjectType
