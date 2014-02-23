@@ -3125,7 +3125,7 @@ private :
 
 namespace Sylmir
 {
-class ObjectDistanceOrderPred
+class ObjectDistanceOrderPredicate
     {
         public:
             ObjectDistanceOrderPred(const Unit* pRefObj, bool ascending = true) : m_refObj(pRefObj), m_ascending(ascending) {}
@@ -3171,7 +3171,7 @@ public :
 			// Sort targets according to the distance, in order to find the nearest
 			if(targets.size() >= 2)
 			{
-				targets.sort(Sylmir::DistanceCompareOrderPred(GetCaster()));
+				targets.sort(Sylmir::DistanceCompareOrderPredicate(GetCaster()));
 				targets.remove_if(InLineCheckPredicate(GetCaster()));
 				
 				if(targets.empty())
