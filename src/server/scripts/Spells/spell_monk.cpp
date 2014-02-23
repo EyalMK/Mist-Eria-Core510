@@ -3123,6 +3123,22 @@ private :
     Unit* _caster ;
 };
 
+namespace Sylmir
+{
+class ObjectDistanceOrderPred
+    {
+        public:
+            ObjectDistanceOrderPred(const Unit* pRefObj, bool ascending = true) : m_refObj(pRefObj), m_ascending(ascending) {}
+            bool operator()(const WorldObject* pLeft, const WorldObject* pRight) const
+            {
+                return m_ascending ? m_refObj->GetDistanceOrder(pLeft, pRight) : !m_refObj->GetDistanceOrder(pLeft, pRight);
+            }
+        private:
+            const Unit* m_refObj;
+            const bool m_ascending;
+    };
+} // Namespace Sylmir
+
 class spell_monk_spinning_fire_blossom : public SpellScriptLoader
 {
 public :
@@ -3155,7 +3171,7 @@ public :
 			// Sort targets according to the distance, in order to find the nearest
 			if(targets.size() >= 2)
 			{
-				targets.sort(Trinity::DistanceCompareOrderPred(GetCaster()));
+				targets.sort(Sylmir::DistanceCompareOrderPred(GetCaster()));
 				targets.remove_if(InLineCheckPredicate(GetCaster()));
 				
 				if(targets.empty())
