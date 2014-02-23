@@ -114,6 +114,11 @@ enum MonkSpells
     // Charging Ox Wave
     SPELL_MONK_CHARGING_OX_WAVE                 = 119392, // Player's spell
     SPELL_MONK_CHARGING_OX_WAVE_DUMMY           = 125084, // Strange
+	
+	// Xuen, the White Tiger
+    MONK_NPC_SUEN_THE_WHITE_TIGER               = 63508, // Npc
+    SPELL_MONK_CRACKLING_TIGER_LIGHTNING        = 123999, // Handle everything by itself
+    SPELL_XUEN_PROVOKE                          = 130793, // Only if player is brewmaster spec
 };
 
 enum Monkspec
@@ -3152,23 +3157,22 @@ public :
 
         void HandleTargetSelect(std::list<WorldObject*>& targets)
         {
-			std::list<Unit*> temp ;
-			for(std::list<WorldObject*>::iterator iter = targets.begin() ; iter != targets.end() ; ++iter)
-				temp.push_back((*iter)->ToUnit());
-            // Sort targets according to the distance, in order to find the nearest
-            temp.sort(Trinity::DistanceCompareOrderPred(GetCaster()));
-            temp.remove_if(InLineCheckPredicate(GetCaster()));
-
-			targets.clear();
-			for(std::list<Unit*>::iterator iter = temp.begin() ; iter != temp.end() ; ++iter)
-				targets.push_back(*iter);
-            // If the closest target is far away (10 yards ++), then the spell will also root it and damages will be duplicated
+			if(targets.empty())
+				return ;
+				
+			// Sort targets according to the distance, in order to find the nearest
+			targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster()));
+			targets.remove_if(InLineCheckPredicate(GetCaster()));
+			
+			if(targets.empty())
+				return ;
+			
 			if(WorldObject* frontObj = targets.front())
 				if(GetCaster()->GetExactDist2d(frontObj->GetPositionX(), frontObj->GetPositionY()) > 10.0f)
 					root = true ;
 
-            if(targets.size() > 1)
-                targets.resize(1);
+			if(targets.size() > 1)
+				targets.resize(1);
         }
 
         void HandleEffectOnHit(SpellEffIndex effIndex)
@@ -3341,6 +3345,72 @@ public :
         return new spell_monk_charging_ox_wave_SpellScript() ;
     }
 };
+
+class npc_monk_xuen_the_white_tiger : public CreatureScript
+{
+public :
+    npc_monk_xuen_the_white_tiger() : CreatureScript("npc_monk_xuen_the_white_tiger")
+    {
+        // UPDATE creature_template SET ScriptName = "npc_monk_xuen_the_white_tiger" WHERE entry = 63508 ;
+    }
+
+    class npc_monk_xuen_the_white_tiger_AIScript : public ScriptedAI
+    {
+    public :
+        npc_monk_xuen_the_white_tiger_AIScript(Creature* creature) : ScriptedAI(creature)
+        {
+            master = NULL ;
+            canProvoke = false ;
+            m_uiProvokeTimer = 6000 ;
+        }
+
+        void IsSummonedBy(Unit *summoner)
+        {
+            // I suspect this thing not to work
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "\n\nSPELLS: Invoke Xuen the White Tiger: Xuen: AI: Entered IsSummonedBy !\n\n");
+            DoCast(me, SPELL_MONK_CRACKLING_TIGER_LIGHTNING, true);
+            if(summoner && summoner->GetTypeId() == TYPEID_PLAYER)
+            {
+                master = summoner->ToPlayer();
+                if(master->getVictim() && master->GetPrimaryTalentTree(master->GetActiveSpec()) == SPEC_MONK_BREWMASTER)
+                {
+                    DoCast(master->getVictim(), SPELL_XUEN_PROVOKE, true);
+                    canProvoke = true ;
+                }
+                m_uiProvokeTimer = 6000 ;
+
+            }
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if(!UpdateVictim() || !canProvoke)
+                return ;
+
+            if(m_uiProvokeTimer <= diff)
+            {
+                if(master && master->IsInWorld() && master->getVictim())
+                {
+                    DoCast(master->getVictim(), SPELL_XUEN_PROVOKE, true);
+                    m_uiProvokeTimer = 6000 ;
+                }
+                else
+                    m_uiProvokeTimer -= diff ;
+            }
+        }
+
+    private :
+        Player* master ;
+        uint32 m_uiProvokeTimer ;
+        bool canProvoke ;
+    };
+
+    CreatureAI* GetAI(Creature *creature) const
+    {
+        return new npc_monk_xuen_the_white_tiger_AIScript(creature);
+    }
+};
+
 void AddSC_monk_spell_scripts()
 {
 	new spell_monk_fists_of_fury_stun();
@@ -3397,8 +3467,9 @@ void AddSC_monk_spell_scripts()
     new spell_monk_elevation();
     new spell_monk_touch_of_death();
 	new spell_monk_legacy_of_the_white_tiger();
-	//new spell_monk_spinning_fire_blossom();
-	//new spell_monk_spinning_fire_blossom_glyphed();
+	new spell_monk_spinning_fire_blossom();
+	new spell_monk_spinning_fire_blossom_glyphed();
 	new spell_monk_rushing_jade_wind();
 	new spell_monk_charging_ox_wave();
+	new npc_monk_xuen_the_white_tiger();
 }
