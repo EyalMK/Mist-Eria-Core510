@@ -942,8 +942,8 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 					{
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_LAVA_DEPOT]))
 						{
-							cart->GetMotionMaster()->Clear(true);
-							depot->UseDoorOrButton(3000);
+							cart->GetMotionMaster()->MoveIdle();
+							depot->UseDoorOrButton();
 							m_mineCartReachedDepot[BG_SM_MINE_CART_1 - 1] = true;
 						}
 					}
@@ -952,8 +952,8 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 					{
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_DIAMOND_DEPOT]))
 						{
-							cart->GetMotionMaster()->Clear(true);
-							depot->UseDoorOrButton(3000);
+							cart->GetMotionMaster()->MoveIdle();
+							depot->UseDoorOrButton();
 							m_mineCartReachedDepot[BG_SM_MINE_CART_1 - 1] = true;
 						}
 					}
@@ -969,8 +969,8 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 					{
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_WATERFALL_DEPOT]))
 						{
-							cart->GetMotionMaster()->Clear(true);
-							depot->UseDoorOrButton(3000);
+							cart->GetMotionMaster()->MoveIdle();
+							depot->UseDoorOrButton();
 							m_mineCartReachedDepot[BG_SM_MINE_CART_2 - 1] = true;
 						}
 					}
@@ -986,8 +986,8 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 					{
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_DIAMOND_DEPOT]))
 						{
-							cart->GetMotionMaster()->Clear(true);
-							depot->UseDoorOrButton(3000);
+							cart->GetMotionMaster()->MoveIdle();
+							depot->UseDoorOrButton();
 							m_mineCartReachedDepot[BG_SM_MINE_CART_3 - 1] = true;
 						}
 					}
@@ -996,8 +996,8 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 					{
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_TROLL_DEPOT]))
 						{
-							cart->GetMotionMaster()->Clear(true);
-							depot->UseDoorOrButton(3000);
+							cart->GetMotionMaster()->MoveIdle();
+							depot->UseDoorOrButton();
 							m_mineCartReachedDepot[BG_SM_MINE_CART_3 - 1] = true;
 						}
 					}
@@ -1025,6 +1025,7 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_LAVA_DEPOT, BG_SM_MINE_CART_1);
+							depot->ResetDoorOrButton();
 							cart->DespawnOrUnsummon();
 						}
 					}
@@ -1044,6 +1045,7 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_DIAMOND_DEPOT, BG_SM_MINE_CART_1);
+							depot->ResetDoorOrButton();
 							cart->DespawnOrUnsummon();
 						}
 					}
@@ -1066,6 +1068,7 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_2), POINTS_PER_MINE_CART);
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_WATERFALL_DEPOT, BG_SM_MINE_CART_2);
+							depot->ResetDoorOrButton();
 							cart->DespawnOrUnsummon();
 						}
 					}
@@ -1088,6 +1091,7 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_DIAMOND_DEPOT, BG_SM_MINE_CART_3);
+							depot->ResetDoorOrButton();
 							cart->DespawnOrUnsummon();
 						}
 					}
@@ -1107,6 +1111,7 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 						{
 							BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_TROLL_DEPOT, BG_SM_MINE_CART_3);
+							depot->ResetDoorOrButton();
 							cart->DespawnOrUnsummon();
 						}
 					}
