@@ -114,6 +114,11 @@ enum MonkSpells
     // Charging Ox Wave
     SPELL_MONK_CHARGING_OX_WAVE                 = 119392, // Player's spell
     SPELL_MONK_CHARGING_OX_WAVE_DUMMY           = 125084, // Strange
+	
+	// Xuen, the White Tiger
+    MONK_NPC_SUEN_THE_WHITE_TIGER               = 63508, // Npc
+    SPELL_MONK_CRACKLING_TIGER_LIGHTNING        = 123999, // Handle everything by itself
+    SPELL_MONK_PROVOKE                          = 130793, // Only if player is brewmaster spec
 };
 
 enum Monkspec
