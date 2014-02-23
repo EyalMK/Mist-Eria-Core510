@@ -3829,7 +3829,7 @@ public:
                 m_uiRocketTimer = 4500 ;
             }
             else
-                m_uiRocketTimer -= diff ;
+                m_uiRocketTimer -= uiDiff ;
             
             DoMeleeAttackIfReady();
         }
