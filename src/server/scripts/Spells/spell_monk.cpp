@@ -3340,6 +3340,72 @@ public :
         return new spell_monk_charging_ox_wave_SpellScript() ;
     }
 };
+
+class npc_monk_xuen_the_white_tiger : public CreatureScript
+{
+public :
+    npc_monk_xuen_the_white_tiger() : CreatureScript("npc_monk_xuen_the_white_tiger")
+    {
+        // UPDATE creature_template SET ScriptName = "npc_monk_xuen_the_white_tiger" WHERE entry = 63508 ;
+    }
+
+    class npc_monk_xuen_the_white_tiger_AIScript : public ScriptedAI
+    {
+    public :
+        npc_monk_xuen_the_white_tiger_AIScript(Creature* creature) : ScriptedAI(creature)
+        {
+            master = NULL ;
+            canProvoke = false ;
+            m_uiProvokeTimer = 6000 ;
+        }
+
+        void IsSummonedBy(Unit *summoner)
+        {
+            // I suspect this thing not to work
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "\n\nSPELLS: Invoke Xuen the White Tiger: Xuen: AI: Entered IsSummonedBy !\n\n");
+            DoCast(me, SPELL_MONK_CRACKLING_TIGER_LIGHTNING, true);
+            if(summoner && summoner->GetTypeId() == TYPEID_PLAYER)
+            {
+                master = summoner->ToPlayer();
+                if(master->getVictim() && master->GetPrimaryTalentTree(master->GetActiveSpec()) == SPEC_MONK_BREWMASTER)
+                {
+                    DoCast(master->getVictim(), SPELL_MONK_PROVOKE, true);
+                    canProvoke = true ;
+                }
+                m_uiProvokeTimer = 6000 ;
+
+            }
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if(!UpdateVictim() || !canProvoke)
+                return ;
+
+            if(m_uiProvokeTimer <= diff)
+            {
+                if(master && master->IsInWorld() && master->getVictim())
+                {
+                    DoCast(master->getVictim(), SPELL_MONK_PROVOKE, true);
+                    m_uiProvokeTimer = 6000 ;
+                }
+                else
+                    m_uiProvokeTimer -= diff ;
+            }
+        }
+
+    private :
+        Player* master ;
+        uint32 m_uiProvokeTimer ;
+        bool canProvoke ;
+    };
+
+    CreatureAI* GetAI(Creature *creature) const
+    {
+        return new npc_monk_xuen_the_white_tiger_AIScript(creature);
+    }
+};
+
 void AddSC_monk_spell_scripts()
 {
 	new spell_monk_fists_of_fury_stun();
@@ -3400,4 +3466,5 @@ void AddSC_monk_spell_scripts()
 	new spell_monk_spinning_fire_blossom_glyphed();
 	new spell_monk_rushing_jade_wind();
 	new spell_monk_charging_ox_wave();
+	new npc_monk_xuen_the_white_tiger();
 }
