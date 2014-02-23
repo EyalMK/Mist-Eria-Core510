@@ -1270,7 +1270,7 @@ void BattlegroundSM::FillInitialWorldStates(WorldPacket& data)
 	data << uint32(SM_MINE_CARTS_DISPLAY) << uint32(DISPLAY_WORLDSTATE);
 	data << uint32(SM_ALLIANCE_RESOURCES) << uint32(m_TeamScores[TEAM_HORDE]);
 	data << uint32(SM_HORDE_RESOURCES) << uint32(m_TeamScores[TEAM_ALLIANCE]);
-	data << uint32(SM_MINE_CART_1) << uint32(0);
+	data << uint32(SM_MINE_CART_1) << uint32(DISPLAY_WORLDSTATE);
 	data << uint32(SM_MINE_CART_2) << uint32(DISPLAY_WORLDSTATE);
 	data << uint32(SM_MINE_CART_3) << uint32(DISPLAY_WORLDSTATE);
 	data << uint32(SM_DISPLAY_ALLIANCE_RESSOURCES) << uint32(DISPLAY_WORLDSTATE);
