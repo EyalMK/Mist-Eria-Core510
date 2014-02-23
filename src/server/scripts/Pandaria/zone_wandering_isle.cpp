@@ -3693,9 +3693,6 @@ public:
         }
 
         bool SayIntro;
-        bool Ruk50;
-        bool Ruk25;
-        bool RukDeath;
 
         uint32 TestAreaTimer;
         uint32 CombatTimer;
@@ -3712,9 +3709,6 @@ public:
             JabTimer = 2000;
             BlackoutTimer = 4000;
             CraneTimer = 6000;
-            Ruk50 = true;
-            Ruk25 = true;
-            RukDeath = true;
         }
 
         void DamageTaken(Unit* attacker, uint32 &amount)
@@ -3779,27 +3773,6 @@ public:
             }
             else CraneTimer -= uiDiff;
 
-            if(me->getVictim()->GetEntry() == 55634)
-            {
-                if(me->getVictim()->GetHealthPct() <= 50 && Ruk50)
-                {
-                    Talk(SAY_HUOJIN_MONK_2);
-                    Ruk50 = false;
-                }
-
-                if(me->getVictim()->GetHealthPct() <= 25 && Ruk25)
-                {
-                    Talk(SAY_HUOJIN_MONK_3);
-                    Ruk25 = false;
-                }
-
-                if(me->getVictim()->GetHealthPct() <= 1 && RukDeath)
-                {
-                    Talk(SAY_HUOJIN_MONK_4);
-                    RukDeath = false;
-                }
-            }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -3807,6 +3780,45 @@ public:
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_huojin_monk_escortAI(creature);
+    }
+};
+
+/*######
+## npc_ruk_ruk
+######*/
+
+enum RukRuk
+{
+};
+
+class npc_ruk_ruk : public CreatureScript
+{
+public:
+    npc_ruk_ruk(): CreatureScript("npc_ruk_ruk") { }
+
+    struct npc_ruk_rukAI : public ScriptedAI
+    {
+        npc_ruk_rukAI(Creature* creature) : ScriptedAI(creature){}
+
+        void Reset()
+        {
+
+        }
+
+        void DamageTaken(Unit* attacker, uint32 &amount)
+        {
+
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ruk_rukAI(creature);
     }
 };
 
@@ -3870,4 +3882,5 @@ void AddSC_wandering_isle()
     new npc_jojo_ironbrow_pillar();
 	new spell_shoot_all_the_fireworks_periodic();
     new npc_huojin_monk_escort();
+    new npc_ruk_ruk();
 }
