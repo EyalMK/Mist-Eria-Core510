@@ -3693,9 +3693,6 @@ public:
         }
 
         bool SayIntro;
-        bool Ruk50;
-        bool Ruk25;
-        bool RukDeath;
 
         uint32 TestAreaTimer;
         uint32 CombatTimer;
@@ -3712,9 +3709,6 @@ public:
             JabTimer = 2000;
             BlackoutTimer = 4000;
             CraneTimer = 6000;
-            Ruk50 = true;
-            Ruk25 = true;
-            RukDeath = true;
         }
 
         void DamageTaken(Unit* attacker, uint32 &amount)
@@ -3779,27 +3773,6 @@ public:
             }
             else CraneTimer -= uiDiff;
 
-            if(me->getVictim()->GetEntry() == 55634)
-            {
-                if(me->getVictim()->GetHealthPct() <= 50 && Ruk50)
-                {
-                    Talk(SAY_HUOJIN_MONK_2);
-                    Ruk50 = false;
-                }
-
-                if(me->getVictim()->GetHealthPct() <= 25 && Ruk25)
-                {
-                    Talk(SAY_HUOJIN_MONK_3);
-                    Ruk25 = false;
-                }
-
-                if(me->getVictim()->GetHealthPct() <= 1 && RukDeath)
-                {
-                    Talk(SAY_HUOJIN_MONK_4);
-                    RukDeath = false;
-                }
-            }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -3810,48 +3783,42 @@ public:
     }
 };
 
-class spell_ruk_ruk_ooksplosions : public SpellScriptLoader
+/*######
+## npc_ruk_ruk
+######*/
+
+enum RukRuk
 {
-public :
-    spell_ruk_ruk_ooksplosions() : SpellScriptLoader("spell_ruk_ruk_ooksplosions")
+};
+
+class npc_ruk_ruk : public CreatureScript
+{
+public:
+    npc_ruk_ruk(): CreatureScript("npc_ruk_ruk") { }
+
+    struct npc_ruk_rukAI : public ScriptedAI
     {
-        
-    }
-    
-    class spell_ruk_ruk_ooksplosions_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_ruk_ruk_ooksplosions_AuraScript)
-        
-        bool Validate(const SpellInfo* /*spellInfo*/)
+        npc_ruk_rukAI(Creature* creature) : ScriptedAI(creature){}
+
+        void Reset()
         {
-            if(sSpellMgr->GetSpellInfo(125699)
-                    && sSpellMgr->GetSpellInfo(125885)
-                    && sSpellMgr->GetSpellInfo(125887))
-                return true ;
-            
-            return false ;
+
         }
-        
-        bool Load()
+
+        void DamageTaken(Unit* attacker, uint32 &amount)
         {
-            return true ;
+
         }
-        
-        void HandlePeriodicDummyTick(AuraEffect const* auraEff)
+
+        void UpdateAI(const uint32 uiDiff)
         {
-            if(GetCaster())
-                GetCaster()->CastSpell(GetCaster(), GetSpellInfo()->Effects[0].BasePoints, true);
-        }
-        
-        void Register()
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_ruk_ruk_ooksplosions_AuraScript::HandlePeriodicDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+            DoMeleeAttackIfReady();
         }
     };
-    
-    AuraScript* GetAuraScript() const
+
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new spell_ruk_ruk_ooksplosions_AuraScript() ;
+        return new npc_ruk_rukAI(creature);
     }
 };
 
@@ -3915,4 +3882,5 @@ void AddSC_wandering_isle()
 	new spell_shoot_all_the_fireworks_periodic();
     new npc_huojin_monk_escort();
 	new spell_ruk_ruk_ooksplosions();
+    new npc_ruk_ruk();
 }
