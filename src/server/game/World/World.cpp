@@ -476,6 +476,14 @@ void World::LoadConfigSettings(bool reload)
         sLog->outError(LOG_FILTER_SERVER_LOADING, "Rate.RepairCost (%f) must be >=0. Using 0.0 instead.", rate_values[RATE_REPAIRCOST]);
         rate_values[RATE_REPAIRCOST] = 0.0f;
     }
+    // Rate multiplicateur alliance et horde
+    rate_values[RATE_MULTIPLICATEUR_DROP_MONEY_A2] = ConfigMgr::GetFloatDefault("Multiplicateur.Rate.Drop.Money.Alliance", 1.0f);
+    rate_values[RATE_MULTIPLICATEUR_DROP_MONEY_H2] = ConfigMgr::GetFloatDefault("Multiplicateur.Rate.Drop.Money.Horde", 1.0f);
+    rate_values[RATE_MULTIPLICATEUR_XP_QUEST_A2] = ConfigMgr::GetFloatDefault("Multiplicateur.Rate.Xp.Quest.Alliance", 1.0f);
+    rate_values[RATE_MULTIPLICATEUR_XP_QUEST_H2] = ConfigMgr::GetFloatDefault("Multiplicateur.Rate.Xp.Quest.Horde", 1.0f);
+	rate_values[RATE_MULTIPLICATEUR_HONOR_A2] = ConfigMgr::GetFloatDefault("Multiplicateur.Rate.Honor.Alliance", 1.0f);
+    rate_values[RATE_MULTIPLICATEUR_HONOR_H2] = ConfigMgr::GetFloatDefault("Multiplicateur.Rate.Honor.Horde", 1.0f);
+	
     rate_values[RATE_REPUTATION_GAIN]  = ConfigMgr::GetFloatDefault("Rate.Reputation.Gain", 1.0f);
     rate_values[RATE_REPUTATION_LOWLEVEL_KILL]  = ConfigMgr::GetFloatDefault("Rate.Reputation.LowLevel.Kill", 1.0f);
     rate_values[RATE_REPUTATION_LOWLEVEL_QUEST]  = ConfigMgr::GetFloatDefault("Rate.Reputation.LowLevel.Quest", 1.0f);

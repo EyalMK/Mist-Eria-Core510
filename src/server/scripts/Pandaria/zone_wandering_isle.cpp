@@ -3802,12 +3802,34 @@ public:
 
         void Reset()
         {
-            m_uiRocketTimer = 4500 ;
+            m_uiRocketTimer = 10000;
+            m_uiOuksplosionsTimer = 5000;
+            Ruk50 = true;
+            Ruk25 = true;
         }
 
         void DamageTaken(Unit* attacker, uint32 &amount)
         {
+            if(Creature* huojin = me->FindNearestCreature(65558, 40.0f, true))
+            {
+                if(me->GetHealthPct() <= 50 && Ruk50)
+                {
+                    huojin->AI()->Talk(SAY_HUOJIN_MONK_2);
+                    Ruk50 = false;
+                }
 
+                if(me->GetHealthPct() <= 25 && Ruk25)
+                {
+                    huojin->AI()->Talk(SAY_HUOJIN_MONK_3);
+                    Ruk25 = false;
+                }
+            }
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            if(Creature* huojin = me->FindNearestCreature(65558, 40.0f, true))
+                huojin->AI()->Talk(SAY_HUOJIN_MONK_4);
         }
 
         void UpdateAI(const uint32 uiDiff)
@@ -3826,16 +3848,29 @@ public:
                         summon->AI()->SetData(0, 1);
                     }
                 }
-                m_uiRocketTimer = 4500 ;
+                m_uiRocketTimer = 10000;
             }
             else
-                m_uiRocketTimer -= uiDiff ;
+                m_uiRocketTimer -= uiDiff;
+
+            if(m_uiOuksplosionsTimer <= uiDiff)
+            {
+                if(Unit* unit = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                    me->CastSpell(unit, 125699, false);
+
+                m_uiOuksplosionsTimer = 10000;
+            }
+            else
+                m_uiOuksplosionsTimer -= uiDiff;
             
             DoMeleeAttackIfReady();
         }
         
     private :
-        uint32 m_uiRocketTimer ;
+        uint32 m_uiRocketTimer;
+        uint32 m_uiOuksplosionsTimer;
+        bool Ruk50;
+        bool Ruk25;
     };
 
     CreatureAI* GetAI(Creature* creature) const
@@ -3849,8 +3884,7 @@ class mob_ruk_ruk_rocket : public CreatureScript
 {
 public :
     mob_ruk_ruk_rocket() : CreatureScript("mob_ruk_ruk_rocket")
-    {
-        
+    {      
     }
     
     class mob_ruk_ruk_rocket_AIScript : public ScriptedAI
@@ -3858,14 +3892,15 @@ public :
     public :
         mob_ruk_ruk_rocket_AIScript(Creature* creature) : ScriptedAI(creature)
         {
-            initialized = false ;
-            m_uiCheckTimer = 10000 ;
+            initialized = false;
+            m_uiCheckTimer = 500;
+            me->CastSpell(me, 125613, true);
         }
         
         void SetData(uint32 index, uint32 value)
         {
             if(index == 0)
-                initialized = true ;
+                initialized = true;
         }
         
         void MovementInform(uint32 motionType, uint32 id)
@@ -3880,15 +3915,15 @@ public :
         void UpdateAI(const uint32 diff)
         {
             if(!initialized)
-                return ;
+                return;
             
             if(m_uiCheckTimer <= diff)
             {
                 CheckForPlayers();
-                m_uiCheckTimer = 500 ;
+                m_uiCheckTimer = 500;
             }
             else
-                m_uiCheckTimer -= diff ;
+                m_uiCheckTimer -= diff;
         }
         
         void CheckForPlayers()
@@ -3906,8 +3941,8 @@ public :
         }
         
     private :
-        bool initialized ;
-        uint32 m_uiCheckTimer ;
+        bool initialized;
+        uint32 m_uiCheckTimer;
     };
     
     CreatureAI* GetAI(Creature* creature) const
@@ -3933,14 +3968,14 @@ public :
             if(sSpellMgr->GetSpellInfo(125699)
                     && sSpellMgr->GetSpellInfo(125885)
                     && sSpellMgr->GetSpellInfo(125887))
-                return true ;
+                return true;
             
-            return false ;
+            return false;
         }
         
         bool Load()
         {
-            return true ;
+            return true;
         }
         
         void HandlePeriodicDummyTick(AuraEffect const* auraEff)
@@ -3957,7 +3992,222 @@ public :
     
     AuraScript* GetAuraScript() const
     {
-        return new spell_ruk_ruk_ooksplosions_AuraScript() ;
+        return new spell_ruk_ruk_ooksplosions_AuraScript();
+    }
+};
+
+/*#####
+## at_wind_chamber
+#####*/
+
+enum eWindChamber
+{
+    QUEST_DAFENG_AIR            = 29785,
+    SPELL_SUMMON_AYSA_CHAMBER   = 104571,
+
+    SAY_AYSA_WIND_CHAMBER_1     = 0,
+    SAY_AYSA_WIND_CHAMBER_2     = 1,
+    SAY_AYSA_WIND_CHAMBER_3     = 2,
+    SAY_AYSA_WIND_CHAMBER_4     = 3
+};
+
+class at_wind_chamber : public AreaTriggerScript
+{
+    public:
+
+        at_wind_chamber(): AreaTriggerScript("at_wind_chamber")
+        {
+        }
+
+        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+        {
+            if (player->isAlive())
+            {
+                if (player->GetQuestStatus(QUEST_DAFENG_AIR) == QUEST_STATUS_INCOMPLETE)
+                {
+                    if(!player->HasAura(SPELL_SUMMON_AYSA_CHAMBER))
+                    {
+                        player->CastSpell(player, SPELL_SUMMON_AYSA_CHAMBER, true);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+};
+
+class npc_aysa_wind_escort : public CreatureScript
+{
+public:
+    npc_aysa_wind_escort(): CreatureScript("npc_aysa_wind_escort") { }
+
+    struct npc_aysa_wind_escortAI : public npc_escortAI
+    {
+        npc_aysa_wind_escortAI(Creature* creature) : npc_escortAI(creature) {}
+
+        bool VerifPlayer;
+
+        void Reset()
+        {
+            VerifPlayer = false;
+            Talk(SAY_AYSA_WIND_CHAMBER_1);
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    Talk(SAY_AYSA_WIND_CHAMBER_2);
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
+                    break;
+                case 5:
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
+                    break;
+                case 6:
+                    Talk(SAY_AYSA_WIND_CHAMBER_3);
+                    break;
+                case 10:
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
+                    break;
+                case 11:
+                    Talk(SAY_AYSA_WIND_CHAMBER_4);
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if(summoner->ToPlayer())
+                            summoner->ToPlayer()->KilledMonsterCredit(55666);
+                    break;
+                case 12:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            if (VerifPlayer)
+            {
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if(summoner->ToPlayer())
+                        if(summoner->IsInDist2d(me, 3.00f))
+                        {
+                            SetEscortPaused(false);
+                            VerifPlayer = false;
+                        }
+            }
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_aysa_wind_escortAI(creature);
+    }
+};
+
+class npc_zhao_ren : public CreatureScript
+{
+public:
+    npc_zhao_ren(): CreatureScript("npc_zhao_ren") { }
+
+    struct npc_zhao_renAI : public npc_escortAI
+    {
+        npc_zhao_renAI(Creature* creature) : npc_escortAI(creature) {}
+
+        bool VerifDamage;
+
+        void Reset()
+        {
+            VerifDamage = false;
+            me->InterruptNonMeleeSpells(false);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetCanFly(true);
+            me->AttackStop();
+        }
+
+        void DamageTaken(Unit* caster, uint32 &damage)
+        {
+            if(damage >= 1)
+            {
+               VerifDamage = true;
+            }
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            if (VerifDamage)
+            {
+                Start(false, true, 0, 0, true, true, true);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_zhao_renAI(creature);
+    }
+};
+
+enum eFireworkLauncher
+{
+    SPELL_LAUNCHER_INACTIVE = 125964
+};
+
+class npc_firework_launcher : public CreatureScript
+{
+public:
+    npc_firework_launcher(): CreatureScript("npc_firework_launcher") { }
+
+    struct npc_firework_launcherAI : public ScriptedAI
+    {
+        npc_firework_launcherAI(Creature* creature) : ScriptedAI(creature){}
+
+        uint32 VerifAuraTimer;
+
+        void Reset()
+        {
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+            VerifAuraTimer = 1000;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(VerifAuraTimer <= uiDiff)
+            {
+                if(me->HasAura(SPELL_LAUNCHER_INACTIVE))
+                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                else
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+
+                VerifAuraTimer = 1000;
+            }
+            else
+                VerifAuraTimer -= uiDiff;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_firework_launcherAI(creature);
     }
 };
 
@@ -4023,4 +4273,8 @@ void AddSC_wandering_isle()
 	new spell_ruk_ruk_ooksplosions();
     new npc_ruk_ruk();
 	new mob_ruk_ruk_rocket();
+    new at_wind_chamber();
+    new npc_aysa_wind_escort();
+    new npc_zhao_ren();
+    new npc_firework_launcher();
 }

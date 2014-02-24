@@ -7492,7 +7492,13 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
 		AddPct(honor_f, GetMaxPositiveAuraModifier(SPELL_AURA_MOD_HONOR_GAIN_PCT_2));
     }
 
+	if (GetTeam() == ALLIANCE)
+    honor_f *= sWorld->getRate(RATE_HONOR) * sWorld->getRate(RATE_MULTIPLICATEUR_HONOR_A2);
+	else if (GetTeam() == HORDE)
+    honor_f *= sWorld->getRate(RATE_HONOR) * sWorld->getRate(RATE_MULTIPLICATEUR_HONOR_H2);
+	else
     honor_f *= sWorld->getRate(RATE_HONOR);
+
     // Back to int now
     honor = int32(honor_f);
     // honor - for show honor points in log
@@ -9340,7 +9346,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
 
                 loot->FillLoot(lootid, LootTemplates_Gameobject, this, !groupRules, false, go->GetLootMode());
 
-                loot->generateMoneyLoot(go->GetGOInfo()->mingold, go->GetGOInfo()->maxgold);
+				loot->generateMoneyLoot(go->GetGOInfo()->mingold, go->GetGOInfo()->mingold, this);
 
                 // get next RR player (for next loot)
                 if (groupRules)
@@ -9432,7 +9438,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
                     loot->FillLoot(item->GetEntry(), LootTemplates_Milling, this, true);
                     break;
                 default:
-                    loot->generateMoneyLoot(item->GetTemplate()->MinMoneyLoot, item->GetTemplate()->MaxMoneyLoot);
+                    loot->generateMoneyLoot(item->GetTemplate()->MinMoneyLoot, item->GetTemplate()->MaxMoneyLoot, this);
                     loot->FillLoot(item->GetEntry(), LootTemplates_Item, this, true, loot->gold != 0);
 
                     // Force save the loot and money items that were just rolled
@@ -9466,6 +9472,11 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
                     loot->FillLoot(1, LootTemplates_Creature, this, true);
             // It may need a better formula
             // Now it works like this: lvl10: ~6copper, lvl70: ~9silver
+			if (GetTeam() == ALLIANCE)
+            bones->loot.gold = uint32(urand(50, 150) * 0.016f * pow(float(pLevel)/5.76f, 2.5f) * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_A2));
+			else if (GetTeam() == HORDE)
+            bones->loot.gold = uint32(urand(50, 150) * 0.016f * pow(float(pLevel)/5.76f, 2.5f) * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_H2));
+			else
             bones->loot.gold = uint32(urand(50, 150) * 0.016f * pow(float(pLevel)/5.76f, 2.5f) * sWorld->getRate(RATE_DROP_MONEY));
         }
 
@@ -9506,7 +9517,14 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
                 // Generate extra money for pick pocket loot
                 const uint32 a = urand(0, creature->getLevel()/2);
                 const uint32 b = urand(0, getLevel()/2);
+				
+				if (GetTeam() == ALLIANCE)
+                loot->gold = uint32(10 * (a + b) * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_A2));
+				else if (GetTeam() == HORDE)
+                loot->gold = uint32(10 * (a + b) * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_H2));
+				else
                 loot->gold = uint32(10 * (a + b) * sWorld->getRate(RATE_DROP_MONEY));
+				
                 permission = OWNER_PERMISSION;
             }
         }
@@ -15746,18 +15764,44 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     for (Unit::AuraEffectList::const_iterator i = ModXPPctAuras.begin(); i != ModXPPctAuras.end(); ++i)
         AddPct(XP, (*i)->GetAmount());
 
+    if (GetTeam() == ALLIANCE)			
+    XP *= sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_MULTIPLICATEUR_XP_QUEST_A2);	
+    else if (GetTeam() == HORDE)	
+    XP *= sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_MULTIPLICATEUR_XP_QUEST_H2);		
+
     int32 moneyRew = 0;
     if (getLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         GiveXP(XP, NULL);
     else
+	{
+	    if (GetTeam() == ALLIANCE)																																															
+        moneyRew = int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_A2));
+	    else if (GetTeam() == HORDE)	
+        moneyRew = int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_H2));
+	    else
         moneyRew = int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY));
+	}
 
     if (Guild* guild = sGuildMgr->GetGuildById(GetGuildId()))
+	{ 
+	    if (GetTeam() == ALLIANCE)
+        guild->GiveXP(uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_MULTIPLICATEUR_XP_QUEST_A2) * sWorld->getRate(RATE_XP_GUILD_MODIFIER)), this);
+		else if (GetTeam() == HORDE)
+        guild->GiveXP(uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_MULTIPLICATEUR_XP_QUEST_H2) * sWorld->getRate(RATE_XP_GUILD_MODIFIER)), this);
+		else
         guild->GiveXP(uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_XP_GUILD_MODIFIER)), this);
+	}
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
     if (quest->GetRewOrReqMoney())
+	{
+	    if (GetTeam() == ALLIANCE)
+        moneyRew += (quest->GetRewOrReqMoney() * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_A2));
+		else if (GetTeam() == HORDE)
+        moneyRew += (quest->GetRewOrReqMoney() * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_H2));
+		else
         moneyRew += quest->GetRewOrReqMoney();
+	}
 
     if (moneyRew)
     {
@@ -17011,11 +17055,21 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP, Object* questGiver)
     if (getLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     {
         xp = XP;
-        moneyReward = quest->GetRewOrReqMoney();
+		if (GetTeam() == ALLIANCE)
+        moneyReward = (quest->GetRewOrReqMoney() * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_A2));
+		else if (GetTeam() == HORDE)
+        moneyReward = (quest->GetRewOrReqMoney() * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_H2));
+		else
+		moneyReward = quest->GetRewOrReqMoney();
     }
     else // At max level, increase gold reward
     {
         xp = 0;
+	if (GetTeam() == ALLIANCE)
+        moneyReward = uint32(quest->GetRewOrReqMoney() + int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_A2)));
+	else if (GetTeam() == HORDE)
+        moneyReward = uint32(quest->GetRewOrReqMoney() + int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_H2)));
+	else
         moneyReward = uint32(quest->GetRewOrReqMoney() + int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY)));
     }
 

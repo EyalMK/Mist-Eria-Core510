@@ -669,17 +669,41 @@ void Loot::NotifyQuestItemRemoved(uint8 questIndex)
     }
 }
 
-void Loot::generateMoneyLoot(uint32 minAmount, uint32 maxAmount)
-{
-    if (maxAmount > 0)
-    {
-        if (maxAmount <= minAmount)
-            gold = uint32(maxAmount * sWorld->getRate(RATE_DROP_MONEY));
-        else if ((maxAmount - minAmount) < 32700)
-            gold = uint32(urand(minAmount, maxAmount) * sWorld->getRate(RATE_DROP_MONEY));
-        else
-            gold = uint32(urand(minAmount >> 8, maxAmount >> 8) * sWorld->getRate(RATE_DROP_MONEY)) << 8;
-    }
+void Loot::generateMoneyLoot(uint32 minAmount, uint32 maxAmount, Player* player)
+{		
+
+        if (maxAmount > 0)
+        {
+           if (maxAmount <= minAmount)
+		   {
+		       if (player->GetTeam() == ALLIANCE)																																															
+               gold = uint32(maxAmount * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_A2));
+			   else if (player->GetTeam() == HORDE)	
+			   gold = uint32(maxAmount * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_H2));
+			   else
+			   gold = uint32(maxAmount * sWorld->getRate(RATE_DROP_MONEY));
+			}
+            else if ((maxAmount - minAmount) < 32700)
+		    {
+			   if (player->GetTeam() == ALLIANCE)				
+               gold = uint32(urand(minAmount, maxAmount) * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_A2));
+			   else	if (player->GetTeam() == HORDE)	
+			   gold = uint32(urand(minAmount, maxAmount) * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_H2));
+			   else
+			   gold = uint32(urand(minAmount, maxAmount) * sWorld->getRate(RATE_DROP_MONEY));
+			}
+            else
+		    {
+			   if (player->GetTeam() == ALLIANCE)				
+               gold = uint32(urand(minAmount >> 8, maxAmount >> 8) * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_A2)) << 8;
+			   else if (player->GetTeam() == HORDE)
+			   gold = uint32(urand(minAmount >> 8, maxAmount >> 8) * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_H2)) << 8;
+			   else
+			   gold = uint32(urand(minAmount >> 8, maxAmount >> 8) * sWorld->getRate(RATE_DROP_MONEY)) <<8;
+			 }
+			
+        } 
+      	 
 }
 
 void Loot::DeleteLootItemFromContainerItemDB(uint32 itemID)
