@@ -4112,6 +4112,58 @@ public:
     }
 };
 
+class npc_zhao_ren : public CreatureScript
+{
+public:
+    npc_zhao_ren(): CreatureScript("npc_zhao_ren") { }
+
+    struct npc_zhao_renAI : public npc_escortAI
+    {
+        npc_zhao_renAI(Creature* creature) : npc_escortAI(creature) {}
+
+        bool VerifDamage;
+
+        void Reset()
+        {
+            VerifDamage = false;
+            me->InterruptNonMeleeSpells(false);
+        }
+
+        void DamageTaken(Unit* caster, uint32 &damage)
+        {
+            if(damage >= 1)
+            {
+               VerifDamage = true;
+            }
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            if (VerifDamage)
+            {
+                Start(false, true, 0, 0, true, true, true);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_zhao_renAI(creature);
+    }
+};
+
 void AddSC_wandering_isle()
 {
     new stalker_item_equiped();
@@ -4176,4 +4228,5 @@ void AddSC_wandering_isle()
 	new mob_ruk_ruk_rocket();
     new at_wind_chamber();
     new npc_aysa_wind_escort();
+    new npc_zhao_ren();
 }
