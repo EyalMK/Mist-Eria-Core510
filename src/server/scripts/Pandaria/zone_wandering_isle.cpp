@@ -4154,7 +4154,7 @@ public:
 
             if(me->GetHealthPct() <= 70 && VerifHP70)
             {
-                me->GetMotionMaster()->MovePoint(0, 723.16f, 4163.79f, 197.00f);
+                me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 197.00f);
                 SetEscortPaused(true);
                 Descente = true;
                 VerifHP70 = false;
@@ -4162,7 +4162,7 @@ public:
 
             if(me->GetHealthPct() <= 20 && VerifHP20)
             {
-                me->GetMotionMaster()->MovePoint(0, 723.16f, 4163.79f, 197.00f);
+                me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 197.00f);
                 SetEscortPaused(true);
                 Descente = true;
                 VerifHP20 = false;
@@ -4181,7 +4181,7 @@ public:
 
         void MovementInform(uint32 motionType, uint32 id)
         {
-            if(motionType == POINT_MOTION_TYPE && id == 0)
+            if(motionType == POINT_MOTION_TYPE && id == 7)
             {
                 me->CastSpell(me, 125992, true);
             }
@@ -4257,7 +4257,7 @@ public:
         void Reset()
         {
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-            VerifAuraTimer = 1000;
+            VerifAuraTimer = 100;
         }
 
         void UpdateAI(const uint32 uiDiff)
@@ -4269,7 +4269,7 @@ public:
                 else
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
 
-                VerifAuraTimer = 1000;
+                VerifAuraTimer = 100;
             }
             else
                 VerifAuraTimer -= uiDiff;
