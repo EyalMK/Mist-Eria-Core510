@@ -4149,8 +4149,9 @@ public:
         {
             if(damage >= 1 && !VerifDamage)
             {
-               SetNextWaypoint(1);
-               VerifDamage = true;
+                Start(false,true,0,0,true,true,true);
+                SetNextWaypoint(1);
+                VerifDamage = true;
             } 
         }
 
