@@ -4122,10 +4122,23 @@ public:
         npc_zhao_renAI(Creature* creature) : npc_escortAI(creature) {}
 
         bool VerifDamage;
+        bool VerifHP70;
+        bool VerifHP20;
+        bool Descente;
+
+        uint32 DescenteTimer;
+        uint32 RemonteTimer;
+        uint32 CastTimer;
 
         void Reset()
         {
             VerifDamage = false;
+            VerifHP70 = true;
+            VerifHP20 = true;
+            Descente = false;
+            DescenteTimer = 12000;
+            RemonteTimer = 15000;
+            CastTimer = 6000;
             me->InterruptNonMeleeSpells(false);
             me->SetReactState(REACT_PASSIVE);
             me->SetCanFly(true);
@@ -4137,6 +4150,24 @@ public:
             if(damage >= 1)
             {
                VerifDamage = true;
+            }
+
+            if(me->GetHealthPct() <= 70 && VerifHP70)
+            {
+                me->GetMotionMaster()->MovePoint(0, 723.16f, 4163.79f, 197.00f);
+                SetEscortPaused(true);
+                Descente = true;
+                me->CastSpell(me, 125992, true);
+                VerifHP70 = false;
+            }
+
+            if(me->GetHealthPct() <= 20 && VerifHP20)
+            {
+                me->GetMotionMaster()->MovePoint(0, 723.16f, 4163.79f, 197.00f);
+                SetEscortPaused(true);
+                Descente = true;
+                me->CastSpell(me, 125992, true);
+                VerifHP20 = false;
             }
         }
 
@@ -4157,6 +4188,40 @@ public:
             if (VerifDamage)
             {
                 Start(false, true, 0, 0, true, true, true);
+            }
+
+            if (Descente)
+            {
+                if(DescenteTimer <= uiDiff)
+                {
+                    me->CastSpell(me, 125990, false);
+                    DescenteTimer = 15000;
+                }
+                else
+                    DescenteTimer -= uiDiff;
+
+                if(RemonteTimer <= uiDiff)
+                {
+                    SetEscortPaused(false);
+                    RemonteTimer = 15000;
+                    Descente = false;
+                }
+                else
+                    RemonteTimer -= uiDiff;
+            }
+
+            if(!Descente)
+            {
+                if(CastTimer <= uiDiff)
+                {
+                    if(Unit* unit = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
+                        if(unit->ToPlayer())
+                            me->CastSpell(unit, 126006, false);
+
+                    CastTimer = 6000;
+                }
+                else
+                    CastTimer -= uiDiff;
             }
         }
     };
@@ -4240,7 +4305,7 @@ public:
             {
                 if(VerifLauncherTimer <= uiDiff)
                 {
-                    if(Creature* launcher = me->FindNearestCreature(64507, 100.00f, true))
+                    if(Creature* launcher = me->FindNearestCreature(64507, 1000.00f, true))
                         if(launcher->HasAura(SPELL_LAUNCHER_INACTIVE))
                         {
                             Position pos;
