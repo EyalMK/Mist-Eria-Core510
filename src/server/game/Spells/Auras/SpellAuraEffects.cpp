@@ -471,6 +471,20 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS] =
     &AuraEffect::HandleNULL,                                      //410
     &AuraEffect::HandleNULL,                                      //411
     &AuraEffect::HandleModManaRegenByHaste,                       //412 SPELL_AURA_MOD_REGEN_BY_HASTE
+	&AuraEffect::HandleNULL,                                      //413
+	&AuraEffect::HandleNULL,                                      //414
+	&AuraEffect::HandleNULL,                                      //415
+	&AuraEffect::HandleNULL,                                      //416
+	&AuraEffect::HandleNULL,                                      //417
+	&AuraEffect::HandleNULL,                                      //418
+	&AuraEffect::HandleNULL,                                      //419
+	&AuraEffect::HandleNULL,                                      //420
+	&AuraEffect::HandleNULL,                                      //421
+	&AuraEffect::HandleNULL,                                      //422
+	&AuraEffect::HandleNULL,                                      //423
+	&AuraEffect::HandleNULL,                                      //424
+	&AuraEffect::HandleNULL,                                      //425
+	&AuraEffect::HandleNULL,                                      //426
 };
 
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32 *baseAmount, Unit* caster):

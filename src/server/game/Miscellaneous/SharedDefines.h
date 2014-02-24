@@ -1025,7 +1025,10 @@ enum SpellEffects
 	SPELL_EFFECT_199                                = 199,
 	SPELL_EFFECT_200                                = 200,
 	SPELL_EFFECT_201                                = 201,
-    TOTAL_SPELL_EFFECTS                             = 202,
+	SPELL_EFFECT_202                                = 202,
+	SPELL_EFFECT_203                                = 203,
+	SPELL_EFFECT_204                                = 204,
+    TOTAL_SPELL_EFFECTS                             = 205,
 };
 
 enum SpellCastResult

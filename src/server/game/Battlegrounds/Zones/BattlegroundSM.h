@@ -70,6 +70,7 @@ enum SMBattlegroundObjectEntry
 {
 	BG_SM_MINE_DEPOT			= 400433,
 	BG_SM_DOOR					= 400434,
+	BG_SM_NEEDLE				= 400435
 };
 
 enum SMBattlegroundGaveyards
@@ -101,8 +102,8 @@ enum SMBattlegroundObjectTypes
     BG_SM_OBJECT_DOOR_H_1			= 1,
 	BG_SM_OBJECT_DOOR_A_2			= 2,
     BG_SM_OBJECT_DOOR_H_2			= 3,
-	BG_SM_OBJECT_NEEDLE_INDICATOR_1	= 4,
-	BG_SM_OBJECT_NEEDLE_INDICATOR_2	= 5,
+	BG_SM_OBJECT_EAST_NEEDLE		= 4,
+	BG_SM_OBJECT_NORTH_NEEDLE		= 5,
 	BG_SM_OBJECT_WATERFALL_DEPOT	= 6,
 	BG_SM_OBJECT_LAVA_DEPOT			= 7,
 	BG_SM_OBJECT_DIAMOND_DEPOT		= 8,
@@ -131,6 +132,12 @@ enum BG_SM_CreatureIds
 	NPC_MINE_CART_TRIGGER	= 400464,
 };
 
+enum BG_SM_Paths
+{
+	SM_EAST_PATH,
+	SM_NORTH_PATH
+};
+
 const float BG_SM_DepotPos[4][4] =
 {
     {566.950989f, 337.05801f, 347.295013f, 1.559089f},   // Waterfall
@@ -145,6 +152,12 @@ const float BG_SM_DoorPos[4][4] =
     {830.092102f, 143.925507f, 326.5f, 3.130245f},       // Alliance 2
     {652.177612f, 228.493423f, 326.917480f, 0.163844f},  // Horde 1
     {635.622925f, 208.220886f, 326.648315f, 3.717332f}   // Horde 2
+};
+
+const float BG_SM_NeedlePos[2][4] =
+{
+	{715.585388f, 101.272034f, 319.994690f, 1.495311f}, // East
+	{847.481689f, 308.032562f, 346.573242f, 3.627884f}  // North
 };
 
 #define MINE_CART_AT_DEPOT_POINTS		200
@@ -209,7 +222,6 @@ class BattlegroundSM : public Battleground
 
         uint32 m_MineCartsTrigger[SM_MINE_CART_MAX];
 		int32 m_MineCartsProgressBar[SM_MINE_CART_MAX];
-		uint8 m_LastMineCart; // 0 = Reset, 1 = First Mine Cart, 2 = Second Mine Cart, 3 = Third Mine Cart
 		uint32 m_MineCartTeamKeeper[SM_MINE_CART_MAX]; // keepers team
 		int32 m_MineCartSpawnTimer;
 		int32 m_FirstMineCartSummonTimer;
