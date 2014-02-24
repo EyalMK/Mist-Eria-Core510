@@ -22,6 +22,12 @@
 #include "Language.h"
 #include "Battleground.h"
 
+enum BG_SM_Sound
+{
+    BG_SM_SOUND_MINE_CART_SPAWNED		= 8174,
+	BG_SM_SOUND_NEAR_VICTORY			= 8456
+};
+
 enum BG_SM_WorldStates
 {
 	SM_MINE_CARTS_DISPLAY			= 6436,
@@ -152,6 +158,7 @@ const float BG_SM_DoorPos[4][4] =
 #define BG_SM_NotSMWeekendHonorTicks    260
 #define BG_SM_SMWeekendHonorTicks       160
 #define SM_MINE_CART_MAX				3
+#define SM_MAX_PATHS					2
 
 struct BattlegroundSMScore : public BattlegroundScore
 {
@@ -219,8 +226,8 @@ class BattlegroundSM : public Battleground
 		bool m_MineCartNearDepot[SM_MINE_CART_MAX];
 		bool m_MineCartSpawned[SM_MINE_CART_MAX];
 		bool m_FirstMineCartSpawned;
-		bool m_FirstPathDone[2];
-		bool m_WaterfallPathDone;
+		bool m_PathDone[SM_MINE_CART_MAX - 1][SM_MAX_PATHS]; // Only for first and third mine cart
+		bool m_WaterfallPathDone; // Waterfall path
 
         uint32 m_HonorTics;
 		bool m_IsInformedNearVictory;
