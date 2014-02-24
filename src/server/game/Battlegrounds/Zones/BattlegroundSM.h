@@ -181,7 +181,6 @@ class BattlegroundSM : public Battleground
         void FillInitialWorldStates(WorldPacket& data);
 
         /* Battleground Events */
-        void EventPlayerClickedOnNeedle(Player* Source, GameObject* target_obj);
 		void EventReopenDepot(uint32 diff);
 
         uint32 GetPrematureWinner();
@@ -192,6 +191,7 @@ class BattlegroundSM : public Battleground
         void UpdatePointsCount(uint32 Team);
 		void SummonMineCart(uint32 diff);
 		void FirstMineCartSummon(uint32 diff);
+		void MineCartsMoves(uint32 diff);
 
         /* Scorekeeping */
         void AddPoints(uint32 Team, uint32 Points);
@@ -219,6 +219,8 @@ class BattlegroundSM : public Battleground
 		bool m_MineCartNearDepot[SM_MINE_CART_MAX];
 		bool m_MineCartSpawned[SM_MINE_CART_MAX];
 		bool m_FirstMineCartSpawned;
+		bool m_FirstPathDone[2];
+		bool m_WaterfallPathDone;
 
         uint32 m_HonorTics;
 		bool m_IsInformedNearVictory;
