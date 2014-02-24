@@ -207,7 +207,8 @@ public:
                 switch (eventId)
                 {
                     case EVENT_DIVINE_RECKONING:
-                        DoCastVictim(SPELL_DIVINE_RECKONING);
+						if(me->getVictim())
+							DoCast(me->getVictim(), SPELL_DIVINE_RECKONING);
                         events.ScheduleEvent(EVENT_DIVINE_RECKONING, urand(10000, 12000));
                         break;
                     case EVENT_BURNING_LIGHT:
@@ -215,9 +216,16 @@ public:
                         Unit* unit = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me));
                         if (!unit)
                             unit = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
+						// Still no target, reschedule everything, then break ;	
+						if (!unit)
+						{
+							events.ScheduleEvent(EVENT_SEAR, 2000);
+							events.ScheduleEvent(EVENT_BURNING_LIGHT, 12000);
+							break ;
+						}
                         DoCast(unit, SPELL_BURNING_LIGHT);
-                        events.ScheduleEvent(EVENT_SEAR, 2000);
-                        events.ScheduleEvent(EVENT_BURNING_LIGHT, 12000);
+						events.ScheduleEvent(EVENT_SEAR, 2000);
+						events.ScheduleEvent(EVENT_BURNING_LIGHT, 12000);
                         break;
                     }
                     case EVENT_SEAR:
@@ -237,9 +245,20 @@ public:
 
                         // Get the closest statue face (any of its eyes)
                         Creature* eye1 = stalkers.front();
+						// No pointer, break ;
+						if(!eye1)
+							break ;
+						
                         stalkers.remove(eye1); // Remove the eye.
+						
+						if(stalkers.empty()) // No object, no pointer
+							break ; 
+						
                         stalkers.sort(Trinity::ObjectDistanceOrderPred(eye1)); // Find the second eye.
                         Creature* eye2 = stalkers.front();
+						// Same deal
+						if(!eye2)
+							break ;
 
                         eye1->CastSpell(eye1, SPELL_SEARING_LIGHT, true);
                         eye2->CastSpell(eye2, SPELL_SEARING_LIGHT, true);
