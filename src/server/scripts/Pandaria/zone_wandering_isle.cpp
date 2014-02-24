@@ -4149,8 +4149,7 @@ public:
         {
             if(damage >= 1 && !VerifDamage)
             {
-                Start(false,true,0,0,true,true,true);
-                SetNextWaypoint(1);
+                me->GetMotionMaster()->MoveTaxiFlight(3151, 66776);
                 VerifDamage = true;
             } 
         }
@@ -4161,24 +4160,6 @@ public:
 
             switch (waypointId)
             {
-                case 1:
-                    SetNextWaypoint(2);
-                    break;
-                case 2:
-                    SetNextWaypoint(3);
-                    break;
-                case 3:
-                    SetNextWaypoint(4);
-                    break;
-                case 4:
-                    SetNextWaypoint(5);
-                    break;
-                case 5:
-                    SetNextWaypoint(6);
-                    break;
-                case 6:
-                    SetNextWaypoint(1);
-                    break;
             }
         }
 
@@ -4188,14 +4169,12 @@ public:
 
             if(me->GetHealthPct() <= 70 && VerifHP70)
             {
-                SetNextWaypoint(7);
                 Descente = true;
                 VerifHP70 = false;
             }
 
             if(me->GetHealthPct() <= 20 && VerifHP20)
             {
-                SetNextWaypoint(7);
                 Descente = true;
                 VerifHP20 = false;
             }
@@ -4212,7 +4191,6 @@ public:
 
                 if(RemonteTimer <= uiDiff)
                 {
-                    SetNextWaypoint(1);
                     RemonteTimer = 15000;
                     Descente = false;
                 }
