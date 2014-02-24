@@ -4197,7 +4197,9 @@ public:
 
                 if(RemonteTimer <= uiDiff)
                 {
-                    me->GetMotionMaster()->Clear();
+                    float fRetX, fRetY, fRetZ;
+                    me->GetRespawnPosition(fRetX, fRetY, fRetZ);
+                    me->GetMotionMaster()->MovePoint(0xFFFFFE, fRetX, fRetY, fRetZ);
                     SetEscortPaused(false);
                     RemonteTimer = 15000;
                     Descente = false;
