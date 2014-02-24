@@ -4168,7 +4168,7 @@ public:
 
             if(me->GetHealthPct() <= 70 && VerifHP70)
             {
-                me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 197.00f);
+                SetNextWaypoint(7);
                 SetEscortPaused(true);
                 Descente = true;
                 VerifHP70 = false;
@@ -4176,7 +4176,7 @@ public:
 
             if(me->GetHealthPct() <= 20 && VerifHP20)
             {
-                me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 197.00f);
+                SetNextWaypoint(7);
                 SetEscortPaused(true);
                 Descente = true;
                 VerifHP20 = false;
