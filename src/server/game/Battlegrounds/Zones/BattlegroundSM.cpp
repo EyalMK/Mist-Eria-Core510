@@ -1133,7 +1133,7 @@ void BattlegroundSM::MineCartsMoves(uint32 diff)
 			if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f, true))
 			{
 				cart->GetMotionMaster()->MovePath(NPC_MINE_CART_1, false);
-				m_FirstPathDone[BG_SM_MINE_CART_1 - 1] = true;
+				m_FirstPathDone[0] = true;
 			}
 
 		if (!m_WaterfallPathDone)
@@ -1147,7 +1147,7 @@ void BattlegroundSM::MineCartsMoves(uint32 diff)
 			if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_3, 99999.0f, true))
 			{
 				cart->GetMotionMaster()->MovePath(NPC_MINE_CART_3, false);
-				m_FirstPathDone[BG_SM_MINE_CART_3 - 1] = true;
+				m_FirstPathDone[1] = true;
 			}
 	}
 }
