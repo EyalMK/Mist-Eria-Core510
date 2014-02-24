@@ -855,7 +855,7 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 						}
 					}
 				}
-			} else m_DepotCloseTimer[SM_LAVA_DEPOT] -= diff;
+			} else m_DepotCloseTimer[SM_DIAMOND_DEPOT] -= diff;
 		}
 	}
 
