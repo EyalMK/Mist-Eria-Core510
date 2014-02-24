@@ -4112,6 +4112,13 @@ public:
     }
 };
 
+enum eZhaoRen
+{
+    SAY_AYSA_ZHAO_1     = 0,
+    SAY_AYSA_ZHAO_2     = 1,
+    SAY_AYSA_ZHAO_3     = 2
+};
+
 class npc_zhao_ren : public CreatureScript
 {
 public:
@@ -4122,9 +4129,11 @@ public:
         npc_zhao_renAI(Creature* creature) : npc_escortAI(creature) {}
 
         bool VerifDamage;
+        bool VerifHP80;
         bool VerifHP70;
         bool VerifHP20;
         bool Descente;
+        bool Attaque;
 
         uint32 DescenteTimer;
         uint32 RemonteTimer;
@@ -4133,9 +4142,11 @@ public:
         void Reset()
         {
             VerifDamage = false;
+            VerifHP80 = true;
             VerifHP70 = true;
             VerifHP20 = true;
             Descente = false;
+            Attaque = false;
             DescenteTimer = 12000;
             RemonteTimer = 15000;
             CastTimer = 6000;
@@ -4156,18 +4167,24 @@ public:
         void WaypointReached(uint32 waypointId)
         {
             Player* player = GetPlayerForEscort();
-
-            switch (waypointId)
-            {
-            }
         }
 
         void UpdateAI(const uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
 
+            if(me->GetHealthPct() <= 80 && VerifHP80)
+            {
+                if(Creature* aysa = me->FindNearestCreature(64506, 200.00f, true))
+                    aysa->AI()->Talk(SAY_AYSA_ZHAO_1);
+
+                VerifHP80 = false;
+            }
             if(me->GetHealthPct() <= 70 && VerifHP70)
             {
+                if(Creature* aysa = me->FindNearestCreature(64506, 200.00f, true))
+                    aysa->AI()->Talk(SAY_AYSA_ZHAO_2);
+
                 me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 196.083f);
                 SetEscortPaused(true);
                 Descente = true;
@@ -4176,9 +4193,12 @@ public:
 
             if(me->GetHealthPct() <= 20 && VerifHP20)
             {
+                if(Creature* aysa = me->FindNearestCreature(64506, 200.00f, true))
+                    aysa->AI()->Talk(SAY_AYSA_ZHAO_3);
+
                 me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 196.083f);
                 SetEscortPaused(true);
-                Descente = true;
+                Attaque = true;
                 VerifHP20 = false;
             }
 
@@ -4220,6 +4240,12 @@ public:
                 }
                 else
                     CastTimer -= uiDiff;
+            }
+
+            if(Attaque)
+            {
+                me->SetReactState(REACT_AGGRESSIVE);
+                Attaque = false;
             }
         }
     };
@@ -4274,6 +4300,7 @@ public:
     }
 };
 
+
 class npc_ji_firepaw_zhao : public CreatureScript
 {
 public:
@@ -4281,7 +4308,12 @@ public:
 
     struct npc_ji_firepaw_zhaoAI : public ScriptedAI
     {
-        npc_ji_firepaw_zhaoAI(Creature* creature) : ScriptedAI(creature){}
+        npc_ji_firepaw_zhaoAI(Creature* creature) : ScriptedAI(creature)
+        {
+            launcher = NULL;
+        }
+
+        Creature* launcher;
 
         bool VerifLauncher;
         bool LauncherRepair;
@@ -4293,7 +4325,7 @@ public:
         {
             VerifLauncher = true;
             LauncherRepair = false;
-            VerifLauncherTimer = 1000;
+            VerifLauncherTimer = 500;
             LauncherRepairTimer = 1000;
         }
 
@@ -4303,17 +4335,23 @@ public:
             {
                 if(VerifLauncherTimer <= uiDiff)
                 {
-                    if(Creature* launcher = me->FindNearestCreature(64507, 1000.00f, true))
-                        if(launcher->HasAura(SPELL_LAUNCHER_INACTIVE))
-                        {
-                            Position pos;
-                            launcher->GetPosition(&pos);
-                            me->GetMotionMaster()->MovePoint(0, pos);
-                            LauncherRepair = true;
-                            VerifLauncher = false;
-                        }
+                    std::list<Creature*> launchers;
+                    GetCreatureListWithEntryInGrid(launchers, me, 64507, 500.0f);
 
-                    VerifLauncherTimer = 1000;
+                    std::list<Creature*>::const_iterator iter = launchers.begin();
+                    std::advance(iter, launchers.size()-1);
+                    launcher = *iter ;
+
+                    if(launcher->HasAura(SPELL_LAUNCHER_INACTIVE))
+                    {
+                        Position pos;
+                        launcher->GetPosition(&pos);
+                        me->GetMotionMaster()->MovePoint(0, pos);
+                        LauncherRepair = true;
+                        VerifLauncher = false;
+                    }
+
+                    VerifLauncherTimer = 500;
                 }
                 else
                     VerifLauncherTimer -= uiDiff;
@@ -4367,10 +4405,10 @@ public:
                 case 1:
                     SetRun();
                     break;
-                case 11:
+                case 8:
                     me->GetMotionMaster()->MoveJump(674.88f, 4202.82f, 197.00f, 20, 20);
                     break;
-                case 12:
+                case 9:
                     me->DespawnOrUnsummon();
                     break;
             }
@@ -4412,7 +4450,7 @@ public:
                 case 1:
                     SetRun();
                     break;
-                case 12:
+                case 10:
                     me->DespawnOrUnsummon();
                     break;
             }

@@ -1186,6 +1186,7 @@ public :
             //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: HandleDummy");
             if(Player* caster = GetCaster()->ToPlayer()) {// Since we checked caster during load, he will not be null
                 if(Unit* target = GetHitUnit()) {
+					std::list<Aura*> toRemove ;
                     //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: caster && target not null");
                     Unit::AuraApplicationMap const& appliedAuras = target->GetAppliedAuras() ;
                     for(Unit::AuraApplicationMap::const_iterator iter = appliedAuras.begin() ; iter != appliedAuras.end() ; ++iter) {
@@ -1212,13 +1213,20 @@ public :
                                         if(auraEff->IsPeriodic()) {
                                             //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS: Mind Spike: Found periodic effect, index == %u",
                                                            //uint32(i));
-                                            target->RemoveAura(base, AURA_REMOVE_BY_ENEMY_SPELL);
+                                            toRemove.push_back(base);
                                             break ; // We have found a periodic effect ; stop looping over effects, return looping over auras
                                         }
                                 }
                             }
                         }
                     }
+					if(toRemove.empty())
+						return ;
+					while(!toRemove.empty()) {
+						Aura* aura = toRemove.front();
+						if(aura) aura->Remove();
+						toRemove.remove(aura);
+					}
                 }
             }
         }
