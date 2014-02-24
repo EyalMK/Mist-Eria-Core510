@@ -70,7 +70,7 @@ enum SMBattlegroundObjectEntry
 {
 	BG_SM_MINE_DEPOT			= 400433,
 	BG_SM_DOOR					= 400434,
-	BG_SM_NEEDLE				= 400434
+	BG_SM_NEEDLE				= 400435
 };
 
 enum SMBattlegroundGaveyards
