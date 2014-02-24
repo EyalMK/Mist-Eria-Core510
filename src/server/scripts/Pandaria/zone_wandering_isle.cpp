@@ -4167,6 +4167,50 @@ public:
     }
 };
 
+enum eFireworkLauncher
+{
+    SPELL_LAUNCHER_INACTIVE = 125964
+};
+
+class npc_firework_launcher : public CreatureScript
+{
+public:
+    npc_firework_launcher(): CreatureScript("npc_firework_launcher") { }
+
+    struct npc_firework_launcherAI : public ScriptedAI
+    {
+        npc_firework_launcherAI(Creature* creature) : ScriptedAI(creature){}
+
+        uint32 VerifAuraTimer;
+
+        void Reset()
+        {
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+            VerifAuraTimer = 1000;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(VerifAuraTimer <= uiDiff)
+            {
+                if(me->HasAura(SPELL_LAUNCHER_INACTIVE))
+                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                else
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+
+                VerifAuraTimer = 1000;
+            }
+            else
+                VerifAuraTimer -= uiDiff;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_firework_launcherAI(creature);
+    }
+};
+
 void AddSC_wandering_isle()
 {
     new stalker_item_equiped();
@@ -4232,4 +4276,5 @@ void AddSC_wandering_isle()
     new at_wind_chamber();
     new npc_aysa_wind_escort();
     new npc_zhao_ren();
+    new npc_firework_launcher();
 }
