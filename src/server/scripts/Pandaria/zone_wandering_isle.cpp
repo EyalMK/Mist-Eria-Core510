@@ -4150,23 +4150,7 @@ public:
             if(damage >= 1)
             {
                VerifDamage = true;
-            }
-
-            if(me->GetHealthPct() <= 70 && VerifHP70)
-            {
-                me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 197.00f);
-                SetEscortPaused(true);
-                Descente = true;
-                VerifHP70 = false;
-            }
-
-            if(me->GetHealthPct() <= 20 && VerifHP20)
-            {
-                me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 197.00f);
-                SetEscortPaused(true);
-                Descente = true;
-                VerifHP20 = false;
-            }
+            } 
         }
 
         void WaypointReached(uint32 waypointId)
@@ -4181,6 +4165,24 @@ public:
         void UpdateAI(const uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
+
+            if(me->GetHealthPct() <= 70 && VerifHP70)
+            {
+                me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 197.00f);
+                SetEscortPaused(true);
+                Descente = true;
+                VerifDamage = false;
+                VerifHP70 = false;
+            }
+
+            if(me->GetHealthPct() <= 20 && VerifHP20)
+            {
+                me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 197.00f);
+                SetEscortPaused(true);
+                Descente = true;
+                VerifDamage = false;
+                VerifHP20 = false;
+            }
 
             if (VerifDamage)
             {
@@ -4200,7 +4202,7 @@ public:
                 if(RemonteTimer <= uiDiff)
                 {
                     SetEscortPaused(false);
-                    Start(false, true, 0, 0, true, true, true);
+                    VerifDamage = true;
                     RemonteTimer = 15000;
                     Descente = false;
                 }
