@@ -1208,8 +1208,8 @@ bool BattlegroundSM::SetupBattleground()
 		|| !AddObject(BG_SM_OBJECT_DOOR_A_2, BG_SM_DOOR, BG_SM_DoorPos[1][0], BG_SM_DoorPos[1][1], BG_SM_DoorPos[1][2], BG_SM_DoorPos[1][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
 		|| !AddObject(BG_SM_OBJECT_DOOR_H_1, BG_SM_DOOR, BG_SM_DoorPos[2][0], BG_SM_DoorPos[2][1], BG_SM_DoorPos[2][2], BG_SM_DoorPos[2][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
 		|| !AddObject(BG_SM_OBJECT_DOOR_H_2, BG_SM_DOOR, BG_SM_DoorPos[3][0], BG_SM_DoorPos[3][1], BG_SM_DoorPos[3][2], BG_SM_DoorPos[3][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
-		|| !AddObject(BG_SM_OBJECT_EAST_NEEDLE, BG_SM_NEEDLE, BG_SM_NeedlePos[0][0], BG_SM_DoorPos[0][1], BG_SM_DoorPos[0][2], BG_SM_DoorPos[0][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
-		|| !AddObject(BG_SM_OBJECT_NORTH_NEEDLE, BG_SM_NEEDLE, BG_SM_DoorPos[1][0], BG_SM_DoorPos[1][1], BG_SM_DoorPos[1][2], BG_SM_DoorPos[1][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY))
+		|| !AddObject(BG_SM_OBJECT_EAST_NEEDLE, BG_SM_NEEDLE, BG_SM_NeedlePos[0][0], BG_SM_NeedlePos[0][1], BG_SM_NeedlePos[0][2], BG_SM_NeedlePos[0][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
+		|| !AddObject(BG_SM_OBJECT_NORTH_NEEDLE, BG_SM_NEEDLE, BG_SM_NeedlePos[1][0], BG_SM_NeedlePos[1][1], BG_SM_NeedlePos[1][2], BG_SM_NeedlePos[1][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY))
     {
         sLog->outError(LOG_FILTER_SQL, "BatteGroundSM: Failed to spawn some object Battleground not created!");
         return false;
