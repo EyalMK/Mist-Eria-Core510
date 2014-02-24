@@ -4149,7 +4149,6 @@ public:
         {
             if(damage >= 1 && !VerifDamage)
             {
-                me->GetMotionMaster()->MoveTaxiFlight(3151, 66776);
                 VerifDamage = true;
             } 
         }
@@ -4169,15 +4168,22 @@ public:
 
             if(me->GetHealthPct() <= 70 && VerifHP70)
             {
+                me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 196.083f);
+                SetEscortPaused(true);
                 Descente = true;
                 VerifHP70 = false;
             }
 
             if(me->GetHealthPct() <= 20 && VerifHP20)
             {
+                me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 196.083f);
+                SetEscortPaused(true);
                 Descente = true;
                 VerifHP20 = false;
             }
+
+            if(VerifDamage)
+                Start(false, true, 0, 0, true, true, true);
 
             if (Descente)
             {
@@ -4191,6 +4197,7 @@ public:
 
                 if(RemonteTimer <= uiDiff)
                 {
+                    SetEscortPaused(false);
                     RemonteTimer = 15000;
                     Descente = false;
                 }
