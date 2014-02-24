@@ -4496,6 +4496,7 @@ public:
         void Reset()
         {
             VerifPlayer = false;
+            me->SetReactState(REACT_PASSIVE);
         }
 
         void WaypointReached(uint32 waypointId)
@@ -4545,11 +4546,12 @@ public:
             {
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     if(summoner->ToPlayer())
-                        if(summoner->IsInDist2d(me, 200.00f))
-                        {
-                            SetEscortPaused(false);
-                            VerifPlayer = false;
-                        }
+                        if(summoner->ToPlayer()->GetQuestStatus(QUEST_WORTHY_OF_PASSING) == QUEST_STATUS_COMPLETE)
+                            if(summoner->IsInDist2d(me, 200.00f))
+                            {
+                                SetEscortPaused(false);
+                                VerifPlayer = false;
+                            }
             }
 
             Start(false, true);
