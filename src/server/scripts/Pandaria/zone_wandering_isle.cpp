@@ -4175,15 +4175,9 @@ public:
 
             switch (waypointId)
             {
-
-            }
-        }
-
-        void MovementInform(uint32 motionType, uint32 id)
-        {
-            if(motionType == POINT_MOTION_TYPE && id == 7)
-            {
-                me->CastSpell(me, 125992, true);
+                case 7:
+                    me->CastSpell(me, 125992, true);
+                    break;
             }
         }
 
