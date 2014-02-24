@@ -4147,8 +4147,9 @@ public:
 
         void DamageTaken(Unit* caster, uint32 &damage)
         {
-            if(damage >= 1)
+            if(damage >= 1 && !VerifDamage)
             {
+               SetNextWaypoint(1);
                VerifDamage = true;
             } 
         }
@@ -4159,6 +4160,24 @@ public:
 
             switch (waypointId)
             {
+                case 1:
+                    SetNextWaypoint(2);
+                    break;
+                case 2:
+                    SetNextWaypoint(3);
+                    break;
+                case 3:
+                    SetNextWaypoint(4);
+                    break;
+                case 4:
+                    SetNextWaypoint(5);
+                    break;
+                case 5:
+                    SetNextWaypoint(6);
+                    break;
+                case 6:
+                    SetNextWaypoint(1);
+                    break;
             }
         }
 
@@ -4169,7 +4188,6 @@ public:
             if(me->GetHealthPct() <= 70 && VerifHP70)
             {
                 SetNextWaypoint(7);
-                SetEscortPaused(true);
                 Descente = true;
                 VerifHP70 = false;
             }
@@ -4177,14 +4195,8 @@ public:
             if(me->GetHealthPct() <= 20 && VerifHP20)
             {
                 SetNextWaypoint(7);
-                SetEscortPaused(true);
                 Descente = true;
                 VerifHP20 = false;
-            }
-
-            if (VerifDamage)
-            {
-                Start(false, true, 0, 0, true, true, true);
             }
 
             if (Descente)
@@ -4199,7 +4211,6 @@ public:
 
                 if(RemonteTimer <= uiDiff)
                 {
-                    SetEscortPaused(false);
                     SetNextWaypoint(1);
                     RemonteTimer = 15000;
                     Descente = false;
