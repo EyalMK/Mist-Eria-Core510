@@ -4122,10 +4122,23 @@ public:
         npc_zhao_renAI(Creature* creature) : npc_escortAI(creature) {}
 
         bool VerifDamage;
+        bool VerifHP70;
+        bool VerifHP20;
+        bool Descente;
+
+        uint32 DescenteTimer;
+        uint32 RemonteTimer;
+        uint32 CastTimer;
 
         void Reset()
         {
             VerifDamage = false;
+            VerifHP70 = true;
+            VerifHP20 = true;
+            Descente = false;
+            DescenteTimer = 12000;
+            RemonteTimer = 15000;
+            CastTimer = 6000;
             me->InterruptNonMeleeSpells(false);
             me->SetReactState(REACT_PASSIVE);
             me->SetCanFly(true);
@@ -4134,10 +4147,10 @@ public:
 
         void DamageTaken(Unit* caster, uint32 &damage)
         {
-            if(damage >= 1)
+            if(damage >= 1 && !VerifDamage)
             {
-               VerifDamage = true;
-            }
+                VerifDamage = true;
+            } 
         }
 
         void WaypointReached(uint32 waypointId)
@@ -4146,7 +4159,6 @@ public:
 
             switch (waypointId)
             {
-
             }
         }
 
@@ -4154,9 +4166,60 @@ public:
         {
             npc_escortAI::UpdateAI(uiDiff);
 
-            if (VerifDamage)
+            if(me->GetHealthPct() <= 70 && VerifHP70)
             {
+                me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 196.083f);
+                SetEscortPaused(true);
+                Descente = true;
+                VerifHP70 = false;
+            }
+
+            if(me->GetHealthPct() <= 20 && VerifHP20)
+            {
+                me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 196.083f);
+                SetEscortPaused(true);
+                Descente = true;
+                VerifHP20 = false;
+            }
+
+            if(VerifDamage)
                 Start(false, true, 0, 0, true, true, true);
+
+            if (Descente)
+            {
+                if(DescenteTimer <= uiDiff)
+                {
+                    me->CastSpell(me, 125990, false);
+                    DescenteTimer = 15000;
+                }
+                else
+                    DescenteTimer -= uiDiff;
+
+                if(RemonteTimer <= uiDiff)
+                {
+                    float fRetX, fRetY, fRetZ;
+                    me->GetRespawnPosition(fRetX, fRetY, fRetZ);
+                    me->GetMotionMaster()->MovePoint(0xFFFFFE, fRetX, fRetY, fRetZ);
+                    SetEscortPaused(false);
+                    RemonteTimer = 15000;
+                    Descente = false;
+                }
+                else
+                    RemonteTimer -= uiDiff;
+            }
+
+            if(!Descente)
+            {
+                if(CastTimer <= uiDiff)
+                {
+                    if(Unit* unit = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
+                        if(unit->ToPlayer())
+                            me->CastSpell(unit, 126006, false);
+
+                    CastTimer = 6000;
+                }
+                else
+                    CastTimer -= uiDiff;
             }
         }
     };
@@ -4186,7 +4249,7 @@ public:
         void Reset()
         {
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-            VerifAuraTimer = 1000;
+            VerifAuraTimer = 100;
         }
 
         void UpdateAI(const uint32 uiDiff)
@@ -4198,7 +4261,7 @@ public:
                 else
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
 
-                VerifAuraTimer = 1000;
+                VerifAuraTimer = 100;
             }
             else
                 VerifAuraTimer -= uiDiff;
@@ -4208,6 +4271,164 @@ public:
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_firework_launcherAI(creature);
+    }
+};
+
+class npc_ji_firepaw_zhao : public CreatureScript
+{
+public:
+    npc_ji_firepaw_zhao(): CreatureScript("npc_ji_firepaw_zhao") { }
+
+    struct npc_ji_firepaw_zhaoAI : public ScriptedAI
+    {
+        npc_ji_firepaw_zhaoAI(Creature* creature) : ScriptedAI(creature){}
+
+        bool VerifLauncher;
+        bool LauncherRepair;
+
+        uint32 VerifLauncherTimer;
+        uint32 LauncherRepairTimer;
+
+        void Reset()
+        {
+            VerifLauncher = true;
+            LauncherRepair = false;
+            VerifLauncherTimer = 1000;
+            LauncherRepairTimer = 1000;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(VerifLauncher)
+            {
+                if(VerifLauncherTimer <= uiDiff)
+                {
+                    if(Creature* launcher = me->FindNearestCreature(64507, 1000.00f, true))
+                        if(launcher->HasAura(SPELL_LAUNCHER_INACTIVE))
+                        {
+                            Position pos;
+                            launcher->GetPosition(&pos);
+                            me->GetMotionMaster()->MovePoint(0, pos);
+                            LauncherRepair = true;
+                            VerifLauncher = false;
+                        }
+
+                    VerifLauncherTimer = 1000;
+                }
+                else
+                    VerifLauncherTimer -= uiDiff;
+            }
+
+            if(LauncherRepair)
+            {
+                if(LauncherRepairTimer <= uiDiff)
+                {
+                    if(Creature* launcher = me->FindNearestCreature(64507, 2.00f, true))
+                        if(launcher->HasAura(SPELL_LAUNCHER_INACTIVE))
+                        {
+                            launcher->RemoveAurasDueToSpell(SPELL_LAUNCHER_INACTIVE);
+                            VerifLauncher = true;
+                            LauncherRepair = false;
+                        }
+
+                    LauncherRepairTimer = 1000;
+                }
+                else
+                    LauncherRepairTimer -= uiDiff;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ji_firepaw_zhaoAI(creature);
+    }
+};
+
+class npc_aysa_wind_exit_escort : public CreatureScript
+{
+public:
+    npc_aysa_wind_exit_escort(): CreatureScript("npc_aysa_wind_exit_escort") { }
+
+    struct npc_aysa_wind_exit_escortAI : public npc_escortAI
+    {
+        npc_aysa_wind_exit_escortAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    break;
+                case 11:
+                    me->GetMotionMaster()->MoveJump(674.88f, 4202.82f, 197.00f, 20, 20);
+                    break;
+                case 12:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_aysa_wind_exit_escortAI(creature);
+    }
+};
+
+class npc_dafeng_escort : public CreatureScript
+{
+public:
+    npc_dafeng_escort(): CreatureScript("npc_dafeng_escort") { }
+
+    struct npc_dafeng_escortAI : public npc_escortAI
+    {
+        npc_dafeng_escortAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    break;
+                case 12:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_dafeng_escortAI(creature);
     }
 };
 
@@ -4277,4 +4498,7 @@ void AddSC_wandering_isle()
     new npc_aysa_wind_escort();
     new npc_zhao_ren();
     new npc_firework_launcher();
+    new npc_ji_firepaw_zhao();
+    new npc_aysa_wind_exit_escort();
+    new npc_dafeng_escort();
 }
