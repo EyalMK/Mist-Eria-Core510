@@ -963,10 +963,16 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
 
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == ALLIANCE)
+							{
 								SendMessageToAll(LANG_BG_SM_ALLIANCE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_ALLIANCE);
+								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_ALLIANCE);
+							}
 
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == HORDE)
+							{
 								SendMessageToAll(LANG_BG_SM_HORDE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_HORDE);
+								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_HORDE);
+							}
 
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_LAVA_DEPOT, BG_SM_MINE_CART_1);
 							depot->ResetDoorOrButton();
@@ -991,10 +997,16 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
 							
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == ALLIANCE)
+							{
 								SendMessageToAll(LANG_BG_SM_ALLIANCE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_ALLIANCE);
+								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_ALLIANCE);
+							}
 
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == HORDE)
+							{
 								SendMessageToAll(LANG_BG_SM_HORDE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_HORDE);
+								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_HORDE);
+							}
 
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_DIAMOND_DEPOT, BG_SM_MINE_CART_1);
 							depot->ResetDoorOrButton();
@@ -1022,10 +1034,16 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_2), POINTS_PER_MINE_CART);
 							
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == ALLIANCE)
+							{
 								SendMessageToAll(LANG_BG_SM_ALLIANCE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_ALLIANCE);
+								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_ALLIANCE);
+							}
 
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == HORDE)
+							{
 								SendMessageToAll(LANG_BG_SM_HORDE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_HORDE);
+								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_HORDE);
+							}
 
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_WATERFALL_DEPOT, BG_SM_MINE_CART_2);
 							depot->ResetDoorOrButton();
@@ -1053,10 +1071,16 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
 							
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == ALLIANCE)
+							{
 								SendMessageToAll(LANG_BG_SM_ALLIANCE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_ALLIANCE);
+								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_ALLIANCE);
+							}
 
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == HORDE)
+							{
 								SendMessageToAll(LANG_BG_SM_HORDE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_HORDE);
+								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_HORDE);
+							}
 
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_DIAMOND_DEPOT, BG_SM_MINE_CART_3);
 							depot->ResetDoorOrButton();

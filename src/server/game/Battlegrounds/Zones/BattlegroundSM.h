@@ -22,12 +22,6 @@
 #include "Language.h"
 #include "Battleground.h"
 
-enum BG_SM_Sound
-{
-    BG_SM_SOUND_MINE_CART_SPAWNED		= 8174,
-	BG_SM_SOUND_NEAR_VICTORY			= 8456
-};
-
 enum BG_SM_WorldStates
 {
 	SM_MINE_CARTS_DISPLAY			= 6436,
@@ -62,6 +56,7 @@ enum BG_SM_Sounds
     BG_SM_SOUND_MINE_CART_CAPTURED_HORDE		= 8213,
     BG_SM_SOUND_MINE_CART_CAPTURED_ALLIANCE		= 8173,
 	BG_SM_SOUND_NEAR_VICTORY					= 8456,
+	BG_SM_SOUND_MINE_CART_SPAWNED				= 8174,
 };
 
 enum BG_SM_Spells
