@@ -4127,6 +4127,9 @@ public:
         {
             VerifDamage = false;
             me->InterruptNonMeleeSpells(false);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetCanFly(true);
+            me->AttackStop();
         }
 
         void DamageTaken(Unit* caster, uint32 &damage)
