@@ -4197,6 +4197,7 @@ public:
 
                 if(RemonteTimer <= uiDiff)
                 {
+                    me->GetMotionMaster()->Clear();
                     SetEscortPaused(false);
                     RemonteTimer = 15000;
                     Descente = false;
@@ -4342,6 +4343,93 @@ public:
     }
 };
 
+class npc_aysa_wind_exit_escort : public CreatureScript
+{
+public:
+    npc_aysa_wind_exit_escort(): CreatureScript("npc_aysa_wind_exit_escort") { }
+
+    struct npc_aysa_wind_exit_escortAI : public npc_escortAI
+    {
+        npc_aysa_wind_exit_escortAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    break;
+                case 11:
+                    me->GetMotionMaster()->MoveJump(674.88f, 4202.82f, 197.00f, 20, 20);
+                    break;
+                case 12:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_aysa_wind_exit_escortAI(creature);
+    }
+};
+
+class npc_dafeng_escort : public CreatureScript
+{
+public:
+    npc_dafeng_escort(): CreatureScript("npc_dafeng_escort") { }
+
+    struct npc_dafeng_escortAI : public npc_escortAI
+    {
+        npc_dafeng_escortAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    break;
+                case 12:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_dafeng_escortAI(creature);
+    }
+};
+
 void AddSC_wandering_isle()
 {
     new stalker_item_equiped();
@@ -4409,4 +4497,6 @@ void AddSC_wandering_isle()
     new npc_zhao_ren();
     new npc_firework_launcher();
     new npc_ji_firepaw_zhao();
+    new npc_aysa_wind_exit_escort();
+    new npc_dafeng_escort();
 }
