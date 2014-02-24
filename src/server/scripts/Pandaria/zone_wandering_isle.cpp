@@ -4175,9 +4175,6 @@ public:
 
             switch (waypointId)
             {
-                case 7:
-                    me->CastSpell(me, 125992, true);
-                    break;
             }
         }
 
@@ -4202,6 +4199,7 @@ public:
 
                 if(RemonteTimer <= uiDiff)
                 {
+                    SetEscortPaused(false);
                     Start(false, true, 0, 0, true, true, true);
                     RemonteTimer = 15000;
                     Descente = false;
