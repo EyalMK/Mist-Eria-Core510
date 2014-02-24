@@ -4491,8 +4491,11 @@ public:
     {
         npc_master_shang_xi_escortAI(Creature* creature) : npc_escortAI(creature) {}
 
+        bool VerifPlayer;
+
         void Reset()
         {
+            VerifPlayer = false;
         }
 
         void WaypointReached(uint32 waypointId)
@@ -4519,10 +4522,7 @@ public:
                     break;
                 case 31:
                     SetEscortPaused(true);
-                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                        if(summoner->ToPlayer())
-                            if(summoner->ToPlayer()->GetQuestStatus(QUEST_WORTHY_OF_PASSING) == QUEST_STATUS_COMPLETE)
-                                SetEscortPaused(false);
+                    VerifPlayer = true;
                     break;
                 case 32:
                     Talk(SAY_MASTER_ESCORT_5);
@@ -4540,6 +4540,18 @@ public:
         void UpdateAI(const uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
+
+            if (VerifPlayer)
+            {
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if(summoner->ToPlayer())
+                        if(summoner->ToPlayer()->GetQuestStatus(QUEST_WORTHY_OF_PASSING) == QUEST_STATUS_COMPLETE)
+                            if(summoner->IsInDist2d(me, 200.00f))
+                            {
+                                SetEscortPaused(false);
+                                VerifPlayer = false;
+                            }
+            }
 
             Start(false, true);
         }
