@@ -1150,9 +1150,9 @@ void BattlegroundSM::UpdateTeamScore(uint32 Team)
     if (!m_IsInformedNearVictory && score >= BG_SM_WARNING_NEAR_VICTORY_SCORE)
     {
         if (Team == ALLIANCE)
-            SendMessageToAll(BG_SM_SOUND_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+            SendMessageToAll(LANG_BG_SM_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
         else
-            SendMessageToAll(BG_SM_SOUND_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+            SendMessageToAll(LANG_BG_SM_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
         PlaySoundToAll(BG_SM_SOUND_NEAR_VICTORY);
         m_IsInformedNearVictory = true;
     }
@@ -1184,6 +1184,19 @@ void BattlegroundSM::EndBattleground(uint32 winner)
     RewardHonorToTeam(GetBonusHonorFromKill(1), HORDE);
 
     Battleground::EndBattleground(winner);
+
+	Creature* trigger = NULL;
+	if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
+	{
+		if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f, true))
+			cart->DespawnOrUnsummon();
+
+		if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_2, 99999.0f, true))
+			cart->DespawnOrUnsummon();
+
+		if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_3, 99999.0f, true))
+			cart->DespawnOrUnsummon();
+	}
 }
 
 void BattlegroundSM::UpdatePointsCount(uint32 Team)
