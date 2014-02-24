@@ -4112,6 +4112,13 @@ public:
     }
 };
 
+enum eZhaoRen
+{
+    SAY_AYSA_ZHAO_1     = 0,
+    SAY_AYSA_ZHAO_2     = 1,
+    SAY_AYSA_ZHAO_3     = 2
+};
+
 class npc_zhao_ren : public CreatureScript
 {
 public:
@@ -4122,6 +4129,7 @@ public:
         npc_zhao_renAI(Creature* creature) : npc_escortAI(creature) {}
 
         bool VerifDamage;
+        bool VerifHP80;
         bool VerifHP70;
         bool VerifHP20;
         bool Descente;
@@ -4134,6 +4142,7 @@ public:
         void Reset()
         {
             VerifDamage = false;
+            VerifHP80 = true;
             VerifHP70 = true;
             VerifHP20 = true;
             Descente = false;
@@ -4160,20 +4169,22 @@ public:
             Player* player = GetPlayerForEscort();
         }
 
-        void MovementInform(uint32 motionType, uint32 id)
-        {
-            if(motionType == POINT_MOTION_TYPE && id == 7)
-            {
-                me->CastSpell(me, 125992, true);
-            }
-        }
-
         void UpdateAI(const uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
 
+            if(me->GetHealthPct() <= 80 && VerifHP80)
+            {
+                if(Creature* aysa = me->FindNearestCreature(64506, 200.00f, true))
+                    aysa->AI()->Talk(SAY_AYSA_ZHAO_1);
+
+                VerifHP80 = false;
+            }
             if(me->GetHealthPct() <= 70 && VerifHP70)
             {
+                if(Creature* aysa = me->FindNearestCreature(64506, 200.00f, true))
+                    aysa->AI()->Talk(SAY_AYSA_ZHAO_2);
+
                 me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 196.083f);
                 SetEscortPaused(true);
                 Descente = true;
@@ -4182,6 +4193,9 @@ public:
 
             if(me->GetHealthPct() <= 20 && VerifHP20)
             {
+                if(Creature* aysa = me->FindNearestCreature(64506, 200.00f, true))
+                    aysa->AI()->Talk(SAY_AYSA_ZHAO_3);
+
                 me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 196.083f);
                 SetEscortPaused(true);
                 Attaque = true;
@@ -4296,10 +4310,10 @@ public:
     {
         npc_ji_firepaw_zhaoAI(Creature* creature) : ScriptedAI(creature)
         {
-            Launcher = NULL;
+            launcher = NULL;
         }
 
-        Creature* Launcher;
+        Creature* launcher;
 
         bool VerifLauncher;
         bool LauncherRepair;
@@ -4321,19 +4335,17 @@ public:
             {
                 if(VerifLauncherTimer <= uiDiff)
                 {
-                    std::list<Creature*> launcher;
-                    std::list<Creature*>::const_iterator iter;
+                    std::list<Creature*> launchers;
+                    GetCreatureListWithEntryInGrid(launchers, me, 64507, 500.0f);
 
-                    GetCreatureListWithEntryInGrid(launcher, me, 64507, 500.0f);
+                    std::list<Creature*>::const_iterator iter = launchers.begin();
+                    std::advance(iter, launchers.size()-1);
+                    launcher = *iter ;
 
-                    iter = launcher.begin();
-                    std::advance(iter, 6);
-                    Launcher = *iter ;
-
-                    if(Launcher->HasAura(SPELL_LAUNCHER_INACTIVE))
+                    if(launcher->HasAura(SPELL_LAUNCHER_INACTIVE))
                     {
                         Position pos;
-                        Launcher->GetPosition(&pos);
+                        launcher->GetPosition(&pos);
                         me->GetMotionMaster()->MovePoint(0, pos);
                         LauncherRepair = true;
                         VerifLauncher = false;
