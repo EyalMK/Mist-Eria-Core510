@@ -4171,7 +4171,6 @@ public:
                 me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 197.00f);
                 SetEscortPaused(true);
                 Descente = true;
-                VerifDamage = false;
                 VerifHP70 = false;
             }
 
@@ -4180,7 +4179,6 @@ public:
                 me->GetMotionMaster()->MovePoint(7, 723.16f, 4163.79f, 197.00f);
                 SetEscortPaused(true);
                 Descente = true;
-                VerifDamage = false;
                 VerifHP20 = false;
             }
 
@@ -4202,7 +4200,7 @@ public:
                 if(RemonteTimer <= uiDiff)
                 {
                     SetEscortPaused(false);
-                    VerifDamage = true;
+                    SetNextWaypoint(1);
                     RemonteTimer = 15000;
                     Descente = false;
                 }
