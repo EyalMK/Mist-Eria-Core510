@@ -4470,6 +4470,99 @@ public:
     }
 };
 
+enum eMasterShangXiEscort
+{
+    QUEST_WORTHY_OF_PASSING     = 29787,
+
+    SAY_MASTER_ESCORT_1         = 0,
+    SAY_MASTER_ESCORT_2         = 1,
+    SAY_MASTER_ESCORT_3         = 2,
+    SAY_MASTER_ESCORT_4         = 3,
+    SAY_MASTER_ESCORT_5         = 4,
+    SAY_MASTER_ESCORT_6         = 5
+};
+
+class npc_master_shang_xi_escort : public CreatureScript
+{
+public:
+    npc_master_shang_xi_escort(): CreatureScript("npc_master_shang_xi_escort") { }
+
+    struct npc_master_shang_xi_escortAI : public npc_escortAI
+    {
+        npc_master_shang_xi_escortAI(Creature* creature) : npc_escortAI(creature) {}
+
+        bool VerifPlayer;
+
+        void Reset()
+        {
+            VerifPlayer = false;
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun(true);
+                    break;
+                case 2:
+                    Talk(SAY_MASTER_ESCORT_1);
+                    break;
+                case 21:
+                    SetRun(false);
+                    Talk(SAY_MASTER_ESCORT_2);
+                    break;
+                case 24:
+                    Talk(SAY_MASTER_ESCORT_3);
+                    break;
+                case 28:
+                    Talk(SAY_MASTER_ESCORT_4);
+                    break;
+                case 31:
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
+                    break;
+                case 32:
+                    Talk(SAY_MASTER_ESCORT_5);
+                    SetRun(true);
+                    break;
+                case 43:
+                    Talk(SAY_MASTER_ESCORT_6);
+                    break;
+                case 44:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            if (VerifPlayer)
+            {
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if(summoner->ToPlayer())
+                        if(summoner->ToPlayer()->GetQuestStatus(QUEST_WORTHY_OF_PASSING) == QUEST_STATUS_COMPLETE)
+                            if(summoner->IsInDist2d(me, 200.00f))
+                            {
+                                SetEscortPaused(false);
+                                VerifPlayer = false;
+                            }
+            }
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_master_shang_xi_escortAI(creature);
+    }
+};
+
 void AddSC_wandering_isle()
 {
     new stalker_item_equiped();
@@ -4539,4 +4632,5 @@ void AddSC_wandering_isle()
     new npc_ji_firepaw_zhao();
     new npc_aysa_wind_exit_escort();
     new npc_dafeng_escort();
+    new npc_master_shang_xi_escort();
 }
