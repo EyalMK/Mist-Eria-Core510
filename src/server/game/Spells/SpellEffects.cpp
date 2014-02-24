@@ -273,6 +273,9 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
 	&Spell::EffectNULL,                                     //199 SPELL_EFFECT_199
 	&Spell::EffectNULL,                                     //200 SPELL_EFFECT_200
 	&Spell::EffectNULL,                                     //201 SPELL_EFFECT_201
+	&Spell::EffectNULL,                                     //201 SPELL_EFFECT_202
+	&Spell::EffectNULL,                                     //201 SPELL_EFFECT_203
+	&Spell::EffectNULL,                                     //201 SPELL_EFFECT_204
 };
 
 void Spell::EffectNULL(SpellEffIndex /*effIndex*/)
