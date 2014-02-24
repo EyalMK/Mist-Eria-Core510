@@ -4496,6 +4496,7 @@ public:
         void Reset()
         {
             VerifPlayer = false;
+            me->SetReactState(REACT_PASSIVE);
         }
 
         void WaypointReached(uint32 waypointId)
