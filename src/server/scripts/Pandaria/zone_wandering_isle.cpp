@@ -4157,7 +4157,6 @@ public:
                 me->GetMotionMaster()->MovePoint(0, 723.16f, 4163.79f, 197.00f);
                 SetEscortPaused(true);
                 Descente = true;
-                me->CastSpell(me, 125992, true);
                 VerifHP70 = false;
             }
 
@@ -4166,7 +4165,6 @@ public:
                 me->GetMotionMaster()->MovePoint(0, 723.16f, 4163.79f, 197.00f);
                 SetEscortPaused(true);
                 Descente = true;
-                me->CastSpell(me, 125992, true);
                 VerifHP20 = false;
             }
         }
