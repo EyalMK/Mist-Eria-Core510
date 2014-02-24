@@ -4211,6 +4211,77 @@ public:
     }
 };
 
+class npc_ji_firepaw_zhao : public CreatureScript
+{
+public:
+    npc_ji_firepaw_zhao(): CreatureScript("npc_ji_firepaw_zhao") { }
+
+    struct npc_ji_firepaw_zhaoAI : public ScriptedAI
+    {
+        npc_ji_firepaw_zhaoAI(Creature* creature) : ScriptedAI(creature){}
+
+        bool VerifLauncher;
+        bool LauncherRepair;
+
+        uint32 VerifLauncherTimer;
+        uint32 LauncherRepairTimer;
+
+        void Reset()
+        {
+            VerifLauncher = true;
+            LauncherRepair = false;
+            VerifLauncherTimer = 1000;
+            LauncherRepairTimer = 1000;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(VerifLauncher)
+            {
+                if(VerifLauncherTimer <= uiDiff)
+                {
+                    if(Creature* launcher = me->FindNearestCreature(64507, 100.00f, true))
+                        if(launcher->HasAura(SPELL_LAUNCHER_INACTIVE))
+                        {
+                            Position pos;
+                            launcher->GetPosition(&pos);
+                            me->GetMotionMaster()->MovePoint(0, pos);
+                            LauncherRepair = true;
+                            VerifLauncher = false;
+                        }
+
+                    VerifLauncherTimer = 1000;
+                }
+                else
+                    VerifLauncherTimer -= uiDiff;
+            }
+
+            if(LauncherRepair)
+            {
+                if(LauncherRepairTimer <= uiDiff)
+                {
+                    if(Creature* launcher = me->FindNearestCreature(64507, 2.00f, true))
+                        if(launcher->HasAura(SPELL_LAUNCHER_INACTIVE))
+                        {
+                            launcher->RemoveAurasDueToSpell(SPELL_LAUNCHER_INACTIVE);
+                            VerifLauncher = true;
+                            LauncherRepair = false;
+                        }
+
+                    LauncherRepairTimer = 1000;
+                }
+                else
+                    LauncherRepairTimer -= uiDiff;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ji_firepaw_zhaoAI(creature);
+    }
+};
+
 void AddSC_wandering_isle()
 {
     new stalker_item_equiped();
@@ -4277,4 +4348,5 @@ void AddSC_wandering_isle()
     new npc_aysa_wind_escort();
     new npc_zhao_ren();
     new npc_firework_launcher();
+    new npc_ji_firepaw_zhao();
 }
