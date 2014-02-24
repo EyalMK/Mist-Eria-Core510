@@ -53,6 +53,9 @@ void BattlegroundSM::Reset()
 	m_LastMineCart = 0;
 	m_MineCartAddPointsTimer = 2000;
 	m_FirstMineCartSpawned = false;
+	m_FirstPathDone[0] = false;
+	m_FirstPathDone[1] = false;
+	m_WaterfallPathDone = false;
 
     for (uint8 i = 0; i < SM_MINE_CART_MAX; ++i)
 	{
@@ -82,6 +85,8 @@ void BattlegroundSM::PostUpdateImpl(uint32 diff)
 
 	if (!m_FirstMineCartSpawned)
 		BattlegroundSM::FirstMineCartSummon(diff);
+
+	BattlegroundSM::MineCartsMoves(diff);
 }
 
 void BattlegroundSM::StartingEventCloseDoors()
@@ -1119,6 +1124,34 @@ void BattlegroundSM::ResetDepotsAndMineCarts(uint8 depot, uint8 mineCart)
 	m_MineCartSpawned[mineCart - 1] = false;
 }
 
+void BattlegroundSM::MineCartsMoves(uint32 diff)
+{
+	Creature* trigger = NULL;
+	if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
+	{
+		if (!m_FirstPathDone[0])
+			if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f, true))
+			{
+				cart->GetMotionMaster()->MovePath(NPC_MINE_CART_1, false);
+				m_FirstPathDone[0] = true;
+			}
+
+		if (!m_WaterfallPathDone)
+			if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_2, 99999.0f, true))
+			{
+				cart->GetMotionMaster()->MovePath(NPC_MINE_CART_2, false);
+				m_WaterfallPathDone = true;
+			}
+
+		if (!m_FirstPathDone[1])
+			if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_3, 99999.0f, true))
+			{
+				cart->GetMotionMaster()->MovePath(NPC_MINE_CART_3, false);
+				m_FirstPathDone[1] = true;
+			}
+	}
+}
+
 void BattlegroundSM::AddPoints(uint32 Team, uint32 Points)
 {
     TeamId team_index = GetTeamIndexByTeamId(Team);
@@ -1239,12 +1272,6 @@ void BattlegroundSM::HandleKillPlayer(Player* player, Player* killer)
 
     Battleground::HandleKillPlayer(player, killer);
     EventPlayerDroppedFlag(player);
-}
-
-void BattlegroundSM::EventPlayerClickedOnNeedle(Player* Source, GameObject* target_obj)
-{
-    if (GetStatus() != STATUS_IN_PROGRESS || !Source->IsWithinDistInMap(target_obj, 10))
-        return;
 }
 
 void BattlegroundSM::UpdatePlayerScore(Player* Source, uint32 type, uint32 value, bool doAddHonor)

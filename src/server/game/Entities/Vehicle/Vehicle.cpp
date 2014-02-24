@@ -69,8 +69,8 @@ void Vehicle::Install()
             case POWER_WRATH:
 			case POWER_JADE:
 			case POWER_COBALT:
-			case POWER_AMETHYST:
 			case POWER_JASPER:
+			case POWER_AMETHYST:
                 _me->setPowerType(POWER_ENERGY);
                 _me->SetMaxPower(POWER_ENERGY, 100);
                 break;
