@@ -4179,6 +4179,14 @@ public:
             }
         }
 
+        void MovementInform(uint32 motionType, uint32 id)
+        {
+            if(motionType == POINT_MOTION_TYPE && id == 0)
+            {
+                me->CastSpell(me, 125992, true);
+            }
+        }
+
         void UpdateAI(const uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
@@ -4200,7 +4208,7 @@ public:
 
                 if(RemonteTimer <= uiDiff)
                 {
-                    SetEscortPaused(false);
+                    Start(false, true, 0, 0, true, true, true);
                     RemonteTimer = 15000;
                     Descente = false;
                 }
