@@ -4657,8 +4657,17 @@ public:
     {
         npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature) {}
 
-        void Reset()
+        void AttackStart(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) {}
+        void EnterEvadeMode() {}
+
+        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
         {
+            if (who->GetTypeId() == TYPEID_PLAYER)
+            {
+                if (apply)
+                    Start(false, true, who->GetGUID());
+            }
         }
 
         void WaypointReached(uint32 waypointId)
@@ -4677,11 +4686,17 @@ public:
             }
         }
 
+        void JustDied(Unit* /*killer*/)
+        {
+        }
+
+        void OnCharmed(bool /*apply*/)
+        {
+        }
+
         void UpdateAI(const uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
-
-            Start(false, true);
         }
     };
 
@@ -4762,4 +4777,5 @@ void AddSC_wandering_isle()
     new npc_dafeng_escort();
     new npc_master_shang_xi_escort();
     new npc_master_shang_xi_dead();
+    new npc_shang_xi_air_balloon();
 }
