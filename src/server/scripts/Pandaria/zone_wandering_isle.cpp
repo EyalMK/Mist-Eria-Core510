@@ -4599,7 +4599,8 @@ public:
                     break;
                 case 2:
                     Talk(SAY_MASTER_DEAD_2);
-                    me->SetFacingTo(0.63f);
+                    if(GameObject* go = me->FindNearestGameObject(209981, 10.00f))
+                        me->SetFacingToObject(go);
                     break;
                 case 3:
                     if(Unit* summoner = me->ToTempSummon()->GetSummoner())
@@ -4611,7 +4612,8 @@ public:
                     break;
                 case 7:
                     Talk(SAY_MASTER_DEAD_5);
-                    me->SetFacingTo(4.31f);
+                    if(GameObject* go = me->FindNearestGameObject(209981, 10.00f))
+                        me->SetFacingToObject(go);
                     me->RemoveAurasDueToSpell(126160);
                     me->SummonCreature(57874, 873.21f, 4461.69f, 241.50f, 2.95f, TEMPSUMMON_TIMED_DESPAWN, 60000);
                     break;
