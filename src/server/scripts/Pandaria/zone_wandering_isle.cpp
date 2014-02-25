@@ -4564,6 +4564,84 @@ public:
     }
 };
 
+enum eMasterShangXiDead
+{
+    SAY_MASTER_DEAD_1           = 0,
+    SAY_MASTER_DEAD_2           = 1,
+    SAY_MASTER_DEAD_3           = 2,
+    SAY_MASTER_DEAD_4           = 3,
+    SAY_MASTER_DEAD_5           = 4,
+    SAY_MASTER_DEAD_6           = 5
+};
+
+class npc_master_shang_xi_dead : public CreatureScript
+{
+public:
+    npc_master_shang_xi_dead(): CreatureScript("npc_master_shang_xi_dead") { }
+
+    struct npc_master_shang_xi_deadAI : public npc_escortAI
+    {
+        npc_master_shang_xi_deadAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+            me->CastSpell(me, 126160, true);
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                Unit* summoner = me->ToTempSummon()->GetSummoner();
+
+                case 1:
+                    Talk(SAY_MASTER_DEAD_1);
+                    break;
+                case 2:
+                    Talk(SAY_MASTER_DEAD_2);
+                    me->SetFacingTo(0.63f);
+                    break;
+                case 3:
+                    Talk(SAY_MASTER_DEAD_3, summoner);
+                    break;
+                case 6:
+                    Talk(SAY_MASTER_DEAD_4);
+                    break;
+                case 7:
+                    Talk(SAY_MASTER_DEAD_5);
+                    me->SetFacingTo(4.31f);
+                    me->RemoveAurasDueToSpell(126160);
+                    me->SummonCreature(57874, 873.21f, 4461.69f, 241.50f, 2.95f, TEMPSUMMON_TIMED_DESPAWN, 60000);
+                    break;
+                case 8:
+                    Talk(SAY_MASTER_DEAD_6);
+                    break;
+                case 9:
+                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    me->CastSpell(me, 128851, true);
+                    break;
+                case 10:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, false);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_master_shang_xi_deadAI(creature);
+    }
+};
+
 void AddSC_wandering_isle()
 {
     new stalker_item_equiped();
@@ -4634,4 +4712,5 @@ void AddSC_wandering_isle()
     new npc_aysa_wind_exit_escort();
     new npc_dafeng_escort();
     new npc_master_shang_xi_escort();
+    new npc_master_shang_xi_dead();
 }
