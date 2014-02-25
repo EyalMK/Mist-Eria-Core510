@@ -4594,8 +4594,6 @@ public:
 
             switch (waypointId)
             {
-                Unit* summoner = me->ToTempSummon()->GetSummoner();
-
                 case 1:
                     Talk(SAY_MASTER_DEAD_1);
                     break;
@@ -4604,7 +4602,9 @@ public:
                     me->SetFacingTo(0.63f);
                     break;
                 case 3:
-                    Talk(SAY_MASTER_DEAD_3, summoner);
+                    if(Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if(summoner->ToPlayer())
+                            Talk(SAY_MASTER_DEAD_3, summoner->ToPlayer()->GetGUID());
                     break;
                 case 6:
                     Talk(SAY_MASTER_DEAD_4);
@@ -4623,6 +4623,7 @@ public:
                     me->CastSpell(me, 128851, true);
                     break;
                 case 10:
+                    me->CastSpell(me, 109336, true);
                     me->DespawnOrUnsummon();
                     break;
             }
