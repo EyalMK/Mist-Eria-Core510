@@ -4693,16 +4693,10 @@ public:
 
     struct npc_shang_xi_air_balloonAI : public npc_escortAI
     {
-        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature), vehicle(creature->GetVehicleKit()){}
-
-        Vehicle* vehicle;
+        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature){}
 
         void Reset()
         {
-            if (vehicle)
-            {
-                vehicle->InstallAccessory(56660, 2, true, TEMPSUMMON_DEAD_DESPAWN, 30000);
-            }
         }
 
         void AttackStart(Unit* /*who*/) {}

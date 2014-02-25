@@ -154,13 +154,13 @@ void BattlegroundSM::CheckTrackSwitch(uint32 diff)
 	if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
 		if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_NORTH]))
 		{
-			if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED) && !m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
+			if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED) && m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
 			{
 				SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
 				m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = true;
 			}
 
-			if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED) && m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
+			if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED) && !m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
 			{
 				SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
 				m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = false;
@@ -263,6 +263,15 @@ void BattlegroundSM::SummonMineCart(uint32 diff)
 			m_MineCartSpawned[BG_SM_MINE_CART_2 - 1] &&
 			m_MineCartSpawned[BG_SM_MINE_CART_3 - 1])
 			mineCart = 0;
+
+		else if (!m_MineCartSpawned[BG_SM_MINE_CART_1 - 1] &&
+			!m_MineCartSpawned[BG_SM_MINE_CART_2 - 1] &&
+			!m_MineCartSpawned[BG_SM_MINE_CART_3 - 1])
+		{
+			mineCart = RAND(BG_SM_MINE_CART_1, BG_SM_MINE_CART_2, BG_SM_MINE_CART_3);
+			SendMessageToAll(LANG_BG_SM_MINE_CART_SPAWNED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+			PlaySoundToAll(BG_SM_SOUND_MINE_CART_SPAWNED);
+		}
 
 		else if (m_MineCartSpawned[BG_SM_MINE_CART_1 - 1] &&
 			!m_MineCartSpawned[BG_SM_MINE_CART_2 - 1] &&
@@ -1105,6 +1114,7 @@ void BattlegroundSM::ResetDepotsAndMineCarts(uint8 depot, uint8 mineCart)
 	m_MineCartsProgressBar[mineCart - 1] = BG_SM_PROGRESS_BAR_NEUTRAL;
 	m_MineCartNearDepot[mineCart - 1] = false;
 	m_MineCartReachedDepot[mineCart - 1] = false;
+	m_MineCartSpawned[mineCart - 1] = false;
 }
 
 void BattlegroundSM::MineCartsMoves(uint32 diff)
