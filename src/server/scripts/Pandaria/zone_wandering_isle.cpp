@@ -25,6 +25,7 @@
 #include "SpellScript.h"
 #include "GridNotifiers.h"
 #include "ScriptedEscortAI.h"
+#include "Vehicle.h"
 
 /***** Script Non Tweex ******/
 
@@ -4692,7 +4693,17 @@ public:
 
     struct npc_shang_xi_air_balloonAI : public npc_escortAI
     {
-        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature) {}
+        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature), vehicle(creature->GetVehicleKit()){}
+
+        Vehicle* vehicle;
+
+        void Reset()
+        {
+            if (vehicle)
+            {
+                vehicle->InstallAccessory(56660, 2, true, TEMPSUMMON_DEAD_DESPAWN, 30000);
+            }
+        }
 
         void AttackStart(Unit* /*who*/) {}
         void EnterCombat(Unit* /*who*/) {}
@@ -4711,81 +4722,109 @@ public:
         {
             Player* player = GetPlayerForEscort();
 
+            Creature* aysa = me->FindNearestCreature(56661, 200.00f, true);
+            Creature* jipatte = me->FindNearestCreature(56660, 200.00f, true);
+            Creature* shen = me->FindNearestCreature(56676, 200.00f, true);
+
             switch (waypointId)
             {
                 case 1:
                     SetRun();
                     me->SetSpeed(MOVE_FLIGHT, 1.0f);
-                    Talk(SAY_JI_BALLON_1);
+                    if(jipatte)
+                        jipatte->AI()->Talk(SAY_JI_BALLON_1);
                     break;
                 case 2:
-                    Talk(SAY_AYSA_BALLON_1);
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_1);
                     break;
                 case 3:
-                    Talk(SAY_JI_BALLON_2);
+                    if(jipatte)
+                        jipatte->AI()->Talk(SAY_JI_BALLON_2);
                     break;
                 case 4:
-                    Talk(SAY_AYSA_BALLON_2);
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_2);
                     break;
                 case 5:
-                    Talk(SAY_JI_BALLON_3);
+                    if(jipatte)
+                        jipatte->AI()->Talk(SAY_JI_BALLON_3);
                     break;
                 case 6:
-                    Talk(SAY_AYSA_BALLON_3);
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_3);
                     break;
                 case 7:
-                    Talk(SAY_AYSA_BALLON_4);
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_4);
                     break;
                 case 8:
-                    Talk(SAY_AYSA_BALLON_5);
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_5);
                     break;
                 case 9:
-                    Talk(SAY_SHEN_ZI_BALLON_1);
+                    if(shen)
+                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_1);
                     break;
                 case 10:
-                    Talk(SAY_SHEN_ZI_BALLON_2);
+                    if(shen)
+                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_2);
                     break;
                 case 11:
-                    Talk(SAY_SHEN_ZI_BALLON_3);
+                    if(shen)
+                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_3);
                     break;
                 case 12:
-                    Talk(SAY_SHEN_ZI_BALLON_4);
+                    if(shen)
+                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_4);
                     break;
                 case 13:
-                    Talk(SAY_AYSA_BALLON_6);
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_6);
                     break;
                 case 14:
-                    Talk(SAY_SHEN_ZI_BALLON_5);
+                    if(shen)
+                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_5);
                     break;
                 case 15:
-                    Talk(SAY_AYSA_BALLON_7);
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_7);
                     break;
                 case 16:
-                    Talk(SAY_SHEN_ZI_BALLON_6);
+                    if(shen)
+                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_6);
                     break;
                 case 17:
-                    Talk(SAY_JI_BALLON_4);
+                    if(jipatte)
+                        jipatte->AI()->Talk(SAY_JI_BALLON_4);
                     break;
                 case 18:
-                    Talk(SAY_JI_BALLON_5);
+                    if(jipatte)
+                        jipatte->AI()->Talk(SAY_JI_BALLON_5);
                     break;
                 case 19:
-                    Talk(SAY_AYSA_BALLON_8);
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_8);
                     break;
                 case 21:
-                    Talk(SAY_JI_BALLON_6);
+                    if(jipatte)
+                        jipatte->AI()->Talk(SAY_JI_BALLON_6);
                     break;
                 case 23:
-                    Talk(SAY_AYSA_BALLON_9);
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_9);
                     break;
                 case 25:
-                    Talk(SAY_JI_BALLON_7);
+                    if(jipatte)
+                        jipatte->AI()->Talk(SAY_JI_BALLON_7);
                     break;
                 case 26:
-                    Talk(SAY_AYSA_BALLON_10);
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_10);
                     break;
                 case 27:
-                    Talk(SAY_AYSA_BALLON_11);
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_11);
                     break;
                 case 29:
                     me->DespawnOrUnsummon();
