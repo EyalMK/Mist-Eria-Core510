@@ -32,8 +32,7 @@ BattlegroundSM::BattlegroundSM()
 }
 
 BattlegroundSM::~BattlegroundSM()
-{
-}
+{	}
 
 void BattlegroundSM::Reset()
 {
@@ -53,6 +52,8 @@ void BattlegroundSM::Reset()
 	m_MineCartAddPointsTimer = 2000;
 	m_FirstMineCartSpawned = false;
 	m_WaterfallPathDone = false;
+	m_TrackSwitch[SM_EAST_TRACK_SWITCH] = true;
+	m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = false;
 
     for (uint8 i = 0; i < SM_MINE_CART_MAX; ++i)
 	{
@@ -81,6 +82,7 @@ void BattlegroundSM::PostUpdateImpl(uint32 diff)
 		BattlegroundSM::CheckMineCartNearDepot(diff);
 		BattlegroundSM::EventReopenDepot(diff);
 		BattlegroundSM::MineCartAddPoints(diff);
+		BattlegroundSM::CheckTrackSwitch(diff);
     }
 
 	if (!m_FirstMineCartSpawned)
@@ -127,6 +129,43 @@ void BattlegroundSM::StartingEventCloseDoors()
 
     for (uint8 i = BG_SM_OBJECT_WATERFALL_DEPOT; i < (BG_SM_OBJECT_TROLL_DEPOT + 1); ++i)
         SpawnBGObject(i, RESPAWN_ONE_DAY);
+}
+
+void BattlegroundSM::CheckTrackSwitch(uint32 diff)
+{
+	Creature* trigger = NULL;
+
+	if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
+		if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_EAST]))
+		{
+			if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED) && !m_TrackSwitch[SM_EAST_TRACK_SWITCH])
+			{
+				SendMessageToAll(LANG_BG_SM_EAST_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+				m_TrackSwitch[SM_EAST_TRACK_SWITCH] = true;
+			}
+
+			if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED) && m_TrackSwitch[SM_EAST_TRACK_SWITCH])
+			{
+				SendMessageToAll(LANG_BG_SM_EAST_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+				m_TrackSwitch[SM_EAST_TRACK_SWITCH] = false;
+			}
+		}
+
+	if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
+		if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_NORTH]))
+		{
+			if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED) && !m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
+			{
+				SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+				m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = true;
+			}
+
+			if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED) && m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
+			{
+				SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+				m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = false;
+			}
+		}
 }
 
 void BattlegroundSM::FirstMineCartSummon(uint32 diff)
@@ -1083,8 +1122,8 @@ void BattlegroundSM::MineCartsMoves(uint32 diff)
 		if (m_PathDone[SM_EAST_PATH][0] && !m_PathDone[SM_EAST_PATH][1])
 			if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_1, 99999.0f, true))
 				if (cart->GetExactDist2d(717.169312f, 114.258339f) < 0.5f) // East pos
-					if (GameObject* needle = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_EAST_NEEDLE]))
-						if (needle->GetGoState() == GO_STATE_READY)
+					if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_EAST]))
+						if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED))
 						{
 							cart->GetMotionMaster()->Clear(true);
 							cart->GetMotionMaster()->MovePath(NPC_MINE_CART_1 * 10, false);
@@ -1114,8 +1153,8 @@ void BattlegroundSM::MineCartsMoves(uint32 diff)
 		if (m_PathDone[SM_NORTH_PATH][0] && !m_PathDone[SM_NORTH_PATH][1])
 			if (Creature* cart = trigger->FindNearestCreature(NPC_MINE_CART_3, 99999.0f, true))
 				if (cart->GetExactDist2d(834.727234f, 299.809753f) < 0.5f) // North pos
-					if (GameObject* needle = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_NORTH_NEEDLE]))
-						if (needle->GetGoState() == GO_STATE_ACTIVE)
+					if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_NORTH]))
+						if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED))
 						{
 							cart->GetMotionMaster()->Clear(true);
 							cart->GetMotionMaster()->MovePath(NPC_MINE_CART_3 * 10, false);
@@ -1226,16 +1265,16 @@ bool BattlegroundSM::SetupBattleground()
 		|| !AddObject(BG_SM_OBJECT_DOOR_A_1, BG_SM_DOOR, BG_SM_DoorPos[0][0], BG_SM_DoorPos[0][1], BG_SM_DoorPos[0][2], BG_SM_DoorPos[0][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
 		|| !AddObject(BG_SM_OBJECT_DOOR_A_2, BG_SM_DOOR, BG_SM_DoorPos[1][0], BG_SM_DoorPos[1][1], BG_SM_DoorPos[1][2], BG_SM_DoorPos[1][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
 		|| !AddObject(BG_SM_OBJECT_DOOR_H_1, BG_SM_DOOR, BG_SM_DoorPos[2][0], BG_SM_DoorPos[2][1], BG_SM_DoorPos[2][2], BG_SM_DoorPos[2][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
-		|| !AddObject(BG_SM_OBJECT_DOOR_H_2, BG_SM_DOOR, BG_SM_DoorPos[3][0], BG_SM_DoorPos[3][1], BG_SM_DoorPos[3][2], BG_SM_DoorPos[3][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
-		|| !AddObject(BG_SM_OBJECT_EAST_NEEDLE, BG_SM_NEEDLE, BG_SM_NeedlePos[0][0], BG_SM_NeedlePos[0][1], BG_SM_NeedlePos[0][2], BG_SM_NeedlePos[0][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
-		|| !AddObject(BG_SM_OBJECT_NORTH_NEEDLE, BG_SM_NEEDLE, BG_SM_NeedlePos[1][0], BG_SM_NeedlePos[1][1], BG_SM_NeedlePos[1][2], BG_SM_NeedlePos[1][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY))
+		|| !AddObject(BG_SM_OBJECT_DOOR_H_2, BG_SM_DOOR, BG_SM_DoorPos[3][0], BG_SM_DoorPos[3][1], BG_SM_DoorPos[3][2], BG_SM_DoorPos[3][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY))
     {
         sLog->outError(LOG_FILTER_SQL, "BatteGroundSM: Failed to spawn some object Battleground not created!");
         return false;
     }
 
 	// Npcs
-	if (!AddCreature(NPC_MINE_CART_TRIGGER, SM_MINE_CART_TRIGGER, 0, 748.360779f, 195.203018f, 331.861938f, 2.428625f))
+	if (!AddCreature(NPC_MINE_CART_TRIGGER, SM_MINE_CART_TRIGGER, 0, 748.360779f, 195.203018f, 331.861938f, 2.428625f)
+		|| !AddCreature(NPC_TRACK_SWITCH_EAST, SM_TRACK_SWITCH_EAST, 0, BG_SM_TrackPos[SM_EAST_PATH][0], BG_SM_TrackPos[SM_EAST_PATH][1], BG_SM_TrackPos[SM_EAST_PATH][2], BG_SM_TrackPos[SM_EAST_PATH][3])
+		|| !AddCreature(NPC_TRACK_SWITCH_NORTH, SM_TRACK_SWITCH_NORTH, 0, BG_SM_TrackPos[SM_NORTH_PATH][0], BG_SM_TrackPos[SM_NORTH_PATH][1], BG_SM_TrackPos[SM_NORTH_PATH][2], BG_SM_TrackPos[SM_NORTH_PATH][3]))
 	{
 		sLog->outError(LOG_FILTER_SQL, "BatteGroundSM: Failed to spawn some creatures Battleground not created!");
 		return false;
