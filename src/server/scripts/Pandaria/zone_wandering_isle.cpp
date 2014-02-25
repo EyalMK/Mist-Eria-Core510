@@ -4648,6 +4648,49 @@ public:
     }
 };
 
+class npc_shang_xi_air_balloon : public CreatureScript
+{
+public:
+    npc_shang_xi_air_balloon(): CreatureScript("npc_shang_xi_air_balloon") { }
+
+    struct npc_shang_xi_air_balloonAI : public npc_escortAI
+    {
+        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    me->SetSpeed(MOVE_FLIGHT, 7.0f);
+                    break;
+                case 21:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_shang_xi_air_balloonAI(creature);
+    }
+};
+
 void AddSC_wandering_isle()
 {
     new stalker_item_equiped();
