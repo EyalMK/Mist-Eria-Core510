@@ -4648,6 +4648,43 @@ public:
     }
 };
 
+
+enum eShenXiBallon
+{
+    SAY_SHEN_ZI_BALLON_1    = 0,
+    SAY_SHEN_ZI_BALLON_2    = 1,
+    SAY_SHEN_ZI_BALLON_3    = 2,
+    SAY_SHEN_ZI_BALLON_4    = 3,
+    SAY_SHEN_ZI_BALLON_5    = 4,
+    SAY_SHEN_ZI_BALLON_6    = 5
+};
+
+enum eAysaBallon
+{
+    SAY_AYSA_BALLON_1       = 0,
+    SAY_AYSA_BALLON_2       = 1,
+    SAY_AYSA_BALLON_3       = 2,
+    SAY_AYSA_BALLON_4       = 3,
+    SAY_AYSA_BALLON_5       = 4,
+    SAY_AYSA_BALLON_6       = 5,
+    SAY_AYSA_BALLON_7       = 6,
+    SAY_AYSA_BALLON_8       = 7,
+    SAY_AYSA_BALLON_9       = 8,
+    SAY_AYSA_BALLON_10      = 9,
+    SAY_AYSA_BALLON_11      = 10
+};
+
+enum eJiBallon
+{
+    SAY_JI_BALLON_1         = 0,
+    SAY_JI_BALLON_2         = 1,
+    SAY_JI_BALLON_3         = 2,
+    SAY_JI_BALLON_4         = 3,
+    SAY_JI_BALLON_5         = 4,
+    SAY_JI_BALLON_6         = 5,
+    SAY_JI_BALLON_7         = 6
+};
+
 class npc_shang_xi_air_balloon : public CreatureScript
 {
 public:
@@ -4678,9 +4715,79 @@ public:
             {
                 case 1:
                     SetRun();
-                    me->SetSpeed(MOVE_FLIGHT, 7.0f);
+                    me->SetSpeed(MOVE_FLIGHT, 1.0f);
+                    Talk(SAY_JI_BALLON_1);
+                    break;
+                case 2:
+                    Talk(SAY_AYSA_BALLON_1);
+                    break;
+                case 3:
+                    Talk(SAY_JI_BALLON_2);
+                    break;
+                case 4:
+                    Talk(SAY_AYSA_BALLON_2);
+                    break;
+                case 5:
+                    Talk(SAY_JI_BALLON_3);
+                    break;
+                case 6:
+                    Talk(SAY_AYSA_BALLON_3);
+                    break;
+                case 7:
+                    Talk(SAY_AYSA_BALLON_4);
+                    break;
+                case 8:
+                    Talk(SAY_AYSA_BALLON_5);
+                    break;
+                case 9:
+                    Talk(SAY_SHEN_ZI_BALLON_1);
+                    break;
+                case 10:
+                    Talk(SAY_SHEN_ZI_BALLON_2);
+                    break;
+                case 11:
+                    Talk(SAY_SHEN_ZI_BALLON_3);
+                    break;
+                case 12:
+                    Talk(SAY_SHEN_ZI_BALLON_4);
+                    break;
+                case 13:
+                    Talk(SAY_AYSA_BALLON_6);
+                    break;
+                case 14:
+                    Talk(SAY_SHEN_ZI_BALLON_5);
+                    break;
+                case 15:
+                    Talk(SAY_AYSA_BALLON_7);
+                    break;
+                case 16:
+                    Talk(SAY_SHEN_ZI_BALLON_6);
+                    break;
+                case 17:
+                    Talk(SAY_JI_BALLON_4);
+                    break;
+                case 18:
+                    Talk(SAY_JI_BALLON_5);
+                    break;
+                case 19:
+                    Talk(SAY_AYSA_BALLON_8);
                     break;
                 case 21:
+                    Talk(SAY_JI_BALLON_6);
+                    break;
+                case 23:
+                    Talk(SAY_AYSA_BALLON_9);
+                    break;
+                case 25:
+                    Talk(SAY_JI_BALLON_7);
+                    break;
+                case 26:
+                    Talk(SAY_AYSA_BALLON_10);
+                    break;
+                case 27:
+                    Talk(SAY_AYSA_BALLON_11);
+                    break;
+                case 29:
                     me->DespawnOrUnsummon();
                     break;
             }
