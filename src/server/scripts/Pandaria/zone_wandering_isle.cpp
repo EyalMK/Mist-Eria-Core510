@@ -25,6 +25,7 @@
 #include "SpellScript.h"
 #include "GridNotifiers.h"
 #include "ScriptedEscortAI.h"
+#include "Vehicle.h"
 
 /***** Script Non Tweex ******/
 
@@ -4648,6 +4649,43 @@ public:
     }
 };
 
+
+enum eShenXiBallon
+{
+    SAY_SHEN_ZI_BALLON_1    = 0,
+    SAY_SHEN_ZI_BALLON_2    = 1,
+    SAY_SHEN_ZI_BALLON_3    = 2,
+    SAY_SHEN_ZI_BALLON_4    = 3,
+    SAY_SHEN_ZI_BALLON_5    = 4,
+    SAY_SHEN_ZI_BALLON_6    = 5
+};
+
+enum eAysaBallon
+{
+    SAY_AYSA_BALLON_1       = 0,
+    SAY_AYSA_BALLON_2       = 1,
+    SAY_AYSA_BALLON_3       = 2,
+    SAY_AYSA_BALLON_4       = 3,
+    SAY_AYSA_BALLON_5       = 4,
+    SAY_AYSA_BALLON_6       = 5,
+    SAY_AYSA_BALLON_7       = 6,
+    SAY_AYSA_BALLON_8       = 7,
+    SAY_AYSA_BALLON_9       = 8,
+    SAY_AYSA_BALLON_10      = 9,
+    SAY_AYSA_BALLON_11      = 10
+};
+
+enum eJiBallon
+{
+    SAY_JI_BALLON_1         = 0,
+    SAY_JI_BALLON_2         = 1,
+    SAY_JI_BALLON_3         = 2,
+    SAY_JI_BALLON_4         = 3,
+    SAY_JI_BALLON_5         = 4,
+    SAY_JI_BALLON_6         = 5,
+    SAY_JI_BALLON_7         = 6
+};
+
 class npc_shang_xi_air_balloon : public CreatureScript
 {
 public:
@@ -4655,7 +4693,17 @@ public:
 
     struct npc_shang_xi_air_balloonAI : public npc_escortAI
     {
-        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature) {}
+        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature), vehicle(creature->GetVehicleKit()){}
+
+        Vehicle* vehicle;
+
+        void Reset()
+        {
+            if (vehicle)
+            {
+                vehicle->InstallAccessory(56660, 2, true, TEMPSUMMON_DEAD_DESPAWN, 30000);
+            }
+        }
 
         void AttackStart(Unit* /*who*/) {}
         void EnterCombat(Unit* /*who*/) {}
@@ -4674,13 +4722,111 @@ public:
         {
             Player* player = GetPlayerForEscort();
 
+            Creature* aysa = me->FindNearestCreature(56661, 200.00f, true);
+            Creature* jipatte = me->FindNearestCreature(56660, 200.00f, true);
+            Creature* shen = me->FindNearestCreature(56676, 200.00f, true);
+
             switch (waypointId)
             {
                 case 1:
                     SetRun();
-                    me->SetSpeed(MOVE_FLIGHT, 7.0f);
+                    me->SetSpeed(MOVE_FLIGHT, 1.0f);
+                    if(jipatte)
+                        jipatte->AI()->Talk(SAY_JI_BALLON_1);
+                    break;
+                case 2:
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_1);
+                    break;
+                case 3:
+                    if(jipatte)
+                        jipatte->AI()->Talk(SAY_JI_BALLON_2);
+                    break;
+                case 4:
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_2);
+                    break;
+                case 5:
+                    if(jipatte)
+                        jipatte->AI()->Talk(SAY_JI_BALLON_3);
+                    break;
+                case 6:
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_3);
+                    break;
+                case 7:
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_4);
+                    break;
+                case 8:
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_5);
+                    break;
+                case 9:
+                    if(shen)
+                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_1);
+                    break;
+                case 10:
+                    if(shen)
+                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_2);
+                    break;
+                case 11:
+                    if(shen)
+                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_3);
+                    break;
+                case 12:
+                    if(shen)
+                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_4);
+                    break;
+                case 13:
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_6);
+                    break;
+                case 14:
+                    if(shen)
+                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_5);
+                    break;
+                case 15:
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_7);
+                    break;
+                case 16:
+                    if(shen)
+                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_6);
+                    break;
+                case 17:
+                    if(jipatte)
+                        jipatte->AI()->Talk(SAY_JI_BALLON_4);
+                    break;
+                case 18:
+                    if(jipatte)
+                        jipatte->AI()->Talk(SAY_JI_BALLON_5);
+                    break;
+                case 19:
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_8);
                     break;
                 case 21:
+                    if(jipatte)
+                        jipatte->AI()->Talk(SAY_JI_BALLON_6);
+                    break;
+                case 23:
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_9);
+                    break;
+                case 25:
+                    if(jipatte)
+                        jipatte->AI()->Talk(SAY_JI_BALLON_7);
+                    break;
+                case 26:
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_10);
+                    break;
+                case 27:
+                    if(aysa)
+                        aysa->AI()->Talk(SAY_AYSA_BALLON_11);
+                    break;
+                case 29:
                     me->DespawnOrUnsummon();
                     break;
             }
