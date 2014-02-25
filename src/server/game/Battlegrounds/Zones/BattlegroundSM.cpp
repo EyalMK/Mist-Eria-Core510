@@ -1149,7 +1149,7 @@ void BattlegroundSM::UpdateTeamScore(uint32 Team)
 
     if (!m_IsInformedNearVictory && score >= BG_SM_WARNING_NEAR_VICTORY_SCORE)
     {
-        if (Team == ALLIANCE)
+        if (Team == TEAM_ALLIANCE)
             SendMessageToAll(LANG_BG_SM_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
         else
             SendMessageToAll(LANG_BG_SM_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
