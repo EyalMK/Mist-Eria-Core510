@@ -4623,6 +4623,9 @@ public:
                     me->CastSpell(me, 128851, true);
                     break;
                 case 10:
+                    if(Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if(summoner->ToPlayer())
+                            me->CastSpell(summoner, 106625, true);
                     me->CastSpell(me, 109336, true);
                     me->DespawnOrUnsummon();
                     break;
