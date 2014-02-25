@@ -63,14 +63,15 @@ enum BG_SM_Spells
 {
     BG_SM_CONTROL_VISUAL_ALLIANCE	= 116086,
     BG_SM_CONTROL_VISUAL_HORDE		= 116085,
-	BG_SM_CONTROL_VISUAL_NEUTRAL	= 118001
+	BG_SM_CONTROL_VISUAL_NEUTRAL	= 118001,
+	BG_SM_TRACK_SWITCH_OPENED		= 120228,
+	BG_SM_TRACK_SWITCH_CLOSED		= 120229
 };
 
 enum SMBattlegroundObjectEntry
 {
 	BG_SM_MINE_DEPOT			= 400433,
-	BG_SM_DOOR					= 400434,
-	BG_SM_NEEDLE				= 400435
+	BG_SM_DOOR					= 400434
 };
 
 enum SMBattlegroundGaveyards
@@ -84,8 +85,10 @@ enum SMBattlegroundCreaturesTypes
     SM_SPIRIT_ALLIANCE		= 0,
     SM_SPIRIT_HORDE			= 1,
 	SM_MINE_CART_TRIGGER	= 2,
+	SM_TRACK_SWITCH_EAST	= 3,
+	SM_TRACK_SWITCH_NORTH	= 4,
 
-    BG_SM_CREATURES_MAX		= 3
+    BG_SM_CREATURES_MAX		= 5
 };
 
 enum SMDepots
@@ -96,19 +99,24 @@ enum SMDepots
 	SM_TROLL_DEPOT,
 };
 
+enum SMTracks
+{
+	SM_EAST_TRACK_SWITCH,
+	SM_NORTH_TRACK_SWITCH,
+	SM_MAX_TRACK_SWITCH
+};
+
 enum SMBattlegroundObjectTypes
 {
 	BG_SM_OBJECT_DOOR_A_1			= 0,
     BG_SM_OBJECT_DOOR_H_1			= 1,
 	BG_SM_OBJECT_DOOR_A_2			= 2,
     BG_SM_OBJECT_DOOR_H_2			= 3,
-	BG_SM_OBJECT_EAST_NEEDLE		= 4,
-	BG_SM_OBJECT_NORTH_NEEDLE		= 5,
-	BG_SM_OBJECT_WATERFALL_DEPOT	= 6,
-	BG_SM_OBJECT_LAVA_DEPOT			= 7,
-	BG_SM_OBJECT_DIAMOND_DEPOT		= 8,
-	BG_SM_OBJECT_TROLL_DEPOT		= 9,
-	BG_SM_OBJECT_MAX				= 10
+	BG_SM_OBJECT_WATERFALL_DEPOT	= 4,
+	BG_SM_OBJECT_LAVA_DEPOT			= 5,
+	BG_SM_OBJECT_DIAMOND_DEPOT		= 6,
+	BG_SM_OBJECT_TROLL_DEPOT		= 7,
+	BG_SM_OBJECT_MAX				= 8
 };
 
 enum BG_SM_Score
@@ -126,6 +134,8 @@ enum SMBattlegroundMineCartState
 
 enum BG_SM_CreatureIds
 {
+	NPC_TRACK_SWITCH_EAST	= 60283,
+	NPC_TRACK_SWITCH_NORTH	= 60309,
 	NPC_MINE_CART_1			= 60378,
 	NPC_MINE_CART_2			= 60379,
 	NPC_MINE_CART_3			= 60380,
@@ -154,10 +164,10 @@ const float BG_SM_DoorPos[4][4] =
     {635.622925f, 208.220886f, 326.648315f, 3.717332f}   // Horde 2
 };
 
-const float BG_SM_NeedlePos[2][4] =
+const float BG_SM_TrackPos[2][4] =
 {
-	{715.585388f, 101.272034f, 319.994690f, 1.495311f}, // East
-	{847.481689f, 308.032562f, 346.573242f, 3.627884f}  // North
+	{715.585388f, 101.272034f, 319.994690f, 4.647377f}, // East
+	{847.481689f, 308.032562f, 346.573242f, 0.587086f}  // North
 };
 
 #define MINE_CART_AT_DEPOT_POINTS		200
@@ -207,16 +217,18 @@ class BattlegroundSM : public Battleground
 		void SummonMineCart(uint32 diff);
 		void FirstMineCartSummon(uint32 diff);
 		void MineCartsMoves(uint32 diff);
+		void CheckPlayerNearMineCart(uint32 diff);
+		void CheckMineCartNearDepot(uint32 diff);
+		void MineCartAddPoints(uint32 diff);
+		void ResetDepotsAndMineCarts(uint8 depot, uint8 mineCart);
+		void CheckTrackSwitch(uint32 diff);
 
         /* Scorekeeping */
         void AddPoints(uint32 Team, uint32 Points);
 
         void RemovePoint(uint32 TeamID, uint32 Points = 1) { m_TeamScores[GetTeamIndexByTeamId(TeamID)] -= Points; }
         void SetTeamPoint(uint32 TeamID, uint32 Points = 0) { m_TeamScores[GetTeamIndexByTeamId(TeamID)] = Points; }
-		void CheckPlayerNearMineCart(uint32 diff);
-		void CheckMineCartNearDepot(uint32 diff);
-		void MineCartAddPoints(uint32 diff);
-		void ResetDepotsAndMineCarts(uint8 depot, uint8 mineCart);
+		
 		uint32 GetMineCartTeamKeeper(uint8 mineCart);
         uint32 m_HonorScoreTics[2];
 
@@ -235,6 +247,7 @@ class BattlegroundSM : public Battleground
 		bool m_FirstMineCartSpawned;
 		bool m_PathDone[SM_MINE_CART_MAX - 1][SM_MAX_PATHS]; // Only for first and third mine cart
 		bool m_WaterfallPathDone; // Waterfall path
+		bool m_TrackSwitch[SM_MAX_TRACK_SWITCH]; // East : true = open, false = close | North : true = close, false = open
 
         uint32 m_HonorTics;
 		bool m_IsInformedNearVictory;
