@@ -4564,6 +4564,148 @@ public:
     }
 };
 
+enum eMasterShangXiDead
+{
+    SAY_MASTER_DEAD_1           = 0,
+    SAY_MASTER_DEAD_2           = 1,
+    SAY_MASTER_DEAD_3           = 2,
+    SAY_MASTER_DEAD_4           = 3,
+    SAY_MASTER_DEAD_5           = 4,
+    SAY_MASTER_DEAD_6           = 5
+};
+
+class npc_master_shang_xi_dead : public CreatureScript
+{
+public:
+    npc_master_shang_xi_dead(): CreatureScript("npc_master_shang_xi_dead") { }
+
+    struct npc_master_shang_xi_deadAI : public npc_escortAI
+    {
+        npc_master_shang_xi_deadAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+            me->CastSpell(me, 126160, true);
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    Talk(SAY_MASTER_DEAD_1);
+                    break;
+                case 2:
+                    Talk(SAY_MASTER_DEAD_2);
+                    if(GameObject* go = me->FindNearestGameObject(209981, 10.00f))
+                        me->SetFacingToObject(go);
+                    break;
+                case 3:
+                    if(Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if(summoner->ToPlayer())
+                            Talk(SAY_MASTER_DEAD_3, summoner->ToPlayer()->GetGUID());
+                    break;
+                case 6:
+                    Talk(SAY_MASTER_DEAD_4);
+                    break;
+                case 7:
+                    Talk(SAY_MASTER_DEAD_5);
+                    if(GameObject* go = me->FindNearestGameObject(209981, 10.00f))
+                        me->SetFacingToObject(go);
+                    me->RemoveAurasDueToSpell(126160);
+                    me->SummonCreature(57874, 873.21f, 4461.69f, 241.50f, 2.95f, TEMPSUMMON_TIMED_DESPAWN, 60000);
+                    break;
+                case 8:
+                    Talk(SAY_MASTER_DEAD_6);
+                    break;
+                case 9:
+                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    me->CastSpell(me, 128851, true);
+                    break;
+                case 10:
+                    if(Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if(summoner->ToPlayer())
+                            me->CastSpell(summoner, 106625, true);
+                    me->CastSpell(me, 109336, true);
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, false);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_master_shang_xi_deadAI(creature);
+    }
+};
+
+class npc_shang_xi_air_balloon : public CreatureScript
+{
+public:
+    npc_shang_xi_air_balloon(): CreatureScript("npc_shang_xi_air_balloon") { }
+
+    struct npc_shang_xi_air_balloonAI : public npc_escortAI
+    {
+        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void AttackStart(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) {}
+        void EnterEvadeMode() {}
+
+        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
+        {
+            if (who->GetTypeId() == TYPEID_PLAYER)
+            {
+                if (apply)
+                    Start(false, true, who->GetGUID());
+            }
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    me->SetSpeed(MOVE_FLIGHT, 7.0f);
+                    break;
+                case 21:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+        }
+
+        void OnCharmed(bool /*apply*/)
+        {
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_shang_xi_air_balloonAI(creature);
+    }
+};
+
 void AddSC_wandering_isle()
 {
     new stalker_item_equiped();
@@ -4634,4 +4776,6 @@ void AddSC_wandering_isle()
     new npc_aysa_wind_exit_escort();
     new npc_dafeng_escort();
     new npc_master_shang_xi_escort();
+    new npc_master_shang_xi_dead();
+    new npc_shang_xi_air_balloon();
 }
