@@ -1420,6 +1420,9 @@ void Player::HandleDrowning(uint32 time_diff)
             SendMirrorTimer(BREATH_TIMER, UnderWaterTime, m_MirrorTimer[BREATH_TIMER], 10);
     }
 
+    if(this->GetMapId()== 860)
+        return;
+
     // In dark water
     if (m_MirrorTimerFlags & UNDERWARER_INDARKWATER)
     {
