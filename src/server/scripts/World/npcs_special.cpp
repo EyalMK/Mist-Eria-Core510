@@ -3587,30 +3587,29 @@ class npc_track_switch_east : public CreatureScript
 
 			bool OnGossipHello(Player* player, Creature* creature)
 			{
-				if (me->HasAura(120228)) // Opened
+				if (creature->HasAura(120228)) // Opened
 				{
 					if (CanInterract)
 					{
-						me->RemoveAurasDueToSpell(120228, me->GetGUID());
-						me->CastSpell(me, 120229, true); // Close
+						creature->RemoveAurasDueToSpell(120228, creature->GetGUID());
+						creature->CastSpell(creature, 120229, true); // Close
 						CanInterractTimer = 3000;
 						CanInterract = false;
 					}
 				}
 
-				if (me->HasAura(120229)) // Close
+				if (creature->HasAura(120229, creature->GetGUID())) // Close
 				{
 					if (CanInterract)
 					{
-						me->RemoveAurasDueToSpell(120229, me->GetGUID());
-						me->CastSpell(me, 120228, true); // Opened
+						creature->RemoveAurasDueToSpell(120229, creature->GetGUID());
+						creature->CastSpell(creature, 120228, true); // Opened
 						CanInterractTimer = 3000;
 						CanInterract = false;
 					}
 				}
 
-				if (player)
-					player->PlayerTalkClass->SendCloseGossip();
+				player->PlayerTalkClass->SendCloseGossip();
 
 				return true;
 			}
@@ -3655,30 +3654,29 @@ class npc_track_switch_north : public CreatureScript
 
 			bool OnGossipHello(Player* player, Creature* creature)
 			{
-				if (me->HasAura(120228)) // Opened
+				if (creature->HasAura(120228, creature->GetGUID())) // Opened
 				{
 					if (CanInterract)
 					{
-						me->RemoveAurasDueToSpell(120228, me->GetGUID());
-						me->CastSpell(me, 120229, true); // Close
+						creature->RemoveAurasDueToSpell(120228, creature->GetGUID());
+						creature->CastSpell(creature, 120229, true); // Close
 						CanInterractTimer = 3000;
 						CanInterract = false;
 					}
 				}
 
-				if (me->HasAura(120229)) // Close
+				if (creature->HasAura(120229, creature->GetGUID())) // Close
 				{
 					if (CanInterract)
 					{
-						me->RemoveAurasDueToSpell(120229, me->GetGUID());
-						me->CastSpell(me, 120228, true); // Opened
+						creature->RemoveAurasDueToSpell(120229, creature->GetGUID());
+						creature->CastSpell(creature, 120228, true); // Opened
 						CanInterractTimer = 3000;
 						CanInterract = false;
 					}
 				}
 
-				if (player)
-					player->PlayerTalkClass->SendCloseGossip();
+				player->PlayerTalkClass->SendCloseGossip();
 
 				return true;
 			}
