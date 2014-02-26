@@ -4687,14 +4687,12 @@ class npc_shang_xi_air_balloon : public CreatureScript
 public:
     npc_shang_xi_air_balloon(): CreatureScript("npc_shang_xi_air_balloon")
     {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "VEHICLEEEEEEEEEEEEEEEEEEEEE");
     }
 
     struct npc_shang_xi_air_balloonAI : public npc_escortAI
     {
         npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature), vehicle(me->GetVehicleKit())
         {
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "ESCORTTTTTTTTTTTTTTTTTTTTT");
             ASSERT(vehicle);
         }
 
@@ -4702,6 +4700,8 @@ public:
 
         void Reset()
         {
+            vehicle->InstallAllAccessories(false);
+            vehicle->RelocatePassengers();
         }
 
         void AttackStart(Unit* /*who*/) {}
@@ -4843,7 +4843,6 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "GETAIIIIIIIIIIIIIIIIII");
         return new npc_shang_xi_air_balloonAI(creature);
     }
 };
