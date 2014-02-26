@@ -127,14 +127,13 @@ void BattlegroundSM::PostUpdateImpl(uint32 diff)
 		{
 			if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_EAST]))
 			{
-				track->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-				track->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-				m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = true;
-
 				for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
 					if (Player* player = ObjectAccessor::FindPlayer(itr->first))
-						if (player->GetExactDist2d(track->GetPositionX(), track->GetPositionY()) <= 90.0f)
+						if (player->GetExactDist2d(track->GetPositionX(), track->GetPositionY()) <= 10.0f)
 							player->PlayerTalkClass->SendCloseGossip(); // Prevent from using multiple times track switches
+
+				track->RemoveAurasDueToSpell(BG_SM_PREVENTION_AURA);
+				m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = true;
 			}
 		}
 		else m_TrackSwitchClickTimer[SM_EAST_TRACK_SWITCH] -= diff;
@@ -146,14 +145,13 @@ void BattlegroundSM::PostUpdateImpl(uint32 diff)
 		{
 			if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_NORTH]))
 			{
-				track->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-				track->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-				m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = true;
-
 				for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
 					if (Player* player = ObjectAccessor::FindPlayer(itr->first))
-						if (player->GetExactDist2d(track->GetPositionX(), track->GetPositionY()) <= 90.0f)
+						if (player->GetExactDist2d(track->GetPositionX(), track->GetPositionY()) <= 10.0f)
 							player->PlayerTalkClass->SendCloseGossip(); // Prevent from using multiple times track switches
+
+				track->RemoveAurasDueToSpell(BG_SM_PREVENTION_AURA);
+				m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = true;
 			}
 		}
 		else m_TrackSwitchClickTimer[SM_NORTH_TRACK_SWITCH] -= diff;
@@ -186,8 +184,6 @@ void BattlegroundSM::CheckTrackSwitch(uint32 diff)
 				if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED) && !m_TrackSwitch[SM_EAST_TRACK_SWITCH])
 				{
 					SendMessageToAll(LANG_BG_SM_EAST_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-					track->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-					track->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 					m_TrackSwitchClickTimer[SM_EAST_TRACK_SWITCH] = 3000;
 					m_TrackSwitch[SM_EAST_TRACK_SWITCH] = true;
 					m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = false;
@@ -196,8 +192,6 @@ void BattlegroundSM::CheckTrackSwitch(uint32 diff)
 				if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED) && m_TrackSwitch[SM_EAST_TRACK_SWITCH])
 				{
 					SendMessageToAll(LANG_BG_SM_EAST_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-					track->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-					track->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 					m_TrackSwitchClickTimer[SM_EAST_TRACK_SWITCH] = 3000;
 					m_TrackSwitch[SM_EAST_TRACK_SWITCH] = false;
 					m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = false;
@@ -214,6 +208,11 @@ void BattlegroundSM::CheckTrackSwitch(uint32 diff)
 			{
 				if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED) && m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
 				{
+					for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+						if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+							if (player->GetExactDist2d(track->GetPositionX(), track->GetPositionY()) <= 90.0f)
+								player->CastSpell(player, BG_SM_PREVENTION_AURA, true);
+
 					SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
 					track->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 					track->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -224,6 +223,11 @@ void BattlegroundSM::CheckTrackSwitch(uint32 diff)
 
 				if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED) && !m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
 				{
+					for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+						if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+							if (player->GetExactDist2d(track->GetPositionX(), track->GetPositionY()) <= 90.0f)
+								player->CastSpell(player, BG_SM_PREVENTION_AURA, true);
+
 					SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
 					track->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 					track->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);

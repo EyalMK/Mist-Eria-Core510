@@ -3577,6 +3577,9 @@ class npc_track_switch_east : public CreatureScript
 
 		bool OnGossipHello(Player* player, Creature* creature)
 		{
+			if (player->HasAura(135846)) // Prevention aura
+				return false;
+
 			bool openClose;
 			if (creature->HasAura(120228)) // Opened
 				openClose = true;
@@ -3587,7 +3590,6 @@ class npc_track_switch_east : public CreatureScript
 				creature->CastSpell(creature, 120229, true); // Closed
 				creature->RemoveAurasDueToSpell(120228);
 				openClose = false;
-				return true;
 			}
 
 			if (!openClose) // Closed
@@ -3595,7 +3597,6 @@ class npc_track_switch_east : public CreatureScript
 				creature->CastSpell(creature, 120228, true); // Opened
 				creature->RemoveAurasDueToSpell(120229);
 				openClose = true;
-				return true;
 			}
 
 			return true;
@@ -3609,6 +3610,9 @@ class npc_track_switch_north : public CreatureScript
 
 		bool OnGossipHello(Player* player, Creature* creature)
 		{
+			if (creature->HasAura(135846)) // Prevention aura
+				return false;
+
 			bool openClose;
 			if (creature->HasAura(120228)) // Opened
 				openClose = true;
@@ -3618,16 +3622,16 @@ class npc_track_switch_north : public CreatureScript
 			{
 				creature->CastSpell(creature, 120229, true); // Closed
 				creature->RemoveAurasDueToSpell(120228);
+				creature->CastSpell(creature, 135846, true); // Prevention aura
 				openClose = false;
-				return true;
 			}
 
 			if (!openClose) // Closed
 			{
 				creature->CastSpell(creature, 120228, true); // Opened
 				creature->RemoveAurasDueToSpell(120229);
+				creature->CastSpell(creature, 135846, true); // Prevention aura
 				openClose = true;
-				return true;
 			}
 
 			return true;

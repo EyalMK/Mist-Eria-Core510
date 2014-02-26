@@ -66,7 +66,8 @@ enum BG_SM_Spells
 	BG_SM_CONTROL_VISUAL_NEUTRAL	= 118001,
 	BG_SM_TRACK_SWITCH_OPENED		= 120228,
 	BG_SM_TRACK_SWITCH_CLOSED		= 120229,
-	BG_SM_FEIGN_DEATH_STUN			= 135781 // Prevent from turn moves
+	BG_SM_FEIGN_DEATH_STUN			= 135781, // Prevent from turn moves
+	BG_SM_PREVENTION_AURA			= 135846, // Prevent from using multiple times track switches
 };
 
 enum SMBattlegroundObjectEntry
