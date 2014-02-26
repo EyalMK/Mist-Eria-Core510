@@ -176,8 +176,8 @@ void BattlegroundSM::CheckTrackSwitch(uint32 diff)
 					SendMessageToAll(LANG_BG_SM_EAST_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
 					track->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 					m_TrackSwitchClickTimer[SM_EAST_TRACK_SWITCH] = 3000;
-					m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = false;
 					m_TrackSwitch[SM_EAST_TRACK_SWITCH] = true;
+					m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = false;
 				}
 
 				if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED) && m_TrackSwitch[SM_EAST_TRACK_SWITCH])
@@ -185,8 +185,8 @@ void BattlegroundSM::CheckTrackSwitch(uint32 diff)
 					SendMessageToAll(LANG_BG_SM_EAST_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
 					track->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 					m_TrackSwitchClickTimer[SM_EAST_TRACK_SWITCH] = 3000;
-					m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = false;
 					m_TrackSwitch[SM_EAST_TRACK_SWITCH] = false;
+					m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = false;
 				}
 			}
 		}
@@ -203,8 +203,8 @@ void BattlegroundSM::CheckTrackSwitch(uint32 diff)
 					SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
 					track->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 					m_TrackSwitchClickTimer[SM_NORTH_TRACK_SWITCH] = 3000;
-					m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = false;
 					m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = true;
+					m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = false;
 				}
 
 				if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED) && !m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
@@ -212,8 +212,8 @@ void BattlegroundSM::CheckTrackSwitch(uint32 diff)
 					SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
 					track->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 					m_TrackSwitchClickTimer[SM_NORTH_TRACK_SWITCH] = 3000;
-					m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = false;
 					m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = false;
+					m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = false;
 				}
 			}
 		}
