@@ -3577,16 +3577,25 @@ class npc_track_switch_east : public CreatureScript
 
 		bool OnGossipHello(Player* player, Creature* creature)
 		{
+			bool openClose;
 			if (creature->HasAura(120228)) // Opened
+				openClose = true;
+			else openClose = false; // Closed
+			
+			if (openClose) // Opened
 			{
-				creature->RemoveAurasDueToSpell(120228, creature->GetGUID());
-				creature->CastSpell(creature, 120229, true); // Close
+				creature->RemoveAurasDueToSpell(120228);
+				creature->CastSpell(creature, 120229, true); // Closed
+				openClose = false;
+				return true;
 			}
 
-			if (creature->HasAura(120229, creature->GetGUID())) // Close
+			if (!openClose) // Closed
 			{
-				creature->RemoveAurasDueToSpell(120229, creature->GetGUID());
+				creature->RemoveAurasDueToSpell(120229);
 				creature->CastSpell(creature, 120228, true); // Opened
+				openClose = true;
+				return true;
 			}
 
 			player->PlayerTalkClass->SendCloseGossip();
@@ -3602,16 +3611,25 @@ class npc_track_switch_north : public CreatureScript
 
 		bool OnGossipHello(Player* player, Creature* creature)
 		{
-			if (creature->HasAura(120228, creature->GetGUID())) // Opened
+			bool openClose;
+			if (creature->HasAura(120228)) // Opened
+				openClose = true;
+			else openClose = false; // Closed
+			
+			if (openClose) // Opened
 			{
-				creature->RemoveAurasDueToSpell(120228, creature->GetGUID());
-				creature->CastSpell(creature, 120229, true); // Close
+				creature->RemoveAurasDueToSpell(120228);
+				creature->CastSpell(creature, 120229, true); // Closed
+				openClose = false;
+				return true;
 			}
 
-			if (creature->HasAura(120229, creature->GetGUID())) // Close
+			if (!openClose) // Closed
 			{
-				creature->RemoveAurasDueToSpell(120229, creature->GetGUID());
+				creature->RemoveAurasDueToSpell(120229);
 				creature->CastSpell(creature, 120228, true); // Opened
+				openClose = true;
+				return true;
 			}
 
 			player->PlayerTalkClass->SendCloseGossip();
