@@ -87,6 +87,8 @@ void PhaseMgr::Recalculate()
         _UpdateFlags |= (PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED | PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED);
     }
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "NOBODIE phasemgr recalc 1");
+
     PhaseDefinitionStore::const_iterator itr = _PhaseDefinitionStore->find(player->GetZoneId());
     if (itr != _PhaseDefinitionStore->end())
         for (PhaseDefinitionContainer::const_iterator phase = itr->second.begin(); phase != itr->second.end(); ++phase)
