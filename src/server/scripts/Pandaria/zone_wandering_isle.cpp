@@ -26,6 +26,7 @@
 #include "GridNotifiers.h"
 #include "ScriptedEscortAI.h"
 #include "Vehicle.h"
+#include "CombatAI.h"
 
 /***** Script Non Tweex ******/
 
@@ -4689,19 +4690,15 @@ public:
     {
     }
 
-    struct npc_shang_xi_air_balloonAI : public npc_escortAI
+    struct npc_shang_xi_air_balloonAI : public VehicleAI
     {
-        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature), vehicle(me->GetVehicleKit())
+        npc_shang_xi_air_balloonAI(Creature* creature) : VehicleAI(creature)
         {
-            ASSERT(vehicle);
         }
 
-        Vehicle* vehicle;
 
         void Reset()
         {
-            vehicle->InstallAllAccessories(false);
-            vehicle->RelocatePassengers();
         }
 
         void AttackStart(Unit* /*who*/) {}
@@ -4712,14 +4709,14 @@ public:
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
             {
-                if (apply)
-                    Start(false, true, who->GetGUID());
+                //if (apply)
+               //     Start(false, true, who->GetGUID());
             }
         }
 
         void WaypointReached(uint32 waypointId)
         {
-            Player* player = GetPlayerForEscort();
+          //  Player* player = GetPlayerForEscort();
 
             Creature* aysa = me->FindNearestCreature(56661, 200.00f, true);
             Creature* jipatte = me->FindNearestCreature(56660, 200.00f, true);
@@ -4728,7 +4725,7 @@ public:
             switch (waypointId)
             {
                 case 1:
-                    SetRun();
+                   // SetRun();
                     me->SetSpeed(MOVE_FLIGHT, 1.0f);
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_1);
@@ -4837,7 +4834,7 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-            npc_escortAI::UpdateAI(uiDiff);
+            //npc_escortAI::UpdateAI(uiDiff);
         }
     };
 
