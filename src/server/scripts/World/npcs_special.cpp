@@ -3575,66 +3575,24 @@ class npc_track_switch_east : public CreatureScript
     public:
         npc_track_switch_east() : CreatureScript("npc_track_switch_east") { }
 
-		static bool CanInterract;
-		static int32 CanInterractTimer;
-
 		bool OnGossipHello(Player* player, Creature* creature)
 		{
 			if (creature->HasAura(120228)) // Opened
 			{
-				if (CanInterract)
-				{
-					creature->RemoveAurasDueToSpell(120228, creature->GetGUID());
-					creature->CastSpell(creature, 120229, true); // Close
-					CanInterractTimer = 3000;
-						CanInterract = false;
-				}
+				creature->RemoveAurasDueToSpell(120228, creature->GetGUID());
+				creature->CastSpell(creature, 120229, true); // Close
 			}
 
 			if (creature->HasAura(120229, creature->GetGUID())) // Close
 			{
-				if (CanInterract)
-				{
-					creature->RemoveAurasDueToSpell(120229, creature->GetGUID());
-					creature->CastSpell(creature, 120228, true); // Opened
-					CanInterractTimer = 3000;
-					CanInterract = false;
-				}
+				creature->RemoveAurasDueToSpell(120229, creature->GetGUID());
+				creature->CastSpell(creature, 120228, true); // Opened
 			}
 
 			player->PlayerTalkClass->SendCloseGossip();
 
 			return true;
 		}
-
-        struct npc_track_switch_eastAI : public ScriptedAI
-        {
-            npc_track_switch_eastAI(Creature *c) : ScriptedAI(c)
-            {
-
-            }
-
-            void Reset()
-            {
-				CanInterract = true;
-				CanInterractTimer = 3000;
-				me->CastSpell(me, 135781, true); // Feign Death to prevent turn
-				me->CastSpell(me, 120228, true); // Opened
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-				if (!CanInterract)
-					if (CanInterractTimer <= 0)
-						CanInterract = true;
-					else CanInterractTimer -= diff;
-            }
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_track_switch_eastAI(pCreature);
-        }
 };
 
 class npc_track_switch_north : public CreatureScript
@@ -3642,66 +3600,24 @@ class npc_track_switch_north : public CreatureScript
     public:
         npc_track_switch_north() : CreatureScript("npc_track_switch_north") { }
 
-		static bool CanInterract;
-		static int32 CanInterractTimer;
-
 		bool OnGossipHello(Player* player, Creature* creature)
 		{
 			if (creature->HasAura(120228, creature->GetGUID())) // Opened
 			{
-				if (CanInterract)
-				{
-					creature->RemoveAurasDueToSpell(120228, creature->GetGUID());
-					creature->CastSpell(creature, 120229, true); // Close
-					CanInterractTimer = 3000;
-					CanInterract = false;
-				}
+				creature->RemoveAurasDueToSpell(120228, creature->GetGUID());
+				creature->CastSpell(creature, 120229, true); // Close
 			}
 
 			if (creature->HasAura(120229, creature->GetGUID())) // Close
 			{
-				if (CanInterract)
-				{
-					creature->RemoveAurasDueToSpell(120229, creature->GetGUID());
-					creature->CastSpell(creature, 120228, true); // Opened
-					CanInterractTimer = 3000;
-					CanInterract = false;
-				}
+				creature->RemoveAurasDueToSpell(120229, creature->GetGUID());
+				creature->CastSpell(creature, 120228, true); // Opened
 			}
 
 			player->PlayerTalkClass->SendCloseGossip();
 
 			return true;
 		}
-
-        struct npc_track_switch_northAI : public ScriptedAI
-        {
-            npc_track_switch_northAI(Creature *c) : ScriptedAI(c)
-            {
-
-            }
-
-            void Reset()
-            {
-				CanInterract = true;
-				CanInterractTimer = 3000;
-				me->CastSpell(me, 135781, true); // Feign Death to prevent turn
-				me->CastSpell(me, 120229, true); // Closed
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-				if (!CanInterract)
-					if (CanInterractTimer <= 0)
-						CanInterract = true;
-					else CanInterractTimer -= diff;
-            }
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_track_switch_northAI(pCreature);
-        }
 };
 
 void AddSC_npcs_special()

@@ -54,6 +54,10 @@ void BattlegroundSM::Reset()
 	m_WaterfallPathDone = false;
 	m_TrackSwitch[SM_EAST_TRACK_SWITCH] = true;
 	m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = false;
+	m_TrackSwitchClickTimer[SM_EAST_TRACK_SWITCH] = 3000;
+	m_TrackSwitchClickTimer[SM_NORTH_TRACK_SWITCH] = 3000;
+	m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = true;
+	m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = true;
 
     for (uint8 i = 0; i < SM_MINE_CART_MAX; ++i)
 	{
@@ -117,6 +121,32 @@ void BattlegroundSM::PostUpdateImpl(uint32 diff)
 		}
 	}
 
+	if (!m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH])
+	{
+		if (m_TrackSwitchClickTimer[SM_EAST_TRACK_SWITCH] <= 0)
+		{
+			if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_EAST]))
+			{
+				track->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+				m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = true;
+			}
+		}
+		else m_TrackSwitchClickTimer[SM_EAST_TRACK_SWITCH] -= diff;
+	}
+
+	if (!m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH])
+	{
+		if (m_TrackSwitchClickTimer[SM_NORTH_TRACK_SWITCH] <= 0)
+		{
+			if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_NORTH]))
+			{
+				track->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+				m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = true;
+			}
+		}
+		else m_TrackSwitchClickTimer[SM_NORTH_TRACK_SWITCH] -= diff;
+	}
+
 	BattlegroundSM::MineCartsMoves(diff);
 }
 
@@ -135,37 +165,59 @@ void BattlegroundSM::CheckTrackSwitch(uint32 diff)
 {
 	Creature* trigger = NULL;
 
-	if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
-		if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_EAST]))
+	if (!m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH])
+	{
+		if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
 		{
-			if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED) && !m_TrackSwitch[SM_EAST_TRACK_SWITCH])
+			if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_EAST]))
 			{
-				SendMessageToAll(LANG_BG_SM_EAST_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-				m_TrackSwitch[SM_EAST_TRACK_SWITCH] = true;
-			}
+				if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED) && !m_TrackSwitch[SM_EAST_TRACK_SWITCH])
+				{
+					SendMessageToAll(LANG_BG_SM_EAST_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+					track->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+					m_TrackSwitchClickTimer[SM_EAST_TRACK_SWITCH] = 3000;
+					m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = false;
+					m_TrackSwitch[SM_EAST_TRACK_SWITCH] = true;
+				}
 
-			if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED) && m_TrackSwitch[SM_EAST_TRACK_SWITCH])
-			{
-				SendMessageToAll(LANG_BG_SM_EAST_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-				m_TrackSwitch[SM_EAST_TRACK_SWITCH] = false;
+				if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED) && m_TrackSwitch[SM_EAST_TRACK_SWITCH])
+				{
+					SendMessageToAll(LANG_BG_SM_EAST_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+					track->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+					m_TrackSwitchClickTimer[SM_EAST_TRACK_SWITCH] = 3000;
+					m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = false;
+					m_TrackSwitch[SM_EAST_TRACK_SWITCH] = false;
+				}
 			}
 		}
+	}
 
-	if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
-		if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_NORTH]))
+	if (!m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH])
+	{
+		if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
 		{
-			if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED) && m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
+			if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_NORTH]))
 			{
-				SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-				m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = true;
-			}
+				if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED) && m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
+				{
+					SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+					track->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+					m_TrackSwitchClickTimer[SM_NORTH_TRACK_SWITCH] = 3000;
+					m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = false;
+					m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = true;
+				}
 
-			if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED) && !m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
-			{
-				SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-				m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = false;
+				if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED) && !m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
+				{
+					SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+					track->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+					m_TrackSwitchClickTimer[SM_NORTH_TRACK_SWITCH] = 3000;
+					m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = false;
+					m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = false;
+				}
 			}
 		}
+	}
 }
 
 void BattlegroundSM::FirstMineCartSummon(uint32 diff)
@@ -1288,6 +1340,18 @@ bool BattlegroundSM::SetupBattleground()
 	{
 		sLog->outError(LOG_FILTER_SQL, "BatteGroundSM: Failed to spawn some creatures Battleground not created!");
 		return false;
+	}
+
+	if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_EAST]))
+	{
+		track->CastSpell(track, BG_SM_FEIGN_DEATH_STUN, true);
+		track->CastSpell(track, BG_SM_TRACK_SWITCH_OPENED, true);
+	}
+
+	if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_NORTH]))
+	{
+		track->CastSpell(track, BG_SM_FEIGN_DEATH_STUN, true);
+		track->CastSpell(track, BG_SM_TRACK_SWITCH_CLOSED, true);
 	}
 
     WorldSafeLocsEntry const* sg = NULL;

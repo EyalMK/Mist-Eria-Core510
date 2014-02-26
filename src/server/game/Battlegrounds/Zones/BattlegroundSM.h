@@ -65,7 +65,8 @@ enum BG_SM_Spells
     BG_SM_CONTROL_VISUAL_HORDE		= 116085,
 	BG_SM_CONTROL_VISUAL_NEUTRAL	= 118001,
 	BG_SM_TRACK_SWITCH_OPENED		= 120228,
-	BG_SM_TRACK_SWITCH_CLOSED		= 120229
+	BG_SM_TRACK_SWITCH_CLOSED		= 120229,
+	BG_SM_FEIGN_DEATH_STUN			= 135781 // Prevent from turn moves
 };
 
 enum SMBattlegroundObjectEntry
@@ -240,6 +241,7 @@ class BattlegroundSM : public Battleground
 		int32 m_MineCartCheckTimer;
 		int32 m_DepotCloseTimer[4];
 		int32 m_MineCartAddPointsTimer;
+		int32 m_TrackSwitchClickTimer[SM_MAX_TRACK_SWITCH];
 		bool m_Depot[4]; // 0 = Waterfall, 1 = Lava, 2 = Diamond, 3 = Troll
 		bool m_MineCartReachedDepot[SM_MINE_CART_MAX];
 		bool m_MineCartNearDepot[SM_MINE_CART_MAX];
@@ -248,6 +250,7 @@ class BattlegroundSM : public Battleground
 		bool m_PathDone[SM_MINE_CART_MAX - 1][SM_MAX_PATHS]; // Only for first and third mine cart
 		bool m_WaterfallPathDone; // Waterfall path
 		bool m_TrackSwitch[SM_MAX_TRACK_SWITCH]; // East : true = open, false = close | North : true = close, false = open
+		bool m_TrackSwitchCanInterract[SM_MAX_TRACK_SWITCH];
 
         uint32 m_HonorTics;
 		bool m_IsInformedNearVictory;
