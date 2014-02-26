@@ -4685,11 +4685,17 @@ enum eJiBallon
 class npc_shang_xi_air_balloon : public VehicleScript
 {
 public:
-    npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon") { }
+    npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon")
+    {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "VEHICLEEEEEEEEEEEEEEEEEEEEE");
+    }
 
     struct npc_shang_xi_air_balloonAI : public npc_escortAI
     {
-        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature){}
+        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature)
+        {
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "ESCORTTTTTTTTTTTTTTTTTTTTT");
+        }
 
         void Reset()
         {
@@ -4836,6 +4842,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "GETAIIIIIIIIIIIIIIIIII");
         return new npc_shang_xi_air_balloonAI(creature);
     }
 };
