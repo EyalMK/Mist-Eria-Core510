@@ -4600,8 +4600,8 @@ public:
                     break;
                 case 2:
                     Talk(SAY_MASTER_DEAD_2);
-                    if(GameObject* go = me->FindNearestGameObject(209981, 10.00f))
-                        me->SetFacingToObject(go);
+                    if(Creature* test = me->FindNearestCreature(57874, 10.00f, true))
+                        me->SetInFront(test);
                     break;
                 case 3:
                     if(Unit* summoner = me->ToTempSummon()->GetSummoner())
@@ -4613,8 +4613,8 @@ public:
                     break;
                 case 7:
                     Talk(SAY_MASTER_DEAD_5);
-                    if(GameObject* go = me->FindNearestGameObject(209981, 10.00f))
-                        me->SetFacingToObject(go);
+                    if(Creature* test = me->FindNearestCreature(57874, 10.00f, true))
+                        me->SetInFront(test);
                     me->RemoveAurasDueToSpell(126160);
                     me->SummonCreature(57874, 873.21f, 4461.69f, 241.50f, 2.95f, TEMPSUMMON_TIMED_DESPAWN, 60000);
                     break;
@@ -4686,10 +4686,10 @@ enum eJiBallon
     SAY_JI_BALLON_7         = 6
 };
 
-class npc_shang_xi_air_balloon : public CreatureScript
+class npc_shang_xi_air_balloon : public VehicleScript
 {
 public:
-    npc_shang_xi_air_balloon(): CreatureScript("npc_shang_xi_air_balloon") { }
+    npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon") { }
 
     struct npc_shang_xi_air_balloonAI : public npc_escortAI
     {
@@ -4699,18 +4699,18 @@ public:
         {
         }
 
-        //void AttackStart(Unit* /*who*/) {}
-        //void EnterCombat(Unit* /*who*/) {}
-        //void EnterEvadeMode() {}
+        void AttackStart(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) {}
+        void EnterEvadeMode() {}
 
-        /*void PassengerBoarded(Unit* who, int8 seatId, bool apply)
+        void PassengerBoarded(Unit* who, int8 seatId, bool apply)
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
             {
                 if (apply)
                     Start(false, true, who->GetGUID());
             }
-        }*/
+        }
 
         void WaypointReached(uint32 waypointId)
         {
@@ -4826,19 +4826,13 @@ public:
             }
         }
 
-        /*void JustDied(Unit* killer)
-        {
-        }
-
         void OnCharmed(bool apply)
         {
-        }*/
+        }
 
         void UpdateAI(const uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
-
-            Start(false, true);
         }
     };
 
