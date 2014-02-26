@@ -4683,34 +4683,25 @@ enum eJiBallon
     SAY_JI_BALLON_7         = 6
 };
 
-class npc_shang_xi_air_balloon : public CreatureScript
+class npc_shang_xi_air_balloon : public DynamicObjectScript
 {
 public:
-    npc_shang_xi_air_balloon(): CreatureScript("npc_shang_xi_air_balloon")
-    {
-    }
+    npc_shang_xi_air_balloon(): DynamicObjectScript("npc_shang_xi_air_balloon"){}
 
-    struct npc_shang_xi_air_balloonAI : public VehicleAI
+    struct npc_shang_xi_air_balloonAI : public npc_escortAI
     {
-        npc_shang_xi_air_balloonAI(Creature* creature) : VehicleAI(creature)
-        {
-        }
-
+        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature){}
 
         void Reset()
         {
         }
 
-        void AttackStart(Unit* /*who*/) {}
-        void EnterCombat(Unit* /*who*/) {}
-        void EnterEvadeMode() {}
-
         void PassengerBoarded(Unit* who, int8 seatId, bool apply)
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
             {
-                //if (apply)
-               //     Start(false, true, who->GetGUID());
+                if (apply)
+                    Start(false, true, who->GetGUID());
             }
         }
 
@@ -4834,7 +4825,7 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-            //npc_escortAI::UpdateAI(uiDiff);
+            npc_escortAI::UpdateAI(uiDiff);
         }
     };
 
