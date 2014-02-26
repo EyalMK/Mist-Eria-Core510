@@ -4692,13 +4692,13 @@ public:
 
     struct npc_shang_xi_air_balloonAI : public npc_escortAI
     {
-        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature)//, vehicle(me->GetVehicleKit())
+        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature), vehicle(me->GetVehicleKit())
         {
             sLog->outDebug(LOG_FILTER_NETWORKIO, "ESCORTTTTTTTTTTTTTTTTTTTTT");
-          //  ASSERT(vehicle);
+            ASSERT(vehicle);
         }
 
-       // Vehicle* vehicle;
+        Vehicle* vehicle;
 
         void Reset()
         {
