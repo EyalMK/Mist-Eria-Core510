@@ -1423,6 +1423,9 @@ void Player::HandleDrowning(uint32 time_diff)
     if(this->GetMapId()== 860)
         return;
 
+    if(this->GetZoneId()== 5144 || this->GetZoneId()== 5145 || this->GetZoneId()== 4815)
+        return;
+
     // In dark water
     if (m_MirrorTimerFlags & UNDERWARER_INDARKWATER)
     {

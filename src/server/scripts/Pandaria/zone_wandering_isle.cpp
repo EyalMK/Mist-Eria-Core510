@@ -4683,29 +4683,32 @@ enum eJiBallon
     SAY_JI_BALLON_7         = 6
 };
 
-class npc_shang_xi_air_balloon : public CreatureScript
+class npc_shang_xi_air_balloon : public VehicleScript
 {
 public:
-    npc_shang_xi_air_balloon(): CreatureScript("npc_shang_xi_air_balloon"){}
+    npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon"){}
 
-    struct npc_shang_xi_air_balloonAI : public npc_escortAI
+    struct npc_shang_xi_air_balloonAI : public ScriptedAI
     {
-        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature){}
+        npc_shang_xi_air_balloonAI(Creature* creature) : ScriptedAI(creature){}
+
+        uint32 Testtimer;
 
         void Reset()
         {
+            Testtimer = 2000;
         }
 
-        void PassengerBoarded(Unit* who, int8 seatId, bool apply)
+        /*void PassengerBoarded(Unit* who, int8 seatId, bool apply)
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
             {
                 if (apply)
                     Start(false, true, who->GetGUID());
             }
-        }
+        }*/
 
-        void WaypointReached(uint32 waypointId)
+        /*void WaypointReached(uint32 waypointId)
         {
             Player* player = GetPlayerForEscort();
 
@@ -4817,7 +4820,7 @@ public:
                     me->DespawnOrUnsummon();
                     break;
             }
-        }
+        }*/
 
         void OnCharmed(bool apply)
         {
@@ -4825,9 +4828,16 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-            npc_escortAI::UpdateAI(uiDiff);
+            if(Testtimer <= uiDiff)
+            {
+                Creature* aysa = me->FindNearestCreature(56661, 200.00f, true);
+                if(aysa)
+                    aysa->AI()->Talk(SAY_JI_BALLON_1);
 
-            me->GetVehicleKit()->RelocatePassengers();
+                Testtimer = 4000;
+            }
+            else
+                Testtimer -= uiDiff;
         }
     };
 
