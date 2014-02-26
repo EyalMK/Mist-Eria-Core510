@@ -3577,7 +3577,7 @@ class npc_track_switch_east : public CreatureScript
 
 		bool OnGossipHello(Player* player, Creature* creature)
 		{
-			if (player->HasAura(135846)) // Prevention aura
+			if (creature->HasAura(135846)) // Prevention aura
 				return false;
 
 			bool openClose;
