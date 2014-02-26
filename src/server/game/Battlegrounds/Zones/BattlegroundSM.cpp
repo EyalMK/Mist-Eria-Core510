@@ -165,7 +165,7 @@ void BattlegroundSM::CheckTrackSwitch(uint32 diff)
 {
 	Creature* trigger = NULL;
 
-	if (!m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH])
+	if (m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH])
 	{
 		if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
 		{
@@ -192,7 +192,7 @@ void BattlegroundSM::CheckTrackSwitch(uint32 diff)
 		}
 	}
 
-	if (!m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH])
+	if (m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH])
 	{
 		if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
 		{
