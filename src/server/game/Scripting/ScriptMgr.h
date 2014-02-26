@@ -627,6 +627,8 @@ class VehicleScript : public ScriptObject
 
         // Called after a passenger is removed from a vehicle.
         virtual void OnRemovePassenger(Vehicle* /*veh*/, Unit* /*passenger*/) { }
+
+        virtual CreatureAI* GetAI(Creature* /*creature*/) const {return NULL ;}
 };
 
 class DynamicObjectScript : public ScriptObject, public UpdatableScript<DynamicObject>
