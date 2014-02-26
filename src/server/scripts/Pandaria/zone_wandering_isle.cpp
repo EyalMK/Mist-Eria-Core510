@@ -4827,8 +4827,7 @@ public:
         {
             npc_escortAI::UpdateAI(uiDiff);
 
-            if(me->IsVehicle())
-                me->GetVehicleKit()->RelocatePassengers();
+            me->GetVehicleKit()->RelocatePassengers();
         }
     };
 
