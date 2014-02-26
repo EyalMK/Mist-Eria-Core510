@@ -4699,18 +4699,18 @@ public:
         {
         }
 
-        void AttackStart(Unit* /*who*/) {}
-        void EnterCombat(Unit* /*who*/) {}
-        void EnterEvadeMode() {}
+        //void AttackStart(Unit* /*who*/) {}
+        //void EnterCombat(Unit* /*who*/) {}
+        //void EnterEvadeMode() {}
 
-        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
+        /*void PassengerBoarded(Unit* who, int8 seatId, bool apply)
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
             {
                 if (apply)
                     Start(false, true, who->GetGUID());
             }
-        }
+        }*/
 
         void WaypointReached(uint32 waypointId)
         {
@@ -4826,17 +4826,19 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        /*void JustDied(Unit* killer)
         {
         }
 
-        void OnCharmed(bool /*apply*/)
+        void OnCharmed(bool apply)
         {
-        }
+        }*/
 
         void UpdateAI(const uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
         }
     };
 
