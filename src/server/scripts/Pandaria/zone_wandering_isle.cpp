@@ -4600,8 +4600,6 @@ public:
                     break;
                 case 2:
                     Talk(SAY_MASTER_DEAD_2);
-                    if(Creature* test = me->FindNearestCreature(57874, 10.00f, true))
-                        me->SetInFront(test);
                     break;
                 case 3:
                     if(Unit* summoner = me->ToTempSummon()->GetSummoner())
@@ -4613,8 +4611,6 @@ public:
                     break;
                 case 7:
                     Talk(SAY_MASTER_DEAD_5);
-                    if(Creature* test = me->FindNearestCreature(57874, 10.00f, true))
-                        me->SetInFront(test);
                     me->RemoveAurasDueToSpell(126160);
                     me->SummonCreature(57874, 873.21f, 4461.69f, 241.50f, 2.95f, TEMPSUMMON_TIMED_DESPAWN, 60000);
                     break;
@@ -4703,14 +4699,14 @@ public:
         void EnterCombat(Unit* /*who*/) {}
         void EnterEvadeMode() {}
 
-        void PassengerBoarded(Unit* who, int8 seatId, bool apply)
+        /*void PassengerBoarded(Unit* who, int8 seatId, bool apply)
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
             {
                 if (apply)
                     Start(false, true, who->GetGUID());
             }
-        }
+        }*/
 
         void WaypointReached(uint32 waypointId)
         {
@@ -4833,6 +4829,8 @@ public:
         void UpdateAI(const uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
         }
     };
 
