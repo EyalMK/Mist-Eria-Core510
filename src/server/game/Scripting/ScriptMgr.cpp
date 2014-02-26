@@ -774,13 +774,6 @@ CreatureAI* ScriptMgr::GetCreatureAI(Creature* creature)
 {
     ASSERT(creature);
 
-    if(creature->GetCreatureTemplate())
-        if(creature->GetCreatureTemplate()->VehicleId != 0)
-        {
-            GET_SCRIPT_RET(VehicleScript, creature->GetScriptId(), tmpscript, NULL);
-            return tmpscript->GetAI(creature);
-        }
-
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, NULL);
     return tmpscript->GetAI(creature);
 }
