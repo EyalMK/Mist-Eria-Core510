@@ -848,9 +848,6 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 					{
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_LAVA_DEPOT]))
 						{
-							if (m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
-								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
-
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == ALLIANCE)
 							{
 								SendMessageToAll(LANG_BG_SM_ALLIANCE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_ALLIANCE);
@@ -862,6 +859,9 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 								SendMessageToAll(LANG_BG_SM_HORDE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_HORDE);
 								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_HORDE);
 							}
+
+							if (m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
+								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
 
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_LAVA_DEPOT, BG_SM_MINE_CART_1);
 							depot->ResetDoorOrButton();
@@ -882,9 +882,6 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 					{
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_DIAMOND_DEPOT]))
 						{
-							if (m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
-								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
-							
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == ALLIANCE)
 							{
 								SendMessageToAll(LANG_BG_SM_ALLIANCE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_ALLIANCE);
@@ -897,6 +894,9 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_HORDE);
 							}
 
+							if (m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
+								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
+							
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_DIAMOND_DEPOT, BG_SM_MINE_CART_1);
 							depot->ResetDoorOrButton();
 							cart->DespawnOrUnsummon();
@@ -919,9 +919,6 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 					{
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_WATERFALL_DEPOT]))
 						{
-							if (m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
-								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_2), POINTS_PER_MINE_CART);
-							
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == ALLIANCE)
 							{
 								SendMessageToAll(LANG_BG_SM_ALLIANCE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_ALLIANCE);
@@ -934,6 +931,9 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_HORDE);
 							}
 
+							if (m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
+								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_2), POINTS_PER_MINE_CART);
+							
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_WATERFALL_DEPOT, BG_SM_MINE_CART_2);
 							depot->ResetDoorOrButton();
 							cart->DespawnOrUnsummon();
@@ -956,9 +956,6 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 					{
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_DIAMOND_DEPOT]))
 						{
-							if (m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
-								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
-							
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == ALLIANCE)
 							{
 								SendMessageToAll(LANG_BG_SM_ALLIANCE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_ALLIANCE);
@@ -971,6 +968,9 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_HORDE);
 							}
 
+							if (m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
+								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
+							
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_DIAMOND_DEPOT, BG_SM_MINE_CART_3);
 							depot->ResetDoorOrButton();
 							cart->DespawnOrUnsummon();
@@ -990,9 +990,6 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 					{
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_TROLL_DEPOT]))
 						{
-							if (m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
-								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
-							
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == ALLIANCE)
 							{
 								SendMessageToAll(LANG_BG_SM_ALLIANCE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_ALLIANCE);
@@ -1005,6 +1002,9 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_HORDE);
 							}
 
+							if (m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
+								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
+							
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_TROLL_DEPOT, BG_SM_MINE_CART_3);
 							depot->ResetDoorOrButton();
 							cart->DespawnOrUnsummon();
