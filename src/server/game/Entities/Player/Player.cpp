@@ -1424,7 +1424,10 @@ void Player::HandleDrowning(uint32 time_diff)
         return;
 
     if(this->GetZoneId()== 5144 || this->GetZoneId()== 5145 || this->GetZoneId()== 4815)
+    {
+        m_MirrorTimer[FATIGUE_TIMER] == DISABLED_MIRROR_TIMER;
         return;
+    }
 
     // In dark water
     if (m_MirrorTimerFlags & UNDERWARER_INDARKWATER)
