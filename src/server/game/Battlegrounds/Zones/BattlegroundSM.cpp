@@ -208,14 +208,7 @@ void BattlegroundSM::CheckTrackSwitch(uint32 diff)
 			{
 				if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED) && m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
 				{
-					for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
-						if (Player* player = ObjectAccessor::FindPlayer(itr->first))
-							if (player->GetExactDist2d(track->GetPositionX(), track->GetPositionY()) <= 90.0f)
-								player->CastSpell(player, BG_SM_PREVENTION_AURA, true);
-
 					SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-					track->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-					track->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 					m_TrackSwitchClickTimer[SM_NORTH_TRACK_SWITCH] = 3000;
 					m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = false;
 					m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = false;
@@ -223,14 +216,7 @@ void BattlegroundSM::CheckTrackSwitch(uint32 diff)
 
 				if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED) && !m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
 				{
-					for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
-						if (Player* player = ObjectAccessor::FindPlayer(itr->first))
-							if (player->GetExactDist2d(track->GetPositionX(), track->GetPositionY()) <= 90.0f)
-								player->CastSpell(player, BG_SM_PREVENTION_AURA, true);
-
 					SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-					track->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-					track->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 					m_TrackSwitchClickTimer[SM_NORTH_TRACK_SWITCH] = 3000;
 					m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = true;
 					m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = false;
