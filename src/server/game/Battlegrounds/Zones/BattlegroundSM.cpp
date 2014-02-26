@@ -130,6 +130,11 @@ void BattlegroundSM::PostUpdateImpl(uint32 diff)
 				track->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 				track->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 				m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = true;
+
+				for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+					if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+						if (player->GetExactDist2d(track->GetPositionX(), track->GetPositionY()) <= 90.0f)
+							player->PlayerTalkClass->SendCloseGossip(); // Prevent from using multiple times track switches
 			}
 		}
 		else m_TrackSwitchClickTimer[SM_EAST_TRACK_SWITCH] -= diff;
@@ -144,6 +149,11 @@ void BattlegroundSM::PostUpdateImpl(uint32 diff)
 				track->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 				track->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 				m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = true;
+
+				for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+					if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+						if (player->GetExactDist2d(track->GetPositionX(), track->GetPositionY()) <= 90.0f)
+							player->PlayerTalkClass->SendCloseGossip(); // Prevent from using multiple times track switches
 			}
 		}
 		else m_TrackSwitchClickTimer[SM_NORTH_TRACK_SWITCH] -= diff;

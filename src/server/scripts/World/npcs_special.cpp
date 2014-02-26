@@ -3584,21 +3584,19 @@ class npc_track_switch_east : public CreatureScript
 			
 			if (openClose) // Opened
 			{
-				creature->RemoveAurasDueToSpell(120228);
 				creature->CastSpell(creature, 120229, true); // Closed
+				creature->RemoveAurasDueToSpell(120228);
 				openClose = false;
 				return true;
 			}
 
 			if (!openClose) // Closed
 			{
-				creature->RemoveAurasDueToSpell(120229);
 				creature->CastSpell(creature, 120228, true); // Opened
+				creature->RemoveAurasDueToSpell(120229);
 				openClose = true;
 				return true;
 			}
-
-			player->PlayerTalkClass->SendCloseGossip();
 
 			return true;
 		}
@@ -3618,21 +3616,19 @@ class npc_track_switch_north : public CreatureScript
 			
 			if (openClose) // Opened
 			{
-				creature->RemoveAurasDueToSpell(120228);
 				creature->CastSpell(creature, 120229, true); // Closed
+				creature->RemoveAurasDueToSpell(120228);
 				openClose = false;
 				return true;
 			}
 
 			if (!openClose) // Closed
 			{
-				creature->RemoveAurasDueToSpell(120229);
 				creature->CastSpell(creature, 120228, true); // Opened
+				creature->RemoveAurasDueToSpell(120229);
 				openClose = true;
 				return true;
 			}
-
-			player->PlayerTalkClass->SendCloseGossip();
 
 			return true;
 		}
