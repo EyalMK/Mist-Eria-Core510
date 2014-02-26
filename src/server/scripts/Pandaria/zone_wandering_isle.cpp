@@ -4683,10 +4683,10 @@ enum eJiBallon
     SAY_JI_BALLON_7         = 6
 };
 
-class npc_shang_xi_air_balloon : public DynamicObjectScript
+class npc_shang_xi_air_balloon : public CreatureScript
 {
 public:
-    npc_shang_xi_air_balloon(): DynamicObjectScript("npc_shang_xi_air_balloon"){}
+    npc_shang_xi_air_balloon(): CreatureScript("npc_shang_xi_air_balloon"){}
 
     struct npc_shang_xi_air_balloonAI : public npc_escortAI
     {
@@ -4707,7 +4707,7 @@ public:
 
         void WaypointReached(uint32 waypointId)
         {
-          //  Player* player = GetPlayerForEscort();
+            Player* player = GetPlayerForEscort();
 
             Creature* aysa = me->FindNearestCreature(56661, 200.00f, true);
             Creature* jipatte = me->FindNearestCreature(56660, 200.00f, true);
@@ -4716,7 +4716,7 @@ public:
             switch (waypointId)
             {
                 case 1:
-                   // SetRun();
+                    SetRun();
                     me->SetSpeed(MOVE_FLIGHT, 1.0f);
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_1);
@@ -4826,6 +4826,9 @@ public:
         void UpdateAI(const uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
+
+            if(me->IsVehicle())
+                me->GetVehicleKit()->RelocatePassengers();
         }
     };
 
