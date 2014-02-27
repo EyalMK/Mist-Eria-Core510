@@ -811,6 +811,13 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
             }
         }
 
+		if (victim && victim->GetTypeId() == TYPEID_PLAYER)
+		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS TESTING PVP POWER DAMAGE BEFORE APPLICATION = %u", damage);
+			damage *= GetFloatValue(PLAYER_FIELD_PVP_POWER_DAMAGE);
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS TESTING PVP POWER DAMAGE AFTER APPLICATION = %u", damage);
+		}
+
         if (damagetype != NODAMAGE && damage)
         {
             if (victim != this && victim->GetTypeId() == TYPEID_PLAYER) // does not support creature push_back
