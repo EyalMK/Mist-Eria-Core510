@@ -590,6 +590,8 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
 	uint32 baseRageDamage = damage;
 	int32 pvpPowerDamage = damage * (GetFloatValue(PLAYER_FIELD_PVP_POWER_DAMAGE)/100);
 
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS TESTING PVP POWER DAMAGE = %u, PVP POWER DAMAGE = %i.", damage, pvpPowerDamage);
+
 	if (damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
     {
 		if(victim->GetTypeId() == TYPEID_PLAYER)
