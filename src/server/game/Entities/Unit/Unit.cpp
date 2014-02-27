@@ -589,7 +589,7 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
 {
 	uint32 baseRageDamage = damage;
 
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS TESTING PVP POWER DAMAGE = %u, LAST DAMAGE = %u.", damage, lastDamage);
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS TESTING PVP POWER DAMAGE = %u.", damage);
 
 	if (damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
     {
