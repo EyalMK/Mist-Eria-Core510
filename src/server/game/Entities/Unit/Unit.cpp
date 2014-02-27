@@ -588,9 +588,6 @@ void Unit::DealDamageMods(Unit* victim, uint32 &damage, uint32* absorb)
 uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss)
 {
 	uint32 baseRageDamage = damage;
-	uint32 lastDamage = damage + (damage * (GetFloatValue(PLAYER_FIELD_PVP_POWER_DAMAGE)/100)); // Pvp Power
-
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "SUNGIS TESTING PVP POWER DAMAGE = %u, LAST DAMAGE = %u.", damage, lastDamage);
 
 	if (damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
     {
@@ -861,7 +858,7 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
 
     sLog->outDebug(LOG_FILTER_UNITS, "DealDamageEnd returned %d damage", damage);
 
-	return lastDamage;
+	return damage;
 }
 
 void Unit::CastStop(uint32 except_spellid)
