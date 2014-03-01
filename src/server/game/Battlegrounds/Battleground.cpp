@@ -465,6 +465,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
     // ***           BATTLEGROUND STARTING SYSTEM            ***
     // *********************************************************
     ModifyStartDelayTime(diff);
+	ModifyCountdownTimer(diff);
 
     if (!isArena())
         SetRemainingTime(300000);
@@ -475,23 +476,6 @@ inline void Battleground::_ProcessJoin(uint32 diff)
         for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(itr->first))
                 player->ResetAllPowers();
-    }
-
-    // Send packet every 10 seconds until the 2nd field reach 0
-    if (m_CountdownTimer >= 10000)
-    {
-        uint32 countdownMaxForBGType = isArena() ? ARENA_COUNTDOWN_MAX : BATTLEGROUND_COUNTDOWN_MAX;
-		
-			WorldPacket data(SMSG_START_TIMER, 4+4+4);
-			data << uint32(0); // unk
-			data << uint32(countdownMaxForBGType - (GetElapsedTime() / 1000));
-			data << uint32(countdownMaxForBGType);
-
-			for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
-				if (Player* player = ObjectAccessor::FindPlayer(itr->first))
-					player->GetSession()->SendPacket(&data);
-
-        m_CountdownTimer = 0;
     }
 
     if (!(m_Events & BG_STARTING_EVENT_1))
@@ -514,6 +498,8 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
         StartingEventCloseDoors();
         SetStartDelayTime(StartDelayTimes[BG_STARTING_EVENT_FIRST]);
+
+		SetCountdownTimer(StartDelayTimes[BG_STARTING_EVENT_FIRST]);
         // First start warning - 2 or 1 minute
         SendMessageToAll(StartMessageIds[BG_STARTING_EVENT_FIRST], CHAT_MSG_BG_SYSTEM_NEUTRAL);
     }
@@ -1244,13 +1230,7 @@ void Battleground::AddPlayer(Player* player)
         if (GetStatus() == STATUS_WAIT_JOIN)                 // not started yet
         {
             player->CastSpell(player, SPELL_PREPARATION, true);   // reduces all mana cost of spells.
-
-            int32 countdownMaxForBGType = isArena() ? ARENA_COUNTDOWN_MAX : BATTLEGROUND_COUNTDOWN_MAX;
-            WorldPacket data(SMSG_START_TIMER, 4+4+4);
-            data << uint32(0); // unk
-            data << uint32(countdownMaxForBGType - (GetElapsedTime() / 1000));
-            data << uint32(countdownMaxForBGType);
-            player->GetSession()->SendPacket(&data);
+            SendCountdownTimer();
         }
     }
 
@@ -1794,6 +1774,15 @@ void Battleground::EndNow()
     RemoveFromBGFreeSlotQueue();
     SetStatus(STATUS_WAIT_LEAVE);
     SetRemainingTime(0);
+}
+
+void Battleground::SendCountdownTimer()
+{
+    int countdownSec = (GetMaxCountdownTimer() - ceil(float(GetElapsedTime()) / 1000));
+
+    for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+        if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+            player->SendBattlegroundTimer(countdownSec, GetMaxCountdownTimer());
 }
 
 // To be removed
