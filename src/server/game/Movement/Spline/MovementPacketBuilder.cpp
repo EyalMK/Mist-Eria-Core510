@@ -149,6 +149,8 @@ namespace Movement
         }
         else
             WriteLinearPath(spline, data);
+
+        data << uint16(0);
     }
 
     void PacketBuilder::WriteCreateBits(MoveSpline const& moveSpline, ByteBuffer& data)
