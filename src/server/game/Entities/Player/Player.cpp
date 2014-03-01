@@ -15768,9 +15768,9 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
         AddPct(XP, (*i)->GetAmount());
 
     if (GetTeam() == ALLIANCE)			
-    XP *= sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_MULTIPLICATEUR_XP_QUEST_A2);	
+		XP *= sWorld->getRate(RATE_MULTIPLICATEUR_XP_QUEST_A2);	
     else if (GetTeam() == HORDE)	
-    XP *= sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_MULTIPLICATEUR_XP_QUEST_H2);		
+		XP *= sWorld->getRate(RATE_MULTIPLICATEUR_XP_QUEST_H2);		
 
     int32 moneyRew = 0;
     if (getLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
@@ -15778,32 +15778,32 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     else
 	{
 	    if (GetTeam() == ALLIANCE)																																															
-        moneyRew = int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_A2));
+			moneyRew = int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_A2));
 	    else if (GetTeam() == HORDE)	
-        moneyRew = int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_H2));
+			moneyRew = int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_H2));
 	    else
-        moneyRew = int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY));
+			moneyRew = int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY));
 	}
 
     if (Guild* guild = sGuildMgr->GetGuildById(GetGuildId()))
 	{ 
 	    if (GetTeam() == ALLIANCE)
-        guild->GiveXP(uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_MULTIPLICATEUR_XP_QUEST_A2) * sWorld->getRate(RATE_XP_GUILD_MODIFIER)), this);
+			guild->GiveXP(uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_MULTIPLICATEUR_XP_QUEST_A2) * sWorld->getRate(RATE_XP_GUILD_MODIFIER)), this);
 		else if (GetTeam() == HORDE)
-        guild->GiveXP(uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_MULTIPLICATEUR_XP_QUEST_H2) * sWorld->getRate(RATE_XP_GUILD_MODIFIER)), this);
+			guild->GiveXP(uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_MULTIPLICATEUR_XP_QUEST_H2) * sWorld->getRate(RATE_XP_GUILD_MODIFIER)), this);
 		else
-        guild->GiveXP(uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_XP_GUILD_MODIFIER)), this);
+			guild->GiveXP(uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_XP_GUILD_MODIFIER)), this);
 	}
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
     if (quest->GetRewOrReqMoney())
 	{
 	    if (GetTeam() == ALLIANCE)
-        moneyRew += (quest->GetRewOrReqMoney() * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_A2));
+			moneyRew += (quest->GetRewOrReqMoney() * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_A2));
 		else if (GetTeam() == HORDE)
-        moneyRew += (quest->GetRewOrReqMoney() * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_H2));
+			moneyRew += (quest->GetRewOrReqMoney() * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_H2));
 		else
-        moneyRew += quest->GetRewOrReqMoney();
+			moneyRew += quest->GetRewOrReqMoney();
 	}
 
     if (moneyRew)

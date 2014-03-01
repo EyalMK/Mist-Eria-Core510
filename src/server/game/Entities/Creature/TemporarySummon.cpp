@@ -253,11 +253,6 @@ void TempSummon::UnSummon(uint32 msTime)
 	if(GetVehicleKit())
         GetVehicleKit()->RemoveAllPassengers();
 	
-	// But also, the TempSummon can be on a vehicle, so we need to remove this from the vehicle
-	// GetVehicle() returns a pointer to the Vehicle the TempSummon is IN
-    if(GetVehicle())
-        GetVehicle()->RemovePassenger(this);
-	
     AddObjectToRemoveList();
 }
 
