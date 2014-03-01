@@ -2624,6 +2624,15 @@ void WorldObject::SetZoneScript()
     }
 }
 
+void Player::SendBattlegroundTimer(uint32 currentTime, uint32 maxTime)
+{
+    WorldPacket data(SMSG_START_TIMER, 12);
+    data << uint32(0);
+    data << uint32(currentTime);
+    data << uint32(maxTime);
+    SendDirectMessage(&data);
+}
+
 TempSummon* WorldObject::SummonCreature(uint32 entry, const Position &pos, TempSummonType spwtype, uint32 duration, uint32 /*vehId*/) const
 {
     if (Map* map = FindMap())
