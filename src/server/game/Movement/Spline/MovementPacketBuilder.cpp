@@ -141,6 +141,23 @@ namespace Movement
         uint32 count = spline.getPointCount() - 3;
         data << count;
         data.append<Vector3>(&spline.getPoint(2), count);
+
+        uint16 unkCount = 0;
+        data << uint16(unkCount);
+        if(unkCount)
+        {
+            data << float(0);
+            data << uint16(0);
+            data << uint16(0);
+            data << float(0);
+            data << uint16(0);
+
+            for(int i = 0; i < unkCount; i++)
+            {
+                data << uint16(0);
+                data << uint16(0);
+            }
+        }
     }
 
     void WriteCatmullRomCyclicPath(const Spline<int32>& spline, ByteBuffer& data)
@@ -149,6 +166,23 @@ namespace Movement
         data << uint32(count + 1);
         data << spline.getPoint(1); // fake point, client will erase it from the spline after first cycle done
         data.append<Vector3>(&spline.getPoint(1), count);
+
+        uint16 unkCount = 0;
+        data << uint16(unkCount);
+        if(unkCount)
+        {
+            data << float(0);
+            data << uint16(0);
+            data << uint16(0);
+            data << float(0);
+            data << uint16(0);
+
+            for(int i = 0; i < unkCount; i++)
+            {
+                data << uint16(0);
+                data << uint16(0);
+            }
+        }
     }
 
     void PacketBuilder::WriteMonsterMove(const MoveSpline& move_spline, WorldPacket& data)
