@@ -471,12 +471,6 @@ class Battleground
         void CheckArenaAfterTimerConditions();
         void CheckArenaWinConditions();
         void UpdateArenaWorldState();
-		void SendCountdownTimer();
-
-		void ResetCountdownTimer() { m_CountdownTimer = m_IsArena ? ARENA_COUNTDOWN_MAX : BATTLEGROUND_COUNTDOWN_MAX; }
-        void SetCountdownTimer(int Time) { m_CountdownTimer = Time; }
-        void ModifyCountdownTimer(int diff) { m_CountdownTimer -= diff; }
-        int32 GetMaxCountdownTimer() { return m_IsArena ? ARENA_COUNTDOWN_MAX / 1000 : BATTLEGROUND_COUNTDOWN_MAX / 1000; }
 
         // Triggers handle
         // must be implemented in BG subclass

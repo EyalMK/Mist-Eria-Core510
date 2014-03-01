@@ -27375,15 +27375,6 @@ void Player::SendMovementSetCollisionHeight(float height)
     SendDirectMessage(&data);
 }
 
-void Player::SendBattlegroundTimer(uint32 currentTime, uint32 maxTime)
-{
-    WorldPacket data(SMSG_START_TIMER, 12);
-    data << uint32(0);
-    data << uint32(currentTime);
-    data << uint32(maxTime);
-    SendDirectMessage(&data);
-}
-
 Guild* Player::GetGuild()
 {
     uint32 guildId = GetGuildId();
