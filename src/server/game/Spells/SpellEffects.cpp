@@ -2660,7 +2660,6 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
     switch (properties->Id)
     {
         case 64:
-        case 61:
         case 1101:
         case 66:
         case 648:
