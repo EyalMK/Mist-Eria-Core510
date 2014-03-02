@@ -858,7 +858,7 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
 
     sLog->outDebug(LOG_FILTER_UNITS, "DealDamageEnd returned %d damage", damage);
 
-    return damage;
+	return damage;
 }
 
 void Unit::CastStop(uint32 except_spellid)

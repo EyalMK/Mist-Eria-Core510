@@ -54,6 +54,10 @@ void BattlegroundSM::Reset()
 	m_WaterfallPathDone = false;
 	m_TrackSwitch[SM_EAST_TRACK_SWITCH] = true;
 	m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = false;
+	m_TrackSwitchClickTimer[SM_EAST_TRACK_SWITCH] = 3000;
+	m_TrackSwitchClickTimer[SM_NORTH_TRACK_SWITCH] = 3000;
+	m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = true;
+	m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = true;
 
     for (uint8 i = 0; i < SM_MINE_CART_MAX; ++i)
 	{
@@ -117,6 +121,42 @@ void BattlegroundSM::PostUpdateImpl(uint32 diff)
 		}
 	}
 
+	if (!m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH])
+	{
+		if (m_TrackSwitchClickTimer[SM_EAST_TRACK_SWITCH] <= 0)
+		{
+			if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_EAST]))
+			{
+				for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+					if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+						if (player->GetExactDist2d(track->GetPositionX(), track->GetPositionY()) <= 10.0f)
+							player->PlayerTalkClass->SendCloseGossip(); // Prevent from using multiple times track switches
+
+				track->RemoveAurasDueToSpell(BG_SM_PREVENTION_AURA);
+				m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = true;
+			}
+		}
+		else m_TrackSwitchClickTimer[SM_EAST_TRACK_SWITCH] -= diff;
+	}
+
+	if (!m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH])
+	{
+		if (m_TrackSwitchClickTimer[SM_NORTH_TRACK_SWITCH] <= 0)
+		{
+			if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_NORTH]))
+			{
+				for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+					if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+						if (player->GetExactDist2d(track->GetPositionX(), track->GetPositionY()) <= 10.0f)
+							player->PlayerTalkClass->SendCloseGossip(); // Prevent from using multiple times track switches
+
+				track->RemoveAurasDueToSpell(BG_SM_PREVENTION_AURA);
+				m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = true;
+			}
+		}
+		else m_TrackSwitchClickTimer[SM_NORTH_TRACK_SWITCH] -= diff;
+	}
+
 	BattlegroundSM::MineCartsMoves(diff);
 }
 
@@ -127,7 +167,7 @@ void BattlegroundSM::StartingEventCloseDoors()
 	SpawnBGObject(BG_SM_OBJECT_DOOR_A_2, RESPAWN_IMMEDIATELY);
 	SpawnBGObject(BG_SM_OBJECT_DOOR_H_2, RESPAWN_IMMEDIATELY);
 
-    for (uint8 i = BG_SM_OBJECT_WATERFALL_DEPOT; i < (BG_SM_OBJECT_TROLL_DEPOT + 1); ++i)
+    for (uint8 i = BG_SM_OBJECT_WATERFALL_DEPOT; i < BG_SM_OBJECT_MAX; ++i)
         SpawnBGObject(i, RESPAWN_ONE_DAY);
 }
 
@@ -135,37 +175,55 @@ void BattlegroundSM::CheckTrackSwitch(uint32 diff)
 {
 	Creature* trigger = NULL;
 
-	if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
-		if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_EAST]))
+	if (m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH])
+	{
+		if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
 		{
-			if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED) && !m_TrackSwitch[SM_EAST_TRACK_SWITCH])
+			if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_EAST]))
 			{
-				SendMessageToAll(LANG_BG_SM_EAST_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-				m_TrackSwitch[SM_EAST_TRACK_SWITCH] = true;
-			}
+				if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED) && !m_TrackSwitch[SM_EAST_TRACK_SWITCH])
+				{
+					SendMessageToAll(LANG_BG_SM_EAST_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+					m_TrackSwitchClickTimer[SM_EAST_TRACK_SWITCH] = 3000;
+					m_TrackSwitch[SM_EAST_TRACK_SWITCH] = true;
+					m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = false;
+				}
 
-			if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED) && m_TrackSwitch[SM_EAST_TRACK_SWITCH])
-			{
-				SendMessageToAll(LANG_BG_SM_EAST_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-				m_TrackSwitch[SM_EAST_TRACK_SWITCH] = false;
+				if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED) && m_TrackSwitch[SM_EAST_TRACK_SWITCH])
+				{
+					SendMessageToAll(LANG_BG_SM_EAST_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+					m_TrackSwitchClickTimer[SM_EAST_TRACK_SWITCH] = 3000;
+					m_TrackSwitch[SM_EAST_TRACK_SWITCH] = false;
+					m_TrackSwitchCanInterract[SM_EAST_TRACK_SWITCH] = false;
+				}
 			}
 		}
+	}
 
-	if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
-		if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_NORTH]))
+	if (m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH])
+	{
+		if (trigger = HashMapHolder<Creature>::Find(BgCreatures[SM_MINE_CART_TRIGGER]))
 		{
-			if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED) && m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
+			if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_NORTH]))
 			{
-				SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-				m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = true;
-			}
+				if (track->HasAura(BG_SM_TRACK_SWITCH_CLOSED) && m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
+				{
+					SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+					m_TrackSwitchClickTimer[SM_NORTH_TRACK_SWITCH] = 3000;
+					m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = false;
+					m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = false;
+				}
 
-			if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED) && !m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
-			{
-				SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-				m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = false;
+				if (track->HasAura(BG_SM_TRACK_SWITCH_OPENED) && !m_TrackSwitch[SM_NORTH_TRACK_SWITCH])
+				{
+					SendMessageToAll(LANG_BG_SM_NORTH_DIRECTION_CHANGED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+					m_TrackSwitchClickTimer[SM_NORTH_TRACK_SWITCH] = 3000;
+					m_TrackSwitch[SM_NORTH_TRACK_SWITCH] = true;
+					m_TrackSwitchCanInterract[SM_NORTH_TRACK_SWITCH] = false;
+				}
 			}
 		}
+	}
 }
 
 void BattlegroundSM::FirstMineCartSummon(uint32 diff)
@@ -248,7 +306,7 @@ void BattlegroundSM::StartingEventOpenDoors()
 	for (uint8 i = BG_SM_OBJECT_DOOR_A_1; i < (BG_SM_OBJECT_DOOR_H_2 + 1); ++i)
 		SpawnBGObject(i, RESPAWN_ONE_DAY);
 	
-	for (uint8 i = BG_SM_OBJECT_WATERFALL_DEPOT; i < (BG_SM_OBJECT_TROLL_DEPOT + 1); ++i)
+	for (uint8 i = BG_SM_OBJECT_WATERFALL_DEPOT; i < BG_SM_OBJECT_MAX; ++i)
 		SpawnBGObject(i, RESPAWN_IMMEDIATELY);
 }
 
@@ -848,9 +906,6 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 					{
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_LAVA_DEPOT]))
 						{
-							if (m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
-								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
-
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == ALLIANCE)
 							{
 								SendMessageToAll(LANG_BG_SM_ALLIANCE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_ALLIANCE);
@@ -862,6 +917,9 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 								SendMessageToAll(LANG_BG_SM_HORDE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_HORDE);
 								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_HORDE);
 							}
+
+							if (m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
+								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
 
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_LAVA_DEPOT, BG_SM_MINE_CART_1);
 							depot->ResetDoorOrButton();
@@ -882,9 +940,6 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 					{
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_DIAMOND_DEPOT]))
 						{
-							if (m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
-								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
-							
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_1) == ALLIANCE)
 							{
 								SendMessageToAll(LANG_BG_SM_ALLIANCE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_ALLIANCE);
@@ -897,6 +952,9 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_HORDE);
 							}
 
+							if (m_MineCartsProgressBar[BG_SM_MINE_CART_1 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
+								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_1), POINTS_PER_MINE_CART);
+							
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_DIAMOND_DEPOT, BG_SM_MINE_CART_1);
 							depot->ResetDoorOrButton();
 							cart->DespawnOrUnsummon();
@@ -919,9 +977,6 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 					{
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_WATERFALL_DEPOT]))
 						{
-							if (m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
-								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_2), POINTS_PER_MINE_CART);
-							
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_2) == ALLIANCE)
 							{
 								SendMessageToAll(LANG_BG_SM_ALLIANCE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_ALLIANCE);
@@ -934,6 +989,9 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_HORDE);
 							}
 
+							if (m_MineCartsProgressBar[BG_SM_MINE_CART_2 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
+								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_2), POINTS_PER_MINE_CART);
+							
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_WATERFALL_DEPOT, BG_SM_MINE_CART_2);
 							depot->ResetDoorOrButton();
 							cart->DespawnOrUnsummon();
@@ -956,9 +1014,6 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 					{
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_DIAMOND_DEPOT]))
 						{
-							if (m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
-								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
-							
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == ALLIANCE)
 							{
 								SendMessageToAll(LANG_BG_SM_ALLIANCE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_ALLIANCE);
@@ -971,6 +1026,9 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_HORDE);
 							}
 
+							if (m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
+								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
+							
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_DIAMOND_DEPOT, BG_SM_MINE_CART_3);
 							depot->ResetDoorOrButton();
 							cart->DespawnOrUnsummon();
@@ -990,9 +1048,6 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 					{
 						if (GameObject* depot = HashMapHolder<GameObject>::Find(BgObjects[BG_SM_OBJECT_TROLL_DEPOT]))
 						{
-							if (m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
-								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
-							
 							if (GetMineCartTeamKeeper(BG_SM_MINE_CART_3) == ALLIANCE)
 							{
 								SendMessageToAll(LANG_BG_SM_ALLIANCE_CAPTURED_MINE_CART, CHAT_MSG_BG_SYSTEM_ALLIANCE);
@@ -1005,6 +1060,9 @@ void BattlegroundSM::EventReopenDepot(uint32 diff)
 								PlaySoundToAll(BG_SM_SOUND_MINE_CART_CAPTURED_HORDE);
 							}
 
+							if (m_MineCartsProgressBar[BG_SM_MINE_CART_3 - 1] != BG_SM_PROGRESS_BAR_NEUTRAL)
+								BattlegroundSM::AddPoints(GetMineCartTeamKeeper(BG_SM_MINE_CART_3), POINTS_PER_MINE_CART);
+							
 							BattlegroundSM::ResetDepotsAndMineCarts(SM_TROLL_DEPOT, BG_SM_MINE_CART_3);
 							depot->ResetDoorOrButton();
 							cart->DespawnOrUnsummon();
@@ -1275,7 +1333,11 @@ bool BattlegroundSM::SetupBattleground()
 		|| !AddObject(BG_SM_OBJECT_DOOR_A_1, BG_SM_DOOR, BG_SM_DoorPos[0][0], BG_SM_DoorPos[0][1], BG_SM_DoorPos[0][2], BG_SM_DoorPos[0][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
 		|| !AddObject(BG_SM_OBJECT_DOOR_A_2, BG_SM_DOOR, BG_SM_DoorPos[1][0], BG_SM_DoorPos[1][1], BG_SM_DoorPos[1][2], BG_SM_DoorPos[1][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
 		|| !AddObject(BG_SM_OBJECT_DOOR_H_1, BG_SM_DOOR, BG_SM_DoorPos[2][0], BG_SM_DoorPos[2][1], BG_SM_DoorPos[2][2], BG_SM_DoorPos[2][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
-		|| !AddObject(BG_SM_OBJECT_DOOR_H_2, BG_SM_DOOR, BG_SM_DoorPos[3][0], BG_SM_DoorPos[3][1], BG_SM_DoorPos[3][2], BG_SM_DoorPos[3][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY))
+		|| !AddObject(BG_SM_OBJECT_DOOR_H_2, BG_SM_DOOR, BG_SM_DoorPos[3][0], BG_SM_DoorPos[3][1], BG_SM_DoorPos[3][2], BG_SM_DoorPos[3][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
+		|| !AddObject(BG_SM_OBJECT_BERSERKING_BUFF_EAST, BG_OBJECTID_BERSERKERBUFF_ENTRY, BG_SM_BuffPos[0][0], BG_SM_BuffPos[0][1], BG_SM_BuffPos[0][2], BG_SM_BuffPos[0][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
+		|| !AddObject(BG_SM_OBJECT_BERSERKING_BUFF_WEST, BG_OBJECTID_BERSERKERBUFF_ENTRY, BG_SM_BuffPos[1][0], BG_SM_BuffPos[1][1], BG_SM_BuffPos[1][2], BG_SM_BuffPos[1][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
+		|| !AddObject(BG_SM_OBJECT_RESTORATION_BUFF_WATERFALL, BG_OBJECTID_REGENBUFF_ENTRY, BG_SM_BuffPos[2][0], BG_SM_BuffPos[2][1], BG_SM_BuffPos[2][2], BG_SM_BuffPos[2][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY)
+		|| !AddObject(BG_SM_OBJECT_RESTORATION_BUFF_LAVA, BG_OBJECTID_REGENBUFF_ENTRY, BG_SM_BuffPos[3][0], BG_SM_BuffPos[3][1], BG_SM_BuffPos[3][2], BG_SM_BuffPos[3][3], 0, 0, 0.710569f, -0.703627f, RESPAWN_IMMEDIATELY))
     {
         sLog->outError(LOG_FILTER_SQL, "BatteGroundSM: Failed to spawn some object Battleground not created!");
         return false;
@@ -1288,6 +1350,18 @@ bool BattlegroundSM::SetupBattleground()
 	{
 		sLog->outError(LOG_FILTER_SQL, "BatteGroundSM: Failed to spawn some creatures Battleground not created!");
 		return false;
+	}
+
+	if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_EAST]))
+	{
+		track->CastSpell(track, BG_SM_FEIGN_DEATH_STUN, true);
+		track->CastSpell(track, BG_SM_TRACK_SWITCH_OPENED, true);
+	}
+
+	if (Creature* track = HashMapHolder<Creature>::Find(BgCreatures[SM_TRACK_SWITCH_NORTH]))
+	{
+		track->CastSpell(track, BG_SM_FEIGN_DEATH_STUN, true);
+		track->CastSpell(track, BG_SM_TRACK_SWITCH_CLOSED, true);
 	}
 
     WorldSafeLocsEntry const* sg = NULL;

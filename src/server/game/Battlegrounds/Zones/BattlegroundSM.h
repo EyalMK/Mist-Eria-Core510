@@ -65,7 +65,9 @@ enum BG_SM_Spells
     BG_SM_CONTROL_VISUAL_HORDE		= 116085,
 	BG_SM_CONTROL_VISUAL_NEUTRAL	= 118001,
 	BG_SM_TRACK_SWITCH_OPENED		= 120228,
-	BG_SM_TRACK_SWITCH_CLOSED		= 120229
+	BG_SM_TRACK_SWITCH_CLOSED		= 120229,
+	BG_SM_FEIGN_DEATH_STUN			= 135781, // Prevent from turn moves
+	BG_SM_PREVENTION_AURA			= 135846, // Prevent from using multiple times track switches
 };
 
 enum SMBattlegroundObjectEntry
@@ -108,15 +110,20 @@ enum SMTracks
 
 enum SMBattlegroundObjectTypes
 {
-	BG_SM_OBJECT_DOOR_A_1			= 0,
-    BG_SM_OBJECT_DOOR_H_1			= 1,
-	BG_SM_OBJECT_DOOR_A_2			= 2,
-    BG_SM_OBJECT_DOOR_H_2			= 3,
-	BG_SM_OBJECT_WATERFALL_DEPOT	= 4,
-	BG_SM_OBJECT_LAVA_DEPOT			= 5,
-	BG_SM_OBJECT_DIAMOND_DEPOT		= 6,
-	BG_SM_OBJECT_TROLL_DEPOT		= 7,
-	BG_SM_OBJECT_MAX				= 8
+	BG_SM_OBJECT_DOOR_A_1					= 0,
+    BG_SM_OBJECT_DOOR_H_1					= 1,
+	BG_SM_OBJECT_DOOR_A_2					= 2,
+    BG_SM_OBJECT_DOOR_H_2					= 3,
+	BG_SM_OBJECT_WATERFALL_DEPOT			= 4,
+	BG_SM_OBJECT_LAVA_DEPOT					= 5,
+	BG_SM_OBJECT_DIAMOND_DEPOT				= 6,
+	BG_SM_OBJECT_TROLL_DEPOT				= 7,
+	BG_SM_OBJECT_BERSERKING_BUFF_EAST		= 8,
+	BG_SM_OBJECT_BERSERKING_BUFF_WEST		= 9,
+	BG_SM_OBJECT_RESTORATION_BUFF_WATERFALL	= 10,
+	BG_SM_OBJECT_RESTORATION_BUFF_LAVA		= 11,
+
+	BG_SM_OBJECT_MAX						= 12
 };
 
 enum BG_SM_Score
@@ -146,6 +153,14 @@ enum BG_SM_Paths
 {
 	SM_EAST_PATH,
 	SM_NORTH_PATH
+};
+
+const float BG_SM_BuffPos[4][4] =
+{
+	{749.444153f, 64.338188f, 369.535797f, 6.058259f},   // Berserking buff East
+    {789.979431f, 281.883575f, 355.389984f, 0.652173f},  // Berserking buff West
+    {539.873596f, 396.386749f, 345.722412f, 3.994188f},  // Restoration buff Waterfall
+    {614.202698f, 120.924660f, 294.430908f, 4.241807f}   // Restoration buff Lava
 };
 
 const float BG_SM_DepotPos[4][4] =
@@ -240,6 +255,7 @@ class BattlegroundSM : public Battleground
 		int32 m_MineCartCheckTimer;
 		int32 m_DepotCloseTimer[4];
 		int32 m_MineCartAddPointsTimer;
+		int32 m_TrackSwitchClickTimer[SM_MAX_TRACK_SWITCH];
 		bool m_Depot[4]; // 0 = Waterfall, 1 = Lava, 2 = Diamond, 3 = Troll
 		bool m_MineCartReachedDepot[SM_MINE_CART_MAX];
 		bool m_MineCartNearDepot[SM_MINE_CART_MAX];
@@ -248,6 +264,7 @@ class BattlegroundSM : public Battleground
 		bool m_PathDone[SM_MINE_CART_MAX - 1][SM_MAX_PATHS]; // Only for first and third mine cart
 		bool m_WaterfallPathDone; // Waterfall path
 		bool m_TrackSwitch[SM_MAX_TRACK_SWITCH]; // East : true = open, false = close | North : true = close, false = open
+		bool m_TrackSwitchCanInterract[SM_MAX_TRACK_SWITCH];
 
         uint32 m_HonorTics;
 		bool m_IsInformedNearVictory;
