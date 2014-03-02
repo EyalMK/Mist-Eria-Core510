@@ -3,6 +3,8 @@
 
 #include "Player.h"
 
+class Player;
+
 class Farm
 {
 public:
