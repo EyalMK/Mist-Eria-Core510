@@ -1747,6 +1747,13 @@ void Player::Update(uint32 p_time)
             uint32 newzone, newarea;
             GetZoneAndAreaId(newzone, newarea);
 
+            if (newarea == 6039) {
+                SetPhaseMask(0);
+            } else {
+                SetPhaseMask(1);
+            }
+
+
             if (m_zoneUpdateId != newzone)
                 UpdateZone(newzone, newarea);                // also update area
             else
@@ -1758,6 +1765,7 @@ void Player::Update(uint32 p_time)
 
                 m_zoneUpdateTimer = ZONE_UPDATE_INTERVAL;
             }
+
         }
         else
             m_zoneUpdateTimer -= p_time;
