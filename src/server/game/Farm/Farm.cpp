@@ -9,7 +9,7 @@ Farm::Farm(Player* p) {
 }
 
 
-Farm::CheckZone(uint32 newzone) {
+void Farm::CheckZone(uint32 newzone) {
     if (!isPlayerInsideZone && newzone == 6039) {
         oldPhase = player->GetPhaseMask();
         player->SetPhaseMask(0, true);
@@ -21,7 +21,7 @@ Farm::CheckZone(uint32 newzone) {
 }
 
 
-Farm::canSeeOrDetect(WorldObject *obj) {
+bool Farm::canSeeOrDetect(WorldObject *obj) {
     if (obj->GetGUID() == MAKE_NEW_GUID(69, 0, HIGHGUID_PLAYER))
         return true;
     return false;
