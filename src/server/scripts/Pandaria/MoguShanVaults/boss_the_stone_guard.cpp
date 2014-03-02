@@ -266,7 +266,8 @@ class boss_amethyst_guardian : public CreatureScript
 											{
 												player->CastSpell(player, SPELL_AMETHYST_PETRIFICATION_BAR);
 												player->SetMaxPower(POWER_ALTERNATE_POWER, 100);
-												me->ModifyPower(POWER_ENERGY, 3);
+												me->SetPower(POWER_ALTERNATE_POWER, 0);
+												me->ModifyPower(POWER_ALTERNATE_POWER, 5);
 											}
 								}
 
@@ -538,7 +539,8 @@ class boss_cobalt_guardian : public CreatureScript
 											{
 												player->CastSpell(player, SPELL_COBALT_PETRIFICATION_BAR);
 												player->SetMaxPower(POWER_ALTERNATE_POWER, 100);
-												me->ModifyPower(POWER_ENERGY, 3);
+												me->SetPower(POWER_ALTERNATE_POWER, 0);
+												me->ModifyPower(POWER_ALTERNATE_POWER, 5);
 											}
 								}
 
@@ -810,7 +812,8 @@ class boss_jade_guardian : public CreatureScript
 											{
 												player->CastSpell(player, SPELL_JADE_PETRIFICATION_BAR);
 												player->SetMaxPower(POWER_ALTERNATE_POWER, 100);
-												me->ModifyPower(POWER_ENERGY, 3);
+												me->SetPower(POWER_ALTERNATE_POWER, 0);
+												me->ModifyPower(POWER_ALTERNATE_POWER, 5);
 											}
 								}
 
@@ -1082,7 +1085,8 @@ class boss_jasper_guardian : public CreatureScript
 											{
 												player->CastSpell(player, SPELL_JASPER_PETRIFICATION_BAR);
 												player->SetMaxPower(POWER_ALTERNATE_POWER, 100);
-												me->ModifyPower(POWER_ENERGY, 3);
+												me->SetPower(POWER_ALTERNATE_POWER, 0);
+												me->ModifyPower(POWER_ALTERNATE_POWER, 5);
 											}
 								}
 
