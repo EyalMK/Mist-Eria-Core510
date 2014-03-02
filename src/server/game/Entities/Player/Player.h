@@ -33,7 +33,7 @@
 #include "SpellMgr.h"
 #include "Unit.h"
 #include "SpyMgr.h"
-#include "Farm/Farm.h"
+#include "Farm.h"
 
 #include <string>
 #include <vector>
