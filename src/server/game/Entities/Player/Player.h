@@ -59,6 +59,7 @@ class PlayerSocial;
 class SpellCastTargets;
 class UpdateMask;
 class PhaseMgr;
+class Farm;
 
 typedef std::deque<Mail*> PlayerMails;
 
