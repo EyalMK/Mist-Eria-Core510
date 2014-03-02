@@ -1748,9 +1748,9 @@ void Player::Update(uint32 p_time)
             GetZoneAndAreaId(newzone, newarea);
 
             if (newarea == 6039) {
-                SetPhaseMask(0);
+                SetPhaseMask(0, true);
             } else {
-                SetPhaseMask(1);
+                SetPhaseMask(1, true);
             }
 
 
