@@ -1,8 +1,6 @@
 #ifndef FARM_H
 #define FARM_H
 
-#include "Player.h"
-
 class Player;
 
 class Farm
