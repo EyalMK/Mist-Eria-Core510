@@ -15,10 +15,12 @@ void Farm::CheckZone(uint32 newzone) {
         oldPhase = player->GetPhaseMask();
         player->SetPhaseMask(0, true);
         player->UpdateTriggerVisibility();
+        player->UpdateObjectVisibility();
         isPlayerInsideZone = true;
     }else if (isPlayerInsideZone & newzone != 6039) {
         player->SetPhaseMask(oldPhase, true);
         player->UpdateTriggerVisibility();
+        player->UpdateObjectVisibility();
         isPlayerInsideZone = false;
     }
 }
