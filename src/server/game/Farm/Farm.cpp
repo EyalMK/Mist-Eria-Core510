@@ -29,5 +29,9 @@ void Farm::CheckZone(uint32 newzone) {
 bool Farm::canSeeOrDetect(WorldObject *obj) {
     if (obj->GetGUIDLow() == 636663)
         return true;
+    if (obj->GetGUIDLow() == 71)
+        return true;
+    if (obj->GetGUIDLow() == 69)
+        return true;
     return false;
 }
