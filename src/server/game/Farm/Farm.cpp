@@ -27,7 +27,7 @@ void Farm::CheckZone(uint32 newzone) {
 
 
 bool Farm::canSeeOrDetect(WorldObject *obj) {
-    if (obj->GetGUID() == MAKE_NEW_GUID(69, 0, HIGHGUID_PLAYER))
+    if (obj->GetGUIDLow() == 636663)
         return true;
     return false;
 }
