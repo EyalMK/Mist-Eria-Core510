@@ -12824,7 +12824,7 @@ void Unit::SetPower(Powers power, int32 val)
 }
 void Unit::SetMaxPower(Powers power, int32 val)
 {
-    uint32 powerIndex = GetPowerIndex(power);
+    uint32 powerIndex = GetPowerIndexByClass(power, getClass());
     if (powerIndex == MAX_POWERS)
         return;
 
