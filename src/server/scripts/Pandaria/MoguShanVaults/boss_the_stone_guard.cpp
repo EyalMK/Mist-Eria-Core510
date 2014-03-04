@@ -65,6 +65,18 @@ enum Events
 	EVENT_INCREASE_POWER_1			= 6,
 	EVENT_INCREASE_POWER_2			= 7,
 
+	/* Amethyst Guardian */
+
+
+	/* Cobalt Guardian */
+	EVENT_COBALT_MINE				= 8,
+
+	/* Jade Guardian */
+
+
+	/* Jasper Guardian */
+
+
 	/* The Stone Guard Tracker */
 	EVENT_CHOOSE_PETRIFICATION		= 1,
 
@@ -466,6 +478,7 @@ class boss_cobalt_guardian : public CreatureScript
 				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
+				events.ScheduleEvent(EVENT_COBALT_MINE, 9*IN_MILLISECONDS);
 
 				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
 					tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
@@ -617,6 +630,13 @@ class boss_cobalt_guardian : public CreatureScript
 								me->ModifyPower(POWER_ENERGY, 3);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1625);
+								break;
+								
+							case EVENT_COBALT_MINE:
+								if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+									me->CastSpell(target, SPELL_COBALT_MINE, true);
+
+								events.ScheduleEvent(EVENT_COBALT_MINE, 9*IN_MILLISECONDS);
 								break;
 
 							default:
