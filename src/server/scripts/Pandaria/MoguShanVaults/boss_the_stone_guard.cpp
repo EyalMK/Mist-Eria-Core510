@@ -1589,6 +1589,40 @@ public:
 	};
 };
 
+class spell_rend_flesh : public SpellScriptLoader
+{
+    public:
+        spell_rend_flesh() : SpellScriptLoader("spell_rend_flesh") { }
+
+        class spell_rend_fleshSpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_rend_fleshSpellScript);
+
+			bool Validate(SpellInfo const* /*spellEntry*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_REND_FLESH))
+                    return false;
+                return true;
+            }
+
+			void HandleBeforeCast()
+            {
+				if (GetHitUnit() && GetHitUnit()->HasAura(SPELL_REND_FLESH))
+					GetHitUnit()->RemoveAurasDueToSpell(SPELL_REND_FLESH);
+            }
+
+            void Register()
+            {
+                 BeforeCast += SpellCastFn(spell_rend_fleshSpellScript::HandleBeforeCast);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_rend_fleshSpellScript();
+        }
+};
+
 void AddSC_boss_the_stone_guard()
 {
     new boss_amethyst_guardian();
@@ -1597,4 +1631,5 @@ void AddSC_boss_the_stone_guard()
 	new boss_jasper_guardian();
 	new npc_the_stone_guard_tracker();
 	new npc_cobalt_mine();
+	new spell_rend_flesh();
 }
