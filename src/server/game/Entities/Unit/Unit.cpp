@@ -12725,15 +12725,16 @@ uint32 Unit::GetPowerIndexByClass(uint32 powerId, uint32 classId) const
     {
         switch (GetEntry())
         {
-            case 26125:
-            case 59915:
-            case 60043:
-            case 60047:
-            case 60051:
+            case 26125: // Risen Ally
                 return 0;
             default:
                 break;
         }
+
+		CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(GetEntry());
+
+		if (cinfo && cinfo->VehicleId && cinfo->VehicleId != 0)
+			return 0;
     }
 
     ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(classId);
