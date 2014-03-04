@@ -73,7 +73,6 @@ PvPDifficultyEntry const* GetBattlegroundBracketById(uint32 mapid, BattlegroundB
 
 CharStartOutfitEntry const* GetCharStartOutfitEntry(uint8 race, uint8 class_, uint8 gender);
 
-uint32 GetPowerIndexByClass(uint32 powerType, uint32 classId);
 std::list<uint32> const* GetSpecializationSpellsBySpec(uint32 specId);
 uint32 GetSpecializationReplaceSpellBySpell(uint32 spellId);
 

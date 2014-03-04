@@ -1418,6 +1418,7 @@ class Unit : public WorldObject
         // returns the change in power
         int32 ModifyPower(Powers power, int32 val);
         int32 ModifyPowerPct(Powers power, float pct, bool apply = true);
+		uint32 GetPowerIndexByClass(uint32 powerId, uint32 classId) const;
 
         uint32 GetAttackTime(WeaponAttackType att) const
         {
