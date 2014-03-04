@@ -48,6 +48,10 @@ enum Spells
     SPELL_ZERO_POWER					= 72242,
     SPELL_TOTALY_PETRIFIED				= 115877,
 	SPELL_BERSERK						= 26662,
+
+	/* Cobalt Mine */
+	SPELL_COBALT_MINE_EXPLOSION			= 116281,
+	SPELL_COBALT_MINE_VISUAL			= 129455,
 };
 
 enum Events
@@ -63,6 +67,9 @@ enum Events
 
 	/* The Stone Guard Tracker */
 	EVENT_CHOOSE_PETRIFICATION		= 1,
+
+	/* Cobalt mine */
+	EVENT_COBALT_MINE_ACTIVATION	= 1,
 };
 
 enum Actions
@@ -1485,6 +1492,83 @@ public:
 	};
 };
 
+class npc_cobalt_mine : public CreatureScript
+{
+public:
+	npc_cobalt_mine() : CreatureScript("npc_cobalt_mine") { }
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_cobalt_mineAI(creature);
+	}
+
+	struct npc_cobalt_mineAI : public ScriptedAI
+	{
+		npc_cobalt_mineAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
+
+		InstanceScript* instance;
+		EventMap events;
+		bool canExplode;
+
+		void Reset()
+        {
+			events.Reset();
+			canExplode = false;
+
+			me->setFaction(14);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+
+			me->CastSpell(me, SPELL_COBALT_MINE_VISUAL, true);
+			events.ScheduleEvent(EVENT_COBALT_MINE_ACTIVATION, 3*IN_MILLISECONDS);
+        }
+
+		void UpdateAI(const uint32 diff)
+		{
+			events.Update(diff);
+
+			if (canExplode)
+			{
+				if (Map* map = me->GetMap())
+				{
+					Map::PlayerList const &PlayerList = map->GetPlayers();
+
+					if (!PlayerList.isEmpty())
+						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+							if (Player* player = i->getSource())
+								if (player->GetExactDist2d(me->GetPositionX(), me->GetPositionY()) < 7.0f)
+								{
+									me->CastSpell(me, SPELL_COBALT_MINE_EXPLOSION, true);
+									me->DespawnOrUnsummon();
+								}
+				}
+			}
+
+			if (instance)
+			{
+				while (uint32 eventId = events.ExecuteEvent())
+				{
+					switch (eventId)
+					{
+						case EVENT_COBALT_MINE_ACTIVATION:
+							canExplode = true;
+
+							events.CancelEvent(EVENT_COBALT_MINE_ACTIVATION);
+							break;
+
+						default:
+							break;
+					}
+				}
+			}
+		}
+	};
+};
+
 void AddSC_boss_the_stone_guard()
 {
     new boss_amethyst_guardian();
@@ -1492,4 +1576,5 @@ void AddSC_boss_the_stone_guard()
 	new boss_jade_guardian();
 	new boss_jasper_guardian();
 	new npc_the_stone_guard_tracker();
+	new npc_cobalt_mine();
 }
