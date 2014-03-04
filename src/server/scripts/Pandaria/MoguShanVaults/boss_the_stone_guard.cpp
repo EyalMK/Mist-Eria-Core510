@@ -1544,12 +1544,17 @@ public:
 			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
 
 			me->CastSpell(me, SPELL_COBALT_MINE_VISUAL, true);
+			me->DespawnOrUnsummon(90*IN_MILLISECONDS); // 10 cobalt mines not more
 			events.ScheduleEvent(EVENT_COBALT_MINE_ACTIVATION, 3*IN_MILLISECONDS);
         }
 
 		void UpdateAI(const uint32 diff)
 		{
 			events.Update(diff);
+
+			if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
+				if (!cobalt->isInCombat())
+					me->DespawnOrUnsummon();
 
 			if (canExplode)
 			{
@@ -1589,40 +1594,6 @@ public:
 	};
 };
 
-class spell_rend_flesh : public SpellScriptLoader
-{
-    public:
-        spell_rend_flesh() : SpellScriptLoader("spell_rend_flesh") { }
-
-        class spell_rend_fleshSpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_rend_fleshSpellScript);
-
-			bool Validate(SpellInfo const* /*spellEntry*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_REND_FLESH))
-                    return false;
-                return true;
-            }
-
-			void HandleBeforeCast()
-            {
-				if (GetHitUnit() && GetHitUnit()->HasAura(SPELL_REND_FLESH))
-					GetHitUnit()->RemoveAurasDueToSpell(SPELL_REND_FLESH);
-            }
-
-            void Register()
-            {
-                 BeforeCast += SpellCastFn(spell_rend_fleshSpellScript::HandleBeforeCast);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_rend_fleshSpellScript();
-        }
-};
-
 void AddSC_boss_the_stone_guard()
 {
     new boss_amethyst_guardian();
@@ -1631,5 +1602,4 @@ void AddSC_boss_the_stone_guard()
 	new boss_jasper_guardian();
 	new npc_the_stone_guard_tracker();
 	new npc_cobalt_mine();
-	new spell_rend_flesh();
 }
