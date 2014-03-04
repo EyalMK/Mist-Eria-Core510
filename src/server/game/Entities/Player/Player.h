@@ -33,6 +33,7 @@
 #include "SpellMgr.h"
 #include "Unit.h"
 #include "SpyMgr.h"
+#include "Farm.h"
 
 #include <string>
 #include <vector>
@@ -3236,6 +3237,8 @@ public:
         uint32 _maxPersonalArenaRate;
 
         PhaseMgr phaseMgr;
+
+        Farm farm;
 
         SpyMgr m_spyMgr;
 };

@@ -672,7 +672,7 @@ void KillRewarder::Reward()
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
-Player::Player(WorldSession* session): Unit(true), phaseMgr(this), m_battlePetMgr(this)
+Player::Player(WorldSession* session): Unit(true), phaseMgr(this), m_battlePetMgr(this), farm(this)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -903,6 +903,7 @@ Player::Player(WorldSession* session): Unit(true), phaseMgr(this), m_battlePetMg
 	transcendence_spirit = NULL;
 	
 	m_bCanShadowWordDeathReset = true ;
+
 }
 
 Player::~Player()
@@ -1747,6 +1748,10 @@ void Player::Update(uint32 p_time)
             uint32 newzone, newarea;
             GetZoneAndAreaId(newzone, newarea);
 
+
+            farm.CheckZone(newarea);
+
+
             if (m_zoneUpdateId != newzone)
                 UpdateZone(newzone, newarea);                // also update area
             else
@@ -1758,6 +1763,7 @@ void Player::Update(uint32 p_time)
 
                 m_zoneUpdateTimer = ZONE_UPDATE_INTERVAL;
             }
+
         }
         else
             m_zoneUpdateTimer -= p_time;
@@ -23107,7 +23113,7 @@ void Player::UpdateVisibilityOf(WorldObject* target)
 {
     if (HaveAtClient(target))
     {
-        if (!canSeeOrDetect(target, false, true))
+        if (!canSeeOrDetect(target, false, true) && !farm.canSeeOrDetect(target))
         {
             if (target->GetTypeId() == TYPEID_UNIT)
                 BeforeVisibilityDestroy<Creature>(target->ToCreature(), this);
@@ -23122,7 +23128,7 @@ void Player::UpdateVisibilityOf(WorldObject* target)
     }
     else
     {
-        if (canSeeOrDetect(target, false, true))
+        if (canSeeOrDetect(target, false, true) || farm.canSeeOrDetect(target))
         {
             //if (target->isType(TYPEMASK_UNIT) && ((Unit*)target)->m_Vehicle)
             //    UpdateVisibilityOf(((Unit*)target)->m_Vehicle);
@@ -23183,7 +23189,7 @@ void Player::UpdateVisibilityOf(T* target, UpdateData& data, std::set<Unit*>& vi
 {
     if (HaveAtClient(target))
     {
-        if (!canSeeOrDetect(target, false, true))
+        if (!canSeeOrDetect(target, false, true) && !farm.canSeeOrDetect(target))
         {
             BeforeVisibilityDestroy<T>(target, this);
 
@@ -23197,7 +23203,7 @@ void Player::UpdateVisibilityOf(T* target, UpdateData& data, std::set<Unit*>& vi
     }
     else //if (visibleNow.size() < 30 || target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsVehicle())
     {
-        if (canSeeOrDetect(target, false, true))
+        if (canSeeOrDetect(target, false, true) || farm.canSeeOrDetect(target))
         {
             //if (target->isType(TYPEMASK_UNIT) && ((Unit*)target)->m_Vehicle)
             //    UpdateVisibilityOf(((Unit*)target)->m_Vehicle, data, visibleNow);

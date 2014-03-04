@@ -81,7 +81,7 @@
 #include "Warden.h"
 #include "CalendarMgr.h"
 #include "BattlefieldMgr.h"
-#include "BlackMarket/BlackMarketMgr.h"
+#include "BlackMarketMgr.h"
 #include "SpellLearn.h"
 #include "MasteryMgr.h"
 #include "SpyMgr.h"
