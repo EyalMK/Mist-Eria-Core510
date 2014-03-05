@@ -200,7 +200,7 @@ void AreaTrigger::Update(uint32 p_time)
         case 116235:// Amethyst Pool
         {
             std::list<Unit*> targetList;
-            radius = 10.0f;
+            radius = 1.0f;
 
             Trinity::NearestAttackableUnitInObjectRangeCheck u_check(this, caster, radius);
             Trinity::UnitListSearcher<Trinity::NearestAttackableUnitInObjectRangeCheck> searcher(this, targetList, u_check);
