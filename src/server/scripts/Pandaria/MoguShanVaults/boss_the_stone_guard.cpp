@@ -272,6 +272,10 @@ class boss_amethyst_guardian : public CreatureScript
 					
 					if (me->GetPower(POWER_ENERGY) == 100)
 					{
+						me->RemoveAurasDueToSpell(SPELL_AMETHYST_PETRIFICATION);
+						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_1);
+						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_2);
+						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
 						me->CastSpell(me, SPELL_AMETHYST_OVERLOAD);
 						me->SetPower(POWER_ENERGY, 0);
 					}
@@ -302,6 +306,8 @@ class boss_amethyst_guardian : public CreatureScript
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 											}
 								}
+
+								me->CastSpell(me, SPELL_AMETHYST_PETRIFICATION, true);
 
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_SET);
@@ -353,7 +359,7 @@ class boss_amethyst_guardian : public CreatureScript
 											if (Player* player = i->getSource())
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 								}
-								
+
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
 								break;
@@ -554,6 +560,10 @@ class boss_cobalt_guardian : public CreatureScript
 					
 					if (me->GetPower(POWER_ENERGY) == 100)
 					{
+						me->RemoveAurasDueToSpell(SPELL_COBALT_PETRIFICATION);
+						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_1);
+						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_2);
+						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
 						me->CastSpell(me, SPELL_COBALT_OVERLOAD);
 						me->SetPower(POWER_ENERGY, 0);
 					}
@@ -584,6 +594,8 @@ class boss_cobalt_guardian : public CreatureScript
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 											}
 								}
+
+								me->CastSpell(me, SPELL_COBALT_PETRIFICATION, true);
 
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_SET);
@@ -635,7 +647,7 @@ class boss_cobalt_guardian : public CreatureScript
 											if (Player* player = i->getSource())
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 								}
-								
+
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
 								break;
@@ -842,6 +854,10 @@ class boss_jade_guardian : public CreatureScript
 					
 					if (me->GetPower(POWER_ENERGY) == 100)
 					{
+						me->RemoveAurasDueToSpell(SPELL_JADE_PETRIFICATION);
+						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_1);
+						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_2);
+						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
 						me->CastSpell(me, SPELL_JADE_OVERLOAD);
 						me->SetPower(POWER_ENERGY, 0);
 					}
@@ -872,6 +888,8 @@ class boss_jade_guardian : public CreatureScript
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 											}
 								}
+
+								me->CastSpell(me, SPELL_JADE_PETRIFICATION, true);
 
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_SET);
@@ -1123,6 +1141,10 @@ class boss_jasper_guardian : public CreatureScript
 
 					if (me->GetPower(POWER_ENERGY) == 100)
 					{
+						me->RemoveAurasDueToSpell(SPELL_JASPER_PETRIFICATION);
+						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_1);
+						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_2);
+						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
 						me->CastSpell(me, SPELL_JASPER_OVERLOAD);
 						me->SetPower(POWER_ENERGY, 0);
 					}
@@ -1153,6 +1175,8 @@ class boss_jasper_guardian : public CreatureScript
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 											}
 								}
+
+								me->CastSpell(me, SPELL_JASPER_PETRIFICATION, true);
 
 								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_SET);
