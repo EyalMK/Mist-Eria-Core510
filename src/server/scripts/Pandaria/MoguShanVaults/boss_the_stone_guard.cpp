@@ -2,7 +2,6 @@
 
 /* Notes : What is missing ? :	- Guardians personnal spells
 								- Overloads with power
-								- Anim sit fails after evade
 */
 
 #include "ScriptPCH.h"
@@ -262,6 +261,12 @@ class boss_amethyst_guardian : public CreatureScript
 									if (player->GetPower(POWER_ALTERNATE_POWER) == 100 && !player->HasAura(SPELL_TOTALY_PETRIFIED))
 										player->CastSpell(player, SPELL_TOTALY_PETRIFIED);
 					}
+					
+					if (me->GetPower(POWER_ENERGY) == 100)
+					{
+						me->CastSpell(me, SPELL_AMETHYST_OVERLOAD);
+						me->SetPower(POWER_ENERGY, 0);
+					}
 
 					while (uint32 eventId = events.ExecuteEvent())
 					{
@@ -347,13 +352,15 @@ class boss_amethyst_guardian : public CreatureScript
 							}
 							
 							case EVENT_INCREASE_POWER_1:
-								me->ModifyPower(POWER_ENERGY, 1);
+								if (!solidStone)
+									me->ModifyPower(POWER_ENERGY, 1);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
 								break;
 
 							case EVENT_INCREASE_POWER_2:
-								me->ModifyPower(POWER_ENERGY, 3);
+								if (!solidStone)
+									me->ModifyPower(POWER_ENERGY, 3);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1725);
 								break;
@@ -536,6 +543,12 @@ class boss_cobalt_guardian : public CreatureScript
 									if (player->GetPower(POWER_ALTERNATE_POWER) == 100 && !player->HasAura(SPELL_TOTALY_PETRIFIED))
 										player->CastSpell(player, SPELL_TOTALY_PETRIFIED);
 					}
+					
+					if (me->GetPower(POWER_ENERGY) == 100)
+					{
+						me->CastSpell(me, SPELL_COBALT_OVERLOAD);
+						me->SetPower(POWER_ENERGY, 0);
+					}
 
 					while (uint32 eventId = events.ExecuteEvent())
 					{
@@ -621,13 +634,15 @@ class boss_cobalt_guardian : public CreatureScript
 							}
 							
 							case EVENT_INCREASE_POWER_1:
-								me->ModifyPower(POWER_ENERGY, 1);
+								if (!solidStone)
+									me->ModifyPower(POWER_ENERGY, 1);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
 								break;
 
 							case EVENT_INCREASE_POWER_2:
-								me->ModifyPower(POWER_ENERGY, 3);
+								if (!solidStone)
+									me->ModifyPower(POWER_ENERGY, 3);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1625);
 								break;
@@ -816,6 +831,12 @@ class boss_jade_guardian : public CreatureScript
 									if (player->GetPower(POWER_ALTERNATE_POWER) == 100 && !player->HasAura(SPELL_TOTALY_PETRIFIED))
 										player->CastSpell(player, SPELL_TOTALY_PETRIFIED);
 					}
+					
+					if (me->GetPower(POWER_ENERGY) == 100)
+					{
+						me->CastSpell(me, SPELL_JADE_OVERLOAD);
+						me->SetPower(POWER_ENERGY, 0);
+					}
 
 					while (uint32 eventId = events.ExecuteEvent())
 					{
@@ -901,13 +922,15 @@ class boss_jade_guardian : public CreatureScript
 							}
 							
 							case EVENT_INCREASE_POWER_1:
-								me->ModifyPower(POWER_ENERGY, 1);
+								if (!solidStone)
+									me->ModifyPower(POWER_ENERGY, 1);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
 								break;
 
 							case EVENT_INCREASE_POWER_2:
-								me->ModifyPower(POWER_ENERGY, 3);
+								if (!solidStone)
+									me->ModifyPower(POWER_ENERGY, 3);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1625);
 								break;
@@ -1090,6 +1113,12 @@ class boss_jasper_guardian : public CreatureScript
 										player->CastSpell(player, SPELL_TOTALY_PETRIFIED);
 					}
 
+					if (me->GetPower(POWER_ENERGY) == 100)
+					{
+						me->CastSpell(me, SPELL_JASPER_OVERLOAD);
+						me->SetPower(POWER_ENERGY, 0);
+					}
+
 					while (uint32 eventId = events.ExecuteEvent())
 					{
 						switch (eventId)
@@ -1180,7 +1209,8 @@ class boss_jasper_guardian : public CreatureScript
 								break;
 
 							case EVENT_INCREASE_POWER_2:
-								me->ModifyPower(POWER_ENERGY, 3);
+								if (!solidStone)
+									me->ModifyPower(POWER_ENERGY, 3);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1625);
 								break;
