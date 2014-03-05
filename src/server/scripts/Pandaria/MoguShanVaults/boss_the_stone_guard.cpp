@@ -228,7 +228,7 @@ class boss_amethyst_guardian : public CreatureScript
 				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
 				events.ScheduleEvent(EVENT_BERSERK, 5*MINUTE*IN_MILLISECONDS);
-				events.ScheduleEvent(EVENT_AMETHYST_POOL, 9*IN_MILLISECONDS);
+				//events.ScheduleEvent(EVENT_AMETHYST_POOL, 9*IN_MILLISECONDS);
 
 				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
 					tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
@@ -1430,6 +1430,46 @@ public:
 			choiceDone = false;
         }
 
+		bool IsAmethystEligible()
+		{
+			if (instance)
+				if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
+					if (amethyst->isAlive() && lastGuardian != AMETHYST)
+						return true;
+
+			return false;
+		}
+
+		bool IsCobaltEligible()
+		{
+			if (instance)
+				if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
+					if (cobalt->isAlive() && lastGuardian != COBALT)
+						return true;
+
+			return false;
+		}
+
+		bool IsJadeEligible()
+		{
+			if (instance)
+				if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
+					if (jade->isAlive() && lastGuardian != JADE)
+						return true;
+
+			return false;
+		}
+
+		bool IsJasperEligible()
+		{
+			if (instance)
+				if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
+					if (jasper->isAlive() && lastGuardian != JASPER)
+						return true;
+
+			return false;
+		}
+
 		void DoAction(const int32 action)
         {
             switch (action)
@@ -1453,6 +1493,15 @@ public:
 						else if (IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
 							lastGuardian = RAND(AMETHYST, COBALT, JADE);
 						
+						else if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
+							lastGuardian = RAND(AMETHYST, COBALT);
+						
+						else if (!IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
+							lastGuardian = RAND(COBALT, JADE);
+						
+						else if (!IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
+							lastGuardian = RAND(JADE, JASPER);
+						
 						else if (!IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
 							lastGuardian = JASPER;
 						
@@ -1465,15 +1514,6 @@ public:
 						else if (IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
 							lastGuardian = AMETHYST;
 						
-						else if (!IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
-							lastGuardian = RAND(JADE, JASPER);
-						
-						else if (!IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
-							lastGuardian = RAND(COBALT, JADE);
-						
-						else if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
-							lastGuardian = RAND(AMETHYST, COBALT);
-
 						else lastGuardian = 0;
 
 						events.ScheduleEvent(EVENT_CHOOSE_PETRIFICATION, 6*IN_MILLISECONDS);
@@ -1490,74 +1530,6 @@ public:
 					break;
 				}
 			}
-		}
-
-		bool IsAmethystEligible()
-		{
-			if (instance)
-			{
-				if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
-				{
-					if (amethyst->isAlive() && lastGuardian != AMETHYST)
-						return true;
-					else return false;
-				}
-				else return false;
-			}
-			else return false;
-
-			return false;
-		}
-
-		bool IsCobaltEligible()
-		{
-			if (instance)
-			{
-				if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
-				{
-					if (cobalt->isAlive() && lastGuardian != COBALT)
-						return true;
-					else return false;
-				}
-				else return false;
-			}
-			else return false;
-
-			return false;
-		}
-
-		bool IsJadeEligible()
-		{
-			if (instance)
-			{
-				if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
-				{
-					if (jade->isAlive() && lastGuardian != JADE)
-						return true;
-					else return false;
-				}
-				else return false;
-			}
-			else return false;
-
-			return false;
-		}
-
-		bool IsJasperEligible()
-		{
-			if (instance)
-			{
-				if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
-				{
-					if (jasper->isAlive() && lastGuardian != JASPER)
-						return true;
-					else return false;
-				}
-				else return false;
-			}
-			else return false;
-
-			return false;
 		}
 
 		void UpdateAI(const uint32 diff)
