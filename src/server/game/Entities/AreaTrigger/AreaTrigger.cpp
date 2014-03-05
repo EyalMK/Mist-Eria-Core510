@@ -234,7 +234,7 @@ void AreaTrigger::Update(uint32 p_time)
                 if ((*i)->IsInAxe(caster, this, 2.0f))
                 {
                     if (!(*i)->HasAura(116663))
-                        caster->AddAura(116663, (*i));
+                        caster->CastSpell((*i), 116663, true);
                 }
                 else
                     (*i)->RemoveAurasDueToSpell(116663);

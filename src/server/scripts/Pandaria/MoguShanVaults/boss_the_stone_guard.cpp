@@ -176,6 +176,20 @@ class boss_amethyst_guardian : public CreatureScript
 							}
 				}
 
+				std::list<AreaTrigger*> poolsList;
+                me->GetAreaTriggerList(poolsList, SPELL_AMETHYST_POOL);
+
+                if (!poolsList.empty())
+                {
+					for (std::list<AreaTrigger*>::const_iterator i = poolsList.begin(); i != poolsList.end(); ++i)
+					{
+						AreaTrigger* poolsList = (*i);
+
+						if (poolsList)
+							poolsList->Remove();
+					}
+				}
+
 				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
 					tracker->AI()->DoAction(ACTION_TRACKER_RESET);
 			}
