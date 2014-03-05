@@ -66,7 +66,7 @@ enum Events
 	EVENT_BERSERK					= 8,
 
 	/* Amethyst Guardian */
-
+	EVENT_AMETHYST_POOL				= 9,
 
 	/* Cobalt Guardian */
 	EVENT_COBALT_MINE				= 9,
@@ -214,6 +214,7 @@ class boss_amethyst_guardian : public CreatureScript
 				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
 				events.ScheduleEvent(EVENT_BERSERK, 5*MINUTE*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_AMETHYST_POOL, 9*IN_MILLISECONDS);
 
 				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
 					tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
@@ -406,6 +407,13 @@ class boss_amethyst_guardian : public CreatureScript
 								me->CastSpell(me, SPELL_BERSERK, true);
 
 								events.CancelEvent(EVENT_BERSERK);
+								break;
+								
+							case EVENT_AMETHYST_POOL:
+								if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+									me->CastSpell(target, SPELL_AMETHYST_POOL, true);
+
+								events.ScheduleEvent(EVENT_AMETHYST_POOL, 9*IN_MILLISECONDS);
 								break;
 
 							default:
@@ -1460,8 +1468,9 @@ public:
 
 				case ACTION_TRACKER_RESET:
 				{
-					lastGuardian = 0;
 					events.Reset();
+					lastGuardian = 0;
+					choiceDone = false;
 					break;
 				}
 			}

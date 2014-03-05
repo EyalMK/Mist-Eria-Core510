@@ -6559,6 +6559,14 @@ void Spell::EffectCreateAreatrigger(SpellEffIndex effIndex)
 
             break;
         }
+		case 116235:// Amethyst pool
+        {
+			AreaTrigger* pool = m_caster->GetAreaTrigger(m_spellInfo->Id);
+
+			if (pool)
+				pool->SetObjectScale(1.0f);
+            break;
+        }
         default:
             break;
     }
