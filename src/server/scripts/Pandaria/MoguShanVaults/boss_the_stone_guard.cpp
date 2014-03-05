@@ -127,13 +127,13 @@ class boss_amethyst_guardian : public CreatureScript
                 me->SetPower(POWER_ENERGY, 0);
 				me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
-				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ANIM_SIT, true);
 				me->CastSpell(me, SPELL_ZERO_POWER);
             }
 
 			void JustReachedHome()
             {
-				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ANIM_SIT, true);
 			}
 
 			void DoAction(const int32 action)
@@ -408,13 +408,13 @@ class boss_cobalt_guardian : public CreatureScript
                 me->SetPower(POWER_ENERGY, 0);
 				me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
-				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ANIM_SIT, true);
 				me->CastSpell(me, SPELL_ZERO_POWER);
             }
 			
 			void JustReachedHome()
             {
-				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ANIM_SIT, true);
 			}
 
 			void DoAction(const int32 action)
@@ -644,7 +644,7 @@ class boss_cobalt_guardian : public CreatureScript
 								if (!solidStone)
 									me->ModifyPower(POWER_ENERGY, 3);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1625);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1725);
 								break;
 								
 							case EVENT_COBALT_MINE:
@@ -697,13 +697,13 @@ class boss_jade_guardian : public CreatureScript
                 me->SetPower(POWER_ENERGY, 0);
 				me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
-				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ANIM_SIT, true);
 				me->CastSpell(me, SPELL_ZERO_POWER);
             }
 			
 			void JustReachedHome()
             {
-				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ANIM_SIT, true);
 			}
 
 			void DoAction(const int32 action)
@@ -932,7 +932,7 @@ class boss_jade_guardian : public CreatureScript
 								if (!solidStone)
 									me->ModifyPower(POWER_ENERGY, 3);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1625);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1725);
 								break;
 
 							default:
@@ -978,13 +978,13 @@ class boss_jasper_guardian : public CreatureScript
                 me->SetPower(POWER_ENERGY, 0);
 				me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
-				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ANIM_SIT, true);
 				me->CastSpell(me, SPELL_ZERO_POWER);
             }
 			
 			void JustReachedHome()
             {
-				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ANIM_SIT, true);
 			}
 
 			void DoAction(const int32 action)
@@ -1203,7 +1203,8 @@ class boss_jasper_guardian : public CreatureScript
 							}
 							
 							case EVENT_INCREASE_POWER_1:
-								me->ModifyPower(POWER_ENERGY, 1);
+								if (!solidStone)
+									me->ModifyPower(POWER_ENERGY, 1);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
 								break;
@@ -1212,7 +1213,7 @@ class boss_jasper_guardian : public CreatureScript
 								if (!solidStone)
 									me->ModifyPower(POWER_ENERGY, 3);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1625);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1725);
 								break;
 
 							default:
