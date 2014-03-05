@@ -1496,14 +1496,14 @@ public:
 			{
 				if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
 				{
-					if (!amethyst->isAlive() || lastGuardian == AMETHYST)
-						return false;
+					if (amethyst->isAlive() && lastGuardian != AMETHYST)
+						return true;
 				}
 				else return false;
 			}
 			else return false;
 
-			return true;
+			return false;
 		}
 
 		bool IsCobaltEligible()
@@ -1512,14 +1512,14 @@ public:
 			{
 				if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
 				{
-					if (!cobalt->isAlive() || lastGuardian == COBALT)
-						return false;
+					if (cobalt->isAlive() && lastGuardian != COBALT)
+						return true;
 				}
 				else return false;
 			}
 			else return false;
 
-			return true;
+			return false;
 		}
 
 		bool IsJadeEligible()
@@ -1528,14 +1528,14 @@ public:
 			{
 				if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
 				{
-					if (!jade->isAlive() || lastGuardian == JADE)
-						return false;
+					if (jade->isAlive() && lastGuardian != JADE)
+						return true;
 				}
 				else return false;
 			}
 			else return false;
 
-			return true;
+			return false;
 		}
 
 		bool IsJasperEligible()
@@ -1544,14 +1544,14 @@ public:
 			{
 				if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
 				{
-					if (!jasper->isAlive() || lastGuardian == JASPER)
-						return false;
+					if (jasper->isAlive() && lastGuardian != JASPER)
+						return true;
 				}
 				else return false;
 			}
 			else return false;
 
-			return true;
+			return false;
 		}
 
 		void UpdateAI(const uint32 diff)
