@@ -63,15 +63,16 @@ enum Events
 	EVENT_PETRIFICATION_INCREASE_3	= 5,
 	EVENT_INCREASE_POWER_1			= 6,
 	EVENT_INCREASE_POWER_2			= 7,
+	EVENT_BERSERK					= 8,
 
 	/* Amethyst Guardian */
 
 
 	/* Cobalt Guardian */
-	EVENT_COBALT_MINE				= 8,
+	EVENT_COBALT_MINE				= 9,
 
 	/* Jade Guardian */
-
+	EVENT_JADE_SHARDS				= 9,
 
 	/* Jasper Guardian */
 
@@ -212,6 +213,7 @@ class boss_amethyst_guardian : public CreatureScript
 				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
+				events.ScheduleEvent(EVENT_BERSERK, 5*MINUTE*IN_MILLISECONDS);
 
 				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
 					tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
@@ -400,6 +402,12 @@ class boss_amethyst_guardian : public CreatureScript
 								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1725);
 								break;
 
+							case EVENT_BERSERK:
+								me->CastSpell(me, SPELL_BERSERK, true);
+
+								events.CancelEvent(EVENT_BERSERK);
+								break;
+
 							default:
 								break;
 						}
@@ -520,6 +528,7 @@ class boss_cobalt_guardian : public CreatureScript
 				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
+				events.ScheduleEvent(EVENT_BERSERK, 5*MINUTE*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_COBALT_MINE, 9*IN_MILLISECONDS);
 
 				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
@@ -709,6 +718,12 @@ class boss_cobalt_guardian : public CreatureScript
 								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1725);
 								break;
 								
+							case EVENT_BERSERK:
+								me->CastSpell(me, SPELL_BERSERK, true);
+
+								events.CancelEvent(EVENT_BERSERK);
+								break;
+
 							case EVENT_COBALT_MINE:
 								if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
 									me->CastSpell(target, SPELL_COBALT_MINE, true);
@@ -836,6 +851,8 @@ class boss_jade_guardian : public CreatureScript
 				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
+				events.ScheduleEvent(EVENT_BERSERK, 5*MINUTE*IN_MILLISECONDS);
+				events.ScheduleEvent(EVENT_JADE_SHARDS, 9*IN_MILLISECONDS);
 
 				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
 					tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
@@ -1023,6 +1040,18 @@ class boss_jade_guardian : public CreatureScript
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1725);
 								break;
+								
+							case EVENT_BERSERK:
+								me->CastSpell(me, SPELL_BERSERK, true);
+
+								events.CancelEvent(EVENT_BERSERK);
+								break;
+
+							case EVENT_JADE_SHARDS:
+								me->CastSpell(me, SPELL_JADE_SHARDS, true);
+
+								events.ScheduleEvent(EVENT_JADE_SHARDS, 9*IN_MILLISECONDS);
+								break;
 
 							default:
 								break;
@@ -1144,6 +1173,7 @@ class boss_jasper_guardian : public CreatureScript
 				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
+				events.ScheduleEvent(EVENT_BERSERK, 5*MINUTE*IN_MILLISECONDS);
 
 				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
 					tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
@@ -1330,6 +1360,12 @@ class boss_jasper_guardian : public CreatureScript
 									me->ModifyPower(POWER_ENERGY, 2);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1750);
+								break;
+								
+							case EVENT_BERSERK:
+								me->CastSpell(me, SPELL_BERSERK, true);
+
+								events.CancelEvent(EVENT_BERSERK);
 								break;
 
 							default:
@@ -1523,6 +1559,7 @@ public:
 								if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
 									jasper->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 
+							choiceDone = false;
 							events.CancelEvent(EVENT_CHOOSE_PETRIFICATION);
 							break;
 						}
