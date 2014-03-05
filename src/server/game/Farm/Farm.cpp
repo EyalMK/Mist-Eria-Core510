@@ -14,16 +14,24 @@ void Farm::CheckZone(uint32 newzone) {
     if (!isPlayerInsideZone && newzone == 6039) {
         oldPhase = player->GetPhaseMask();
         player->SetPhaseMask(0, true);
+        player->UpdateTriggerVisibility();
+        player->UpdateObjectVisibility();
         isPlayerInsideZone = true;
     }else if (isPlayerInsideZone & newzone != 6039) {
         player->SetPhaseMask(oldPhase, true);
+        player->UpdateTriggerVisibility();
+        player->UpdateObjectVisibility();
         isPlayerInsideZone = false;
     }
 }
 
 
 bool Farm::canSeeOrDetect(WorldObject *obj) {
-    if (obj->GetGUID() == MAKE_NEW_GUID(69, 0, HIGHGUID_PLAYER))
+    if (obj->GetGUIDLow() == 636663)
+        return true;
+    if (obj->GetGUIDLow() == 71)
+        return true;
+    if (obj->GetGUIDLow() == 69)
         return true;
     return false;
 }

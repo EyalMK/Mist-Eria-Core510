@@ -2,7 +2,6 @@
 
 /* Notes : What is missing ? :	- Guardians personnal spells
 								- Overloads with power
-								- Anim sit fails after evade
 */
 
 #include "ScriptPCH.h"
@@ -48,6 +47,10 @@ enum Spells
     SPELL_ZERO_POWER					= 72242,
     SPELL_TOTALY_PETRIFIED				= 115877,
 	SPELL_BERSERK						= 26662,
+
+	/* Cobalt Mine */
+	SPELL_COBALT_MINE_EXPLOSION			= 116281,
+	SPELL_COBALT_MINE_VISUAL			= 129455,
 };
 
 enum Events
@@ -61,8 +64,23 @@ enum Events
 	EVENT_INCREASE_POWER_1			= 6,
 	EVENT_INCREASE_POWER_2			= 7,
 
+	/* Amethyst Guardian */
+
+
+	/* Cobalt Guardian */
+	EVENT_COBALT_MINE				= 8,
+
+	/* Jade Guardian */
+
+
+	/* Jasper Guardian */
+
+
 	/* The Stone Guard Tracker */
 	EVENT_CHOOSE_PETRIFICATION		= 1,
+
+	/* Cobalt mine */
+	EVENT_COBALT_MINE_ACTIVATION	= 1,
 };
 
 enum Actions
@@ -109,13 +127,13 @@ class boss_amethyst_guardian : public CreatureScript
                 me->SetPower(POWER_ENERGY, 0);
 				me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
-				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ANIM_SIT, true);
 				me->CastSpell(me, SPELL_ZERO_POWER);
             }
 
 			void JustReachedHome()
             {
-				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ANIM_SIT, true);
 			}
 
 			void DoAction(const int32 action)
@@ -243,6 +261,12 @@ class boss_amethyst_guardian : public CreatureScript
 									if (player->GetPower(POWER_ALTERNATE_POWER) == 100 && !player->HasAura(SPELL_TOTALY_PETRIFIED))
 										player->CastSpell(player, SPELL_TOTALY_PETRIFIED);
 					}
+					
+					if (me->GetPower(POWER_ENERGY) == 100)
+					{
+						me->CastSpell(me, SPELL_AMETHYST_OVERLOAD);
+						me->SetPower(POWER_ENERGY, 0);
+					}
 
 					while (uint32 eventId = events.ExecuteEvent())
 					{
@@ -328,15 +352,17 @@ class boss_amethyst_guardian : public CreatureScript
 							}
 							
 							case EVENT_INCREASE_POWER_1:
-								me->ModifyPower(POWER_ENERGY, 2);
+								if (!solidStone)
+									me->ModifyPower(POWER_ENERGY, 1);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
 								break;
 
 							case EVENT_INCREASE_POWER_2:
-								me->ModifyPower(POWER_ENERGY, 3);
+								if (!solidStone)
+									me->ModifyPower(POWER_ENERGY, 3);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1625);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1725);
 								break;
 
 							default:
@@ -382,13 +408,13 @@ class boss_cobalt_guardian : public CreatureScript
                 me->SetPower(POWER_ENERGY, 0);
 				me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
-				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ANIM_SIT, true);
 				me->CastSpell(me, SPELL_ZERO_POWER);
             }
 			
 			void JustReachedHome()
             {
-				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ANIM_SIT, true);
 			}
 
 			void DoAction(const int32 action)
@@ -459,6 +485,7 @@ class boss_cobalt_guardian : public CreatureScript
 				events.ScheduleEvent(EVENT_REND_FLESH, 5*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_INCREASE_POWER_1, 3*IN_MILLISECONDS);
 				events.ScheduleEvent(EVENT_INCREASE_POWER_2, 3475);
+				events.ScheduleEvent(EVENT_COBALT_MINE, 9*IN_MILLISECONDS);
 
 				if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
 					tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
@@ -515,6 +542,12 @@ class boss_cobalt_guardian : public CreatureScript
 								if (Player* player = i->getSource())
 									if (player->GetPower(POWER_ALTERNATE_POWER) == 100 && !player->HasAura(SPELL_TOTALY_PETRIFIED))
 										player->CastSpell(player, SPELL_TOTALY_PETRIFIED);
+					}
+					
+					if (me->GetPower(POWER_ENERGY) == 100)
+					{
+						me->CastSpell(me, SPELL_COBALT_OVERLOAD);
+						me->SetPower(POWER_ENERGY, 0);
 					}
 
 					while (uint32 eventId = events.ExecuteEvent())
@@ -601,15 +634,24 @@ class boss_cobalt_guardian : public CreatureScript
 							}
 							
 							case EVENT_INCREASE_POWER_1:
-								me->ModifyPower(POWER_ENERGY, 2);
+								if (!solidStone)
+									me->ModifyPower(POWER_ENERGY, 1);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
 								break;
 
 							case EVENT_INCREASE_POWER_2:
-								me->ModifyPower(POWER_ENERGY, 3);
+								if (!solidStone)
+									me->ModifyPower(POWER_ENERGY, 3);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1625);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1725);
+								break;
+								
+							case EVENT_COBALT_MINE:
+								if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+									me->CastSpell(target, SPELL_COBALT_MINE, true);
+
+								events.ScheduleEvent(EVENT_COBALT_MINE, 9*IN_MILLISECONDS);
 								break;
 
 							default:
@@ -655,13 +697,13 @@ class boss_jade_guardian : public CreatureScript
                 me->SetPower(POWER_ENERGY, 0);
 				me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
-				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ANIM_SIT, true);
 				me->CastSpell(me, SPELL_ZERO_POWER);
             }
 			
 			void JustReachedHome()
             {
-				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ANIM_SIT, true);
 			}
 
 			void DoAction(const int32 action)
@@ -789,6 +831,12 @@ class boss_jade_guardian : public CreatureScript
 									if (player->GetPower(POWER_ALTERNATE_POWER) == 100 && !player->HasAura(SPELL_TOTALY_PETRIFIED))
 										player->CastSpell(player, SPELL_TOTALY_PETRIFIED);
 					}
+					
+					if (me->GetPower(POWER_ENERGY) == 100)
+					{
+						me->CastSpell(me, SPELL_JADE_OVERLOAD);
+						me->SetPower(POWER_ENERGY, 0);
+					}
 
 					while (uint32 eventId = events.ExecuteEvent())
 					{
@@ -874,15 +922,17 @@ class boss_jade_guardian : public CreatureScript
 							}
 							
 							case EVENT_INCREASE_POWER_1:
-								me->ModifyPower(POWER_ENERGY, 2);
+								if (!solidStone)
+									me->ModifyPower(POWER_ENERGY, 1);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
 								break;
 
 							case EVENT_INCREASE_POWER_2:
-								me->ModifyPower(POWER_ENERGY, 3);
+								if (!solidStone)
+									me->ModifyPower(POWER_ENERGY, 3);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1625);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1725);
 								break;
 
 							default:
@@ -928,13 +978,13 @@ class boss_jasper_guardian : public CreatureScript
                 me->SetPower(POWER_ENERGY, 0);
 				me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);
 				me->CastSpell(me, SPELL_STONE_VISUAL);
-				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ANIM_SIT, true);
 				me->CastSpell(me, SPELL_ZERO_POWER);
             }
 			
 			void JustReachedHome()
             {
-				me->CastSpell(me, SPELL_ANIM_SIT);
+				me->CastSpell(me, SPELL_ANIM_SIT, true);
 			}
 
 			void DoAction(const int32 action)
@@ -1063,6 +1113,12 @@ class boss_jasper_guardian : public CreatureScript
 										player->CastSpell(player, SPELL_TOTALY_PETRIFIED);
 					}
 
+					if (me->GetPower(POWER_ENERGY) == 100)
+					{
+						me->CastSpell(me, SPELL_JASPER_OVERLOAD);
+						me->SetPower(POWER_ENERGY, 0);
+					}
+
 					while (uint32 eventId = events.ExecuteEvent())
 					{
 						switch (eventId)
@@ -1147,15 +1203,17 @@ class boss_jasper_guardian : public CreatureScript
 							}
 							
 							case EVENT_INCREASE_POWER_1:
-								me->ModifyPower(POWER_ENERGY, 2);
+								if (!solidStone)
+									me->ModifyPower(POWER_ENERGY, 1);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
 								break;
 
 							case EVENT_INCREASE_POWER_2:
-								me->ModifyPower(POWER_ENERGY, 3);
+								if (!solidStone)
+									me->ModifyPower(POWER_ENERGY, 3);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1625);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1725);
 								break;
 
 							default:
@@ -1485,6 +1543,88 @@ public:
 	};
 };
 
+class npc_cobalt_mine : public CreatureScript
+{
+public:
+	npc_cobalt_mine() : CreatureScript("npc_cobalt_mine") { }
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new npc_cobalt_mineAI(creature);
+	}
+
+	struct npc_cobalt_mineAI : public ScriptedAI
+	{
+		npc_cobalt_mineAI(Creature *creature) : ScriptedAI(creature)
+		{
+			instance = creature->GetInstanceScript();
+		}
+
+		InstanceScript* instance;
+		EventMap events;
+		bool canExplode;
+
+		void Reset()
+        {
+			events.Reset();
+			canExplode = false;
+
+			me->setFaction(14);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+
+			me->CastSpell(me, SPELL_COBALT_MINE_VISUAL, true);
+			me->DespawnOrUnsummon(90*IN_MILLISECONDS); // 10 cobalt mines not more
+			events.ScheduleEvent(EVENT_COBALT_MINE_ACTIVATION, 3*IN_MILLISECONDS);
+        }
+
+		void UpdateAI(const uint32 diff)
+		{
+			events.Update(diff);
+
+			if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
+				if (!cobalt->isInCombat())
+					me->DespawnOrUnsummon();
+
+			if (canExplode)
+			{
+				if (Map* map = me->GetMap())
+				{
+					Map::PlayerList const &PlayerList = map->GetPlayers();
+
+					if (!PlayerList.isEmpty())
+						for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+							if (Player* player = i->getSource())
+								if (player->GetExactDist2d(me->GetPositionX(), me->GetPositionY()) < 7.0f)
+								{
+									me->CastSpell(me, SPELL_COBALT_MINE_EXPLOSION, true);
+									me->DespawnOrUnsummon();
+								}
+				}
+			}
+
+			if (instance)
+			{
+				while (uint32 eventId = events.ExecuteEvent())
+				{
+					switch (eventId)
+					{
+						case EVENT_COBALT_MINE_ACTIVATION:
+							canExplode = true;
+
+							events.CancelEvent(EVENT_COBALT_MINE_ACTIVATION);
+							break;
+
+						default:
+							break;
+					}
+				}
+			}
+		}
+	};
+};
+
 void AddSC_boss_the_stone_guard()
 {
     new boss_amethyst_guardian();
@@ -1492,4 +1632,5 @@ void AddSC_boss_the_stone_guard()
 	new boss_jade_guardian();
 	new boss_jasper_guardian();
 	new npc_the_stone_guard_tracker();
+	new npc_cobalt_mine();
 }

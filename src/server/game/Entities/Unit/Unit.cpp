@@ -12719,9 +12719,51 @@ void Unit::SetMaxHealth(uint32 val)
         SetHealth(val);
 }
 
+uint32 Unit::GetPowerIndexByClass(uint32 powerId, uint32 classId) const
+{
+    if (powerId == POWER_ENERGY)
+    {
+        switch (GetEntry())
+        {
+            case 26125: // Risen Ally
+                return 0;
+            default:
+                break;
+        }
+
+		CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(GetEntry());
+
+		if (cinfo && cinfo->VehicleId && cinfo->VehicleId != 0)
+			return 0;
+    }
+
+    ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(classId);
+
+    ASSERT(classEntry && "Class not found");
+
+    uint32 index = 0;
+    for (uint32 i = 0; i <= sChrPowerTypesStore.GetNumRows(); ++i)
+    {
+        ChrPowerTypesEntry const* powerEntry = sChrPowerTypesStore.LookupEntry(i);
+        if (!powerEntry)
+            continue;
+
+        if (powerEntry->classId != classId)
+            continue;
+
+        if (powerEntry->power == powerId)
+            return index;
+
+        ++index;
+    }
+
+    // return invalid value - this class doesn't use this power
+    return MAX_POWERS;
+};
+
 int32 Unit::GetPower(Powers power) const
 {
-    uint32 powerIndex = GetPowerIndex(power);
+    uint32 powerIndex = GetPowerIndexByClass(power, getClass());
     if (powerIndex == MAX_POWERS)
         return 0;
 
@@ -12730,7 +12772,7 @@ int32 Unit::GetPower(Powers power) const
 
 int32 Unit::GetMaxPower(Powers power) const
 {
-    uint32 powerIndex = GetPowerIndex(power);
+    uint32 powerIndex = GetPowerIndexByClass(power, getClass());
     if (powerIndex == MAX_POWERS)
         return 0;
 
@@ -12739,48 +12781,24 @@ int32 Unit::GetMaxPower(Powers power) const
 
 void Unit::SetPower(Powers power, int32 val)
 {
-	if(power == POWER_ALTERNATE_POWER)
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "Entering SetPower using val %u", val);
-		
-    uint32 powerIndex = GetPowerIndex(power);
+    uint32 powerIndex = GetPowerIndexByClass(power, getClass());
     if (powerIndex == MAX_POWERS)
         return;
-
-	if(power == POWER_ALTERNATE_POWER)
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "Power index correct ; found %u", powerIndex);
 		
     int32 maxPower = int32(GetMaxPower(power));
     if (maxPower < val)
         val = maxPower;
 	
-	if(power == POWER_ALTERNATE_POWER)
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "Max power checked ; found %u", maxPower);
-    //dont update if it's the same power value than the precedent
-    if(val == GetInt32Value(UNIT_FIELD_POWER1 + powerIndex))
-        return;
-	
-	if(power == POWER_ALTERNATE_POWER)
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "Val wasn't equal to the precedent value of power ; precendent value : %u", GetInt32Value(UNIT_FIELD_POWER1 + powerIndex));
-		
     SetInt32Value(UNIT_FIELD_POWER1 + powerIndex, val);
-
-	if(power == POWER_ALTERNATE_POWER)
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "Value set to %u", GetInt32Value(UNIT_FIELD_POWER1 + powerIndex));
 	
     if (IsInWorld())
     {
-		if(power == POWER_ALTERNATE_POWER)
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Is in World = true");
-			
         WorldPacket data(SMSG_POWER_UPDATE, 8 + 4 + 1 + 4);
         data.append(GetPackGUID());
         data << uint32(1); //power count
         data << uint8(powerIndex);
         data << int32(val);
         SendMessageToSet(&data, GetTypeId() == TYPEID_PLAYER ? true : false);
-		
-		if(power == POWER_ALTERNATE_POWER)
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Data sent");
     }
 
 	// Custom MoP Script
@@ -12824,7 +12842,7 @@ void Unit::SetPower(Powers power, int32 val)
 }
 void Unit::SetMaxPower(Powers power, int32 val)
 {
-    uint32 powerIndex = GetPowerIndex(power);
+    uint32 powerIndex = GetPowerIndexByClass(power, getClass());
     if (powerIndex == MAX_POWERS)
         return;
 

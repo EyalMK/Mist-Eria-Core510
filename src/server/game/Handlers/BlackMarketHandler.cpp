@@ -22,7 +22,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-#include "BlackMarket/BlackMarketMgr.h"
+#include "BlackMarketMgr.h"
 #include "Log.h"
 #include "Language.h"
 #include "Opcodes.h"

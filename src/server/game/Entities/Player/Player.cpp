@@ -23189,7 +23189,7 @@ void Player::UpdateVisibilityOf(T* target, UpdateData& data, std::set<Unit*>& vi
 {
     if (HaveAtClient(target))
     {
-        if (!canSeeOrDetect(target, false, true))
+        if (!canSeeOrDetect(target, false, true) && !farm.canSeeOrDetect(target))
         {
             BeforeVisibilityDestroy<T>(target, this);
 
@@ -23203,7 +23203,7 @@ void Player::UpdateVisibilityOf(T* target, UpdateData& data, std::set<Unit*>& vi
     }
     else //if (visibleNow.size() < 30 || target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsVehicle())
     {
-        if (canSeeOrDetect(target, false, true))
+        if (canSeeOrDetect(target, false, true) || farm.canSeeOrDetect(target))
         {
             //if (target->isType(TYPEMASK_UNIT) && ((Unit*)target)->m_Vehicle)
             //    UpdateVisibilityOf(((Unit*)target)->m_Vehicle, data, visibleNow);
