@@ -95,7 +95,7 @@ enum Npcs
 	NPC_THE_STONE_GUARD_TRACKER		= 400463,
 };
 
-enum Creatures
+enum Guardians
 {
 	AMETHYST	= 1,
 	COBALT		= 2,
