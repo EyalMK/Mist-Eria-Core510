@@ -1,7 +1,7 @@
 /* # Script de Sungis : The Stone Guard # */
 
-/* Notes : What is missing ? :	- Guardians personnal spells
-								- Overloads with power
+/* Notes : What is missing ? :	- Guardians personnal spells (Amethyst & Jasper & Jade)
+								- 
 */
 
 #include "ScriptPCH.h"
@@ -20,21 +20,21 @@ enum Spells
     SPELL_COBALT_OVERLOAD				= 115840,
     SPELL_COBALT_PETRIFICATION			= 115852,
     SPELL_COBALT_PETRIFICATION_BAR		= 131268,
-    SEPLL_COBALT_TRUE_FORM				= 115771,
+    SPELL_COBALT_TRUE_FORM				= 115771,
     SPELL_COBALT_MINE					= 129460,
 
 	/* Jade Guardian */
     SPELL_JADE_OVERLOAD                 = 115842,
     SPELL_JADE_PETRIFICATION            = 116006,
     SPELL_JADE_PETRIFICATION_BAR        = 131269,
-    SEPLL_JADE_TRUE_FORM                = 115827,
+    SPELL_JADE_TRUE_FORM                = 115827,
     SPELL_JADE_SHARDS                   = 116223,
 
 	/* Jasper Guardian */
     SPELL_JASPER_OVERLOAD				= 115843,
     SPELL_JASPER_PETRIFICATION			= 116036,
     SPELL_JASPER_PETRIFICATION_BAR		= 131270,
-    SEPLL_JASPER_TRUE_FORM				= 115828,
+    SPELL_JASPER_TRUE_FORM				= 115828,
     SPELL_JASPER_CHAINS					= 130395,
     SPELL_JASPER_CHAINS_VISUAL			= 130403,
     SPELL_JASPER_CHAINS_DAMAGE			= 130404,
@@ -244,6 +244,9 @@ class boss_amethyst_guardian : public CreatureScript
 							!me->FindNearestCreature(BOSS_JADE_GUARDIAN, 10.0f, true) &&
 							!me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 10.0f, true))
 						{
+							if (me->HasAura(SPELL_AMETHYST_TRUE_FORM))
+								me->RemoveAurasDueToSpell(SPELL_AMETHYST_TRUE_FORM, me->GetGUID());
+
 							me->CastSpell(me, SPELL_SOLID_STONE);
 							solidStone = true;
 						}
@@ -256,6 +259,7 @@ class boss_amethyst_guardian : public CreatureScript
 							if (me->HasAura(SPELL_SOLID_STONE))
 								me->RemoveAurasDueToSpell(SPELL_SOLID_STONE, me->GetGUID());
 
+							me->CastSpell(me, SPELL_AMETHYST_TRUE_FORM, true);
 							solidStone = false;
 						}
 
@@ -549,6 +553,9 @@ class boss_cobalt_guardian : public CreatureScript
 							!me->FindNearestCreature(BOSS_JADE_GUARDIAN, 10.0f, true) &&
 							!me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 10.0f, true))
 						{
+							if (me->HasAura(SPELL_COBALT_TRUE_FORM))
+								me->RemoveAurasDueToSpell(SPELL_COBALT_TRUE_FORM, me->GetGUID());
+
 							me->CastSpell(me, SPELL_SOLID_STONE);
 							solidStone = true;
 						}
@@ -561,6 +568,7 @@ class boss_cobalt_guardian : public CreatureScript
 							if (me->HasAura(SPELL_SOLID_STONE))
 								me->RemoveAurasDueToSpell(SPELL_SOLID_STONE, me->GetGUID());
 
+							me->CastSpell(me, SPELL_COBALT_TRUE_FORM, true);
 							solidStone = false;
 						}
 
@@ -860,6 +868,9 @@ class boss_jade_guardian : public CreatureScript
 							!me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 10.0f, true) &&
 							!me->FindNearestCreature(BOSS_JASPER_GUARDIAN, 10.0f, true))
 						{
+							if (me->HasAura(SPELL_JADE_TRUE_FORM))
+								me->RemoveAurasDueToSpell(SPELL_JADE_TRUE_FORM, me->GetGUID());
+
 							me->CastSpell(me, SPELL_SOLID_STONE);
 							solidStone = true;
 						}
@@ -872,6 +883,7 @@ class boss_jade_guardian : public CreatureScript
 							if (me->HasAura(SPELL_SOLID_STONE))
 								me->RemoveAurasDueToSpell(SPELL_SOLID_STONE, me->GetGUID());
 
+							me->CastSpell(me, SPELL_JADE_TRUE_FORM, true);
 							solidStone = false;
 						}
 
@@ -1164,6 +1176,9 @@ class boss_jasper_guardian : public CreatureScript
 							!me->FindNearestCreature(BOSS_COBALT_GUARDIAN, 10.0f, true) &&
 							!me->FindNearestCreature(BOSS_JADE_GUARDIAN, 10.0f, true))
 						{
+							if (me->HasAura(SPELL_JASPER_TRUE_FORM))
+								me->RemoveAurasDueToSpell(SPELL_JASPER_TRUE_FORM, me->GetGUID());
+
 							me->CastSpell(me, SPELL_SOLID_STONE);
 							solidStone = true;
 						}
@@ -1176,6 +1191,7 @@ class boss_jasper_guardian : public CreatureScript
 							if (me->HasAura(SPELL_SOLID_STONE))
 								me->RemoveAurasDueToSpell(SPELL_SOLID_STONE, me->GetGUID());
 
+							me->CastSpell(me, SPELL_JASPER_TRUE_FORM, true);
 							solidStone = false;
 						}
 

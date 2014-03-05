@@ -3955,6 +3955,18 @@ void SpellMgr::LoadSpellInfoCorrections()
                 case 114685:
                     spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_1_YARD);
                     break ;
+				case 115829: // Amethyst true form
+                    spellInfo->Effects[EFFECT_0].Effect = NULL;
+                    break ;
+				case 115771: // Cobalt true form
+                    spellInfo->Effects[EFFECT_0].Effect = NULL;
+                    break ;
+				case 115827: // Jade true form
+                    spellInfo->Effects[EFFECT_0].Effect = NULL;
+                    break ;
+				case 115828: // Jasper true form
+                    spellInfo->Effects[EFFECT_0].Effect = NULL;
+                    break ;
 				default:
 					break;
 			}
