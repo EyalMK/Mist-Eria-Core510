@@ -1364,7 +1364,7 @@ public:
 								}
 							}
 
-							if (!IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
+							else if (!IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
 							{
 								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_COBALT_GUARDIAN,
 																									   DATA_JADE_GUARDIAN,
@@ -1376,7 +1376,7 @@ public:
 								}
 							}
 
-							if (IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
+							else if (IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
 							{
 								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_AMETHYST_GUARDIAN,
 																									   DATA_JADE_GUARDIAN,
@@ -1388,7 +1388,7 @@ public:
 								}
 							}
 
-							if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
+							else if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
 							{
 								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_AMETHYST_GUARDIAN,
 																									   DATA_COBALT_GUARDIAN,
@@ -1400,7 +1400,7 @@ public:
 								}
 							}
 
-							if (IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
+							else if (IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
 							{
 								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_AMETHYST_GUARDIAN,
 																									   DATA_COBALT_GUARDIAN,
@@ -1412,7 +1412,7 @@ public:
 								}
 							}
 
-							if (!IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
+							else if (!IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
 							{
 								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_JADE_GUARDIAN,
 																									   DATA_JASPER_GUARDIAN))))
@@ -1424,7 +1424,7 @@ public:
 							}
 
 
-							if (!IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
+							else if (!IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
 							{
 								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_COBALT_GUARDIAN,
 																									   DATA_JASPER_GUARDIAN))))
@@ -1435,7 +1435,7 @@ public:
 								}
 							}
 
-							if (!IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
+							else if (!IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
 							{
 								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_COBALT_GUARDIAN,
 																									   DATA_JADE_GUARDIAN))))
@@ -1446,7 +1446,7 @@ public:
 								}
 							}
 
-							if (IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
+							else if (IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
 							{
 								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_AMETHYST_GUARDIAN,
 																									   DATA_JASPER_GUARDIAN))))
@@ -1457,7 +1457,7 @@ public:
 								}
 							}
 
-							if (IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
+							else if (IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
 							{
 								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_AMETHYST_GUARDIAN,
 																									   DATA_JADE_GUARDIAN))))
@@ -1468,7 +1468,7 @@ public:
 								}
 							}
 
-							if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
+							else if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
 							{
 								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_AMETHYST_GUARDIAN,
 																									   DATA_COBALT_GUARDIAN))))
@@ -1479,7 +1479,7 @@ public:
 								}
 							}
 
-							if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
+							else if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
 							{
 								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_AMETHYST_GUARDIAN,
 																									   DATA_COBALT_GUARDIAN))))
@@ -1490,7 +1490,7 @@ public:
 								}
 							}
 
-							if (IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
+							else if (IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
 							{
 								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
 								{
@@ -1500,7 +1500,7 @@ public:
 								}
 							}
 
-							if (!IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
+							else if (!IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
 							{
 								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
 								{
@@ -1510,7 +1510,7 @@ public:
 								}
 							}
 
-							if (!IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
+							else if (!IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
 							{
 								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
 								{
@@ -1520,7 +1520,7 @@ public:
 								}
 							}
 
-							if (!IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
+							else if (!IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
 							{
 								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
 								{
