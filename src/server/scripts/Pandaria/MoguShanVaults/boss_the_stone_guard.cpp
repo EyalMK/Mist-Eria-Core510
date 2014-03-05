@@ -95,6 +95,14 @@ enum Npcs
 	NPC_THE_STONE_GUARD_TRACKER		= 400463,
 };
 
+enum Creatures
+{
+	AMETHYST	= 1,
+	COBALT		= 2,
+	JADE		= 3,
+	JASPER		= 4
+};
+
 class boss_amethyst_guardian : public CreatureScript
 {
     public:
@@ -1246,13 +1254,13 @@ public:
 
 		InstanceScript* instance;
 		EventMap events;
-		uint64 lastGuardianPetrificationGUID;
+		uint8 lastGuardian;
 		bool choiceDone;
-
+		
 		void Reset()
         {
 			events.Reset();
-			lastGuardianPetrificationGUID = 0;
+			lastGuardian = 0;
 			choiceDone = false;
         }
 
@@ -1264,6 +1272,42 @@ public:
 				{
 					if (!choiceDone)
 					{
+						if (IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
+							lastGuardian = RAND(AMETHYST, COBALT, JADE, JASPER);
+
+						else if (!IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
+							lastGuardian = JASPER;
+
+						else if (!IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
+							lastGuardian = JADE;
+
+						else if (!IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
+							lastGuardian = COBALT;
+
+						else if (IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
+							lastGuardian = AMETHYST;
+
+						else if (!IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
+							lastGuardian = RAND(JADE, JASPER);
+
+						else if (!IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
+							lastGuardian = RAND(COBALT, JADE);
+
+						else if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
+							lastGuardian = RAND(AMETHYST, COBALT);
+
+						else if (!IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
+							lastGuardian = RAND(COBALT, JADE, JASPER);
+
+						else if (IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
+							lastGuardian = RAND(AMETHYST, JADE, JASPER);
+
+						else if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
+							lastGuardian =RAND(AMETHYST, COBALT, JASPER);
+
+						else if (IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
+							lastGuardian = RAND(AMETHYST, COBALT, JADE);
+
 						events.ScheduleEvent(EVENT_CHOOSE_PETRIFICATION, 6*IN_MILLISECONDS);
 						choiceDone = true;
 					}
@@ -1272,8 +1316,8 @@ public:
 
 				case ACTION_TRACKER_RESET:
 				{
+					lastGuardian = 0;
 					events.Reset();
-					lastGuardianPetrificationGUID = 0;
 					break;
 				}
 			}
@@ -1285,11 +1329,12 @@ public:
 			{
 				if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
 				{
-					if (!amethyst->isAlive() || amethyst->GetGUID() == lastGuardianPetrificationGUID)
+					if (!amethyst->isAlive() || lastGuardian == AMETHYST)
 						return false;
 				}
 				else return false;
 			}
+			else return false;
 
 			return true;
 		}
@@ -1300,11 +1345,12 @@ public:
 			{
 				if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
 				{
-					if (!cobalt->isAlive() || cobalt->GetGUID() == lastGuardianPetrificationGUID)
+					if (!cobalt->isAlive() || lastGuardian == COBALT)
 						return false;
 				}
 				else return false;
 			}
+			else return false;
 
 			return true;
 		}
@@ -1315,11 +1361,12 @@ public:
 			{
 				if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
 				{
-					if (!jade->isAlive() || jade->GetGUID() == lastGuardianPetrificationGUID)
+					if (!jade->isAlive() || lastGuardian == JADE)
 						return false;
 				}
 				else return false;
 			}
+			else return false;
 
 			return true;
 		}
@@ -1330,11 +1377,12 @@ public:
 			{
 				if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
 				{
-					if (!jasper->isAlive() || jasper->GetGUID() == lastGuardianPetrificationGUID)
+					if (!jasper->isAlive() || lastGuardian == JASPER)
 						return false;
 				}
 				else return false;
 			}
+			else return false;
 
 			return true;
 		}
@@ -1351,184 +1399,21 @@ public:
 					{
 						case EVENT_CHOOSE_PETRIFICATION:
 						{
-							if (IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
-							{
-								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_AMETHYST_GUARDIAN,
-																									   DATA_COBALT_GUARDIAN,
-																									   DATA_JADE_GUARDIAN,
-																									   DATA_JASPER_GUARDIAN))))
-								{
-									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
-									lastGuardianPetrificationGUID = guardian->GetGUID();
-									choiceDone = false;
-								}
-							}
+							if (lastGuardian == AMETHYST)
+								if (Creature* amethyst = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
+									amethyst->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 
-							else if (!IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
-							{
-								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_COBALT_GUARDIAN,
-																									   DATA_JADE_GUARDIAN,
-																									   DATA_JASPER_GUARDIAN))))
-								{
-									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
-									lastGuardianPetrificationGUID = guardian->GetGUID();
-									choiceDone = false;
-								}
-							}
+							if (lastGuardian == COBALT)
+								if (Creature* cobalt = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
+									cobalt->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 
-							else if (IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
-							{
-								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_AMETHYST_GUARDIAN,
-																									   DATA_JADE_GUARDIAN,
-																									   DATA_JASPER_GUARDIAN))))
-								{
-									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
-									lastGuardianPetrificationGUID = guardian->GetGUID();
-									choiceDone = false;
-								}
-							}
+							if (lastGuardian == JADE)
+								if (Creature* jade = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
+									jade->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 
-							else if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
-							{
-								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_AMETHYST_GUARDIAN,
-																									   DATA_COBALT_GUARDIAN,
-																									   DATA_JASPER_GUARDIAN))))
-								{
-									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
-									lastGuardianPetrificationGUID = guardian->GetGUID();
-									choiceDone = false;
-								}
-							}
-
-							else if (IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
-							{
-								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_AMETHYST_GUARDIAN,
-																									   DATA_COBALT_GUARDIAN,
-																									   DATA_JADE_GUARDIAN))))
-								{
-									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
-									lastGuardianPetrificationGUID = guardian->GetGUID();
-									choiceDone = false;
-								}
-							}
-
-							else if (!IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
-							{
-								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_JADE_GUARDIAN,
-																									   DATA_JASPER_GUARDIAN))))
-								{
-									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
-									lastGuardianPetrificationGUID = guardian->GetGUID();
-									choiceDone = false;
-								}
-							}
-
-
-							else if (!IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
-							{
-								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_COBALT_GUARDIAN,
-																									   DATA_JASPER_GUARDIAN))))
-								{
-									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
-									lastGuardianPetrificationGUID = guardian->GetGUID();
-									choiceDone = false;
-								}
-							}
-
-							else if (!IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
-							{
-								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_COBALT_GUARDIAN,
-																									   DATA_JADE_GUARDIAN))))
-								{
-									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
-									lastGuardianPetrificationGUID = guardian->GetGUID();
-									choiceDone = false;
-								}
-							}
-
-							else if (IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
-							{
-								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_AMETHYST_GUARDIAN,
-																									   DATA_JASPER_GUARDIAN))))
-								{
-									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
-									lastGuardianPetrificationGUID = guardian->GetGUID();
-									choiceDone = false;
-								}
-							}
-
-							else if (IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
-							{
-								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_AMETHYST_GUARDIAN,
-																									   DATA_JADE_GUARDIAN))))
-								{
-									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
-									lastGuardianPetrificationGUID = guardian->GetGUID();
-									choiceDone = false;
-								}
-							}
-
-							else if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
-							{
-								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_AMETHYST_GUARDIAN,
-																									   DATA_COBALT_GUARDIAN))))
-								{
-									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
-									lastGuardianPetrificationGUID = guardian->GetGUID();
-									choiceDone = false;
-								}
-							}
-
-							else if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
-							{
-								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(RAND(DATA_AMETHYST_GUARDIAN,
-																									   DATA_COBALT_GUARDIAN))))
-								{
-									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
-									lastGuardianPetrificationGUID = guardian->GetGUID();
-									choiceDone = false;
-								}
-							}
-
-							else if (IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
-							{
-								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(DATA_AMETHYST_GUARDIAN)))
-								{
-									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
-									lastGuardianPetrificationGUID = guardian->GetGUID();
-									choiceDone = false;
-								}
-							}
-
-							else if (!IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
-							{
-								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(DATA_COBALT_GUARDIAN)))
-								{
-									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
-									lastGuardianPetrificationGUID = guardian->GetGUID();
-									choiceDone = false;
-								}
-							}
-
-							else if (!IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
-							{
-								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(DATA_JADE_GUARDIAN)))
-								{
-									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
-									lastGuardianPetrificationGUID = guardian->GetGUID();
-									choiceDone = false;
-								}
-							}
-
-							else if (!IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
-							{
-								if (Creature* guardian = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
-								{
-									guardian->AI()->DoAction(ACTION_PETRIFICATION_BAR);
-									lastGuardianPetrificationGUID = guardian->GetGUID();
-									choiceDone = false;
-								}
-							}
+							if (lastGuardian == JASPER)
+								if (Creature* jasper = me->GetCreature(*me, instance->GetData64(DATA_JASPER_GUARDIAN)))
+									jasper->AI()->DoAction(ACTION_PETRIFICATION_BAR);
 
 							events.CancelEvent(EVENT_CHOOSE_PETRIFICATION);
 							break;
