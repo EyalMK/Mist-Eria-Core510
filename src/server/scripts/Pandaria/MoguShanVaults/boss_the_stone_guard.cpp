@@ -1441,27 +1441,6 @@ public:
 						if (IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
 							lastGuardian = RAND(AMETHYST, COBALT, JADE, JASPER);
 
-						else if (!IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
-							lastGuardian = JASPER;
-
-						else if (!IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
-							lastGuardian = JADE;
-
-						else if (!IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
-							lastGuardian = COBALT;
-
-						else if (IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
-							lastGuardian = AMETHYST;
-
-						else if (!IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
-							lastGuardian = RAND(JADE, JASPER);
-
-						else if (!IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
-							lastGuardian = RAND(COBALT, JADE);
-
-						else if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
-							lastGuardian = RAND(AMETHYST, COBALT);
-
 						else if (!IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
 							lastGuardian = RAND(COBALT, JADE, JASPER);
 
@@ -1473,6 +1452,29 @@ public:
 
 						else if (IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
 							lastGuardian = RAND(AMETHYST, COBALT, JADE);
+						
+						else if (!IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && IsJasperEligible())
+							lastGuardian = JASPER;
+						
+						else if (!IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
+							lastGuardian = JADE;
+						
+						else if (!IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
+							lastGuardian = COBALT;
+						
+						else if (IsAmethystEligible() && !IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
+							lastGuardian = AMETHYST;
+						
+						else if (!IsAmethystEligible() && !IsCobaltEligible() && IsJadeEligible() && IsJasperEligible())
+							lastGuardian = RAND(JADE, JASPER);
+						
+						else if (!IsAmethystEligible() && IsCobaltEligible() && IsJadeEligible() && !IsJasperEligible())
+							lastGuardian = RAND(COBALT, JADE);
+						
+						else if (IsAmethystEligible() && IsCobaltEligible() && !IsJadeEligible() && !IsJasperEligible())
+							lastGuardian = RAND(AMETHYST, COBALT);
+
+						else lastGuardian = 0;
 
 						events.ScheduleEvent(EVENT_CHOOSE_PETRIFICATION, 6*IN_MILLISECONDS);
 						choiceDone = true;
@@ -1498,6 +1500,7 @@ public:
 				{
 					if (amethyst->isAlive() && lastGuardian != AMETHYST)
 						return true;
+					else return false;
 				}
 				else return false;
 			}
@@ -1514,6 +1517,7 @@ public:
 				{
 					if (cobalt->isAlive() && lastGuardian != COBALT)
 						return true;
+					else return false;
 				}
 				else return false;
 			}
@@ -1530,6 +1534,7 @@ public:
 				{
 					if (jade->isAlive() && lastGuardian != JADE)
 						return true;
+					else return false;
 				}
 				else return false;
 			}
@@ -1546,6 +1551,7 @@ public:
 				{
 					if (jasper->isAlive() && lastGuardian != JASPER)
 						return true;
+					else return false;
 				}
 				else return false;
 			}
