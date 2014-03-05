@@ -276,6 +276,23 @@ class boss_amethyst_guardian : public CreatureScript
 						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_1);
 						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_2);
 						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
+
+						if (map)
+						{
+							Map::PlayerList const &PlayerList = map->GetPlayers();
+
+							if (!PlayerList.isEmpty())
+								for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+									if (Player* player = i->getSource())
+									{
+										player->RemoveAurasDueToSpell(SPELL_AMETHYST_PETRIFICATION_BAR);
+										player->SetPower(POWER_ALTERNATE_POWER, 0);
+									}
+						}
+
+						if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
+							tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
+
 						me->CastSpell(me, SPELL_AMETHYST_OVERLOAD);
 						me->SetPower(POWER_ENERGY, 0);
 					}
@@ -309,7 +326,7 @@ class boss_amethyst_guardian : public CreatureScript
 
 								me->CastSpell(me, SPELL_AMETHYST_PETRIFICATION, true);
 
-								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 7*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_SET);
 								break;
 							}
@@ -326,7 +343,7 @@ class boss_amethyst_guardian : public CreatureScript
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 								}
 								
-								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_2, 2*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_2, 3*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_1);
 								break;
 							}
@@ -343,7 +360,7 @@ class boss_amethyst_guardian : public CreatureScript
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 								}
 								
-								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_3, 2*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_3, 3*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_2);
 								break;
 							}
@@ -360,7 +377,7 @@ class boss_amethyst_guardian : public CreatureScript
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 								}
 
-								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 7*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
 								break;
 							}
@@ -369,12 +386,12 @@ class boss_amethyst_guardian : public CreatureScript
 								if (!solidStone)
 									me->ModifyPower(POWER_ENERGY, 1);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1250);
 								break;
 
 							case EVENT_INCREASE_POWER_2:
 								if (!solidStone)
-									me->ModifyPower(POWER_ENERGY, 3);
+									me->ModifyPower(POWER_ENERGY, 2);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1725);
 								break;
@@ -564,6 +581,23 @@ class boss_cobalt_guardian : public CreatureScript
 						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_1);
 						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_2);
 						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
+						
+						if (map)
+						{
+							Map::PlayerList const &PlayerList = map->GetPlayers();
+
+							if (!PlayerList.isEmpty())
+								for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+									if (Player* player = i->getSource())
+									{
+										player->RemoveAurasDueToSpell(SPELL_COBALT_PETRIFICATION_BAR);
+										player->SetPower(POWER_ALTERNATE_POWER, 0);
+									}
+						}
+						
+						if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
+							tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
+
 						me->CastSpell(me, SPELL_COBALT_OVERLOAD);
 						me->SetPower(POWER_ENERGY, 0);
 					}
@@ -597,7 +631,7 @@ class boss_cobalt_guardian : public CreatureScript
 
 								me->CastSpell(me, SPELL_COBALT_PETRIFICATION, true);
 
-								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 7*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_SET);
 								break;
 							}
@@ -614,7 +648,7 @@ class boss_cobalt_guardian : public CreatureScript
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 								}
 								
-								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_2, 2*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_2, 3*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_1);
 								break;
 							}
@@ -631,7 +665,7 @@ class boss_cobalt_guardian : public CreatureScript
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 								}
 								
-								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_3, 2*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_3, 3*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_2);
 								break;
 							}
@@ -648,7 +682,7 @@ class boss_cobalt_guardian : public CreatureScript
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 								}
 
-								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 7*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
 								break;
 							}
@@ -657,12 +691,12 @@ class boss_cobalt_guardian : public CreatureScript
 								if (!solidStone)
 									me->ModifyPower(POWER_ENERGY, 1);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1250);
 								break;
 
 							case EVENT_INCREASE_POWER_2:
 								if (!solidStone)
-									me->ModifyPower(POWER_ENERGY, 3);
+									me->ModifyPower(POWER_ENERGY, 2);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1725);
 								break;
@@ -858,6 +892,23 @@ class boss_jade_guardian : public CreatureScript
 						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_1);
 						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_2);
 						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
+
+						if (map)
+						{
+							Map::PlayerList const &PlayerList = map->GetPlayers();
+
+							if (!PlayerList.isEmpty())
+								for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+									if (Player* player = i->getSource())
+									{
+										player->RemoveAurasDueToSpell(SPELL_JADE_PETRIFICATION_BAR);
+										player->SetPower(POWER_ALTERNATE_POWER, 0);
+									}
+						}
+						
+						if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
+							tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
+
 						me->CastSpell(me, SPELL_JADE_OVERLOAD);
 						me->SetPower(POWER_ENERGY, 0);
 					}
@@ -891,7 +942,7 @@ class boss_jade_guardian : public CreatureScript
 
 								me->CastSpell(me, SPELL_JADE_PETRIFICATION, true);
 
-								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 7*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_SET);
 								break;
 							}
@@ -908,7 +959,7 @@ class boss_jade_guardian : public CreatureScript
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 								}
 								
-								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_2, 2*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_2, 3*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_1);
 								break;
 							}
@@ -925,7 +976,7 @@ class boss_jade_guardian : public CreatureScript
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 								}
 								
-								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_3, 2*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_3, 3*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_2);
 								break;
 							}
@@ -942,7 +993,7 @@ class boss_jade_guardian : public CreatureScript
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 								}
 								
-								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 7*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
 								break;
 							}
@@ -951,12 +1002,12 @@ class boss_jade_guardian : public CreatureScript
 								if (!solidStone)
 									me->ModifyPower(POWER_ENERGY, 1);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1250);
 								break;
 
 							case EVENT_INCREASE_POWER_2:
 								if (!solidStone)
-									me->ModifyPower(POWER_ENERGY, 3);
+									me->ModifyPower(POWER_ENERGY, 2);
 
 								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1725);
 								break;
@@ -1145,6 +1196,23 @@ class boss_jasper_guardian : public CreatureScript
 						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_1);
 						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_2);
 						events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
+
+						if (map)
+						{
+							Map::PlayerList const &PlayerList = map->GetPlayers();
+
+							if (!PlayerList.isEmpty())
+								for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+									if (Player* player = i->getSource())
+									{
+										player->RemoveAurasDueToSpell(SPELL_JASPER_PETRIFICATION_BAR);
+										player->SetPower(POWER_ALTERNATE_POWER, 0);
+									}
+						}
+						
+						if (Creature* tracker = me->FindNearestCreature(NPC_THE_STONE_GUARD_TRACKER, 99999.0f, true))
+							tracker->AI()->DoAction(ACTION_CHOOSE_PETRIFICATION);
+
 						me->CastSpell(me, SPELL_JASPER_OVERLOAD);
 						me->SetPower(POWER_ENERGY, 0);
 					}
@@ -1178,7 +1246,7 @@ class boss_jasper_guardian : public CreatureScript
 
 								me->CastSpell(me, SPELL_JASPER_PETRIFICATION, true);
 
-								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 7*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_SET);
 								break;
 							}
@@ -1195,7 +1263,7 @@ class boss_jasper_guardian : public CreatureScript
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 								}
 								
-								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_2, 2*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_2, 3*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_1);
 								break;
 							}
@@ -1212,7 +1280,7 @@ class boss_jasper_guardian : public CreatureScript
 												player->ModifyPower(POWER_ALTERNATE_POWER, 5);
 								}
 								
-								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_3, 2*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_3, 3*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_2);
 								break;
 							}
@@ -1226,10 +1294,10 @@ class boss_jasper_guardian : public CreatureScript
 									if (!PlayerList.isEmpty())
 										for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
 											if (Player* player = i->getSource())
-												me->ModifyPower(POWER_ENERGY, 3);
+												me->ModifyPower(POWER_ENERGY, 2);
 								}
 								
-								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 6*IN_MILLISECONDS);
+								events.ScheduleEvent(EVENT_PETRIFICATION_INCREASE_1, 7*IN_MILLISECONDS);
 								events.CancelEvent(EVENT_PETRIFICATION_INCREASE_3);
 								break;
 							}
@@ -1238,14 +1306,14 @@ class boss_jasper_guardian : public CreatureScript
 								if (!solidStone)
 									me->ModifyPower(POWER_ENERGY, 1);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1150);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_1, 1350);
 								break;
 
 							case EVENT_INCREASE_POWER_2:
 								if (!solidStone)
-									me->ModifyPower(POWER_ENERGY, 3);
+									me->ModifyPower(POWER_ENERGY, 2);
 
-								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1725);
+								events.ScheduleEvent(EVENT_INCREASE_POWER_2, 1750);
 								break;
 
 							default:
