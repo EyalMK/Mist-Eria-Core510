@@ -82,18 +82,6 @@ bool AreaTrigger::CreateAreaTrigger(uint32 guidlow, uint32 triggerEntry, Unit* c
     SetUInt32Value(AREATRIGGER_SPELLVISUALID, spell->SpellVisual[0]);
     SetUInt32Value(AREATRIGGER_DURATION, spell->GetDuration());
 
-    switch (spell->Id)
-    {
-        case 116011:// Rune of Power
-            SetVisualRadius(3.5f);
-            break;
-        case 116235:// Amethyst Pool
-            SetVisualRadius(3.5f);
-            break;
-        default:
-            break;
-    }
-
     if (!GetMap()->AddToMap(this))
         return false;
 

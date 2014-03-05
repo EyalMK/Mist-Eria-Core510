@@ -6527,7 +6527,9 @@ void Spell::EffectCreateAreatrigger(SpellEffIndex effIndex)
 					for (std::list<AreaTrigger*>::const_iterator i = healingSphereList.begin(); i != healingSphereList.end(); ++i)
                     {
                         AreaTrigger* healingSphere = (*i);
-                        healingSphere->SetDuration(0);
+
+						if (healingSphere)
+							healingSphere->SetDuration(0);
                         break;
                     }
                 }
@@ -6551,7 +6553,12 @@ void Spell::EffectCreateAreatrigger(SpellEffIndex effIndex)
 					for (std::list<AreaTrigger*>::const_iterator i = runeOfPowerList.begin(); i != runeOfPowerList.end(); ++i)
                     {
                         AreaTrigger* runeOfPower = (*i);
-                        runeOfPower->SetDuration(0);
+
+						if (runeOfPower)
+						{
+							runeOfPower->SetVisualRadius(6.0f);
+							runeOfPower->SetDuration(0);
+						}
                         break;
                     }
                 }
