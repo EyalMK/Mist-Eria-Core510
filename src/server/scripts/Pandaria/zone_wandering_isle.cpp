@@ -4821,16 +4821,12 @@ public:
                     break;
             }
         }
-
-        void OnCharmed(bool apply)
-        {
-        }
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_shang_xi_air_balloonAI(creature);
-        }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_shang_xi_air_balloonAI(creature);
+    }
 };
 
 void AddSC_wandering_isle()
