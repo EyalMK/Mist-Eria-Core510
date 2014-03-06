@@ -4694,7 +4694,7 @@ public:
 
         void Reset()
         {
-            me->CreateVehicleKit(1820, 55649);
+            me->IsVehicle();
         }
 
         void PassengerBoarded(Unit* who, int8 seatId, bool apply)
