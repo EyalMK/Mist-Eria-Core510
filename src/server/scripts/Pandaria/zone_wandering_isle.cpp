@@ -4692,9 +4692,13 @@ public:
     {
         if(passenger->GetTypeId() == TYPEID_PLAYER)
         {
-            Creature* aysa = veh->GetBase()->FindNearestCreature(56661, 200.00f, true);
-            if(aysa)
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "COUUUUUUUUUUUUUU");
+
+            if(Creature* aysa = veh->GetBase()->ToCreature()->FindNearestCreature(56661, 200.00f, true))
+            {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "TESSSSSSSSSSSSSS");
                 aysa->AI()->Talk(SAY_JI_BALLON_1);
+            }
         }
     }
 
