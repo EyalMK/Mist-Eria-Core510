@@ -4688,15 +4688,17 @@ class npc_shang_xi_air_balloon : public VehicleScript
 public:
     npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon"){}
 
-    void OnAddPassenger(Vehicle* veh, Unit* /*passenger*/, int8 /*seatId*/)
+    void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 /*seatId*/)
     {
-        if (veh->GetBase())
-            if (veh->GetBase()->ToCreature())
-                if (veh->GetBase()->ToCreature()->AI())
-                    veh->GetBase()->ToCreature()->AI()->DoAction(0);
+        if(passenger->GetTypeId() == TYPEID_PLAYER)
+        {
+            Creature* aysa = veh->GetBase()->FindNearestCreature(56661, 200.00f, true);
+            if(aysa)
+                aysa->AI()->Talk(SAY_JI_BALLON_1);
+        }
     }
 
-    struct npc_shang_xi_air_balloonAI : public ScriptedAI
+   /* struct npc_shang_xi_air_balloonAI : public ScriptedAI
     {
         npc_shang_xi_air_balloonAI(Creature* creature) : ScriptedAI(creature){}
 
@@ -4839,7 +4841,7 @@ public:
         {
         }*/
 
-        void UpdateAI(const uint32 uiDiff)
+       /* void UpdateAI(const uint32 uiDiff)
         {
             if(Testtimer <= uiDiff)
             {
@@ -4857,7 +4859,7 @@ public:
         {
             return new npc_shang_xi_air_balloonAI(creature);
         }
-    };
+    };*/
 };
 
 void AddSC_wandering_isle()
