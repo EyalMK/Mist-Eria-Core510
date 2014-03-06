@@ -4683,45 +4683,20 @@ enum eJiBallon
     SAY_JI_BALLON_7         = 6
 };
 
-/*class npc_shang_xi_air_balloon : public VehicleScript
+class npc_shang_xi_air_balloon : public VehicleScript
 {
 public:
     npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon"){}
 
-    void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatID)
+    struct npc_shang_xi_air_balloonAI : public npc_escortAI
     {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "COUUUUUUUUUUUUUU");
-
-            if(Creature* aysa = veh->GetBase()->ToCreature()->FindNearestCreature(56661, 200.00f, true))
-            {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "TESSSSSSSSSSSSSS");
-                aysa->AI()->Talk(SAY_JI_BALLON_1);
-            }
-    }
-
-    void OnInstall(Vehicle* veh)
-    {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "AAAAAAAAAAAAH");
-
-        veh->GetBase()->SummonCreature(56661, 906.10f, 4563.74f, 232.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-        veh->GetBase()->ToUnit()->SummonCreature(56661, 906.10f, 4563.74f, 232.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-        veh->GetBase()->ToCreature()->SummonCreature(56661, 906.10f, 4563.74f, 232.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-    }
-
-    struct npc_shang_xi_air_balloonAI : public ScriptedAI
-    {
-        npc_shang_xi_air_balloonAI(Creature* creature) : ScriptedAI(creature){}
+        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature){}
 
         uint32 Testtimer;
 
         void Reset()
         {
-            Testtimer = 0;
-        }
 
-        void DoAction(int32 const action)
-        {
-            Testtimer = 3000;
         }
 
         void PassengerBoarded(Unit* who, int8 seatId, bool apply)
@@ -4851,26 +4826,12 @@ public:
         {
         }
 
-        void UpdateAI(const uint32 uiDiff)
-        {
-            if(Testtimer <= uiDiff)
-            {
-                Creature* aysa = me->FindNearestCreature(56661, 200.00f, true);
-                if(aysa)
-                    aysa->AI()->Talk(SAY_JI_BALLON_1);
-
-                Testtimer = 4000;
-            }
-            else
-                Testtimer -= uiDiff;
-        }
-
         CreatureAI* GetAI(Creature* creature) const
         {
             return new npc_shang_xi_air_balloonAI(creature);
         }
     };
-};*/
+};
 
 void AddSC_wandering_isle()
 {
@@ -4943,5 +4904,5 @@ void AddSC_wandering_isle()
     new npc_dafeng_escort();
     new npc_master_shang_xi_escort();
     new npc_master_shang_xi_dead();
-    //new npc_shang_xi_air_balloon();
+    new npc_shang_xi_air_balloon();
 }
