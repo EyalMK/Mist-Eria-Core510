@@ -4694,7 +4694,7 @@ public:
 
         void Reset()
         {
-            me->IsVehicle();
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_PLAYER_VEHICLE);
         }
 
         void PassengerBoarded(Unit* who, int8 seatId, bool apply)
@@ -4823,9 +4823,6 @@ public:
         void UpdateAI(const uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
-
-            me->GetVehicleKit()->RelocatePassengers();
-            me->UpdateObjectVisibility(false);
         }
     };
 
