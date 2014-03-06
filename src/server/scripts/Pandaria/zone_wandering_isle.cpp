@@ -4703,7 +4703,9 @@ public:
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "AAAAAAAAAAAAH");
 
-        veh->GetBase()->ToCreature()->DespawnOrUnsummon(3000);
+        veh->GetBase()->SummonCreature(56661, 906.10f, 4563.74f, 232.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+        veh->GetBase()->ToUnit()->SummonCreature(56661, 906.10f, 4563.74f, 232.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+        veh->GetBase()->ToCreature()->SummonCreature(56661, 906.10f, 4563.74f, 232.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
     }
 
    /* struct npc_shang_xi_air_balloonAI : public ScriptedAI
