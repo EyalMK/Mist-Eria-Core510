@@ -4688,7 +4688,7 @@ class npc_shang_xi_air_balloon : public VehicleScript
 public:
     npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon"){}
 
-    void OnAddPassenger(Vehicle* veh, Unit* /*passenger*/, int8 /*seatId*/)
+    /*void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatID)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "COUUUUUUUUUUUUUU");
 
@@ -4697,17 +4697,13 @@ public:
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "TESSSSSSSSSSSSSS");
                 aysa->AI()->Talk(SAY_JI_BALLON_1);
             }
-    }
+    }*/
 
     void OnInstall(Vehicle* veh)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "AAAAAAAAAAAAH");
 
-            if(Creature* aysa = veh->GetBase()->ToCreature()->FindNearestCreature(56661, 200.00f, true))
-            {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "WEAHHHHHHH");
-                aysa->AI()->Talk(SAY_JI_BALLON_1);
-            }
+        veh->GetBase()->ToCreature()->DespawnOrUnsummon(3000);
     }
 
    /* struct npc_shang_xi_air_balloonAI : public ScriptedAI
