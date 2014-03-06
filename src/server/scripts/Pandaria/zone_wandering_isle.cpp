@@ -4683,15 +4683,10 @@ enum eJiBallon
     SAY_JI_BALLON_7         = 6
 };
 
-class npc_shang_xi_air_balloon : public VehicleScript
+class npc_shang_xi_air_balloon : public CreatureScript
 {
 public:
-    npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon"){}
-
-    void OnInstall(Vehicle* veh)
-    {
-        veh->GetBase()->ToCreature()->AI()->DoAction(0);
-    }
+    npc_shang_xi_air_balloon(): CreatureScript("npc_shang_xi_air_balloon"){}
 
     struct npc_shang_xi_air_balloonAI : public npc_escortAI
     {
@@ -4699,14 +4694,8 @@ public:
 
         void Reset()
         {
-
+            me->CreateVehicleKit(1820, 55649);
         }
-
-        void DoAction(int32 const action)
-        {
-            me->DespawnOrUnsummon(5000);
-        }
-
 
         void PassengerBoarded(Unit* who, int8 seatId, bool apply)
         {
