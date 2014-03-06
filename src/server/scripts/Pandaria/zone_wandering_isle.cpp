@@ -4819,6 +4819,14 @@ public:
                     break;
             }
         }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            me->GetVehicleKit()->RelocatePassengers();
+            me->UpdateObjectVisibility(false);
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const
