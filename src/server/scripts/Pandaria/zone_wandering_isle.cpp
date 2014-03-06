@@ -4683,12 +4683,12 @@ enum eJiBallon
     SAY_JI_BALLON_7         = 6
 };
 
-class npc_shang_xi_air_balloon : public VehicleScript
+/*class npc_shang_xi_air_balloon : public VehicleScript
 {
 public:
     npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon"){}
 
-    /*void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatID)
+    void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatID)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "COUUUUUUUUUUUUUU");
 
@@ -4697,7 +4697,7 @@ public:
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "TESSSSSSSSSSSSSS");
                 aysa->AI()->Talk(SAY_JI_BALLON_1);
             }
-    }*/
+    }
 
     void OnInstall(Vehicle* veh)
     {
@@ -4708,7 +4708,7 @@ public:
         veh->GetBase()->ToCreature()->SummonCreature(56661, 906.10f, 4563.74f, 232.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
     }
 
-   /* struct npc_shang_xi_air_balloonAI : public ScriptedAI
+    struct npc_shang_xi_air_balloonAI : public ScriptedAI
     {
         npc_shang_xi_air_balloonAI(Creature* creature) : ScriptedAI(creature){}
 
@@ -4724,16 +4724,16 @@ public:
             Testtimer = 3000;
         }
 
-        /*void PassengerBoarded(Unit* who, int8 seatId, bool apply)
+        void PassengerBoarded(Unit* who, int8 seatId, bool apply)
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
             {
                 if (apply)
                     Start(false, true, who->GetGUID());
             }
-        }*/
+        }
 
-       /* void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId)
         {
             Player* player = GetPlayerForEscort();
 
@@ -4845,13 +4845,13 @@ public:
                     me->DespawnOrUnsummon();
                     break;
             }
-        }*/
+        }
 
-        /*void OnCharmed(bool apply)
+        void OnCharmed(bool apply)
         {
-        }*/
+        }
 
-       /* void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(const uint32 uiDiff)
         {
             if(Testtimer <= uiDiff)
             {
@@ -4869,8 +4869,8 @@ public:
         {
             return new npc_shang_xi_air_balloonAI(creature);
         }
-    };*/
-};
+    };
+};*/
 
 void AddSC_wandering_isle()
 {
@@ -4943,5 +4943,5 @@ void AddSC_wandering_isle()
     new npc_dafeng_escort();
     new npc_master_shang_xi_escort();
     new npc_master_shang_xi_dead();
-    new npc_shang_xi_air_balloon();
+    //new npc_shang_xi_air_balloon();
 }
