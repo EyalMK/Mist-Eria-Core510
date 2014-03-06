@@ -4688,6 +4688,14 @@ class npc_shang_xi_air_balloon : public VehicleScript
 public:
     npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon"){}
 
+    void OnAddPassenger(Vehicle* veh, Unit* /*passenger*/, int8 /*seatId*/)
+    {
+        if (veh->GetBase())
+            if (veh->GetBase()->ToCreature())
+                if (veh->GetBase()->ToCreature()->AI())
+                    veh->GetBase()->ToCreature()->AI()->DoAction(0);
+    }
+
     struct npc_shang_xi_air_balloonAI : public ScriptedAI
     {
         npc_shang_xi_air_balloonAI(Creature* creature) : ScriptedAI(creature){}
@@ -4696,7 +4704,12 @@ public:
 
         void Reset()
         {
-            Testtimer = 2000;
+            Testtimer = 0;
+        }
+
+        void DoAction(int32 const action)
+        {
+            Testtimer = 3000;
         }
 
         /*void PassengerBoarded(Unit* who, int8 seatId, bool apply)
@@ -4708,7 +4721,7 @@ public:
             }
         }*/
 
-        /*void WaypointReached(uint32 waypointId)
+       /* void WaypointReached(uint32 waypointId)
         {
             Player* player = GetPlayerForEscort();
 
@@ -4822,9 +4835,9 @@ public:
             }
         }*/
 
-        void OnCharmed(bool apply)
+        /*void OnCharmed(bool apply)
         {
-        }
+        }*/
 
         void UpdateAI(const uint32 uiDiff)
         {
@@ -4839,12 +4852,12 @@ public:
             else
                 Testtimer -= uiDiff;
         }
-    };
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_shang_xi_air_balloonAI(creature);
-    }
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_shang_xi_air_balloonAI(creature);
+        }
+    };
 };
 
 void AddSC_wandering_isle()
