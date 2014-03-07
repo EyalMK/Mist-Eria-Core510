@@ -4683,12 +4683,18 @@ enum eJiBallon
     SAY_JI_BALLON_7         = 6
 };
 
-class npc_shang_xi_air_balloon : public CreatureScript
+class npc_shang_xi_air_balloon : public VehicleScript
 {
 public:
-    npc_shang_xi_air_balloon(): CreatureScript("npc_shang_xi_air_balloon"){}
+    npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon"){}
 
-    struct npc_shang_xi_air_balloonAI : public npc_escortAI
+    void OnInstallAccessory(Vehicle* veh, Creature* /*accessory*/)
+    {
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "COUUUUUUUUU");
+        veh->GetBase()->ToCreature()->DespawnOrUnsummon(3000);
+    }
+
+    /*struct npc_shang_xi_air_balloonAI : public npc_escortAI
     {
         npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature){}
 
@@ -4829,7 +4835,7 @@ public:
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_shang_xi_air_balloonAI(creature);
-    }
+    }*/
 };
 
 void AddSC_wandering_isle()
