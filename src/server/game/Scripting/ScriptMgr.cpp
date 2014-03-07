@@ -92,7 +92,7 @@ class ScriptRegistry
                     else
                     {
                         // If the script is already assigned -> delete it!
-                        sLog->outError(LOG_FILTER_TSCR, "Script '%s' already assigned with the same script name, so the script can't work.",
+                        sLog->outError(LOG_FILTER_NETWORKIO, "Script '%s' already assigned with the same script name, so the script can't work.",
                             script->GetName().c_str());
 
                         ASSERT(false); // Error that should be fixed ASAP.
@@ -102,7 +102,7 @@ class ScriptRegistry
                 {
                     // The script uses a script name from database, but isn't assigned to anything.
                     if (script->GetName().find("example") == std::string::npos && script->GetName().find("Smart") == std::string::npos)
-                        sLog->outError(LOG_FILTER_SQL, "Script named '%s' does not have a script name assigned in database.",
+                        sLog->outError(LOG_FILTER_NETWORKIO, "Script named '%s' does not have a script name assigned in database.",
                             script->GetName().c_str());
                 }
             }
