@@ -4683,10 +4683,12 @@ enum eJiBallon
     SAY_JI_BALLON_7         = 6
 };
 
-/*class npc_shang_xi_air_balloon : public VehicleScript
+class npc_shang_xi_air_balloon : public VehicleScript
 {
 public:
-    npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon"){}*/
+    npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon")
+    {
+    }
 
     void OnReset(Vehicle* veh)
     {
@@ -4836,7 +4838,7 @@ public:
     {
         return new npc_shang_xi_air_balloonAI(creature);
     }*/
-//};
+};
 
 void AddSC_wandering_isle()
 {
@@ -4909,5 +4911,5 @@ void AddSC_wandering_isle()
     new npc_dafeng_escort();
     new npc_master_shang_xi_escort();
     new npc_master_shang_xi_dead();
-   // new npc_shang_xi_air_balloon();
+    new npc_shang_xi_air_balloon();
 }
