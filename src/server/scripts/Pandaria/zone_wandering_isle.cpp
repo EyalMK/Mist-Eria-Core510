@@ -4865,8 +4865,8 @@ public:
 
         void OnSpellClick(Unit* clicker)
         {
-            Creature* mongol = me->SummonCreature(55649, 908.82f, 4558.87f, 232.31f, 0.62f);
-            me->SummonCreature(31002, 908.82f, 4558.87f, 232.31f, 0.62f);
+            Creature* mongol = me->SummonCreature(55649, 908.82f, 4558.87f, 232.31f, 0.62f, TEMPSUMMON_TIMED_DESPAWN, 600000);
+            me->SummonCreature(31002, 908.82f, 4558.87f, 232.31f, 0.62f, TEMPSUMMON_TIMED_DESPAWN, 600000);
 
             if(clicker->GetTypeId() == TYPEID_PLAYER)
                 clicker->EnterVehicle(mongol);
