@@ -4688,7 +4688,7 @@ class npc_shang_xi_air_balloon : public VehicleScript
 public:
     npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon"){}
 
-    void OnInstallAccessory(Vehicle* veh, Creature* /*accessory*/)
+    void OnReset(Vehicle* veh)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "COUUUUUUUUU");
         veh->GetBase()->ToCreature()->DespawnOrUnsummon(3000);
