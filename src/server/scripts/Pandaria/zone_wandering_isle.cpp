@@ -4692,30 +4692,35 @@ public:
 
     void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatId)
     {
-        Creature* aysa = veh->GetBase()->ToCreature()->FindNearestCreature(56661, 200.00f, true);
-
         if(veh->GetBase()->ToCreature()->GetEntry() == 55649)
+        {
+            Creature* escort = veh->GetBase()->ToCreature()->FindNearestCreature(31002, 200.00f, true);
+
             if(passenger->GetTypeId() == TYPEID_PLAYER)
-                if(aysa)
-                    aysa->AI()->Talk(SAY_AYSA_BALLON_1);
-    }
-
-    /*struct npc_shang_xi_air_balloonAI : public npc_escortAI
-    {
-        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature){}
-
-        void Reset()
-        {
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_PLAYER_VEHICLE);
-        }
-
-        void PassengerBoarded(Unit* who, int8 seatId, bool apply)
-        {
-            if (who->GetTypeId() == TYPEID_PLAYER)
             {
-                if (apply)
-                    Start(false, true, who->GetGUID());
+                if(escort)
+                {
+                    escort->AI()->DoAction(0);
+                    veh->GetBase()->ToCreature()->GetMotionMaster()->MoveFollow(escort, 1.00f, 0);
+                }
             }
+        }
+    }
+};
+
+class npc_waypoint_air_balloon : public CreatureScript
+{
+public:
+    npc_waypoint_air_balloon(): CreatureScript("npc_waypoint_air_balloon"){}
+
+    struct npc_waypoint_air_balloonAI : public npc_escortAI
+    {
+        npc_waypoint_air_balloonAI(Creature* creature) : npc_escortAI(creature){}
+
+
+        void DoAction(int32 const action)
+        {
+            Start(false, true);
         }
 
         void WaypointReached(uint32 waypointId)
@@ -4840,9 +4845,40 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_shang_xi_air_balloonAI(creature);
-    }*/
+        return new npc_waypoint_air_balloonAI(creature);
+    }
 };
+
+class npc_shang_xi_air_balloon_click : public CreatureScript
+{
+public:
+    npc_shang_xi_air_balloon_click(): CreatureScript("npc_shang_xi_air_balloon_click") { }
+
+    struct npc_shang_xi_air_balloon_clickAI : public ScriptedAI
+    {
+        npc_shang_xi_air_balloon_clickAI(Creature* creature) : ScriptedAI(creature){}
+
+        void Reset()
+        {
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+        }
+
+        void OnSpellClick(Unit* clicker)
+        {
+            Creature* mongol = me->SummonCreature(55649, 908.82f, 4558.87f, 232.31f, 0.62f);
+            me->SummonCreature(31002, 908.82f, 4558.87f, 232.31f, 0.62f);
+
+            if(clicker->GetTypeId() == TYPEID_PLAYER)
+                clicker->EnterVehicle(mongol);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_shang_xi_air_balloon_clickAI(creature);
+    }
+};
+
 
 void AddSC_wandering_isle()
 {
@@ -4916,4 +4952,6 @@ void AddSC_wandering_isle()
     new npc_master_shang_xi_escort();
     new npc_master_shang_xi_dead();
     new npc_shang_xi_air_balloon();
+    new npc_waypoint_air_balloon();
+    new npc_shang_xi_air_balloon_click();
 }
