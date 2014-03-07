@@ -4690,11 +4690,17 @@ public:
     {
     }
 
-    void OnReset(Vehicle* veh)
+    void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatId)
     {
         if(veh->GetBase()->ToCreature()->GetEntry() == 55649)
             veh->GetBase()->ToCreature()->DespawnOrUnsummon(3000);
     }
+
+    /*void OnReset(Vehicle* veh)
+    {
+        if(veh->GetBase()->ToCreature()->GetEntry() == 55649)
+            veh->GetBase()->ToCreature()->DespawnOrUnsummon(3000);
+    }*/
 
     /*struct npc_shang_xi_air_balloonAI : public npc_escortAI
     {
