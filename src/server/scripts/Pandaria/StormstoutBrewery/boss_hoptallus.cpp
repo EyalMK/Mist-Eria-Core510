@@ -164,7 +164,7 @@ public :
 
         void UpdateAI(const uint32 diff)
         {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Hoptallus : Update AI using diff %u", diff);
+			// sLog->outDebug(LOG_FILTER_NETWORKIO, "Hoptallus : Update AI using diff %u", diff);
             if(!m_bReady && m_bHasStartedOnce)
             {
                 events.Update(diff);
@@ -424,6 +424,7 @@ public :
         /// Constructor
         stalker_carrot_breathAI(Creature* creature) : ScriptedAI(creature)
         {
+			
             b_init = false ;
         }
 
@@ -555,6 +556,7 @@ public :
          */
         void UpdateAI(const uint32 diff)
         {
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : UpdateAI (stalker CB)");
             // RETURN_IF(!b_init);
 
             m_uiMSTimeDiff += diff ;
@@ -627,6 +629,7 @@ public :
 
         bool Validate(const SpellInfo *spellInfo)
         {
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Carrot Breath : VALIDATE");
             return true ;
         }
 
@@ -647,6 +650,7 @@ public :
                                                                      caster->GetPositionZ(),
                                                                      0, TEMPSUMMON_TIMED_DESPAWN, 15000))
                 {
+					sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Carrot Breath : Summoned");
                     caster->SetTarget(stalker->GetGUID()); //! Core guid !
                     caster->SetFacingToObject(stalker);
                     stalker->SetTarget(caster->GetGUID()); //! Core guid !
