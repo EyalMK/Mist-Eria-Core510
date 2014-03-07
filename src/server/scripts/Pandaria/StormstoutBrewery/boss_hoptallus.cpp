@@ -78,9 +78,10 @@ public :
     public :
         boss_hoptallusAI(Creature* creature) : ScriptedAI(creature)
         {
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Hoptallus : AI Constructed");
             instance = creature->GetInstanceScript();
-            m_bHasStartedOnce = false ;
-            m_bReady = false ;
+            m_bHasStartedOnce = true ;
+            m_bReady = true ;
         }
 
         void Reset()
@@ -163,6 +164,7 @@ public :
 
         void UpdateAI(const uint32 diff)
         {
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Hoptallus : Update AI using diff %u", diff);
             if(!m_bReady && m_bHasStartedOnce)
             {
                 events.Update(diff);
@@ -299,6 +301,7 @@ public :
 
     CreatureAI* GetAI(Creature *creature) const
     {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "Hoptallus : GetAI");
         return new boss_hoptallusAI(creature);
     }
 };
