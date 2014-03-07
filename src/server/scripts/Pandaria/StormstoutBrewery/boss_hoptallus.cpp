@@ -290,6 +290,11 @@ public :
 				}
             }
         }
+		
+		void SummonedCreatureDespawn(Creature *creature) {
+            if(instance)
+                instance->DoSendNotifyToInstance("Hoptallus Stalker just despawned !");
+        }
 
     private :
         EventMap events ;
@@ -424,7 +429,6 @@ public :
         /// Constructor
         stalker_carrot_breathAI(Creature* creature) : ScriptedAI(creature)
         {
-			
             b_init = false ;
         }
 
@@ -556,7 +560,7 @@ public :
          */
         void UpdateAI(const uint32 diff)
         {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : UpdateAI (stalker CB)");
+			// sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : UpdateAI (stalker CB)");
             // RETURN_IF(!b_init);
 
             m_uiMSTimeDiff += diff ;
