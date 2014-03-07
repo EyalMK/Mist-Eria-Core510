@@ -4690,8 +4690,8 @@ public:
 
     void OnReset(Vehicle* veh)
     {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "COUUUUUUUUU");
-        veh->GetBase()->ToCreature()->DespawnOrUnsummon(3000);
+        if(veh->GetBase()->ToCreature()->GetEntry() == 55649)
+            veh->GetBase()->ToCreature()->DespawnOrUnsummon(3000);
     }
 
     /*struct npc_shang_xi_air_balloonAI : public npc_escortAI
