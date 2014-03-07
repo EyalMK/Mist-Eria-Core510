@@ -4693,7 +4693,8 @@ public:
     void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatId)
     {
         if(veh->GetBase()->ToCreature()->GetEntry() == 55649)
-            veh->GetBase()->ToCreature()->DespawnOrUnsummon(3000);
+            if(passenger->GetTypeId() == TYPEID_PLAYER)
+                veh->GetBase()->ToCreature()->DespawnOrUnsummon(3000);
     }
 
     /*void OnReset(Vehicle* veh)
