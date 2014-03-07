@@ -4692,16 +4692,13 @@ public:
 
     void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatId)
     {
+        Creature* aysa = veh->GetBase()->ToCreature()->FindNearestCreature(56661, 200.00f, true);
+
         if(veh->GetBase()->ToCreature()->GetEntry() == 55649)
             if(passenger->GetTypeId() == TYPEID_PLAYER)
-                veh->GetBase()->ToCreature()->DespawnOrUnsummon(3000);
+                if(aysa)
+                    aysa->AI()->Talk(SAY_AYSA_BALLON_1);
     }
-
-    /*void OnReset(Vehicle* veh)
-    {
-        if(veh->GetBase()->ToCreature()->GetEntry() == 55649)
-            veh->GetBase()->ToCreature()->DespawnOrUnsummon(3000);
-    }*/
 
     /*struct npc_shang_xi_air_balloonAI : public npc_escortAI
     {
