@@ -4706,6 +4706,8 @@ public:
             }
         }
     }
+
+    bool IsDatabaseBound() const { return true; }
 };
 
 class npc_waypoint_air_balloon : public CreatureScript
