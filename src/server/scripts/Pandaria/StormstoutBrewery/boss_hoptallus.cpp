@@ -3,7 +3,7 @@
 #include "MoveSpline.h"
 #include "PointMovementGenerator.h"
 
-#define RETURN_IF(condition) if(!condition) return ;
+// #define RETURN_IF(condition) if(!condition) return ;
 
 enum HoptallusSpells
 {
@@ -552,7 +552,7 @@ public :
          */
         void UpdateAI(const uint32 diff)
         {
-            RETURN_IF(!b_init);
+            // RETURN_IF(!b_init);
 
             m_uiMSTimeDiff += diff ;
 
