@@ -649,8 +649,8 @@ public :
                 target = caster->getVictim();
                 // See if I care to use a spell !
                 if(TempSummon* stalker = caster->SummonCreature(NPC_CARROT_BREATH_HELPER,
-                                                                     0.5f * cos(caster->GetOrientation()),
-                                                                     0.5f * sin(caster->GetOrientation()),
+                                                                     caster->GetPositionX() + 0.5f * cos(caster->GetOrientation()),
+                                                                     caster->GetPositionY() + 0.5f * sin(caster->GetOrientation()),
                                                                      caster->GetPositionZ(),
                                                                      0, TEMPSUMMON_TIMED_DESPAWN, 15000))
                 {
