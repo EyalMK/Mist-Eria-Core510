@@ -471,7 +471,7 @@ public :
 		}
 		
 		TempSummon* stalker ;
-	}
+	};
 
     SpellScript* GetSpellScript() const
     {
