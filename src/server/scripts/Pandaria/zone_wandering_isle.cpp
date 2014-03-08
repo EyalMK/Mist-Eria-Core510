@@ -4703,6 +4703,7 @@ public:
                 {
                     escort->AI()->DoAction(0);
                     veh->GetBase()->ToCreature()->GetMotionMaster()->MovePath(55649, false);
+                    veh->GetBase()->ToCreature()->SetSpeed(MOVE_FLIGHT, 0.5f);
                 }
             }
         }
@@ -4728,17 +4729,17 @@ public:
         {
             Player* player = GetPlayerForEscort();
 
-            Creature* aysa = me->FindNearestCreature(56661, 20.00f, true);
-            Creature* jipatte = me->FindNearestCreature(56660, 20.00f, true);
-            Creature* shen = me->FindNearestCreature(56676, 20.00f, true);
-            Creature* mongol = me->FindNearestCreature(55649, 20.00f, true);
+            Creature* aysa = me->FindNearestCreature(56661, 50.00f, true);
+            Creature* jipatte = me->FindNearestCreature(56660, 50.00f, true);
+            Creature* shen = me->FindNearestCreature(56676, 50.00f, true);
+            Creature* mongol = me->FindNearestCreature(55649, 50.00f, true);
             Map* map = me->GetMap();
 
             switch (waypointId)
             {
                 case 1:
                     SetRun();
-                    me->SetSpeed(MOVE_FLIGHT, 0.5f);
+                    me->SetSpeed(MOVE_FLIGHT, 1.0f);
                     mongol->SetSpeed(MOVE_FLIGHT, 0.5f);
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_1);
@@ -4748,6 +4749,7 @@ public:
                         aysa->AI()->Talk(SAY_AYSA_BALLON_1);
                     break;
                 case 3:
+                    me->SetSpeed(MOVE_FLIGHT, 0.5f);
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_2);
                     break;
@@ -4809,8 +4811,8 @@ public:
                         {
                             Player *player = iter->getSource();
                             if(player)
-                                if (player->isAlive() && player->IsInDist2d(me, 20))
-                                    player->CastSpell(player, 105010, true);
+                                if (player->isAlive() && player->IsInDist2d(me, 50))
+                                    player->KilledMonsterCredit(55939);
                         }
                     }
                     if(shen)
@@ -4889,7 +4891,9 @@ public:
             /*Creature* mongol = clicker->SummonCreature(55649, 908.82f, 4558.87f, 232.31f, 0.62f, TEMPSUMMON_TIMED_DESPAWN, 600000);*/
             Creature* mongol = clicker->FindNearestCreature(55649, 50.00f, true);
             clicker->SummonCreature(31002, 908.82f, 4558.87f, 232.31f, 0.62f, TEMPSUMMON_TIMED_DESPAWN, 600000);
-            clicker->CastSpell(clicker, 105895, true);
+
+            if(clicker->ToPlayer())
+                clicker->ToPlayer()->KilledMonsterCredit(56378);
 
             if(clicker->GetTypeId() == TYPEID_PLAYER)
                 if(mongol)
