@@ -4745,11 +4745,11 @@ public:
                         jipatte->AI()->Talk(SAY_JI_BALLON_1);
                     break;
                 case 2:
+                    me->SetSpeed(MOVE_FLIGHT, 0.5f);
                     if(aysa)
                         aysa->AI()->Talk(SAY_AYSA_BALLON_1);
                     break;
                 case 3:
-                    me->SetSpeed(MOVE_FLIGHT, 0.5f);
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_2);
                     break;
