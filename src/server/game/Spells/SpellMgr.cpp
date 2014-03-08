@@ -3970,6 +3970,9 @@ void SpellMgr::LoadSpellInfoCorrections()
 				case 130774: // Amethyst pool
 					spellInfo->Attributes &= SPELL_ATTR0_CANT_CANCEL;
 					break;
+                case 105002: // Invocation d'un faucon de feu apprivoisé
+                    spellInfo->Effects[EFFECT_2].Effect = NULL;
+                    break;
 				default:
 					break;
 			}

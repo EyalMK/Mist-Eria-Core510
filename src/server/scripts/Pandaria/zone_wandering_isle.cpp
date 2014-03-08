@@ -4907,33 +4907,6 @@ public:
     }
 };
 
-class spell_hot_air_balloon : public SpellScriptLoader
-{
-    public:
-        spell_hot_air_balloon() : SpellScriptLoader("spell_hot_air_balloon") { }
-
-        class spell_hot_air_balloon_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_hot_air_balloon_SpellScript);
-
-            void HandleScript(SpellEffIndex effIndex)
-            {
-                PreventHitDefaultEffect(effIndex);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_hot_air_balloon_SpellScript::HandleScript, EFFECT_2, SPELL_EFFECT_TRIGGER_SPELL);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_hot_air_balloon_SpellScript();
-        }
-};
-
-
 void AddSC_wandering_isle()
 {
     new stalker_item_equiped();
@@ -5008,5 +4981,4 @@ void AddSC_wandering_isle()
     new npc_shang_xi_air_balloon();
     new npc_waypoint_air_balloon();
     new npc_shang_xi_air_balloon_click();
-    new spell_hot_air_balloon();
 }
