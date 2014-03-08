@@ -96,7 +96,8 @@ public :
                 go->RemoveFromWorld();
             if(Creature* stalker = me->FindNearestCreature(200501, 50000.0f))
                 stalker->AI()->DoAction(0);
-
+			
+			DoRemoveBarrels();
             Talk(SAY_JUST_DIED);
         }
 
