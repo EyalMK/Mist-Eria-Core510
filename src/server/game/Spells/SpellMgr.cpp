@@ -3968,7 +3968,7 @@ void SpellMgr::LoadSpellInfoCorrections()
                     spellInfo->Effects[EFFECT_0].Effect = NULL;
                     break;
 				case 130774: // Amethyst pool
-					spellInfo->Attributes &= SPELL_ATTR0_CANT_CANCEL;
+					spellInfo->AttributesCu |= SPELL_ATTR0_CANT_CANCEL;
 					break;
 				default:
 					break;

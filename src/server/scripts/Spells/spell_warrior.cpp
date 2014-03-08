@@ -921,7 +921,7 @@ class spell_warr_heroic_throw : public SpellScriptLoader
         }
 };
 
-// 100130 - Wild strike
+// 100130 - Wild strike # disabled #
 class spell_warr_wild_strike : public SpellScriptLoader
 {
     public:
@@ -945,8 +945,7 @@ class spell_warr_wild_strike : public SpellScriptLoader
                 if(!player)
                     return;
 
-				int32 damage = GetHitDamage();
-                SetHitDamage(damage + (player->GetTotalAttackPowerValue(BASE_ATTACK) * 2.3f));
+                SetHitDamage(player->GetTotalAttackPowerValue(BASE_ATTACK) * 2.3f);
             }
 
             void Register()
@@ -1841,7 +1840,7 @@ void AddSC_warrior_spell_scripts()
 	new spell_warr_heroic_leap_damage();
 	new spell_warr_colossus_smash();
 	new spell_warr_heroic_throw();
-	new spell_warr_wild_strike();
+	//new spell_warr_wild_strike();
 	new spell_warr_heroic_strike();
 	new spell_warr_raging_blow_main();
 	new spell_warr_raging_blow_off();
