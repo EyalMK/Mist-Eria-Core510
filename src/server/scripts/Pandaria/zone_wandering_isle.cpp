@@ -4886,7 +4886,7 @@ public:
             {
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     if(summoner->ToPlayer())
-                        if(summoner->IsInDist2d(me, 3.00f))
+                        if(summoner->IsInDist2d(me, 10.00f))
                         {
                             SetEscortPaused(false);
                             VerifPlayer = false;
@@ -4917,7 +4917,6 @@ public:
 
         void OnSpellClick(Unit* clicker)
         {
-            /*Creature* mongol = clicker->SummonCreature(55649, 908.82f, 4558.87f, 232.31f, 0.62f, TEMPSUMMON_TIMED_DESPAWN, 600000);*/
             Creature* mongol = clicker->FindNearestCreature(55649, 50.00f, true);
             clicker->SummonCreature(31002, 908.82f, 4558.87f, 232.31f, 0.62f, TEMPSUMMON_TIMED_DESPAWN, 600000);
 
