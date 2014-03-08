@@ -4833,6 +4833,8 @@ public:
                 case 17:
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_4);
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
                     break;
                 case 18:
                     me->SetSpeed(MOVE_FLIGHT, 5.0f);
@@ -4840,8 +4842,6 @@ public:
                         mongol->SetSpeed(MOVE_FLIGHT, 5.0f);
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_5);
-                    SetEscortPaused(true);
-                    VerifPlayer = true;
                     break;
                 case 19:
                     if(aysa)
@@ -4850,6 +4850,8 @@ public:
                 case 21:
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_6);
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
                     break;
                 case 23:
                     me->SetSpeed(MOVE_FLIGHT, 3.0f);
@@ -4857,8 +4859,6 @@ public:
                         mongol->SetSpeed(MOVE_FLIGHT, 3.0f);
                     if(aysa)
                         aysa->AI()->Talk(SAY_AYSA_BALLON_9);
-                    SetEscortPaused(true);
-                    VerifPlayer = true;
                     break;
                 case 25:
                     if(jipatte)
