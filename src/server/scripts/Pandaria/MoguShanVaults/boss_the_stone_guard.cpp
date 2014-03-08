@@ -1,6 +1,6 @@
 /* # Script de Sungis : The Stone Guard # */
 
-/* Notes : What is missing ? :	- Guardians personnal spells (Amethyst & Jasper & Jade)
+/* Notes : What is missing ? :	- Guardians personnal spells (Amethyst & Jasper)
 								- 
 */
 

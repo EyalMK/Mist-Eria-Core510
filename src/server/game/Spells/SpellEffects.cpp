@@ -4538,6 +4538,19 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
             }
             break;
         }
+		case SPELLFAMILY_WARRIOR:
+        {
+            // Shattering Throw
+            if (m_spellInfo->SpellFamilyFlags[1] & 0x00400000)
+            {
+                if (!unitTarget)
+                    return;
+                // remove shields, will still display immune to damage part
+                unitTarget->RemoveAurasWithMechanic(1<<MECHANIC_IMMUNE_SHIELD, AURA_REMOVE_BY_ENEMY_SPELL);
+                return;
+            }
+            break;
+        }
         default:
             break;
     }
