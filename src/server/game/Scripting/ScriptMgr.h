@@ -990,7 +990,7 @@ class ScriptMgr
         void OnInstallAccessory(Vehicle* veh, Creature* accessory);
         void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatId);
         void OnRemovePassenger(Vehicle* veh, Unit* passenger);
-		void GetCreatureBaseAI(Vehicle* vehicle);
+		CreatureAI* GetCreatureBaseAI(Vehicle* vehicle);
 
     public: /* DynamicObjectScript */
 		
