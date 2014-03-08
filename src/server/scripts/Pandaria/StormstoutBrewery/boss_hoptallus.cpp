@@ -457,7 +457,7 @@ public :
 		{
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : UpdateAI using diff %u", uiDiff);
 			
-			angle -= (2 * M_PI / 5000.0f) * uiDiff ;
+			angle -= (2 * M_PI / 15000.0f) * uiDiff ;
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : angle computed %f", angle);
 			
 			x = p_master->GetPositionX() + rayon * cos(angle);
