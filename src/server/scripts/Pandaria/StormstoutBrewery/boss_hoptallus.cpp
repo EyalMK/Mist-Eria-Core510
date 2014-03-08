@@ -444,69 +444,38 @@ public :
 
     }
 
-    class spell_hoptallus_carrot_breath_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_hoptallus_carrot_breath_AuraScript);
-
-        bool Validate(const SpellInfo *spellInfo)
-        {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Carrot Breath : VALIDATE");
-            return true ;
-        }
-
-        bool Load()
-        {
-            return true ;
-        }
-
-        void HandleEffectApply(AuraEffect const* auraEf, AuraEffectHandleModes mode)
-        {
-            if(Unit* caster = GetCaster())
-            {
-                target = caster->getVictim();
-                // See if I care to use a spell !
-                stalker = caster->SummonCreature(NPC_CARROT_BREATH_HELPER,
-                                                                     caster->GetPositionX() + 30 * cos(caster->GetOrientation()),
-                                                                     caster->GetPositionY() + 30 * sin(caster->GetOrientation()),
-                                                                     caster->GetPositionZ(),
-                                                                     0, TEMPSUMMON_TIMED_DESPAWN, 15000);
-            }
-        }
+    class spell_hoptallus_carrot_breath_SpellScript : public SpellScript {
+		PrepareSpellScript(spell_hoptallus_carrot_breath_SpellScript);
 		
-		void HandlePeriodic(AuraEffect const* auraEff) {
-			GetCaster()->CastSpell(stalker, 74758, true);
+		bool Validate(const SpellInfo* spellInfo) { return true ; }
+		
+		bool Load() { return true ; }
+		
+		void HandleAfterCast() {
+			if(!GetCaster()) 
+				return ;
+			
+			Unit* caster = GetCaster();
+			stalker = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, 
+											caster->GetPositionX() + 30 * cos(caster->GetOrientation()), 
+											caster->GetPositionY() + 30 * sin(caster->GetOrientation()), 
+											caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000);
+			if(!stalker)
+				return ;			
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "Stalker guid is %u", stalker->GetGUID());
+			caster->SetTarget(stalker->GetGUID());
 		}
-
-        void HandleEffectRemove(AuraEffect const* auraEf, AuraEffectHandleModes mode)
-        {
-            if(target)
-            {
-                if(GetCaster())
-                {
-                    GetCaster()->SetTarget(target->GetGUID());
-                    GetCaster()->SetFacingToObject(target);
-                    /*if(boss_hoptallus::boss_hoptallusAI* ai = CAST_AI(boss_hoptallus::boss_hoptallusAI, GetCaster()->GetAI()))
-                        ai->SetStalker(NULL);*/
-                }
-            }
-        }
-
-        void Register()
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_hoptallus_carrot_breath_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_hoptallus_carrot_breath_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-			OnEffectPeriodic += AuraEffectPeriodicFn(spell_hoptallus_carrot_breath_AuraScript::HandlePeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
+		
+		void Register() {
+			AfterCast += SpellCastFn(spell_hoptallus_carrot_breath_SpellScript::HandleAfterCast);
+		}
 		
 		TempSummon* stalker ;
+	}
 
-    private :
-        Unit* target ;
-    };
-
-    AuraScript* GetAuraScript() const
+    SpellScript* GetSpellScript() const
     {
-        return new spell_hoptallus_carrot_breath_AuraScript();
+        return new spell_hoptallus_carrot_breath_SpellScript();
     }
 };
 
