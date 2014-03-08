@@ -30,7 +30,8 @@ enum Talk
     SAY_GOING_BANANAS_TWO   = 4,
     SAY_GOING_BANANAS_THREE = 5,
     SAY_KILLED_PLAYER       = 6,
-    SAY_JUST_DIED           = 7
+    SAY_JUST_DIED           = 7,
+    SAY_SUMMON_ALL_BARRELS  = 8
 };
 
 const Position jumpPosition = {-756.727173f, 1354.609985f, 147.095245f, 2.085622f};
@@ -128,10 +129,8 @@ public :
                 DoCast(me, SPELL_GOING_BANANAS, true);
                 Talk(SAY_KILLED_PLAYER - m_uiNextBananaPercent / 30);
                 if(instance)
-                {
-                    instance->DoSendNotifyToInstance("Ook Ook is going bananas ! More barrels are coming !");
                     instance->ProcessEvent(NULL, INSTANCE_EVENT_SUMMON_ALL);
-                }
+                Talk(SAY_SUMMON_ALL_BARRELS);
                 m_uiNextBananaPercent -= 30 ;
             }
         }
