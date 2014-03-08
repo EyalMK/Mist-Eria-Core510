@@ -56,13 +56,14 @@ public :
 
             // Ook Ook Event
             m_uiKilledHozens = 0 ;
-            m_bNextWaveFull = true ;
-            m_uiBarrelsTimer = 1000 ;
+            // m_bNextWaveFull = true ;
+            // m_uiBarrelsTimer = 1000 ;
 
             // Hoptallus Event
             m_uiHoptallusTrashSummonTimer = 1000 ;
             m_uiKilledHoptallusTrash = 0 ;
             m_bHoptallusActive = false ;
+            b_allSummoned = false ;
 
             LogFunction("Initialize", false);
         }
@@ -74,7 +75,7 @@ public :
             /// Update is called at each world's tick
 
             // Summoning barrels timer
-            if(GetData(INSTANCE_DATA_OOK_OOK_STATUS) != DONE)
+            /*if(GetData(INSTANCE_DATA_OOK_OOK_STATUS) != DONE)
             {
                 if(m_uiBarrelsTimer <= uiDiff)
                 {
@@ -91,8 +92,8 @@ public :
                 }
                 else
                     m_uiBarrelsTimer -= uiDiff ;
-            }
-            else if((GetData(INSTANCE_DATA_OOK_OOK_STATUS) == DONE) && (GetData(INSTANCE_DATA_HOPTALLUS_STATUS) == NOT_STARTED) && !m_bHoptallusActive)
+            }*/
+            if((GetData(INSTANCE_DATA_OOK_OOK_STATUS) == DONE) && (GetData(INSTANCE_DATA_HOPTALLUS_STATUS) == NOT_STARTED) && !m_bHoptallusActive)
             {
                 if(m_uiHoptallusTrashSummonTimer <= uiDiff)
                 {
@@ -119,15 +120,17 @@ public :
             if(eventId <= INSTANCE_EVENT_SUMMON_BARREL_5)
                 SummonBarrel(eventId);
             else if(eventId == INSTANCE_EVENT_SUMMON_ALL)
-            {
-                m_bNextWaveFull = true ;
-                m_uiBarrelsTimer = 0 ; // We make sure the spawn will be almost instant (50ms < diff < 200ms) (normally)
-            }
+                SummonAllBarrels();
         }
 
         void OnPlayerEnter(Player *player)
         {
             LogFunction("OnPlayerEnter");
+
+            if(!b_allSummoned) {
+                SummonAllBarrels();
+                b_allSummoned = true ;
+            }
 
             if(player)
 			{
@@ -406,6 +409,7 @@ public :
 
         bool m_bNextWaveFull ; /// If true, summon all the barrels at one time ; else, summon only one
         bool m_bHoptallusActive ; /// If true, stop summoning npcs
+        bool b_allSummoned ; /// Should we summon all the barrels on player enter ?
     };
 
     // Get instance script

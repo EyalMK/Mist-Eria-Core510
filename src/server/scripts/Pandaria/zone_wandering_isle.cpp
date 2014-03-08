@@ -3471,6 +3471,7 @@ public:
         void Reset()
         {
             me->setActive(true);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void UpdateAI(const uint32 uiDiff)
@@ -4686,43 +4687,72 @@ enum eJiBallon
 class npc_shang_xi_air_balloon : public VehicleScript
 {
 public:
-    npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon"){}
-
-    struct npc_shang_xi_air_balloonAI : public ScriptedAI
+    npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon")
     {
-        npc_shang_xi_air_balloonAI(Creature* creature) : ScriptedAI(creature){}
+    }
 
-        uint32 Testtimer;
+    void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatId)
+    {
+        if(veh->GetBase()->ToCreature()->GetEntry() == 55649)
+        {
+            Creature* escort = veh->GetBase()->ToCreature()->FindNearestCreature(31002, 200.00f, true);
+
+            if(passenger->GetTypeId() == TYPEID_PLAYER)
+            {
+                if(escort)
+                {
+                    escort->AI()->DoAction(0);
+                    veh->GetBase()->ToCreature()->SetSpeed(MOVE_FLIGHT, 0.5f);
+                }
+            }
+        }
+    }
+};
+
+class npc_waypoint_air_balloon : public CreatureScript
+{
+public:
+    npc_waypoint_air_balloon(): CreatureScript("npc_waypoint_air_balloon"){}
+
+    struct npc_waypoint_air_balloonAI : public npc_escortAI
+    {
+        npc_waypoint_air_balloonAI(Creature* creature) : npc_escortAI(creature){}
+
+        bool VerifPlayer;
 
         void Reset()
         {
-            Testtimer = 2000;
+            VerifPlayer = false;
         }
 
-        /*void PassengerBoarded(Unit* who, int8 seatId, bool apply)
+        void DoAction(int32 const action)
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
-            {
-                if (apply)
-                    Start(false, true, who->GetGUID());
-            }
-        }*/
+            Start(false, true);
+        }
 
-        /*void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId)
         {
             Player* player = GetPlayerForEscort();
 
-            Creature* aysa = me->FindNearestCreature(56661, 200.00f, true);
-            Creature* jipatte = me->FindNearestCreature(56660, 200.00f, true);
-            Creature* shen = me->FindNearestCreature(56676, 200.00f, true);
+            Creature* aysa = me->FindNearestCreature(56661, 50.00f, true);
+            Creature* jipatte = me->FindNearestCreature(56660, 50.00f, true);
+            Creature* shen = me->FindNearestCreature(56676, 50.00f, true);
+            Creature* mongol = me->FindNearestCreature(55649, 50.00f, true);
+            Map* map = me->GetMap();
 
             switch (waypointId)
             {
                 case 1:
-                    SetRun();
-                    me->SetSpeed(MOVE_FLIGHT, 1.0f);
+                    me->SetSpeed(MOVE_FLIGHT, 0.5f);
+                    if(mongol)
+                    {
+                        mongol->GetMotionMaster()->MovePath(55649, false);
+                        mongol->SetSpeed(MOVE_FLIGHT, 0.5f);
+                    }
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_1);
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
                     break;
                 case 2:
                     if(aysa)
@@ -4749,8 +4779,13 @@ public:
                         aysa->AI()->Talk(SAY_AYSA_BALLON_4);
                     break;
                 case 8:
+                    me->SetSpeed(MOVE_FLIGHT, 1.0f);
+                    if(mongol)
+                        mongol->SetSpeed(MOVE_FLIGHT, 1.0f);
                     if(aysa)
                         aysa->AI()->Talk(SAY_AYSA_BALLON_5);
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
                     break;
                 case 9:
                     if(shen)
@@ -4781,14 +4816,30 @@ public:
                         aysa->AI()->Talk(SAY_AYSA_BALLON_7);
                     break;
                 case 16:
+                    if(map)
+                    {
+                        Map::PlayerList const& players = map->GetPlayers();
+                        for(Map::PlayerList::const_iterator iter = players.begin() ; iter != players.end() ; ++iter)
+                        {
+                            Player *player = iter->getSource();
+                            if(player)
+                                if (player->isAlive() && player->IsInDist2d(me, 50))
+                                    player->KilledMonsterCredit(55939);
+                        }
+                    }
                     if(shen)
                         shen->AI()->Talk(SAY_SHEN_ZI_BALLON_6);
                     break;
                 case 17:
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_4);
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
                     break;
                 case 18:
+                    me->SetSpeed(MOVE_FLIGHT, 5.0f);
+                    if(mongol)
+                        mongol->SetSpeed(MOVE_FLIGHT, 5.0f);
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_5);
                     break;
@@ -4799,8 +4850,13 @@ public:
                 case 21:
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_6);
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
                     break;
                 case 23:
+                    me->SetSpeed(MOVE_FLIGHT, 3.0f);
+                    if(mongol)
+                        mongol->SetSpeed(MOVE_FLIGHT, 3.0f);
                     if(aysa)
                         aysa->AI()->Talk(SAY_AYSA_BALLON_9);
                     break;
@@ -4820,30 +4876,62 @@ public:
                     me->DespawnOrUnsummon();
                     break;
             }
-        }*/
-
-        void OnCharmed(bool apply)
-        {
         }
 
         void UpdateAI(const uint32 uiDiff)
         {
-            if(Testtimer <= uiDiff)
-            {
-                Creature* aysa = me->FindNearestCreature(56661, 200.00f, true);
-                if(aysa)
-                    aysa->AI()->Talk(SAY_JI_BALLON_1);
+            npc_escortAI::UpdateAI(uiDiff);
 
-                Testtimer = 4000;
+            if (VerifPlayer)
+            {
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if(summoner->ToPlayer())
+                        if(summoner->IsInDist2d(me, 10.00f))
+                        {
+                            SetEscortPaused(false);
+                            VerifPlayer = false;
+                        }
             }
-            else
-                Testtimer -= uiDiff;
         }
     };
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_shang_xi_air_balloonAI(creature);
+        return new npc_waypoint_air_balloonAI(creature);
+    }
+};
+
+class npc_shang_xi_air_balloon_click : public CreatureScript
+{
+public:
+    npc_shang_xi_air_balloon_click(): CreatureScript("npc_shang_xi_air_balloon_click") { }
+
+    struct npc_shang_xi_air_balloon_clickAI : public ScriptedAI
+    {
+        npc_shang_xi_air_balloon_clickAI(Creature* creature) : ScriptedAI(creature){}
+
+        void Reset()
+        {
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+        }
+
+        void OnSpellClick(Unit* clicker)
+        {
+            Creature* mongol = clicker->FindNearestCreature(55649, 50.00f, true);
+            clicker->SummonCreature(31002, 908.82f, 4558.87f, 232.31f, 0.62f, TEMPSUMMON_TIMED_DESPAWN, 600000);
+
+            if(clicker->ToPlayer())
+                clicker->ToPlayer()->KilledMonsterCredit(56378);
+
+            if(clicker->GetTypeId() == TYPEID_PLAYER)
+                if(mongol)
+                    clicker->EnterVehicle(mongol);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_shang_xi_air_balloon_clickAI(creature);
     }
 };
 
@@ -4919,4 +5007,6 @@ void AddSC_wandering_isle()
     new npc_master_shang_xi_escort();
     new npc_master_shang_xi_dead();
     new npc_shang_xi_air_balloon();
+    new npc_waypoint_air_balloon();
+    new npc_shang_xi_air_balloon_click();
 }

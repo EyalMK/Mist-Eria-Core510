@@ -38,8 +38,14 @@ namespace FactorySelector
 
         //scriptname in db
         if (!ai_factory)
-            if (CreatureAI* scriptedAI = sScriptMgr->GetCreatureAI(creature))
+		{
+			if(creature->GetVehicleKit())
+				if(CreatureAI* scriptedAI = sScriptMgr->GetCreatureBaseAI(creature->GetVehicleKit()))
+					return scriptedAI ;
+            
+			if(CreatureAI* scriptedAI = sScriptMgr->GetCreatureAI(creature))
                 return scriptedAI;
+		}
 
         // AIname in db
         std::string ainame=creature->GetAIName();
