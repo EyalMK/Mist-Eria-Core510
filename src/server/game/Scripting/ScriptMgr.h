@@ -629,6 +629,9 @@ class VehicleScript : public ScriptObject
 
         // Called after a passenger is removed from a vehicle.
         virtual void OnRemovePassenger(Vehicle* /*veh*/, Unit* /*passenger*/) { }
+		
+		// Call when an AI is needed for the Creature used as base
+		virtual CreatureAI* GetAI(Creature* creature) const {return NULL ; }
 };
 
 class DynamicObjectScript : public ScriptObject, public UpdatableScript<DynamicObject>
@@ -987,6 +990,7 @@ class ScriptMgr
         void OnInstallAccessory(Vehicle* veh, Creature* accessory);
         void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatId);
         void OnRemovePassenger(Vehicle* veh, Unit* passenger);
+		void GetCreatureBaseAI(Vehicle* vehicle);
 
     public: /* DynamicObjectScript */
 		

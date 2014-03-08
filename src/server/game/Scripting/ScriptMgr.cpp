@@ -1000,6 +1000,7 @@ bool ScriptMgr::OnConditionCheck(Condition* condition, ConditionSourceInfo& sour
     return tmpscript->OnConditionCheck(condition, sourceInfo);
 }
 
+// VehicleScript / TransportScript
 void ScriptMgr::OnInstall(Vehicle* veh)
 {
     ASSERT(veh);
@@ -1055,6 +1056,16 @@ void ScriptMgr::OnRemovePassenger(Vehicle* veh, Unit* passenger)
 
     GET_SCRIPT(VehicleScript, veh->GetBase()->ToCreature()->GetScriptId(), tmpscript);
     tmpscript->OnRemovePassenger(veh, passenger);
+}
+
+CreatureAI* ScriptMgr::GetCreatureBaseAI(Vehicle* vehicle)
+{
+	ASSERT(vehicle);
+	ASSERT(vehicle->GetBase());
+	ASSERT(vehicle->GetBase()->GetTypeId() == TYPEID_UNIT);
+	
+	GET_SCRIPT_RET(VehicleScript, vehicle->GetBase()->ToCreature()->GetScriptId(), tmpscript, NULL);
+	return tmpscript->GetAI() ;
 }
 
 void ScriptMgr::OnDynamicObjectUpdate(DynamicObject* dynobj, uint32 diff)
