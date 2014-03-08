@@ -465,22 +465,17 @@ public :
             {
                 target = caster->getVictim();
                 // See if I care to use a spell !
-                if(TempSummon* stalker = caster->SummonCreature(NPC_CARROT_BREATH_HELPER,
+                stalker = caster->SummonCreature(NPC_CARROT_BREATH_HELPER,
                                                                      caster->GetPositionX() + 30 * cos(caster->GetOrientation()),
                                                                      caster->GetPositionY() + 30 * sin(caster->GetOrientation()),
                                                                      caster->GetPositionZ(),
-                                                                     0, TEMPSUMMON_TIMED_DESPAWN, 15000))
-                {
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Carrot Breath : Summoned");
-					caster->CastSpell(stalker, 74758);
-                }
+                                                                     0, TEMPSUMMON_TIMED_DESPAWN, 15000));
             }
         }
 		
-		/*void HandlePeriodic(AuraEffect const* auraEff) {
-			if(Creature * helper = GetCaster()->FindNearestCreature(NPC_CARROT_BREATH_HELPER, 50000.0f)
-				GetCaster()->CastSpell(helper, 74758, true);
-		}*/
+		void HandlePeriodic(AuraEffect const* auraEff) {
+			GetCaster()->CastSpell(stalker, 74758, true);
+		}
 
         void HandleEffectRemove(AuraEffect const* auraEf, AuraEffectHandleModes mode)
         {
@@ -500,8 +495,10 @@ public :
         {
             OnEffectApply += AuraEffectApplyFn(spell_hoptallus_carrot_breath_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_hoptallus_carrot_breath_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-			// OnEffectPeriodic += AuraEffectPeriodicFn
+			OnEffectPeriodic += AuraEffectPeriodicFn(spell_hoptallus_carrot_breath_AuraScript::HandlePeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
+		
+		TempSummon* stalker ;
 
     private :
         Unit* target ;
