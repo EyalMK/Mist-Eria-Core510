@@ -476,7 +476,7 @@ public :
                                                                      0, TEMPSUMMON_TIMED_DESPAWN, 15000))
                 {
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Carrot Breath : Summoned");
-					caster->CastSpell(stalker, 74758, true);
+					caster->CastSpell(stalker, 74758);
                 }
             }
         }
