@@ -202,14 +202,7 @@ public :
                         events.ScheduleEvent(EVENT_CARROT_BREATH, 100);
                         break ;
                     }
-					if(TempSummon* sstalker = me->SummonCreature(NPC_CARROT_BREATH_HELPER,
-                                                                     me->GetPositionX() + 30 * cos(me->GetOrientation()),
-                                                                     me->GetPositionY() + 30 * sin(me->GetOrientation()),
-                                                                     me->GetPositionZ(),
-                                                                     0, TEMPSUMMON_TIMED_DESPAWN, 15000))
-					{
-						DoCast(sstalker, SPELL_CARROT_BREATH);
-					}
+					DoCastAOE(SPELL_CARROT_BREATH);
 					Talk(TALK_CARROT_BREATH);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
@@ -483,15 +476,15 @@ public :
                                                                      0, TEMPSUMMON_TIMED_DESPAWN, 15000))
                 {
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Carrot Breath : Summoned");
-                    caster->SetTarget(stalker->GetGUID()); //! Core guid !
-                    caster->StopMoving();
-                    caster->SetFacingToObject(stalker);
 					caster->CastSpell(stalker, 74758, true);
-                    /*if(boss_hoptallus::boss_hoptallusAI * ai = CAST_AI(boss_hoptallus::boss_hoptallusAI, caster->GetAI()))
-                        ai->SetStalker(stalker);*/
                 }
             }
         }
+		
+		/*void HandlePeriodic(AuraEffect const* auraEff) {
+			if(Creature * helper = GetCaster()->FindNearestCreature(NPC_CARROT_BREATH_HELPER, 50000.0f)
+				GetCaster()->CastSpell(helper, 74758, true);
+		}*/
 
         void HandleEffectRemove(AuraEffect const* auraEf, AuraEffectHandleModes mode)
         {
@@ -511,6 +504,7 @@ public :
         {
             OnEffectApply += AuraEffectApplyFn(spell_hoptallus_carrot_breath_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_hoptallus_carrot_breath_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+			// OnEffectPeriodic += AuraEffectPeriodicFn
         }
 
     private :
@@ -573,6 +567,6 @@ void AddSC_boss_hoptallus()
     new mob_virmen();
     new stalker_carrot_breath();
     new npc_big_ol_hammer();
-    // new spell_hoptallus_carrot_breath();
+    new spell_hoptallus_carrot_breath();
     new spell_hoptallus_furlwind();
 }
