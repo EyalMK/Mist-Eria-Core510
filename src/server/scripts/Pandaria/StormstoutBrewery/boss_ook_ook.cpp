@@ -128,6 +128,7 @@ public :
             {
                 DoCast(me, SPELL_GOING_BANANAS, true);
                 Talk(SAY_KILLED_PLAYER - m_uiNextBananaPercent / 30);
+				DoRemoveBarrels();
                 if(instance)
                     instance->ProcessEvent(NULL, INSTANCE_EVENT_SUMMON_ALL);
                 Talk(SAY_SUMMON_ALL_BARRELS);

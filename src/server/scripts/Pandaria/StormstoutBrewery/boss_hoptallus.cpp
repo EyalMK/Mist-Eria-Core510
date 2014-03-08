@@ -190,6 +190,10 @@ public :
                         break ;
                     }
                     Talk(TALK_FURLWIND);
+					if(me->getVictim())
+						me->GetMotionMaster()->MoveChase(me->getVictim())
+					else
+						me->GetMotionMaster()->MoveRandom();
                     DoCastAOE(SPELL_FURLWIND);
                     events.ScheduleEvent(EVENT_FURLWIND, IsHeroic() ? urand(12000, 14000) : urand(14000, 17000));
                     break ;
@@ -200,6 +204,7 @@ public :
                         break ;
                     }
                     DoCast(SPELL_CARROT_BREATH);
+					Talk(TALK_CARROT_BREATH);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
 
@@ -462,7 +467,7 @@ public :
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Carrot Breath : Summoned");
                     caster->SetTarget(stalker->GetGUID()); //! Core guid !
                     caster->SetFacingToObject(stalker);
-					caster->CastSpell(stalker, 120301, true);
+					// caster->CastSpell(stalker, 120301, true);
                     if(boss_hoptallus::boss_hoptallusAI * ai = CAST_AI(boss_hoptallus::boss_hoptallusAI, caster->GetAI()))
                         ai->SetStalker(stalker);
                 }
