@@ -426,161 +426,50 @@ public :
     class stalker_carrot_breathAI : public ScriptedAI
     {
     public :
-        /// Constructor
         stalker_carrot_breathAI(Creature* creature) : ScriptedAI(creature)
-        {
-            b_init = false ;
-        }
-
-        /**
-         * @brief IsSummonedBy
-         * Overrides ScriptedAI::IsSummonedBy
-         * Replace constructor
-         *
-         * @param summoner
-         * Pointer to the summoner
-         */
-        void IsSummonedBy(Unit *summoner)
-        {
-            if(!summoner)
-            {
-                sLog->outFatal(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : No summoner available for Carrot Breath Helper !");
-                return ;
-            }
-
-            if(!summoner->ToCreature())
-            {
-                sLog->outFatal(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : Summoner is not a creature for CBH !");
-                return ;
-            }
-
-            // Quelques init
-            m_uiMSTimeDiff = m_uiId = 0 ;
-            x = y = z = 0.0f ;
-
-            p_master = summoner->ToCreature();
-            p_instance = summoner->GetInstanceScript();
-
-            center.Relocate(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ());
-            rayon = me->GetExactDist2d(&center);
-            angle = me->GetOrientation();
-
-            m_uiFirstMoveTimer = MIN_MAP_UPDATE_DELAY ; // Ca devrait faire l'affaire
-
-            // Vitesse
-            SpellInfo const* carrotBreathSI = sSpellMgr->GetSpellInfo(SPELL_CARROT_BREATH);
-            if(!carrotBreathSI)
-                m_uiTimeToDoATurn = 15000 ; // En 5.1.0a
-            else
-                m_uiTimeToDoATurn = carrotBreathSI->DurationEntry->Duration[0];
-
-            /// Remember only one thing :
-            /// CHANGE THE FUCKING LIMIT IN MOVE SPLINE ! (DONE)
-            me->SetSpeed(MOVE_RUN, 2 * M_PI * rayon / m_uiTimeToDoATurn, true);
-            me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * rayon / m_uiTimeToDoATurn, true);
-
-            // Log pour voir
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMRSTOUT BREWERY : CBH run speed set to %f, flight speed set to %f",
-                           me->GetSpeedRate(MOVE_RUN), me->GetSpeedRate(MOVE_FLIGHT));
-        }
-
-        void MovementInform(uint32 motionType, uint32 id)
-        {
-            /// This needs some documentation ; MovementInform is a function very special, called in many places
-            /// but here we will focus only on a special case, when PointMovementGenerator::DoFinalize is called.
-            /// When PMG::DoFinalize is called, there is a check done on the movespline of the owner of the movement
-            /// generator. If the spline is finalized, MovementInform is called.
-            ///
-            /// DoFinalize is a subsequent call from MovementGeneratorMedium::Finalize, which is a subsequent
-            /// call from MotionMaster::DirectDelete. This is a bit complicated isn't it ? DirectDelete is called
-            /// in many places, but if we deal with each of them correctly, it is easy to understand.
-            ///
-            /// When the world ticks, the motion master is updated ; if the movement generator is finalized,
-            /// *MovementGenerator::Update returns false, so there is a MovementExpired, with DirectExpire
-            /// and DirectDelete. This is one of the calls.
-            ///
-            /// DirectDelete is also called in DirectClean, which is only called during MotionMaster::Clear. This
-            /// call is not usefull right here.
-            ///
-            /// In UpdateMotion, the DirectDelete is called during the clear of the ExpiredList, which we don't care
-            /// right here, because we only proceed with direct methods, so the core doesn't wait for a tick of the
-            /// world to clean the generators.
-            ///
-            /// Finally, DirectDelete is called during Mutate, if some condition are validated. But since, the MMCF_UPDATE
-            /// flag is almost NEVER used, the condition is almost everytime validated. So each time we call Mutate,
-            /// using MotionMaster::MovePoint, we clean the movement already cleaned. This is perfect.
-
-            if(motionType != POINT_MOTION_TYPE)
-            {
-                sLog->outFatal(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : MovementInform called on CBH, but motion type is not POINT_MOTION_TYPE, it is %u", motionType);
-                return ;
-            }
-
-            // Violent mais bon
-            ASSERT(me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE);
-
-            // Log avant de tout calculer (au cas où)
-
-
-            /// Calcul à partir de la somme de time diff
-
-            // On check le spline (useless mais sait-on jamais)
-            if(!me->movespline->Finalized())
-                me->movespline->_Finalize();
-
-            //! On va considérer que le MotionMaster n'a pas pu fail...
-
-            ++m_uiId ;
-            // m_uiMSTimeDiff is used only to prevent too many calls to the motion master
-            angle -= ((2 * M_PI / m_uiTimeToDoATurn) * m_uiMSTimeDiff) ;
-            x = center.GetPositionX() + cos(angle) * rayon ;
-            y = center.GetPositionY() + sin(angle) * rayon ;
-            z = center.GetPositionZ() ;
-
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : CBH supposed to go to %f, %f, %f, with id %u", x, y, z, m_uiId);
-
-            // On envoie
-            me->GetMotionMaster()->MovePoint(m_uiId, x, y, z, true);
-            /*PointMovementGenerator* mGen = static_cast<PointMovementGenerator*>(me->GetMotionMaster()->top());
-            float mx, my, mz ;
-            mGen->GetDestination(mx, my, mz);
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "Datas computed : x %f, y %f, z %f", mx, my, mz);*/
-
-            // Reset des timers
-            m_uiMSTimeDiff = 0 ;
-        }
-
-        /**
-         * @brief UpdateAI
-         * Overload ScriptedAI::UpdateAI
-         * Only used to compute m_uiMSTimeDiff correctly
-         *
-         * @param diff
-         * Time between current and previous tick of the world
-         */
-        void UpdateAI(const uint32 diff)
-        {
-			// sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : UpdateAI (stalker CB)");
-            // RETURN_IF(!b_init);
-
-            m_uiMSTimeDiff += diff ;
-
-            // First movement, nothing will crash because UpdateAI is called only after IsSummonedBy
-            // As a matter of facts : Map::SummonCreature, Object::AddToMap, TS::AddToWorld, Creature::AddToWorld, Creature::AIM_Initialize
-            if(m_uiFirstMoveTimer <= diff)
-            {
-                angle -= ((2 * M_PI / m_uiTimeToDoATurn) * diff) ;
-                x = center.GetPositionX() + cos(angle) * rayon ;
-                y = center.GetPositionY() + sin(angle) * rayon ;
-                z = center.GetPositionZ() ;
-
-                me->GetMotionMaster()->MovePoint(m_uiId, x, y, z);
-            }
-        }
+		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : AI Constructed");
+			// Init
+			m_uiId = 0 ;
+			x = y = z = 0.0f ;
+			
+			p_master = me->ToTempSummon()->GetSummoner() ;
+			p_instance = p_master->GetInstanceScript();
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : pointers initialized");
+			
+			me->SetFacingToObject(p_master);
+			me->SetTarget(p_master->GetGUID());
+			angle = me->GetOrientation();
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : Orientation && target set");
+			
+			// Positions
+			rayon = me->GetExactDist2d(p_master->GetPositionX(), p_master->GetPositionY());
+			center.Relocate(p_master->GetPositionX(), p_master->GetPositionY(), p_master->GetPositionZ());
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : rayon computed to %f, center relocated", rayon);
+			
+			// Speed
+			me->SetSpeed(MOVE_RUN, (2 * M_PI * rayon / 15.0f), true);
+			me->SetSpeed(MOVE_FLIGHT, (2 * M_PI * rayon / 15.f) , true);
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : Speeds computed, run %f, flight %f", me->GetSpeedRate(MOVE_RUN), me->GetSpeedRate(MOVE_FLIGHT));
+		}
+		
+		void UpdateAI(const uint32 uiDiff)
+		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : UpdateAI using diff %u", uiDiff);
+			
+			angle -= (2 * M_PI / 15000.0f) * uiDiff ;
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : angle computed %f", angle);
+			
+			x = p_master->GetPositionX() + rayon * cos(angle);
+			y = p_master->GetPositionY() + rayon * sin(angle);
+			z = p_master->GetPositionZ() ;
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : coordinates computed, x = %f, y = %f, z = %f", x, y, z);
+			++m_uiId ;
+			
+			me->GetMotionMaster()->MovePoint(m_uiId, x, y, z);
+		}
 
     private :
-        /// Used in MovementInform
-        uint32 m_uiMSTimeDiff ;
 
         /// Used in MotionMaster, id of the point
         uint32 m_uiId ;
@@ -589,7 +478,7 @@ public :
         float x, y, z ;
 
         /// Pointer to the master
-        Creature* p_master ;
+        Unit* p_master ;
 
         /// Pointer to InstanceScript in case
         InstanceScript* p_instance ;
@@ -602,15 +491,6 @@ public :
 
         /// Position of the master
         Position center ;
-
-        /// Duration of a turn
-        uint32 m_uiTimeToDoATurn ;
-
-        /// Timer before first movement
-        uint32 m_uiFirstMoveTimer ;
-
-        /// Prevents calling UpdateAI if AI IsSummondeBy has not yet been called
-        bool b_init ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
@@ -649,16 +529,15 @@ public :
                 target = caster->getVictim();
                 // See if I care to use a spell !
                 if(TempSummon* stalker = caster->SummonCreature(NPC_CARROT_BREATH_HELPER,
-                                                                     0.5f * cos(caster->GetOrientation()),
-                                                                     0.5f * sin(caster->GetOrientation()),
+                                                                     caster->GetPositionX() + 30 * cos(caster->GetOrientation()),
+                                                                     caster->GetPositionY() + 30 * sin(caster->GetOrientation()),
                                                                      caster->GetPositionZ(),
                                                                      0, TEMPSUMMON_TIMED_DESPAWN, 15000))
                 {
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Carrot Breath : Summoned");
                     caster->SetTarget(stalker->GetGUID()); //! Core guid !
                     caster->SetFacingToObject(stalker);
-                    stalker->SetTarget(caster->GetGUID()); //! Core guid !
-                    stalker->SetFacingToObject(caster);
+					caster->CastSpell(stalker, 120301, true);
                 }
             }
         }
