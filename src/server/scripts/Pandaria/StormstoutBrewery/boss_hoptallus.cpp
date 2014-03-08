@@ -393,11 +393,7 @@ public :
 		
 		void UpdateAI(const uint32 uiDiff)
         {
-			m_uiWaitTimer -= uiDiff ;
-			if(m_uiWaitTimer != 0)
-				return ;
-			
-            angle -= (2 * M_PI / 15000.0f) * uiDiff ;
+			angle -= (2 * M_PI / 15000.0f) * uiDiff ;
 			
 			x = p_master->GetPositionX() + rayon * cos(angle);
 			y = p_master->GetPositionY() + rayon * sin(angle);
