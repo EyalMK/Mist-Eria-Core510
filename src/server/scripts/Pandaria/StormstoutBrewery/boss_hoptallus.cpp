@@ -210,6 +210,7 @@ public :
 				
 				case EVENT_RESET_SPEED :
 					me->SetSpeed(MOVE_RUN, 7.0f);
+					me->GetMotionMaster()->MoveChase(me->getVictim());
 					break ;
 
                 default :
