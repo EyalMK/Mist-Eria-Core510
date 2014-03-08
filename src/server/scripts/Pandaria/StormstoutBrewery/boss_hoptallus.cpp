@@ -509,7 +509,9 @@ public :
             /// Finally, DirectDelete is called during Mutate, if some condition are validated. But since, the MMCF_UPDATE
             /// flag is almost NEVER used, the condition is almost everytime validated. So each time we call Mutate,
             /// using MotionMaster::MovePoint, we clean the movement already cleaned. This is perfect.
-
+			
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : CBH : Entering MovementInform, motionType = %u, id = %u", motionType, id);
+			
             if(motionType != POINT_MOTION_TYPE)
             {
                 sLog->outFatal(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : MovementInform called on CBH, but motion type is not POINT_MOTION_TYPE, it is %u", motionType);
@@ -527,7 +529,9 @@ public :
             // On check le spline (useless mais sait-on jamais)
             if(!me->movespline->Finalized())
                 me->movespline->_Finalize();
-
+			
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : CBH : Checked movespline");
+			
             //! On va considérer que le MotionMaster n'a pas pu fail...
 
             ++m_uiId ;
@@ -560,7 +564,7 @@ public :
          */
         void UpdateAI(const uint32 diff)
         {
-			// sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : UpdateAI (stalker CB)");
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : UpdateAI (stalker CB)");
             // RETURN_IF(!b_init);
 
             m_uiMSTimeDiff += diff ;
@@ -569,11 +573,13 @@ public :
             // As a matter of facts : Map::SummonCreature, Object::AddToMap, TS::AddToWorld, Creature::AddToWorld, Creature::AIM_Initialize
             if(m_uiFirstMoveTimer <= diff)
             {
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : CBH : FirstMoveTimer expired !");
                 angle -= ((2 * M_PI / m_uiTimeToDoATurn) * diff) ;
                 x = center.GetPositionX() + cos(angle) * rayon ;
                 y = center.GetPositionY() + sin(angle) * rayon ;
                 z = center.GetPositionZ() ;
-
+				
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : CBH : Motion master computed : x = %f, y = %f, z = %f", x, y, z);
                 me->GetMotionMaster()->MovePoint(m_uiId, x, y, z);
             }
         }
