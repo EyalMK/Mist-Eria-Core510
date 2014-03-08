@@ -207,8 +207,9 @@ public :
                                                                      me->GetPositionY() + 30 * sin(me->GetOrientation()),
                                                                      me->GetPositionZ(),
                                                                      0, TEMPSUMMON_TIMED_DESPAWN, 15000))
-						DoCast(sstalker, 74758);
-					DoCastAOE(SPELL_CARROT_BREATH, true);
+					{
+						DoCast(sstalker, SPELL_CARROT_BREATH);
+					}
 					Talk(TALK_CARROT_BREATH);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
