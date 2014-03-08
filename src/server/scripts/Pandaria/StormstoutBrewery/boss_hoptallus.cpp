@@ -208,7 +208,7 @@ public :
                                                                      me->GetPositionZ(),
                                                                      0, TEMPSUMMON_TIMED_DESPAWN, 15000))
 						DoCast(sstalker, 74758);
-					me->CastSpell((Unit*)NULL, SPELL_CARROT_BREATH, TRIGGERED_IGNORE_CAST_IN_PROGRESS);
+					DoCastAOE(SPELL_CARROT_BREATH, true);
 					Talk(TALK_CARROT_BREATH);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
