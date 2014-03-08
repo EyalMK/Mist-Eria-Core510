@@ -25,7 +25,8 @@ enum Talk
     TALK_KILLED_PLAYER  = 2,
     TALK_FURLWIND       = 3,
     TALK_CARROT_BREATH  = 4,
-    TALK_JUST_DIED      = 5
+    TALK_JUST_DIED      = 5,
+    TALK_SUMMON_VIRMEN  = 6
 };
 
 enum Misc
@@ -78,10 +79,8 @@ public :
     public :
         boss_hoptallusAI(Creature* creature) : ScriptedAI(creature)
         {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Hoptallus : AI Constructed");
             instance = creature->GetInstanceScript();
-            m_bHasStartedOnce = true ;
-            m_bReady = true ;
+            stalker = NULL ;
         }
 
         void Reset()
@@ -89,8 +88,6 @@ public :
             if(instance)
                 instance->SetData(INSTANCE_DATA_HOPTALLUS_STATUS, NOT_STARTED);
             events.Reset();
-            if(m_bHasStartedOnce)
-                events.ScheduleEvent(EVENT_CHECK, 500);
         }
 
         void DoAction(const int32 action)
@@ -100,15 +97,12 @@ public :
                 if(GameObject* go = me->FindNearestGameObject(GOB_GIANT_BARREL, 50000.0f))
                     go->SetGoState(GO_STATE_ACTIVE);
                 me->GetMotionMaster()->MoveJump(jumpPosition, 1.0f, 1.0f);
-                m_bReady = true ;
+                me->SetHomePosition(jumpPosition); // So it will not return into the barrel
             }
         }
 
         void EnterCombat(Unit *aggro)
         {
-            if(!m_bHasStartedOnce)
-                m_bHasStartedOnce = true ;
-
             if(instance)
             {
                 instance->SetData(INSTANCE_DATA_HOPTALLUS_STATUS, IN_PROGRESS);
@@ -131,8 +125,7 @@ public :
                     door->SetGoState(GO_STATE_ACTIVE);
             }
 
-            if(!m_bReady)
-                ScriptedAI::EnterEvadeMode();
+            ScriptedAI::EnterEvadeMode();
         }
 
         void JustDied(Unit *killer)
@@ -158,46 +151,15 @@ public :
         void KilledUnit(Unit *killed)
         {
             Talk(TALK_KILLED_PLAYER);
-            if(!UpdateVictim())
-                m_bReady = false ;
         }
 
         void UpdateAI(const uint32 diff)
         {
-			// sLog->outDebug(LOG_FILTER_NETWORKIO, "Hoptallus : Update AI using diff %u", diff);
-            if(!m_bReady && m_bHasStartedOnce)
-            {
-                events.Update(diff);
-
-                while(uint32 eventId = events.ExecuteEvent())
-                {
-                    switch(eventId)
-                    {
-                    case EVENT_CHECK :
-                        if(DoCheckForPlayers())
-                        {
-                            me->GetMotionMaster()->MoveJump(jumpPosition, 1, 1);
-                            events.Reset();
-                            m_bReady = true ;
-                            break;
-                        }
-                        else
-                        {
-                            events.ScheduleEvent(EVENT_CHECK, 500);
-                            return ;
-                        }
-                        break ;
-
-                    default :
-                        break ;
-                    }
-                }
-
+            if(!UpdateVictim())
                 return ;
-            }
 
-            if(m_bReady && !UpdateVictim())
-                return ;
+            if(stalker)
+                me->SetFacingToObject(stalker);
 
             events.Update(diff);
 
@@ -206,9 +168,10 @@ public :
                 switch(eventId)
                 {
                 case EVENT_SUMMON_VIRMEN :
-                    if(m_uiSummonTimes == 0)
-                        if(instance)
-                            instance->DoSendNotifyToInstance("Hoptallus emits a shrill cry : more virmens are coming !");
+                    if(m_uiSummonTimes == 0) {
+                        Talk(TALK_SUMMON_VIRMEN);
+                        DoCast(me, 114367, true);
+                    }
                     SummonVirmens();
                     ++m_uiSummonTimes;
                     if(m_uiSummonTimes < 3)
@@ -224,7 +187,7 @@ public :
                     if(me->HasUnitState(UNIT_STATE_CASTING))
                     {
                         events.ScheduleEvent(EVENT_FURLWIND, 100);
-                        return ;
+                        break ;
                     }
                     Talk(TALK_FURLWIND);
                     DoCastAOE(SPELL_FURLWIND);
@@ -232,6 +195,10 @@ public :
                     break ;
 
                 case EVENT_CARROT_BREATH :
+                    if(me->HasUnitState(UNIT_STATE_CASTING)) {
+                        events.ScheduleEvent(EVENT_CARROT_BREATH, 100);
+                        break ;
+                    }
                     DoCast(SPELL_CARROT_BREATH);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
@@ -244,69 +211,35 @@ public :
 			DoMeleeAttackIfReady();
         }
 
-        bool DoCheckForPlayers()
-        {
-            if(Map* map = me->GetMap())
-            {
-                Map::PlayerList const& playerList = map->GetPlayers();
-                if(!playerList.isEmpty())
-                {
-                    for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
-                    {
-                        if(Player* p = iter->getSource())
-                        {
-                            if(p->isDead())
-                                return false ;
-                            else
-                                continue ;
-                        }
-                    }
-                }
-                else
-                    return false ;
-            }
-            else
-                return false ;
-
-            return true ;
-        }
-
         void SummonVirmens()
         {
-            // sLog->outDebug(LOG_FILTER_NETWORKIO, "Entered SummonVirmens");
             for(uint8 i = 0 ; i < 5 ; ++i)
             {
-                // sLog->outDebug(LOG_FILTER_NETWORKIO, "Looping");
-				uint32 index = urand(0, MAX_SUMMON_VIRMEN - 1);
-				const Position posSummon = summonVirmenPosition[index];
-				index = urand(0, MAX_SUMMON_VIRMEN - 1);
-				const Position posJump = jumpVirmenPosition[index];
+                const Position posSummon = summonVirmenPosition[urand(0, MAX_SUMMON_VIRMEN - 1)],
+                        posJump = jumpVirmenPosition[urand(0, MAX_SUMMON_VIRMEN - 1)];
+
 				uint32 entry = RAND(MOB_HOPPER, MOB_HOPPLING, MOB_BOPPER);
+
                 if(Creature* summon = me->SummonCreature(entry, posSummon))
-				{
-                    // sLog->outDebug(LOG_FILTER_NETWORKIO, "Summoned virmen ; motion master");
                     summon->GetMotionMaster()->MoveJump(posJump, 8.0f, 8.0f);
-                    // sLog->outDebug(LOG_FILTER_NETWORKIO, "Jumped");
-				}
             }
         }
-		
-		void SummonedCreatureDespawn(Creature *creature) {
-            if(instance)
-                instance->DoSendNotifyToInstance("Hoptallus Stalker just despawned !");
+
+        void SetStalker(TempSummon * s) {
+            stalker = s ;
         }
 
     private :
         EventMap events ;
         InstanceScript * instance ;
-        bool m_bHasStartedOnce ;
-        bool m_bReady ;
         uint8 m_uiSummonTimes ;
+
+        bool b_carrotBreath ;
+        TempSummon* stalker ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
     {
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "Hoptallus : GetAI");
         return new boss_hoptallusAI(creature);
     }
 };
@@ -427,43 +360,35 @@ public :
     {
     public :
         stalker_carrot_breathAI(Creature* creature) : ScriptedAI(creature)
-		{
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : AI Constructed");
+        {
 			// Init
 			m_uiId = 0 ;
 			x = y = z = 0.0f ;
 			
 			p_master = me->ToTempSummon()->GetSummoner() ;
-			p_instance = p_master->GetInstanceScript();
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : pointers initialized");
+            p_instance = p_master->GetInstanceScript();
 			
 			me->SetFacingToObject(p_master);
 			me->SetTarget(p_master->GetGUID());
-			angle = me->GetOrientation();
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : Orientation && target set");
+            angle = me->GetOrientation();
 			
 			// Positions
 			rayon = me->GetExactDist2d(p_master->GetPositionX(), p_master->GetPositionY());
-			center.Relocate(p_master->GetPositionX(), p_master->GetPositionY(), p_master->GetPositionZ());
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : rayon computed to %f, center relocated", rayon);
+            center.Relocate(p_master->GetPositionX(), p_master->GetPositionY(), p_master->GetPositionZ());
 			
 			// Speed
 			me->SetSpeed(MOVE_RUN, (2 * M_PI * rayon / 15.0f), true);
-			me->SetSpeed(MOVE_FLIGHT, (2 * M_PI * rayon / 15.f) , true);
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : Speeds computed, run %f, flight %f", me->GetSpeedRate(MOVE_RUN), me->GetSpeedRate(MOVE_FLIGHT));
+            me->SetSpeed(MOVE_FLIGHT, (2 * M_PI * rayon / 15.f) , true);
 		}
 		
 		void UpdateAI(const uint32 uiDiff)
-		{
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : UpdateAI using diff %u", uiDiff);
+        {
 			
-			angle -= (2 * M_PI / 15000.0f) * uiDiff ;
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : angle computed %f", angle);
+            angle -= (2 * M_PI / 15000.0f) * uiDiff ;
 			
 			x = p_master->GetPositionX() + rayon * cos(angle);
 			y = p_master->GetPositionY() + rayon * sin(angle);
-			z = p_master->GetPositionZ() ;
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : coordinates computed, x = %f, y = %f, z = %f", x, y, z);
+            z = p_master->GetPositionZ() ;
 			++m_uiId ;
 			
 			me->GetMotionMaster()->MovePoint(m_uiId, x, y, z);
@@ -538,6 +463,8 @@ public :
                     caster->SetTarget(stalker->GetGUID()); //! Core guid !
                     caster->SetFacingToObject(stalker);
 					caster->CastSpell(stalker, 120301, true);
+                    if(boss_hoptallus::boss_hoptallusAI * ai = CAST_AI(boss_hoptallus::boss_hoptallusAI, caster->GetAI()))
+                        ai->SetStalker(stalker);
                 }
             }
         }
@@ -550,6 +477,8 @@ public :
                 {
                     GetCaster()->SetTarget(target->GetGUID());
                     GetCaster()->SetFacingToObject(target);
+                    if(boss_hoptallus::boss_hoptallusAI* ai = CAST_AI(boss_hoptallus::boss_hoptallusAI, GetCaster()->GetAI()))
+                        ai->SetStalker(NULL);
                 }
             }
         }

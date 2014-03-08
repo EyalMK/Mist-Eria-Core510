@@ -1,4 +1,5 @@
 #include "stormstout_brewery.h"
+#include "MoveSpline.h"
 
 /********************************************************/
 /********************* OOK OOK **************************/
@@ -437,6 +438,7 @@ public :
         npc_rolling_barrelAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
+            DoCast(me, 106647, true); // Let's roll !
         }
 		
 		void DoAction(const int32 actionId)
@@ -459,9 +461,12 @@ public :
             }
         }
 
-        void PassengerBoarded(Unit *passenger, int8 seatId, bool boolean)
+        void PassengerBoarded(Unit *passenger, int8 seatId, bool enter)
         {
-            me->GetMotionMaster()->Clear(false);
+            if(enter)
+                me->StopMoving();
+            else
+                MovementInform(POINT_MOTION_TYPE, 0);
         }
 
         void SetData(uint32 uiData, uint32 uiValue)
