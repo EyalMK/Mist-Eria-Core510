@@ -3973,9 +3973,9 @@ void SpellMgr::LoadSpellInfoCorrections()
                 case 105002: // Invocation d'un faucon de feu apprivoisé
                     spellInfo->Effects[EFFECT_2].Effect = NULL;
                     break;
-				case 112945 : // Carrot Breath Periodic
-					spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CONE_ENEMY_24); 
-					spellInfo->Effects[EFFECT_1].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_CONE_ENEMY_24); 
+				case 112944 : // Carrot Breath
+					spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTarget(TARGET_UNIT_TARGET_ANY);
+					spellInfo->ExplicitTargetMask = spellInfo->ExplicitTargetMask | TARGET_FLAG_UNIT_MASK ;
 					break ;
 				default:
 					break;
