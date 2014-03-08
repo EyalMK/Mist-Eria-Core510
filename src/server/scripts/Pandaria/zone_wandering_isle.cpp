@@ -4743,9 +4743,12 @@ public:
             switch (waypointId)
             {
                 case 1:
-                    mongol->GetMotionMaster()->MovePath(55649, false);
                     me->SetSpeed(MOVE_FLIGHT, 0.5f);
-                    mongol->SetSpeed(MOVE_FLIGHT, 0.5f);
+                    if(mongol)
+                    {
+                        mongol->GetMotionMaster()->MovePath(55649, false);
+                        mongol->SetSpeed(MOVE_FLIGHT, 0.5f);
+                    }
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_1);
                     SetEscortPaused(true);
@@ -4777,9 +4780,12 @@ public:
                     break;
                 case 8:
                     me->SetSpeed(MOVE_FLIGHT, 1.0f);
-                    mongol->SetSpeed(MOVE_FLIGHT, 1.0f);
+                    if(mongol)
+                        mongol->SetSpeed(MOVE_FLIGHT, 1.0f);
                     if(aysa)
                         aysa->AI()->Talk(SAY_AYSA_BALLON_5);
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
                     break;
                 case 9:
                     if(shen)
@@ -4829,10 +4835,13 @@ public:
                         jipatte->AI()->Talk(SAY_JI_BALLON_4);
                     break;
                 case 18:
-                    me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                    mongol->SetSpeed(MOVE_FLIGHT, 3.0f);
+                    me->SetSpeed(MOVE_FLIGHT, 5.0f);
+                    if(mongol)
+                        mongol->SetSpeed(MOVE_FLIGHT, 5.0f);
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_5);
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
                     break;
                 case 19:
                     if(aysa)
@@ -4843,10 +4852,13 @@ public:
                         jipatte->AI()->Talk(SAY_JI_BALLON_6);
                     break;
                 case 23:
-                    me->SetSpeed(MOVE_FLIGHT, 2.0f);
-                    mongol->SetSpeed(MOVE_FLIGHT, 2.0f);
+                    me->SetSpeed(MOVE_FLIGHT, 3.0f);
+                    if(mongol)
+                        mongol->SetSpeed(MOVE_FLIGHT, 3.0f);
                     if(aysa)
                         aysa->AI()->Talk(SAY_AYSA_BALLON_9);
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
                     break;
                 case 25:
                     if(jipatte)
@@ -4874,7 +4886,7 @@ public:
             {
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     if(summoner->ToPlayer())
-                        if(summoner->IsInDist2d(me, 5.00f))
+                        if(summoner->IsInDist2d(me, 3.00f))
                         {
                             SetEscortPaused(false);
                             VerifPlayer = false;
