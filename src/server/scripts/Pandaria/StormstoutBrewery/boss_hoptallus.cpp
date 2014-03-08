@@ -469,7 +469,7 @@ public :
                                                                      caster->GetPositionX() + 30 * cos(caster->GetOrientation()),
                                                                      caster->GetPositionY() + 30 * sin(caster->GetOrientation()),
                                                                      caster->GetPositionZ(),
-                                                                     0, TEMPSUMMON_TIMED_DESPAWN, 15000));
+                                                                     0, TEMPSUMMON_TIMED_DESPAWN, 15000);
             }
         }
 		
