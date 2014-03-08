@@ -532,10 +532,10 @@ public :
             float x, y, z ;
 			if(victim) {
 				victim->GetPosition(x, y, z);
-				me->GetMotionMaster()->MovePoint(0, x, y, z);
+				caster->GetMotionMaster()->MovePoint(0, x, y, z);
 			}
 			else
-				me->GetMotionMaster()->MoveRandom();
+				caster->GetMotionMaster()->MoveRandom();
         }
 
         void Register() {
