@@ -158,10 +158,10 @@ public :
             if(!UpdateVictim())
                 return ;
 
-            if(stalker) {
+            /*if(stalker) {
 				orientation -= 2 * M_PI / 15000.0f * diff ;
                 me->SetOrientation(orientation);
-			}
+			}*/
 
             events.Update(diff);
 
@@ -468,9 +468,9 @@ public :
                     caster->SetTarget(stalker->GetGUID()); //! Core guid !
                     caster->StopMoving();
                     caster->SetFacingToObject(stalker);
-					// caster->CastSpell(stalker, 120301, true);
-                    if(boss_hoptallus::boss_hoptallusAI * ai = CAST_AI(boss_hoptallus::boss_hoptallusAI, caster->GetAI()))
-                        ai->SetStalker(stalker);
+					caster->CastSpell(stalker, 74758, true);
+                    /*if(boss_hoptallus::boss_hoptallusAI * ai = CAST_AI(boss_hoptallus::boss_hoptallusAI, caster->GetAI()))
+                        ai->SetStalker(stalker);*/
                 }
             }
         }
@@ -483,8 +483,8 @@ public :
                 {
                     GetCaster()->SetTarget(target->GetGUID());
                     GetCaster()->SetFacingToObject(target);
-                    if(boss_hoptallus::boss_hoptallusAI* ai = CAST_AI(boss_hoptallus::boss_hoptallusAI, GetCaster()->GetAI()))
-                        ai->SetStalker(NULL);
+                    /*if(boss_hoptallus::boss_hoptallusAI* ai = CAST_AI(boss_hoptallus::boss_hoptallusAI, GetCaster()->GetAI()))
+                        ai->SetStalker(NULL);*/
                 }
             }
         }
@@ -529,11 +529,13 @@ public :
             if(!caster) return ;
 
             victim = caster->getVictim();
-            caster->GetMotionMaster()->Clear(true);
-            if(victim)
-                caster->GetMotionMaster()->MoveChase(victim);
-            else
-                caster->GetMotionMaster()->MoveRandom();
+            float x, y, z ;
+			if(victim) {
+				victim->GetPosition(x, y, z);
+				me->GetMotionMaster()->MovePoint(0, x, y, z);
+			}
+			else
+				me->GetMotionMaster()->MoveRandom();
         }
 
         void Register() {
