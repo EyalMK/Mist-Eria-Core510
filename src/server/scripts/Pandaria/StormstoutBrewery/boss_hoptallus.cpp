@@ -448,8 +448,8 @@ public :
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : rayon computed to %f, center relocated", rayon);
 			
 			// Speed
-			me->SetSpeed(MOVE_RUN, (2 * M_PI * rayon / 5.f), true);
-			me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * rayon / 5.f, true);
+			me->SetSpeed(MOVE_RUN, (2 * M_PI * rayon / 15.0f), true);
+			me->SetSpeed(MOVE_FLIGHT, (2 * M_PI * rayon / 15.f) , true);
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : Speeds computed, run %f, flight %f", me->GetSpeedRate(MOVE_RUN), me->GetSpeedRate(MOVE_FLIGHT));
 		}
 		
@@ -537,6 +537,7 @@ public :
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Carrot Breath : Summoned");
                     caster->SetTarget(stalker->GetGUID()); //! Core guid !
                     caster->SetFacingToObject(stalker);
+					caster->CastSpell(stalker, 120301, true);
                 }
             }
         }
