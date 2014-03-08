@@ -482,7 +482,7 @@ public :
         float x, y, z ;
 
         /// Pointer to the master
-        Creature* p_master ;
+        Unit* p_master ;
 
         /// Pointer to InstanceScript in case
         InstanceScript* p_instance ;
