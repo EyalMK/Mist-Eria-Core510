@@ -202,10 +202,10 @@ public :
                         events.ScheduleEvent(EVENT_CARROT_BREATH, 100);
                         break ;
                     }
-					if(TempSummon* sstalker = caster->SummonCreature(NPC_CARROT_BREATH_HELPER,
-                                                                     caster->GetPositionX() + 30 * cos(caster->GetOrientation()),
-                                                                     caster->GetPositionY() + 30 * sin(caster->GetOrientation()),
-                                                                     caster->GetPositionZ(),
+					if(TempSummon* sstalker = me->SummonCreature(NPC_CARROT_BREATH_HELPER,
+                                                                     me->GetPositionX() + 30 * cos(me->GetOrientation()),
+                                                                     me->GetPositionY() + 30 * sin(me->GetOrientation()),
+                                                                     me->GetPositionZ(),
                                                                      0, TEMPSUMMON_TIMED_DESPAWN, 15000))
 						DoCast(sstalker, SPELL_CARROT_BREATH);
 					Talk(TALK_CARROT_BREATH);
