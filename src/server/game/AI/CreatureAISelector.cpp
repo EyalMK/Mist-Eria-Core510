@@ -40,7 +40,7 @@ namespace FactorySelector
         if (!ai_factory)
 		{
 			if(creature->GetVehicleKit())
-				if(CreatureAI* scriptedAI = sScriptMgr->GetCreatureBaseAI(creature->GetVehicleKit())
+				if(CreatureAI* scriptedAI = sScriptMgr->GetCreatureBaseAI(creature->GetVehicleKit()))
 					return scriptedAI ;
             
 			if(CreatureAI* scriptedAI = sScriptMgr->GetCreatureAI(creature))
