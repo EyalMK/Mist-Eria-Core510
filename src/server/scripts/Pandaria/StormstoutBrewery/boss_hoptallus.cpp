@@ -191,7 +191,7 @@ public :
                     }
                     Talk(TALK_FURLWIND);
 					if(me->getVictim())
-						me->GetMotionMaster()->MoveChase(me->getVictim())
+						me->GetMotionMaster()->MoveChase(me->getVictim());
 					else
 						me->GetMotionMaster()->MoveRandom();
                     DoCastAOE(SPELL_FURLWIND);
