@@ -158,8 +158,10 @@ public :
             if(!UpdateVictim())
                 return ;
 
-            if(stalker)
-                me->SetFacingToObject(stalker);
+            if(stalker) {
+				orientation -= 2 * M_PI / 15000.0f * diff ;
+                me->SetOrientation(orientation);
+			}
 
             events.Update(diff);
 
@@ -190,10 +192,6 @@ public :
                         break ;
                     }
                     Talk(TALK_FURLWIND);
-					if(me->getVictim())
-						me->GetMotionMaster()->MoveChase(me->getVictim());
-					else
-						me->GetMotionMaster()->MoveRandom();
                     DoCastAOE(SPELL_FURLWIND);
                     events.ScheduleEvent(EVENT_FURLWIND, IsHeroic() ? urand(12000, 14000) : urand(14000, 17000));
                     break ;
@@ -203,6 +201,7 @@ public :
                         events.ScheduleEvent(EVENT_CARROT_BREATH, 100);
                         break ;
                     }
+					orientation = me->GetOrientation();
                     DoCast(SPELL_CARROT_BREATH);
 					Talk(TALK_CARROT_BREATH);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
@@ -238,6 +237,7 @@ public :
         EventMap events ;
         InstanceScript * instance ;
         uint8 m_uiSummonTimes ;
+		float orientation ;
 
         bool b_carrotBreath ;
         TempSummon* stalker ;
@@ -466,6 +466,7 @@ public :
                 {
 					sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Carrot Breath : Summoned");
                     caster->SetTarget(stalker->GetGUID()); //! Core guid !
+                    caster->StopMoving();
                     caster->SetFacingToObject(stalker);
 					// caster->CastSpell(stalker, 120301, true);
                     if(boss_hoptallus::boss_hoptallusAI * ai = CAST_AI(boss_hoptallus::boss_hoptallusAI, caster->GetAI()))
@@ -504,6 +505,47 @@ public :
     }
 };
 
+class spell_hoptallus_furlwind : public SpellScriptLoader {
+public :
+    spell_hoptallus_furlwind() : SpellScriptLoader("spell_hoptallus_furlwind") {
+
+    }
+
+    class spell_hoptallus_furlwind_SpellScript : public SpellScript {
+        PrepareSpellScript(spell_hoptallus_furlwind_SpellScript) ;
+
+        bool Validate(const SpellInfo *spellInfo) {
+            return true ;
+        }
+
+        bool Load() {
+            return true ;
+        }
+
+        Unit* victim ;
+
+        void HandleAfterCast() {
+            Unit* caster = GetCaster();
+            if(!caster) return ;
+
+            victim = caster->getVictim();
+            caster->GetMotionMaster()->Clear(true);
+            if(victim)
+                caster->GetMotionMaster()->MoveChase(victim);
+            else
+                caster->GetMotionMaster()->MoveRandom();
+        }
+
+        void Register() {
+            AfterCast += SpellCastFn(spell_hoptallus_furlwind_SpellScript::HandleAfterCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const {
+        return new spell_hoptallus_furlwind_SpellScript();
+    }
+};
+
 void AddSC_boss_hoptallus()
 {
     new boss_hoptallus();
@@ -511,4 +553,5 @@ void AddSC_boss_hoptallus()
     new stalker_carrot_breath();
     new npc_big_ol_hammer();
     new spell_hoptallus_carrot_breath();
+    new spell_hoptallus_furlwind();
 }

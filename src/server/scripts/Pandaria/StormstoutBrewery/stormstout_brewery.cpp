@@ -463,10 +463,7 @@ public :
 
         void PassengerBoarded(Unit *passenger, int8 seatId, bool enter)
         {
-            if(enter)
-                me->StopMoving();
-            else
-                MovementInform(POINT_MOTION_TYPE, 0);
+            me->StopMoving();
         }
 
         void SetData(uint32 uiData, uint32 uiValue)
@@ -477,8 +474,8 @@ public :
 
         void Reset()
         {
-            /*if(me->GetMapId() == 961)
-                m_uiCheckTimer = 1000 ;*/
+            if(me->GetMapId() == 961)
+                m_uiCheckTimer = 1000 ;
         }
 
         void JustDied(Unit *killer)
@@ -489,7 +486,7 @@ public :
 
         void UpdateAI(const uint32 diff)
         {
-            /*if(me->GetMapId() != 961)
+            if(me->GetMapId() != 961)
                 return ; // Return since we are not ine the right map
             if(m_uiCheckTimer <= diff)
             {
@@ -500,7 +497,7 @@ public :
                 }
             }
             else
-                m_uiCheckTimer -= diff ;*/
+                m_uiCheckTimer -= diff ;
         }
 
         void DoCheckOokOok()
