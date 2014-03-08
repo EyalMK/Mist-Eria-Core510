@@ -4707,11 +4707,18 @@ public:
         }
     }*/
 
-    struct npc_shang_xi_air_balloonAI : public npc_escortAI
+    struct npc_shang_xi_air_balloonAI : public ScriptedAI
     {
-        npc_shang_xi_air_balloonAI(Creature* creature) : npc_escortAI(creature){}
+        npc_shang_xi_air_balloonAI(Creature* creature) : ScriptedAI(creature){}
 
-        void WaypointReached(uint32 waypointId)
+        uint32 Test;
+
+        void Reset()
+        {
+            Test = 10000;
+        }
+
+       /* void WaypointReached(uint32 waypointId)
         {
             Player* player = GetPlayerForEscort();
 
@@ -4823,13 +4830,17 @@ public:
                     me->DespawnOrUnsummon();
                     break;
             }
-        }
+        }*/
 
         void UpdateAI(const uint32 uiDiff)
         {
-            npc_escortAI::UpdateAI(uiDiff);
-
-            Start(false, true);
+            if(Test <= uiDiff)
+            {
+                me->DespawnOrUnsummon();
+                Test = 10000;
+            }
+            else
+                Test -= uiDiff;
         }
     };
 
