@@ -429,6 +429,7 @@ public :
         /// Constructor
         stalker_carrot_breathAI(Creature* creature) : ScriptedAI(creature)
         {
+			b_firstMoveDone = false ;
             b_init = false ;
         }
 
@@ -571,8 +572,9 @@ public :
 
             // First movement, nothing will crash because UpdateAI is called only after IsSummonedBy
             // As a matter of facts : Map::SummonCreature, Object::AddToMap, TS::AddToWorld, Creature::AddToWorld, Creature::AIM_Initialize
-            if(m_uiFirstMoveTimer <= diff)
+            if(m_uiFirstMoveTimer <= diff && !b_firstMoveDone) 
             {
+				b_firstMoveDone = true ;
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : CBH : FirstMoveTimer expired !");
                 angle -= ((2 * M_PI / m_uiTimeToDoATurn) * diff) ;
                 x = center.GetPositionX() + cos(angle) * rayon ;
@@ -617,6 +619,9 @@ public :
 
         /// Prevents calling UpdateAI if AI IsSummondeBy has not yet been called
         bool b_init ;
+		
+		/// Prevents
+		bool b_firstMoveDone ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
