@@ -1065,7 +1065,7 @@ CreatureAI* ScriptMgr::GetCreatureBaseAI(Vehicle* vehicle)
 	ASSERT(vehicle->GetBase()->GetTypeId() == TYPEID_UNIT);
 	
 	GET_SCRIPT_RET(VehicleScript, vehicle->GetBase()->ToCreature()->GetScriptId(), tmpscript, NULL);
-	return tmpscript->GetAI(vehicle->GetBase()->ToCreature) ;
+	return tmpscript->GetAI(vehicle->GetBase()->ToCreature()) ;
 }
 
 void ScriptMgr::OnDynamicObjectUpdate(DynamicObject* dynobj, uint32 diff)
