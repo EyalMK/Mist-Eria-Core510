@@ -4683,14 +4683,14 @@ enum eJiBallon
     SAY_JI_BALLON_7         = 6
 };
 
-class npc_shang_xi_air_balloon : public CreatureScript
+class npc_shang_xi_air_balloon : public VehicleScript
 {
 public:
-    npc_shang_xi_air_balloon(): CreatureScript("npc_shang_xi_air_balloon")
+    npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon")
     {
     }
 
-    /*void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatId)
+    void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatId)
     {
         if(veh->GetBase()->ToCreature()->GetEntry() == 55649)
         {
@@ -4701,156 +4701,14 @@ public:
                 if(escort)
                 {
                     escort->AI()->DoAction(0);
-                    veh->GetBase()->ToCreature()->GetMotionMaster()->MoveFollow(escort, 1.00f, 0);
+                    veh->GetBase()->ToCreature()->GetMotionMaster()->MovePath(55649, false);
                 }
             }
         }
-    }*/
-
-    /*struct npc_shang_xi_air_balloonAI : public ScriptedAI
-    {
-        npc_shang_xi_air_balloonAI(Creature* creature) : ScriptedAI(creature){}
-
-        uint32 Test;
-
-        void Reset()
-        {
-            Test = 10000;
-        }
-
-        void WaypointReached(uint32 waypointId)
-        {
-            Player* player = GetPlayerForEscort();
-
-            Creature* aysa = me->FindNearestCreature(56661, 200.00f, true);
-            Creature* jipatte = me->FindNearestCreature(56660, 200.00f, true);
-            Creature* shen = me->FindNearestCreature(56676, 200.00f, true);
-
-            switch (waypointId)
-            {
-                case 1:
-                    SetRun();
-                    me->SetSpeed(MOVE_FLIGHT, 1.0f);
-                    if(jipatte)
-                        jipatte->AI()->Talk(SAY_JI_BALLON_1);
-                    break;
-                case 2:
-                    if(aysa)
-                        aysa->AI()->Talk(SAY_AYSA_BALLON_1);
-                    break;
-                case 3:
-                    if(jipatte)
-                        jipatte->AI()->Talk(SAY_JI_BALLON_2);
-                    break;
-                case 4:
-                    if(aysa)
-                        aysa->AI()->Talk(SAY_AYSA_BALLON_2);
-                    break;
-                case 5:
-                    if(jipatte)
-                        jipatte->AI()->Talk(SAY_JI_BALLON_3);
-                    break;
-                case 6:
-                    if(aysa)
-                        aysa->AI()->Talk(SAY_AYSA_BALLON_3);
-                    break;
-                case 7:
-                    if(aysa)
-                        aysa->AI()->Talk(SAY_AYSA_BALLON_4);
-                    break;
-                case 8:
-                    if(aysa)
-                        aysa->AI()->Talk(SAY_AYSA_BALLON_5);
-                    break;
-                case 9:
-                    if(shen)
-                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_1);
-                    break;
-                case 10:
-                    if(shen)
-                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_2);
-                    break;
-                case 11:
-                    if(shen)
-                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_3);
-                    break;
-                case 12:
-                    if(shen)
-                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_4);
-                    break;
-                case 13:
-                    if(aysa)
-                        aysa->AI()->Talk(SAY_AYSA_BALLON_6);
-                    break;
-                case 14:
-                    if(shen)
-                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_5);
-                    break;
-                case 15:
-                    if(aysa)
-                        aysa->AI()->Talk(SAY_AYSA_BALLON_7);
-                    break;
-                case 16:
-                    if(shen)
-                        shen->AI()->Talk(SAY_SHEN_ZI_BALLON_6);
-                    break;
-                case 17:
-                    if(jipatte)
-                        jipatte->AI()->Talk(SAY_JI_BALLON_4);
-                    break;
-                case 18:
-                    if(jipatte)
-                        jipatte->AI()->Talk(SAY_JI_BALLON_5);
-                    break;
-                case 19:
-                    if(aysa)
-                        aysa->AI()->Talk(SAY_AYSA_BALLON_8);
-                    break;
-                case 21:
-                    if(jipatte)
-                        jipatte->AI()->Talk(SAY_JI_BALLON_6);
-                    break;
-                case 23:
-                    if(aysa)
-                        aysa->AI()->Talk(SAY_AYSA_BALLON_9);
-                    break;
-                case 25:
-                    if(jipatte)
-                        jipatte->AI()->Talk(SAY_JI_BALLON_7);
-                    break;
-                case 26:
-                    if(aysa)
-                        aysa->AI()->Talk(SAY_AYSA_BALLON_10);
-                    break;
-                case 27:
-                    if(aysa)
-                        aysa->AI()->Talk(SAY_AYSA_BALLON_11);
-                    break;
-                case 29:
-                    me->DespawnOrUnsummon();
-                    break;
-            }
-        }
-
-        void UpdateAI(const uint32 uiDiff)
-        {
-            if(Test <= uiDiff)
-            {
-                me->DespawnOrUnsummon();
-                Test = 10000;
-            }
-            else
-                Test -= uiDiff;
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_shang_xi_air_balloonAI(creature);
-    }*/
+    }
 };
 
-/*class npc_waypoint_air_balloon : public CreatureScript
+class npc_waypoint_air_balloon : public CreatureScript
 {
 public:
     npc_waypoint_air_balloon(): CreatureScript("npc_waypoint_air_balloon"){}
@@ -4989,7 +4847,7 @@ public:
     {
         return new npc_waypoint_air_balloonAI(creature);
     }
-};*/
+};
 
 class npc_shang_xi_air_balloon_click : public CreatureScript
 {
@@ -5007,13 +4865,13 @@ public:
 
         void OnSpellClick(Unit* clicker)
         {
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "CLICKER");
-
-            Creature* mongol = clicker->SummonCreature(55649, 908.82f, 4558.87f, 232.31f, 0.62f, TEMPSUMMON_TIMED_DESPAWN, 600000);
+            /*Creature* mongol = clicker->SummonCreature(55649, 908.82f, 4558.87f, 232.31f, 0.62f, TEMPSUMMON_TIMED_DESPAWN, 600000);*/
+            Creature* mongol = clicker->FindNearestCreature(55649, 50.00f, true);
             clicker->SummonCreature(31002, 908.82f, 4558.87f, 232.31f, 0.62f, TEMPSUMMON_TIMED_DESPAWN, 600000);
 
             if(clicker->GetTypeId() == TYPEID_PLAYER)
-                clicker->EnterVehicle(mongol);
+                if(mongol)
+                    clicker->EnterVehicle(mongol);
         }
     };
 
@@ -5096,6 +4954,6 @@ void AddSC_wandering_isle()
     new npc_master_shang_xi_escort();
     new npc_master_shang_xi_dead();
     new npc_shang_xi_air_balloon();
-   // new npc_waypoint_air_balloon();
+    new npc_waypoint_air_balloon();
     new npc_shang_xi_air_balloon_click();
 }
