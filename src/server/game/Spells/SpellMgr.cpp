@@ -3974,7 +3974,7 @@ void SpellMgr::LoadSpellInfoCorrections()
                     spellInfo->Effects[EFFECT_2].Effect = NULL;
                     break;
 				case 112944 : // Carrot Breath
-					spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTarget(TARGET_UNIT_TARGET_ANY);
+					spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
 					spellInfo->ExplicitTargetMask = spellInfo->ExplicitTargetMask | TARGET_FLAG_UNIT_MASK ;
 					break ; 
 				default:
