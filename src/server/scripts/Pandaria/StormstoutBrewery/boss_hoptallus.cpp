@@ -469,11 +469,13 @@ public :
             m_uiFirstMoveTimer = MIN_MAP_UPDATE_DELAY ; // Ca devrait faire l'affaire
 
             // Vitesse
-            SpellInfo const* carrotBreathSI = sSpellMgr->GetSpellInfo(SPELL_CARROT_BREATH);
+            /*SpellInfo const* carrotBreathSI = sSpellMgr->GetSpellInfo(SPELL_CARROT_BREATH);
             if(!carrotBreathSI)
                 m_uiTimeToDoATurn = 15000 ; // En 5.1.0a
             else
-                m_uiTimeToDoATurn = carrotBreathSI->DurationEntry->Duration[0];
+                m_uiTimeToDoATurn = carrotBreathSI->DurationEntry->Duration[0];*/
+				
+			m_uiTimeToDoATurn = 5000 ;
 
             /// Remember only one thing :
             /// CHANGE THE FUCKING LIMIT IN MOVE SPLINE ! (DONE)
@@ -660,8 +662,8 @@ public :
                 target = caster->getVictim();
                 // See if I care to use a spell !
                 if(TempSummon* stalker = caster->SummonCreature(NPC_CARROT_BREATH_HELPER,
-                                                                     caster->GetPositionX() + 0.5f * cos(caster->GetOrientation()),
-                                                                     caster->GetPositionY() + 0.5f * sin(caster->GetOrientation()),
+                                                                     caster->GetPositionX() + 30 * cos(caster->GetOrientation()),
+                                                                     caster->GetPositionY() + 30 * sin(caster->GetOrientation()),
                                                                      caster->GetPositionZ(),
                                                                      0, TEMPSUMMON_TIMED_DESPAWN, 15000))
                 {
