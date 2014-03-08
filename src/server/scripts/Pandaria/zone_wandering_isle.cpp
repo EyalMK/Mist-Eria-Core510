@@ -4702,7 +4702,6 @@ public:
                 if(escort)
                 {
                     escort->AI()->DoAction(0);
-                    veh->GetBase()->ToCreature()->GetMotionMaster()->MovePath(55649, false);
                     veh->GetBase()->ToCreature()->SetSpeed(MOVE_FLIGHT, 0.5f);
                 }
             }
@@ -4719,6 +4718,12 @@ public:
     {
         npc_waypoint_air_balloonAI(Creature* creature) : npc_escortAI(creature){}
 
+        bool VerifPlayer;
+
+        void Reset()
+        {
+            VerifPlayer = false;
+        }
 
         void DoAction(int32 const action)
         {
@@ -4738,14 +4743,15 @@ public:
             switch (waypointId)
             {
                 case 1:
-                    SetRun();
-                    me->SetSpeed(MOVE_FLIGHT, 1.0f);
+                    mongol->GetMotionMaster()->MovePath(55649, false);
+                    me->SetSpeed(MOVE_FLIGHT, 0.5f);
                     mongol->SetSpeed(MOVE_FLIGHT, 0.5f);
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_1);
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
                     break;
                 case 2:
-                    me->SetSpeed(MOVE_FLIGHT, 0.5f);
                     if(aysa)
                         aysa->AI()->Talk(SAY_AYSA_BALLON_1);
                     break;
@@ -4863,6 +4869,17 @@ public:
         void UpdateAI(const uint32 uiDiff)
         {
             npc_escortAI::UpdateAI(uiDiff);
+
+            if (VerifPlayer)
+            {
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if(summoner->ToPlayer())
+                        if(summoner->IsInDist2d(me, 5.00f))
+                        {
+                            SetEscortPaused(false);
+                            VerifPlayer = false;
+                        }
+            }
         }
     };
 
