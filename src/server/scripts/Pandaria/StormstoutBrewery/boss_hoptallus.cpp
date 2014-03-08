@@ -448,8 +448,8 @@ public :
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : rayon computed to %f, center relocated", rayon);
 			
 			// Speed
-			me->SetSpeed(MOVE_RUN, 2 * M_PI * rayon / 5000.0f, true);
-			me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * rayon / 5000.0f, true);
+			me->SetSpeed(MOVE_RUN, (2 * M_PI * rayon / 5.f), true);
+			me->SetSpeed(MOVE_FLIGHT, 2 * M_PI * rayon / 5.f, true);
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : Speeds computed, run %f, flight %f", me->GetSpeedRate(MOVE_RUN), me->GetSpeedRate(MOVE_FLIGHT));
 		}
 		
@@ -464,13 +464,9 @@ public :
 			y = p_master->GetPositionY() + rayon * sin(angle);
 			z = p_master->GetPositionZ() ;
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : coordinates computed, x = %f, y = %f, z = %f", x, y, z);
+			++m_uiId ;
 			
-			me->Relocate(x, y, z);
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : Relocated");
-			
-			p_master->SetFacingToObject(me);
-			p_master->SetTarget(me->GetGUID());
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "STOMSTOUT BREWERY : CBH : Facing && target reSet");
+			me->GetMotionMaster()->MovePoint(m_uiId, x, y, z);
 		}
 
     private :
