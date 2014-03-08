@@ -16,7 +16,7 @@ enum Events
     EVENT_SUMMON_VIRMEN = 1,
     EVENT_FURLWIND      = 2,
     EVENT_CARROT_BREATH = 3,
-    EVENT_CHECK         = 4
+    EVENT_RESET_SPEED   = 4
 };
 
 enum Talk
@@ -194,6 +194,7 @@ public :
                     Talk(TALK_FURLWIND);
                     DoCastAOE(SPELL_FURLWIND);
                     events.ScheduleEvent(EVENT_FURLWIND, IsHeroic() ? urand(12000, 14000) : urand(14000, 17000));
+					events.ScheduleEvent(EVENT_RESET_SPEED, 10000);
                     break ;
 
                 case EVENT_CARROT_BREATH :
@@ -206,7 +207,10 @@ public :
 					Talk(TALK_CARROT_BREATH);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
-
+				
+				case EVENT_RESET_SPEED :
+					me->SetSpeed(MOVE_RUN, 7.0f);
+					break ;
 
                 default :
                     break ;
@@ -532,6 +536,7 @@ public :
             float x, y, z ;
 			if(victim) {
 				victim->GetPosition(x, y, z);
+				caster->SetSpeed(MOVE_RUN, caster->GetSpeedRate(MOVE_RUN) * 2.5f);
 				caster->GetMotionMaster()->MovePoint(0, x, y, z);
 			}
 			else
@@ -542,7 +547,7 @@ public :
             AfterCast += SpellCastFn(spell_hoptallus_furlwind_SpellScript::HandleAfterCast);
         }
     };
-
+	
     SpellScript* GetSpellScript() const {
         return new spell_hoptallus_furlwind_SpellScript();
     }
