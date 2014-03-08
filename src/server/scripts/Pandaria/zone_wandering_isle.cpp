@@ -4683,10 +4683,10 @@ enum eJiBallon
     SAY_JI_BALLON_7         = 6
 };
 
-class npc_shang_xi_air_balloon : public VehicleScript
+class npc_shang_xi_air_balloon : public CreatureScript
 {
 public:
-    npc_shang_xi_air_balloon(): VehicleScript("npc_shang_xi_air_balloon")
+    npc_shang_xi_air_balloon(): CreatureScript("npc_shang_xi_air_balloon")
     {
     }
 
@@ -4707,7 +4707,7 @@ public:
         }
     }*/
 
-    struct npc_shang_xi_air_balloonAI : public ScriptedAI
+    /*struct npc_shang_xi_air_balloonAI : public ScriptedAI
     {
         npc_shang_xi_air_balloonAI(Creature* creature) : ScriptedAI(creature){}
 
@@ -4718,7 +4718,7 @@ public:
             Test = 10000;
         }
 
-       /* void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId)
         {
             Player* player = GetPlayerForEscort();
 
@@ -4830,7 +4830,7 @@ public:
                     me->DespawnOrUnsummon();
                     break;
             }
-        }*/
+        }
 
         void UpdateAI(const uint32 uiDiff)
         {
@@ -4847,7 +4847,7 @@ public:
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_shang_xi_air_balloonAI(creature);
-    }
+    }*/
 };
 
 /*class npc_waypoint_air_balloon : public CreatureScript
