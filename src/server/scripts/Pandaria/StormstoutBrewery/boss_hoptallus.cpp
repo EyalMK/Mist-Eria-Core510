@@ -378,6 +378,7 @@ public :
         {
 			// Init
 			m_uiId = 0 ;
+			m_uiWaitTimer = 2000 ;
 			x = y = z = 0.0f ;
 			
 			p_master = me->ToTempSummon()->GetSummoner() ;
@@ -398,6 +399,9 @@ public :
 		
 		void UpdateAI(const uint32 uiDiff)
         {
+			m_uiWaitTimer -= diff ;
+			if(m_uiWaitTimer != 0)
+				return ;
 			
             angle -= (2 * M_PI / 15000.0f) * uiDiff ;
 			
@@ -431,6 +435,9 @@ public :
 
         /// Position of the master
         Position center ;
+		
+		/// Enable timer
+		uint32 m_uiWaitTimer ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
