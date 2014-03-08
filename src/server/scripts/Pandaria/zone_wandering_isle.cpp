@@ -3471,6 +3471,7 @@ public:
         void Reset()
         {
             me->setActive(true);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void UpdateAI(const uint32 uiDiff)
@@ -4727,15 +4728,18 @@ public:
         {
             Player* player = GetPlayerForEscort();
 
-            Creature* aysa = me->FindNearestCreature(56661, 200.00f, true);
-            Creature* jipatte = me->FindNearestCreature(56660, 200.00f, true);
-            Creature* shen = me->FindNearestCreature(56676, 200.00f, true);
+            Creature* aysa = me->FindNearestCreature(56661, 20.00f, true);
+            Creature* jipatte = me->FindNearestCreature(56660, 20.00f, true);
+            Creature* shen = me->FindNearestCreature(56676, 20.00f, true);
+            Creature* mongol = me->FindNearestCreature(55649, 20.00f, true);
+            Map* map = me->GetMap();
 
             switch (waypointId)
             {
                 case 1:
                     SetRun();
-                    me->SetSpeed(MOVE_FLIGHT, 1.0f);
+                    me->SetSpeed(MOVE_FLIGHT, 0.5f);
+                    mongol->SetSpeed(MOVE_FLIGHT, 0.5f);
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_1);
                     break;
@@ -4764,6 +4768,8 @@ public:
                         aysa->AI()->Talk(SAY_AYSA_BALLON_4);
                     break;
                 case 8:
+                    me->SetSpeed(MOVE_FLIGHT, 1.0f);
+                    mongol->SetSpeed(MOVE_FLIGHT, 1.0f);
                     if(aysa)
                         aysa->AI()->Talk(SAY_AYSA_BALLON_5);
                     break;
@@ -4796,6 +4802,17 @@ public:
                         aysa->AI()->Talk(SAY_AYSA_BALLON_7);
                     break;
                 case 16:
+                    if(map)
+                    {
+                        Map::PlayerList const& players = map->GetPlayers();
+                        for(Map::PlayerList::const_iterator iter = players.begin() ; iter != players.end() ; ++iter)
+                        {
+                            Player *player = iter->getSource();
+                            if(player)
+                                if (player->isAlive() && player->IsInDist2d(me, 20))
+                                    player->CastSpell(player, 105010, true);
+                        }
+                    }
                     if(shen)
                         shen->AI()->Talk(SAY_SHEN_ZI_BALLON_6);
                     break;
@@ -4804,6 +4821,8 @@ public:
                         jipatte->AI()->Talk(SAY_JI_BALLON_4);
                     break;
                 case 18:
+                    me->SetSpeed(MOVE_FLIGHT, 3.0f);
+                    mongol->SetSpeed(MOVE_FLIGHT, 3.0f);
                     if(jipatte)
                         jipatte->AI()->Talk(SAY_JI_BALLON_5);
                     break;
@@ -4816,6 +4835,8 @@ public:
                         jipatte->AI()->Talk(SAY_JI_BALLON_6);
                     break;
                 case 23:
+                    me->SetSpeed(MOVE_FLIGHT, 2.0f);
+                    mongol->SetSpeed(MOVE_FLIGHT, 2.0f);
                     if(aysa)
                         aysa->AI()->Talk(SAY_AYSA_BALLON_9);
                     break;
@@ -4868,6 +4889,7 @@ public:
             /*Creature* mongol = clicker->SummonCreature(55649, 908.82f, 4558.87f, 232.31f, 0.62f, TEMPSUMMON_TIMED_DESPAWN, 600000);*/
             Creature* mongol = clicker->FindNearestCreature(55649, 50.00f, true);
             clicker->SummonCreature(31002, 908.82f, 4558.87f, 232.31f, 0.62f, TEMPSUMMON_TIMED_DESPAWN, 600000);
+            clicker->CastSpell(clicker, 105895, true);
 
             if(clicker->GetTypeId() == TYPEID_PLAYER)
                 if(mongol)
@@ -4879,6 +4901,32 @@ public:
     {
         return new npc_shang_xi_air_balloon_clickAI(creature);
     }
+};
+
+class spell_hot_air_balloon : public SpellScriptLoader
+{
+    public:
+        spell_hot_air_balloon() : SpellScriptLoader("spell_hot_air_balloon") { }
+
+        class spell_hot_air_balloon_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_hot_air_balloon_SpellScript);
+
+            void HandleScript(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_hot_air_balloon_SpellScript::HandleScript, EFFECT_2, SPELL_EFFECT_TRIGGER_SPELL);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_hot_air_balloon_SpellScript();
+        }
 };
 
 
@@ -4956,4 +5004,5 @@ void AddSC_wandering_isle()
     new npc_shang_xi_air_balloon();
     new npc_waypoint_air_balloon();
     new npc_shang_xi_air_balloon_click();
+    new spell_hot_air_balloon();
 }
