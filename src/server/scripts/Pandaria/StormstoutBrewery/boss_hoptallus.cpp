@@ -16,7 +16,8 @@ enum Events
     EVENT_SUMMON_VIRMEN = 1,
     EVENT_FURLWIND      = 2,
     EVENT_CARROT_BREATH = 3,
-    EVENT_RESET_SPEED   = 4
+    EVENT_RESET_SPEED   = 4,
+	EVENT_RESET_STALKER	= 5
 };
 
 enum Talk
@@ -160,7 +161,9 @@ public :
 
             if(stalker) {
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : Hoptallus SetFacingTo");
-				me->SetFacingTo(me->GetAngle(stalker));
+				// On va le faire à la Halion
+				DoCast((Unit*)NULL, 74758, true) ; 
+				me->SetFacingToObject(stalker);
 			}
 
             events.Update(diff);
@@ -202,12 +205,13 @@ public :
                         events.ScheduleEvent(EVENT_CARROT_BREATH, 100);
                         break ;
                     }
-					me->SummonCreature(NPC_CARROT_BREATH_HELPER, 
+					DoCast(SPELL_CARROT_BREATH);
+					stalker = me->SummonCreature(NPC_CARROT_BREATH_HELPER, 
 										me->GetPositionX() + 30 * cos(me->GetOrientation()),
 										me->GetPositionY() + 30 * sin(me->GetOrientation()),
-										me->GetPositionX(), 0, TEMPSUMMON_TIMED_DESPAWN, 17000);
-					DoCast(SPELL_CARROT_BREATH);
+										me->GetPositionX(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000);
 					Talk(TALK_CARROT_BREATH);
+					events.ScheduleEvent(EVENT_RESET_STALKER, 15000);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
 				
@@ -215,7 +219,11 @@ public :
 					me->SetSpeed(MOVE_RUN, 7.0f);
 					me->GetMotionMaster()->MoveChase(me->getVictim());
 					break ;
-
+					
+				case EVENT_RESET_STALKER :
+					stalker = NULL ;
+					break ;
+					
                 default :
                     break ;
                 }
@@ -235,10 +243,6 @@ public :
                 if(Creature* summon = me->SummonCreature(entry, posSummon))
                     summon->GetMotionMaster()->MoveJump(posJump, 8.0f, 8.0f);
             }
-        }
-
-        void SetStalker(TempSummon * s) {
-            stalker = s ;
         }
 
     private :
@@ -487,7 +491,7 @@ public :
 		return new spell_hoptallus_carrot_breath_SpellScript();
 	}
 
-    /*class spell_hoptallus_carrot_breath_AuraScript : public AuraScript {
+    class spell_hoptallus_carrot_breath_AuraScript : public AuraScript {
 		PrepareAuraScript(spell_hoptallus_carrot_breath_AuraScript);
 		
 		bool Validate(const SpellInfo* spellInfo) {
@@ -532,7 +536,7 @@ public :
 	
 	AuraScript* GetAuraScript() const {
 		return new spell_hoptallus_carrot_breath_AuraScript();
-	}*/
+	}
 };
 
 class spell_hoptallus_furlwind : public SpellScriptLoader {
@@ -585,6 +589,6 @@ void AddSC_boss_hoptallus()
     new mob_virmen();
     new stalker_carrot_breath();
     new npc_big_ol_hammer();
-    new spell_hoptallus_carrot_breath();
+    // new spell_hoptallus_carrot_breath();
     new spell_hoptallus_furlwind();
 }
