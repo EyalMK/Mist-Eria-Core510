@@ -158,12 +158,18 @@ public :
         {
             if(!UpdateVictim())
                 return ;
-
-            if(stalker) {
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : Hoptallus SetFacingTo");
-				// On va le faire à la Halion
-				DoCast((Unit*)NULL, 74758, true) ; 
-				me->SetFacingToObject(stalker);
+				
+			if(b_carrotBreath) {
+				/// Event if the client doesn't see the update (because we do not use MSG_START_TURN_LEFT ?), we need to update 
+				/// the orientation inside the core, in order to let the SpellScript of CarrotBreath correctly filter the targets
+				/// In one ms, the boss should have turned of 2 * M_PI (circumference of a 1 meter circle) divided by 15000 ms (duration of the spell) degrees
+				float turn = 2 * M_PI / 15000.0f ; // This is the distance in one ms
+				turn *= float(diff); // Since last tick of the world
+				
+				float orientation = me->GetOrientation(); // Current orientation
+				orientation -= turn ; // Rotate it
+				
+				me->SetOrientation(orientation) ; // Update
 			}
 
             events.Update(diff);
@@ -205,13 +211,9 @@ public :
                         events.ScheduleEvent(EVENT_CARROT_BREATH, 100);
                         break ;
                     }
+					b_carrotBreath = true ;
 					DoCast(SPELL_CARROT_BREATH);
-					stalker = me->SummonCreature(NPC_CARROT_BREATH_HELPER, 
-										me->GetPositionX() + 30 * cos(me->GetOrientation()),
-										me->GetPositionY() + 30 * sin(me->GetOrientation()),
-										me->GetPositionX(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000);
 					Talk(TALK_CARROT_BREATH);
-					events.ScheduleEvent(EVENT_RESET_STALKER, 15000);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
 				
@@ -219,9 +221,9 @@ public :
 					me->SetSpeed(MOVE_RUN, 7.0f);
 					me->GetMotionMaster()->MoveChase(me->getVictim());
 					break ;
-					
+				
 				case EVENT_RESET_STALKER :
-					stalker = NULL ;
+					b_carrotBreath = false ;
 					break ;
 					
                 default :
@@ -457,39 +459,6 @@ public :
     {
 
     }
-	
-	class spell_hoptallus_carrot_breath_SpellScript : public SpellScript {
-		PrepareSpellScript(spell_hoptallus_carrot_breath_SpellScript);
-		// TempSummon* stalker ;
-	
-		bool Validate(const SpellInfo* spellInfo) {
-			return true ;
-		}
-		
-		bool Load() {
-			return true ; 
-		}
-		
-		void InitializeTarget(WorldObject*& target) {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : CB : InitializeTarget");
-			if(!GetCaster())
-				return ;
-				
-			Unit* caster = GetCaster() ;
-			if(Creature* stalker = caster->FindNearestCreature(NPC_CARROT_BREATH_HELPER, 50000.0f)) {
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BRWERY : CBH Found !");
-				target = stalker ;
-			}
-		}
-		
-		void Register() {
-			OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_hoptallus_carrot_breath_SpellScript::InitializeTarget, EFFECT_0, TARGET_UNIT_NEARBY_ENTRY);
-		}
-	};
-	
-	SpellScript* GetSpellScript() const {
-		return new spell_hoptallus_carrot_breath_SpellScript();
-	}
 
     class spell_hoptallus_carrot_breath_AuraScript : public AuraScript {
 		PrepareAuraScript(spell_hoptallus_carrot_breath_AuraScript);
@@ -511,28 +480,73 @@ public :
 			if(TempSummon* summon = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, 
 															caster->GetPositionX() + 30 * cos(caster->GetOrientation()),
 															caster->GetPositionY() + 30 * sin(caster->GetOrientation()),
-															caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000)) {
-				caster->SetTarget(summon->GetGUID());
-				caster->SetFacingToObject(summon);
-			}
-		}
-		
-		void HandleRemove(AuraEffect const* auraEff, AuraEffectHandleModes mode) {
-			if(!GetCaster())
-				return ;
-				
-			Unit* caster = GetCaster();
+															caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000))
+				caster->CastSpell(summon, 74758, true);
 		}
 		
 		void Register() {
 			OnEffectApply += AuraEffectApplyFn(spell_hoptallus_carrot_breath_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-			OnEffectRemove += AuraEffectRemoveFn(spell_hoptallus_carrot_breath_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
 		}
 	};
 	
 	AuraScript* GetAuraScript() const {
 		return new spell_hoptallus_carrot_breath_AuraScript();
 	}
+};
+
+class spell_hoptallus_carrot_breath_periodic : public SpellScriptLoader {
+public :
+    spell_hoptallus_carrot_breath_periodic() : SpellScriptLoader("spell_hoptallus_carrot_breath_periodic") {
+        
+    }
+    
+    class InArcCheckPredicate {
+    public :
+        InArcCheckPredicate(Creature* source) : p_creatureSource(source) {
+            
+        }
+        
+        bool operator()(WorldObject * target) {
+            Position& pos ;
+            target->GetPosition(pos);
+            
+            if(p_creatureSource->HasInArc(static_cast<float>(M_PI / 6.0f), pos))
+                return false ;
+            
+            return true ;
+        }
+
+    private :
+        Creature* p_creatureSource ;
+    };
+    
+    class spell_hoptallus_carrot_breath_periodic_SpellScript : public SpellScript {
+        PrepareSpellScript(spell_hoptallus_carrot_breath_periodic_SpellScript)
+        
+        bool Validate(SpellInfo* const spellInfo) {
+            return true ;
+        }
+        
+        bool Load() {
+            return true ;
+        }
+        
+        typedef std::list<WorldObject*> WorldObjectList ;
+        
+        void FilterTargets(WorldObjectList& targets) {
+            targets.remove_if(InArcCheckPredicate(GetCaster()->ToCreature()));
+        }
+        
+        void Register() {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hoptallus_carrot_breath_periodic_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_CONE_ENEMY_24);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hoptallus_carrot_breath_periodic_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_CONE_ENEMY_24);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hoptallus_carrot_breath_periodic_SpellScript::FilterTargets, EFFECT_2, TARGET_UNIT_CONE_ENEMY_24);
+        }
+    };
+    
+    SpellScript* GetSpellScript() const {
+        return new spell_hoptallus_carrot_breath_periodic_SpellScript() ;
+    }
 };
 
 class spell_hoptallus_furlwind : public SpellScriptLoader {
@@ -585,6 +599,7 @@ void AddSC_boss_hoptallus()
     new mob_virmen();
     new stalker_carrot_breath();
     new npc_big_ol_hammer();
-    // new spell_hoptallus_carrot_breath();
+    new spell_hoptallus_carrot_breath();
+	new spell_hoptallus_carrot_breath_periodic();
     new spell_hoptallus_furlwind();
 }
