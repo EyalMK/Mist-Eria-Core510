@@ -202,7 +202,11 @@ public :
                         events.ScheduleEvent(EVENT_CARROT_BREATH, 100);
                         break ;
                     }
-					DoCastAOE(SPELL_CARROT_BREATH);
+					me->SummonCreature(NPC_CARROT_BREATH_HELPER, 
+										me->GetPositionX() + 30 * cos(me->GetOrientation()),
+										me->GetPositionY() + 30 * sin(me->GetOrientation()),
+										me->GetPositionX(), 0, TEMPSUMMON_TIMED_DESPAWN, 17000);
+					DoCast(SPELL_CARROT_BREATH);
 					Talk(TALK_CARROT_BREATH);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
@@ -462,25 +466,20 @@ public :
 			return true ; 
 		}
 		
-		void HandleBeforeCast() {
+		void InitializeTarget(WorldObject*& target) {
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : CB : InitializeTarget");
 			if(!GetCaster())
 				return ;
 				
-			Unit* caster = GetCaster();
-			
-			stalker = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, 
-															caster->GetPositionX() + 30 * cos(caster->GetOrientation()),
-															caster->GetPositionY() + 30 * sin(caster->GetOrientation()),
-															caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 17000);
-		}
-		
-		void InitializeTarget(WorldObject*& target) {
-			target = stalker ;
+			Unit* caster = GetCaster() ;
+			if(Creature* stalker = caster->FindNearestCreature(NPC_CARROT_BREATH_HELPER, 50000.0f)) {
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BRWERY : CBH Found !");
+				target = stalker ;
+			}
 		}
 		
 		void Register() {
 			OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_hoptallus_carrot_breath_SpellScript::InitializeTarget, EFFECT_0, TARGET_UNIT_NEARBY_ENTRY);
-			BeforeCast += SpellCastFn(spell_hoptallus_carrot_breath_SpellScript::HandleBeforeCast);
 		}
 	};
 	
