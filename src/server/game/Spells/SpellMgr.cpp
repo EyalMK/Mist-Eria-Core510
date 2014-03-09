@@ -3974,7 +3974,7 @@ void SpellMgr::LoadSpellInfoCorrections()
                     spellInfo->Effects[EFFECT_2].Effect = NULL;
                     break;
 				case 112944 :
-					spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
+					// spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
 					// spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNEL_TRACK_TARGET ;
 					break ;
 				case 112945 :
