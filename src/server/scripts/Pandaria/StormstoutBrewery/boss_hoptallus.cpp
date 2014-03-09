@@ -393,7 +393,7 @@ public :
 		
 		void UpdateAI(const uint32 uiDiff)
         {
-			m_uiWaitTimer += diff ;
+			m_uiWaitTimer += uiDiff ;
 			if(m_uiWaitTimer <= 2000)
 				return ;
 				
