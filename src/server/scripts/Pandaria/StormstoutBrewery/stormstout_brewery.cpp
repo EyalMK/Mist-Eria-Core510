@@ -1220,7 +1220,7 @@ public :
     class npc_uncle_gao_AI : public ScriptedAI {
     public :
         npc_uncle_gao_AI(Creature* creature) : ScriptedAI(creature) {
-
+			_instance = creature->GetInstanceScript();
         }
 
         /** ScriptedAI functions **/
@@ -1228,7 +1228,6 @@ public :
         void Reset() {
             /** Initialize everything **/
             _events.Reset();
-            _instance = creature->GetInstanceScript();
 
             _aleAlamental = _stoutAlamental = _wheatAlamental = 0 ;
             _numberOfSummons = 0 ;
@@ -1449,7 +1448,21 @@ public :
 
         /// Npcs summoned ; when it reaches 0, it means we have to start the next phase
         uint32 _numberOfSummons ;
-
+		
+		/// Points to go to
+		enum MovePoints {
+			POINT_YAN_ZHU_CORPSE = 1
+		};
+		
+		enum Phases {
+			PHASE_NOT_STARTED   = 0,
+			PHASE_FIRST_WAVE    = 1,
+			PHASE_SECOND_WAVE   = 2,
+			PHASE_THIRD_WAVE    = 3,
+			PHASE_YAN_ZHU       = 4,
+			PHASE_END           = 5
+		};
+		
         /// Current phase
         Phases _phase ;
     };
@@ -1472,11 +1485,6 @@ private :
         // Wheat alamentals
         MOB_WHEAT_ALAMENTAL_STOUT_BREW      = 59519,
         MOB_WHEAT_ALAMENTAL_BLOATED_BREW    = 59518
-    };
-
-    /// Points to go to
-    enum MovePoints {
-        POINT_YAN_ZHU_CORPSE = 1
     };
 
     /// Spells to be casted
@@ -1509,20 +1517,6 @@ private :
         EVENT_SUMMON_THIRD_WAVE     = 4,
         EVENT_SUMMON_YAN_ZHU        = 5,
         EVENT_PERFECT_BREW          = 6
-    };
-
-    /// Actions
-    enum Actions {
-
-    };
-
-    enum Phases {
-        PHASE_NOT_STARTED   = 0,
-        PHASE_FIRST_WAVE    = 1,
-        PHASE_SECOND_WAVE   = 2,
-        PHASE_THIRD_WAVE    = 3,
-        PHASE_YAN_ZHU       = 4,
-        PHASE_END           = 5
     };
 };
 

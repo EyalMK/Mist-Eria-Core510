@@ -99,7 +99,7 @@ namespace YanZhu {
 
     class InlineCheckPredicate {
     public :
-        InlineCheckPredicate(Creature* source, spellId = 0) : _source(source), _spellId(spellId) {
+        InlineCheckPredicate(Creature* caster, uint32 spellId = 0) : _caster(caster), _spellId(spellId) {
 
         }
 
@@ -111,7 +111,7 @@ namespace YanZhu {
                 if(target->GetTypeId() != TYPEID_PLAYER)
                     return true ;
 
-            if(!_caster->HasInLine(target))
+            if(!_caster->HasInLine(target, 0.0f))
                 return true ;
 
             return false ;
@@ -264,7 +264,7 @@ public :
                     break ;
 
                 case EVENT_YAN_ZHU_BREW_BOLT :
-                    if(Unit* target = SelectTarget(SLECT_TARGET_RANDOM, 0, 40.0f, true))
+                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
                         DoCast(target, SPELL_BREW_BOLT);
                     _events.ScheduleEvent(EVENT_YAN_ZHU_BREW_BOLT, IsHeroic() ? 750 : 1000);
                     break ;
@@ -356,7 +356,7 @@ public :
         }
 
         void IsSummonedBy(Unit* summoner) {
-            _yanZhu = summoner;
+            _yanZhu = summoner->ToCreature();
             _events.Reset();
 
             // _events.ScheduleEvent(EVENT_YEASTY_BREW_ALAMENTAL_BREW_BOLT, 1000); // Don't know when this is casted
@@ -509,7 +509,7 @@ public :
 
 class spell_yanzhu_blackout_brew : public SpellScriptLoader {
 public :
-    spell_yanzhu_blackout_brew() : SpellScript("spell_yanzhu_blackout_brew") {
+    spell_yanzhu_blackout_brew() : SpellScriptLoader("spell_yanzhu_blackout_brew") {
 
     }
 
