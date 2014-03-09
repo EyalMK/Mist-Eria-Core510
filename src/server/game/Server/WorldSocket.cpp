@@ -187,6 +187,7 @@ int WorldSocket::SendPacket(WorldPacket const& pct)
         case SMSG_DESTROY_OBJECT:
         case SMSG_TIME_SYNC_REQ:
         case SMSG_PLAYER_MOVE:
+		case SMSG_POWER_UPDATE:
 			break;
 		default:
 		{
