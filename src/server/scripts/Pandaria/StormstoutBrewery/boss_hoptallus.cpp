@@ -444,39 +444,40 @@ public :
 
     }
 
-    class spell_hoptallus_carrot_breath_SpellScript : public SpellScript {
-		PrepareSpellScript(spell_hoptallus_carrot_breath_SpellScript);
+    class spell_hoptallus_carrot_breath_AuraScript : public AuraScript {
+		PrepareAuraScript(spell_hoptallus_carrot_breath_AuraScript);
 		
-		bool Validate(const SpellInfo* spellInfo) { return true ; }
+		bool Validate(const SpellInfo* spellInfo) {
+			return true ;
+		}
 		
-		bool Load() { return true ; }
+		bool Load() {
+			return true ; 
+		}
 		
-		void HandleAfterCast() {
-			if(!GetCaster()) 
+		void HandleApply(AuraEffect const* auraEff, AuraEffectHandleModes mode) {
+			if(!GetCaster())
 				return ;
-			
+				
 			Unit* caster = GetCaster();
-			stalker = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, 
-											caster->GetPositionX() + 30 * cos(caster->GetOrientation()), 
-											caster->GetPositionY() + 30 * sin(caster->GetOrientation()), 
-											caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000);
-			if(!stalker)
-				return ;			
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Stalker guid is %u", stalker->GetGUID());
-			caster->SetTarget(stalker->GetGUID());
+			
+			if(TempSummon* summon = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, 
+															caster->GetPositionX() + 30 * cos(caster->GetOrientation()),
+															caster->GetPositionY() + 30 * sin(caster->GetOrientation()),
+															caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000) {
+				caster->SetTarget(summon->GetGUID());
+				caster->SetFacingToObject(stalker);
+			}
 		}
 		
 		void Register() {
-			AfterCast += SpellCastFn(spell_hoptallus_carrot_breath_SpellScript::HandleAfterCast);
+			OnEffectApply += AuraEffectApplyFn(spell_hoptallus_carrot_breath_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
 		}
-		
-		TempSummon* stalker ;
 	};
-
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_hoptallus_carrot_breath_SpellScript();
-    }
+	
+	AuraScript* GetAuraScript() const {
+		return new spell_hoptallus_carrot_breath_AuraScript();
+	}
 };
 
 class spell_hoptallus_furlwind : public SpellScriptLoader {
