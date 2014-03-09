@@ -3973,9 +3973,9 @@ void SpellMgr::LoadSpellInfoCorrections()
                 case 105002: // Invocation d'un faucon de feu apprivoisé
                     spellInfo->Effects[EFFECT_2].Effect = NULL;
                     break;
-				case 112944 : // Carrot Breath
+				/*case 112944 : // Carrot Breath
 					spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNEL_TRACK_TARGET ;
-					break ;
+					break ;*/
 				default:
 					break;
 			}
