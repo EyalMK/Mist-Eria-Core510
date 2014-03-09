@@ -8839,7 +8839,7 @@ void ObjectMgr::LoadPhaseDefinitions()
         phaseDefinition.flags                 = fields[5].GetUInt32();
 		
 		// sLog->outDebug(LOG_FILTER_NETWORKIO, "ObjectMgr : WorldServer Loading : LoadPhaseDefinitions : Built phase definition : %u, %u, %u, %u, %u, %u", 
-												fields[0].GetUInt32(), fields[1].GetUInt32(), fields[2].GetUInt32(), fields[3].GetUInt32(), fields[4].GetUInt32(), fields[5].GetUInt32());
+												// fields[0].GetUInt32(), fields[1].GetUInt32(), fields[2].GetUInt32(), fields[3].GetUInt32(), fields[4].GetUInt32(), fields[5].GetUInt32());
         // Checks
         if ((phaseDefinition.flags & PHASE_FLAG_OVERWRITE_EXISTING) && (phaseDefinition.flags & PHASE_FLAG_NEGATE_PHASE))
         {
