@@ -79,13 +79,11 @@ enum YanZhuSpells {
 };
 
 namespace YanZhu {
-    class BloatTargetSelector {
+    struct BloatTargetSelector : public std::unary_function<Unit*, bool> {
     public :
-        BloatTargetSelector(uint32 t = 0) {
+        explicit BloatTargetSelector(uint32 t = 0) ; _t(t) { }
 
-        }
-
-        bool operator()(Unit* target) {
+        bool operator()(Unit* target) const {
             if(target->HasAura(SPELL_BLOAT))
                 return false ;
 
@@ -94,6 +92,9 @@ namespace YanZhu {
 
             return true ;
         }
+		
+	private :
+		uint32 _t ;
     };
 
     class InlineCheckPredicate {
