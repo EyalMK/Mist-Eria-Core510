@@ -507,7 +507,7 @@ public :
         }
         
         bool operator()(WorldObject * target) {
-            Position& pos ;
+            Position* pos ;
             target->GetPosition(pos);
             
             if(p_creatureSource->HasInArc(static_cast<float>(M_PI / 6.0f), pos))
