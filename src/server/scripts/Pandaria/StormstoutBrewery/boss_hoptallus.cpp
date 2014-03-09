@@ -456,7 +456,7 @@ public :
 	
 	class spell_hoptallus_carrot_breath_SpellScript : public SpellScript {
 		PrepareSpellScript(spell_hoptallus_carrot_breath_SpellScript);
-		TempSummon* stalker ;
+		// TempSummon* stalker ;
 	
 		bool Validate(const SpellInfo* spellInfo) {
 			return true ;
