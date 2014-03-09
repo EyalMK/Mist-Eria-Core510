@@ -4733,7 +4733,7 @@ public:
         {
             Action = true;
             Say1_timer = 1000;
-            Say2_timer = 10000;
+            Say2_timer = 14000;
         }
 
         void UpdateAI(const uint32 uiDiff)
@@ -4787,7 +4787,7 @@ public:
         void DoAction(int32 const action)
         {
             Action = true;
-            Say1_timer = 1000;
+            Say1_timer = 5000;
         }
 
         void UpdateAI(const uint32 uiDiff)
