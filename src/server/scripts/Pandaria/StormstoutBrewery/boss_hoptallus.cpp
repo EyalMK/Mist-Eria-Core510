@@ -474,8 +474,18 @@ public :
 			}
 		}
 		
+		void HandleRemove(AuraEffect const* auraEff, AuraEffectHandleModes mode) {
+			if(!GetCaster())
+				return ;
+				
+			Unit* caster = GetCaster();
+			if(HoptallusAI* ai = CAST_AI(HoptallusAI, caster->GetAI()))
+				ai->SetStalker(NULL);
+		}
+		
 		void Register() {
 			OnEffectApply += AuraEffectApplyFn(spell_hoptallus_carrot_breath_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+			OnEffectRemove += AuraEffectRemoveFn(spell_hoptallus_carrot_breath_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
 		}
 	};
 	
