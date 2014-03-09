@@ -1203,6 +1203,329 @@ public :
     };
 };
 
+#define PROGRESS_X 2.038879f
+#define PROGRESS_Y 8.39978f
+
+#define PROGRESS_LINE_X 8.077647f
+#define PROGRESS_LINE_Y -2.111451f
+#define PROGRESS_Z 5.0f
+
+class npc_uncle_gao : public CreatureScript {
+
+public :
+    npc_uncle_gao() : CreatureScript("npc_uncle_gao") {
+
+    }
+
+    class npc_uncle_gao_AI : public ScriptedAI {
+    public :
+        npc_uncle_gao_AI(Creature* creature) : ScriptedAI(creature) {
+
+        }
+
+        /** ScriptedAI functions **/
+
+        void Reset() {
+            /** Initialize everything **/
+            _events.Reset();
+            _instance = creature->GetInstanceScript();
+
+            _aleAlamental = _stoutAlamental = _wheatAlamental = 0 ;
+            _numberOfSummons = 0 ;
+
+            _phase = PHASE_NOT_STARTED ;
+
+            /** And start **/
+            _events.ScheduleEvent(EVENT_CHECK_FOR_PLAYERS, 500);
+        }
+
+        void UpdateAI(const uint32 diff) {
+            // Not start if Hoptallus not done
+            if(_instance)
+                if(_instance->GetData(INSTANCE_DATA_HOPTALLUS_STATUS) != DONE)
+                    return ;
+
+            // Update EventMap
+            _events.Update(diff);
+
+            // And switch
+            while(uint32 eventId = _events.ExecuteEvent()) {
+                switch(eventId) {
+                case EVENT_CHECK_FOR_PLAYERS :
+                    CheckForPlayers();
+                    break ;
+
+                case EVENT_SUMMON_FIRST_WAVE :
+                    SummonFirstWave();
+                    break ;
+
+                case EVENT_SUMMON_SECOND_WAVE :
+                    SummonSecondWave();
+                    break ;
+
+                case EVENT_SUMMON_THIRD_WAVE :
+                    SummonThirdWave();
+                    break ;
+
+                case EVENT_SUMMON_YAN_ZHU :
+                    SummonYanZhu();
+                    break ;
+
+                case EVENT_PERFECT_BREW :
+                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    Talk(TALK_PERFECT_BREW);
+                    break ;
+
+                default :
+                    break ;
+                }
+            }
+        }
+
+        void SummonedCreatureDies(Creature *summoned, Unit *killer) {
+
+            // Yan Zhu not yet started
+            if(_phase < PHASE_YAN_ZHU) {
+                --_numberOfSummons ;
+
+                // Everybody killed, start next wave
+                if(_numberOfSummons == 0) {
+                    switch(_phase) {
+                    case PHASE_FIRST_WAVE :
+                        Talk(TALK_SUMMON_SECOND_WAVE);
+                        _events.ScheduleEvent(EVENT_SUMMON_SECOND_WAVE, 4000);
+                        break ;
+
+                    case PHASE_SECOND_WAVE :
+                        Talk(TALK_SUMMON_THIRD_WAVE);
+                        _events.ScheduleEvent(EVENT_SUMMON_THIRD_WAVE, 4000);
+                        break ;
+
+                    case PHASE_THIRD_WAVE :
+                        _events.ScheduleEvent(EVENT_SUMMON_YAN_ZHU, 4000);
+                        break ;
+
+                    default :
+                        break ;
+                    }
+                }
+            } else if(_phase == PHASE_YAN_ZHU) {
+                // Yan Zhu has been killed, schedule final event
+                _numberOfSummons = 0 ;
+                _phase = PHASE_END ;
+                Creature* yanZhu = me->FindNearestCreature(BOSS_YAN_ZHU, 200.0f, false);
+                if(!yanZhu)
+                    return ;
+
+                Talk(TALK_YAN_ZHU_DEATH);
+                me->GetMotionMaster()->MovePoint(POINT_YAN_ZHU_CORPSE, yanZhu);
+            } else return ;
+        }
+
+        void MovementInform(uint32 motionType, uint32 pointId) {
+            if(motionType != POINT_MOTION_TYPE
+                    || pointId != POINT_YAN_ZHU_CORPSE)
+                return ;
+
+            _events.ScheduleEvent(EVENT_PERFECT_BREW, 2000);
+        }
+
+        /** Non ScriptedAI functions **/
+
+        void CheckForPlayers() {
+            if(Map* map = me->GetMap()) {
+                Map::PlayerList const& playerList = map->GetPlayers();
+
+                if(playerList.isEmpty())
+                    return ;
+
+                for(Map::PlayerList::const_iterator c_iter = playerList.begin() ; c_iter != playerList.end() ; ++c_iter) {
+                    if(Player* player = c_iter->getSource()) {
+                        float dist = me->GetExactDist2d(player);
+
+                        // Player found, start next wave then return ;
+                        if(dist <= 10.0f) {
+                            _phase = PHASE_FIRST_WAVE ;
+
+                            Talk(TALK_SUMMON_FIRST_WAVE);
+                            _events.ScheduleEvent(EVENT_SUMMON_FIRST_WAVE, 4000);
+
+                            /// @todo : remove this as soon as possible
+                            if(_instance)
+                                _instance->DoSendNotifyToInstance("Starting Gao Event");
+
+                            return ;
+                        }
+                    }
+                }
+
+                // No player found, check again
+                _events.ScheduleEvent(EVENT_CHECK_FOR_PLAYERS, 500);
+            }
+        }
+
+        void SummonFirstWave() {
+            _wheatAlamental = RAND(MOB_WHEAT_ALAMENTAL_BLOATED_BREW, MOB_WHEAT_ALAMENTAL_STOUT_BREW);
+
+            Position start = {-704.517517f, 1166.889648f, 166.141571f, 0.275305f};
+            for(uint8 i = 0 ; i < 2 ; ++i)
+                if(Creature* summon = me->SummonCreature(_wheatAlamental, start.GetPositionX() + PROGRESS_X * i, start.GetPositionY() + PROGRESS_Y * i, start.GetPositionZ()))
+                    summon->SetOrientation(0.0f);
+
+            _numberOfSummons = 2 ;
+        }
+
+        void SummonSecondWave() {
+            _aleAlamental = RAND(MOB_ALE_ALAMENTAL_BUBBLING_BREW, MOB_ALE_ALAMENTAL_YEASTY_BREW);
+
+            Position start = {-713.708191f, 1168.700195f, 166.145874f, 0.275305f};
+
+            for(uint8 i = 0 ; i < 3 ; ++i) {
+                float x = start.GetPositionX() + PROGRESS_LINE_X * i ;
+                float y = start.GetPositionY() + PROGRESS_LINE_Y * i ;
+                for(uint8 j = 0 ; j < 3 ; ++j)
+                    if(Creature* summon = me->SummonCreature(_aleAlamental, x + PROGRESS_X * j, y + PROGRESS_Y * j, start.GetPositionZ()))
+                        summon->SetOrientation(0.0f);
+            }
+
+            _numberOfSummons = 9 ;
+        }
+
+        void SummonThirdWave() {
+            _stoutAlamental = RAND(MOB_STOUT_ALAMENTAL_FIZZY_BREW, MOB_STOUT_ALAMENTAL_SUDSY_BREW);
+
+            Position start = {-713.708191f, 1168.700195f, 166.145874f, 0.275305f};
+
+            for(uint8 i = 0 ; i < 2 ; ++i) {
+                float x = start.GetPositionX() + 2 * PROGRESS_LINE_X * i ;
+                float y = start.GetPositionY() + 2 * PROGRESS_LINE_Y * i ;
+                for(uint8 j = 0 ; j < 2 ; ++j)
+                    if(Creature* summon = me->SummonCreature(_stoutAlamental, x + 2 * PROGRESS_X * j, y + 2 * PROGRESS_Y * j, start.GetPositionZ()))
+                        summon->SetOrientation(0.0f);
+            }
+
+            _numberOfSummons = 4 ;
+        }
+
+        void SummonYanZhu() {
+            Talk(TALK_SUMMON_YAN_ZHU);
+
+            Position const summon = {-703.415771f, 1162.801025f, 163.141693f, 0.273505f}; // Correct height is 160, but YanZhu must "grow" from ground
+            Creature* yanZhu = me->SummonCreature(BOSS_YAN_ZHU, summon, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 24 * HOUR * IN_MILLISECONDS);
+
+            if(!yanZhu) {
+                sLog->outFatal(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : Unable to summon Yan Zhu the Uncasked !");
+                if(_instance)
+                    _instance->DoSendNotifyToInstance("DEBUG LOG : Unable to summon Yan Zhu the Uncasked");
+            }
+
+            // Cast the spells on YanZhu, based on which creatures were summoned
+            if(_stoutAlamental == MOB_STOUT_ALAMENTAL_FIZZY_BREW)
+                DoCast(yanZhu, SPELL_FIZZY_BREW);
+            else
+                DoCast(yanZhu, SPELL_SUDSY_BREW);
+
+            if(_aleAlamental == MOB_ALE_ALAMENTAL_BUBBLING_BREW)
+                DoCast(yanZhu, SPELL_BUBBLING_BREW);
+            else
+                DoCast(yanZhu, SPELL_YEASTY_BREW);
+
+            if(_wheatAlamental == MOB_WHEAT_ALAMENTAL_BLOATED_BREW)
+                DoCast(yanZhu, SPELL_BLACKOUT_BREW);
+            else
+                DoCast(yanZhu, SPELL_BLOATING_BREW);
+
+        }
+
+    private :
+        /// May be usefull
+        EventMap _events ;
+
+        /// Pointer to the instance
+        InstanceScript* _instance ;
+
+        /// Entries of the alamentals to be summoned ; also determines the spells YanZhu will cast
+        uint32 _aleAlamental, _stoutAlamental, _wheatAlamental ;
+
+        /// Npcs summoned ; when it reaches 0, it means we have to start the next phase
+        uint32 _numberOfSummons ;
+
+        /// Current phase
+        Phases _phase ;
+    };
+
+    CreatureAI* GetAI(Creature *creature) const {
+        return new npc_uncle_gao_AI(creature);
+    }
+
+private :
+    /// Creatures to be summoned
+    enum Creatures {
+        // Stout alamentals
+        MOB_STOUT_ALAMENTAL_SUDSY_BREW      = 59522,
+        MOB_STOUT_ALAMENTAL_FIZZY_BREW      = 59520,
+
+        // Ale alamentals
+        MOB_ALE_ALAMENTAL_BUBBLING_BREW     = 59521,
+        MOB_ALE_ALAMENTAL_YEASTY_BREW       = 59494,
+
+        // Wheat alamentals
+        MOB_WHEAT_ALAMENTAL_STOUT_BREW      = 59519,
+        MOB_WHEAT_ALAMENTAL_BLOATED_BREW    = 59518
+    };
+
+    /// Points to go to
+    enum MovePoints {
+        POINT_YAN_ZHU_CORPSE = 1
+    };
+
+    /// Spells to be casted
+    enum Spells {
+        SPELL_SUDSY_BREW    = 114933,
+        SPELL_FIZZY_BREW    = 114934,
+
+        SPELL_BLOATING_BREW = 114929,
+        SPELL_BLACKOUT_BREW = 114930,
+
+        SPELL_BUBBLING_BREW = 114931,
+        SPELL_YEASTY_BREW   = 114932
+    };
+
+    /// Dialogs
+    enum Talk {
+        TALK_SUMMON_FIRST_WAVE  = 1,
+        TALK_SUMMON_SECOND_WAVE = 2,
+        TALK_SUMMON_THIRD_WAVE  = 3,
+        TALK_SUMMON_YAN_ZHU     = 4,
+        TALK_YAN_ZHU_DEATH      = 5,
+        TALK_PERFECT_BREW       = 6
+    };
+
+    /// Events
+    enum Events {
+        EVENT_CHECK_FOR_PLAYERS     = 1,
+        EVENT_SUMMON_FIRST_WAVE     = 2,
+        EVENT_SUMMON_SECOND_WAVE    = 3,
+        EVENT_SUMMON_THIRD_WAVE     = 4,
+        EVENT_SUMMON_YAN_ZHU        = 5,
+        EVENT_PERFECT_BREW          = 6
+    };
+
+    /// Actions
+    enum Actions {
+
+    };
+
+    enum Phases {
+        PHASE_NOT_STARTED   = 0,
+        PHASE_FIRST_WAVE    = 1,
+        PHASE_SECOND_WAVE   = 2,
+        PHASE_THIRD_WAVE    = 3,
+        PHASE_YAN_ZHU       = 4,
+        PHASE_END           = 5
+    };
+};
+
 void AddSC_stormstout_brewery()
 {
     // Ook Ook
@@ -1223,5 +1546,5 @@ void AddSC_stormstout_brewery()
     // YanZhu
     new stalker_gushing_brew();
     new stalker_gushing_brew_target();
-    // new npc_uncle_gao();
+    new npc_uncle_gao();
 }
