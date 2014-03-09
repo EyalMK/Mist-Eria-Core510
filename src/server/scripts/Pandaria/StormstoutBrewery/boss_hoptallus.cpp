@@ -510,7 +510,7 @@ public :
             Position* pos ;
             target->GetPosition(pos);
             
-            if(p_creatureSource->HasInArc(static_cast<float>(M_PI / 6.0f), pos))
+            if(p_creatureSource->HasInArc(static_cast<float>(M_PI / 3.0f), pos))
                 return false ;
             
             return true ;
