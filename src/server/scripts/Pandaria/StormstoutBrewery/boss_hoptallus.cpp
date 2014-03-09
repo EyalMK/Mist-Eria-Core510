@@ -466,7 +466,7 @@ public :
 															caster->GetPositionY() + 30 * sin(caster->GetOrientation()),
 															caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000)) {
 				caster->SetTarget(summon->GetGUID());
-				caster->SetFacingToObject(stalker);
+				caster->SetFacingToObject(summon);
 			}
 		}
 		
