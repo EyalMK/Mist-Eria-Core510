@@ -80,8 +80,7 @@ enum YanZhuSpells {
 
 namespace YanZhu {
     struct BloatTargetSelector : public std::unary_function<Unit*, bool> {
-    public :
-        explicit BloatTargetSelector(uint32 t = 0) ; _t(t) { }
+        explicit BloatTargetSelector(uint32 t = 0) : _t(t) { }
 
         bool operator()(Unit* target) const {
             if(target->HasAura(SPELL_BLOAT))
@@ -92,8 +91,6 @@ namespace YanZhu {
 
             return true ;
         }
-		
-	private :
 		uint32 _t ;
     };
 
