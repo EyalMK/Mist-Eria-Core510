@@ -523,7 +523,7 @@ public :
     class spell_hoptallus_carrot_breath_periodic_SpellScript : public SpellScript {
         PrepareSpellScript(spell_hoptallus_carrot_breath_periodic_SpellScript)
         
-        bool Validate(SpellInfo* const spellInfo) {
+        bool Validate(const SpellInfo* spellInfo) {
             return true ;
         }
         
