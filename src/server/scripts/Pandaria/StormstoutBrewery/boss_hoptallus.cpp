@@ -158,10 +158,10 @@ public :
             if(!UpdateVictim())
                 return ;
 
-            /*if(stalker) {
-				orientation -= 2 * M_PI / 15000.0f * diff ;
-                me->SetOrientation(orientation);
-			}*/
+            if(stalker) {
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : Hoptallus SetFacingTo");
+				me->SetFacingTo(me->GetAngle(stalker));
+			}
 
             events.Update(diff);
 
@@ -436,6 +436,8 @@ public :
     }
 };
 
+typedef boss_hoptallus::boss_hoptallusAI HoptallusAI ;
+
 class spell_hoptallus_carrot_breath : public SpellScriptLoader
 {
 public :
@@ -467,6 +469,8 @@ public :
 															caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000)) {
 				caster->SetTarget(summon->GetGUID());
 				caster->SetFacingToObject(summon);
+				if(HoptallusAI* ai = CAST_AI(HoptallusAI, caster->GetAI()))
+					ai->SetStalker(summon);
 			}
 		}
 		
