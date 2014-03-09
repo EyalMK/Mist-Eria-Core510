@@ -49,7 +49,7 @@ void PhaseMgr::Update()
 	
 	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Leaving Update");
 	
-	Ace_Stack_Trace stackTrace ;
+	ACE_Stack_Trace stackTrace ;
 	sLog->outDebug(LOG_FILTER_NETWORKIO, "%s", stackTrace.c_str());
     _UpdateFlags = 0;
 }
