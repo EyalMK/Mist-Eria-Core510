@@ -118,6 +118,8 @@ void PhaseMgr::Recalculate()
         for (PhaseDefinitionContainer::const_iterator phase = itr->second.begin(); phase != itr->second.end(); ++phase)
             if (CheckDefinition(&(*phase)))
             {
+				PhaseDefinition * def = (&(*iter));
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "Phase def is : %u, %u, %u, %u, %u, %u", def->zoneId, def->entry, def->phasemask, def->phaseId, def->terrainswapmap, def->flags);
 				sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Recalc : Good def found");
                 phaseData.AddPhaseDefinition(&(*phase));
 
