@@ -32,52 +32,52 @@ PhaseMgr::PhaseMgr(Player* _player) : player(_player), phaseData(_player), _Upda
 
 void PhaseMgr::Update()
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Update");
+	// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Update");
     if (IsUpdateInProgress())
         return;
 	
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Checking flags");
+	// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Checking flags");
     if (_UpdateFlags & PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED) {
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : SendPhaseshitToPlayer");
+		// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : SendPhaseshitToPlayer");
         phaseData.SendPhaseshiftToPlayer();
 	}
 
     if (_UpdateFlags & PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED) {
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : SendPhaseMaskToPlayer");
+		// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : SendPhaseMaskToPlayer");
         phaseData.SendPhaseMaskToPlayer();
 	}
 	
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Leaving Update");
+	// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Leaving Update");
 	
-	ACE_Stack_Trace stackTrace ;
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "%s", stackTrace.c_str());
+	// ACE_Stack_Trace stackTrace ;
+	// sLog->outDebug(LOG_FILTER_NETWORKIO, "%s", stackTrace.c_str());
     _UpdateFlags = 0;
 }
 
 void PhaseMgr::RemoveUpdateFlag(PhaseUpdateFlag updateFlag)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : RemoveUpdateFlag %u", (uint32)updateFlag);
+	// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : RemoveUpdateFlag %u", (uint32)updateFlag);
     _UpdateFlags &= ~updateFlag;
 
     if (updateFlag == PHASE_UPDATE_FLAG_ZONE_UPDATE)
     {
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : PHASE_UPDATE_FLAG_ZONE_UPDATE");
+		// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : PHASE_UPDATE_FLAG_ZONE_UPDATE");
         // Update zone changes
         if (phaseData.HasActiveDefinitions())
         {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : RemoveUpdateFlag : HasActiveDefinitions");
+			// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : RemoveUpdateFlag : HasActiveDefinitions");
             phaseData.ResetDefinitions();
             _UpdateFlags |= (PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED | PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED);
         }
 		
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : RemoveUpdateFlag : Check Zone");
+		// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : RemoveUpdateFlag : Check Zone");
         if (_PhaseDefinitionStore->find(player->GetZoneId()) != _PhaseDefinitionStore->end()) {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : RemoveUpdateFlag : Recalculate");
+			// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : RemoveUpdateFlag : Recalculate");
             Recalculate();
 		}
     }
 	
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Updating");
+	// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Updating");
     Update();
 }
 
@@ -86,14 +86,14 @@ void PhaseMgr::RemoveUpdateFlag(PhaseUpdateFlag updateFlag)
 
 void PhaseMgr::NotifyConditionChanged(PhaseUpdateData const& updateData)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : NotifyConditionChanged");
+	// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : NotifyConditionChanged");
     if (NeedsPhaseUpdateWithData(updateData))
     {
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : NotifyConditionChanged : NeedsPhaseUpdateWithData = true");
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : NCC : Recalc");
+		// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : NotifyConditionChanged : NeedsPhaseUpdateWithData = true");
+		// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : NCC : Recalc");
         Recalculate();
 		
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : NCC : Update");
+		// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : NCC : Update");
         Update();
     }
 }
@@ -103,15 +103,15 @@ void PhaseMgr::NotifyConditionChanged(PhaseUpdateData const& updateData)
 
 void PhaseMgr::Recalculate()
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Recalculate");
+	// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Recalculate");
     if (phaseData.HasActiveDefinitions())
     {
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Recalc : Clean active defs");
+		// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Recalc : Clean active defs");
         phaseData.ResetDefinitions();
         _UpdateFlags |= (PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED | PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED);
     }
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Recalc : PhaseDefStore");
+    // sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Recalc : PhaseDefStore");
 
     PhaseDefinitionStore::const_iterator itr = _PhaseDefinitionStore->find(player->GetZoneId());
     if (itr != _PhaseDefinitionStore->end())
@@ -119,22 +119,22 @@ void PhaseMgr::Recalculate()
             if (CheckDefinition(&(*phase)))
             {
 				const PhaseDefinition * def = (&(*phase));
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "Phase def is : %u, %u, %u, %u, %u, %u", def->zoneId, def->entry, def->phasemask, def->phaseId, def->terrainswapmap, def->flags);
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Recalc : Good def found");
+				// sLog->outDebug(LOG_FILTER_NETWORKIO, "Phase def is : %u, %u, %u, %u, %u, %u", def->zoneId, def->entry, def->phasemask, def->phaseId, def->terrainswapmap, def->flags);
+				// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Recalc : Good def found");
                 phaseData.AddPhaseDefinition(&(*phase));
 
                 if (phase->phasemask) {
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Recalc : Need phasemask");
+					// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Recalc : Need phasemask");
                     _UpdateFlags |= PHASE_UPDATE_FLAG_SERVERSIDE_CHANGED;
 				}
 
                 if (phase->phaseId || phase->terrainswapmap) {
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Recalc : Need PhaseShift");
+					// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Recalc : Need PhaseShift");
                     _UpdateFlags |= PHASE_UPDATE_FLAG_CLIENTSIDE_CHANGED;
 				}
 
                 if (phase->IsLastDefinition()) {
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Recalc : Last definition");
+					// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Recalc : Last definition");
                     break;
 				}
             }
@@ -142,13 +142,13 @@ void PhaseMgr::Recalculate()
 
 inline bool PhaseMgr::CheckDefinition(PhaseDefinition const* phaseDefinition)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Check definition");
+	// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : Check definition");
     return sConditionMgr->IsObjectMeetToConditions(player, sConditionMgr->GetConditionsForPhaseDefinition(phaseDefinition->zoneId, phaseDefinition->entry));
 }
 
 bool PhaseMgr::NeedsPhaseUpdateWithData(PhaseUpdateData const updateData) const
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : NeedsPhaseUpdateWIthData");
+	// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : NeedsPhaseUpdateWIthData");
     PhaseDefinitionStore::const_iterator itr = _PhaseDefinitionStore->find(player->GetZoneId());
     if (itr != _PhaseDefinitionStore->end())
     {
@@ -160,7 +160,7 @@ bool PhaseMgr::NeedsPhaseUpdateWithData(PhaseUpdateData const updateData) const
                     return true;
         }
     }
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : NPUWD : FALSE");
+	// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : NPUWD : FALSE");
     return false;
 }
 
@@ -313,7 +313,7 @@ void PhaseData::SendPhaseshiftToPlayer()
 
 void PhaseData::AddPhaseDefinition(PhaseDefinition const* phaseDefinition)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : AddPhaseDef");
+	// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : AddPhaseDef");
     if (phaseDefinition->IsOverwritingExistingPhases())
     {
         activePhaseDefinitions.clear();
@@ -371,7 +371,7 @@ uint32 PhaseData::RemoveAuraInfo(uint32 const spellId)
 
 void PhaseUpdateData::AddQuestUpdate(uint32 const questId)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : AddQuestUpdate, quest %u", questId);
+	// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : AddQuestUpdate, quest %u", questId);
     AddConditionType(CONDITION_QUESTREWARDED);
     AddConditionType(CONDITION_QUESTTAKEN);
     AddConditionType(CONDITION_QUEST_COMPLETE);
@@ -382,7 +382,7 @@ void PhaseUpdateData::AddQuestUpdate(uint32 const questId)
 
 bool PhaseUpdateData::IsConditionRelated(Condition const* condition) const
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : IsConditionRelated");
+	// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : IsConditionRelated");
     switch (condition->ConditionType)
     {
         case CONDITION_QUESTREWARDED:
@@ -397,7 +397,7 @@ bool PhaseUpdateData::IsConditionRelated(Condition const* condition) const
 
 bool PhaseMgr::IsConditionTypeSupported(ConditionTypes const conditionType)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : IsConditionTypeSupported");
+	// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : IsConditionTypeSupported");
     switch (conditionType)
     {
         case CONDITION_QUESTREWARDED:
@@ -411,7 +411,7 @@ bool PhaseMgr::IsConditionTypeSupported(ConditionTypes const conditionType)
         case CONDITION_LEVEL:
             return true;
         default:
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : IsConditionTypeSupported : FALSE");
+			// sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : IsConditionTypeSupported : FALSE");
             return false;
     }
 }

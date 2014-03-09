@@ -8821,12 +8821,12 @@ void ObjectMgr::LoadPhaseDefinitions()
         return;
     }
 	
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "ObjectMgr : WorldServer Loading : LoadPhaseDefinitions : result not null");
+	// sLog->outDebug(LOG_FILTER_NETWORKIO, "ObjectMgr : WorldServer Loading : LoadPhaseDefinitions : result not null");
     uint32 count = 0;
 
     do
     {
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "ObjectMgr : WorldServer Loading : LoadPhaseDefinitions : looping");
+		// sLog->outDebug(LOG_FILTER_NETWORKIO, "ObjectMgr : WorldServer Loading : LoadPhaseDefinitions : looping");
         Field* fields = result->Fetch();
 
         PhaseDefinition phaseDefinition;
@@ -8838,7 +8838,7 @@ void ObjectMgr::LoadPhaseDefinitions()
         phaseDefinition.terrainswapmap        = fields[4].GetUInt32();
         phaseDefinition.flags                 = fields[5].GetUInt32();
 		
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "ObjectMgr : WorldServer Loading : LoadPhaseDefinitions : Built phase definition : %u, %u, %u, %u, %u, %u", 
+		// sLog->outDebug(LOG_FILTER_NETWORKIO, "ObjectMgr : WorldServer Loading : LoadPhaseDefinitions : Built phase definition : %u, %u, %u, %u, %u, %u", 
 												fields[0].GetUInt32(), fields[1].GetUInt32(), fields[2].GetUInt32(), fields[3].GetUInt32(), fields[4].GetUInt32(), fields[5].GetUInt32());
         // Checks
         if ((phaseDefinition.flags & PHASE_FLAG_OVERWRITE_EXISTING) && (phaseDefinition.flags & PHASE_FLAG_NEGATE_PHASE))
