@@ -81,7 +81,7 @@ enum YanZhuSpells {
 namespace YanZhu {
     class BloatTargetSelector {
     public :
-        BloatTargetSelector() {
+        BloatTargetSelector(uint32 t = 0) {
 
         }
 
@@ -94,7 +94,6 @@ namespace YanZhu {
 
             return true ;
         }
-
     };
 
     class InlineCheckPredicate {
@@ -107,7 +106,7 @@ namespace YanZhu {
             if(!target)
                 return true ;
 
-            if(!spellId)
+            if(!_spellId)
                 if(target->GetTypeId() != TYPEID_PLAYER)
                     return true ;
 
@@ -229,11 +228,13 @@ public :
                     _events.ScheduleEvent(EVENT_YAN_ZHU_BLACKOUT_BREW, IsHeroic() ? urand(8500, 10500) : urand(12000, 15000));
                     break ;
 
-                case EVENT_YAN_ZHU_BLOAT :
-                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, YanZhu::BloatTargetSelector()))
+                case EVENT_YAN_ZHU_BLOAT : {
+					YanZhu::BloatTargetSelector selector ;
+                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, selector))
                         DoCast(target, SPELL_BLOAT);
                     _events.ScheduleEvent(EVENT_YAN_ZHU_BLOAT, IsHeroic() ? urand(8500, 10500) : urand(12000, 15000));
                     break ;
+				}
 
                 case EVENT_YAN_ZHU_CARBONATION :
                     for(uint8 i = 0 ; i < 9 ; ++i) {

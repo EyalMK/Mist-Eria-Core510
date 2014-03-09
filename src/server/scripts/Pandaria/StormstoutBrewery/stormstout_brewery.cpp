@@ -1317,7 +1317,7 @@ public :
                     return ;
 
                 Talk(TALK_YAN_ZHU_DEATH);
-                me->GetMotionMaster()->MovePoint(POINT_YAN_ZHU_CORPSE, yanZhu);
+                me->GetMotionMaster()->MovePoint(POINT_YAN_ZHU_CORPSE, *yanZhu);
             } else return ;
         }
 
