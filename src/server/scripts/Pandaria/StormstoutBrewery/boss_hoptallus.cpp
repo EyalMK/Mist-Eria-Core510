@@ -372,7 +372,7 @@ public :
         {
 			// Init
 			m_uiId = 0 ;
-			m_uiWaitTimer = 2000 ;
+			m_uiWaitTimer = 0;
 			x = y = z = 0.0f ;
 			
 			p_master = me->ToTempSummon()->GetSummoner() ;
@@ -393,6 +393,10 @@ public :
 		
 		void UpdateAI(const uint32 uiDiff)
         {
+			m_uiWaitTimer += diff ;
+			if(m_uiWaitTimer <= 2000)
+				return ;
+				
 			angle -= (2 * M_PI / 15000.0f) * uiDiff ;
 			
 			x = p_master->GetPositionX() + rayon * cos(angle);
@@ -445,8 +449,46 @@ public :
     {
 
     }
+	
+	class spell_hoptallus_carrot_breath_SpellScript : public SpellScript {
+		PrepareSpellScript(spell_hoptallus_carrot_breath_SpellScript);
+		TempSummon* stalker ;
+	
+		bool Validate(const SpellInfo* spellInfo) {
+			return true ;
+		}
+		
+		bool Load() {
+			return true ; 
+		}
+		
+		void HandleBeforeCast() {
+			if(!GetCaster())
+				return ;
+				
+			Unit* caster = GetCaster();
+			
+			stalker = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, 
+															caster->GetPositionX() + 30 * cos(caster->GetOrientation()),
+															caster->GetPositionY() + 30 * sin(caster->GetOrientation()),
+															caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 17000);
+		}
+		
+		void InitializeTarget(WorldObject*& target) {
+			target = stalker ;
+		}
+		
+		void Register() {
+			OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_hoptallus_carrot_breath_SpellScript::InitializeTarget, EFFECT_0, TARGET_UNIT_NEARBY_ENTRY);
+			BeforeCast += SpellCastFn(spell_hoptallus_carrot_breath_SpellScript::HandleBeforeCast);
+		}
+	};
+	
+	SpellScript* GetSpellScript() const {
+		return new spell_hoptallus_carrot_breath_SpellScript();
+	}
 
-    class spell_hoptallus_carrot_breath_AuraScript : public AuraScript {
+    /*class spell_hoptallus_carrot_breath_AuraScript : public AuraScript {
 		PrepareAuraScript(spell_hoptallus_carrot_breath_AuraScript);
 		
 		bool Validate(const SpellInfo* spellInfo) {
@@ -491,7 +533,7 @@ public :
 	
 	AuraScript* GetAuraScript() const {
 		return new spell_hoptallus_carrot_breath_AuraScript();
-	}
+	}*/
 };
 
 class spell_hoptallus_furlwind : public SpellScriptLoader {
