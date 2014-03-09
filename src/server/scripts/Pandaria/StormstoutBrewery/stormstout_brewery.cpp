@@ -1223,5 +1223,5 @@ void AddSC_stormstout_brewery()
     // YanZhu
     new stalker_gushing_brew();
     new stalker_gushing_brew_target();
-    new npc_uncle_gao();
+    // new npc_uncle_gao();
 }
