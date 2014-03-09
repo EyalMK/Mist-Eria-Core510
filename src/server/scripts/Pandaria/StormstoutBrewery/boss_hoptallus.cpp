@@ -514,8 +514,6 @@ public :
 															caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000)) {
 				caster->SetTarget(summon->GetGUID());
 				caster->SetFacingToObject(summon);
-				if(HoptallusAI* ai = CAST_AI(HoptallusAI, caster->GetAI()))
-					ai->SetStalker(summon);
 			}
 		}
 		
@@ -524,8 +522,6 @@ public :
 				return ;
 				
 			Unit* caster = GetCaster();
-			if(HoptallusAI* ai = CAST_AI(HoptallusAI, caster->GetAI()))
-				ai->SetStalker(NULL);
 		}
 		
 		void Register() {
