@@ -53,7 +53,7 @@ void PhaseMgr::Update()
 
 void PhaseMgr::RemoveUpdateFlag(PhaseUpdateFlag updateFlag)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : RemoveUpdateFlag %s", (uint32)updateFlag);
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "PHASE MGR : RemoveUpdateFlag %u", (uint32)updateFlag);
     _UpdateFlags &= ~updateFlag;
 
     if (updateFlag == PHASE_UPDATE_FLAG_ZONE_UPDATE)
