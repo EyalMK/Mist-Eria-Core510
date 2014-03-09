@@ -464,7 +464,7 @@ public :
 			if(TempSummon* summon = caster->SummonCreature(NPC_CARROT_BREATH_HELPER, 
 															caster->GetPositionX() + 30 * cos(caster->GetOrientation()),
 															caster->GetPositionY() + 30 * sin(caster->GetOrientation()),
-															caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000) {
+															caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000)) {
 				caster->SetTarget(summon->GetGUID());
 				caster->SetFacingToObject(stalker);
 			}
