@@ -1089,6 +1089,55 @@ private :
 };
 
 
+enum Area7106
+{
+    QUEST_PASSING_WISDOM    = 29790,
+    NPC_AYSA_7106           = 56662,
+    NPC_JI_7106             = 56663
+};
+
+class at_7106_mongolfiere : public AreaTriggerScript
+{
+public :
+    at_7106_mongolfiere() : AreaTriggerScript("at_7106_mongolfiere") {}
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *at)
+    {
+        std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
+        if(iter != forbiddenPlayers.end())
+            return false;
+
+        if(player->GetQuestStatus(QUEST_PASSING_WISDOM) == QUEST_STATUS_COMPLETE)
+        {
+            Creature* aysa = player->FindNearestCreature(NPC_AYSA_7106, 500.0f);
+            Creature* ji = player->FindNearestCreature(NPC_JI_7106, 500.0f);
+            if(aysa && ji)
+            {
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 120000));
+                aysa->AI()->DoAction(0);
+                ji->AI()->DoAction(0);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void Update(const uint32 uiDiff)
+    {
+        for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter)
+        {
+            if(iter->second <= uiDiff)
+                forbiddenPlayers.erase(iter);
+            else
+                iter->second -= uiDiff ;
+        }
+    }
+
+private :
+    std::map<uint64, uint32> forbiddenPlayers ;
+};
+
+
 /************************************/
 /******* FIN AREATRIGGER ************/
 /************************************/
@@ -4648,6 +4697,124 @@ public:
 };
 
 
+/* Event Area 7106 mongolfière */
+
+enum eAysa7106
+{
+    SAY_AYSA_7106_1     = 0,
+    SAY_AYSA_7106_2     = 1
+};
+
+enum eJi7106
+{
+    SAY_JI_7106_1   = 0
+};
+
+class npc_aysa_7106 : public CreatureScript
+{
+public:
+    npc_aysa_7106(): CreatureScript("npc_aysa_7106") { }
+
+    struct npc_aysa_7106AI : public ScriptedAI
+    {
+        npc_aysa_7106AI(Creature* creature) : ScriptedAI(creature){}
+
+        bool Action;
+
+        uint32 Say1_timer;
+        uint32 Say2_timer;
+
+        void Reset()
+        {
+            Action = false;
+        }
+
+        void DoAction(int32 const action)
+        {
+            Action = true;
+            Say1_timer = 1000;
+            Say2_timer = 10000;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(Action)
+            {
+                if(Say1_timer <= uiDiff)
+                {
+                    Talk(SAY_AYSA_7106_1);
+                    Say1_timer = 60000;
+                }
+                else
+                    Say1_timer -= uiDiff;
+
+                if(Say2_timer <= uiDiff)
+                {
+                    Talk(SAY_AYSA_7106_2);
+                    Say2_timer = 60000;
+                    Action = false;
+                }
+                else
+                    Say2_timer -= uiDiff;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_aysa_7106AI(creature);
+    }
+};
+
+class npc_ji_7106 : public CreatureScript
+{
+public:
+    npc_ji_7106(): CreatureScript("npc_ji_7106") { }
+
+    struct npc_ji_7106AI : public ScriptedAI
+    {
+        npc_ji_7106AI(Creature* creature) : ScriptedAI(creature){}
+
+        bool Action;
+
+        uint32 Say1_timer;
+
+        void Reset()
+        {
+            Action = false;
+        }
+
+        void DoAction(int32 const action)
+        {
+            Action = true;
+            Say1_timer = 1000;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(Action)
+            {
+                if(Say1_timer <= uiDiff)
+                {
+                    Talk(SAY_JI_7106_1);
+                    Say1_timer = 60000;
+                    Action = false;
+                }
+                else
+                    Say1_timer -= uiDiff;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ji_7106AI(creature);
+    }
+};
+
+
+/* Event mongolfière (29791) */
+
 enum eShenXiBallon
 {
     SAY_SHEN_ZI_BALLON_1    = 0,
@@ -4955,6 +5122,7 @@ void AddSC_wandering_isle()
     new at_pop_child_panda();
     new at_delivery_cart_talk();
     new at_delivery_cart_talk_2();
+    new at_7106_mongolfiere();
     new npc_first_quest_pandaren();	
     new npc_trainee();
     new areatrigger_at_the_missing_driver();
@@ -5006,6 +5174,8 @@ void AddSC_wandering_isle()
     new npc_dafeng_escort();
     new npc_master_shang_xi_escort();
     new npc_master_shang_xi_dead();
+    new npc_aysa_7106();
+    new npc_ji_7106();
     new npc_shang_xi_air_balloon();
     new npc_waypoint_air_balloon();
     new npc_shang_xi_air_balloon_click();
