@@ -142,7 +142,7 @@ public :
 
             if(Creature* c = me->SummonCreature(NPC_CARROT_COLLECTOR, -702.496643f, 1248.231689f, 162.794922f, 1.271960f))
             {
-                if(Creature* carrot = me->FindNearestCreature(500002, 50000.0f, true))
+                if(Creature* carrot = me->FindNearestCreature(200502, 50000.0f, true))
                     c->GetMotionMaster()->MoveFollow(carrot, 0.5f, carrot->GetOrientation() - M_PI / 4);
             }
 

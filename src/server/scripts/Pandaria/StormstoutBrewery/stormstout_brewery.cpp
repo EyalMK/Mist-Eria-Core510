@@ -648,7 +648,7 @@ public :
     }
 };
 
-#define STALKER_BOUNCER 500001
+#define STALKER_BOUNCER 200501
 
 class mob_hozen_bouncer : public CreatureScript
 {
@@ -1072,7 +1072,7 @@ public :
     }
 };
 
-#define NPC_CARROT_STALKER 500002
+#define NPC_CARROT_STALKER 200502
 #define MAX_CARROT_POSITIONS 8
 const Position carrotPositions[MAX_CARROT_POSITIONS] =
 {
@@ -1189,7 +1189,7 @@ public :
 /********************* YANZHU **************************/
 /*******************************************************/
 
-#define STALKER_TARGET 500000
+#define STALKER_TARGET 200500
 
 class stalker_gushing_brew : public CreatureScript
 {
@@ -1384,16 +1384,19 @@ public :
                 if(_numberOfSummons == 0) {
                     switch(_phase) {
                     case PHASE_FIRST_WAVE :
+						_phase = PHASE_SECOND_WAVE ;
                         Talk(TALK_SUMMON_SECOND_WAVE);
                         _events.ScheduleEvent(EVENT_SUMMON_SECOND_WAVE, 4000);
                         break ;
 
                     case PHASE_SECOND_WAVE :
+						_phase = PHASE_THIRD_WAVE ;
                         Talk(TALK_SUMMON_THIRD_WAVE);
                         _events.ScheduleEvent(EVENT_SUMMON_THIRD_WAVE, 4000);
                         break ;
 
                     case PHASE_THIRD_WAVE :
+						_phase = PHASE_YAN_ZHU ;
                         _events.ScheduleEvent(EVENT_SUMMON_YAN_ZHU, 4000);
                         break ;
 
