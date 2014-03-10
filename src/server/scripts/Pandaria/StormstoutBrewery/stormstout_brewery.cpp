@@ -266,7 +266,7 @@ public :
             GetCreatureListWithEntryInGrid(hozensWater, me, 59605, 50000.0f); // Sodden Hozen Brawlers
             GetCreatureListWithEntryInGrid(hozensFire, me, 56924, 50000.0f); // Inflammed Hozen Brawlers
 
-            for(std::list<Creature*> water = waterIllusioners.begin() ; water != waterIllusioners.end() ; ++water ) {
+            for(std::list<Creature*>::iterator water = waterIllusioners.begin() ; water != waterIllusioners.end() ; ++water ) {
                 hozensWater.sort(StormstoutBrewery::DistanceOrderPred(*water));
                 hozensWater.remove_if(Trinity::UnitAuraCheck(true, 107044));
 
@@ -275,7 +275,7 @@ public :
                     ai->SetDatas(hozensWater.front(), 107044);
             }
 
-            for(std::list<Creature*> fire = fieryIllusioners.begin() ; fire != fieryIllusioners.end() ; ++fire) {
+            for(std::list<Creature*>::iterator fire = fieryIllusioners.begin() ; fire != fieryIllusioners.end() ; ++fire) {
                 hozensFire.sort(StormstoutBrewery::DistanceOrderPred(*fire));
                 hozensFire.remove_if(Trinity::UnitAuraCheck(true, 107175));
 

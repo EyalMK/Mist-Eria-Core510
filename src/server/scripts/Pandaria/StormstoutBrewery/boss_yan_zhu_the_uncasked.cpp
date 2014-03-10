@@ -367,7 +367,7 @@ public :
             if(count < 2)
                 _events.CancelEvent(EVENT_YAN_ZHU_STOP_SEARCHING);
             else
-                _events.ScheduleEvent(EVENT_YAN_ZHU_CHECK_FOR_SUDSY);
+                _events.ScheduleEvent(EVENT_YAN_ZHU_CHECK_FOR_SUDSY, 500);
         }
 
     private :
