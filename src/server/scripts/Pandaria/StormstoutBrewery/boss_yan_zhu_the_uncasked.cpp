@@ -276,6 +276,10 @@ public :
                     break ;
 
                 case EVENT_YAN_ZHU_BUBBLE_SHIELD :
+					if(me->HasAura(SPELL_BUBBLE_SHIELD)) {
+						_events.ScheduleEvent(EVENT_YAN_ZHU_BUBBLE_SHIELD, IsHeroic() ? urand(12000, 14000) : urand(13000, 16000));
+						break ;
+					}
                     DoCast(me, SPELL_BUBBLE_SHIELD);
                     if(Aura* aura = me->GetAura(SPELL_BUBBLE_SHIELD))
                         aura->ModStackAmount(7);
