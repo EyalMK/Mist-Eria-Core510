@@ -645,6 +645,10 @@ public :
                                                               0, TEMPSUMMON_TIMED_DESPAWN, 30000)) {
                     creature->EnterVehicle(owner);
                     creature->CastSpell(creature, SPELL_BLOAT_TRIGGER_PERIODIC);
+					if(i == 0)
+						creature->SetOrientation(owner->GetOrientation() + M_PI / 2) ;
+					else
+						creature->SetOrientation(owner->GetOrientation() - M_PI / 2) ;
                 }
             }
         }
