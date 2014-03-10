@@ -258,7 +258,11 @@ public :
         }
 
         void Reset() {
-            std::list<Creature*> waterIllusioners, hozensWater, fieryIllusioners, hozensFire ;
+			_uiWaitTimer = 2000 ;
+        }
+		
+		void StartIllusioners() {
+			std::list<Creature*> waterIllusioners, hozensWater, fieryIllusioners, hozensFire ;
 
             GetCreatureListWithEntryInGrid(waterIllusioners, me, 56865, 50000.0f); // Aqua dancers
             GetCreatureListWithEntryInGrid(fieryIllusioners, me, 56867, 50000.0f); // Fiery Tricksters
@@ -282,7 +286,17 @@ public :
                 if(IllusionerAI* ai = dynamic_cast<IllusionerAI*>((*fire)->AI()))
                     ai->SetDatas(hozensFire.front(), 107044);
             }
-        }
+		}
+		
+		void UpdateAI(const uint32 diff) {
+			if(_uiWaitTimer <= diff)
+				StartIllusioners();
+			else
+				_uiWaitTimer -= diff ;
+		}
+		
+	private :
+		uint32 _uiWaitTimer ;
     };
 
     CreatureAI* GetAI(Creature *creature) const {
@@ -1049,6 +1063,8 @@ public :
 				}
 				else
 				{
+					if(InstanceScript* instance = me->GetInstanceScript())
+						instance->SetData64(INSTANCE_DATA64_KILLED_HOPTALLUS_TRASH, 1);
 					me->Kill(me);
 				}
 			}
@@ -1505,7 +1521,7 @@ public :
         void SummonYanZhu() {
             Talk(TALK_SUMMON_YAN_ZHU);
 
-            Position const summon = {-703.415771f, 1162.801025f, 163.141693f, 0.273505f}; // Correct height is 160, but YanZhu must "grow" from ground
+            Position const summon = {-703.415771f, 1162.801025f, 166.141693f, 0.273505f}; // Correct height is 160, but YanZhu must "grow" from ground
             Creature* yanZhu = me->SummonCreature(BOSS_YAN_ZHU, summon, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 24 * HOUR * IN_MILLISECONDS);
 
             if(!yanZhu) {
@@ -1516,19 +1532,19 @@ public :
 
             // Cast the spells on YanZhu, based on which creatures were summoned
             if(_stoutAlamental == MOB_STOUT_ALAMENTAL_FIZZY_BREW)
-                DoCast(yanZhu, SPELL_FIZZY_BREW);
+                yanZhu->CastSpell(yanZhu, SPELL_FIZZY_BREW);
             else
-                DoCast(yanZhu, SPELL_SUDSY_BREW);
+                yanZhu->CastSpell(yanZhu, SPELL_SUDSY_BREW);
 
             if(_aleAlamental == MOB_ALE_ALAMENTAL_BUBBLING_BREW)
-                DoCast(yanZhu, SPELL_BUBBLING_BREW);
+                yanZhu->CastSpell(yanZhu, SPELL_BUBBLING_BREW);
             else
-                DoCast(yanZhu, SPELL_YEASTY_BREW);
+                yanZhu->CastSpell(yanZhu, SPELL_YEASTY_BREW);
 
             if(_wheatAlamental == MOB_WHEAT_ALAMENTAL_BLOATED_BREW)
-                DoCast(yanZhu, SPELL_BLACKOUT_BREW);
+                yanZhu->CastSpell(yanZhu, SPELL_BLACKOUT_BREW);
             else
-                DoCast(yanZhu, SPELL_BLOATING_BREW);
+                yanZhu->CastSpell(yanZhu, SPELL_BLOATING_BREW);
 
         }
 

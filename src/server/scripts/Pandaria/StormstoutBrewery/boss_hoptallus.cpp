@@ -97,7 +97,7 @@ public :
             {
                 if(GameObject* go = me->FindNearestGameObject(GOB_GIANT_BARREL, 50000.0f))
                     go->SetGoState(GO_STATE_ACTIVE);
-                me->GetMotionMaster()->MoveJump(jumpPosition, 1.0f, 1.0f);
+                me->GetMotionMaster()->MoveJump(jumpPosition, 10.0f, 10.0f);
                 me->SetHomePosition(jumpPosition); // So it will not return into the barrel
             }
         }
