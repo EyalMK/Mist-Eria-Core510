@@ -45,7 +45,7 @@ public :
             if(action == 1 && m_bCanTalk)
             {
                 m_bCanTalk = false ;
-                m_uiTalkTimer = 7000 ;
+                m_uiTalkTimer = 8000 ; // Before SAY_1 : 2 s wait + 6 sec Auntie
                 if(Creature* auntie = me->FindNearestCreature(59822, 40.0f, true))
                     auntie->AI()->DoAction(1);
             }
@@ -63,31 +63,31 @@ public :
                 switch(m_uiTalkId)
                 {
                 case 0 : // After "I am not"
-                    m_uiTalkTimer = 16000 ;
+                    m_uiTalkTimer = 9000 ; // 3 s self + 2s wait + 2s Autie + 2s wait
                     break ;
 
                 case 1 : // After "Tell me"
-                    m_uiTalkTimer = 10000 ;
+                    m_uiTalkTimer = 10000 ; // 2s self + 2s wait + 4 s Auntie + 2s wait
                     break ;
 
                 case 2 : // After "Where are"
-                    m_uiTalkTimer = 11000 ;
+                    m_uiTalkTimer = 11000 ; // 4s self + 2s wait + 3 s Auntie + 2s wait
                     break ;
 
                 case 3 : // After "Auntie Stormstout"
-                    m_uiTalkTimer = 18000 ;
+                    m_uiTalkTimer = 19000 ; // 4s self + 2s wait + 11s Auntie + 2s wait
                     break ;
 
                 case 4 : // After "I see"
-                    m_uiTalkTimer = 9000 ;
+                    m_uiTalkTimer = 8000 ; // 2 s self + 2s wait + 2s Auntie + 2s wait
                     break ;
 
                 case 5 : // After "there is no time"
-                    m_uiTalkTimer = 30000 ;
+                    m_uiTalkTimer = 30000 ; // Custom timer
                     break ;
 
                 case 6 :
-                    m_uiTalkTimer = DIALOGUE_STOP_TIMER ;
+                    m_uiTalkTimer = DIALOGUE_STOP_TIMER ; // Okay, end
                     break ;
 
                 default :
@@ -131,7 +131,7 @@ public :
         {
             if(action == 1)
             {
-                m_uiTalkTimer = 200 ;
+                m_uiTalkTimer = 200 ; // Before SAY_1
                 m_uiTalkId = 0 ;
             }
         }
@@ -148,27 +148,27 @@ public :
                 switch(m_uiTalkId)
                 {
                 case 0 : // After "Oh Hello"
-                    m_uiTalkTimer = 12000 ;
+                    m_uiTalkTimer = 13000 ; // 2 s wait + 6 s self + 3 s Chen + 2s wait
                     break ;
 
                 case 1 : // After "Oh Zan"
-                    m_uiTalkTimer = 10000 ;
+                    m_uiTalkTimer = 8000 ; // 4 s self + 2 s wait + 2 s Chen
                     break ;
 
                 case 2 : // After "It is certainly"
-                    m_uiTalkTimer = 11000 ;
+                    m_uiTalkTimer = 10000 ; // 4s self + 2s wait + 4 s Chen
                     break ;
 
                 case 3 : // After "Have you seen"
-                    m_uiTalkTimer = 10000 ;
+                    m_uiTalkTimer = 9000 ; // 3s self + 2s wait + 4 s Chen
                     break ;
 
                 case 4 : // After "Abandonned"
-                    m_uiTalkTimer = 17000 ;
+                    m_uiTalkTimer = 15000 ; // 11 s self + 2 s wait + 2s Chen
                     break ;
 
                 case 5 : // After "I have"
-                    m_uiTalkTimer = DIALOGUE_STOP_TIMER ;
+                    m_uiTalkTimer = DIALOGUE_STOP_TIMER ; // Okay, end
                     break ;
 
                 default :
