@@ -5118,11 +5118,12 @@ public :
     {
         if(player->GetQuestStatus(QUEST_BIDDEN_GREATNESS) == QUEST_STATUS_INCOMPLETE)
         {
-            if(!player->HasAura(115337))
+            if(player->HasAura(59073))
             {
                 player->CastSpell(player, 115337, true); //jojo
                 player->CastSpell(player, 115335, true); // ji patte
                 player->CastSpell(player, 115332, true); // aysa
+                player->RemoveAurasDueToSpell(59073);
                 return true;
             }
         }
@@ -5171,9 +5172,13 @@ public:
         {
             Player* player = GetPlayerForEscort();
 
+            GameObject* mandori = me->GetMap()->GetGameObject(449300);
+
             switch (waypointId)
             {
-                case 1: // ouverture porte
+                case 1:
+                    if(mandori)
+                        mandori->SetGoState(GO_STATE_ACTIVE);
                     break;
 
                 case 12:
@@ -5243,6 +5248,8 @@ public:
         {
             Player* player = GetPlayerForEscort();
 
+            GameObject* peiwu = me->GetMap()->GetGameObject(449469);
+
             switch (waypointId)
             {
                 case 10:
@@ -5250,7 +5257,9 @@ public:
                     VerifPlayer = true;
                     break;
 
-                case 12: // ouveture porte
+                case 12:
+                    if(peiwu)
+                        peiwu->SetGoState(GO_STATE_ACTIVE);
                     break;
 
                 case 22:
