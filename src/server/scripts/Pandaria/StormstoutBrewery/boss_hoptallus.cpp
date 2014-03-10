@@ -82,6 +82,7 @@ public :
         {
             instance = creature->GetInstanceScript();
             stalker = NULL ;
+			_bCanSearch = true ;
         }
 
         void Reset()
@@ -90,7 +91,6 @@ public :
                 instance->SetData(INSTANCE_DATA_HOPTALLUS_STATUS, NOT_STARTED);
             events.Reset();
 			_uiSearchTimer = 500 ;
-			_bCanSearch = true ;
         }
 
         void DoAction(const int32 action)
