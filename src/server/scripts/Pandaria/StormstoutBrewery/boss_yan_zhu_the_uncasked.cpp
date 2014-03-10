@@ -140,6 +140,24 @@ namespace YanZhu {
         Unit* _ignore;
     };
 
+    class HeightCheckPredicate {
+    public :
+        HeightCheckPredicate(Unit* source, float diff) : _source(source), _difference(diff) {
+
+        }
+
+        bool operator()(WorldObject* target) {
+            float diff = abs(_source->GetPositionZ() - target->GetPositionZ());
+            if(diff < _difference)
+                return false ;
+            return true ;
+        }
+
+    private :
+        Unit* _source ;
+        float _difference ;
+    };
+
     const Position wallOfSudsPositions[2] = {
         {0.0f, 0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 0.0f, 0.0f}
@@ -333,7 +351,7 @@ public :
                 for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter) {
                     if(Player* player = iter->getSource()) {
                         float dist = me->GetExactDist2d(player);
-                        if(dist <= MELEE_RANGE) {
+                        if(dist <= 5.0f) {
                             _events.ScheduleEvent(EVENT_YAN_ZHU_CHECK_FOR_PLAYERS, 500);
                             _events.CancelEvent(EVENT_YAN_ZHU_BREW_BOLT);
                             return ;
@@ -470,6 +488,40 @@ public :
 
     CreatureAI* GetAI(Creature *creature) const {
         return new mob_yeasty_brew_alamental_yan_zhu_AI(creature);
+    }
+};
+
+class npc_fizzy_bubble : public CreatureScript {
+public :
+    npc_fizzy_bubble() : CreatureScript("npc_fizzy_bubble") {
+
+    }
+
+    bool OnGossipHello(Player *player, Creature *creature) {
+        if(!player || !creature)
+            return false ;
+
+        if(player->HasAura(114459))
+            return false ;
+
+        player->CastSpell(player, 114459, true);
+		creature->Kill(creature);
+        return false ;
+    }
+
+    class npc_fizzy_bubble_AI : public ScriptedAI {
+    public :
+        npc_fizzy_bubble_AI(Creature* creature) : ScriptedAI(creature) {
+
+        }
+
+        void Reset() {
+            DoCast(me, 114458); // Make me visible
+        }
+    };
+
+    CreatureAI* GetAI(Creature *creature) const {
+        return new npc_fizzy_bubble_AI(creature);
     }
 };
 
@@ -811,10 +863,44 @@ public :
     }
 };
 
+class spell_yanzhu_carbonation_target_selector : public SpellScriptLoader {
+public :
+    spell_yanzhu_carbonation_target_selector() : SpellScriptLoader("spell_yanzhu_carbonation_target_selector") {
+
+    }
+
+    class spell_yanzhu_carbonation_target_selector_SpellScript : public SpellScript {
+        PrepareSpellScript(spell_yanzhu_carbonation_target_selector_SpellScript);
+
+        bool Validate(const SpellInfo *spellInfo) {
+            return true ;
+        }
+
+        bool Load() {
+            return true ;
+        }
+
+        void FilterTargets(std::list<WorldObject*>& targets) {
+            targets.remove_if(YanZhu::HeightCheckPredicate(GetCaster(), 2.5f));
+        }
+
+        void Register() {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yanzhu_carbonation_target_selector_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yanzhu_carbonation_target_selector_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const {
+        return new spell_yanzhu_carbonation_target_selector_SpellScript();
+    }
+};
+
 void AddSC_boss_yan_zhu_the_uncasked() {
     new boss_yan_zhu_the_uncasked();
 
     new mob_yeasty_brew_alamental_yan_zhu();
+
+    new npc_fizzy_bubble();
 
     new spell_yanzhu_wall_of_suds();
     new spell_yanzhu_wall_of_suds_target_selector();
@@ -823,4 +909,5 @@ void AddSC_boss_yan_zhu_the_uncasked() {
     new spell_yanzhu_bloat_damage_target_selector();
     new spell_yanzhu_ferment();
     new spell_yanzhu_bubble_shield();
+    new spell_yanzhu_carbonation_target_selector();
 }
