@@ -205,8 +205,11 @@ public :
         }
 
         void EnterCombat(Unit *aggro) {
-            if(_instance)
+            if(_instance) {
                 _instance->SetData(INSTANCE_DATA_YAN_ZHU_STATUS, IN_PROGRESS);
+				if(GameObject* entrance = ObjectAccessor::GetGameObject(*me, _instance->GetData64(INSTANCE_DATA64_YAN_ZHU_ENTRANCE_GUID)))
+					entrance->SetGoState(GO_STATE_READY);
+			}
 
             // Stout
             if(me->HasAura(SPELL_SUDSY_BREW))
@@ -231,15 +234,21 @@ public :
         }
 
         void EnterEvadeMode() {
-            if(_instance)
+            if(_instance) {
                 _instance->SetData(INSTANCE_DATA_YAN_ZHU_STATUS, FAIL);
+				if(GameObject* entrance = ObjectAccessor::GetGameObject(*me, _instance->GetData64(INSTANCE_DATA64_YAN_ZHU_ENTRANCE_GUID)))
+					entrance->SetGoState(GO_STATE_ACTIVE);
+			}
 
             ScriptedAI::EnterEvadeMode();
         }
 
         void JustDied(Unit* killer) {
-            if(_instance)
+            if(_instance) {
                 _instance->SetData(INSTANCE_DATA_YAN_ZHU_STATUS, DONE);
+				if(GameObject* entrance = ObjectAccessor::GetGameObject(*me, _instance->GetData64(INSTANCE_DATA64_YAN_ZHU_ENTRANCE_GUID)))
+					entrance->SetGoState(GO_STATE_ACTIVE);
+			}
         }
 
         void UpdateAI(const uint32 diff) {

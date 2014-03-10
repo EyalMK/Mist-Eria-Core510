@@ -152,19 +152,19 @@ public :
                     break ;
 
                 case 1 : // After "Oh Zan"
-                    m_uiTalkTimer = 8000 ; // 4 s self + 2 s wait + 2 s Chen
+                    m_uiTalkTimer = 10000 ; // 4 s self + 2 s wait + 2 s Chen
                     break ;
 
                 case 2 : // After "It is certainly"
-                    m_uiTalkTimer = 10000 ; // 4s self + 2s wait + 4 s Chen
+                    m_uiTalkTimer = 12000 ; // 4s self + 2s wait + 4 s Chen
                     break ;
 
                 case 3 : // After "Have you seen"
-                    m_uiTalkTimer = 9000 ; // 3s self + 2s wait + 4 s Chen
+                    m_uiTalkTimer = 11000 ; // 3s self + 2s wait + 4 s Chen
                     break ;
 
                 case 4 : // After "Abandonned"
-                    m_uiTalkTimer = 15000 ; // 11 s self + 2 s wait + 2s Chen
+                    m_uiTalkTimer = 17000 ; // 11 s self + 2 s wait + 2s Chen
                     break ;
 
                 case 5 : // After "I have"
