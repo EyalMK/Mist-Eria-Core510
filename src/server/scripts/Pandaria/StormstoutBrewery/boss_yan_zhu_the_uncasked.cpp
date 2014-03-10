@@ -26,9 +26,12 @@ enum Events {
     EVENT_YAN_ZHU_CARBONATION       = 7,
     EVENT_YAN_ZHU_WALL_OF_SUDS      = 8,
 
+    EVENT_YAN_ZHU_CHECK_FOR_SUDSY   = 9,
+    EVENT_YAN_ZHU_STOP_SEARCHING    = 10,
+
     /** Yeasty Brew Alamental **/
-    EVENT_YEASTY_BREW_ALAMENTAL_FERMENT     = 9,
-    EVENT_YEASTY_BREW_ALAMENTAL_BREW_BOLT   = 10,
+    EVENT_YEASTY_BREW_ALAMENTAL_FERMENT     = 11,
+    EVENT_YEASTY_BREW_ALAMENTAL_BREW_BOLT   = 12,
 };
 
 enum YanZhuSpells {
@@ -250,6 +253,8 @@ public :
                     }
                     DoCastToAllHostilePlayers(SPELL_SUDSY_PROC_TRIGGER_SPELL);
                     _events.ScheduleEvent(EVENT_YAN_ZHU_WALL_OF_SUDS, IsHeroic() ? urand(25000, 30000) : urand(40000, 50000));
+                    _events.ScheduleEvent(EVENT_YAN_ZHU_CHECK_FOR_SUDSY, 500);
+                    _events.ScheduleEvent(EVENT_YAN_ZHU_STOP_SEARCHING, 15000);
                     break ;
 
                 case EVENT_YAN_ZHU_BUBBLE_SHIELD :
@@ -266,6 +271,14 @@ public :
                     if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
                         DoCast(target, SPELL_BREW_BOLT);
                     _events.ScheduleEvent(EVENT_YAN_ZHU_BREW_BOLT, IsHeroic() ? 750 : 1000);
+                    break ;
+
+                case EVENT_YAN_ZHU_CHECK_FOR_SUDSY :
+                    DoCheckForSudsy();
+                    break ;
+
+                case EVENT_YAN_ZHU_STOP_SEARCHING :
+                    _events.CancelEvent(EVENT_YAN_ZHU_CHECK_FOR_SUDSY);
                     break ;
 
                 default :
@@ -324,6 +337,37 @@ public :
                 second->SetFacingToObject(me);
 
             _events.ScheduleEvent(EVENT_YAN_ZHU_SUMMON_ALAMENTALS, IsHeroic() ? urand(12000, 14000) : urand(13000, 16000));
+        }
+
+        void DoCheckForSudsy() {
+            uint32 count = 0 ;
+
+            if(Map* map = me->GetMap()) {
+                Map::PlayerList const& playerList = map->GetPlayers();
+                if(playerList.isEmpty()) {
+                    _events.CancelEvent(EVENT_YAN_ZHU_STOP_SEARCHING);
+                    return ;
+                }
+
+                for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter) {
+                    if(Player* player = iter->getSource()) {
+                        if(player->GetPositionZ() > me->GetPositionZ() + 0.1) {
+                            if(Aura* sudsy = player->GetAura(SPELL_SUDSY_PROC_TRIGGER_SPELL)) {
+                                SpellInfo const* sudsySI = sudsy->GetSpellInfo();
+                                player->CastSpell(player, sudsySI->Effects[0].TriggerSpell, true);
+                                ++count ;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 0 or 1 player had the aura left ; so know, it is useless to check again : if one player had the aura, know it hasn't it anymore
+            // If zero player had the aura, nobody has it know
+            if(count < 2)
+                _events.CancelEvent(EVENT_YAN_ZHU_STOP_SEARCHING);
+            else
+                _events.ScheduleEvent(EVENT_YAN_ZHU_CHECK_FOR_SUDSY);
         }
 
     private :

@@ -192,86 +192,192 @@ public :
     }
 };
 
-class npc_sb_illusioner : public CreatureScript
-{
-public :
-    npc_sb_illusioner() : CreatureScript("npc_sb_illusioner")
-    {
-
-    }
-
-    class npc_sb_illusionerAI : public ScriptedAI
-    {
+namespace StormstoutBrewery {
+    class DistanceOrderPred {
     public :
-        npc_sb_illusionerAI(Creature* creature) : ScriptedAI(creature)
-        {
+        DistanceOrderPred(Creature* source) : _source(source) {
 
         }
 
-        void Reset()
-        {
-            m_bWater = (me->GetEntry() == 56865);
-            CheckForTarget();
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if(InstanceScript* instance = me->GetInstanceScript())
-                if(instance->GetData(INSTANCE_DATA_OOK_OOK_STATUS) == DONE)
-                    return ; // return since there is no need to continue
-
-            if(!target)
-            {
-                if(m_uiCheckForTarget <= diff)
-                {
-                    bool targetB = CheckForTarget() ;
-                    if(!targetB)
-                        m_uiCheckForTarget = 1000 ;
-                }
-                else
-                    m_uiCheckForTarget -= diff ;
-            }
-        }
-
-        void JustDied(Unit *killer)
-        {
-            if(target && target->IsInWorld())
-            {
-                target->RemoveAurasDueToSpell(m_bWater ? 107044 : 107175);
-                target->CastSpell(target, 114656);
-            }
-        }
-
-        bool CheckForTarget()
-        {
-            CreatureList drunkenHozens ;
-            GetCreatureListWithEntryInGrid(drunkenHozens, me, m_bWater ? 56862 : 56924, 50000.0f);
-
-            for(CreatureListConstIter iter = drunkenHozens.begin() ; iter != drunkenHozens.end() ; ++iter)
-            {
-                if(Creature* hozen = *iter)
-                {
-                    if(!hozen->HasAura(m_bWater ? 107044 : 107175))
-                    {
-                        DoCast(hozen, m_bWater ? 107044 : 107175, true);
-                        target = hozen ;
-                        return true ;
-                    }
-                }
-            }
-
-            return false ;
+        bool operator()(Creature* first, Creature* second) {
+            return _source->GetExactDist2d(first) < _source->GetExactDist2d(second);
         }
 
     private :
-        Creature* target ; // bool m_bNeedTarget ;
-        uint32 m_uiCheckForTarget ;
-        bool m_bWater ;
+        Creature* _source ;
+    };
+} // Stormstout Brewery
+
+class npc_sb_illusioner : public CreatureScript {
+public :
+    npc_sb_illusioner() : CreatureScript("npc_sb_illusioner") {
+
+    }
+
+    class npc_sb_illusioner_AI : public ScriptedAI {
+    public :
+        npc_sb_illusioner_AI(Creature* creature) : ScriptedAI(creature) {
+            _target = NULL ;
+            _spellId = 0 ;
+        }
+
+        void SetDatas(Creature* target, uint32 spellId) { // Can't do it another way
+            _target = target ;
+            _spellId = spellId ;
+
+            DoCast(_target, _spellId);
+        }
+
+        void JustDied(Unit *killer) {
+            if(_target)
+                _target->RemoveAurasDueToSpell(_spellId);
+        }
+
+    private :
+        Creature* _target ;
+        uint32 _spellId ;
     };
 
-    CreatureAI* GetAI(Creature *creature) const
-    {
-        return new npc_sb_illusionerAI(creature);
+    CreatureAI* GetAI(Creature *creature) const {
+        return new npc_sb_illusioner_AI(creature);
+    }
+};
+
+typedef npc_sb_illusioner::npc_sb_illusioner_AI IllusionerAI ;
+
+class stalker_illusioner_master : public CreatureScript {
+public :
+    stalker_illusioner_master() : CreatureScript("stalker_illusioner_master") {
+
+    }
+
+    class stalker_illusioner_master_AI : public ScriptedAI {
+    public:
+        stalker_illusioner_master_AI(Creature* creature) : ScriptedAI(creature) {
+
+        }
+
+        void Reset() {
+            std::list<Creature*> waterIllusioners, hozensWater, fieryIllusioners, hozensFire ;
+
+            GetCreatureListWithEntryInGrid(waterIllusioners, me, 56865, 50000.0f); // Aqua dancers
+            GetCreatureListWithEntryInGrid(fieryIllusioners, me, 56867, 50000.0f); // Fiery Tricksters
+
+            GetCreatureListWithEntryInGrid(hozensWater, me, 59605, 50000.0f); // Sodden Hozen Brawlers
+            GetCreatureListWithEntryInGrid(hozensFire, me, 56924, 50000.0f); // Inflammed Hozen Brawlers
+
+            for(std::list<Creature*> water = waterIllusioners.begin() ; water != waterIllusioners.end() ; ++water ) {
+                hozensWater.sort(StormstoutBrewery::DistanceOrderPred(*water));
+                hozensWater.remove_if(Trinity::UnitAuraCheck(true, 107044));
+
+                // Can't do it otherwise, if SetData could receive a void* pointer, it could work, but for now...
+                if(IllusionerAI* ai = dynamic_cast<IllusionerAI*>(*water->AI()))
+                    ai->SetDatas(hozensWater.front(), 107044);
+            }
+
+            for(std::list<Creature*> fire = fieryIllusioners.begin() ; fire != fieryIllusioners.end() ; ++fire) {
+                hozensFire.sort(StormstoutBrewery::DistanceOrderPred(*fire));
+                hozensFire.remove_if(Trinity::UnitAuraCheck(true, 107175));
+
+                if(IllusionerAI* ai = dynamic_cast<IllusionerAI*>(*fire->AI()))
+                    ai->SetDatas(hozensFire.front(), 107044);
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature *creature) const {
+        return new stalker_illusioner_master_AI(creature);
+    }
+};
+
+class spell_sb_mind_illusion : public SpellScriptLoader {
+public :
+    spell_sb_mind_illusion() : SpellScriptLoader("spell_sb_mind_illusion") {
+
+    }
+
+    class spell_sb_mind_illusion_AuraScript : public AuraScript {
+        PrepareAuraScript(spell_sb_mind_illusion_AuraScript);
+
+        bool Validate(const SpellInfo *spellInfo) {
+            return true ;
+        }
+
+        bool Load() {
+            return true ;
+        }
+
+        void HandleEffectRemove(AuraEffect const* auraEff, AuraEffectHandleModes mode) {
+            if(!GetOwner() || !GetOwner()->ToCreature())
+                return ;
+
+            Creature* owner = GetOwner()->ToCreature();
+
+            switch(GetSpellInfo()->Id) {
+            case 107044 :
+                owner->CastSpell(owner, 114655);
+                break ;
+
+            case 107125 :
+                owner->CastSpell(owner, 114656);
+                break ;
+
+            default :
+                break ;
+            }
+        }
+
+        void Register() {
+            OnEffectRemove += AuraEffectRemoveFn(spell_sb_mind_illusion_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const {
+        return new spell_sb_mind_illusion_AuraScript();
+    }
+};
+
+class mob_hozen_illusioned : public CreatureScript {
+public :
+    mob_hozen_illusioned() : CreatureScript("mob_hozen_illusioned") {
+
+    }
+
+    class mob_hozen_illusioned_AI : public ScriptedAI {
+    public :
+        mob_hozen_illusioned_AI(Creature* creature) : ScriptedAI(creature) {
+
+        }
+
+        void UpdateAI(const uint32 diff) {
+            if(!UpdateVictim())
+                return ;
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            Unit* victim = me->getVictim();
+            //Make sure our attack is ready and we aren't currently casting before checking distance
+            if (me->isAttackReady() && me->IsWithinMeleeRange(victim))
+            {
+                me->AttackerStateUpdate(victim);
+                me->resetAttackTimer();
+            }
+
+            if (me->haveOffhandWeapon() && me->isAttackReady(OFF_ATTACK) && me->IsWithinMeleeRange(victim))
+            {
+                me->AttackerStateUpdate(victim, OFF_ATTACK);
+                me->resetAttackTimer(OFF_ATTACK);
+            }
+
+            uint32 spellId = me->HasAura(107044) ? 107046 : me->HasAura(107175) ? 107176 : 0 ;
+            if(spellId)
+                DoCastAOE(spellId);
+        }
+    };
+
+    CreatureAI* GetAI(Creature *creature) const {
+        return new mob_hozen_illusioned_AI(creature);
     }
 };
 
@@ -329,7 +435,6 @@ public :
 
         void MovementInform(uint32 type, uint32 id)
         {
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "Entering MovementInform (Hozen Party Animal), using type %u, and id %u", type, id);
             if(type == POINT_MOTION_TYPE)
             {
                 if(id == 0)
@@ -350,24 +455,17 @@ public :
 
         void JustDied(Unit *killer)
         {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Creature entered JustDied");
             if(InstanceScript* instance = me->GetInstanceScript())
             {
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "Creature entered JustDied");
                 instance->SetData64(INSTANCE_DATA64_KILLED_HOZENS, 1);
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "Data set in instancescript ; ready to change power");
                 AddPowerOnPlayers(1);
             }
         }
 
         void AddPowerOnPlayer(Player* p, int32 amount)
         {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "entered addpoweronplayer");
             if(p)
-			{
-				/*sLog->outDebug(LOG_FILTER_NETWORKIO, "player not null ; seting power ; before %u", p->GetPower(POWER_ALTERNATE_POWER));
-				p->SetPower(POWER_ALTERNATE_POWER, p->GetPower(POWER_ALTERNATE_POWER) + amount);
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "Now : %u", p->GetPower(POWER_ALTERNATE_POWER));*/
+            {
 				p->SetMaxPower(POWER_ALTERNATE_POWER, 40);
 				p->SetPower(POWER_ALTERNATE_POWER, p->GetPower(POWER_ALTERNATE_POWER) + 1);
 			}
@@ -375,17 +473,13 @@ public :
 
         void AddPowerOnPlayers(int32 amount)
         {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Entered addpoweronplayers");
             if(Map* map = me->GetMap())
             {
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "map not null");
                 Map::PlayerList const & playerList = map->GetPlayers();
                 if(!playerList.isEmpty())
                 {
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "playerlist not empty");
                     for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
                     {
-						sLog->outDebug(LOG_FILTER_NETWORKIO, "ready to apply change");
                         AddPowerOnPlayer(iter->getSource(), amount);
                     }
                 }
@@ -463,7 +557,14 @@ public :
 
         void PassengerBoarded(Unit *passenger, int8 seatId, bool enter)
         {
-            me->StopMoving();
+            if(enter)
+                me->StopMoving();
+            else {
+                if(instance)
+                    instance->ProcessEvent(NULL, m_uiIndex);
+                me->Kill(me);
+                return ;
+            }
         }
 
         void SetData(uint32 uiData, uint32 uiValue)
@@ -486,61 +587,53 @@ public :
 
         void UpdateAI(const uint32 diff)
         {
-            if(me->GetMapId() != 961)
-                return ; // Return since we are not ine the right map
             if(m_uiCheckTimer <= diff)
-            {
-                if(instance)
-                {
-                    instance->GetData(INSTANCE_DATA_OOK_OOK_STATUS) == IN_PROGRESS ? DoCheckOokOok() : DoCheckHozens();
-                    m_uiCheckTimer = 1000 ;
-                }
-            }
+                DoCheckForExplosion();
             else
                 m_uiCheckTimer -= diff ;
         }
 
-        void DoCheckOokOok()
-        {
-            if(instance)
-            {
-                if(Creature* ookOok = ObjectAccessor::GetCreature(*me, instance->GetData64(INSTANCE_DATA64_OOK_OOK_GUID)))
-                {
-                    float dist = me->GetExactDist2d(ookOok->GetPositionX(), ookOok->GetPositionY());
-                    if(dist <= 1.0f)
-                    {
-                        DoCastAOE(115875, true);
-                        me->Kill(me);
+        void DoCheckForExplosion() {
+            // Check instance boss status
+            if(instance && instance->GetData(INSTANCE_DATA_OOK_OOK_STATUS) == IN_PROGRESS) { // Check for OokOok
+                Creature* ookOok = ObjectAccessor::GetCreature(*me, instance->GetData64(INSTANCE_DATA64_OOK_OOK_GUID));
+                if(ookOok) {
+                    float dist = me->GetExactDist2d(ookOok);
+                    if(dist <= 2.0f) {
+                        CastExplosion();
                         return ;
                     }
                 }
-            }
-        }
+            } else { // Check for hozens
+                std::list<Creature*> hozens ;
+                GetCreatureListWithEntryInGrid(hozens, me, 56927, 50000.0f);
+                GetCreatureListWithEntryInGrid(hozens, me, 59684, 50000.0f);
+                GetCreatureListWithEntryInGrid(hozens, me, 57097, 50000.0f);
 
-        void DoCheckHozens()
-        {
-            CreatureList hozens[3] ;
-            GetCreatureListWithEntryInGrid(hozens[0], me, 56927, 50000.0f);
-            GetCreatureListWithEntryInGrid(hozens[1], me, 59684, 50000.0f);
-            GetCreatureListWithEntryInGrid(hozens[2], me, 57097, 50000.0f);
+                if(hozens.empty())
+                    return ;
 
-            for(uint8 i = 0 ; i < 3 ; ++i)
-            {
-                CreatureList creatures = hozens[i];
-                for(CreatureListConstIter iter = creatures.begin() ; iter != creatures.end() ; ++iter)
-                {
-                    if(Creature* c = *iter)
-                    {
-                        float dist = me->GetExactDist2d(c->GetPositionX(), c->GetPositionZ());
-                        if(dist <= 1.0f)
-                        {
-                            DoCastAOE(115875, true);
-                            me->Kill(me);
+                for(std::list<Creature*>::iterator iter = hozens.begin() ; iter != hozens.end() ; ++iter) {
+                    if(Creature* hozen = *iter) {
+                        float dist = me->GetExactDist2d(hozen);
+                        if(dist <= 2.0f) {
+                            CastExplosion();
                             return ;
                         }
                     }
                 }
             }
+
+            // Didn't return yet, so it means nobody was found, so reschedule the timer
+            m_uiCheckTimer = 500 ;
+        }
+
+        inline void CastExplosion() {
+            DoCastAOE(115875);
+            instance->ProcessEvent(NULL, m_uiIndex);
+            if(Vehicle* vec = me->GetVehicleKit())
+                vec->RemoveAllPassengers();
+            me->Kill(me);
         }
 
     private :
@@ -1525,7 +1618,10 @@ void AddSC_stormstout_brewery()
     // Ook Ook
     new npc_chen_stormstout();
     new npc_auntie_stormstout();
-    //new npc_sb_illusioner();
+    new npc_sb_illusioner();
+    new stalker_illusioner_master();
+    new spell_sb_mind_illusion();
+    new mob_hozen_illusioned();
     new mob_habanero_brew();
     new mob_ook_ook_hozen();
     new npc_rolling_barrel();
