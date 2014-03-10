@@ -5118,12 +5118,12 @@ public :
     {
         if(player->GetQuestStatus(QUEST_BIDDEN_GREATNESS) == QUEST_STATUS_INCOMPLETE)
         {
-            if(player->HasAura(59073))
+            if(player->HasAura(115426))
             {
                 player->CastSpell(player, 115337, true); //jojo
                 player->CastSpell(player, 115335, true); // ji patte
                 player->CastSpell(player, 115332, true); // aysa
-                player->RemoveAurasDueToSpell(59073);
+                player->RemoveAurasDueToSpell(115426);
                 return true;
             }
         }

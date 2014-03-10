@@ -337,7 +337,9 @@ public :
                 Position pos ;
                 me->GetPosition(&pos);
 
-                me->SummonCreature(NPC_BIG_OL_HAMMER, pos, TEMPSUMMON_TIMED_DESPAWN, 20000);
+                Creature * hammer = me->SummonCreature(NPC_BIG_OL_HAMMER, pos, TEMPSUMMON_TIMED_DESPAWN, 20000);
+				if(hammer)
+					hammer->CastSpell(hammer, 114533, true); // Light !
             }
         }
 
@@ -404,7 +406,7 @@ public :
     {
         if(!p->HasAura(111662))
         {
-            me->CastSpell(p, 116662, true);
+            p->CastSpell(p, 111662, true); // Need to fix handler of the aura asap
             me->Kill(me);
             return false ;
         }
