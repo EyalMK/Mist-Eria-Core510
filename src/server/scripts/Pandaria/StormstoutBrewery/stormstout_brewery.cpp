@@ -271,7 +271,7 @@ public :
                 hozensWater.remove_if(Trinity::UnitAuraCheck(true, 107044));
 
                 // Can't do it otherwise, if SetData could receive a void* pointer, it could work, but for now...
-                if(IllusionerAI* ai = dynamic_cast<IllusionerAI*>(*water->AI()))
+                if(IllusionerAI* ai = dynamic_cast<IllusionerAI*>((*water)->AI()))
                     ai->SetDatas(hozensWater.front(), 107044);
             }
 
@@ -279,7 +279,7 @@ public :
                 hozensFire.sort(StormstoutBrewery::DistanceOrderPred(*fire));
                 hozensFire.remove_if(Trinity::UnitAuraCheck(true, 107175));
 
-                if(IllusionerAI* ai = dynamic_cast<IllusionerAI*>(*fire->AI()))
+                if(IllusionerAI* ai = dynamic_cast<IllusionerAI*>((*fire)->AI()))
                     ai->SetDatas(hozensFire.front(), 107044);
             }
         }
