@@ -1,53 +1,44 @@
-/*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+#include "ScriptPCH.h"
 
-#ifndef DEF_SCHOLOMANCE_H
-#define DEF_SCHOLOMANCE_H
+/** Global header for the instance "Scholomance **/
 
-uint32 const EncounterCount             = 8;
+/// Const value representing how many encounters there are in the instance
+#define MAX_ENCOUNTER 5
 
-enum DataTypes
-{
-    DATA_DOCTORTHEOLENKRASTINOV         = 0,
-    DATA_INSTRUCTORMALICIA              = 1,
-    DATA_LADYILLUCIABAROV               = 2,
-    DATA_LORDALEXEIBAROV                = 3,
-    DATA_LOREKEEPERPOLKELT              = 4,
-    DATA_THERAVENIAN                    = 5,
-    DATA_DARKMASTERGANDLING             = 6,
-    DATA_KIRTONOS                       = 7
+/// Enumerates entries of the bosses
+enum Bosses {
+	BOSS_INSTRUCTOR_CHILLHEART 	= 58633,
+	BOSS_JANDICE_BAROV			= 59184,
+	BOSS_RATTLEGORE				= 59153,
+	BOSS_LILIAN_VOSS			= 58722,
+	BOSS_DARKMASTER_GANDLING	= 59080
 };
 
-enum CreatureIds
-{
-    NPC_DARKMASTER_GANDLING             = 1853
+/// Miscellanous creatures of the instance, not tied to a specific script
+enum Creatures {
+
 };
 
-enum GameobjectIds
-{
-    GO_GATE_KIRTONOS                    = 175570,
-    GO_GATE_GANDLING                    = 177374,
-    GO_GATE_RAVENIAN                    = 177372,
-    GO_GATE_THEOLEN                     = 177377,
-    GO_GATE_ILLUCIA                     = 177371,
-    GO_GATE_MALICIA                     = 177375,
-    GO_GATE_BAROV                       = 177373,
-    GO_GATE_POLKELT                     = 177376,
-    GO_BRAZIER_OF_THE_HERALD            = 175564
+/// Miscellanous GameObjects such as doors
+enum GameObjects {
+
 };
 
-#endif
+/// Used in InstanceScript to get status of the bosses
+enum Datas {
+	// Bosses states
+	DATA_INSTRUCTOR_CHILLHEART  = 1,
+	DATA_JANDICE_BAROV			= 2,
+	DATA_RATTLEGORE				= 3,
+	DATA_LILIAN_VOSS			= 4,
+	DATA_DARKMASTER_GANDLING	= 5
+};
+
+/// Used in InstanceScript to get datas stored on 64 bits, such as guids
+enum Datas64 {
+	DATA64_INSTRUCTOR_CHILLHEART  = 1,
+	DATA64_JANDICE_BAROV			= 2,
+	DATA64_RATTLEGORE				= 3,
+	DATA64_LILIAN_VOSS			= 4,
+	DATA64_DARKMASTER_GANDLING	= 5
+};

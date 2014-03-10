@@ -89,6 +89,8 @@ public :
             if(instance)
                 instance->SetData(INSTANCE_DATA_HOPTALLUS_STATUS, NOT_STARTED);
             events.Reset();
+			_uiSearchTimer = 500 ;
+			_bCanSearch = true ;
         }
 
         void DoAction(const int32 action)
@@ -97,7 +99,7 @@ public :
             {
                 if(GameObject* go = me->FindNearestGameObject(GOB_GIANT_BARREL, 50000.0f))
                     go->SetGoState(GO_STATE_ACTIVE);
-                me->GetMotionMaster()->MoveJump(jumpPosition, 1.0f, 1.0f);
+                me->GetMotionMaster()->MoveJump(jumpPosition, 10.0f, 10.0f);
                 me->SetHomePosition(jumpPosition); // So it will not return into the barrel
             }
         }
@@ -153,11 +155,43 @@ public :
         {
             Talk(TALK_KILLED_PLAYER);
         }
+		
+		void SearchForPlayers() {
+			if(Map* map = me->GetMap()) {
+				Map::PlayerList const& playerList = map->GetPlayers();
+				
+				if(playerList.isEmpty()) {
+					_uiSearchTimer = 500 ;
+					return ;
+				}
+				
+				for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter) {
+					if(Player* player = iter->getSource()) {
+						float dist = me->GetExactDist2d(player);
+						if(dist <= 10.0f) {
+							DoAction(0) ;
+							_bCanSearch = false ;
+							return ;
+						}
+					}
+				}
+			}
+			
+			_uiSearchTimer = 500 ;
+		}
 
         void UpdateAI(const uint32 diff)
         {
-            if(!UpdateVictim())
+            if(!UpdateVictim()) {
+				if(!_bCanSearch)
+					return ;
+					
+				if(_uiSearchTimer <= diff)
+					SearchForPlayers();
+				else
+					_uiSearchTimer -= diff ;
                 return ;
+			}
 				
 			if(b_carrotBreath) {
 				/// Event if the client doesn't see the update (because we do not use MSG_START_TURN_LEFT ?), we need to update 
@@ -252,6 +286,9 @@ public :
         InstanceScript * instance ;
         uint8 m_uiSummonTimes ;
 		float orientation ;
+		
+		uint32 _uiSearchTimer ;
+		bool _bCanSearch ;
 
         bool b_carrotBreath ;
         TempSummon* stalker ;

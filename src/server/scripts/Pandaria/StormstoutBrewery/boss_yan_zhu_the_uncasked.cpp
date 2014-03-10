@@ -225,7 +225,7 @@ public :
                 case EVENT_YAN_ZHU_BLACKOUT_BREW :
                     if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
                         for(uint8 i = 0 ; i < 3 ; ++i) // Add three stack that way, better than something wierd in AuraScript handler
-                            DoCast(target, SPELL_BLACKOUT_BREW_STACK);
+                            DoCast(target, SPELL_BLACKOUT_BREW_STACK, true);
                     _events.ScheduleEvent(EVENT_YAN_ZHU_BLACKOUT_BREW, IsHeroic() ? urand(8500, 10500) : urand(12000, 15000));
                     break ;
 
@@ -259,7 +259,7 @@ public :
 
                 case EVENT_YAN_ZHU_BUBBLE_SHIELD :
                     for(uint8 i = 0 ; i < 8 ; ++i)
-                        DoCast(me, SPELL_BUBBLE_SHIELD);
+                        DoCast(me, SPELL_BUBBLE_SHIELD, true);
                     _events.ScheduleEvent(EVENT_YAN_ZHU_BUBBLE_SHIELD, IsHeroic() ? urand(12000, 14000) : urand(13000, 16000));
                     break ;
 
@@ -645,6 +645,10 @@ public :
                                                               0, TEMPSUMMON_TIMED_DESPAWN, 30000)) {
                     creature->EnterVehicle(owner);
                     creature->CastSpell(creature, SPELL_BLOAT_TRIGGER_PERIODIC);
+					if(i == 0)
+						creature->SetFacingTo(owner->GetOrientation() + M_PI / 2.0f);
+					else
+						creature->SetFacingTo(owner->GetOrientation() - M_PI / 2.0f) ;
                 }
             }
         }
@@ -729,14 +733,20 @@ public :
 
             if(Creature* summon = caster->SummonCreature(MOB_BUBBLE_SHIELD, caster->GetPositionX() + rand() % 4,
                                                          caster->GetPositionY() + rand() % 4, caster->GetPositionZ(), 0,
-                                                         TEMPSUMMON_CORPSE_TIMED_DESPAWN, 0))
+                                                         TEMPSUMMON_CORPSE_TIMED_DESPAWN, 0)) {
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Bubble Shield : Summoned !");
                 summon->EnterVehicle(caster);
+			}
         }
 
         void Register() {
             AfterEffectApply += AuraEffectApplyFn(spell_yanzhu_bubble_shield_AuraScript::HandleAfterEffectApply, EFFECT_1, SPELL_AURA_SET_VEHICLE_ID, AURA_EFFECT_HANDLE_REAL);
         }
     };
+	
+	AuraScript* GetAuraScript() const {
+		return new spell_yanzhu_bubble_shield_AuraScript();
+	}
 };
 
 void AddSC_boss_yan_zhu_the_uncasked() {

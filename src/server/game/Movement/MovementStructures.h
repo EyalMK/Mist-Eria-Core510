@@ -1996,8 +1996,8 @@ MovementStatusElements MoveChngTransport[]=
     MSEHasTransportData,
     MSEIsAlive,
     MSEHasOrientation,
-    MSEHasCounter,
     MSEHasFallData,
+    MSEHasCounter,
     MSEHasGuidByte3,
     MSEZeroBit,
     MSEHasGuidByte4,
@@ -2049,7 +2049,7 @@ MovementStatusElements MoveChngTransport[]=
     MSESplineElevation,
     MSEPitch,
     MSEAlive,
-    MSEEnd,
+    MSEEnd
 };
 
 //5.1.0 16357 OK
