@@ -45,7 +45,7 @@ public :
             if(action == 1 && m_bCanTalk)
             {
                 m_bCanTalk = false ;
-                m_uiTalkTimer = 6000 ;
+                m_uiTalkTimer = 7000 ;
                 if(Creature* auntie = me->FindNearestCreature(59822, 40.0f, true))
                     auntie->AI()->DoAction(1);
             }
