@@ -3755,9 +3755,9 @@ void Guild::SendGuildXP(WorldSession* session /* = NULL */) const
 
     WorldPacket data(SMSG_GUILD_XP, 40);
     data << uint64(sGuildMgr->GetXPForGuildLevel(GetLevel()) - GetExperience());    // XP missing for next level
-    data << uint64(GetTodayExperience());
-    data << uint64(/*member ? member->GetWeeklyActivity() :*/ 0);
+    data << uint64(100); //data << uint64(GetTodayExperience());
     data << uint64(GetExperience());
+    data << uint64(203);//data << uint64(/*member ? member->GetWeeklyActivity() :*/ 0);
     session->SendPacket(&data);
 }
 
