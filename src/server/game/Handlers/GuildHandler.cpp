@@ -620,7 +620,7 @@ void WorldSession::HandleGuildQueryXPOpcode(WorldPacket& recvPacket)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_QUERY_GUILD_XP");
 
     if (GetPlayer()->GetGuild())
-        guild->SendGuildXP(this);
+        GetPlayer()->GetGuild()->SendGuildXP(this);
 }
 
 void WorldSession::HandleGuildSetRankPermissionsOpcode(WorldPacket& recvPacket)
@@ -780,7 +780,7 @@ void WorldSession::HandleGuildQueryNewsOpcode(WorldPacket& recvPacket)
 {
     recvPacket.read_skip<uint32>();
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_QUERY_NEWS [%s]", GetPlayerInfo().c_str());
-    if (Guild* guild = GetPlayer()->GetGuild()) {
+    if (Guild* guild = GetPlayer()->GetGuild())
         guild->SendNewsUpdate(this);
 }
 
