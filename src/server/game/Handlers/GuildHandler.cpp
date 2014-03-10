@@ -619,31 +619,8 @@ void WorldSession::HandleGuildQueryXPOpcode(WorldPacket& recvPacket)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_QUERY_GUILD_XP");
 
-    ObjectGuid guildGuid;
-
-    guildGuid[2] = recvPacket.ReadBit();
-    guildGuid[1] = recvPacket.ReadBit();
-    guildGuid[0] = recvPacket.ReadBit();
-    guildGuid[5] = recvPacket.ReadBit();
-    guildGuid[4] = recvPacket.ReadBit();
-    guildGuid[7] = recvPacket.ReadBit();
-    guildGuid[6] = recvPacket.ReadBit();
-    guildGuid[3] = recvPacket.ReadBit();
-
-    recvPacket.ReadByteSeq(guildGuid[7]);
-    recvPacket.ReadByteSeq(guildGuid[2]);
-    recvPacket.ReadByteSeq(guildGuid[3]);
-    recvPacket.ReadByteSeq(guildGuid[6]);
-    recvPacket.ReadByteSeq(guildGuid[1]);
-    recvPacket.ReadByteSeq(guildGuid[5]);
-    recvPacket.ReadByteSeq(guildGuid[0]);
-    recvPacket.ReadByteSeq(guildGuid[4]);
-
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_QUERY_GUILD_XP [%s]: Guild: %u", GetPlayerInfo().c_str(), GUID_LOPART(guildGuid));
-
-    if (Guild* guild = sGuildMgr->GetGuildByGuid(guildGuid))
-        if (guild->IsMember(_player->GetGUID()))
-            guild->SendGuildXP(this);
+    if (GetPlayer()->GetGuild())
+        guild->SendGuildXP(this);
 }
 
 void WorldSession::HandleGuildSetRankPermissionsOpcode(WorldPacket& recvPacket)
@@ -803,7 +780,7 @@ void WorldSession::HandleGuildQueryNewsOpcode(WorldPacket& recvPacket)
 {
     recvPacket.read_skip<uint32>();
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_QUERY_NEWS [%s]", GetPlayerInfo().c_str());
-    if (Guild* guild = GetPlayer()->GetGuild())
+    if (Guild* guild = GetPlayer()->GetGuild()) {
         guild->SendNewsUpdate(this);
 }
 
