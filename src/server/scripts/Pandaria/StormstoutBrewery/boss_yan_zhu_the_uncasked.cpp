@@ -351,7 +351,7 @@ public :
                 for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter) {
                     if(Player* player = iter->getSource()) {
                         float dist = me->GetExactDist2d(player);
-                        if(dist <= MELEE_RANGE) {
+                        if(dist <= 5.0f) {
                             _events.ScheduleEvent(EVENT_YAN_ZHU_CHECK_FOR_PLAYERS, 500);
                             _events.CancelEvent(EVENT_YAN_ZHU_BREW_BOLT);
                             return ;

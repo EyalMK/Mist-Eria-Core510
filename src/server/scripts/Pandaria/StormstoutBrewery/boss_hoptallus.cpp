@@ -168,7 +168,7 @@ public :
 				for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter) {
 					if(Player* player = iter->getSource()) {
 						float dist = me->GetExactDist2d(player);
-						if(dist <= 10.0f) {
+						if(dist <= 15.0f) {
 							DoAction(0) ;
 							_bCanSearch = false ;
 							return ;
