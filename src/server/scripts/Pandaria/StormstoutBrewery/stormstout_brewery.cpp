@@ -571,8 +571,10 @@ public :
 
         void PassengerBoarded(Unit *passenger, int8 seatId, bool enter)
         {
-            if(enter)
+            if(enter) {
+				me->movespline->_Finalize();
                 me->StopMoving();
+			}
             else {
                 if(instance)
                     instance->ProcessEvent(NULL, m_uiIndex);

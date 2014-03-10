@@ -741,6 +741,10 @@ public :
             AfterEffectApply += AuraEffectApplyFn(spell_yanzhu_bubble_shield_AuraScript::HandleAfterEffectApply, EFFECT_1, SPELL_AURA_SET_VEHICLE_ID, AURA_EFFECT_HANDLE_REAL);
         }
     };
+	
+	AuraScript* GetAuraScript() const {
+		return new spell_yanzhu_bubble_shield_AuraScript();
+	}
 };
 
 void AddSC_boss_yan_zhu_the_uncasked() {
