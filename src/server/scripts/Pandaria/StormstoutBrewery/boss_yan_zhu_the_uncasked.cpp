@@ -790,7 +790,7 @@ public :
 
             for(uint8 i = 0 ; i < 8 ; ++i) {
                 if(Creature* bubble = caster->SummonCreature(MOB_BUBBLE_SHIELD, caster->GetPositionX() + rand() % 3, caster->GetPositionY() + rand() % 3,
-                                                             caster->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN)) {
+                                                             caster->GetPositionZ() + 7, 0, TEMPSUMMON_CORPSE_DESPAWN)) {
                     bubble->EnterVehicle(caster);
                     sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Bubble Shield : Unit boarded");
                 }
