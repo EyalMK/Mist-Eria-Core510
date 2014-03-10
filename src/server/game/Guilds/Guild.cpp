@@ -3716,6 +3716,16 @@ void Guild::GiveXP(uint32 xp, Player* source)
     _experience += xp;
     _todayExperience += xp;
 
+
+    for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+    {
+        Player* p = member->FindPlayer();
+        if (p) {
+            SendGuildXP(p->GetSession());
+        }
+    }
+
+
     if (!xp)
         return;
 
