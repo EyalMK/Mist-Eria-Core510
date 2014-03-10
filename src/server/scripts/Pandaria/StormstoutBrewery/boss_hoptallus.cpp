@@ -527,8 +527,8 @@ public :
 															caster->GetPositionX() + 30 * cos(caster->GetOrientation()),
 															caster->GetPositionY() + 30 * sin(caster->GetOrientation()),
 															caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000))
-                // caster->CastSpell(summon, 74758, true);
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Carrot Breath : Just summoned");
+                caster->CastSpell(summon, 74758, true);
+                //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Carrot Breath : Just summoned");
 		}
 		
 		void Register() {
