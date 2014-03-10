@@ -82,6 +82,7 @@ public :
         {
             instance = creature->GetInstanceScript();
             stalker = NULL ;
+			_bCanSearch = true ;
         }
 
         void Reset()
@@ -89,6 +90,7 @@ public :
             if(instance)
                 instance->SetData(INSTANCE_DATA_HOPTALLUS_STATUS, NOT_STARTED);
             events.Reset();
+			_uiSearchTimer = 500 ;
         }
 
         void DoAction(const int32 action)
@@ -153,23 +155,64 @@ public :
         {
             Talk(TALK_KILLED_PLAYER);
         }
+		
+		void SearchForPlayers() {
+			if(Map* map = me->GetMap()) {
+				Map::PlayerList const& playerList = map->GetPlayers();
+				
+				if(playerList.isEmpty()) {
+					_uiSearchTimer = 500 ;
+					return ;
+				}
+				
+				for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter) {
+					if(Player* player = iter->getSource()) {
+						float dist = me->GetExactDist2d(player);
+						if(dist <= 10.0f) {
+							DoAction(0) ;
+							_bCanSearch = false ;
+							return ;
+						}
+					}
+				}
+			}
+			
+			_uiSearchTimer = 500 ;
+		}
 
         void UpdateAI(const uint32 diff)
         {
-            if(!UpdateVictim())
+            if(!UpdateVictim()) {
+				if(!_bCanSearch)
+					return ;
+					
+				if(_uiSearchTimer <= diff)
+					SearchForPlayers();
+				else
+					_uiSearchTimer -= diff ;
                 return ;
+			}
 				
 			if(b_carrotBreath) {
 				/// Event if the client doesn't see the update (because we do not use MSG_START_TURN_LEFT ?), we need to update 
 				/// the orientation inside the core, in order to let the SpellScript of CarrotBreath correctly filter the targets
 				/// In one ms, the boss should have turned of 2 * M_PI (circumference of a 1 meter circle) divided by 15000 ms (duration of the spell) degrees
-				float turn = 2 * M_PI / 15000.0f ; // This is the distance in one ms
+                 float turn = 2 * M_PI / 15000.0f ; // This is the distance in one ms
 				turn *= float(diff); // Since last tick of the world
 				
 				float orientation = me->GetOrientation(); // Current orientation
 				orientation -= turn ; // Rotate it
 				
-				me->SetOrientation(orientation) ; // Update
+                me->SetOrientation(orientation) ; // Update
+
+                /*Creature* stalker = me->FindNearestCreature(NPC_CARROT_BREATH_HELPER, 200.0f);
+                if(!stalker)
+                    return ;
+
+                Movement::MoveSplineInit init(me);
+                init.MoveTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+                init.SetFacing(stalker);
+                init.Launch();*/
 			}
 
             events.Update(diff);
@@ -252,6 +295,9 @@ public :
         InstanceScript * instance ;
         uint8 m_uiSummonTimes ;
 		float orientation ;
+		
+		uint32 _uiSearchTimer ;
+		bool _bCanSearch ;
 
         bool b_carrotBreath ;
         TempSummon* stalker ;
@@ -481,7 +527,8 @@ public :
 															caster->GetPositionX() + 30 * cos(caster->GetOrientation()),
 															caster->GetPositionY() + 30 * sin(caster->GetOrientation()),
 															caster->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000))
-				caster->CastSpell(summon, 74758, true);
+                caster->CastSpell(summon, 74758, true);
+                //sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Carrot Breath : Just summoned");
 		}
 		
 		void Register() {

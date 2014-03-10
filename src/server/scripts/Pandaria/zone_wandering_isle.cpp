@@ -5102,6 +5102,269 @@ public:
     }
 };
 
+/* Event Ouverture Porte */
+
+enum Area7710
+{
+    QUEST_BIDDEN_GREATNESS  = 29792
+};
+
+class at_bidden_greatness_door : public AreaTriggerScript
+{
+public :
+    at_bidden_greatness_door() : AreaTriggerScript("at_bidden_greatness_door") {}
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *at)
+    {
+        if(player->GetQuestStatus(QUEST_BIDDEN_GREATNESS) == QUEST_STATUS_INCOMPLETE)
+        {
+            if(player->HasAura(59073))
+            {
+                player->CastSpell(player, 115337, true); //jojo
+                player->CastSpell(player, 115335, true); // ji patte
+                player->CastSpell(player, 115332, true); // aysa
+                player->RemoveAurasDueToSpell(59073);
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+enum eAysaEventDoor
+{
+    SAY_AYSA_DOOR_1     = 1,
+    SAY_AYSA_DOOR_2     = 2,
+    SAY_AYSA_DOOR_3     = 3
+};
+
+enum eJiEventDoor
+{
+    SAY_JI_DOOR_1       = 0,
+    SAY_JI_DOOR_2       = 1,
+    SAY_JI_DOOR_3       = 2,
+    SAY_JI_DOOR_4       = 3,
+    SAY_JI_DOOR_5       = 4
+};
+
+enum eJojoEventDoor
+{
+
+};
+
+class npc_aysa_door : public CreatureScript
+{
+public:
+    npc_aysa_door(): CreatureScript("npc_aysa_door") { }
+
+    struct npc_aysa_doorAI : public npc_escortAI
+    {
+        npc_aysa_doorAI(Creature* creature) : npc_escortAI(creature) {}
+
+        bool VerifPlayer;
+
+        void Reset()
+        {
+            VerifPlayer = false;
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            GameObject* mandori = me->GetMap()->GetGameObject(449300);
+
+            switch (waypointId)
+            {
+                case 1:
+                    if(mandori)
+                        mandori->SetGoState(GO_STATE_ACTIVE);
+                    break;
+
+                case 12:
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
+                    break;
+
+                case 13:
+                    Talk(SAY_AYSA_DOOR_1);
+                    me->HandleEmoteCommand(EMOTE_STATE_USE_STANDING);
+                    break;
+
+                case 14:
+                    Talk(SAY_AYSA_DOOR_2);
+                    me->HandleEmoteCommand(EMOTE_STATE_NONE);
+                    break;
+
+                case 25:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+
+            if (VerifPlayer)
+            {
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if(summoner->ToPlayer())
+                        if(summoner->IsInDist2d(me, 10.00f))
+                        {
+                            SetEscortPaused(false);
+                            VerifPlayer = false;
+                        }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_aysa_doorAI(creature);
+    }
+};
+
+class npc_jojo_door : public CreatureScript
+{
+public:
+    npc_jojo_door(): CreatureScript("npc_jojo_door") { }
+
+    struct npc_jojo_doorAI : public npc_escortAI
+    {
+        npc_jojo_doorAI(Creature* creature) : npc_escortAI(creature) {}
+
+        bool VerifPlayer;
+
+        void Reset()
+        {
+            me->CastSpell(me, 115672, true);
+            VerifPlayer = false;
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            GameObject* peiwu = me->GetMap()->GetGameObject(449469);
+
+            switch (waypointId)
+            {
+                case 10:
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
+                    break;
+
+                case 12:
+                    if(peiwu)
+                        peiwu->SetGoState(GO_STATE_ACTIVE);
+                    break;
+
+                case 22:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+
+            if (VerifPlayer)
+            {
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if(summoner->ToPlayer())
+                        if(summoner->IsInDist2d(me, 10.00f))
+                        {
+                            SetEscortPaused(false);
+                            VerifPlayer = false;
+                        }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_jojo_doorAI(creature);
+    }
+};
+
+class npc_ji_door : public CreatureScript
+{
+public:
+    npc_ji_door(): CreatureScript("npc_ji_door") { }
+
+    struct npc_ji_doorAI : public npc_escortAI
+    {
+        npc_ji_doorAI(Creature* creature) : npc_escortAI(creature) {}
+
+        bool VerifPlayer;
+
+        void Reset()
+        {
+            VerifPlayer = false;
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 12:
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
+                    break;
+
+                case 14:
+                    Talk(SAY_JI_DOOR_1);
+                    me->HandleEmoteCommand(EMOTE_STATE_USE_STANDING);
+                    break;
+
+                case 15:
+                    Talk(SAY_JI_DOOR_2);
+                    me->HandleEmoteCommand(EMOTE_STATE_NONE);
+                    break;
+
+                case 18:
+                    Talk(SAY_JI_DOOR_3);
+                    break;
+
+                case 26:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+
+            if (VerifPlayer)
+            {
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if(summoner->ToPlayer())
+                        if(summoner->IsInDist2d(me, 10.00f))
+                        {
+                            SetEscortPaused(false);
+                            VerifPlayer = false;
+                        }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ji_doorAI(creature);
+    }
+};
+
 void AddSC_wandering_isle()
 {
     new stalker_item_equiped();
@@ -5179,4 +5442,8 @@ void AddSC_wandering_isle()
     new npc_shang_xi_air_balloon();
     new npc_waypoint_air_balloon();
     new npc_shang_xi_air_balloon_click();
+    new at_bidden_greatness_door();
+    new npc_aysa_door();
+    new npc_jojo_door();
+    new npc_ji_door();
 }

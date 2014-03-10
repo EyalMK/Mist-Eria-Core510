@@ -279,7 +279,7 @@ public :
                 if(m_uiKilledHoptallusTrash >= m_uiSummonedHoptallusTrash)
                 {
                     m_bHoptallusActive = true ;
-                    DoStartHoptallus();
+                    // DoStartHoptallus();
                 }
             }
         }

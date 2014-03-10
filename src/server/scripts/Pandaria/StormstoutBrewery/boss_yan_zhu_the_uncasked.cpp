@@ -122,30 +122,47 @@ namespace YanZhu {
         uint32 _spellId ;
     };
 
+    class IgnoreTargetPredicate {
+    public :
+        IgnoreTargetPredicate(Unit* ignore) : _ignore(ignore) {
+
+        }
+
+        bool operator()(WorldObject* target) {
+            if(!target->ToUnit())
+                return false ;
+
+            if(target->ToUnit() == _ignore)
+                return true ;
+        }
+
+    private :
+        Unit* _ignore;
+    };
+
     const Position wallOfSudsPositions[2] = {
         {0.0f, 0.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 0.0f, 0.0f}
     };
 
-    const Position summonFizzyBubblePositions[9] = {
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f}
+    const Position summonFizzyBubblePositions[8] = {
+        {-718.938965f, 1171.644287f, 166.156494f, 0.0f},
+        {-715.915100f, 1159.415649f, 166.156494f, 0.0f},
+        {-712.300415f, 1147.217163f, 166.156494f, 0.0f},
+        {-700.215149f, 1150.571167f, 166.156494f, 0.0f},
+        {-687.963074f, 1154.350342f, 166.156494f, 0.0f},
+        {-691.251221f, 1166.405884f, 166.156494f, 0.0f},
+        {-694.422852f, 1178.316162f, 166.156494f, 0.0f},
+        {-706.848511f, 1174.876831f, 166.156494f, 0.0f}
     };
 
     const Position summonYeastyBrewAlamentalsPositions[6] = {
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f}
+        {-718.938965f, 1171.644287f, 166.156494f, 0.0f},
+        {-715.915100f, 1159.415649f, 166.156494f, 0.0f},
+        {-712.300415f, 1147.217163f, 166.156494f, 0.0f},
+        {-687.963074f, 1154.350342f, 166.156494f, 0.0f},
+        {-691.251221f, 1166.405884f, 166.156494f, 0.0f},
+        {-694.422852f, 1178.316162f, 166.156494f, 0.0f}
     };
 } // namespace YanZhu
 
@@ -225,7 +242,7 @@ public :
                 case EVENT_YAN_ZHU_BLACKOUT_BREW :
                     if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
                         for(uint8 i = 0 ; i < 3 ; ++i) // Add three stack that way, better than something wierd in AuraScript handler
-                            DoCast(target, SPELL_BLACKOUT_BREW_STACK);
+                            DoCast(target, SPELL_BLACKOUT_BREW_STACK, true);
                     _events.ScheduleEvent(EVENT_YAN_ZHU_BLACKOUT_BREW, IsHeroic() ? urand(8500, 10500) : urand(12000, 15000));
                     break ;
 
@@ -238,10 +255,11 @@ public :
 				}
 
                 case EVENT_YAN_ZHU_CARBONATION :
-                    for(uint8 i = 0 ; i < 9 ; ++i) {
+                    for(uint8 i = 0 ; i < 8 ; ++i) {
                         const Position summonPosition = YanZhu::summonFizzyBubblePositions[i];
                         me->SummonCreature(MOB_FIZZY_BUBBLE, summonPosition, TEMPSUMMON_TIMED_DESPAWN, 15000);
                     }
+                    DoCast(me, SPELL_CARBONATION_TRIGGER_PERIODIC);
                     _events.ScheduleEvent(EVENT_YAN_ZHU_CARBONATION, IsHeroic() ? urand(25000, 30000) : urand(40000, 50000));
                     break ;
 
@@ -258,8 +276,9 @@ public :
                     break ;
 
                 case EVENT_YAN_ZHU_BUBBLE_SHIELD :
-                    for(uint8 i = 0 ; i < 8 ; ++i)
-                        DoCast(me, SPELL_BUBBLE_SHIELD);
+                    DoCast(me, SPELL_BUBBLE_SHIELD);
+                    if(Aura* aura = me->GetAura(SPELL_BUBBLE_SHIELD))
+                        aura->ModStackAmount(7);
                     _events.ScheduleEvent(EVENT_YAN_ZHU_BUBBLE_SHIELD, IsHeroic() ? urand(12000, 14000) : urand(13000, 16000));
                     break ;
 
@@ -646,9 +665,9 @@ public :
                     creature->EnterVehicle(owner);
                     creature->CastSpell(creature, SPELL_BLOAT_TRIGGER_PERIODIC);
 					if(i == 0)
-						creature->SetOrientation(owner->GetOrientation() + M_PI / 2) ;
+						creature->SetFacingTo(owner->GetOrientation() + M_PI / 2.0f);
 					else
-						creature->SetOrientation(owner->GetOrientation() - M_PI / 2) ;
+						creature->SetFacingTo(owner->GetOrientation() - M_PI / 2.0f) ;
                 }
             }
         }
@@ -660,6 +679,44 @@ public :
 
     AuraScript* GetAuraScript() const {
         return new spell_yanzhu_bloat_AuraScript();
+    }
+};
+
+class spell_yanzhu_bloat_damage_target_selector : public SpellScriptLoader {
+public :
+    spell_yanzhu_bloat_damage_target_selector() : SpellScriptLoader("spell_yanzhu_bloat_damage_target_selector") {
+
+    }
+
+    class spell_yanzhu_bloat_damage_target_selector_SpellScript : public SpellScript {
+        PrepareSpellScript(spell_yanzhu_bloat_damage_target_selector_SpellScript);
+
+        bool Validate(const SpellInfo *spellInfo) {
+            return true ;
+        }
+
+        bool Load() {
+            return true ;
+        }
+
+        void FilterTargets(std::list<WorldObject*>& targets) {
+            if(!GetCaster() || !GetCaster()->GetVehicle() || !GetCaster()->GetVehicle()->GetBase())
+                return ;
+
+            // Must not target the vehicle
+            targets.remove_if(YanZhu::IgnoreTargetPredicate(GetCaster()->GetVehicle()->GetBase()));
+        }
+
+        void Register() {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yanzhu_bloat_damage_target_selector_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_CONE_ENTRY);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yanzhu_bloat_damage_target_selector_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_CONE_ENTRY);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yanzhu_bloat_damage_target_selector_SpellScript::FilterTargets, EFFECT_2, TARGET_UNIT_CONE_ENTRY);
+        }
+
+    };
+
+    SpellScript* GetSpellScript() const {
+        return new spell_yanzhu_bloat_damage_target_selector_SpellScript();
     }
 };
 
@@ -714,33 +771,40 @@ public :
 
     }
 
-    class spell_yanzhu_bubble_shield_AuraScript : public AuraScript {
-        PrepareAuraScript(spell_yanzhu_bubble_shield_AuraScript);
+    class spell_yanzhu_bubble_shield_SpellScript : public SpellScript {
+        PrepareSpellScript(spell_yanzhu_bubble_shield_SpellScript);
 
         bool Validate(const SpellInfo *spellInfo) {
-            return sSpellMgr->GetSpellInfo(SPELL_BUBBLE_SHIELD);
+            return true ;
         }
 
         bool Load() {
-            return (GetCaster() && GetCaster()->ToCreature());
+            return true ;
         }
 
-        void HandleAfterEffectApply(AuraEffect const* auraEff, AuraEffectHandleModes mode) {
-            if(!GetCaster() || !GetCaster()->ToCreature())
+        void HandleAfterCast() {
+            if(!GetCaster())
                 return ;
 
-            Creature* caster = GetCaster()->ToCreature();
+            Unit* caster = GetCaster();
 
-            if(Creature* summon = caster->SummonCreature(MOB_BUBBLE_SHIELD, caster->GetPositionX() + rand() % 4,
-                                                         caster->GetPositionY() + rand() % 4, caster->GetPositionZ(), 0,
-                                                         TEMPSUMMON_CORPSE_TIMED_DESPAWN, 0))
-                summon->EnterVehicle(caster);
+            for(uint8 i = 0 ; i < 8 ; ++i) {
+                if(Creature* bubble = caster->SummonCreature(MOB_BUBBLE_SHIELD, caster->GetPositionX() + rand() % 3, caster->GetPositionY() + rand() % 3,
+                                                             caster->GetPositionZ() + 7, 0, TEMPSUMMON_CORPSE_DESPAWN)) {
+                    bubble->EnterVehicle(caster);
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Bubble Shield : Unit boarded");
+                }
+            }
         }
 
         void Register() {
-            AfterEffectApply += AuraEffectApplyFn(spell_yanzhu_bubble_shield_AuraScript::HandleAfterEffectApply, EFFECT_1, SPELL_AURA_SET_VEHICLE_ID, AURA_EFFECT_HANDLE_REAL);
+            AfterCast += SpellCastFn(spell_yanzhu_bubble_shield_SpellScript::HandleAfterCast);
         }
     };
+
+    SpellScript* GetSpellScript() const {
+        return new spell_yanzhu_bubble_shield_SpellScript();
+    }
 };
 
 void AddSC_boss_yan_zhu_the_uncasked() {
@@ -752,6 +816,7 @@ void AddSC_boss_yan_zhu_the_uncasked() {
     new spell_yanzhu_wall_of_suds_target_selector();
     new spell_yanzhu_blackout_brew();
     new spell_yanzhu_bloat();
+    new spell_yanzhu_bloat_damage_target_selector();
     new spell_yanzhu_ferment();
     new spell_yanzhu_bubble_shield();
 }
