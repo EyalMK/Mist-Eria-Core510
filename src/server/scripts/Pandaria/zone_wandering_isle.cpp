@@ -5124,8 +5124,8 @@ public :
                 player->CastSpell(player, 115335, true); // ji patte
                 player->CastSpell(player, 115332, true); // aysa
                 player->RemoveAurasDueToSpell(115426);
-                return true;
             }
+            return true;
         }
         return false;
     }
@@ -5172,7 +5172,7 @@ public:
         {
             Player* player = GetPlayerForEscort();
 
-            GameObject* mandori = me->GetMap()->GetGameObject(449300);
+            GameObject* mandori = ObjectAccessor::GetGameObject(*me, 449300);
 
             switch (waypointId)
             {
@@ -5248,7 +5248,7 @@ public:
         {
             Player* player = GetPlayerForEscort();
 
-            GameObject* peiwu = me->GetMap()->GetGameObject(449469);
+            GameObject* peiwu = ObjectAccessor::GetGameObject(*me, 449469);
 
             switch (waypointId)
             {
