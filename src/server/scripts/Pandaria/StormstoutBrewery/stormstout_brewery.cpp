@@ -1314,12 +1314,29 @@ public :
     };
 };
 
-#define PROGRESS_X 2.038879f
-#define PROGRESS_Y 8.39978f
+const Position summonFirstWavePositions[2] = {
+    {-705.682800f, 1170.583618f, 166.156494f, 0.0f},
+    {-701.111816f, 1154.608887f, 166.156494f, 0.0f}
+};
 
-#define PROGRESS_LINE_X 8.077647f
-#define PROGRESS_LINE_Y -2.111451f
-#define PROGRESS_Z 5.0f
+const Position summonSecondWavePositions[9] = {
+    {-718.938965f, 1171.644287f, 166.156494f, 0.0f},
+    {-715.915100f, 1159.415649f, 166.156494f, 0.0f},
+    {-712.300415f, 1147.217163f, 166.156494f, 0.0f},
+    {-700.215149f, 1150.571167f, 166.156494f, 0.0f},
+    {-687.963074f, 1154.350342f, 166.156494f, 0.0f},
+    {-691.251221f, 1166.405884f, 166.156494f, 0.0f},
+    {-694.422852f, 1178.316162f, 166.156494f, 0.0f},
+    {-706.848511f, 1174.876831f, 166.156494f, 0.0f},
+    {-703.296143f, 1162.781860f, 166.156494f, 0.0f}
+};
+
+const Position summonThirdWavePositions[4] = {
+    {-709.214905f, 1152.527466f, 166.156494f, 0.0f},
+    {-692.953735f, 1156.818848f, 166.156494f, 0.0f},
+    {-697.649536f, 1173.198608f, 166.156494f, 0.0f},
+    {-713.727356f, 1168.606079f, 166.156494f, 0.0f}
+};
 
 class npc_uncle_gao : public CreatureScript {
 
@@ -1480,10 +1497,10 @@ public :
         void SummonFirstWave() {
             _wheatAlamental = RAND(MOB_WHEAT_ALAMENTAL_BLOATED_BREW, MOB_WHEAT_ALAMENTAL_STOUT_BREW);
 
-            Position start = {-704.517517f, 1166.889648f, 166.141571f, 0.275305f};
-            for(uint8 i = 0 ; i < 2 ; ++i)
-                if(Creature* summon = me->SummonCreature(_wheatAlamental, start.GetPositionX() + PROGRESS_X * i, start.GetPositionY() + PROGRESS_Y * i, start.GetPositionZ()))
-                    summon->SetOrientation(0.0f);
+            for(uint8 i = 0 ; i < 2 ; ++i) {
+                const Position summon = summonFirstWavePositions[i];
+                me->SummonCreature(_wheatAlamental, summon, TEMPSUMMON_CORPSE_DESPAWN);
+            }
 
             _numberOfSummons = 2 ;
         }
@@ -1491,14 +1508,9 @@ public :
         void SummonSecondWave() {
             _aleAlamental = RAND(MOB_ALE_ALAMENTAL_BUBBLING_BREW, MOB_ALE_ALAMENTAL_YEASTY_BREW);
 
-            Position start = {-713.708191f, 1168.700195f, 166.145874f, 0.275305f};
-
-            for(uint8 i = 0 ; i < 3 ; ++i) {
-                float x = start.GetPositionX() + PROGRESS_LINE_X * i ;
-                float y = start.GetPositionY() + PROGRESS_LINE_Y * i ;
-                for(uint8 j = 0 ; j < 3 ; ++j)
-                    if(Creature* summon = me->SummonCreature(_aleAlamental, x + PROGRESS_X * j, y + PROGRESS_Y * j, start.GetPositionZ()))
-                        summon->SetOrientation(0.0f);
+            for(uint8 i = 0 ; i < 9 ; ++i) {
+                const Position summon = summonSecondWavePositions[i];
+                me->SummonCreature(_aleAlamental, summon, TEMPSUMMON_CORPSE_DESPAWN);
             }
 
             _numberOfSummons = 9 ;
@@ -1507,14 +1519,9 @@ public :
         void SummonThirdWave() {
             _stoutAlamental = RAND(MOB_STOUT_ALAMENTAL_FIZZY_BREW, MOB_STOUT_ALAMENTAL_SUDSY_BREW);
 
-            Position start = {-713.708191f, 1168.700195f, 166.145874f, 0.275305f};
-
-            for(uint8 i = 0 ; i < 2 ; ++i) {
-                float x = start.GetPositionX() + 2 * PROGRESS_LINE_X * i ;
-                float y = start.GetPositionY() + 2 * PROGRESS_LINE_Y * i ;
-                for(uint8 j = 0 ; j < 2 ; ++j)
-                    if(Creature* summon = me->SummonCreature(_stoutAlamental, x + 2 * PROGRESS_X * j, y + 2 * PROGRESS_Y * j, start.GetPositionZ()))
-                        summon->SetOrientation(0.0f);
+            for(uint8 i = 0 ; i < 4 ; ++i) {
+                const Position summon = summonThirdWavePositions[i] ;
+                me->SummonCreature(_stoutAlamental, summon, TEMPSUMMON_CORPSE_DESPAWN);
             }
 
             _numberOfSummons = 4 ;
