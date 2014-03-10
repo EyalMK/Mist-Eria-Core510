@@ -5120,10 +5120,10 @@ public :
         {
             if(player->HasAura(115426))
             {
-                player->CastSpell(player, 70889, true);
-                player->SummonCreature(59963, 702.18f, 3603.03f, 142.2f, 3.08f, TEMPSUMMON_TIMED_DESPAWN, 300000);
-                player->SummonCreature(59960, 701.62f, 3598.03f, 142.0f, 3.08f, TEMPSUMMON_TIMED_DESPAWN, 300000);
-                player->SummonCreature(59962, 699.36f, 3600.62f, 142.6f, 3.08f, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                player->CastSpell(player, 115337, true); //jojo
+                player->CastSpell(player, 115335, true); // ji patte
+                player->CastSpell(player, 115332, true); // aysa
+                player->RemoveAurasDueToSpell(94568);
                 player->RemoveAurasDueToSpell(115426);
                 return true;
             }
