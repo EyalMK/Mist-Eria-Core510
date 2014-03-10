@@ -504,7 +504,9 @@ public :
         if(player->HasAura(114459))
             return false ;
 
-        player->CastSpell(player, 114459, true);;
+        player->CastSpell(player, 114459, true);
+		creature->Kill(creature);
+        return false ;
     }
 
     class npc_fizzy_bubble_AI : public ScriptedAI {
