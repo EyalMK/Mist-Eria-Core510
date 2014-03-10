@@ -5114,16 +5114,17 @@ class at_bidden_greatness_door : public AreaTriggerScript
 public :
     at_bidden_greatness_door() : AreaTriggerScript("at_bidden_greatness_door") {}
 
-    bool OnTrigger(Player *player, const AreaTriggerEntry *at)
+    bool OnTrigger(Player* player, const AreaTriggerEntry *at)
     {
         if(player->GetQuestStatus(QUEST_BIDDEN_GREATNESS) == QUEST_STATUS_INCOMPLETE)
         {
-            if(!player->HasAura(115426))
+            if(player->HasAura(115426))
             {
                 player->CastSpell(player, 115337, true); //jojo
                 player->CastSpell(player, 115335, true); // ji patte
                 player->CastSpell(player, 115332, true); // aysa
-                player->CastSpell(player, 115426, true);
+                player->CastSpell(player, 59073, true);
+                player->RemoveAurasDueToSpell(115426);
                 return true;
             }
         }
@@ -5133,6 +5134,7 @@ public :
 
 enum eAysaEventDoor
 {
+    SAY_AYSA_DOOR_0     = 0,
     SAY_AYSA_DOOR_1     = 1,
     SAY_AYSA_DOOR_2     = 2,
     SAY_AYSA_DOOR_3     = 3
@@ -5166,6 +5168,7 @@ public:
         void Reset()
         {
             VerifPlayer = false;
+            Talk(SAY_AYSA_DOOR_0);
         }
 
         void WaypointReached(uint32 waypointId)
@@ -5179,6 +5182,7 @@ public:
                 case 1:
                     if(mandori)
                         mandori->SetGoState(GO_STATE_ACTIVE);
+                    me->CastSpell(me, 115442, true);
                     break;
 
                 case 12:
@@ -5260,6 +5264,7 @@ public:
                 case 12:
                     if(peiwu)
                         peiwu->SetGoState(GO_STATE_ACTIVE);
+                    me->CastSpell(me, 115443, true);
                     break;
 
                 case 22:
