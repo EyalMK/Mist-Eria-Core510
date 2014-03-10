@@ -5149,10 +5149,18 @@ enum eJiEventDoor
     SAY_JI_DOOR_5       = 4
 };
 
-enum eJojoEventDoor
+enum eWeiEventDoor
 {
-
+    SAY_WEI_DOOR_1      = 0
 };
+
+enum eKorgaEventDoor
+{
+    SAY_KORGA_DOOR_1    = 0,
+    SAY_KORGA_DOOR_2    = 1,
+    SAY_KORGA_DOOR_3    = 2
+};
+
 
 class npc_aysa_door : public CreatureScript
 {
@@ -5186,8 +5194,6 @@ public:
                     break;
 
                 case 12:
-                    if(mandori)
-                        mandori->SetGoState(GO_STATE_ACTIVE);
                     SetEscortPaused(true);
                     VerifPlayer = true;
                     break;
@@ -5203,6 +5209,19 @@ public:
                     break;
 
                 case 25:
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
+                    break;
+
+                case 27:
+                    Talk(SAY_AYSA_DOOR_3);
+                    break;
+
+                case 29:
+                    me->GetMotionMaster()->MoveJump(425.79f, 3674.37f, 78.4f, 10, 10);
+                    break;
+
+                case 33:
                     me->DespawnOrUnsummon();
                     break;
             }
@@ -5243,11 +5262,13 @@ public:
         npc_jojo_doorAI(Creature* creature) : npc_escortAI(creature) {}
 
         bool VerifPlayer;
+        bool VerifPlayer2;
 
         void Reset()
         {
             me->CastSpell(me, 115672, true);
             VerifPlayer = false;
+            VerifPlayer2 = false;
         }
 
         void WaypointReached(uint32 waypointId)
@@ -5270,8 +5291,15 @@ public:
                     break;
 
                 case 22:
-                    if(peiwu)
-                        peiwu->SetGoState(GO_STATE_ACTIVE);
+                    SetEscortPaused(true);
+                    VerifPlayer2 = true;
+                    break;
+
+                case 25:
+                    me->GetMotionMaster()->MoveJump(425.79f, 3674.37f, 78.4f, 10, 10);
+                    break;
+
+                case 29:
                     me->DespawnOrUnsummon();
                     break;
             }
@@ -5291,6 +5319,17 @@ public:
                         {
                             SetEscortPaused(false);
                             VerifPlayer = false;
+                        }
+            }
+
+            if (VerifPlayer2)
+            {
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if(summoner->ToPlayer())
+                        if(summoner->IsInDist2d(me, 15.00f))
+                        {
+                            SetEscortPaused(false);
+                            VerifPlayer2 = false;
                         }
             }
         }
@@ -5322,6 +5361,9 @@ public:
         {
             Player* player = GetPlayerForEscort();
 
+            Creature* korga = me->FindNearestCreature(60042, 30.00f, true);
+            Creature* wei = me->FindNearestCreature(55943, 30.00f, true);
+
             switch (waypointId)
             {
                 case 12:
@@ -5344,6 +5386,39 @@ public:
                     break;
 
                 case 26:
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
+                    break;
+
+                case 27:
+                    if(korga)
+                        korga->AI()->Talk(SAY_KORGA_DOOR_1);
+                    break;
+
+                case 28:
+                    if(wei)
+                        wei->AI()->Talk(SAY_WEI_DOOR_1);
+                    break;
+
+                case 29:
+                    if(korga)
+                        korga->AI()->Talk(SAY_KORGA_DOOR_2);
+                    break;
+
+                case 30:
+                    Talk(SAY_JI_DOOR_4);
+                    break;
+
+                case 31:
+                    if(korga)
+                        korga->AI()->Talk(SAY_KORGA_DOOR_3);
+                    break;
+
+                case 32:
+                    Talk(SAY_JI_DOOR_5);
+                    break;
+
+                case 33:
                     me->DespawnOrUnsummon();
                     break;
             }
