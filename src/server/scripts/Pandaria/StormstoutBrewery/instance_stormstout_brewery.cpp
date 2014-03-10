@@ -38,8 +38,6 @@ public :
         // Initialize everything
         void Initialize()
         {
-            LogFunction("Initialize");
-
             memset(&m_auiEncounter, NOT_STARTED, sizeof(m_auiEncounter));
 
             // Guids
@@ -56,15 +54,14 @@ public :
 
             // Ook Ook Event
             m_uiKilledHozens = 0 ;
-            m_bNextWaveFull = true ;
-            m_uiBarrelsTimer = 1000 ;
+            // m_bNextWaveFull = true ;
+            // m_uiBarrelsTimer = 1000 ;
 
             // Hoptallus Event
             m_uiHoptallusTrashSummonTimer = 1000 ;
             m_uiKilledHoptallusTrash = 0 ;
             m_bHoptallusActive = false ;
-
-            LogFunction("Initialize", false);
+            b_allSummoned = false ;
         }
 
         // Update timers when world ticks
@@ -74,7 +71,7 @@ public :
             /// Update is called at each world's tick
 
             // Summoning barrels timer
-            if(GetData(INSTANCE_DATA_OOK_OOK_STATUS) != DONE)
+            /*if(GetData(INSTANCE_DATA_OOK_OOK_STATUS) != DONE)
             {
                 if(m_uiBarrelsTimer <= uiDiff)
                 {
@@ -91,8 +88,8 @@ public :
                 }
                 else
                     m_uiBarrelsTimer -= uiDiff ;
-            }
-            else if((GetData(INSTANCE_DATA_OOK_OOK_STATUS) == DONE) && (GetData(INSTANCE_DATA_HOPTALLUS_STATUS) == NOT_STARTED) && !m_bHoptallusActive)
+            }*/
+            if((GetData(INSTANCE_DATA_OOK_OOK_STATUS) == DONE) && (GetData(INSTANCE_DATA_HOPTALLUS_STATUS) == NOT_STARTED) && !m_bHoptallusActive)
             {
                 if(m_uiHoptallusTrashSummonTimer <= uiDiff)
                 {
@@ -119,15 +116,16 @@ public :
             if(eventId <= INSTANCE_EVENT_SUMMON_BARREL_5)
                 SummonBarrel(eventId);
             else if(eventId == INSTANCE_EVENT_SUMMON_ALL)
-            {
-                m_bNextWaveFull = true ;
-                m_uiBarrelsTimer = 0 ; // We make sure the spawn will be almost instant (50ms < diff < 200ms) (normally)
-            }
+                SummonAllBarrels();
         }
 
         void OnPlayerEnter(Player *player)
         {
-            LogFunction("OnPlayerEnter");
+
+            if(!b_allSummoned) {
+                SummonAllBarrels();
+                b_allSummoned = true ;
+            }
 
             if(player)
 			{
@@ -139,17 +137,12 @@ public :
 				}
 			}
 
-            ///@todo : here, handle the rp sequence between Chen and Auntie
             if(Creature* chen = instance->GetCreature(m_uiChenGuid))
                 chen->AI()->DoAction(1);
-
-            LogFunction("OnPlayerEnter", false);
         }
 
         void OnCreatureCreate(Creature *creature)
         {
-            //LogFunction("OnCreatureCreate");
-
             if(creature)
             {
                 uint64 guid = creature->GetGUID();
@@ -174,14 +167,10 @@ public :
                     break ;
                 }
             }
-
-            //LogFunction("OnCreatureCreate", false);
         }
 
         void OnGameObjectCreate(GameObject *gameObject)
         {
-            LogFunction("OnGameObjectCreate");
-
             if(gameObject)
             {
                 uint64 guid = gameObject->GetGUID();
@@ -212,28 +201,19 @@ public :
                     break ;
                 }
             }
-
-            LogFunction("OnGameObjectCreate", false);
         }
 
         void SetData(uint32 uiData, uint32 uiStatus)
         {
-            LogFunction("SetData");
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "Setting data %u to value %u", uiData, uiStatus);
-
             /// WARNING
             if(uiData >= MAX_ENCOUNTERS)
                 return ;
 
             m_auiEncounter[uiData] = uiStatus ;
-
-            LogFunction("SetData", false);
         }
 
         uint32 GetData(uint32 uiData) const
         {
-            //LogFunction("GetData");
-
             if(uiData >= MAX_ENCOUNTERS)
                 return 0;
 
@@ -406,6 +386,7 @@ public :
 
         bool m_bNextWaveFull ; /// If true, summon all the barrels at one time ; else, summon only one
         bool m_bHoptallusActive ; /// If true, stop summoning npcs
+        bool b_allSummoned ; /// Should we summon all the barrels on player enter ?
     };
 
     // Get instance script

@@ -4538,6 +4538,19 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
             }
             break;
         }
+		case SPELLFAMILY_WARRIOR:
+        {
+            // Shattering Throw
+            if (m_spellInfo->SpellFamilyFlags[1] & 0x00400000)
+            {
+                if (!unitTarget)
+                    return;
+                // remove shields, will still display immune to damage part
+                unitTarget->RemoveAurasWithMechanic(1<<MECHANIC_IMMUNE_SHIELD, AURA_REMOVE_BY_ENEMY_SPELL);
+                return;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -6527,7 +6540,9 @@ void Spell::EffectCreateAreatrigger(SpellEffIndex effIndex)
 					for (std::list<AreaTrigger*>::const_iterator i = healingSphereList.begin(); i != healingSphereList.end(); ++i)
                     {
                         AreaTrigger* healingSphere = (*i);
-                        healingSphere->SetDuration(0);
+
+						if (healingSphere)
+							healingSphere->SetDuration(0);
                         break;
                     }
                 }
@@ -6551,12 +6566,25 @@ void Spell::EffectCreateAreatrigger(SpellEffIndex effIndex)
 					for (std::list<AreaTrigger*>::const_iterator i = runeOfPowerList.begin(); i != runeOfPowerList.end(); ++i)
                     {
                         AreaTrigger* runeOfPower = (*i);
-                        runeOfPower->SetDuration(0);
+
+						if (runeOfPower)
+						{
+							runeOfPower->SetVisualRadius(6.0f);
+							runeOfPower->SetDuration(0);
+						}
                         break;
                     }
                 }
             }
 
+            break;
+        }
+		case 116235:// Amethyst pool
+        {
+			AreaTrigger* pool = m_caster->GetAreaTrigger(m_spellInfo->Id);
+
+			if (pool)
+				pool->SetObjectScale(1.0f);
             break;
         }
         default:

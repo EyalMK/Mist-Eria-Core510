@@ -341,7 +341,7 @@ public:
 
         int32 altPower = atoi((char*)args);
 
-        if (altPower <= 0)
+        if (altPower < 0)
         {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
@@ -360,7 +360,7 @@ public:
         if (handler->needReportToTarget(target))
             ChatHandler(target->GetSession()).PSendSysMessage("You changed Alternate power of %s to %i.", handler->GetNameLink(target).c_str(), altPower);
 
-        target->SetPower(POWER_ALTERNATE_POWER, altPower);
+        target->ModifyPower(POWER_ALTERNATE_POWER, altPower);
 
         return true;
     }

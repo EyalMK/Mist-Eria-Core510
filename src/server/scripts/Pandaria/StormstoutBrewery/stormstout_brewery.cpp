@@ -1,4 +1,5 @@
 #include "stormstout_brewery.h"
+#include "MoveSpline.h"
 
 /********************************************************/
 /********************* OOK OOK **************************/
@@ -191,86 +192,206 @@ public :
     }
 };
 
-class npc_sb_illusioner : public CreatureScript
-{
-public :
-    npc_sb_illusioner() : CreatureScript("npc_sb_illusioner")
-    {
-
-    }
-
-    class npc_sb_illusionerAI : public ScriptedAI
-    {
+namespace StormstoutBrewery {
+    class DistanceOrderPred {
     public :
-        npc_sb_illusionerAI(Creature* creature) : ScriptedAI(creature)
-        {
+        DistanceOrderPred(Creature* source) : _source(source) {
 
         }
 
-        void Reset()
-        {
-            m_bWater = (me->GetEntry() == 56865);
-            CheckForTarget();
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if(InstanceScript* instance = me->GetInstanceScript())
-                if(instance->GetData(INSTANCE_DATA_OOK_OOK_STATUS) == DONE)
-                    return ; // return since there is no need to continue
-
-            if(!target)
-            {
-                if(m_uiCheckForTarget <= diff)
-                {
-                    bool targetB = CheckForTarget() ;
-                    if(!targetB)
-                        m_uiCheckForTarget = 1000 ;
-                }
-                else
-                    m_uiCheckForTarget -= diff ;
-            }
-        }
-
-        void JustDied(Unit *killer)
-        {
-            if(target && target->IsInWorld())
-            {
-                target->RemoveAurasDueToSpell(m_bWater ? 107044 : 107175);
-                target->CastSpell(target, 114656);
-            }
-        }
-
-        bool CheckForTarget()
-        {
-            CreatureList drunkenHozens ;
-            GetCreatureListWithEntryInGrid(drunkenHozens, me, m_bWater ? 56862 : 56924, 50000.0f);
-
-            for(CreatureListConstIter iter = drunkenHozens.begin() ; iter != drunkenHozens.end() ; ++iter)
-            {
-                if(Creature* hozen = *iter)
-                {
-                    if(!hozen->HasAura(m_bWater ? 107044 : 107175))
-                    {
-                        DoCast(hozen, m_bWater ? 107044 : 107175, true);
-                        target = hozen ;
-                        return true ;
-                    }
-                }
-            }
-
-            return false ;
+        bool operator()(Creature* first, Creature* second) {
+            return _source->GetExactDist2d(first) < _source->GetExactDist2d(second);
         }
 
     private :
-        Creature* target ; // bool m_bNeedTarget ;
-        uint32 m_uiCheckForTarget ;
-        bool m_bWater ;
+        Creature* _source ;
+    };
+} // Stormstout Brewery
+
+class npc_sb_illusioner : public CreatureScript {
+public :
+    npc_sb_illusioner() : CreatureScript("npc_sb_illusioner") {
+
+    }
+
+    class npc_sb_illusioner_AI : public ScriptedAI {
+    public :
+        npc_sb_illusioner_AI(Creature* creature) : ScriptedAI(creature) {
+            _target = NULL ;
+            _spellId = 0 ;
+        }
+
+        void SetDatas(Creature* target, uint32 spellId) { // Can't do it another way
+            _target = target ;
+            _spellId = spellId ;
+
+            DoCast(_target, _spellId);
+        }
+
+        void JustDied(Unit *killer) {
+            if(_target)
+                _target->RemoveAurasDueToSpell(_spellId);
+        }
+
+    private :
+        Creature* _target ;
+        uint32 _spellId ;
     };
 
-    CreatureAI* GetAI(Creature *creature) const
-    {
-        return new npc_sb_illusionerAI(creature);
+    CreatureAI* GetAI(Creature *creature) const {
+        return new npc_sb_illusioner_AI(creature);
+    }
+};
+
+typedef npc_sb_illusioner::npc_sb_illusioner_AI IllusionerAI ;
+
+class stalker_illusioner_master : public CreatureScript {
+public :
+    stalker_illusioner_master() : CreatureScript("stalker_illusioner_master") {
+
+    }
+
+    class stalker_illusioner_master_AI : public ScriptedAI {
+    public:
+        stalker_illusioner_master_AI(Creature* creature) : ScriptedAI(creature) {
+
+        }
+
+        void Reset() {
+			_uiWaitTimer = 2000 ;
+        }
+		
+		void StartIllusioners() {
+			std::list<Creature*> waterIllusioners, hozensWater, fieryIllusioners, hozensFire ;
+
+            GetCreatureListWithEntryInGrid(waterIllusioners, me, 56865, 50000.0f); // Aqua dancers
+            GetCreatureListWithEntryInGrid(fieryIllusioners, me, 56867, 50000.0f); // Fiery Tricksters
+
+            GetCreatureListWithEntryInGrid(hozensWater, me, 59605, 50000.0f); // Sodden Hozen Brawlers
+            GetCreatureListWithEntryInGrid(hozensFire, me, 56924, 50000.0f); // Inflammed Hozen Brawlers
+
+            for(std::list<Creature*>::iterator water = waterIllusioners.begin() ; water != waterIllusioners.end() ; ++water ) {
+                hozensWater.sort(StormstoutBrewery::DistanceOrderPred(*water));
+                hozensWater.remove_if(Trinity::UnitAuraCheck(true, 107044));
+
+                // Can't do it otherwise, if SetData could receive a void* pointer, it could work, but for now...
+                if(IllusionerAI* ai = dynamic_cast<IllusionerAI*>((*water)->AI()))
+                    ai->SetDatas(hozensWater.front(), 107044);
+            }
+
+            for(std::list<Creature*>::iterator fire = fieryIllusioners.begin() ; fire != fieryIllusioners.end() ; ++fire) {
+                hozensFire.sort(StormstoutBrewery::DistanceOrderPred(*fire));
+                hozensFire.remove_if(Trinity::UnitAuraCheck(true, 107175));
+
+                if(IllusionerAI* ai = dynamic_cast<IllusionerAI*>((*fire)->AI()))
+                    ai->SetDatas(hozensFire.front(), 107044);
+            }
+		}
+		
+		void UpdateAI(const uint32 diff) {
+			if(_uiWaitTimer <= diff)
+				StartIllusioners();
+			else
+				_uiWaitTimer -= diff ;
+		}
+		
+	private :
+		uint32 _uiWaitTimer ;
+    };
+
+    CreatureAI* GetAI(Creature *creature) const {
+        return new stalker_illusioner_master_AI(creature);
+    }
+};
+
+class spell_sb_mind_illusion : public SpellScriptLoader {
+public :
+    spell_sb_mind_illusion() : SpellScriptLoader("spell_sb_mind_illusion") {
+
+    }
+
+    class spell_sb_mind_illusion_AuraScript : public AuraScript {
+        PrepareAuraScript(spell_sb_mind_illusion_AuraScript);
+
+        bool Validate(const SpellInfo *spellInfo) {
+            return true ;
+        }
+
+        bool Load() {
+            return true ;
+        }
+
+        void HandleEffectRemove(AuraEffect const* auraEff, AuraEffectHandleModes mode) {
+            if(!GetOwner() || !GetOwner()->ToCreature())
+                return ;
+
+            Creature* owner = GetOwner()->ToCreature();
+
+            switch(GetSpellInfo()->Id) {
+            case 107044 :
+                owner->CastSpell(owner, 114655);
+                break ;
+
+            case 107125 :
+                owner->CastSpell(owner, 114656);
+                break ;
+
+            default :
+                break ;
+            }
+        }
+
+        void Register() {
+            OnEffectRemove += AuraEffectRemoveFn(spell_sb_mind_illusion_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const {
+        return new spell_sb_mind_illusion_AuraScript();
+    }
+};
+
+class mob_hozen_illusioned : public CreatureScript {
+public :
+    mob_hozen_illusioned() : CreatureScript("mob_hozen_illusioned") {
+
+    }
+
+    class mob_hozen_illusioned_AI : public ScriptedAI {
+    public :
+        mob_hozen_illusioned_AI(Creature* creature) : ScriptedAI(creature) {
+
+        }
+
+        void UpdateAI(const uint32 diff) {
+            if(!UpdateVictim())
+                return ;
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            Unit* victim = me->getVictim();
+            //Make sure our attack is ready and we aren't currently casting before checking distance
+            if (me->isAttackReady() && me->IsWithinMeleeRange(victim))
+            {
+                me->AttackerStateUpdate(victim);
+                me->resetAttackTimer();
+            }
+
+            if (me->haveOffhandWeapon() && me->isAttackReady(OFF_ATTACK) && me->IsWithinMeleeRange(victim))
+            {
+                me->AttackerStateUpdate(victim, OFF_ATTACK);
+                me->resetAttackTimer(OFF_ATTACK);
+            }
+
+            uint32 spellId = me->HasAura(107044) ? 107046 : me->HasAura(107175) ? 107176 : 0 ;
+            if(spellId)
+                DoCastAOE(spellId);
+        }
+    };
+
+    CreatureAI* GetAI(Creature *creature) const {
+        return new mob_hozen_illusioned_AI(creature);
     }
 };
 
@@ -328,7 +449,6 @@ public :
 
         void MovementInform(uint32 type, uint32 id)
         {
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "Entering MovementInform (Hozen Party Animal), using type %u, and id %u", type, id);
             if(type == POINT_MOTION_TYPE)
             {
                 if(id == 0)
@@ -349,24 +469,17 @@ public :
 
         void JustDied(Unit *killer)
         {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Creature entered JustDied");
             if(InstanceScript* instance = me->GetInstanceScript())
             {
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "Creature entered JustDied");
                 instance->SetData64(INSTANCE_DATA64_KILLED_HOZENS, 1);
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "Data set in instancescript ; ready to change power");
                 AddPowerOnPlayers(1);
             }
         }
 
         void AddPowerOnPlayer(Player* p, int32 amount)
         {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "entered addpoweronplayer");
             if(p)
-			{
-				/*sLog->outDebug(LOG_FILTER_NETWORKIO, "player not null ; seting power ; before %u", p->GetPower(POWER_ALTERNATE_POWER));
-				p->SetPower(POWER_ALTERNATE_POWER, p->GetPower(POWER_ALTERNATE_POWER) + amount);
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "Now : %u", p->GetPower(POWER_ALTERNATE_POWER));*/
+            {
 				p->SetMaxPower(POWER_ALTERNATE_POWER, 40);
 				p->SetPower(POWER_ALTERNATE_POWER, p->GetPower(POWER_ALTERNATE_POWER) + 1);
 			}
@@ -374,17 +487,13 @@ public :
 
         void AddPowerOnPlayers(int32 amount)
         {
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "Entered addpoweronplayers");
             if(Map* map = me->GetMap())
             {
-				sLog->outDebug(LOG_FILTER_NETWORKIO, "map not null");
                 Map::PlayerList const & playerList = map->GetPlayers();
                 if(!playerList.isEmpty())
                 {
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "playerlist not empty");
                     for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
                     {
-						sLog->outDebug(LOG_FILTER_NETWORKIO, "ready to apply change");
                         AddPowerOnPlayer(iter->getSource(), amount);
                     }
                 }
@@ -437,6 +546,7 @@ public :
         npc_rolling_barrelAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
+            DoCast(me, 106647, true); // Let's roll !
         }
 		
 		void DoAction(const int32 actionId)
@@ -459,9 +569,16 @@ public :
             }
         }
 
-        void PassengerBoarded(Unit *passenger, int8 seatId, bool boolean)
+        void PassengerBoarded(Unit *passenger, int8 seatId, bool enter)
         {
-            me->GetMotionMaster()->Clear(false);
+            if(enter)
+                me->StopMoving();
+            else {
+                if(instance)
+                    instance->ProcessEvent(NULL, m_uiIndex);
+                me->Kill(me);
+                return ;
+            }
         }
 
         void SetData(uint32 uiData, uint32 uiValue)
@@ -472,8 +589,8 @@ public :
 
         void Reset()
         {
-            /*if(me->GetMapId() == 961)
-                m_uiCheckTimer = 1000 ;*/
+            if(me->GetMapId() == 961)
+                m_uiCheckTimer = 1000 ;
         }
 
         void JustDied(Unit *killer)
@@ -484,61 +601,53 @@ public :
 
         void UpdateAI(const uint32 diff)
         {
-            /*if(me->GetMapId() != 961)
-                return ; // Return since we are not ine the right map
             if(m_uiCheckTimer <= diff)
-            {
-                if(instance)
-                {
-                    instance->GetData(INSTANCE_DATA_OOK_OOK_STATUS) == IN_PROGRESS ? DoCheckOokOok() : DoCheckHozens();
-                    m_uiCheckTimer = 1000 ;
-                }
-            }
+                DoCheckForExplosion();
             else
-                m_uiCheckTimer -= diff ;*/
+                m_uiCheckTimer -= diff ;
         }
 
-        void DoCheckOokOok()
-        {
-            if(instance)
-            {
-                if(Creature* ookOok = ObjectAccessor::GetCreature(*me, instance->GetData64(INSTANCE_DATA64_OOK_OOK_GUID)))
-                {
-                    float dist = me->GetExactDist2d(ookOok->GetPositionX(), ookOok->GetPositionY());
-                    if(dist <= 1.0f)
-                    {
-                        DoCastAOE(115875, true);
-                        me->Kill(me);
+        void DoCheckForExplosion() {
+            // Check instance boss status
+            if(instance && instance->GetData(INSTANCE_DATA_OOK_OOK_STATUS) == IN_PROGRESS) { // Check for OokOok
+                Creature* ookOok = ObjectAccessor::GetCreature(*me, instance->GetData64(INSTANCE_DATA64_OOK_OOK_GUID));
+                if(ookOok) {
+                    float dist = me->GetExactDist2d(ookOok);
+                    if(dist <= 2.0f) {
+                        CastExplosion();
                         return ;
                     }
                 }
-            }
-        }
+            } else { // Check for hozens
+                std::list<Creature*> hozens ;
+                GetCreatureListWithEntryInGrid(hozens, me, 56927, 50000.0f);
+                GetCreatureListWithEntryInGrid(hozens, me, 59684, 50000.0f);
+                GetCreatureListWithEntryInGrid(hozens, me, 57097, 50000.0f);
 
-        void DoCheckHozens()
-        {
-            CreatureList hozens[3] ;
-            GetCreatureListWithEntryInGrid(hozens[0], me, 56927, 50000.0f);
-            GetCreatureListWithEntryInGrid(hozens[1], me, 59684, 50000.0f);
-            GetCreatureListWithEntryInGrid(hozens[2], me, 57097, 50000.0f);
+                if(hozens.empty())
+                    return ;
 
-            for(uint8 i = 0 ; i < 3 ; ++i)
-            {
-                CreatureList creatures = hozens[i];
-                for(CreatureListConstIter iter = creatures.begin() ; iter != creatures.end() ; ++iter)
-                {
-                    if(Creature* c = *iter)
-                    {
-                        float dist = me->GetExactDist2d(c->GetPositionX(), c->GetPositionZ());
-                        if(dist <= 1.0f)
-                        {
-                            DoCastAOE(115875, true);
-                            me->Kill(me);
+                for(std::list<Creature*>::iterator iter = hozens.begin() ; iter != hozens.end() ; ++iter) {
+                    if(Creature* hozen = *iter) {
+                        float dist = me->GetExactDist2d(hozen);
+                        if(dist <= 2.0f) {
+                            CastExplosion();
                             return ;
                         }
                     }
                 }
             }
+
+            // Didn't return yet, so it means nobody was found, so reschedule the timer
+            m_uiCheckTimer = 500 ;
+        }
+
+        inline void CastExplosion() {
+            DoCastAOE(115875);
+            instance->ProcessEvent(NULL, m_uiIndex);
+            if(Vehicle* vec = me->GetVehicleKit())
+                vec->RemoveAllPassengers();
+            me->Kill(me);
         }
 
     private :
@@ -553,7 +662,7 @@ public :
     }
 };
 
-#define STALKER_BOUNCER 500001
+#define STALKER_BOUNCER 200501
 
 class mob_hozen_bouncer : public CreatureScript
 {
@@ -954,6 +1063,8 @@ public :
 				}
 				else
 				{
+					if(InstanceScript* instance = me->GetInstanceScript())
+						instance->SetData64(INSTANCE_DATA64_KILLED_HOPTALLUS_TRASH, 1);
 					me->Kill(me);
 				}
 			}
@@ -977,7 +1088,7 @@ public :
     }
 };
 
-#define NPC_CARROT_STALKER 500002
+#define NPC_CARROT_STALKER 200502
 #define MAX_CARROT_POSITIONS 8
 const Position carrotPositions[MAX_CARROT_POSITIONS] =
 {
@@ -1094,7 +1205,7 @@ public :
 /********************* YANZHU **************************/
 /*******************************************************/
 
-#define STALKER_TARGET 500000
+#define STALKER_TARGET 200500
 
 class stalker_gushing_brew : public CreatureScript
 {
@@ -1201,7 +1312,6 @@ public :
     };
 };
 
-#define MAX_SUMMON_GAO_WAVE 8
 #define PROGRESS_X 2.038879f
 #define PROGRESS_Y 8.39978f
 
@@ -1209,221 +1319,317 @@ public :
 #define PROGRESS_LINE_Y -2.111451f
 #define PROGRESS_Z 5.0f
 
-class npc_uncle_gao : public CreatureScript
-{
+class npc_uncle_gao : public CreatureScript {
+
 public :
-    npc_uncle_gao() : CreatureScript("npc_uncle_gao")
-    {
+    npc_uncle_gao() : CreatureScript("npc_uncle_gao") {
 
     }
 
-    class npc_uncle_gaoAI : public ScriptedAI
-    {
+    class npc_uncle_gao_AI : public ScriptedAI {
     public :
-        npc_uncle_gaoAI(Creature* creature) : ScriptedAI(creature)
-        {
-            instance = creature->GetInstanceScript();
+        npc_uncle_gao_AI(Creature* creature) : ScriptedAI(creature) {
+			_instance = creature->GetInstanceScript();
         }
 
-        void Reset()
-        {
-            m_uiCheckTimer = 0 ;
-            m_uiWaveId = 1 ;
-            m_uiSummoned = 0 ;
-            m_bStarted = false ;
-            m_uiWaitTimer = 1000 ;
+        /** ScriptedAI functions **/
 
-            m_uiFirstAlemental = RAND(59519, 59518);
-            m_uiSecondAlemental = RAND(59521, 66413);
-            m_uiThirdAlemental = RAND(59520, 59522);
+        void Reset() {
+            /** Initialize everything **/
+            _events.Reset();
+
+            _aleAlamental = _stoutAlamental = _wheatAlamental = 0 ;
+            _numberOfSummons = 0 ;
+
+            _phase = PHASE_NOT_STARTED ;
+
+            /** And start **/
+            _events.ScheduleEvent(EVENT_CHECK_FOR_PLAYERS, 500);
         }
 
-        void JustSummoned(Creature *creature)
-        {
-            ++m_uiSummoned;
-        }
-
-        void SummonedCreatureDies(Creature *creature, Unit *killer)
-        {
-            --m_uiSummoned;
-            if(m_uiSummoned == 0)
-            {
-                Talk(m_uiWaveId + 1);
-                m_uiWaitTimer = 7000 ;
-                StartNextWave();
-            }
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if(instance)
-            {
-                if(instance->GetData(INSTANCE_DATA_HOPTALLUS_STATUS) == DONE && !m_bStarted)
-                {
-                    if(m_uiCheckTimer <= diff)
-                    {
-                        if(!DoCheckForPlayer())
-                            m_uiCheckTimer = 1000 ;
-                        else
-                            Start();
-                    }
-                    else
-                        m_uiCheckTimer -= diff ;
+        void UpdateAI(const uint32 diff) {
+            // Not start if Hoptallus not done
+            if(_instance)
+                if(_instance->GetData(INSTANCE_DATA_HOPTALLUS_STATUS) != DONE)
                     return ;
-                }
 
-                if(m_uiWaitTimer > diff)
-                {
-                    if(m_uiSummoned == 0)
-                        m_uiWaitTimer -= diff ;
+            // Update EventMap
+            _events.Update(diff);
+
+            // And switch
+            while(uint32 eventId = _events.ExecuteEvent()) {
+                switch(eventId) {
+                case EVENT_CHECK_FOR_PLAYERS :
+                    CheckForPlayers();
+                    break ;
+
+                case EVENT_SUMMON_FIRST_WAVE :
+                    SummonFirstWave();
+                    break ;
+
+                case EVENT_SUMMON_SECOND_WAVE :
+                    SummonSecondWave();
+                    break ;
+
+                case EVENT_SUMMON_THIRD_WAVE :
+                    SummonThirdWave();
+                    break ;
+
+                case EVENT_SUMMON_YAN_ZHU :
+                    SummonYanZhu();
+                    break ;
+
+                case EVENT_PERFECT_BREW :
+                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    Talk(TALK_PERFECT_BREW);
+                    break ;
+
+                default :
+                    break ;
                 }
-                else
-                    StartNextWave();
             }
         }
 
-        bool DoCheckForPlayer()
-        {
-            if(Map* map = me->GetMap())
-            {
-                Map::PlayerList const & playerList = map->GetPlayers();
-                if(!playerList.isEmpty())
-                {
-                    for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter)
-                    {
-                        if(Player* p = iter->getSource())
-                        {
-                            Position pos ;
-                            p->GetPosition(&pos);
-                            if(me->GetExactDist2d(&pos) <= 10.0f)
-                                return true ;
+        void SummonedCreatureDies(Creature *summoned, Unit *killer) {
+
+            // Yan Zhu not yet started
+            if(_phase < PHASE_YAN_ZHU) {
+                --_numberOfSummons ;
+
+                // Everybody killed, start next wave
+                if(_numberOfSummons == 0) {
+                    switch(_phase) {
+                    case PHASE_FIRST_WAVE :
+						_phase = PHASE_SECOND_WAVE ;
+                        Talk(TALK_SUMMON_SECOND_WAVE);
+                        _events.ScheduleEvent(EVENT_SUMMON_SECOND_WAVE, 4000);
+                        break ;
+
+                    case PHASE_SECOND_WAVE :
+						_phase = PHASE_THIRD_WAVE ;
+                        Talk(TALK_SUMMON_THIRD_WAVE);
+                        _events.ScheduleEvent(EVENT_SUMMON_THIRD_WAVE, 4000);
+                        break ;
+
+                    case PHASE_THIRD_WAVE :
+						_phase = PHASE_YAN_ZHU ;
+                        _events.ScheduleEvent(EVENT_SUMMON_YAN_ZHU, 4000);
+                        break ;
+
+                    default :
+                        break ;
+                    }
+                }
+            } else if(_phase == PHASE_YAN_ZHU) {
+                // Yan Zhu has been killed, schedule final event
+                _numberOfSummons = 0 ;
+                _phase = PHASE_END ;
+                Creature* yanZhu = me->FindNearestCreature(BOSS_YAN_ZHU, 200.0f, false);
+                if(!yanZhu)
+                    return ;
+
+                Talk(TALK_YAN_ZHU_DEATH);
+                me->GetMotionMaster()->MovePoint(POINT_YAN_ZHU_CORPSE, *yanZhu);
+            } else return ;
+        }
+
+        void MovementInform(uint32 motionType, uint32 pointId) {
+            if(motionType != POINT_MOTION_TYPE
+                    || pointId != POINT_YAN_ZHU_CORPSE)
+                return ;
+
+            _events.ScheduleEvent(EVENT_PERFECT_BREW, 2000);
+        }
+
+        /** Non ScriptedAI functions **/
+
+        void CheckForPlayers() {
+            if(Map* map = me->GetMap()) {
+                Map::PlayerList const& playerList = map->GetPlayers();
+
+                if(playerList.isEmpty())
+                    return ;
+
+                for(Map::PlayerList::const_iterator c_iter = playerList.begin() ; c_iter != playerList.end() ; ++c_iter) {
+                    if(Player* player = c_iter->getSource()) {
+                        float dist = me->GetExactDist2d(player);
+
+                        // Player found, start next wave then return ;
+                        if(dist <= 10.0f) {
+                            _phase = PHASE_FIRST_WAVE ;
+
+                            Talk(TALK_SUMMON_FIRST_WAVE);
+                            _events.ScheduleEvent(EVENT_SUMMON_FIRST_WAVE, 4000);
+
+                            /// @todo : remove this as soon as possible
+                            if(_instance)
+                                _instance->DoSendNotifyToInstance("Starting Gao Event");
+
+                            return ;
                         }
                     }
                 }
-                else
-                    return false ;
-            }
 
-            return false ;
+                // No player found, check again
+                _events.ScheduleEvent(EVENT_CHECK_FOR_PLAYERS, 500);
+            }
         }
 
-        void Start()
-        {
-            m_bStarted = true ;
-            Talk(1); // Introduction
-            StartNextWave();
-        }
+        void SummonFirstWave() {
+            _wheatAlamental = RAND(MOB_WHEAT_ALAMENTAL_BLOATED_BREW, MOB_WHEAT_ALAMENTAL_STOUT_BREW);
 
-        void StartNextWave()
-        {
-            switch(m_uiWaveId)
-            {
-            case 1 :
-                //Talk(2);
-                SummonFirstWave();
-                break ;
-
-            case 2 :
-                //Talk(3);
-                SummonSecondWave();
-                break ;
-
-            case 3 :
-                //Talk(4);
-                SummonThirdWave();
-                break ;
-
-            case 4 :
-                //Talk(5);
-                SummonYanZhu();
-                break ;
-
-            case 5:
-            {
-                Talk(6);
-                Position const movePoint = {-703.415771f, 1162.801025f, 166.141693f, 0.273505f};
-                me->GetMotionMaster()->MovePoint(0, movePoint);
-                break ;
-            }
-
-            default :
-                break ;
-            }
-
-            ++m_uiWaveId;
-        }
-
-        void SummonFirstWave()
-        {
             Position start = {-704.517517f, 1166.889648f, 166.141571f, 0.275305f};
             for(uint8 i = 0 ; i < 2 ; ++i)
-            {
-                if(Creature* summon = me->SummonCreature(m_uiFirstAlemental, start.GetPositionX() + PROGRESS_X * i, start.GetPositionY() + PROGRESS_Y * i, start.GetPositionZ()))
+                if(Creature* summon = me->SummonCreature(_wheatAlamental, start.GetPositionX() + PROGRESS_X * i, start.GetPositionY() + PROGRESS_Y * i, start.GetPositionZ()))
                     summon->SetOrientation(0.0f);
-            }
+
+            _numberOfSummons = 2 ;
         }
 
-        void SummonSecondWave()
-        {
+        void SummonSecondWave() {
+            _aleAlamental = RAND(MOB_ALE_ALAMENTAL_BUBBLING_BREW, MOB_ALE_ALAMENTAL_YEASTY_BREW);
+
             Position start = {-713.708191f, 1168.700195f, 166.145874f, 0.275305f};
 
-            for(uint8 i = 0 ; i < 3 ; ++i)
-            {
+            for(uint8 i = 0 ; i < 3 ; ++i) {
                 float x = start.GetPositionX() + PROGRESS_LINE_X * i ;
                 float y = start.GetPositionY() + PROGRESS_LINE_Y * i ;
                 for(uint8 j = 0 ; j < 3 ; ++j)
-                {
-                    if(Creature* summon = me->SummonCreature(m_uiSecondAlemental, x + PROGRESS_X * j, y + PROGRESS_Y * j, start.GetPositionZ()))
+                    if(Creature* summon = me->SummonCreature(_aleAlamental, x + PROGRESS_X * j, y + PROGRESS_Y * j, start.GetPositionZ()))
                         summon->SetOrientation(0.0f);
-                }
             }
+
+            _numberOfSummons = 9 ;
         }
 
-        void SummonThirdWave()
-        {
+        void SummonThirdWave() {
+            _stoutAlamental = RAND(MOB_STOUT_ALAMENTAL_FIZZY_BREW, MOB_STOUT_ALAMENTAL_SUDSY_BREW);
+
             Position start = {-713.708191f, 1168.700195f, 166.145874f, 0.275305f};
 
-            for(uint8 i = 0 ; i < 2 ; ++i)
-            {
+            for(uint8 i = 0 ; i < 2 ; ++i) {
                 float x = start.GetPositionX() + 2 * PROGRESS_LINE_X * i ;
                 float y = start.GetPositionY() + 2 * PROGRESS_LINE_Y * i ;
                 for(uint8 j = 0 ; j < 2 ; ++j)
-                {
-                    if(Creature* summon = me->SummonCreature(m_uiThirdAlemental, x + 2 * PROGRESS_X * j, y + 2 * PROGRESS_Y * j, start.GetPositionZ()))
+                    if(Creature* summon = me->SummonCreature(_stoutAlamental, x + 2 * PROGRESS_X * j, y + 2 * PROGRESS_Y * j, start.GetPositionZ()))
                         summon->SetOrientation(0.0f);
-                }
             }
+
+            _numberOfSummons = 4 ;
         }
 
-        void SummonYanZhu()
-        {
-            Position const summon = {-703.415771f, 1162.801025f, 166.141693f, 0.273505f};
-            if(Creature* yanZhu = me->SummonCreature(BOSS_YAN_ZHU, summon, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 24 * HOUR, 0))
-            {
-                yanZhu->AI()->DoAction(0);
-                yanZhu->AI()->SetData(BOSS_YAN_ZHU_DATA_WHEAT_SPELL, m_uiFirstAlemental);
-                yanZhu->AI()->SetData(BOSS_YAN_ZHU_DATA_ALE_SPELL, m_uiSecondAlemental);
-                yanZhu->AI()->SetData(BOSS_YAN_ZHU_DATA_STOUT_SPELL, m_uiThirdAlemental);
+        void SummonYanZhu() {
+            Talk(TALK_SUMMON_YAN_ZHU);
+
+            Position const summon = {-703.415771f, 1162.801025f, 166.141693f, 0.273505f}; // Correct height is 160, but YanZhu must "grow" from ground
+            Creature* yanZhu = me->SummonCreature(BOSS_YAN_ZHU, summon, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 24 * HOUR * IN_MILLISECONDS);
+
+            if(!yanZhu) {
+                sLog->outFatal(LOG_FILTER_NETWORKIO, "STORMSTOUT BREWERY : Unable to summon Yan Zhu the Uncasked !");
+                if(_instance)
+                    _instance->DoSendNotifyToInstance("DEBUG LOG : Unable to summon Yan Zhu the Uncasked");
             }
+
+            // Cast the spells on YanZhu, based on which creatures were summoned
+            if(_stoutAlamental == MOB_STOUT_ALAMENTAL_FIZZY_BREW)
+                yanZhu->CastSpell(yanZhu, SPELL_FIZZY_BREW);
+            else
+                yanZhu->CastSpell(yanZhu, SPELL_SUDSY_BREW);
+
+            if(_aleAlamental == MOB_ALE_ALAMENTAL_BUBBLING_BREW)
+                yanZhu->CastSpell(yanZhu, SPELL_BUBBLING_BREW);
+            else
+                yanZhu->CastSpell(yanZhu, SPELL_YEASTY_BREW);
+
+            if(_wheatAlamental == MOB_WHEAT_ALAMENTAL_BLOATED_BREW)
+                yanZhu->CastSpell(yanZhu, SPELL_BLACKOUT_BREW);
+            else
+                yanZhu->CastSpell(yanZhu, SPELL_BLOATING_BREW);
+
         }
 
     private :
-        InstanceScript* instance ;
-        uint32 m_uiSummoned ;
-        uint32 m_uiWaveId ;
-        uint32 m_uiCheckTimer ;
-        uint32 m_uiWaitTimer ;
-        bool m_bStarted ;
+        /// May be usefull
+        EventMap _events ;
 
-        uint32 m_uiFirstAlemental ;
-        uint32 m_uiSecondAlemental ;
-        uint32 m_uiThirdAlemental ;
+        /// Pointer to the instance
+        InstanceScript* _instance ;
+
+        /// Entries of the alamentals to be summoned ; also determines the spells YanZhu will cast
+        uint32 _aleAlamental, _stoutAlamental, _wheatAlamental ;
+
+        /// Npcs summoned ; when it reaches 0, it means we have to start the next phase
+        uint32 _numberOfSummons ;
+		
+		/// Points to go to
+		enum MovePoints {
+			POINT_YAN_ZHU_CORPSE = 1
+		};
+		
+		enum Phases {
+			PHASE_NOT_STARTED   = 0,
+			PHASE_FIRST_WAVE    = 1,
+			PHASE_SECOND_WAVE   = 2,
+			PHASE_THIRD_WAVE    = 3,
+			PHASE_YAN_ZHU       = 4,
+			PHASE_END           = 5
+		};
+		
+        /// Current phase
+        Phases _phase ;
     };
 
-    CreatureAI* GetAI(Creature *creature) const
-    {
-        return new npc_uncle_gaoAI(creature);
+    CreatureAI* GetAI(Creature *creature) const {
+        return new npc_uncle_gao_AI(creature);
     }
+
+private :
+    /// Creatures to be summoned
+    enum Creatures {
+        // Stout alamentals
+        MOB_STOUT_ALAMENTAL_SUDSY_BREW      = 59522,
+        MOB_STOUT_ALAMENTAL_FIZZY_BREW      = 59520,
+
+        // Ale alamentals
+        MOB_ALE_ALAMENTAL_BUBBLING_BREW     = 59521,
+        MOB_ALE_ALAMENTAL_YEASTY_BREW       = 59494,
+
+        // Wheat alamentals
+        MOB_WHEAT_ALAMENTAL_STOUT_BREW      = 59519,
+        MOB_WHEAT_ALAMENTAL_BLOATED_BREW    = 59518
+    };
+
+    /// Spells to be casted
+    enum Spells {
+        SPELL_SUDSY_BREW    = 114933,
+        SPELL_FIZZY_BREW    = 114934,
+
+        SPELL_BLOATING_BREW = 114929,
+        SPELL_BLACKOUT_BREW = 114930,
+
+        SPELL_BUBBLING_BREW = 114931,
+        SPELL_YEASTY_BREW   = 114932
+    };
+
+    /// Dialogs
+    enum Talk {
+        TALK_SUMMON_FIRST_WAVE  = 1,
+        TALK_SUMMON_SECOND_WAVE = 2,
+        TALK_SUMMON_THIRD_WAVE  = 3,
+        TALK_SUMMON_YAN_ZHU     = 4,
+        TALK_YAN_ZHU_DEATH      = 5,
+        TALK_PERFECT_BREW       = 6
+    };
+
+    /// Events
+    enum Events {
+        EVENT_CHECK_FOR_PLAYERS     = 1,
+        EVENT_SUMMON_FIRST_WAVE     = 2,
+        EVENT_SUMMON_SECOND_WAVE    = 3,
+        EVENT_SUMMON_THIRD_WAVE     = 4,
+        EVENT_SUMMON_YAN_ZHU        = 5,
+        EVENT_PERFECT_BREW          = 6
+    };
 };
 
 void AddSC_stormstout_brewery()
@@ -1431,7 +1637,10 @@ void AddSC_stormstout_brewery()
     // Ook Ook
     new npc_chen_stormstout();
     new npc_auntie_stormstout();
-    //new npc_sb_illusioner();
+    new npc_sb_illusioner();
+    new stalker_illusioner_master();
+    new spell_sb_mind_illusion();
+    new mob_hozen_illusioned();
     new mob_habanero_brew();
     new mob_ook_ook_hozen();
     new npc_rolling_barrel();
