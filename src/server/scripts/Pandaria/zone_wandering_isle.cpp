@@ -5123,7 +5123,7 @@ public :
                 player->CastSpell(player, 115337, true); //jojo
                 player->CastSpell(player, 115335, true); // ji patte
                 player->CastSpell(player, 115332, true); // aysa
-                player->CastSpell(player, 59073, true);
+                player->CastSpell(player, 70889, true);
                 player->RemoveAurasDueToSpell(115426);
                 return true;
             }
@@ -5175,7 +5175,7 @@ public:
         {
             Player* player = GetPlayerForEscort();
 
-            GameObject* mandori = me->FindNearestGameObject(210967, 20.00f);
+            GameObject* mandori = me->FindNearestGameObject(210967, 500.00f);
 
             switch (waypointId)
             {
@@ -5186,6 +5186,8 @@ public:
                     break;
 
                 case 12:
+                    if(mandori)
+                        mandori->SetGoState(GO_STATE_ACTIVE);
                     SetEscortPaused(true);
                     VerifPlayer = true;
                     break;
@@ -5252,7 +5254,7 @@ public:
         {
             Player* player = GetPlayerForEscort();
 
-            GameObject* peiwu = me->FindNearestGameObject(210966, 20.00f);
+            GameObject* peiwu = me->FindNearestGameObject(210966, 500.00f);
 
             switch (waypointId)
             {
@@ -5268,6 +5270,8 @@ public:
                     break;
 
                 case 22:
+                    if(peiwu)
+                        peiwu->SetGoState(GO_STATE_ACTIVE);
                     me->DespawnOrUnsummon();
                     break;
             }
