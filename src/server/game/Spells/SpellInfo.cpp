@@ -338,7 +338,7 @@ SpellImplicitTargetInfo::StaticData  SpellImplicitTargetInfo::_data[TOTAL_SPELL_
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 128 No spells
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_AREA,	TARGET_CHECK_ENEMY,   TARGET_DIR_FRONT},       // 129 TARGET_UNIT_ENNEMY_INLINE_FRONT // Targets all the units in a line in front of the caster
                                                                                                                                             // But apparently, updates target maps while spells is flying to explicit target !
-    {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 130 TARGET_UNIT_SRC_CASTER_INLINE_LEFT
+    {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_AREA,	TARGET_CHECK_DEFAULT,   TARGET_DIR_LEFT},        // 130 TARGET_UNIT_SRC_CASTER_INLINE_LEFT
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 131 // Seems related to position, but doesn't cast if something between caster and targeted position
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 132 // Apparently, used on spell that use explicit / implicit target as a source to trigger another effect
                                                                                                                                             // Please... THIS IS JOKE
