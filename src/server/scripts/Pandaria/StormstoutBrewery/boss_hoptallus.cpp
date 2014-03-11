@@ -255,7 +255,11 @@ public :
                         break ;
                     }
 					b_carrotBreath = true ;
-					DoCast(SPELL_CARROT_BREATH);
+					if(TempSummon* summon = me->SummonCreature(NPC_CARROT_BREATH_HELPER, 
+															me->GetPositionX() + 0.5 * cos(me->GetOrientation()),
+															me->GetPositionY() + 0.5 * sin(me->GetOrientation()),
+															me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000))
+						DoCast(summon, SPELL_CARROT_BREATH, true);
 					Talk(TALK_CARROT_BREATH);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
@@ -648,7 +652,7 @@ void AddSC_boss_hoptallus()
     new mob_virmen();
     new stalker_carrot_breath();
     new npc_big_ol_hammer();
-    new spell_hoptallus_carrot_breath();
+    // new spell_hoptallus_carrot_breath();
 	new spell_hoptallus_carrot_breath_periodic();
     new spell_hoptallus_furlwind();
 }
