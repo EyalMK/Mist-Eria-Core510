@@ -77,7 +77,7 @@ enum YanZhuSpells {
     SPELL_YEASTY_BREW                   = 114932,
 
     /** Yeasty Brew Alamental **/
-    SPELL_FERMENT                       = 106859, // Periodically trigger 114451, but using it this way, we can handle targets better
+    SPELL_FERMENT                       = 114451, // Since 106859 doesn't work (don'y know why), this is the only solution
     SPELL_BREW_BOLT_MINOR               = 116155
 };
 
@@ -465,16 +465,13 @@ public :
             if(me->HasUnitState(UNIT_STATE_CASTING))
                 return ;
 
-            if(me->HasAura(SPELL_FERMENT))
-                return ;
-
             while(uint32 eventId = _events.ExecuteEvent()) {
                 switch(eventId) {
                 case EVENT_YEASTY_BREW_ALAMENTAL_FERMENT :
                     if(_yanZhu)
                         me->SetFacingToObject(_yanZhu);
-                    DoCast(me, SPELL_FERMENT);
-                    _events.ScheduleEvent(EVENT_YEASTY_BREW_ALAMENTAL_FERMENT, 1000); // In case aura removed
+                    DoCast(SPELL_FERMENT);
+                    _events.ScheduleEvent(EVENT_YEASTY_BREW_ALAMENTAL_FERMENT, 500); // Replace the periodic tick
                     break ;
 
                 default :
