@@ -139,7 +139,7 @@ public :
                 if(GameObject* entrance = ObjectAccessor::GetGameObject(*me, instance->GetData64(INSTANCE_DATA64_HOPTALLUS_ENTRANCE_GUID)))
                     entrance->SetGoState(GO_STATE_ACTIVE);
                 if(GameObject* exit = ObjectAccessor::GetGameObject(*me, instance->GetData64(INSTANCE_DATA64_HOPTALLUS_EXIT_GUID)))
-                    exit->SetGoState(GO_STATE_ACTIVE);
+                    exit->RemoveFromWorld();
             }
 
             if(Creature* c = me->SummonCreature(NPC_CARROT_COLLECTOR, -702.496643f, 1248.231689f, 162.794922f, 1.271960f))
@@ -255,14 +255,7 @@ public :
                         break ;
                     }
 					b_carrotBreath = true ;
-					if(TempSummon* summon = me->SummonCreature(NPC_CARROT_BREATH_HELPER, 
-															me->GetPositionX() + 0.5 * cos(me->GetOrientation()),
-															me->GetPositionY() + 0.5 * sin(me->GetOrientation()),
-															me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000)) {
-						me->SetTarget(summon->GetGUID());
-						me->SetFacingTo(me->GetAngle(summon));
-						DoCast(summon, SPELL_CARROT_BREATH, true);
-					}
+					DoCast(SPELL_CARROT_BREATH);
 					Talk(TALK_CARROT_BREATH);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
@@ -655,7 +648,7 @@ void AddSC_boss_hoptallus()
     new mob_virmen();
     new stalker_carrot_breath();
     new npc_big_ol_hammer();
-    // new spell_hoptallus_carrot_breath();
+    new spell_hoptallus_carrot_breath();
 	new spell_hoptallus_carrot_breath_periodic();
     new spell_hoptallus_furlwind();
 }
