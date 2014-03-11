@@ -653,23 +653,6 @@ public :
             return (GetCaster() && GetCaster()->ToCreature());
         }
 
-        // Puts target to sleep if stacks reaches 10
-        void HandleAfterEffectApply(AuraEffect const* auraEff, AuraEffectHandleModes mode) {
-            if(!GetOwner())
-                return ;
-
-            if(GetOwner()->GetTypeId() != TYPEID_PLAYER)
-                return ;
-
-            Player* owner = GetOwner()->ToPlayer();
-
-            if(Aura* blackoutBrew = owner->GetAura(SPELL_BLACKOUT_BREW_STACK))
-                if(blackoutBrew->GetStackAmount() >= 10) {
-                    owner->RemoveAurasDueToSpell(SPELL_BLACKOUT_BREW_STACK);
-                    owner->CastSpell(owner, SPELL_BLACKOUT_DRUNK);
-                }
-        }
-
         // Remove a stack each second if and only if owner is moving
         void HandleEffectPeriodic(AuraEffect const* auraEff) {
             if(!GetOwner() || GetOwner()->GetTypeId() != TYPEID_PLAYER)
@@ -679,11 +662,13 @@ public :
 
             if(owner->isMoving())
                 if(Aura* blackoutBrew = owner->GetAura(SPELL_BLACKOUT_BREW_STACK))
-                    blackoutBrew->SetStackAmount(blackoutBrew->GetStackAmount() - 1);
+					if(blackoutBrew->GetStackAmount() > 1) // Otherwise the core lowers it to 255 stack, this is logic don't you think ?
+						blackoutBrew->SetStackAmount(blackoutBrew->GetStackAmount() - 1);
+					else // Standart remove
+						blackoutBrew->Remove();
         }
 
         void Register() {
-            AfterEffectApply += AuraEffectApplyFn(spell_yanzhu_blackout_brew_AuraScript::HandleAfterEffectApply, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_yanzhu_blackout_brew_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
@@ -691,6 +676,35 @@ public :
     AuraScript* GetAuraScript() const {
         return new spell_yanzhu_blackout_brew_AuraScript();
     }
+	
+	class spell_yanzhu_blackout_brew_SpellScript : public SpellScript {
+		PrepareSpellScript(spell_yanzhu_blackout_brew_SpellScript);
+		
+		bool Validate(const SpellInfo* spellInfo) {
+			return true ;
+		}
+		
+		bool Load() {
+			return true ;
+		}
+		
+		void HandleEffectHitTarget(SpellEffIndex effIndex) {
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Blackout Brew : OnEffectHitTarget (EFFECT_1) Handler") ; // Because I never trust OnEffectHitTarget handlers
+			if(GetHitUnit())
+				if(Aura* brew = GetHitUnit()->GetAura(SPELL_BLACKOUT_BREW_STACK))
+					if(brew->GetStackAmount() == 9) // Check is done right here, because script effect handlers are called before call to the handlers
+						// We could prevent the default effect, but it's a bit useless, since the aura cannot stack over 10
+						GetHitUnit()->CastSpell(GetHitUnit(), SPELL_BLACKOUT_DRUNK, true) ;
+		}
+		
+		void Register() {
+			OnEffectHitTarget += SpellEffectFn(spell_yanzhu_blackout_brew_SpellScript::HandleEffectHitTarget, EFFECT_1, SPELL_EFFECT_APPLY_AURA); // Multi target spell, so HitTarget instead of Hit
+		}
+	};
+	
+	SpellScript* GetSpellScript() const {
+		return new spell_yanzhu_blackout_brew_SpellScript(); 
+	}
 };
 
 class spell_yanzhu_bloat : public SpellScriptLoader {
