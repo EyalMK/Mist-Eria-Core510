@@ -258,8 +258,11 @@ public :
 					if(TempSummon* summon = me->SummonCreature(NPC_CARROT_BREATH_HELPER, 
 															me->GetPositionX() + 0.5 * cos(me->GetOrientation()),
 															me->GetPositionY() + 0.5 * sin(me->GetOrientation()),
-															me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000))
+															me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000)) {
+						me->SetTarget(summon->GetGUID());
+						me->SetFacingTo(me->GetAngle(summon));
 						DoCast(summon, SPELL_CARROT_BREATH, true);
+					}
 					Talk(TALK_CARROT_BREATH);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
