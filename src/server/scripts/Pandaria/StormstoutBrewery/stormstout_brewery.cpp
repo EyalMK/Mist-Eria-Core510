@@ -152,19 +152,19 @@ public :
                     break ;
 
                 case 1 : // After "Oh Zan"
-                    m_uiTalkTimer = 8000 ; // 4 s self + 2 s wait + 2 s Chen
+                    m_uiTalkTimer = 10000 ; // 4 s self + 2 s wait + 2 s Chen
                     break ;
 
                 case 2 : // After "It is certainly"
-                    m_uiTalkTimer = 10000 ; // 4s self + 2s wait + 4 s Chen
+                    m_uiTalkTimer = 12000 ; // 4s self + 2s wait + 4 s Chen
                     break ;
 
                 case 3 : // After "Have you seen"
-                    m_uiTalkTimer = 9000 ; // 3s self + 2s wait + 4 s Chen
+                    m_uiTalkTimer = 11000 ; // 3s self + 2s wait + 4 s Chen
                     break ;
 
                 case 4 : // After "Abandonned"
-                    m_uiTalkTimer = 15000 ; // 11 s self + 2 s wait + 2s Chen
+                    m_uiTalkTimer = 17000 ; // 11 s self + 2 s wait + 2s Chen
                     break ;
 
                 case 5 : // After "I have"
@@ -361,6 +361,25 @@ public :
     public :
         mob_hozen_illusioned_AI(Creature* creature) : ScriptedAI(creature) {
 
+        }
+
+        void JustDied(Unit* killer) {
+            if(InstanceScript* instance = me->GetInstanceScript())
+                instance->SetData64(INSTANCE_DATA64_KILLED_HOZENS, 1);
+
+            if(Map* map = me->GetMap()) {
+                Map::PlayerList const& playerList = map->GetPlayers();
+
+                if(playerList.isEmpty())
+                    return ;
+
+                for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter) {
+                    if(Player* player = iter->getSource()) {
+                        player->SetMaxPower(POWER_ALTERNATE_POWER, 40);
+                        player->SetPower(POWER_ALTERNATE_POWER, player->GetPower(POWER_ALTERNATE_POWER) + 1);
+                    }
+                }
+            }
         }
 
         void UpdateAI(const uint32 diff) {
@@ -574,8 +593,7 @@ public :
             if(enter) {
 				me->movespline->_Finalize();
                 me->StopMoving();
-			}
-            else {
+            } else {
                 if(instance)
                     instance->ProcessEvent(NULL, m_uiIndex);
                 me->Kill(me);
@@ -749,7 +767,7 @@ public :
 
         void DoAction(const int32 action)
         {
-            if(action == 0)
+            if(action == 1)
             {
                 DoMoveBouncers();
             }
@@ -1090,6 +1108,53 @@ public :
     }
 };
 
+class npc_carrot_collector : public CreatureScript {
+public :
+    npc_carrot_collector() : CreatureScript("npc_carrot_collector") {
+
+    }
+
+    class npc_carrot_collector_AI : public ScriptedAI {
+    public :
+        npc_carrot_collector_AI(Creature* creature) : ScriptedAI(creature) {
+            _carrotStalker = NULL ;
+        }
+
+        void Reset() {
+            _carrotStalker = NULL ;
+        }
+
+        void DoAction(const int32 action) {
+            if(action == 1) {
+                _carrotStalker = me->FindNearestCreature(200504, 50000.0f);
+                if(_carrotStalker)
+                    me->GetMotionMaster()->MovePoint(0, *_carrotStalker);
+            }
+        }
+
+        void MovementInform(uint32 motionType, uint32 pointId) {
+            if(motionType != POINT_MOTION_TYPE || pointId != 0)
+                return ;
+
+            if(_carrotStalker) {
+                _carrotStalker->AI()->DoAction(0);
+                me->GetMotionMaster()->MoveFollow(_carrotStalker, 1.0f, _carrotStalker->GetOrientation());
+            }
+        }
+
+        void UpdateAI(const uint32 diff) {
+            return ;
+        }
+
+    private :
+        Creature* _carrotStalker ;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const {
+        return new npc_carrot_collector_AI(creature);
+    }
+};
+
 #define NPC_CARROT_STALKER 200502
 #define MAX_CARROT_POSITIONS 8
 const Position carrotPositions[MAX_CARROT_POSITIONS] =
@@ -1244,6 +1309,8 @@ public :
                 DoCheckForPlayers();
                 m_uiCheckTimer = 500 ;
             }
+            else
+                m_uiCheckTimer -= diff ;
         }
 
         void DoCheckForPlayers()
@@ -1541,20 +1608,22 @@ public :
 
             // Cast the spells on YanZhu, based on which creatures were summoned
             if(_stoutAlamental == MOB_STOUT_ALAMENTAL_FIZZY_BREW)
-                yanZhu->CastSpell(yanZhu, SPELL_FIZZY_BREW);
+                yanZhu->AI()->SetData(0, SPELL_FIZZY_BREW);
             else
-                yanZhu->CastSpell(yanZhu, SPELL_SUDSY_BREW);
+                yanZhu->AI()->SetData(0, SPELL_SUDSY_BREW);
 
             if(_aleAlamental == MOB_ALE_ALAMENTAL_BUBBLING_BREW)
-                yanZhu->CastSpell(yanZhu, SPELL_BUBBLING_BREW);
+                yanZhu->AI()->SetData(1, SPELL_BUBBLING_BREW);
             else
-                yanZhu->CastSpell(yanZhu, SPELL_YEASTY_BREW);
+                yanZhu->AI()->SetData(1, SPELL_YEASTY_BREW);
 
             if(_wheatAlamental == MOB_WHEAT_ALAMENTAL_BLOATED_BREW)
-                yanZhu->CastSpell(yanZhu, SPELL_BLACKOUT_BREW);
+                yanZhu->AI()->SetData(2, SPELL_BLACKOUT_BREW);
             else
-                yanZhu->CastSpell(yanZhu, SPELL_BLOATING_BREW);
-
+                yanZhu->AI()->SetData(2, SPELL_BLOATING_BREW);
+			
+			// Force boss to cast spells on self :
+			yanZhu->AI()->Reset();
         }
 
     private :
@@ -1659,6 +1728,7 @@ void AddSC_stormstout_brewery()
 
     // Hoptallus
     new mob_hoptallus_trash();
+    new npc_carrot_collector();
     new stalker_carrot_door();
 
     // YanZhu

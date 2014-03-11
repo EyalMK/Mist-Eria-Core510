@@ -189,7 +189,7 @@ public :
                 case GOB_HOPTALLUS_EXIT :
                     m_uiHoptallusExitGuid = guid ;
                     if(GetData(INSTANCE_DATA_HOPTALLUS_STATUS) == DONE)
-                        gameObject->SetGoState(GO_STATE_ACTIVE);
+                        gameObject->RemoveFromWorld();
                     break ;
 
                 case GOB_YAN_ZHU_ENTRANCE :

@@ -77,7 +77,7 @@ enum YanZhuSpells {
     SPELL_YEASTY_BREW                   = 114932,
 
     /** Yeasty Brew Alamental **/
-    SPELL_FERMENT                       = 106859, // Periodically trigger 114451, but using it this way, we can handle targets better
+    SPELL_FERMENT                       = 114451, // Since 106859 doesn't work (don'y know why), this is the only solution
     SPELL_BREW_BOLT_MINOR               = 116155
 };
 
@@ -107,11 +107,21 @@ namespace YanZhu {
             if(!target)
                 return true ;
 
-            if(!_spellId)
+            if(_spellId == SPELL_WALL_OF_SUDS_DAMAGES)
                 if(target->GetTypeId() != TYPEID_PLAYER)
                     return true ;
-
-            if(!_caster->HasInLine(target, 0.0f))
+			
+			float width = 0.0f ;
+			switch(_spellId) {
+				case SPELL_WALL_OF_SUDS_DAMAGES :
+					width = 4.0f ;
+					break ;
+					
+				default :
+					break ;
+			}
+			
+            if(!_caster->HasInLine(target, width))
                 return true ;
 
             return false ;
@@ -121,6 +131,44 @@ namespace YanZhu {
         Creature* _caster ;
         uint32 _spellId ;
     };
+	
+	class FermentTargetSelector {
+	public :
+		FermentTargetSelector() {
+		
+		}
+		
+		bool operator()(WorldObject* target) {
+			// Target is a player : do not remove it
+			if(target && target->GetTypeId() == TYPEID_PLAYER)
+				return false ;
+				
+			// Didn't return, target is not player, so check entry
+			if(target && target->GetEntry() == BOSS_YAN_ZHU)
+				return false ;
+			
+			// Didn't return, wasn't YanZhu, check for friends
+			if(target && target->GetEntry() == MOB_YEASTY_BREW_ALAMENTAL)
+				return false ;
+				
+			// Didn't return, not a player, yan zhu or a friend, so it is bad target : remove it
+			return true ;
+		}
+	};
+	
+	class WallOfSudsTargetSelector {
+	public :
+		WallOfSudsTargetSelector() {
+		
+		}
+		
+		bool operator()(WorldObject* target) {
+			if(target && target->GetTypeId() != TYPEID_PLAYER)
+				return true ;
+				
+			return false ;
+		}
+	};
 
     class IgnoreTargetPredicate {
     public :
@@ -158,9 +206,15 @@ namespace YanZhu {
         float _difference ;
     };
 
-    const Position wallOfSudsPositions[2] = {
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f}
+    const Position wallOfSudsPositions[2][2] = {
+		{
+			{-673.752014f, 1193.162231f, 166.732635f, 3.423159f},
+			{-664.642944f, 1148.553955f, 166.732635f, 1.811523f}
+		}, 
+		{
+			{-744.290283f, 1179.231079f, 166.732635f, 4.968039f},
+			{-732.704712f, 1131.331665f, 166.732635f, 0.225805f}
+		}
     };
 
     const Position summonFizzyBubblePositions[8] = {
@@ -194,6 +248,7 @@ public :
     public :
         boss_yan_zhu_the_uncasked_AI(Creature* creature) : ScriptedAI(creature) {
             _instance = creature->GetInstanceScript();
+			memset(&_brews, 0, sizeof(_brews));
         }
 
         /** ScriptedAI Functions **/
@@ -202,11 +257,18 @@ public :
                 _instance->SetData(INSTANCE_DATA_YAN_ZHU_STATUS, NOT_STARTED);
             _uncleGao = me->ToTempSummon()->GetSummoner()->ToCreature() ;
             _events.Reset();
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+			
+			for(uint8 i = 0 ; i < 3 ; ++i)
+				DoCast(me, _brews[i]);
         }
 
         void EnterCombat(Unit *aggro) {
-            if(_instance)
+            if(_instance) {
                 _instance->SetData(INSTANCE_DATA_YAN_ZHU_STATUS, IN_PROGRESS);
+				if(GameObject* entrance = ObjectAccessor::GetGameObject(*me, _instance->GetData64(INSTANCE_DATA64_YAN_ZHU_ENTRANCE_GUID)))
+					entrance->SetGoState(GO_STATE_READY);
+			}
 
             // Stout
             if(me->HasAura(SPELL_SUDSY_BREW))
@@ -231,16 +293,26 @@ public :
         }
 
         void EnterEvadeMode() {
-            if(_instance)
+            if(_instance) {
                 _instance->SetData(INSTANCE_DATA_YAN_ZHU_STATUS, FAIL);
+				if(GameObject* entrance = ObjectAccessor::GetGameObject(*me, _instance->GetData64(INSTANCE_DATA64_YAN_ZHU_ENTRANCE_GUID)))
+					entrance->SetGoState(GO_STATE_ACTIVE);
+			}
 
             ScriptedAI::EnterEvadeMode();
         }
 
         void JustDied(Unit* killer) {
-            if(_instance)
+            if(_instance) {
                 _instance->SetData(INSTANCE_DATA_YAN_ZHU_STATUS, DONE);
+				if(GameObject* entrance = ObjectAccessor::GetGameObject(*me, _instance->GetData64(INSTANCE_DATA64_YAN_ZHU_ENTRANCE_GUID)))
+					entrance->SetGoState(GO_STATE_ACTIVE);
+			}
         }
+		
+		void SetData(uint32 index, uint32 data) {
+			_brews[index] = data ;
+		}
 
         void UpdateAI(const uint32 diff) {
             if(!UpdateVictim())
@@ -281,17 +353,19 @@ public :
                     _events.ScheduleEvent(EVENT_YAN_ZHU_CARBONATION, IsHeroic() ? urand(25000, 30000) : urand(40000, 50000));
                     break ;
 
-                case EVENT_YAN_ZHU_WALL_OF_SUDS :
+                case EVENT_YAN_ZHU_WALL_OF_SUDS : {
+					uint8 j = (uint8)urand(0, 1);
                     for(uint8 i = 0 ; i < 2 ; ++i) {
-                        const Position summonPosition = YanZhu::wallOfSudsPositions[i];
+                        const Position summonPosition = YanZhu::wallOfSudsPositions[j][i];
                         if(Creature* summon = me->SummonCreature(MOB_WALL_OF_SUDS, summonPosition, TEMPSUMMON_TIMED_DESPAWN, 15000))
-                            DoCast(summon, SPELL_WALL_OF_SUDS_TRIGGER_PERIODIC);
+                            summon->CastSpell(summon, SPELL_WALL_OF_SUDS_TRIGGER_PERIODIC);
                     }
                     DoCastToAllHostilePlayers(SPELL_SUDSY_PROC_TRIGGER_SPELL);
                     _events.ScheduleEvent(EVENT_YAN_ZHU_WALL_OF_SUDS, IsHeroic() ? urand(25000, 30000) : urand(40000, 50000));
                     _events.ScheduleEvent(EVENT_YAN_ZHU_CHECK_FOR_SUDSY, 500);
                     _events.ScheduleEvent(EVENT_YAN_ZHU_STOP_SEARCHING, 15000);
                     break ;
+				}
 
                 case EVENT_YAN_ZHU_BUBBLE_SHIELD :
 					if(me->HasAura(SPELL_BUBBLE_SHIELD)) {
@@ -351,7 +425,7 @@ public :
                 for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter) {
                     if(Player* player = iter->getSource()) {
                         float dist = me->GetExactDist2d(player);
-                        if(dist <= 5.0f) {
+                        if(dist <= 7.5f) {
                             _events.ScheduleEvent(EVENT_YAN_ZHU_CHECK_FOR_PLAYERS, 500);
                             _events.CancelEvent(EVENT_YAN_ZHU_BREW_BOLT);
                             return ;
@@ -420,6 +494,9 @@ public :
 
         /// Pointer to the summoner
         Creature* _uncleGao ;
+		
+		/// Spells the boss will cast on itself
+		uint32 _brews[3];
     };
 
     CreatureAI* GetAI(Creature* creature) const {
@@ -445,6 +522,11 @@ public :
 
             // _events.ScheduleEvent(EVENT_YEASTY_BREW_ALAMENTAL_BREW_BOLT, 1000); // Don't know when this is casted
             _events.ScheduleEvent(EVENT_YEASTY_BREW_ALAMENTAL_FERMENT, MIN_MAP_UPDATE_DELAY);
+			
+			if(_yanZhu) {
+                me->SetFacingToObject(_yanZhu);
+				me->SetFacingTo(me->GetOrientation() - M_PI / 2); // Rotate 90 ° right, to cast spell on Yan Zhu 
+			}
 
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
         }
@@ -455,16 +537,12 @@ public :
             if(me->HasUnitState(UNIT_STATE_CASTING))
                 return ;
 
-            if(me->HasAura(SPELL_FERMENT))
-                return ;
-
             while(uint32 eventId = _events.ExecuteEvent()) {
                 switch(eventId) {
                 case EVENT_YEASTY_BREW_ALAMENTAL_FERMENT :
-                    if(_yanZhu)
-                        me->SetFacingToObject(_yanZhu);
-                    DoCast(me, SPELL_FERMENT);
-                    _events.ScheduleEvent(EVENT_YEASTY_BREW_ALAMENTAL_FERMENT, 1000); // In case aura removed
+                    
+                    DoCast(SPELL_FERMENT);
+                    _events.ScheduleEvent(EVENT_YEASTY_BREW_ALAMENTAL_FERMENT, 500); // Replace the periodic tick
                     break ;
 
                 default :
@@ -605,7 +683,8 @@ public :
             caster->SetOrientation(caster->GetOrientation() + M_PI / 2.0f);
 
             // Filters targets like the target 129
-            targets.remove_if(YanZhu::InlineCheckPredicate(caster));
+			targets.remove_if(YanZhu::WallOfSudsTargetSelector());
+            targets.remove_if(YanZhu::InlineCheckPredicate(caster, GetSpellInfo()->Id));
 
             // Restores caster orientation
             caster->SetOrientation(caster->GetOrientation() - M_PI / 2.0f);
@@ -646,23 +725,6 @@ public :
             return (GetCaster() && GetCaster()->ToCreature());
         }
 
-        // Puts target to sleep if stacks reaches 10
-        void HandleAfterEffectApply(AuraEffect const* auraEff, AuraEffectHandleModes mode) {
-            if(!GetOwner())
-                return ;
-
-            if(GetOwner()->GetTypeId() != TYPEID_PLAYER)
-                return ;
-
-            Player* owner = GetOwner()->ToPlayer();
-
-            if(Aura* blackoutBrew = owner->GetAura(SPELL_BLACKOUT_BREW_STACK))
-                if(blackoutBrew->GetStackAmount() >= 10) {
-                    owner->RemoveAurasDueToSpell(SPELL_BLACKOUT_BREW_STACK);
-                    owner->CastSpell(owner, SPELL_BLACKOUT_DRUNK);
-                }
-        }
-
         // Remove a stack each second if and only if owner is moving
         void HandleEffectPeriodic(AuraEffect const* auraEff) {
             if(!GetOwner() || GetOwner()->GetTypeId() != TYPEID_PLAYER)
@@ -672,11 +734,13 @@ public :
 
             if(owner->isMoving())
                 if(Aura* blackoutBrew = owner->GetAura(SPELL_BLACKOUT_BREW_STACK))
-                    blackoutBrew->SetStackAmount(blackoutBrew->GetStackAmount() - 1);
+					if(blackoutBrew->GetStackAmount() > 1) // Otherwise the core lowers it to 255 stack, this is logic don't you think ?
+						blackoutBrew->SetStackAmount(blackoutBrew->GetStackAmount() - 1);
+					else // Standart remove
+						blackoutBrew->Remove();
         }
 
         void Register() {
-            AfterEffectApply += AuraEffectApplyFn(spell_yanzhu_blackout_brew_AuraScript::HandleAfterEffectApply, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_yanzhu_blackout_brew_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
@@ -684,6 +748,37 @@ public :
     AuraScript* GetAuraScript() const {
         return new spell_yanzhu_blackout_brew_AuraScript();
     }
+	
+	class spell_yanzhu_blackout_brew_SpellScript : public SpellScript {
+		PrepareSpellScript(spell_yanzhu_blackout_brew_SpellScript);
+		
+		bool Validate(const SpellInfo* spellInfo) {
+			return true ;
+		}
+		
+		bool Load() {
+			return true ;
+		}
+		
+		void HandleEffectHitTarget(SpellEffIndex effIndex) {
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Blackout Brew : OnEffectHitTarget (EFFECT_1) Handler") ; // Because I never trust OnEffectHitTarget handlers
+			if(GetHitUnit())
+				if(Aura* brew = GetHitUnit()->GetAura(SPELL_BLACKOUT_BREW_STACK))
+					if(brew->GetStackAmount() == 9) { // Check is done right here, because script effect handlers are called before call to the handlers
+						// We could prevent the default effect, but it's a bit useless, since the aura cannot stack over 10
+						GetHitUnit()->CastSpell(GetHitUnit(), SPELL_BLACKOUT_DRUNK, true) ;
+						brew->Remove() ; // Prevents the player from being commated again
+					}
+		}
+		
+		void Register() {
+			OnEffectHitTarget += SpellEffectFn(spell_yanzhu_blackout_brew_SpellScript::HandleEffectHitTarget, EFFECT_1, SPELL_EFFECT_APPLY_AURA); // Multi target spell, so HitTarget instead of Hit
+		}
+	};
+	
+	SpellScript* GetSpellScript() const {
+		return new spell_yanzhu_blackout_brew_SpellScript(); 
+	}
 };
 
 class spell_yanzhu_bloat : public SpellScriptLoader {
@@ -797,8 +892,12 @@ public :
             Creature* caster = GetCaster()->ToCreature();
             // Add 90° to face the targets
             caster->SetOrientation(caster->GetOrientation() + M_PI / 2.0f);
-
+			
+			targets.remove_if(YanZhu::FermentTargetSelector()); // Remove everything except friends, Yan Zhu and players (prevent casting spell on creatures in the romm downstairs)
             targets.remove_if(YanZhu::InlineCheckPredicate(GetCaster()->ToCreature(), GetSpellInfo()->Id)); // Remove bad targets
+			if(targets.empty())
+				return ;
+				
             targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster())); // Sort by distance
 
             WorldObject* final = targets.front(); // Get the closest
@@ -848,7 +947,7 @@ public :
                 if(Creature* bubble = caster->SummonCreature(MOB_BUBBLE_SHIELD, caster->GetPositionX() + rand() % 3, caster->GetPositionY() + rand() % 3,
                                                              caster->GetPositionZ() + 7, 0, TEMPSUMMON_CORPSE_DESPAWN)) {
                     bubble->EnterVehicle(caster);
-                    sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Bubble Shield : Unit boarded");
+					bubble->SetReactState(REACT_PASSIVE);
                 }
             }
         }

@@ -23565,7 +23565,7 @@ void Player::SendInitialPacketsAfterAddToMap()
     GetSession()->SendPacket(&data);
 
     WorldPacket pets(Opcodes(0x535));
-    pets.WriteBit(1);
+    pets.WriteBit(0);
     pets.WriteBits(0, 21);
     pets.WriteBit(0);
     pets.FlushBits();
