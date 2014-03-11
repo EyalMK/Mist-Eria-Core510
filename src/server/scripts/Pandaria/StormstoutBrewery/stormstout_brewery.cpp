@@ -1608,20 +1608,22 @@ public :
 
             // Cast the spells on YanZhu, based on which creatures were summoned
             if(_stoutAlamental == MOB_STOUT_ALAMENTAL_FIZZY_BREW)
-                yanZhu->CastSpell(yanZhu, SPELL_FIZZY_BREW);
+                yanZhu->AI()->SetData(0, SPELL_FIZZY_BREW);
             else
-                yanZhu->CastSpell(yanZhu, SPELL_SUDSY_BREW);
+                yanZhu->AI()->SetData(0, SPELL_SUDSY_BREW);
 
             if(_aleAlamental == MOB_ALE_ALAMENTAL_BUBBLING_BREW)
-                yanZhu->CastSpell(yanZhu, SPELL_BUBBLING_BREW);
+                yanZhu->AI()->SetData(1, SPELL_BUBBLING_BREW);
             else
-                yanZhu->CastSpell(yanZhu, SPELL_YEASTY_BREW);
+                yanZhu->AI()->SetData(1, SPELL_YEASTY_BREW);
 
             if(_wheatAlamental == MOB_WHEAT_ALAMENTAL_BLOATED_BREW)
-                yanZhu->CastSpell(yanZhu, SPELL_BLACKOUT_BREW);
+                yanZhu->AI()->SetData(2, SPELL_BLACKOUT_BREW);
             else
-                yanZhu->CastSpell(yanZhu, SPELL_BLOATING_BREW);
-
+                yanZhu->AI()->SetData(2, SPELL_BLOATING_BREW);
+			
+			// Force boss to cast spells on self :
+			yanZhu->AI()->Reset();
         }
 
     private :
