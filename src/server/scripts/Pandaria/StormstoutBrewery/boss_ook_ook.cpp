@@ -95,7 +95,7 @@ public :
             if(GameObject* go = me->FindNearestGameObject(200002, 50000.0f))
                 go->RemoveFromWorld();
             if(Creature* stalker = me->FindNearestCreature(200501, 50000.0f))
-                stalker->AI()->DoAction(0);
+                stalker->AI()->DoAction(1);
 			
 			DoRemoveBarrels();
             Talk(SAY_JUST_DIED);

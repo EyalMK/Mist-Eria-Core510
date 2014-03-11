@@ -363,6 +363,25 @@ public :
 
         }
 
+        void JustDied(Unit* killer) {
+            if(InstanceScript* instance = me->GetInstanceScript())
+                instance->SetData64(INSTANCE_DATA64_KILLED_HOZENS, 1);
+
+            if(Map* map = me->GetMap()) {
+                Map::PlayerList const& playerList = map->GetPlayers();
+
+                if(playerList.isEmpty())
+                    return ;
+
+                for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter) {
+                    if(Player* player = iter->getSource()) {
+                        player->SetMaxPower(POWER_ALTERNATE_POWER, 40);
+                        player->SetPower(POWER_ALTERNATE_POWER, player->GetPower(POWER_ALTERNATE_POWER) + 1);
+                    }
+                }
+            }
+        }
+
         void UpdateAI(const uint32 diff) {
             if(!UpdateVictim())
                 return ;
@@ -574,8 +593,7 @@ public :
             if(enter) {
 				me->movespline->_Finalize();
                 me->StopMoving();
-			}
-            else {
+            } else {
                 if(instance)
                     instance->ProcessEvent(NULL, m_uiIndex);
                 me->Kill(me);
@@ -749,7 +767,7 @@ public :
 
         void DoAction(const int32 action)
         {
-            if(action == 0)
+            if(action == 1)
             {
                 DoMoveBouncers();
             }
@@ -1090,6 +1108,53 @@ public :
     }
 };
 
+class npc_carrot_collector : public CreatureScript {
+public :
+    npc_carrot_collector() : CreatureScript("npc_carrot_collector") {
+
+    }
+
+    class npc_carrot_collector_AI : public ScriptedAI {
+    public :
+        npc_carrot_collector_AI(Creature* creature) : ScriptedAI(creature) {
+            _carrotStalker = NULL ;
+        }
+
+        void Reset() {
+            _carrotStalker = NULL ;
+        }
+
+        void DoAction(const int32 action) {
+            if(action == 1) {
+                _carrotStalker = me->FindNearestCreature(200504, 50000.0f);
+                if(_carrotStalker)
+                    me->GetMotionMaster()->MovePoint(0, *_carrotStalker);
+            }
+        }
+
+        void MovementInform(uint32 motionType, uint32 pointId) {
+            if(motionType != POINT_MOTION_TYPE || pointId != 0)
+                return ;
+
+            if(_carrotStalker) {
+                _carrotStalker->AI()->DoAction(0);
+                me->GetMotionMaster()->MoveFollow(_carrotStalker, 1.0f, _carrotStalker->GetOrientation());
+            }
+        }
+
+        void UpdateAI(const uint32 diff) {
+            return ;
+        }
+
+    private :
+        Creature* _carrotStalker ;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const {
+        return new npc_carrot_collector_AI(creature);
+    }
+};
+
 #define NPC_CARROT_STALKER 200502
 #define MAX_CARROT_POSITIONS 8
 const Position carrotPositions[MAX_CARROT_POSITIONS] =
@@ -1244,6 +1309,8 @@ public :
                 DoCheckForPlayers();
                 m_uiCheckTimer = 500 ;
             }
+            else
+                m_uiCheckTimer -= diff ;
         }
 
         void DoCheckForPlayers()
@@ -1659,6 +1726,7 @@ void AddSC_stormstout_brewery()
 
     // Hoptallus
     new mob_hoptallus_trash();
+    new npc_carrot_collector();
     new stalker_carrot_door();
 
     // YanZhu

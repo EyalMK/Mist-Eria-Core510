@@ -202,6 +202,7 @@ public :
                 _instance->SetData(INSTANCE_DATA_YAN_ZHU_STATUS, NOT_STARTED);
             _uncleGao = me->ToTempSummon()->GetSummoner()->ToCreature() ;
             _events.Reset();
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
         }
 
         void EnterCombat(Unit *aggro) {
@@ -360,7 +361,7 @@ public :
                 for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter) {
                     if(Player* player = iter->getSource()) {
                         float dist = me->GetExactDist2d(player);
-                        if(dist <= 5.0f) {
+                        if(dist <= 7.5f) {
                             _events.ScheduleEvent(EVENT_YAN_ZHU_CHECK_FOR_PLAYERS, 500);
                             _events.CancelEvent(EVENT_YAN_ZHU_BREW_BOLT);
                             return ;
