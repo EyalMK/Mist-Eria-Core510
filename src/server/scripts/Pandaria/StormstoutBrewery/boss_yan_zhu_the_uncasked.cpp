@@ -107,11 +107,21 @@ namespace YanZhu {
             if(!target)
                 return true ;
 
-            if(!_spellId)
+            if(_spellId == SPELL_WALL_OF_SUDS_DAMAGES)
                 if(target->GetTypeId() != TYPEID_PLAYER)
                     return true ;
-
-            if(!_caster->HasInLine(target, 0.0f))
+			
+			float width = 0.0f ;
+			switch(_spellId) {
+				case SPELL_WALL_OF_SUDS_DAMAGES :
+					_width = 4.0f ;
+					break ;
+					
+				default :
+					break ;
+			}
+			
+            if(!_caster->HasInLine(target, width))
                 return true ;
 
             return false ;
@@ -501,6 +511,11 @@ public :
 
             // _events.ScheduleEvent(EVENT_YEASTY_BREW_ALAMENTAL_BREW_BOLT, 1000); // Don't know when this is casted
             _events.ScheduleEvent(EVENT_YEASTY_BREW_ALAMENTAL_FERMENT, MIN_MAP_UPDATE_DELAY);
+			
+			if(_yanZhu) {
+                me->SetFacingToObject(_yanZhu);
+				me->SetFacingTo(me->GetOrientation() - M_PI / 2); // Rotate 90 ° right, to cast spell on Yan Zhu 
+			}
 
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
         }
@@ -514,10 +529,7 @@ public :
             while(uint32 eventId = _events.ExecuteEvent()) {
                 switch(eventId) {
                 case EVENT_YEASTY_BREW_ALAMENTAL_FERMENT :
-                    if(_yanZhu) {
-                        me->SetFacingToObject(_yanZhu);
-						me->SetFacingTo(me->GetOrientation() - M_PI / 2); // Rotate 90 ° right, to cast spell on Yan Zhu 
-					}
+                    
                     DoCast(SPELL_FERMENT);
                     _events.ScheduleEvent(EVENT_YEASTY_BREW_ALAMENTAL_FERMENT, 500); // Replace the periodic tick
                     break ;
@@ -661,7 +673,7 @@ public :
 
             // Filters targets like the target 129
 			targets.remove_if(YanZhu::WallOfSudsTargetSelector());
-            targets.remove_if(YanZhu::InlineCheckPredicate(caster));
+            targets.remove_if(YanZhu::InlineCheckPredicate(caster, GetSpellInfo()->Id));
 
             // Restores caster orientation
             caster->SetOrientation(caster->GetOrientation() - M_PI / 2.0f);
