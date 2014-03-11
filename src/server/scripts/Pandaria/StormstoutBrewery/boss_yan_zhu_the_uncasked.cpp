@@ -466,7 +466,7 @@ public :
 
                 for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter) {
                     if(Player* player = iter->getSource()) {
-                        if(player->GetPositionZ() > me->GetPositionZ()) { // Not perfect, maybe movementflags ?
+                        if(player->GetPositionZ() > me->GetPositionZ() + 1.0f) { // Not perfect, maybe movementflags ?
                             if(Aura* sudsy = player->GetAura(SPELL_SUDSY_PROC_TRIGGER_SPELL)) {
                                 SpellInfo const* sudsySI = sudsy->GetSpellInfo();
                                 player->CastSpell(player, sudsySI->Effects[0].TriggerSpell, true);
@@ -524,10 +524,8 @@ public :
             // _events.ScheduleEvent(EVENT_YEASTY_BREW_ALAMENTAL_BREW_BOLT, 1000); // Don't know when this is casted
             _events.ScheduleEvent(EVENT_YEASTY_BREW_ALAMENTAL_FERMENT, MIN_MAP_UPDATE_DELAY);
 			
-			if(_yanZhu) {
+			if(_yanZhu)
                 me->SetFacingToObject(_yanZhu);
-				me->SetFacingTo(me->GetOrientation() - M_PI / 2); // Rotate 90 ° right, to cast spell on Yan Zhu 
-			}
 
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
         }
@@ -680,15 +678,10 @@ public :
                 return ;
 
             Creature* caster = GetCaster()->ToCreature();
-            // Add 90° to face the targets
-            caster->SetOrientation(caster->GetOrientation() + M_PI / 2.0f);
 
             // Filters targets like the target 129
 			targets.remove_if(YanZhu::WallOfSudsTargetSelector());
             targets.remove_if(YanZhu::InlineCheckPredicate(caster, GetSpellInfo()->Id));
-
-            // Restores caster orientation
-            caster->SetOrientation(caster->GetOrientation() - M_PI / 2.0f);
 
             //! Since this is supposed to be executed in less than one tick of the world,
             //! players may not see the changing of orientation
@@ -891,8 +884,6 @@ public :
 
         void FilterTargets(std::list<WorldObject*>& targets) {
             Creature* caster = GetCaster()->ToCreature();
-            // Add 90° to face the targets
-            caster->SetOrientation(caster->GetOrientation() + M_PI / 2.0f);
 			
 			targets.remove_if(YanZhu::FermentTargetSelector()); // Remove everything except friends, Yan Zhu and players (prevent casting spell on creatures in the romm downstairs)
             targets.remove_if(YanZhu::InlineCheckPredicate(GetCaster()->ToCreature(), GetSpellInfo()->Id)); // Remove bad targets
@@ -904,9 +895,6 @@ public :
             WorldObject* final = targets.front(); // Get the closest
             targets.clear(); // Remove all
             targets.push_back(final); // Add the closest
-
-            // Reset orientation
-            caster->SetOrientation(caster->GetOrientation() - M_PI / 2.0f);
         }
 
         void Register() {
