@@ -248,6 +248,7 @@ public :
     public :
         boss_yan_zhu_the_uncasked_AI(Creature* creature) : ScriptedAI(creature) {
             _instance = creature->GetInstanceScript();
+			memset(&_brews, 0, sizeof(_brews));
         }
 
         /** ScriptedAI Functions **/
@@ -257,6 +258,9 @@ public :
             _uncleGao = me->ToTempSummon()->GetSummoner()->ToCreature() ;
             _events.Reset();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+			
+			for(uint8 i = 0 ; i < 3 ; ++i)
+				DoCast(me, _brews[i]);
         }
 
         void EnterCombat(Unit *aggro) {
@@ -305,6 +309,10 @@ public :
 					entrance->SetGoState(GO_STATE_ACTIVE);
 			}
         }
+		
+		void SetData(uint32 index, uint32 data) {
+			_brews[index] = data ;
+		}
 
         void UpdateAI(const uint32 diff) {
             if(!UpdateVictim())
@@ -486,6 +494,9 @@ public :
 
         /// Pointer to the summoner
         Creature* _uncleGao ;
+		
+		/// Spells the boss will cast on itself
+		uint32 _brews[3];
     };
 
     CreatureAI* GetAI(Creature* creature) const {
