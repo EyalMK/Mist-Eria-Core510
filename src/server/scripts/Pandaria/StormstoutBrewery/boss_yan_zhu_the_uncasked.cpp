@@ -114,7 +114,7 @@ namespace YanZhu {
 			float width = 0.0f ;
 			switch(_spellId) {
 				case SPELL_WALL_OF_SUDS_DAMAGES :
-					_width = 4.0f ;
+					width = 4.0f ;
 					break ;
 					
 				default :
