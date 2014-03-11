@@ -809,6 +809,9 @@ public :
             caster->SetOrientation(caster->GetOrientation() + M_PI / 2.0f);
 
             targets.remove_if(YanZhu::InlineCheckPredicate(GetCaster()->ToCreature(), GetSpellInfo()->Id)); // Remove bad targets
+			if(targets.empty())
+				return ;
+				
             targets.sort(Trinity::ObjectDistanceOrderPred(GetCaster())); // Sort by distance
 
             WorldObject* final = targets.front(); // Get the closest
