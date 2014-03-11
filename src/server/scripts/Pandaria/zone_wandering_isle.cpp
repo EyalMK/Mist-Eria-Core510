@@ -5449,6 +5449,53 @@ public:
     }
 };
 
+class npc_ji_lugubre : public CreatureScript
+{
+public:
+    npc_ji_lugubre(): CreatureScript("npc_ji_lugubre") { }
+
+    struct npc_ji_lugubreAI : public npc_escortAI
+    {
+        npc_ji_lugubreAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 2:
+                    Talk(0);
+                    break;
+
+                case 4:
+                    me->GetMotionMaster()->MoveJump(424.67f, 3674.40f, 78.4f, 10, 10);
+                    break;
+
+                case 35:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ji_lugubreAI(creature);
+    }
+};
+
 void AddSC_wandering_isle()
 {
     new stalker_item_equiped();
@@ -5530,4 +5577,5 @@ void AddSC_wandering_isle()
     new npc_aysa_door();
     new npc_jojo_door();
     new npc_ji_door();
+    new npc_ji_lugubre();
 }
