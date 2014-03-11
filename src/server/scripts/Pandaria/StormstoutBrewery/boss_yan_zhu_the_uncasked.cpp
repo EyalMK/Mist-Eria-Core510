@@ -158,9 +158,15 @@ namespace YanZhu {
         float _difference ;
     };
 
-    const Position wallOfSudsPositions[2] = {
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f}
+    const Position wallOfSudsPositions[2][2] = {
+		{
+			{-673.752014f, 1193.162231f, 166.732635f, 3.423159f},
+			{-664.642944f, 1148.553955f, 166.732635f, 1.811523f}
+		}, 
+		{
+			{-744.290283f, 1179.231079f, 166.732635f, 4.968039f},
+			{-732.704712f, 1131.331665f, 166.732635f, 0.225805f}
+		}
     };
 
     const Position summonFizzyBubblePositions[8] = {
@@ -291,17 +297,19 @@ public :
                     _events.ScheduleEvent(EVENT_YAN_ZHU_CARBONATION, IsHeroic() ? urand(25000, 30000) : urand(40000, 50000));
                     break ;
 
-                case EVENT_YAN_ZHU_WALL_OF_SUDS :
+                case EVENT_YAN_ZHU_WALL_OF_SUDS : {
+					uint8 j = (uint8)urand(0, 1);
                     for(uint8 i = 0 ; i < 2 ; ++i) {
-                        const Position summonPosition = YanZhu::wallOfSudsPositions[i];
+                        const Position summonPosition = YanZhu::wallOfSudsPositions[j][i];
                         if(Creature* summon = me->SummonCreature(MOB_WALL_OF_SUDS, summonPosition, TEMPSUMMON_TIMED_DESPAWN, 15000))
-                            DoCast(summon, SPELL_WALL_OF_SUDS_TRIGGER_PERIODIC);
+                            summon->CastSpell(summon, SPELL_WALL_OF_SUDS_TRIGGER_PERIODIC);
                     }
                     DoCastToAllHostilePlayers(SPELL_SUDSY_PROC_TRIGGER_SPELL);
                     _events.ScheduleEvent(EVENT_YAN_ZHU_WALL_OF_SUDS, IsHeroic() ? urand(25000, 30000) : urand(40000, 50000));
                     _events.ScheduleEvent(EVENT_YAN_ZHU_CHECK_FOR_SUDSY, 500);
                     _events.ScheduleEvent(EVENT_YAN_ZHU_STOP_SEARCHING, 15000);
                     break ;
+				}
 
                 case EVENT_YAN_ZHU_BUBBLE_SHIELD :
 					if(me->HasAura(SPELL_BUBBLE_SHIELD)) {
