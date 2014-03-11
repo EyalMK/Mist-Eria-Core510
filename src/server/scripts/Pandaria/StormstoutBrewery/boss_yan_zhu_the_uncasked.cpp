@@ -121,6 +121,44 @@ namespace YanZhu {
         Creature* _caster ;
         uint32 _spellId ;
     };
+	
+	class FermentTargetSelector {
+	public :
+		FermentTargetSelector() {
+		
+		}
+		
+		bool operator()(WorldObject* target) {
+			// Target is a player : do not remove it
+			if(target && target->GetTypeId() == TYPEID_PLAYER)
+				return false ;
+				
+			// Didn't return, target is not player, so check entry
+			if(target && target->GetEntry() == BOSS_YAN_ZHU)
+				return false ;
+			
+			// Didn't return, wasn't YanZhu, check for friends
+			if(target && target->GetEntry() == MOB_YEASTY_BREW_ALAMENTAL)
+				return false ;
+				
+			// Didn't return, not a player, yan zhu or a friend, so it is bad target : remove it
+			return true ;
+		}
+	};
+	
+	class WallOfSudsTargetSelector {
+	public :
+		WallOfSudsTargetSelector() {
+		
+		}
+		
+		bool operator()(WorldObject* target) {
+			if(target && target->GetTypeId() != TYPEID_PLAYER)
+				return true ;
+				
+			return false ;
+		}
+	};
 
     class IgnoreTargetPredicate {
     public :
@@ -476,8 +514,10 @@ public :
             while(uint32 eventId = _events.ExecuteEvent()) {
                 switch(eventId) {
                 case EVENT_YEASTY_BREW_ALAMENTAL_FERMENT :
-                    if(_yanZhu)
+                    if(_yanZhu) {
                         me->SetFacingToObject(_yanZhu);
+						me->SetFacingTo(me->GetOrientation() - M_PI / 2); // Rotate 90 ° right, to cast spell on Yan Zhu 
+					}
                     DoCast(SPELL_FERMENT);
                     _events.ScheduleEvent(EVENT_YEASTY_BREW_ALAMENTAL_FERMENT, 500); // Replace the periodic tick
                     break ;
@@ -620,6 +660,7 @@ public :
             caster->SetOrientation(caster->GetOrientation() + M_PI / 2.0f);
 
             // Filters targets like the target 129
+			targets.remove_if(YanZhu::WallOfSudsTargetSelector());
             targets.remove_if(YanZhu::InlineCheckPredicate(caster));
 
             // Restores caster orientation
@@ -700,9 +741,11 @@ public :
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Blackout Brew : OnEffectHitTarget (EFFECT_1) Handler") ; // Because I never trust OnEffectHitTarget handlers
 			if(GetHitUnit())
 				if(Aura* brew = GetHitUnit()->GetAura(SPELL_BLACKOUT_BREW_STACK))
-					if(brew->GetStackAmount() == 9) // Check is done right here, because script effect handlers are called before call to the handlers
+					if(brew->GetStackAmount() == 9) { // Check is done right here, because script effect handlers are called before call to the handlers
 						// We could prevent the default effect, but it's a bit useless, since the aura cannot stack over 10
 						GetHitUnit()->CastSpell(GetHitUnit(), SPELL_BLACKOUT_DRUNK, true) ;
+						brew->Remove() ; // Prevents the player from being commated again
+					}
 		}
 		
 		void Register() {
@@ -826,7 +869,8 @@ public :
             Creature* caster = GetCaster()->ToCreature();
             // Add 90° to face the targets
             caster->SetOrientation(caster->GetOrientation() + M_PI / 2.0f);
-
+			
+			targets.remove_if(YanZhu::FermentTargetSelector()); // Remove everything except friends, Yan Zhu and players (prevent casting spell on creatures in the romm downstairs)
             targets.remove_if(YanZhu::InlineCheckPredicate(GetCaster()->ToCreature(), GetSpellInfo()->Id)); // Remove bad targets
 			if(targets.empty())
 				return ;
@@ -880,7 +924,7 @@ public :
                 if(Creature* bubble = caster->SummonCreature(MOB_BUBBLE_SHIELD, caster->GetPositionX() + rand() % 3, caster->GetPositionY() + rand() % 3,
                                                              caster->GetPositionZ() + 7, 0, TEMPSUMMON_CORPSE_DESPAWN)) {
                     bubble->EnterVehicle(caster);
-                    sLog->outDebug(LOG_FILTER_NETWORKIO, "SPELLS : Bubble Shield : Unit boarded");
+					bubble->SetReactState(REACT_PASSIVE);
                 }
             }
         }
