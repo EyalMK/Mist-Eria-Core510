@@ -15793,13 +15793,9 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
     if (Guild* guild = sGuildMgr->GetGuildById(GetGuildId()))
 	{ 
-	    if (GetTeam() == ALLIANCE)
-			guild->GiveXP(uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_MULTIPLICATEUR_XP_QUEST_A2) * sWorld->getRate(RATE_XP_GUILD_MODIFIER)), this);
-		else if (GetTeam() == HORDE)
-			guild->GiveXP(uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_MULTIPLICATEUR_XP_QUEST_H2) * sWorld->getRate(RATE_XP_GUILD_MODIFIER)), this);
-		else
-			guild->GiveXP(uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST) * sWorld->getRate(RATE_XP_GUILD_MODIFIER)), this);
-	}
+        if ((getLevel()-6) < quest->GetQuestLevel() || quest->GetQuestLevel() == -1)
+            guild->GiveXP(uint32(60000*sWorld->getRate(RATE_XP_GUILD_MODIFIER)), this);
+        }
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
     if (quest->GetRewOrReqMoney())
