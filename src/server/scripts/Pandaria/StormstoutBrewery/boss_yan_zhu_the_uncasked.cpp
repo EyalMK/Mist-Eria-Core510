@@ -114,7 +114,7 @@ namespace YanZhu {
 			float width = 0.0f ;
 			switch(_spellId) {
 				case SPELL_WALL_OF_SUDS_DAMAGES :
-					width = 4.0f ;
+					width = 3.0f ;
 					break ;
 					
 				default :
@@ -466,10 +466,11 @@ public :
 
                 for(Map::PlayerList::const_iterator iter = playerList.begin() ; iter != playerList.end() ; ++iter) {
                     if(Player* player = iter->getSource()) {
-                        if(player->GetPositionZ() > me->GetPositionZ() + 0.1) {
+                        if(player->GetPositionZ() > me->GetPositionZ()) { // Not perfect, maybe movementflags ?
                             if(Aura* sudsy = player->GetAura(SPELL_SUDSY_PROC_TRIGGER_SPELL)) {
                                 SpellInfo const* sudsySI = sudsy->GetSpellInfo();
                                 player->CastSpell(player, sudsySI->Effects[0].TriggerSpell, true);
+								sudsy->Remove();
                                 ++count ;
                             }
                         }
