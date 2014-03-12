@@ -394,7 +394,7 @@ void AreaTrigger::Update(uint32 p_time)
             uint32 thisCount = 0, totalCount = others.size() - 1 ; // total count must remove self
             
             for(std::list<Player*>::const_iterator iter = targets.begin() ; iter != targets.end() ; ++iter) {
-                for(std::list<AreaTrigger*>::const_iterator _iter = others.begin() ; iter != others.end() ; ++iter) {                    
+                for(std::list<AreaTrigger*>::const_iterator _iter = others.begin() ; _iter != others.end() ; ++_iter) {                    
                     float dist = (*_iter)->GetExactDist2d(*iter);
                     if(dist > 2.0f)
                         ++thisCount ;
@@ -406,7 +406,7 @@ void AreaTrigger::Update(uint32 p_time)
             for(std::list<Player*>::const_iterator iter = targets.begin() ; iter != targets.end() ; ++iter) {
                 if(GetExactDist2d(*iter) <= 2.0f)
                     if(!((*iter)->HasAura(128421)))
-                        caster->CastSpell(*itr, 128421, true);
+                        caster->CastSpell(*iter, 128421, true);
             }
         }
         default:
