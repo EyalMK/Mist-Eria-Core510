@@ -378,7 +378,7 @@ void AreaTrigger::Update(uint32 p_time)
         case 128420 : // Shadow Geyser
         {
 			std::list<Player*> targets ;
-			radius = 4.0f ;
+			radius = 100.0f ;
 			SetObjectScale(0.5f);
 
 			Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, caster, radius);
@@ -389,7 +389,14 @@ void AreaTrigger::Update(uint32 p_time)
 				return ;
 
 			for(std::list<Player*>::iterator iter = targets.begin() ; iter != targets.end() ; ++iter) {
-				caster->CastSpell(*iter, 128421, true); // Shadow Geyser damages
+				float dist = caster->GetExactDist2d(*itr);
+				if(dist <= 2.0f) {
+					if(!((*iter)->HasAura(128421)))
+						caster->CastSpell(*iter, 128421, true); // Shadow Geyser damages
+				} else {
+					(*itr)->RemoveAurasDueToSpell(128421);
+				}
+					
 			}
         }
         default:
