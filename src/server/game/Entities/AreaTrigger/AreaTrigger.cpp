@@ -389,12 +389,12 @@ void AreaTrigger::Update(uint32 p_time)
 				return ;
 
 			for(std::list<Player*>::iterator iter = targets.begin() ; iter != targets.end() ; ++iter) {
-				float dist = caster->GetExactDist2d(*itr);
+				float dist = caster->GetExactDist2d(*iter);
 				if(dist <= 2.0f) {
 					if(!((*iter)->HasAura(128421)))
 						caster->CastSpell(*iter, 128421, true); // Shadow Geyser damages
 				} else {
-					(*itr)->RemoveAurasDueToSpell(128421);
+					(*iter)->RemoveAurasDueToSpell(128421);
 				}
 					
 			}
