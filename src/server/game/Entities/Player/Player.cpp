@@ -23140,8 +23140,6 @@ void Player::UpdateVisibilityOf(WorldObject* target)
             // send data at target visibility change (adding to client)
             if (target->isType(TYPEMASK_UNIT))
                 SendInitialVisiblePackets((Unit*)target);
-
-            UpdateObjectVisibility();
         }
     }
 }
@@ -23212,8 +23210,6 @@ void Player::UpdateVisibilityOf(T* target, UpdateData& data, std::set<Unit*>& vi
             #ifdef TRINITY_DEBUG
                 sLog->outDebug(LOG_FILTER_MAPS, "Object %u (Type: %u, Entry: %u) is visible now for player %u. Distance = %f", target->GetGUIDLow(), target->GetTypeId(), target->GetEntry(), GetGUIDLow(), GetDistance(target));
             #endif
-
-            UpdateObjectVisibility();
         }
     }
 }
