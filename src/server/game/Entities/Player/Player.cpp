@@ -23130,7 +23130,6 @@ void Player::UpdateVisibilityOf(WorldObject* target)
             //    UpdateVisibilityOf(((Unit*)target)->m_Vehicle);
 
             target->SendUpdateToPlayer(this);
-            target->UpdateObjectVisibility();
             m_clientGUIDs.insert(target->GetGUID());
 
             #ifdef TRINITY_DEBUG
