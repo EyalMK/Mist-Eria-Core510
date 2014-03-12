@@ -2192,7 +2192,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
                 continue;
             }
 
-            CastSpell(this, *itr, true);
+            AddAura(*itr, this);
             sLog->outDebug(LOG_FILTER_UNITS, "Spell: %u added to creature (GUID: %u Entry: %u)", *itr, GetGUIDLow(), GetEntry());
         }
     }

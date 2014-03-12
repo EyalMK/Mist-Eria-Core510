@@ -15867,8 +15867,9 @@ Aura* Unit::AddAura(SpellInfo const* spellInfo, uint32 effMask, Unit* target)
             effMask &= ~(1<<i);
     }
 
-    if (Aura* aura = Aura::TryRefreshStackOrCreate(spellInfo, effMask, target, this))
+    if (Aura* aura = Aura::TryCreate(spellInfo, effMask, target, this))
     {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "AURAS : Entered Unit::AddAura, using spellInfo = %p, effMask = %u, target= %p, caster = %p", spellInfo, effMask, target, this);
         aura->ApplyForTargets();
         return aura;
     }
