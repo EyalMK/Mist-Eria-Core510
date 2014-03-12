@@ -1605,13 +1605,13 @@ void AuraEffect::HandleModInvisibilityDetect(AuraApplication const* aurApp, uint
     UpdateObject::UpdateObjectShiftInvisibility u_check(InvisibilityType(GetMiscValue()), target, 50000.0f);
 	
 	// 3. Build the searcher
-    Trinity::CreatureListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(target, toUpdate, u_check);
+    Trinity::CreatureListSearcher<UpdateObject::UpdateObjectShiftInvisibility> searcher(target, toUpdate, u_check);
 	
 	// 4. Fill the list
     target->VisitNearbyObject(50000.0f, searcher);
 
 	// 5. Update visibility
-    for(std::list<Creature*>::iterator iter = toUpdate.begin( ; iter != toUpdate.end() ; ++iter)) {
+    for(std::list<Creature*>::iterator iter = toUpdate.begin() ; iter != toUpdate.end() ; ++iter)) {
         if(Creature* creature = *iter) {
             creature->UpdateObjectVisibility();
         }
