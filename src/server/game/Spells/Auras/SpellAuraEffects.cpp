@@ -1611,7 +1611,7 @@ void AuraEffect::HandleModInvisibilityDetect(AuraApplication const* aurApp, uint
     target->VisitNearbyObject(50000.0f, searcher);
 
 	// 5. Update visibility
-    for(std::list<Creature*>::iterator iter = toUpdate.begin() ; iter != toUpdate.end() ; ++iter)) {
+    for(std::list<Creature*>::iterator iter = toUpdate.begin() ; iter != toUpdate.end() ; ++iter) {
         if(Creature* creature = *iter) {
             creature->UpdateObjectVisibility();
         }
