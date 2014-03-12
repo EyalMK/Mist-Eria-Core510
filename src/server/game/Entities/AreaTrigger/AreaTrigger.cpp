@@ -375,6 +375,22 @@ void AreaTrigger::Update(uint32 p_time)
 
             break;
         }
+        case 128420 : // Shadow Geyser
+        {
+                std::list<Player*> targets ;
+                radius = 2.0f ;
+                SetObjectScale(2.0f);
+
+                Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, caster, radius);
+                Trinity::PlayerListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
+                VisitNearbyObject(radius, searcher);
+
+                if(targets.empty())
+                    return ;
+
+                for(std::list<Player*>::iterator iter = targets.begin() ; iter != targets.end() ; ++iter)
+                    caster->CastSpell(*iter, 128421, true); // Shadow Geyser damages
+        }
         default:
             break;
     }
