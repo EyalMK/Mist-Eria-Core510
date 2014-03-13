@@ -5505,15 +5505,43 @@ public:
     {
         npc_injured_sailor_clickAI(Creature* creature) : ScriptedAI(creature){}
 
+        bool Recup;
+
+        uint32 Despawn_Timer;
+
         void Reset()
         {
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+            Recup = false;
         }
 
         void OnSpellClick(Unit* clicker)
         {
-            if(clicker->ToPlayer() && !clicker->ToPlayer()->HasAura(129340))
+            if(clicker->ToPlayer())
+            {
                 me->EnterVehicle(clicker);
+                Recup = true;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(Recup)
+            {
+                Player* player;
+
+                if(!me->IsOnVehicle(player->GetVehicleKit()->GetBase()))
+                {
+                    me->ExitVehicle();
+                    Despawn_Timer = 5000;
+                    Recup = false;
+                }
+            }
+
+            if(Despawn_Timer <= uiDiff)
+                me->DisappearAndDie();
+            else
+                Despawn_Timer -= uiDiff;
         }
     };
 
@@ -5522,6 +5550,38 @@ public:
         return new npc_injured_sailor_clickAI(creature);
     }
 };
+
+enum Area7087
+{
+    QUEST_NONE_LEFT_BEHIND  = 29794
+};
+
+class at_none_left_behind : public AreaTriggerScript
+{
+public :
+    at_none_left_behind() : AreaTriggerScript("at_none_left_behind") {}
+
+    bool OnTrigger(Player* player, const AreaTriggerEntry *at)
+    {
+        if(player->GetQuestStatus(QUEST_NONE_LEFT_BEHIND) == QUEST_STATUS_INCOMPLETE)
+        {
+            if(player->IsVehicle() && player->HasAura(129340))
+            {
+                Unit* sailor = player->GetVehicleKit()->GetPassenger(0);
+
+                if(sailor && sailor->ToCreature())
+                    sailor->ToCreature()->AI()->Talk(0);
+
+                player->RemoveAurasDueToSpell(129340);
+                player->KilledMonsterCredit(55999);
+
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
 
 void AddSC_wandering_isle()
 {
@@ -5606,4 +5666,5 @@ void AddSC_wandering_isle()
     new npc_ji_door();
     new npc_ji_lugubre();
     new npc_injured_sailor_click();
+    new at_none_left_behind();
 }
