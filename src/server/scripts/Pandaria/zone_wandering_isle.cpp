@@ -5517,6 +5517,12 @@ public:
             Despawn = false;
         }
 
+        void DoAction(int32 const action)
+        {
+            Despawn = true;
+            Despawn_Timer = 5000;
+        }
+
         void OnSpellClick(Unit* clicker)
         {
             if(clicker->ToPlayer())
@@ -5529,11 +5535,6 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-            if(Recup)
-            {
-
-            }
-
             if(Despawn)
             {
                 if(Despawn_Timer <= uiDiff)
@@ -5582,6 +5583,38 @@ public :
         return false;
     }
 };
+
+class spell_rescue_injured_sailor : public SpellScriptLoader
+{
+public :
+    spell_rescue_injured_sailor() : SpellScriptLoader("spell_rescue_injured_sailor") {}
+
+    class spell_rescue_injured_sailor_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_rescue_injured_sailor_AuraScript);
+
+
+        void HandleEffectRemove(AuraEffect const* auraEff, AuraEffectHandleModes mode)
+        {
+            if(GetCaster())
+                if(Vehicle* vehicle = GetCaster()->GetVehicleKit())
+                    if(Unit* unit = vehicle->GetPassenger(0))
+                        if(unit && unit->ToCreature())
+                            unit->ToCreature()->AI()->DoAction(0);
+        }
+
+        void Register()
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_rescue_injured_sailor_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_rescue_injured_sailor_AuraScript();
+    }
+};
+
 
 
 void AddSC_wandering_isle()
@@ -5668,4 +5701,5 @@ void AddSC_wandering_isle()
     new npc_ji_lugubre();
     new npc_injured_sailor_click();
     new at_none_left_behind();
+    new spell_rescue_injured_sailor();
 }
