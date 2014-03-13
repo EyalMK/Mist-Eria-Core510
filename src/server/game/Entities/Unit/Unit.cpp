@@ -4511,6 +4511,7 @@ void Unit::_UnregisterAreaTrigger(AreaTrigger* areaTrigger)
 		} else {
 			++iter ;
 		}
+	}
 }
 
 DynamicObject* Unit::GetDynObject(uint32 spellId)
