@@ -5522,6 +5522,7 @@ public:
             if(clicker->ToPlayer())
             {
                 me->EnterVehicle(clicker);
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
                 Recup = true;
             }
         }
@@ -5530,16 +5531,13 @@ public:
         {
             if(Recup)
             {
-                Vehicle* player = me->GetVehicle();
+                Vehicle* vehicle = me->GetVehicle();
 
-                if(player && player->GetBase()->ToPlayer())
+                if(!me->IsOnVehicle(vehicle->GetBase()))
                 {
-                    if(!me->IsOnVehicle(player->GetBase()->ToPlayer()))
-                    {
-                        Despawn = true;
-                        Despawn_Timer = 5000;
-                        Recup = false;
-                    }
+                    Despawn = true;
+                    Despawn_Timer = 5000;
+                    Recup = false;
                 }
             }
 
@@ -5580,7 +5578,7 @@ public :
                 Unit* sailor = player->GetVehicleKit()->GetPassenger(0);
 
                 if(sailor && sailor->ToCreature())
-                    sailor->ToCreature()->AI()->Talk(0);
+                    sailor->ToCreature()->AI()->Talk(0, player->GetGUID());
 
                 player->RemoveAurasDueToSpell(129340);
                 player->KilledMonsterCredit(55999);
