@@ -5535,6 +5535,7 @@ public:
 
                 if(!me->IsOnVehicle(vehicle->GetBase()))
                 {
+                    me->ExitVehicle();
                     Despawn = true;
                     Despawn_Timer = 5000;
                     Recup = false;
