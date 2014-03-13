@@ -5496,6 +5496,33 @@ public:
     }
 };
 
+class npc_injured_sailor_click : public CreatureScript
+{
+public:
+    npc_injured_sailor_click(): CreatureScript("npc_injured_sailor_click") { }
+
+    struct npc_injured_sailor_clickAI : public ScriptedAI
+    {
+        npc_injured_sailor_clickAI(Creature* creature) : ScriptedAI(creature){}
+
+        void Reset()
+        {
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+        }
+
+        void OnSpellClick(Unit* clicker)
+        {
+            if(clicker->ToPlayer())
+                me->EnterVehicle(clicker);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_injured_sailor_clickAI(creature);
+    }
+};
+
 void AddSC_wandering_isle()
 {
     new stalker_item_equiped();
@@ -5578,4 +5605,5 @@ void AddSC_wandering_isle()
     new npc_jojo_door();
     new npc_ji_door();
     new npc_ji_lugubre();
+    new npc_injured_sailor_click();
 }
