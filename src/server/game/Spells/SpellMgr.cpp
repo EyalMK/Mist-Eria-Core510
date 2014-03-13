@@ -3973,11 +3973,10 @@ void SpellMgr::LoadSpellInfoCorrections()
                 case 105002: // Invocation d'un faucon de feu apprivoisé
                     spellInfo->Effects[EFFECT_2].Effect = NULL;
                     break;
-				case 112944 :
+				/*case 112944 :
 					spellInfo->ExplicitTargetMask |= TARGET_FLAG_UNIT_MASK ;
 					spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY) ;
-					spellInfo->Effects[EFFECT_1].Effect = NULL ;
-					break ;
+					break ;*/
 				default:
 					break;
 			}

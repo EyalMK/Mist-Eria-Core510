@@ -82,6 +82,7 @@ public :
         {
             instance = creature->GetInstanceScript();
             stalker = NULL ;
+			_victim = NULL ;
 			_bCanSearch = true ;
         }
 
@@ -189,10 +190,10 @@ public :
                 return ;
 			}
 			
-			if(b_carrotBreath) {
+			/*if(b_carrotBreath) {
 				if(stalker)
 					me->SetFacingTo(me->GetAngle(stalker));
-			}
+			}*/
 
             events.Update(diff);
 
@@ -236,9 +237,10 @@ public :
 					b_carrotBreath = true ;
 					stalker = me->SummonCreature(NPC_CARROT_BREATH_HELPER, me->GetPositionX() + 10 * cos(me->GetOrientation()), me->GetPositionY() + 10 * sin(me->GetOrientation()),
 												 me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000) ;
-					me->SetTarget(stalker->GetGUID());
-					DoCast(stalker, SPELL_CARROT_BREATH);
+					_victim = me->getVictim();
+					me->CastSpell(stalker, SPELL_CARROT_BREATH);
 					Talk(TALK_CARROT_BREATH);
+					events.RescheduleEvent(EVENT_FURLWIND, 17000);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
 				
@@ -248,6 +250,8 @@ public :
 					break ;
 				
 				case EVENT_RESET_STALKER :
+					if(_victim)
+						me->SetTarget(_victim->GetGUID());
 					b_carrotBreath = false ;
 					stalker = NULL ;
 					break ;
@@ -284,6 +288,7 @@ public :
 
         bool b_carrotBreath ;
         TempSummon* stalker ;
+		Unit* _victim ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
