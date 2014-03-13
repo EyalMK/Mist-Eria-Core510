@@ -290,6 +290,8 @@ public :
 
             // General
             _events.ScheduleEvent(EVENT_YAN_ZHU_CHECK_FOR_PLAYERS, 500);
+			
+			DoZoneInCombat();
         }
 
         void EnterEvadeMode() {
