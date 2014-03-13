@@ -5533,12 +5533,14 @@ public:
             {
                 Vehicle* vehicle = me->GetVehicle();
 
-                if(!me->IsOnVehicle(vehicle->GetBase()))
+                if(vehicle)
                 {
-                    me->ExitVehicle();
-                    Despawn = true;
-                    Despawn_Timer = 5000;
-                    Recup = false;
+                    if(!me->IsOnVehicle(vehicle->GetBase()))
+                    {
+                        Despawn = true;
+                        Despawn_Timer = 5000;
+                        Recup = false;
+                    }
                 }
             }
 
