@@ -240,6 +240,7 @@ public :
 					_victim = me->getVictim();
 					me->SetTarget(stalker->GetGUID());
 					DoCast(stalker, SPELL_CARROT_BREATH);
+					me->AddAura(me, 112944, 2);
 					Talk(TALK_CARROT_BREATH);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
