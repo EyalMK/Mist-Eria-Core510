@@ -238,7 +238,7 @@ public :
 					stalker = me->SummonCreature(NPC_CARROT_BREATH_HELPER, me->GetPositionX() + 10 * cos(me->GetOrientation()), me->GetPositionY() + 10 * sin(me->GetOrientation()),
 												 me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000) ;
 					_victim = me->getVictim();
-					DoCast(stalker, SPELL_CARROT_BREATH);
+					me->CastSpell(stalker, SPELL_CARROT_BREATH);
 					Talk(TALK_CARROT_BREATH);
 					events.RescheduleEvent(EVENT_FURLWIND, 17000);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
