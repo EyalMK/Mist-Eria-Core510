@@ -1816,10 +1816,10 @@ namespace UncleGaoEvent {
      * @brief A predicate inheriting from std::unary_function, taking a pointer to Unit as Arg and
      * returning bool. It is used to filter the targets during the cast of the spell bloat.
      */
-    class BloatedTargetSelector : public std::unary_function<Unit*, bool> {
+    struct BloatedTargetSelector : public std::unary_function<Unit*, bool> {
     public :
         /// Constructor
-        BloatedTargetSelector() {
+        explicit BloatedTargetSelector(uint32 t = 0) : _t(t) {
 
         }
 
@@ -1833,7 +1833,7 @@ namespace UncleGaoEvent {
          * @return true if the target fits condition to be added to temp targets list,
          * false otherwise
          */
-        bool operator()(Unit* target) {
+        bool operator()(Unit* target) const {
             if(!target)
                 return false ;
 
@@ -1845,6 +1845,8 @@ namespace UncleGaoEvent {
 
             return true ;
         }
+		
+		uint32 _t ;
     };
 } // namespace UncleGaoEvent
 
@@ -1933,7 +1935,7 @@ public :
 
                 case UncleGaoEvent::EVENT_FIZZY_CARBONATION :
                     if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
-                        me->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), UncleGaoEvent::SPELL_FIZZY_CARBONATION);
+                        me->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), UncleGaoEvent::SPELL_FIZZY_CARBONATION, false);
                     _events.ScheduleEvent(UncleGaoEvent::EVENT_FIZZY_CARBONATION, IsHeroic() ? urand(10000, 11000) : urand(12000, 14000));
                     break ;
 
@@ -1965,7 +1967,7 @@ public :
 
     private :
         EventMap _events ;
-        InstanceScript _instance ;
+        InstanceScript* _instance ;
     };
 
     CreatureAI* GetAI(Creature *creature) const {
