@@ -190,10 +190,10 @@ public :
                 return ;
 			}
 			
-			if(b_carrotBreath) {
+			/*if(b_carrotBreath) {
 				if(stalker)
 					me->SetFacingTo(me->GetAngle(stalker));
-			}
+			}*/
 
             events.Update(diff);
 
@@ -240,6 +240,7 @@ public :
 					_victim = me->getVictim();
 					DoCast(stalker, SPELL_CARROT_BREATH);
 					Talk(TALK_CARROT_BREATH);
+					events.RescheduleEvent(EVENT_FURLWIND, 17000);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
 				
