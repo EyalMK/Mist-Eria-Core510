@@ -82,6 +82,7 @@ public :
         {
             instance = creature->GetInstanceScript();
             stalker = NULL ;
+			_victim = NULL ;
 			_bCanSearch = true ;
         }
 
@@ -236,6 +237,7 @@ public :
 					b_carrotBreath = true ;
 					stalker = me->SummonCreature(NPC_CARROT_BREATH_HELPER, me->GetPositionX() + 10 * cos(me->GetOrientation()), me->GetPositionY() + 10 * sin(me->GetOrientation()),
 												 me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000) ;
+					_victim = me->getVictim();
 					me->SetTarget(stalker->GetGUID());
 					DoCast(stalker, SPELL_CARROT_BREATH);
 					Talk(TALK_CARROT_BREATH);
@@ -248,6 +250,8 @@ public :
 					break ;
 				
 				case EVENT_RESET_STALKER :
+					if(_victim)
+						me->SetTarget(_victim->GetGUID());
 					b_carrotBreath = false ;
 					stalker = NULL ;
 					break ;
@@ -284,6 +288,7 @@ public :
 
         bool b_carrotBreath ;
         TempSummon* stalker ;
+		Unit* _victim ;
     };
 
     CreatureAI* GetAI(Creature *creature) const
