@@ -5605,7 +5605,7 @@ public :
 
         void Register()
         {
-            OnEffectRemove += AuraEffectRemoveFn(spell_rescue_injured_sailor_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_rescue_injured_sailor_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_SET_VEHICLE_ID, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
