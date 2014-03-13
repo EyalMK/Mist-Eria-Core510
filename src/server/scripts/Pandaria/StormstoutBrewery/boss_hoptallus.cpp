@@ -188,27 +188,10 @@ public :
 					_uiSearchTimer -= diff ;
                 return ;
 			}
-				
+			
 			if(b_carrotBreath) {
-				/// Event if the client doesn't see the update (because we do not use MSG_START_TURN_LEFT ?), we need to update 
-				/// the orientation inside the core, in order to let the SpellScript of CarrotBreath correctly filter the targets
-				/// In one ms, the boss should have turned of 2 * M_PI (circumference of a 1 meter circle) divided by 15000 ms (duration of the spell) degrees
-                 float turn = 2 * M_PI / 15000.0f ; // This is the distance in one ms
-				turn *= float(diff); // Since last tick of the world
-				
-				float orientation = me->GetOrientation(); // Current orientation
-				orientation -= turn ; // Rotate it
-				
-                me->SetOrientation(orientation) ; // Update
-
-                /*Creature* stalker = me->FindNearestCreature(NPC_CARROT_BREATH_HELPER, 200.0f);
-                if(!stalker)
-                    return ;
-
-                Movement::MoveSplineInit init(me);
-                init.MoveTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-                init.SetFacing(stalker);
-                init.Launch();*/
+				if(stalker)
+					me->SetFacingTo(me->GetAngle(stalker));
 			}
 
             events.Update(diff);
@@ -251,7 +234,10 @@ public :
                         break ;
                     }
 					b_carrotBreath = true ;
-					DoCast(SPELL_CARROT_BREATH);
+					stalker = me->SummonCreature(NPC_CARROT_BREATH_HELPER, me->GetPositionX() + 10 * cos(me->GetOrientation()), me->GetPositionY() + 10 * sin(me->GetOrientation()),
+												 me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 15000) ;
+					me->SetTarget(stalker->GetGUID());
+					DoCast(stalker, SPELL_CARROT_BREATH);
 					Talk(TALK_CARROT_BREATH);
                     events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
                     break ;
@@ -263,6 +249,7 @@ public :
 				
 				case EVENT_RESET_STALKER :
 					b_carrotBreath = false ;
+					stalker = NULL ;
 					break ;
 					
                 default :
@@ -644,7 +631,7 @@ void AddSC_boss_hoptallus()
     new mob_virmen();
     new stalker_carrot_breath();
     new npc_big_ol_hammer();
-    new spell_hoptallus_carrot_breath();
-	new spell_hoptallus_carrot_breath_periodic();
+    // new spell_hoptallus_carrot_breath();
+	// new spell_hoptallus_carrot_breath_periodic();
     new spell_hoptallus_furlwind();
 }
