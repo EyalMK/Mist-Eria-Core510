@@ -5506,6 +5506,7 @@ public:
         npc_injured_sailor_clickAI(Creature* creature) : ScriptedAI(creature){}
 
         bool Recup;
+        bool Despawn;
 
         uint32 Despawn_Timer;
 
@@ -5513,6 +5514,7 @@ public:
         {
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
             Recup = false;
+            Despawn = false;
         }
 
         void OnSpellClick(Unit* clicker)
@@ -5528,20 +5530,28 @@ public:
         {
             if(Recup)
             {
-                Player* player;
+                Vehicle* player = me->GetVehicle();
 
-                if(!me->IsOnVehicle(player->GetVehicleKit()->GetBase()))
+                if(player && player->GetBase()->ToPlayer())
                 {
-                    me->ExitVehicle();
-                    Despawn_Timer = 5000;
-                    Recup = false;
+                    if(!me->IsOnVehicle(player->GetBase()->ToPlayer()))
+                    {
+                        Despawn = true;
+                        Despawn_Timer = 5000;
+                        Recup = false;
+                    }
                 }
             }
 
-            if(Despawn_Timer <= uiDiff)
-                me->DisappearAndDie();
-            else
-                Despawn_Timer -= uiDiff;
+            if(Despawn)
+            {
+                if(Despawn_Timer <= uiDiff)
+                {
+                    me->DisappearAndDie();
+                }
+                else
+                    Despawn_Timer -= uiDiff;
+            }
         }
     };
 
