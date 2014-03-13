@@ -5512,7 +5512,7 @@ public:
 
         void OnSpellClick(Unit* clicker)
         {
-            if(clicker->ToPlayer())
+            if(clicker->ToPlayer() && !clicker->ToPlayer()->HasAura(129340))
                 me->EnterVehicle(clicker);
         }
     };
