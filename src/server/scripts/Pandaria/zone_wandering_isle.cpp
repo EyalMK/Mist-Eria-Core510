@@ -5496,6 +5496,9 @@ public:
     }
 };
 
+
+/* Ramassage Marin */
+
 class npc_injured_sailor_click : public CreatureScript
 {
 public:
@@ -5505,7 +5508,6 @@ public:
     {
         npc_injured_sailor_clickAI(Creature* creature) : ScriptedAI(creature){}
 
-        bool Recup;
         bool Despawn;
 
         uint32 Despawn_Timer;
@@ -5513,7 +5515,6 @@ public:
         void Reset()
         {
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-            Recup = false;
             Despawn = false;
         }
 
@@ -5529,7 +5530,6 @@ public:
             {
                 me->EnterVehicle(clicker);
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-                Recup = true;
             }
         }
 
@@ -5615,6 +5615,131 @@ public :
     }
 };
 
+class npc_vordraka : public CreatureScript
+{
+public:
+    npc_vordraka(): CreatureScript("npc_vordraka") { }
+
+    struct npc_vordrakaAI : public ScriptedAI
+    {
+        npc_vordrakaAI(Creature* creature) : ScriptedAI(creature), Summons(me){}
+
+        uint32 Deep_Sea_Smash_Timer;
+        uint32 Deep_Sea_Rupture_Timer;
+
+        bool Summon_Timer_1;
+        bool Summon_Timer_2;
+        bool Say20;
+        bool SaySmash;
+
+        SummonList Summons;
+
+        void Reset()
+        {
+            Deep_Sea_Smash_Timer = 10000;
+            Deep_Sea_Rupture_Timer = 20000;
+
+            Summon_Timer_1 = true;
+            Summon_Timer_2 = true;
+            Say20 = true;
+            SaySmash = true;
+
+            Summons.DespawnAll();
+        }
+
+        void EnterEvadeMode()
+        {
+            Creature* aysa = me->FindNearestCreature(56417, 100.00f, true);
+            if(aysa)
+                aysa->AI()->Talk(0);
+        }
+
+        void JustSummoned(Creature* Summoned)
+        {
+            Summons.Summon(Summoned);
+
+            if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
+                if(target && target->GetTypeId() == TYPEID_PLAYER)
+                    if(target->InSamePhase(2) && target->isInCombat())
+                    {
+                        Summoned->CastSpell(target, 117407, false);
+                        Summoned->AI()->AttackStart(target);
+                    }
+        }
+
+        void JustDied(Unit *pWho)
+        {
+            Creature* aysa = me->FindNearestCreature(56417, 100.00f, true);
+            Summons.DespawnAll();
+
+            if(aysa)
+                aysa->AI()->Talk(4);
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(me->HealthBelowPct(66) && Summon_Timer_1)
+            {
+                Creature* aysa = me->FindNearestCreature(56417, 100.00f, true);
+                if(aysa)
+                    aysa->AI()->Talk(2);
+
+                me->SummonCreature(60685, 256.02f, 3963.01f, 75.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                me->SummonCreature(60685, 249.40f, 3972.39f, 76.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                Summon_Timer_1 = false;
+            }
+
+            if(me->HealthBelowPct(33) && Summon_Timer_2)
+            {
+                me->SummonCreature(60685, 266.57f, 4014.58f, 80.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                me->SummonCreature(60685, 271.92f, 4018.93f, 81.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                Summon_Timer_2 = false;
+            }
+
+            if(me->HealthBelowPct(20) && Say20)
+            {
+                Creature* aysa = me->FindNearestCreature(56417, 100.00f, true);
+                if(aysa)
+                    aysa->AI()->Talk(3);
+
+                Say20 = false;
+            }
+
+            if(Deep_Sea_Smash_Timer <= uiDiff)
+            {
+                if(SaySmash)
+                {
+                    Creature* aysa = me->FindNearestCreature(56417, 100.00f, true);
+                    if(aysa)
+                        aysa->AI()->Talk(1);
+
+                    SaySmash = false;
+                }
+
+                DoCast(117287);
+
+                Deep_Sea_Smash_Timer = 20000;
+            }
+            else
+                Deep_Sea_Smash_Timer -= uiDiff;
+
+            if(Deep_Sea_Rupture_Timer <= uiDiff)
+            {
+                if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST))
+                    me->CastSpell(target, 117456, false);
+
+                Deep_Sea_Rupture_Timer = 20000;
+            }
+            else
+                Deep_Sea_Rupture_Timer -= uiDiff;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_vordrakaAI(creature);
+    }
+};
 
 
 void AddSC_wandering_isle()
@@ -5702,4 +5827,5 @@ void AddSC_wandering_isle()
     new npc_injured_sailor_click();
     new at_none_left_behind();
     new spell_rescue_injured_sailor();
+    new npc_vordraka();
 }
