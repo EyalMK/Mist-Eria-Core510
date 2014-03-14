@@ -5673,7 +5673,10 @@ public:
             Summons.DespawnAll();
 
             if(aysa)
+            {
                 aysa->AI()->Talk(4);
+                aysa->GetMotionMaster()->MovePoint(1, 286.39f, 4004.87f, 75.00f);
+            }
         }
 
         void UpdateAI(const uint32 uiDiff)
@@ -5766,8 +5769,21 @@ public:
             Taunt_Timer = 1000;
         }
 
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type == POINT_MOTION_TYPE && id == 1)
+            {
+                me->DespawnOrUnsummon();
+            }
+        }
+
         void UpdateAI(const uint32 uiDiff)
         {
+            if(me->HealthBelowPct(50))
+            {
+                me->SetHealth(me->GetMaxHealth());
+            }
+
             if(Taunt_Timer <= uiDiff)
             {
                 Creature* vordraka = me->FindNearestCreature(56009, 200.00f, true);
