@@ -5649,6 +5649,8 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
+            me->SummonCreature(56417, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 300000);
+
             Creature* aysa = me->FindNearestCreature(56417, 100.00f, true);
             if(aysa)
                 aysa->AI()->Talk(0);
