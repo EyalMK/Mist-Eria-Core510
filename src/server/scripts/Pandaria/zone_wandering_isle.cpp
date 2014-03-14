@@ -5726,7 +5726,7 @@ public:
 
                 Creature* aysa = me->FindNearestCreature(56417, 100.00f, true);
                 if(aysa)
-                    aysa->CastSpell(me, 117275, true);
+                    aysa->AI()->DoAction(0);
 
                 DoCast(117287);
 
@@ -5777,6 +5777,33 @@ public:
             {
                 me->DespawnOrUnsummon();
             }
+        }
+
+        void DoAction(int32 const action)
+        {
+            Creature* vordraka = me->FindNearestCreature(56009, 200.00f, true);
+            if(vordraka)
+                JumpBehindTarget(vordraka);
+        }
+
+        void JumpBehindTarget(WorldObject const* target)
+        {
+            Position const targetExactPosition = {target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation()};
+
+            float orientation = targetExactPosition.m_orientation + static_cast<float>(M_PI);
+
+            orientation = Position::NormalizeOrientation(orientation);
+
+            float x = targetExactPosition.m_positionX + 0.5f * cos(orientation);
+            float y = targetExactPosition.m_positionY + 0.5f * sin(orientation);
+            float z = targetExactPosition.m_positionZ;
+
+            Position const exactJumpPosition = {x, y, z, targetExactPosition.m_orientation};
+
+            float speedZ = 10.0f ;
+            float speedXY = me->GetExactDist2d(target);
+
+            me->GetMotionMaster()->MoveJump(exactJumpPosition, speedXY, speedZ);
         }
 
         void UpdateAI(const uint32 uiDiff)
