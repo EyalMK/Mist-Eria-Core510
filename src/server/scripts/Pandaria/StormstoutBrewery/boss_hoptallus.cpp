@@ -118,6 +118,7 @@ public :
             events.ScheduleEvent(EVENT_CARROT_BREATH, IsHeroic() ? 25000 : 35000);
 
             Talk(TALK_AGGRO);
+			DoZoneInCombat();
         }
 
         void EnterEvadeMode()

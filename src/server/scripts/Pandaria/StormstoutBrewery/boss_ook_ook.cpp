@@ -86,6 +86,7 @@ public :
             events.ScheduleEvent(EVENT_GROUND_POUND, IsHeroic() ? 6000 : 8000);
             Talk(SAY_ENTER_COMBAT);
             m_bHasActivated = true ;
+			DoZoneInCombat();
         }
 
         void JustDied(Unit* killer)
