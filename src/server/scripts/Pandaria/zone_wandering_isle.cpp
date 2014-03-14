@@ -5678,6 +5678,9 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
+            if(!UpdateVictim())
+                return;
+
             if(me->HealthBelowPct(66) && Summon_Timer_1)
             {
                 Creature* aysa = me->FindNearestCreature(56417, 100.00f, true);
