@@ -5719,6 +5719,10 @@ public:
                     SaySmash = false;
                 }
 
+                Creature* aysa = me->FindNearestCreature(56417, 100.00f, true);
+                if(aysa)
+                    aysa->CastSpell(me, 117275, true);
+
                 DoCast(117287);
 
                 Deep_Sea_Smash_Timer = 20000;
@@ -5735,6 +5739,8 @@ public:
             }
             else
                 Deep_Sea_Rupture_Timer -= uiDiff;
+
+            DoMeleeAttackIfReady();
         }
     };
 
@@ -5776,6 +5782,8 @@ public:
             }
             else
                 Taunt_Timer -= uiDiff;
+
+            DoMeleeAttackIfReady();
         }
     };
 
