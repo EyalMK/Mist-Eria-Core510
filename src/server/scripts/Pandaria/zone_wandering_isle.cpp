@@ -5647,7 +5647,7 @@ public:
             Summons.DespawnAll();
         }
 
-        void EnterEvadeMode()
+        void EnterCombat(Unit* /*who*/)
         {
             Creature* aysa = me->FindNearestCreature(56417, 100.00f, true);
             if(aysa)
@@ -5744,6 +5744,47 @@ public:
     }
 };
 
+class npc_aysa_attack_vordraka : public CreatureScript
+{
+public:
+    npc_aysa_attack_vordraka(): CreatureScript("npc_aysa_attack_vordraka") { }
+
+    struct npc_aysa_attack_vordrakaAI : public ScriptedAI
+    {
+        npc_aysa_attack_vordrakaAI(Creature* creature) : ScriptedAI(creature){}
+
+        uint32 Taunt_Timer;
+
+        void Reset()
+        {
+            Taunt_Timer = 1000;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(Taunt_Timer <= uiDiff)
+            {
+                Creature* vordraka = me->FindNearestCreature(56009, 200.00f, true);
+
+                if(vordraka)
+                {
+                    me->CastSpell(vordraka, 114915, true);
+                    me->AI()->AttackStart(vordraka);
+                }
+
+                Taunt_Timer = 5000;
+            }
+            else
+                Taunt_Timer -= uiDiff;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_aysa_attack_vordrakaAI(creature);
+    }
+};
+
 
 void AddSC_wandering_isle()
 {
@@ -5831,4 +5872,5 @@ void AddSC_wandering_isle()
     new at_none_left_behind();
     new spell_rescue_injured_sailor();
     new npc_vordraka();
+    new npc_aysa_attack_vordraka();
 }
