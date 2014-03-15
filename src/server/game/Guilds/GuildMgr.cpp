@@ -497,6 +497,8 @@ void GuildMgr::LoadGuildXpForLevel()
         uint32 level        = fields[0].GetUInt8();
         uint32 requiredXP   = fields[1].GetUInt64();
 
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "nobodie loadGuildXPForLevel %u %u", level, requiredXP);
+
         if (level >= sWorld->getIntConfig(CONFIG_GUILD_MAX_LEVEL))
         {
             sLog->outInfo(LOG_FILTER_GENERAL, "Unused (> Guild.MaxLevel in worldserver.conf) level %u in `guild_xp_for_level` table, ignoring.", uint32(level));

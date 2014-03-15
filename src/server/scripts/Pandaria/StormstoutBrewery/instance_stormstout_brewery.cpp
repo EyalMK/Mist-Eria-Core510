@@ -38,8 +38,6 @@ public :
         // Initialize everything
         void Initialize()
         {
-            LogFunction("Initialize");
-
             memset(&m_auiEncounter, NOT_STARTED, sizeof(m_auiEncounter));
 
             // Guids
@@ -64,8 +62,6 @@ public :
             m_uiKilledHoptallusTrash = 0 ;
             m_bHoptallusActive = false ;
             b_allSummoned = false ;
-
-            LogFunction("Initialize", false);
         }
 
         // Update timers when world ticks
@@ -125,7 +121,6 @@ public :
 
         void OnPlayerEnter(Player *player)
         {
-            LogFunction("OnPlayerEnter");
 
             if(!b_allSummoned) {
                 SummonAllBarrels();
@@ -142,17 +137,12 @@ public :
 				}
 			}
 
-            ///@todo : here, handle the rp sequence between Chen and Auntie
             if(Creature* chen = instance->GetCreature(m_uiChenGuid))
                 chen->AI()->DoAction(1);
-
-            LogFunction("OnPlayerEnter", false);
         }
 
         void OnCreatureCreate(Creature *creature)
         {
-            //LogFunction("OnCreatureCreate");
-
             if(creature)
             {
                 uint64 guid = creature->GetGUID();
@@ -177,14 +167,10 @@ public :
                     break ;
                 }
             }
-
-            //LogFunction("OnCreatureCreate", false);
         }
 
         void OnGameObjectCreate(GameObject *gameObject)
         {
-            LogFunction("OnGameObjectCreate");
-
             if(gameObject)
             {
                 uint64 guid = gameObject->GetGUID();
@@ -203,7 +189,7 @@ public :
                 case GOB_HOPTALLUS_EXIT :
                     m_uiHoptallusExitGuid = guid ;
                     if(GetData(INSTANCE_DATA_HOPTALLUS_STATUS) == DONE)
-                        gameObject->SetGoState(GO_STATE_ACTIVE);
+                        gameObject->RemoveFromWorld();
                     break ;
 
                 case GOB_YAN_ZHU_ENTRANCE :
@@ -215,28 +201,19 @@ public :
                     break ;
                 }
             }
-
-            LogFunction("OnGameObjectCreate", false);
         }
 
         void SetData(uint32 uiData, uint32 uiStatus)
         {
-            LogFunction("SetData");
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "Setting data %u to value %u", uiData, uiStatus);
-
             /// WARNING
             if(uiData >= MAX_ENCOUNTERS)
                 return ;
 
             m_auiEncounter[uiData] = uiStatus ;
-
-            LogFunction("SetData", false);
         }
 
         uint32 GetData(uint32 uiData) const
         {
-            //LogFunction("GetData");
-
             if(uiData >= MAX_ENCOUNTERS)
                 return 0;
 
@@ -302,7 +279,7 @@ public :
                 if(m_uiKilledHoptallusTrash >= m_uiSummonedHoptallusTrash)
                 {
                     m_bHoptallusActive = true ;
-                    DoStartHoptallus();
+                    // DoStartHoptallus();
                 }
             }
         }

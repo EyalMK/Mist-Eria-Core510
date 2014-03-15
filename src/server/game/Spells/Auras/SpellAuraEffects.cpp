@@ -1499,6 +1499,79 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
 /***       VISIBILITY & PHASES      ***/
 /**************************************/
 
+/**
+ * @namespace UpdateObject
+ * A namespace containing a predicate used to filter all the targets on map that have a special invisiblity aura
+ */
+namespace UpdateObject {
+    /**
+     * @class  UpdateObjectShiftInvisibility
+     *
+     * @brief A predicate used to determine wherever a creature has an invisibility aura of a specified type
+     * or not. When we have this, we can simply use the Trinity::VisibleChangesNotifier to update the auras
+     * on the creature, and allow players to see them correctly.
+     *
+     * @sa Trinity::VisibleChangesNotifier
+     *
+     * @sa Unit::UpdateObjectVisibility
+     */
+    class UpdateObjectShiftInvisibility {
+    public :
+        /**
+         * @fn UpdateObjectShiftInvisibility
+         *
+         * @brief Default constructor for the predicate
+         *
+         * @param detect : The invisiblity type we are searching on creatures
+         */
+        UpdateObjectShiftInvisibility(InvisibilityType detect, WorldObject * source, float radius) :
+            _invisibilityDetect(detect), _source(source), _radius(radius) {
+
+        }
+
+        /**
+         * @fn operator ()
+         *
+         * @brief Overload of the function operator, used to filter the creatures on the map, having or not
+         * the given _invisibilityDetect
+         *
+         * @param creature : Pointer to the creature we are actually checking
+         *
+         * @return : true in case the creature has an aura of type invisiblity with the givent _invisibilityDetect
+         * as MiscValue ;
+         *
+         * @return : false otherwise
+         */
+        bool operator()(Creature* creature) {
+            if(!creature)
+                return false ;
+
+            // 1. Get all the aura effects of type SPELL_AURA_MOD_INVISIBILITY on the creature
+            Unit::AuraEffectList const& invisibilityAuras = creature->GetAuraEffectsByType(SPELL_AURA_MOD_INVISIBILITY);
+
+            // 2. If empty, creature must not be updated == return false
+            if(invisibilityAuras.empty())
+                return false ;
+
+            // 3. Loop until an aura with the given _invisibilityDetect as MiscValue
+            for(Unit::AuraEffectList::const_iterator iter = invisibilityAuras.begin() ; iter != invisibilityAuras.end() ; ++iter) {
+                if(AuraEffect const* invisibilityEffect = const_cast<AuraEffect const*>(*iter)) {
+                    if((InvisibilityType)invisibilityEffect->GetMiscValue() == _invisibilityDetect)
+                        return true ;
+                }
+            }
+
+            // 4. No aura found, creature must not be updated : return false
+            return false ;
+        }
+
+    private :
+        InvisibilityType _invisibilityDetect ;
+        WorldObject* _source ;
+        float _radius ;
+    };
+}
+
 void AuraEffect::HandleModInvisibilityDetect(AuraApplication const* aurApp, uint8 mode, bool apply) const
 {
     if (!(mode & AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK))
@@ -1522,6 +1595,27 @@ void AuraEffect::HandleModInvisibilityDetect(AuraApplication const* aurApp, uint
 
     // call functions which may have additional effects after chainging state of unit
     target->UpdateObjectVisibility();
+	
+	/** Visibility of auras **/
+	
+	// 1. Declare something to store the creatures in
+	std::list<Creature*> toUpdate ;
+	
+	// 2. Build a predicate
+    UpdateObject::UpdateObjectShiftInvisibility u_check(InvisibilityType(GetMiscValue()), target, 50000.0f);
+	
+	// 3. Build the searcher
+    Trinity::CreatureListSearcher<UpdateObject::UpdateObjectShiftInvisibility> searcher(target, toUpdate, u_check);
+	
+	// 4. Fill the list
+    target->VisitNearbyObject(50000.0f, searcher);
+
+	// 5. Update visibility
+    for(std::list<Creature*>::iterator iter = toUpdate.begin() ; iter != toUpdate.end() ; ++iter) {
+        if(Creature* creature = *iter) {
+            creature->UpdateObjectVisibility();
+        }
+    }
 }
 
 void AuraEffect::HandleModInvisibility(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -5524,7 +5618,7 @@ void AuraEffect::HandleAuraOverrideSpells(AuraApplication const* aurApp, uint8 m
 
     if (apply)
     {
-        //target->SetUInt16Value(PLAYER_FIELD_BYTES2, 0, overrideId); //MOP need fix
+		// target->SetUInt32Value(PLAYER_FIELD_OVERRIDE_SPELLS_ID, overrideId); // maybe this ; but wait for now
         if (OverrideSpellDataEntry const* overrideSpells = sOverrideSpellDataStore.LookupEntry(overrideId))
             for (uint8 i = 0; i < MAX_OVERRIDE_SPELL; ++i)
                 if (uint32 spellId = overrideSpells->spellId[i])
@@ -5532,7 +5626,7 @@ void AuraEffect::HandleAuraOverrideSpells(AuraApplication const* aurApp, uint8 m
     }
     else
     {
-        //target->SetUInt16Value(PLAYER_FIELD_BYTES2, 0, 0);//MOP need fix
+        // target->SetUInt32Value(PLAYER_FIELD_OVERRIDE_SPELLS_ID, 0); // maybe this ; but wait for now
         if (OverrideSpellDataEntry const* overrideSpells = sOverrideSpellDataStore.LookupEntry(overrideId))
             for (uint8 i = 0; i < MAX_OVERRIDE_SPELL; ++i)
                 if (uint32 spellId = overrideSpells->spellId[i])

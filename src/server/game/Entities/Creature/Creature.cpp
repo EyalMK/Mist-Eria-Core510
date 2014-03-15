@@ -637,7 +637,8 @@ void Creature::Update(uint32 diff)
         default:
             break;
     }
-
+	
+	UpdateObjectVisibility();
     sScriptMgr->OnCreatureUpdate(this, diff);
 }
 
@@ -2192,7 +2193,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
                 continue;
             }
 
-            CastSpell(this, *itr, true);
+            AddAura(*itr, this);
             sLog->outDebug(LOG_FILTER_UNITS, "Spell: %u added to creature (GUID: %u Entry: %u)", *itr, GetGUIDLow(), GetEntry());
         }
     }

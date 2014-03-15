@@ -1089,6 +1089,55 @@ private :
 };
 
 
+enum Area7106
+{
+    QUEST_PASSING_WISDOM    = 29790,
+    NPC_AYSA_7106           = 56662,
+    NPC_JI_7106             = 56663
+};
+
+class at_7106_mongolfiere : public AreaTriggerScript
+{
+public :
+    at_7106_mongolfiere() : AreaTriggerScript("at_7106_mongolfiere") {}
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *at)
+    {
+        std::map<uint64, uint32>::iterator iter = forbiddenPlayers.find(player->GetGUID());
+        if(iter != forbiddenPlayers.end())
+            return false;
+
+        if(player->GetQuestStatus(QUEST_PASSING_WISDOM) == QUEST_STATUS_COMPLETE)
+        {
+            Creature* aysa = player->FindNearestCreature(NPC_AYSA_7106, 500.0f);
+            Creature* ji = player->FindNearestCreature(NPC_JI_7106, 500.0f);
+            if(aysa && ji)
+            {
+                forbiddenPlayers.insert(std::pair<uint64, uint32>(player->GetGUID(), 120000));
+                aysa->AI()->DoAction(0);
+                ji->AI()->DoAction(0);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void Update(const uint32 uiDiff)
+    {
+        for (std::map<uint64, uint32>::iterator iter = forbiddenPlayers.begin() ; iter != forbiddenPlayers.end() ; ++iter)
+        {
+            if(iter->second <= uiDiff)
+                forbiddenPlayers.erase(iter);
+            else
+                iter->second -= uiDiff ;
+        }
+    }
+
+private :
+    std::map<uint64, uint32> forbiddenPlayers ;
+};
+
+
 /************************************/
 /******* FIN AREATRIGGER ************/
 /************************************/
@@ -4648,6 +4697,124 @@ public:
 };
 
 
+/* Event Area 7106 mongolfière */
+
+enum eAysa7106
+{
+    SAY_AYSA_7106_1     = 0,
+    SAY_AYSA_7106_2     = 1
+};
+
+enum eJi7106
+{
+    SAY_JI_7106_1   = 0
+};
+
+class npc_aysa_7106 : public CreatureScript
+{
+public:
+    npc_aysa_7106(): CreatureScript("npc_aysa_7106") { }
+
+    struct npc_aysa_7106AI : public ScriptedAI
+    {
+        npc_aysa_7106AI(Creature* creature) : ScriptedAI(creature){}
+
+        bool Action;
+
+        uint32 Say1_timer;
+        uint32 Say2_timer;
+
+        void Reset()
+        {
+            Action = false;
+        }
+
+        void DoAction(int32 const action)
+        {
+            Action = true;
+            Say1_timer = 1000;
+            Say2_timer = 14000;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(Action)
+            {
+                if(Say1_timer <= uiDiff)
+                {
+                    Talk(SAY_AYSA_7106_1);
+                    Say1_timer = 60000;
+                }
+                else
+                    Say1_timer -= uiDiff;
+
+                if(Say2_timer <= uiDiff)
+                {
+                    Talk(SAY_AYSA_7106_2);
+                    Say2_timer = 60000;
+                    Action = false;
+                }
+                else
+                    Say2_timer -= uiDiff;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_aysa_7106AI(creature);
+    }
+};
+
+class npc_ji_7106 : public CreatureScript
+{
+public:
+    npc_ji_7106(): CreatureScript("npc_ji_7106") { }
+
+    struct npc_ji_7106AI : public ScriptedAI
+    {
+        npc_ji_7106AI(Creature* creature) : ScriptedAI(creature){}
+
+        bool Action;
+
+        uint32 Say1_timer;
+
+        void Reset()
+        {
+            Action = false;
+        }
+
+        void DoAction(int32 const action)
+        {
+            Action = true;
+            Say1_timer = 5000;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(Action)
+            {
+                if(Say1_timer <= uiDiff)
+                {
+                    Talk(SAY_JI_7106_1);
+                    Say1_timer = 60000;
+                    Action = false;
+                }
+                else
+                    Say1_timer -= uiDiff;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ji_7106AI(creature);
+    }
+};
+
+
+/* Event mongolfière (29791) */
+
 enum eShenXiBallon
 {
     SAY_SHEN_ZI_BALLON_1    = 0,
@@ -4935,6 +5102,880 @@ public:
     }
 };
 
+/* Event Ouverture Porte */
+
+enum Area7710
+{
+    QUEST_BIDDEN_GREATNESS  = 29792
+};
+
+class at_bidden_greatness_door : public AreaTriggerScript
+{
+public :
+    at_bidden_greatness_door() : AreaTriggerScript("at_bidden_greatness_door") {}
+
+    bool OnTrigger(Player* player, const AreaTriggerEntry *at)
+    {
+        if(player->GetQuestStatus(QUEST_BIDDEN_GREATNESS) == QUEST_STATUS_INCOMPLETE)
+        {
+            if(player->HasAura(115426))
+            {
+                player->CastSpell(player, 115337, true); //jojo
+                player->CastSpell(player, 115335, true); // ji patte
+                player->CastSpell(player, 115332, true); // aysa
+                player->RemoveAurasDueToSpell(94568);
+                player->RemoveAurasDueToSpell(115426);
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+enum eAysaEventDoor
+{
+    SAY_AYSA_DOOR_0     = 0,
+    SAY_AYSA_DOOR_1     = 1,
+    SAY_AYSA_DOOR_2     = 2,
+    SAY_AYSA_DOOR_3     = 3
+};
+
+enum eJiEventDoor
+{
+    SAY_JI_DOOR_1       = 0,
+    SAY_JI_DOOR_2       = 1,
+    SAY_JI_DOOR_3       = 2,
+    SAY_JI_DOOR_4       = 3,
+    SAY_JI_DOOR_5       = 4
+};
+
+enum eWeiEventDoor
+{
+    SAY_WEI_DOOR_1      = 0
+};
+
+enum eKorgaEventDoor
+{
+    SAY_KORGA_DOOR_1    = 0,
+    SAY_KORGA_DOOR_2    = 1,
+    SAY_KORGA_DOOR_3    = 2
+};
+
+
+class npc_aysa_door : public CreatureScript
+{
+public:
+    npc_aysa_door(): CreatureScript("npc_aysa_door") { }
+
+    struct npc_aysa_doorAI : public npc_escortAI
+    {
+        npc_aysa_doorAI(Creature* creature) : npc_escortAI(creature) {}
+
+        bool VerifPlayer;
+
+        void Reset()
+        {
+            VerifPlayer = false;
+            Talk(SAY_AYSA_DOOR_0);
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            GameObject* mandori = me->FindNearestGameObject(210967, 500.00f);
+
+            switch (waypointId)
+            {
+                case 1:
+                    if(mandori)
+                        mandori->SetGoState(GO_STATE_ACTIVE);
+                    me->CastSpell(me, 115442, true);
+                    break;
+
+                case 12:
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
+                    break;
+
+                case 13:
+                    Talk(SAY_AYSA_DOOR_1);
+                    me->HandleEmoteCommand(EMOTE_STATE_USE_STANDING);
+                    break;
+
+                case 14:
+                    Talk(SAY_AYSA_DOOR_2);
+                    me->HandleEmoteCommand(EMOTE_STATE_NONE);
+                    break;
+
+                case 25:
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
+                    break;
+
+                case 27:
+                    Talk(SAY_AYSA_DOOR_3);
+                    break;
+
+                case 29:
+                    me->GetMotionMaster()->MoveJump(425.79f, 3674.37f, 78.4f, 10, 10);
+                    break;
+
+                case 33:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+
+            if (VerifPlayer)
+            {
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if(summoner->ToPlayer())
+                        if(summoner->IsInDist2d(me, 10.00f))
+                        {
+                            SetEscortPaused(false);
+                            VerifPlayer = false;
+                        }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_aysa_doorAI(creature);
+    }
+};
+
+class npc_jojo_door : public CreatureScript
+{
+public:
+    npc_jojo_door(): CreatureScript("npc_jojo_door") { }
+
+    struct npc_jojo_doorAI : public npc_escortAI
+    {
+        npc_jojo_doorAI(Creature* creature) : npc_escortAI(creature) {}
+
+        bool VerifPlayer;
+        bool VerifPlayer2;
+
+        void Reset()
+        {
+            me->CastSpell(me, 115672, true);
+            VerifPlayer = false;
+            VerifPlayer2 = false;
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            GameObject* peiwu = me->FindNearestGameObject(210966, 500.00f);
+
+            switch (waypointId)
+            {
+                case 10:
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
+                    break;
+
+                case 12:
+                    if(peiwu)
+                        peiwu->SetGoState(GO_STATE_ACTIVE);
+                    me->CastSpell(me, 115443, true);
+                    break;
+
+                case 22:
+                    SetEscortPaused(true);
+                    VerifPlayer2 = true;
+                    break;
+
+                case 25:
+                    me->GetMotionMaster()->MoveJump(425.79f, 3674.37f, 78.4f, 10, 10);
+                    break;
+
+                case 29:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+
+            if (VerifPlayer)
+            {
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if(summoner->ToPlayer())
+                        if(summoner->IsInDist2d(me, 10.00f))
+                        {
+                            SetEscortPaused(false);
+                            VerifPlayer = false;
+                        }
+            }
+
+            if (VerifPlayer2)
+            {
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if(summoner->ToPlayer())
+                        if(summoner->IsInDist2d(me, 15.00f))
+                        {
+                            SetEscortPaused(false);
+                            VerifPlayer2 = false;
+                        }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_jojo_doorAI(creature);
+    }
+};
+
+class npc_ji_door : public CreatureScript
+{
+public:
+    npc_ji_door(): CreatureScript("npc_ji_door") { }
+
+    struct npc_ji_doorAI : public npc_escortAI
+    {
+        npc_ji_doorAI(Creature* creature) : npc_escortAI(creature) {}
+
+        bool VerifPlayer;
+
+        void Reset()
+        {
+            VerifPlayer = false;
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            Creature* korga = me->FindNearestCreature(60042, 30.00f, true);
+            Creature* wei = me->FindNearestCreature(55943, 30.00f, true);
+
+            switch (waypointId)
+            {
+                case 12:
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
+                    break;
+
+                case 14:
+                    Talk(SAY_JI_DOOR_1);
+                    me->HandleEmoteCommand(EMOTE_STATE_USE_STANDING);
+                    break;
+
+                case 15:
+                    Talk(SAY_JI_DOOR_2);
+                    me->HandleEmoteCommand(EMOTE_STATE_NONE);
+                    break;
+
+                case 18:
+                    Talk(SAY_JI_DOOR_3);
+                    break;
+
+                case 26:
+                    SetEscortPaused(true);
+                    VerifPlayer = true;
+                    break;
+
+                case 27:
+                    if(korga)
+                        korga->AI()->Talk(SAY_KORGA_DOOR_1);
+                    break;
+
+                case 28:
+                    if(wei)
+                        wei->AI()->Talk(SAY_WEI_DOOR_1);
+                    break;
+
+                case 29:
+                    if(korga)
+                        korga->AI()->Talk(SAY_KORGA_DOOR_2);
+                    break;
+
+                case 30:
+                    Talk(SAY_JI_DOOR_4);
+                    break;
+
+                case 31:
+                    if(korga)
+                        korga->AI()->Talk(SAY_KORGA_DOOR_3);
+                    break;
+
+                case 32:
+                    Talk(SAY_JI_DOOR_5);
+                    break;
+
+                case 33:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+
+            if (VerifPlayer)
+            {
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if(summoner->ToPlayer())
+                        if(summoner->IsInDist2d(me, 10.00f))
+                        {
+                            SetEscortPaused(false);
+                            VerifPlayer = false;
+                        }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ji_doorAI(creature);
+    }
+};
+
+class npc_ji_lugubre : public CreatureScript
+{
+public:
+    npc_ji_lugubre(): CreatureScript("npc_ji_lugubre") { }
+
+    struct npc_ji_lugubreAI : public npc_escortAI
+    {
+        npc_ji_lugubreAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 2:
+                    Talk(0);
+                    break;
+
+                case 4:
+                    me->GetMotionMaster()->MoveJump(424.67f, 3674.40f, 78.4f, 10, 10);
+                    break;
+
+                case 35:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ji_lugubreAI(creature);
+    }
+};
+
+
+/* Ramassage Marin */
+
+class npc_injured_sailor_click : public CreatureScript
+{
+public:
+    npc_injured_sailor_click(): CreatureScript("npc_injured_sailor_click") { }
+
+    struct npc_injured_sailor_clickAI : public ScriptedAI
+    {
+        npc_injured_sailor_clickAI(Creature* creature) : ScriptedAI(creature){}
+
+        bool Despawn;
+
+        uint32 Despawn_Timer;
+
+        void Reset()
+        {
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+            Despawn = false;
+        }
+
+        void DoAction(int32 const action)
+        {
+            Despawn = true;
+            Despawn_Timer = 5000;
+        }
+
+        void OnSpellClick(Unit* clicker)
+        {
+            if(clicker->ToPlayer())
+            {
+                me->EnterVehicle(clicker);
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(Despawn)
+            {
+                if(Despawn_Timer <= uiDiff)
+                {
+                    me->DisappearAndDie();
+                }
+                else
+                    Despawn_Timer -= uiDiff;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_injured_sailor_clickAI(creature);
+    }
+};
+
+enum Area7087
+{
+    QUEST_NONE_LEFT_BEHIND  = 29794
+};
+
+class at_none_left_behind : public AreaTriggerScript
+{
+public :
+    at_none_left_behind() : AreaTriggerScript("at_none_left_behind") {}
+
+    bool OnTrigger(Player* player, const AreaTriggerEntry *at)
+    {
+        if(player->GetQuestStatus(QUEST_NONE_LEFT_BEHIND) == QUEST_STATUS_INCOMPLETE)
+        {
+            if(player->IsVehicle() && player->HasAura(129340))
+            {
+                Unit* sailor = player->GetVehicleKit()->GetPassenger(0);
+
+                if(sailor && sailor->ToCreature())
+                    sailor->ToCreature()->AI()->Talk(0, player->GetGUID());
+
+                player->RemoveAurasDueToSpell(129340);
+                player->KilledMonsterCredit(55999);
+
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+class spell_rescue_injured_sailor : public SpellScriptLoader
+{
+public :
+    spell_rescue_injured_sailor() : SpellScriptLoader("spell_rescue_injured_sailor") {}
+
+    class spell_rescue_injured_sailor_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_rescue_injured_sailor_AuraScript);
+
+
+        void HandleEffectRemove(AuraEffect const* auraEff, AuraEffectHandleModes mode)
+        {
+            if(GetCaster())
+                if(Vehicle* vehicle = GetCaster()->GetVehicleKit())
+                    if(Unit* unit = vehicle->GetPassenger(0))
+                        if(unit && unit->ToCreature())
+                            unit->ToCreature()->AI()->DoAction(0);
+        }
+
+        void Register()
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_rescue_injured_sailor_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_SET_VEHICLE_ID, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_rescue_injured_sailor_AuraScript();
+    }
+};
+
+class npc_vordraka : public CreatureScript
+{
+public:
+    npc_vordraka(): CreatureScript("npc_vordraka") { }
+
+    struct npc_vordrakaAI : public ScriptedAI
+    {
+        npc_vordrakaAI(Creature* creature) : ScriptedAI(creature), Summons(me){}
+
+        uint32 Deep_Sea_Smash_Timer;
+        uint32 Deep_Sea_Rupture_Timer;
+
+        bool Summon_Timer_1;
+        bool Summon_Timer_2;
+        bool Say20;
+        bool SaySmash;
+
+        SummonList Summons;
+
+        void Reset()
+        {
+            Deep_Sea_Smash_Timer = 10000;
+            Deep_Sea_Rupture_Timer = 20000;
+
+            Summon_Timer_1 = true;
+            Summon_Timer_2 = true;
+            Say20 = true;
+            SaySmash = true;
+
+            Summons.DespawnAll();
+        }
+
+        void EnterCombat(Unit* /*who*/)
+        {
+            me->SummonCreature(56417, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 300000);
+
+            Creature* aysa = me->FindNearestCreature(56417, 100.00f, true);
+            if(aysa)
+                aysa->AI()->Talk(0);
+        }
+
+        void JustSummoned(Creature* Summoned)
+        {
+            Summons.Summon(Summoned);
+
+            if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true))
+                if(target && target->GetTypeId() == TYPEID_PLAYER)
+                    if(target->InSamePhase(2) && target->isInCombat())
+                    {
+                        Summoned->CastSpell(target, 117407, false);
+                        Summoned->AI()->AttackStart(target);
+                    }
+        }
+
+        void JustDied(Unit *pWho)
+        {
+            Creature* aysa = me->FindNearestCreature(56417, 100.00f, true);
+            Summons.DespawnAll();
+
+            if(aysa)
+            {
+                aysa->AI()->Talk(4);
+                aysa->GetMotionMaster()->MovePoint(1, 286.39f, 4004.87f, 75.00f);
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(!UpdateVictim())
+                return;
+
+            if(me->HealthBelowPct(66) && Summon_Timer_1)
+            {
+                Creature* aysa = me->FindNearestCreature(56417, 100.00f, true);
+                if(aysa)
+                    aysa->AI()->Talk(2);
+
+                me->SummonCreature(60685, 256.02f, 3963.01f, 75.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                me->SummonCreature(60685, 249.40f, 3972.39f, 76.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                Summon_Timer_1 = false;
+            }
+
+            if(me->HealthBelowPct(33) && Summon_Timer_2)
+            {
+                me->SummonCreature(60685, 266.57f, 4014.58f, 80.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                me->SummonCreature(60685, 271.92f, 4018.93f, 81.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                Summon_Timer_2 = false;
+            }
+
+            if(me->HealthBelowPct(20) && Say20)
+            {
+                Creature* aysa = me->FindNearestCreature(56417, 100.00f, true);
+                if(aysa)
+                    aysa->AI()->Talk(3);
+
+                Say20 = false;
+            }
+
+            if(Deep_Sea_Smash_Timer <= uiDiff)
+            {
+                if(SaySmash)
+                {
+                    Creature* aysa = me->FindNearestCreature(56417, 100.00f, true);
+                    if(aysa)
+                        aysa->AI()->Talk(1);
+
+                    SaySmash = false;
+                }
+
+                Creature* aysa = me->FindNearestCreature(56417, 100.00f, true);
+                if(aysa)
+                    aysa->AI()->DoAction(0);
+
+                DoCast(117287);
+
+                Deep_Sea_Smash_Timer = 20000;
+            }
+            else
+                Deep_Sea_Smash_Timer -= uiDiff;
+
+            if(Deep_Sea_Rupture_Timer <= uiDiff)
+            {
+                if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST))
+                    me->CastSpell(target, 117456, false);
+
+                Deep_Sea_Rupture_Timer = 20000;
+            }
+            else
+                Deep_Sea_Rupture_Timer -= uiDiff;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_vordrakaAI(creature);
+    }
+};
+
+class npc_aysa_attack_vordraka : public CreatureScript
+{
+public:
+    npc_aysa_attack_vordraka(): CreatureScript("npc_aysa_attack_vordraka") { }
+
+    struct npc_aysa_attack_vordrakaAI : public ScriptedAI
+    {
+        npc_aysa_attack_vordrakaAI(Creature* creature) : ScriptedAI(creature){}
+
+        uint32 Taunt_Timer;
+
+        void Reset()
+        {
+            Taunt_Timer = 1000;
+        }
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type == POINT_MOTION_TYPE && id == 1)
+            {
+                me->DespawnOrUnsummon();
+            }
+        }
+
+        void DoAction(int32 const action)
+        {
+            Creature* vordraka = me->FindNearestCreature(56009, 200.00f, true);
+            if(vordraka)
+                JumpBehindTarget(vordraka);
+        }
+
+        void JumpBehindTarget(WorldObject const* target)
+        {
+            Position const targetExactPosition = {target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation()};
+
+            float orientation = targetExactPosition.m_orientation + static_cast<float>(M_PI);
+
+            orientation = Position::NormalizeOrientation(orientation);
+
+            float x = targetExactPosition.m_positionX + 0.5f * cos(orientation);
+            float y = targetExactPosition.m_positionY + 0.5f * sin(orientation);
+            float z = targetExactPosition.m_positionZ;
+
+            Position const exactJumpPosition = {x, y, z, targetExactPosition.m_orientation};
+
+            float speedZ = 10.0f ;
+            float speedXY = me->GetExactDist2d(target);
+
+            me->GetMotionMaster()->MoveJump(exactJumpPosition, speedXY, speedZ);
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(me->HealthBelowPct(50))
+            {
+                me->SetHealth(me->GetMaxHealth());
+            }
+
+            if(Taunt_Timer <= uiDiff)
+            {
+                Creature* vordraka = me->FindNearestCreature(56009, 200.00f, true);
+
+                if(vordraka)
+                {
+                    me->CastSpell(vordraka, 114915, true);
+                    me->AI()->AttackStart(vordraka);
+                }
+
+                Taunt_Timer = 5000;
+            }
+            else
+                Taunt_Timer -= uiDiff;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_aysa_attack_vordrakaAI(creature);
+    }
+};
+
+class npc_aysa_boat : public CreatureScript
+{
+public:
+    npc_aysa_boat(): CreatureScript("npc_aysa_boat") { }
+
+    struct npc_aysa_boatAI : public npc_escortAI
+    {
+        npc_aysa_boatAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    if(Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        Talk(0, summoner->GetGUID());
+                    break;
+
+                case 18:
+                    Talk(1);
+                    break;
+
+                case 19:
+                    Talk(2);
+                    break;
+
+                case 20:
+                    Talk(3);
+                    break;
+
+                case 21:
+                    Talk(4);
+                    break;
+
+                case 22:
+                    Talk(5);
+                    break;
+
+                case 24:
+                    me->GetMotionMaster()->MoveJump(228.98f, 3938.96f, 62.5f, 10, 10);
+
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if(summoner->ToPlayer())
+                        {
+                            summoner->CastSpell(summoner, 117615, true);
+                            summoner->ToPlayer()->SendMovieStart(117);
+                        }
+                    break;
+
+                case 25:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_aysa_boatAI(creature);
+    }
+};
+
+class npc_ji_boat : public CreatureScript
+{
+public:
+    npc_ji_boat(): CreatureScript("npc_ji_boat") { }
+
+    struct npc_ji_boatAI : public npc_escortAI
+    {
+        npc_ji_boatAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 2:
+                    Talk(0);
+                    break;
+
+                case 3:
+                    Talk(1);
+                    break;
+
+                case 4:
+                    Talk(2);
+                    break;
+
+                case 5:
+                    me->HandleEmoteCommand(EMOTE_STATE_USE_STANDING);
+                    break;
+
+                case 6:
+                    me->HandleEmoteCommand(EMOTE_STATE_NONE);
+                    break;
+
+                case 8:
+                    me->GetMotionMaster()->MoveJump(228.98f, 3938.96f, 62.5f, 10, 10);
+                    break;
+
+                case 9:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ji_boatAI(creature);
+    }
+};
+
 void AddSC_wandering_isle()
 {
     new stalker_item_equiped();
@@ -4955,6 +5996,7 @@ void AddSC_wandering_isle()
     new at_pop_child_panda();
     new at_delivery_cart_talk();
     new at_delivery_cart_talk_2();
+    new at_7106_mongolfiere();
     new npc_first_quest_pandaren();	
     new npc_trainee();
     new areatrigger_at_the_missing_driver();
@@ -5006,7 +6048,21 @@ void AddSC_wandering_isle()
     new npc_dafeng_escort();
     new npc_master_shang_xi_escort();
     new npc_master_shang_xi_dead();
+    new npc_aysa_7106();
+    new npc_ji_7106();
     new npc_shang_xi_air_balloon();
     new npc_waypoint_air_balloon();
     new npc_shang_xi_air_balloon_click();
+    new at_bidden_greatness_door();
+    new npc_aysa_door();
+    new npc_jojo_door();
+    new npc_ji_door();
+    new npc_ji_lugubre();
+    new npc_injured_sailor_click();
+    new at_none_left_behind();
+    new spell_rescue_injured_sailor();
+    new npc_vordraka();
+    new npc_aysa_attack_vordraka();
+    new npc_aysa_boat();
+    new npc_ji_boat();
 }

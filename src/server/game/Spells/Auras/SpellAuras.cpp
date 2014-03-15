@@ -370,8 +370,10 @@ Aura* Aura::TryCreate(SpellInfo const* spellproto, uint32 tryEffMask, WorldObjec
     ASSERT(caster || casterGUID);
     ASSERT(tryEffMask <= MAX_EFFECT_MASK);
     uint32 effMask = Aura::BuildEffectMaskForOwner(spellproto, tryEffMask, owner);
-    if (!effMask)
+    if (!effMask) {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "AURAS : Aura::TryCreate : Aura::BuildEffectMaskForOwner returned 0, used spellproto = %p, tryEffMask = %u, owner = %p", spellproto, tryEffMask, owner);
         return NULL;
+	}
     return Create(spellproto, effMask, owner, caster, baseAmount, castItem, casterGUID);
 }
 
@@ -398,8 +400,11 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint32 effMask, WorldObject* own
     if (owner->isType(TYPEMASK_UNIT))
         if (!owner->IsInWorld() || ((Unit*)owner)->IsDuringRemoveFromWorld())
             // owner not in world so don't allow to own not self casted single target auras
-            if (casterGUID != owner->GetGUID() && spellproto->IsSingleTarget())
+            if (casterGUID != owner->GetGUID() && spellproto->IsSingleTarget()) {
+				sLog->outDebug(LOG_FILTER_NETWORKIO, "AURAS : Aura::Create : owner not in world ||owner is during remove from world casterGUID %u != owner->GetGUID() %u && spellProto->IsSingleTarget() == true", 
+								casterGUID, owner->GetGUID());
                 return NULL;
+			}
 
     Aura* aura = NULL;
     switch (owner->GetTypeId())
@@ -423,8 +428,10 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint32 effMask, WorldObject* own
             return NULL;
     }
     // aura can be removed in Unit::_AddAura call
-    if (aura->IsRemoved())
+    if (aura->IsRemoved()) {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "AURAS : Aura::Create : Aura has be removed !");
         return NULL;
+	}
     return aura;
 }
 

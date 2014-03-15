@@ -4504,7 +4504,14 @@ void Unit::_UnregisterDynObject(DynamicObject* dynObj)
 
 void Unit::_UnregisterAreaTrigger(AreaTrigger* areaTrigger)
 {
-    m_AreaTrigger.remove(areaTrigger);
+	std::list<AreaTrigger*>::iterator iter = m_AreaTrigger.begin() ;
+	for(; iter != m_AreaTrigger.end() ; ) {
+		if(*iter == areaTrigger) {
+			m_AreaTrigger.erase(iter++);
+		} else {
+			++iter ;
+		}
+	}
 }
 
 DynamicObject* Unit::GetDynObject(uint32 spellId)
@@ -15838,26 +15845,38 @@ void Unit::GetPartyMembers(std::list<Unit*> &TagUnitMap)
 
 Aura* Unit::AddAura(uint32 spellId, Unit* target)
 {
-    if (!target)
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "AURAS : Unit::AddAura using spellId = %u, target = %p", spellId, target);
+    if (!target) {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "AURAS : Unit::AddAura : target is the null pointer !");
         return NULL;
+	}
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-    if (!spellInfo)
+    if (!spellInfo) {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "AURAS : Unit::AddAura : no spell info found in sSpellMgr !");
         return NULL;
+	}
 
-    if (!target->isAlive() && !(spellInfo->Attributes & SPELL_ATTR0_PASSIVE) && !(spellInfo->AttributesEx2 & SPELL_ATTR2_CAN_TARGET_DEAD))
+    if (!target->isAlive() && !(spellInfo->Attributes & SPELL_ATTR0_PASSIVE) && !(spellInfo->AttributesEx2 & SPELL_ATTR2_CAN_TARGET_DEAD)) {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "AURAS : Unit::AddAura : Target is dead and spell cannot target dead !");
         return NULL;
+	}
 
     return AddAura(spellInfo, MAX_EFFECT_MASK, target);
 }
 
 Aura* Unit::AddAura(SpellInfo const* spellInfo, uint32 effMask, Unit* target)
 {
-    if (!spellInfo)
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "AURAS : Unit::AddAura(complete) : using spellInfo %p, effMask %u, target = %p", spellInfo, effMask, target);
+    if (!spellInfo) {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "AURAS : Unit::AddAura(complete) : spellInfo is the null pointer !");
         return NULL;
+	}
 
-    if (target->IsImmunedToSpell(spellInfo))
+    if (target->IsImmunedToSpell(spellInfo)) {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "AURAS : Unit::AddAura(complete) : target is immuned to spell !");
         return NULL;
+	}
 
     for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
@@ -15867,8 +15886,9 @@ Aura* Unit::AddAura(SpellInfo const* spellInfo, uint32 effMask, Unit* target)
             effMask &= ~(1<<i);
     }
 
-    if (Aura* aura = Aura::TryRefreshStackOrCreate(spellInfo, effMask, target, this))
+    if (Aura* aura = Aura::TryCreate(spellInfo, effMask, target, this))
     {
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "AURAS : Entered Unit::AddAura, using spellInfo = %p, effMask = %u, target= %p, caster = %p", spellInfo, effMask, target, this);
         aura->ApplyForTargets();
         return aura;
     }

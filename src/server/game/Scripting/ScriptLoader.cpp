@@ -243,12 +243,13 @@ void AddSC_boss_armsmaster_harlan(); // Scarlet Halls
 void AddSC_boss_flameweaver_koegler();
 void AddSC_boss_houndmaster_braun();
 void AddSC_instance_scarlet_halls();
+/* Scholomance OLD
 void AddSC_boss_darkmaster_gandling();       //Scholomance
 void AddSC_boss_death_knight_darkreaver();
 void AddSC_boss_theolenkrastinov();
 void AddSC_boss_illuciabarov();
 void AddSC_boss_instructormalicia();
-//void AddSC_boss_jandicebarov();
+void AddSC_boss_jandicebarov();
 void AddSC_boss_kormok();
 void AddSC_boss_lordalexeibarov();
 void AddSC_boss_lorekeeperpolkelt();
@@ -256,7 +257,7 @@ void AddSC_boss_rasfrost();
 void AddSC_boss_theravenian();
 void AddSC_boss_vectus();
 void AddSC_boss_kirtonos_the_herald();
-void AddSC_instance_scholomance();
+void AddSC_instance_scholomance();*/
 void AddSC_shadowfang_keep();                //Shadowfang keep
 void AddSC_instance_shadowfang_keep();
 void AddSC_boss_magistrate_barthilas();      //Stratholme
@@ -900,12 +901,13 @@ void AddEasternKingdomsScripts()
 	AddSC_boss_flameweaver_koegler();
 	AddSC_boss_houndmaster_braun();
 	AddSC_instance_scarlet_halls();
-    AddSC_boss_darkmaster_gandling();       //Scholomance
+    /* Scholomance OLD
+	AddSC_boss_darkmaster_gandling();       
     AddSC_boss_death_knight_darkreaver();
     AddSC_boss_theolenkrastinov();
     AddSC_boss_illuciabarov();
     AddSC_boss_instructormalicia();
-    //AddSC_boss_jandicebarov();
+    AddSC_boss_jandicebarov();
     AddSC_boss_kormok();
     AddSC_boss_lordalexeibarov();
     AddSC_boss_lorekeeperpolkelt();
@@ -913,7 +915,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_theravenian();
     AddSC_boss_vectus();
     AddSC_boss_kirtonos_the_herald();
-    AddSC_instance_scholomance();
+    AddSC_instance_scholomance();*/
     AddSC_shadowfang_keep();                //Shadowfang keep
     AddSC_instance_shadowfang_keep();
     AddSC_boss_magistrate_barthilas();      //Stratholme

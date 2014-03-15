@@ -375,6 +375,40 @@ void AreaTrigger::Update(uint32 p_time)
 
             break;
         }
+        case 128420 : // Shadow Geyser
+        {
+			std::list<Player*> targets ;
+			radius = 100.0f ;
+			SetObjectScale(0.5f);
+
+			Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, caster, radius);
+			Trinity::PlayerListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
+			VisitNearbyObject(radius, searcher);
+
+			if(targets.empty())
+				return ;
+
+			std::list<AreaTrigger*> others ;
+            caster->GetAreaTriggerList(others, GetUInt32Value(AREATRIGGER_SPELLID));
+            
+            uint32 thisCount = 0, totalCount = others.size() - 1 ; // total count must remove self
+            
+            for(std::list<Player*>::const_iterator iter = targets.begin() ; iter != targets.end() ; ++iter) {
+                for(std::list<AreaTrigger*>::const_iterator _iter = others.begin() ; _iter != others.end() ; ++_iter) {                    
+                    float dist = (*_iter)->GetExactDist2d(*iter);
+                    if(dist > 2.0f)
+                        ++thisCount ;
+                    if(thisCount >= totalCount)
+                        (*iter)->RemoveAurasDueToSpell(128421);
+                }
+            }
+            
+            for(std::list<Player*>::const_iterator iter = targets.begin() ; iter != targets.end() ; ++iter) {
+                if(GetExactDist2d(*iter) <= 2.0f)
+                    if(!((*iter)->HasAura(128421)))
+                        caster->CastSpell(*iter, 128421, true);
+            }
+        }
         default:
             break;
     }

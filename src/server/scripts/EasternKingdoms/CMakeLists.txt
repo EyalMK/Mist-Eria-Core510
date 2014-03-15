@@ -19,21 +19,6 @@ set(sources
   EasternKingdoms/AlteracValley/alterac_valley.cpp
   EasternKingdoms/BaradinHold/boss_alizabal.cpp
   EasternKingdoms/BaradinHold/instance_baradin_hold.cpp
-  EasternKingdoms/Scholomance/boss_the_ravenian.cpp
-  EasternKingdoms/Scholomance/boss_instructor_malicia.cpp
-  EasternKingdoms/Scholomance/boss_death_knight_darkreaver.cpp
-  EasternKingdoms/Scholomance/boss_illucia_barov.cpp
-  EasternKingdoms/Scholomance/scholomance.h
-  EasternKingdoms/Scholomance/boss_vectus.cpp
-  EasternKingdoms/Scholomance/boss_jandice_barov.cpp
-  EasternKingdoms/Scholomance/boss_kormok.cpp
-  EasternKingdoms/Scholomance/boss_lord_alexei_barov.cpp
-  EasternKingdoms/Scholomance/boss_doctor_theolen_krastinov.cpp
-  EasternKingdoms/Scholomance/boss_darkmaster_gandling.cpp
-  EasternKingdoms/Scholomance/instance_scholomance.cpp
-  EasternKingdoms/Scholomance/boss_lorekeeper_polkelt.cpp
-  EasternKingdoms/Scholomance/boss_ras_frostwhisper.cpp
-  EasternKingdoms/Scholomance/boss_kirtonos_the_herald.cpp
   EasternKingdoms/zone_isle_of_queldanas.cpp
   EasternKingdoms/ZulGurub/boss_grilek.cpp
   EasternKingdoms/ZulGurub/boss_hazzarah.cpp

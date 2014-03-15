@@ -3710,8 +3710,21 @@ void Guild::GiveXP(uint32 xp, Player* source)
     data << uint64(xp);
     source->GetSession()->SendPacket(&data);
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "guild xp gain : %u", xp);
+
+
     _experience += xp;
     _todayExperience += xp;
+
+
+    for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+    {
+        Player* p = itr->second->FindPlayer();
+        if (p) {
+            SendGuildXP(p->GetSession());
+        }
+    }
+
 
     if (!xp)
         return;
@@ -3747,18 +3760,27 @@ void Guild::GiveXP(uint32 xp, Player* source)
 
         ++oldLevel;
     }
+
+    for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+    {
+        Player* p = itr->second->FindPlayer();
+        if (p) {
+            SendGuildXP(p->GetSession());
+        }
+    }
+
 }
 
 void Guild::SendGuildXP(WorldSession* session /* = NULL */) const
 {
     //Member const* member = GetMember(session->GetGuidLow());
 
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "guild xp for level %u : %u (%u)", GetLevel(), sGuildMgr->GetXPForGuildLevel(GetLevel()), GetExperience());
     WorldPacket data(SMSG_GUILD_XP, 40);
-    data << uint64(/*member ? member->GetTotalActivity() :*/ 0);
     data << uint64(sGuildMgr->GetXPForGuildLevel(GetLevel()) - GetExperience());    // XP missing for next level
-    data << uint64(GetTodayExperience());
-    data << uint64(/*member ? member->GetWeeklyActivity() :*/ 0);
+    data << uint64(0); //data << uint64(GetTodayExperience());
     data << uint64(GetExperience());
+    data << uint64(0);//data << uint64(/*member ? member->GetWeeklyActivity() :*/ 0);
     session->SendPacket(&data);
 }
 
