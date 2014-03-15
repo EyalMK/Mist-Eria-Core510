@@ -587,7 +587,7 @@ class spell_summon_echeyakee : public SpellScriptLoader
 
             void HandleSummonEcheyakee()
             {
-				if (TempSummon* echayakee = GetHitUnit()->SummonCreature(NPC_ECHEYAKEE, -25.634071f, -2401.624756f, 91.667641f, 1.275207f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, MINUTE*IN_MILLISECONDS))
+				if (TempSummon* echayakee = GetCaster()->SummonCreature(NPC_ECHEYAKEE, -25.634071f, -2401.624756f, 91.667641f, 1.275207f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, MINUTE*IN_MILLISECONDS))
 					echayakee->GetMotionMaster()->MoveJump(-20.098173f, -2380.448242f, 91.667641f, 10.0f, 10.0f);
             }
 
