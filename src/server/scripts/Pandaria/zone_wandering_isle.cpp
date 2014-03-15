@@ -5838,6 +5838,135 @@ public:
     }
 };
 
+class npc_aysa_boat : public CreatureScript
+{
+public:
+    npc_aysa_boat(): CreatureScript("npc_aysa_boat") { }
+
+    struct npc_aysa_boatAI : public npc_escortAI
+    {
+        npc_aysa_boatAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    Talk(0);
+                    break;
+
+                case 18:
+                    Talk(1);
+                    break;
+
+                case 19:
+                    Talk(2);
+                    break;
+
+                case 20:
+                    Talk(3);
+                    break;
+
+                case 21:
+                    Talk(4);
+                    break;
+
+                case 22:
+                    Talk(5);
+                    break;
+
+                case 24:
+                    me->GetMotionMaster()->MoveJump(228.98f, 3938.96f, 62.5f, 10, 10);
+                    break;
+
+                case 25:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_aysa_boatAI(creature);
+    }
+};
+
+class npc_ji_boat : public CreatureScript
+{
+public:
+    npc_ji_boat(): CreatureScript("npc_ji_boat") { }
+
+    struct npc_ji_boatAI : public npc_escortAI
+    {
+        npc_ji_boatAI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 2:
+                    Talk(0);
+                    break;
+
+                case 3:
+                    Talk(1);
+                    break;
+
+                case 4:
+                    Talk(2);
+                    break;
+
+                case 5:
+                    me->HandleEmoteCommand(EMOTE_STATE_USE_STANDING);
+                    break;
+
+                case 6:
+                    me->HandleEmoteCommand(EMOTE_STATE_NONE);
+                    break;
+
+                case 8:
+                    me->GetMotionMaster()->MoveJump(228.98f, 3938.96f, 62.5f, 10, 10);
+                    break;
+
+                case 9:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ji_boatAI(creature);
+    }
+};
 
 void AddSC_wandering_isle()
 {
@@ -5926,4 +6055,6 @@ void AddSC_wandering_isle()
     new spell_rescue_injured_sailor();
     new npc_vordraka();
     new npc_aysa_attack_vordraka();
+    new npc_aysa_boat();
+    new npc_ji_boat();
 }
