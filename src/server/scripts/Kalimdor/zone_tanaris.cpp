@@ -27,6 +27,7 @@ EndScriptData */
 npc_custodian_of_time
 npc_steward_of_time
 npc_OOX17
+spell_summon_echeyakee
 EndContentData */
 
 #include "ScriptMgr.h"
@@ -572,9 +573,49 @@ public:
 
 };
 
+#define NPC_ECHEYAKEE	3475
+
+// Summon Echeyakee : 12189
+class spell_summon_echeyakee : public SpellScriptLoader
+{
+    public:
+        spell_summon_echeyakee() : SpellScriptLoader("spell_summon_echeyakee") { }
+
+        class spell_summon_echeyakee_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_summon_echeyakee_SpellScript);
+
+            bool Validate (SpellInfo const* /*spellEntry*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(12189)) // Summon echeyakee
+                    return false;
+
+                return true;
+            }
+
+            void HandleEffect(SpellEffIndex /*effIndex*/)
+            {
+				if (Player* player = GetCaster()->ToPlayer())
+					if (TempSummon* echayakee = player->SummonCreature(NPC_ECHEYAKEE, -25.634071f, -2401.624756f, 91.667641f, 1.275207f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, MINUTE*IN_MILLISECONDS))
+						echayakee->GetMotionMaster()->MoveJump(-20.098173f, -2380.448242f, 91.667641f, 10.0f, 10.0f);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_summon_echeyakee_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_summon_echeyakee_SpellScript();
+        }
+};
+
 void AddSC_tanaris()
 {
     new npc_custodian_of_time();
     new npc_steward_of_time();
     new npc_OOX17();
+    new spell_summon_echeyakee();
 }

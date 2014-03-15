@@ -3875,12 +3875,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
-				case 12189: // Summon echayakee
-				{
-					if (TempSummon* echayakee = m_caster->SummonCreature(3475, -25.634071f, -2401.624756f, 91.667641f, 1.275207f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, MINUTE*IN_MILLISECONDS))
-						echayakee->GetMotionMaster()->MoveJump(-20.098173f, -2380.448242f, 91.667641f, 10.0f, 10.0f);
-					break;
-				}
                 // Glyph of Backstab
                 case 63975:
                 {
