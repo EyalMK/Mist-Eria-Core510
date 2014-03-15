@@ -5858,7 +5858,8 @@ public:
             switch (waypointId)
             {
                 case 1:
-                    Talk(0);
+                    if(Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        Talk(0, summoner->GetGUID());
                     break;
 
                 case 18:
@@ -5883,6 +5884,13 @@ public:
 
                 case 24:
                     me->GetMotionMaster()->MoveJump(228.98f, 3938.96f, 62.5f, 10, 10);
+
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if(summoner->ToPlayer())
+                        {
+                            summoner->CastSpell(summoner, 117615, true);
+                            summoner->ToPlayer()->SendMovieStart(117);
+                        }
                     break;
 
                 case 25:
