@@ -6011,8 +6011,9 @@ public:
     {
         if (quest->GetQuestId() == 29799)
         {
-            player->SendInitWorldStates(5736, 5833);
-            player->SendUpdateWorldState(6489, 0);
+           // player->SendInitWorldStates(5736, 5833);
+            player->SendUpdateWorldState(6489, 1);
+            player->SendUpdateWorldState(6488, 0);
         }
         return true;
     }
