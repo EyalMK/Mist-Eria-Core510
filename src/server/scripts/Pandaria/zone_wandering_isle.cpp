@@ -6027,7 +6027,7 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-            Map* map = me->GetMap();
+           /* Map* map = me->GetMap();
 
             Map::PlayerList const& pl = map->GetPlayers();
 
@@ -6038,7 +6038,7 @@ public:
                     p->SendUpdateWorldState(6489, 1);
                     p->SendUpdateWorldState(6488, 1);
                 }
-            }
+            }*/
         }
     };
 
