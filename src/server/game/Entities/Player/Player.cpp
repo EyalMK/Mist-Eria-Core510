@@ -10304,10 +10304,9 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             break;
 
         // Wandering isle
-        /*case 5736:
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "HEALING");
-            data << uint32(6489) << uint32(0x0);
-            break;*/
+        case 5736:
+            data << uint32(6489) << uint32(1);
+            break;
 
         default:
             data << uint32(0x914) << uint32(0x0);           // 7

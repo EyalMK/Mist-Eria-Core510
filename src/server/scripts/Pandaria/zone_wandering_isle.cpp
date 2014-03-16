@@ -6013,7 +6013,7 @@ public:
         {
             player->SendInitWorldStates(5736, 5833);
             player->SendUpdateWorldState(6489, 1);
-            player->SendUpdateWorldState(6488, 0);
+            player->SendUpdateWorldState(6488, 1);
         }
         return true;
     }
