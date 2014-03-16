@@ -10303,6 +10303,12 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
                 break;
             }
             // No break here, intended.
+
+        // Wandering isle
+        case 5736:
+            data << uint32(6489) << uint32(0x0);
+            break;
+
         default:
             data << uint32(0x914) << uint32(0x0);           // 7
             data << uint32(0x913) << uint32(0x0);           // 8
