@@ -5982,15 +5982,6 @@ class npc_trigger_healing_shen: public CreatureScript
 public:
     npc_trigger_healing_shen(): CreatureScript("npc_trigger_healing_shen") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
-    {
-        if (quest->GetQuestId() == 29799)
-        {
-            player->SendInitWorldStates(5736, 5833);
-        }
-        return true;
-    }
-
     struct npc_trigger_healing_shenAI : public ScriptedAI
     {
         npc_trigger_healing_shenAI(Creature* creature) : ScriptedAI(creature){}
@@ -6008,6 +5999,40 @@ public:
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_trigger_healing_shenAI(creature);
+    }
+};
+
+class npc_ji_healing_shen: public CreatureScript
+{
+public:
+    npc_ji_healing_shen(): CreatureScript("npc_ji_healing_shen") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        if (quest->GetQuestId() == 29799)
+        {
+            player->SendInitWorldStates(5736, 5833);
+        }
+        return true;
+    }
+
+    struct npc_ji_healing_shenAI : public ScriptedAI
+    {
+        npc_ji_healing_shenAI(Creature* creature) : ScriptedAI(creature){}
+
+        void Reset()
+        {
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ji_healing_shenAI(creature);
     }
 };
 
@@ -6101,4 +6126,5 @@ void AddSC_wandering_isle()
     new npc_aysa_boat();
     new npc_ji_boat();
     new npc_trigger_healing_shen();
+    new npc_ji_healing_shen();
 }
