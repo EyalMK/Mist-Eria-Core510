@@ -6011,7 +6011,6 @@ public:
     {
         if (quest->GetQuestId() == 29799)
         {
-            player->SendInitWorldStates(5736, 5833);
             player->SendUpdateWorldState(6489, 1);
             player->SendUpdateWorldState(6488, 1);
         }
@@ -6028,7 +6027,18 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-            DoMeleeAttackIfReady();
+            Map* map = me->GetMap();
+
+            Map::PlayerList const& pl = map->GetPlayers();
+
+            for(Map::PlayerList::const_iterator iter = pl.begin() ; iter != pl.end() ; ++iter)
+            {
+                if(Player* p = iter->getSource())
+                {
+                    p->SendUpdateWorldState(6489, 1);
+                    p->SendUpdateWorldState(6488, 1);
+                }
+            }
         }
     };
 
