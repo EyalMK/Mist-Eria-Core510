@@ -3970,7 +3970,7 @@ void SpellMgr::LoadSpellInfoCorrections()
 				case 130774: // Amethyst pool
 					spellInfo->AttributesCu |= SPELL_ATTR0_CANT_CANCEL;
 					break;
-                case 105002: // Invocation d'un faucon de feu apprivoisé
+                case 105002: // Summon Hot Air Balloon
                     spellInfo->Effects[EFFECT_2].Effect = NULL;
                     break;
 				/*case 112944 :
