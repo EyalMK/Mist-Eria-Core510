@@ -6120,6 +6120,7 @@ public:
         {
             me->SetHealth(me->GetMaxHealth() / 4);
             me->SetStandState(UNIT_STAND_STATE_SLEEP);
+            me->SetReactState(REACT_PASSIVE);
             me->CastSpell(me, 117857, true);
             HealingShen = false;
         }
@@ -6247,7 +6248,6 @@ public:
 
         void Reset()
         {
-            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             VerifCombat_Timer = 1000;
             Cast_Timer = 1000;
             Verifhp50 = true;
@@ -6259,6 +6259,7 @@ public:
             if (type == POINT_MOTION_TYPE && id == 1)
             {
                 me->CastSpell(me, 117932, true);
+                me->SetReactState(REACT_PASSIVE);
                 Healing_timer = 2000;
                 HealingShen = true;
             }
@@ -6315,7 +6316,7 @@ public:
 
                 switch(player->GetPower(POWER_ALTERNATE_POWER))
                 {
-                    case 700 :
+                    case 700:
                         player->KilledMonsterCredit(56011);
                         player->RemoveAura(117783);
                         break ;
@@ -6349,6 +6350,7 @@ public:
                     if(!me->isInCombat())
                         me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
+                    me->SetReactState(REACT_DEFENSIVE);
                     VerifCombat_Timer = 1000;
                 }
                 else
