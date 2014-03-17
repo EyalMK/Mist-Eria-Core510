@@ -6044,12 +6044,22 @@ public:
     {
         npc_ji_healing_shenAI(Creature* creature) : ScriptedAI(creature){}
 
+        uint32 Text_Timer;
+
         void Reset()
         {
+            Text_Timer = 1000;
         }
 
         void UpdateAI(const uint32 uiDiff)
         {
+            if(Text_Timer <= uiDiff)
+            {
+                Talk(0);
+                Text_Timer = 120000;
+            }
+            else
+                Text_Timer -= uiDiff;
         }
     };
 
@@ -6075,18 +6085,21 @@ public:
             me->CastSpell(me, 117857, true);
         }
 
+        void DoAction(int32 const action)
+        {
+            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->CastSpell(me, 117934, false);
+        }
+
         void SpellHit(Unit* caster, const SpellInfo* spell)
         {
-            if (spell->Id == 117848)
+            if (spell->Id == 117934)
             {
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->SetHealth(me->GetMaxHealth());
-
-                if(me->GetGUID() == 60834)
+                Talk(0);
+                if(me->GetGUIDLow() == 60834)
                     me->DisappearAndDie();
             }
         }
-
 
         void UpdateAI(const uint32 uiDiff)
         {
@@ -6096,6 +6109,60 @@ public:
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_healer_shen_wreckageAI(creature);
+    }
+};
+
+class npc_healer_shen: public CreatureScript
+{
+public:
+    npc_healer_shen(): CreatureScript("npc_healer_shen") { }
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        if(player->hasQuest(29799))
+            if(!creature->isInCombat())
+                creature->AI()->DoAction(0);
+
+        return true;
+    }
+
+    struct npc_healer_shenAI : public ScriptedAI
+    {
+        npc_healer_shenAI(Creature* creature) : ScriptedAI(creature){}
+
+        uint32 VerifCombat_Timer;
+
+        void Reset()
+        {
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            VerifCombat_Timer = 1000;
+        }
+
+        void DoAction(int32 const action)
+        {
+            Talk(0);
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(VerifCombat_Timer <= uiDiff)
+            {
+                if(me->isInCombat())
+                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+
+                if(!me->isInCombat())
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+
+                VerifCombat_Timer = 1000;
+            }
+            else
+                VerifCombat_Timer -= uiDiff;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_healer_shenAI(creature);
     }
 };
 
@@ -6126,6 +6193,15 @@ public:
         void OnSpellClick(Unit* clicker)
         {
             me->GetMotionMaster()->MoveJump(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10, 10, 10, EVENT_JUMP);
+
+            Creature* healerA = me->FindNearestCreature(60878, 10.0f, true);
+            Creature* healerH = me->FindNearestCreature(60834, 10.0f, true);
+
+            if(healerA)
+                healerA->AI()->DoAction(0);
+
+            if(healerH)
+                healerH->AI()->DoAction(0);
         }
 
         void UpdateAI(const uint32 uiDiff)
@@ -6231,5 +6307,6 @@ void AddSC_wandering_isle()
     new npc_trigger_healing_shen();
     new npc_ji_healing_shen();
     new npc_healer_shen_wreckage();
+    new npc_healer_shen();
     new npc_wreckage();
 }
