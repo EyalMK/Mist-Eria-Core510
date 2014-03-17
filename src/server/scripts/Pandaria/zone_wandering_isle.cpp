@@ -6096,8 +6096,7 @@ public:
             if (spell->Id == 117934)
             {
                 Talk(0);
-                if(me->GetGUIDLow() == 60834)
-                    me->DisappearAndDie();
+                me->SetHealth(me->GetMaxHealth());
             }
         }
 
@@ -6141,6 +6140,7 @@ public:
         void DoAction(int32 const action)
         {
             Talk(0);
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
         }
 
         void UpdateAI(const uint32 uiDiff)
@@ -6157,6 +6157,16 @@ public:
             }
             else
                 VerifCombat_Timer -= uiDiff;
+
+            if(me->HealthBelowPct(50))
+            {
+                me->CastSpell(me, 117934, false);
+            }
+
+            if(!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
         }
     };
 
