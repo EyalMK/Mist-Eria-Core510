@@ -6126,6 +6126,7 @@ public:
             me->SetHealth(me->GetMaxHealth() / 4);
             me->SetStandState(UNIT_STAND_STATE_SLEEP);
             me->SetReactState(REACT_PASSIVE);
+            me->setFaction(35);
             me->CastSpell(me, 117857, true);
             HealingShen = false;
         }
@@ -6135,6 +6136,7 @@ public:
             if (type == POINT_MOTION_TYPE && id == 1)
             {
                 me->CastSpell(me, 117932, true);
+                me->setFaction(42);
                 Healing_timer = 2000;
                 HealingShen = true;
             }
