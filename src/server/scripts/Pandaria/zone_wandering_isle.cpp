@@ -6115,9 +6115,11 @@ public:
 
     struct npc_healer_shen_wreckageAI : public ScriptedAI
     {
-        npc_healer_shen_wreckageAI(Creature* creature) : ScriptedAI(creature){}
+        npc_healer_shen_wreckageAI(Creature* creature) : ScriptedAI(creature), Summons(me){}
 
         uint32 Healing_timer;
+        uint32 Pop_timer;
+        SummonList Summons;
 
         bool HealingShen;
 
@@ -6130,12 +6132,20 @@ public:
             HealingShen = false;
         }
 
+        void JustSummoned(Creature* Summoned)
+        {
+            Summons.Summon(Summoned);
+
+            Summoned->GetMotionMaster()->MoveJump(253.51f, 3954.70f, 66.00f, 20, 20);
+        }
+
         void MovementInform(uint32 type, uint32 id)
         {
             if (type == POINT_MOTION_TYPE && id == 1)
             {
                 me->CastSpell(me, 117932, true);
                 Healing_timer = 2000;
+                Pop_timer = 4000;
                 HealingShen = true;
             }
         }
@@ -6208,6 +6218,15 @@ public:
                 }
                 else
                     Healing_timer -= uiDiff;
+
+                if(Pop_timer <= uiDiff)
+                {
+                    me->SummonCreature(60780, 215.76f, 3950.22f, 72.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
+                    me->SummonCreature(60858, 288.58f, 3939.21f, 87.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
+                    Pop_timer = 20000;
+                }
+                else
+                    Pop_timer -= uiDiff;
             }
         }
     };
@@ -6234,11 +6253,13 @@ public:
 
     struct npc_healer_shenAI : public ScriptedAI
     {
-        npc_healer_shenAI(Creature* creature) : ScriptedAI(creature){}
+        npc_healer_shenAI(Creature* creature) : ScriptedAI(creature), Summons(me){}
 
         uint32 VerifCombat_Timer;
         uint32 Cast_Timer;
         uint32 Healing_timer;
+        uint32 Pop_timer;
+        SummonList Summons;
 
         bool Verifhp50;
         bool HealingShen;
@@ -6251,6 +6272,13 @@ public:
             HealingShen = false;
         }
 
+        void JustSummoned(Creature* Summoned)
+        {
+            Summons.Summon(Summoned);
+
+            Summoned->GetMotionMaster()->MoveJump(253.51f, 3954.70f, 66.00f, 20, 20);
+        }
+
         void MovementInform(uint32 type, uint32 id)
         {
             if (type == POINT_MOTION_TYPE && id == 1)
@@ -6258,6 +6286,7 @@ public:
                 me->CastSpell(me, 117932, true);
                 me->SetReactState(REACT_PASSIVE);
                 Healing_timer = 2000;
+                Pop_timer = 4000;
                 HealingShen = true;
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
@@ -6333,18 +6362,22 @@ public:
                 }
                 else
                     Healing_timer -= uiDiff;
+
+                if(Pop_timer <= uiDiff)
+                {
+                    me->SummonCreature(60780, 215.76f, 3950.22f, 72.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
+                    me->SummonCreature(60858, 288.58f, 3939.21f, 87.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
+                    Pop_timer = 20000;
+                }
+                else
+                    Pop_timer -= uiDiff;
             }
 
             if(!HealingShen)
             {
                 if(me->HealthBelowPct(50) && Verifhp50)
                 {
-                    if(me->GetEntry() == 60877)
-                        me->CastSpell(me, 117934,false);
-
-                    if(me->GetEntry() == 60770)
-                        me->CastSpell(me, 117765,false);
-
+                    me->SetHealth(me->GetMaxHealth());
                     Verifhp50 = false;
                 }
 
@@ -6435,32 +6468,6 @@ public:
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_wreckageAI(creature);
-    }
-};
-
-class npc_deepscale_ravager: public CreatureScript
-{
-public:
-    npc_deepscale_ravager(): CreatureScript("npc_deepscale_ravager") { }
-
-    struct npc_deepscale_ravagerAI : public ScriptedAI
-    {
-        npc_deepscale_ravagerAI(Creature* creature) : ScriptedAI(creature){}
-
-        void Reset()
-        {
-
-        }
-
-        void UpdateAI(const uint32 uiDiff)
-        {
-
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_deepscale_ravagerAI(creature);
     }
 };
 
@@ -6604,6 +6611,5 @@ void AddSC_wandering_isle()
     new npc_healer_shen_wreckage();
     new npc_healer_shen();
     new npc_wreckage();
-    new npc_deepscale_ravager();
     new npc_deepscale_fleshripper();
 }
