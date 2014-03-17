@@ -6097,6 +6097,8 @@ public:
             }
             else
                 Text_Timer -= uiDiff;
+
+            DoMeleeAttackIfReady();
         }
     };
 
@@ -6270,14 +6272,6 @@ public:
                     me->GetMotionMaster()->MovePoint(1, 254.25f, 3959.83f, 65.0f, true);
                     me->SetReactState(REACT_PASSIVE);
                     break;
-
-                case 1:
-                    me->CastSpell(me, 117934, false);
-                    break;
-
-                case 2:
-                    me->CastSpell(me, 117765, false);
-                    break;
             }
         }
 
@@ -6343,6 +6337,17 @@ public:
 
             if(!HealingShen)
             {
+                if(me->HealthBelowPct(50) && Verifhp50)
+                {
+                    if(me->GetEntry() == 60877)
+                        me->CastSpell(me, 117934,false);
+
+                    if(me->GetEntry() == 60770)
+                        me->CastSpell(me, 117765,false);
+
+                    Verifhp50 = false;
+                }
+
                 if(VerifCombat_Timer <= uiDiff)
                 {
                     if(me->isInCombat())
@@ -6359,17 +6364,6 @@ public:
 
                 if(!UpdateVictim())
                     return;
-
-                if(me->HealthBelowPct(50) && Verifhp50)
-                {
-                    if(me->GetEntry() == 60877)
-                        me->AI()->DoAction(1);
-
-                    if(me->GetEntry() == 60770)
-                        me->AI()->DoAction(2);
-
-                    Verifhp50 = false;
-                }
 
                 if(Cast_Timer <= uiDiff)
                 {
