@@ -6022,11 +6022,22 @@ public:
             Map::PlayerList const& pl = map->GetPlayers();
 
             for(Map::PlayerList::const_iterator iter = pl.begin() ; iter != pl.end() ; ++iter)
+            {
                 if(Player* player = iter->getSource())
-                    if(player->isAlive() && player->InSamePhase(1024))
-                        if(player->GetAreaId() == 5833)
-                            if(player->GetQuestStatus(29799) == QUEST_STATUS_NONE && player->HasAura(117783))
-                                player->RemoveAurasDueToSpell(117783);
+                {
+                    if(!player->HasAura(117783) && player->GetQuestStatus(29799) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        player->CastSpell(player, 117783, true);
+                        player->SetMaxPower(POWER_ALTERNATE_POWER, 700);
+                        player->SetPower(POWER_ALTERNATE_POWER, 0);
+                    }
+
+                    if(player->HasAura(117783) && player->GetQuestStatus(29799) == QUEST_STATUS_NONE)
+                    {
+                        player->RemoveAurasDueToSpell(117783);
+                    }
+                }
+            }
         }
 
         void PainShake()
