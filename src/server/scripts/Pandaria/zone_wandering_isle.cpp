@@ -5977,6 +5977,8 @@ public:
 };
 
 
+/* Final Event */
+
 class npc_trigger_healing_shen: public CreatureScript
 {
 public:
@@ -6048,24 +6050,79 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-           /* Map* map = me->GetMap();
-
-            Map::PlayerList const& pl = map->GetPlayers();
-
-            for(Map::PlayerList::const_iterator iter = pl.begin() ; iter != pl.end() ; ++iter)
-            {
-                if(Player* p = iter->getSource())
-                {
-                    p->SendUpdateWorldState(6489, 1);
-                    p->SendUpdateWorldState(6488, 1);
-                }
-            }*/
         }
     };
 
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_ji_healing_shenAI(creature);
+    }
+};
+
+class npc_healer_shen_wreckage: public CreatureScript
+{
+public:
+    npc_healer_shen_wreckage(): CreatureScript("npc_healer_shen_wreckage") { }
+
+    struct npc_healer_shen_wreckageAI : public ScriptedAI
+    {
+        npc_healer_shen_wreckageAI(Creature* creature) : ScriptedAI(creature){}
+
+        void Reset()
+        {
+            me->SetHealth(me->GetMaxHealth() / 4);
+            me->SetStandState(UNIT_STAND_STATE_SLEEP);
+            me->CastSpell(me, 117857, true);
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_healer_shen_wreckageAI(creature);
+    }
+};
+
+class npc_wreckage: public CreatureScript
+{
+public:
+    npc_wreckage(): CreatureScript("npc_wreckage") { }
+
+    struct npc_wreckageAI : public ScriptedAI
+    {
+        npc_wreckageAI(Creature* creature) : ScriptedAI(creature){}
+
+        void Reset()
+        {
+            me->CastSpell(me, 117855, true);
+        }
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            switch (id)
+            {
+                case EVENT_JUMP:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void OnSpellClick(Unit* clicker)
+        {
+            me->GetMotionMaster()->MoveJump(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10, 10, 10, EVENT_JUMP);
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_wreckageAI(creature);
     }
 };
 
@@ -6160,4 +6217,6 @@ void AddSC_wandering_isle()
     new npc_ji_boat();
     new npc_trigger_healing_shen();
     new npc_ji_healing_shen();
+    new npc_healer_shen_wreckage();
+    new npc_wreckage();
 }
