@@ -6253,6 +6253,7 @@ public:
         {
             VerifCombat_Timer = 1000;
             Cast_Timer = 1000;
+            me->setFaction(42);
             HealingShen = false;
         }
 
@@ -6270,6 +6271,7 @@ public:
             {
                 me->CastSpell(me, 117932, true);
                 me->SetReactState(REACT_PASSIVE);
+                me->setFaction(42);
                 Healing_timer = 2000;
                 Pop_timer = 4000;
                 HealingShen = true;
@@ -6285,6 +6287,7 @@ public:
                     Talk(0);
                     me->GetMotionMaster()->MovePoint(1, 254.25f, 3959.83f, 65.0f, true);
                     me->SetReactState(REACT_PASSIVE);
+                    me->setFaction(35);
                     break;
             }
         }
