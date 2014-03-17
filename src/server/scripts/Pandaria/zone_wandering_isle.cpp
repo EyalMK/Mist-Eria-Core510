@@ -6137,7 +6137,10 @@ public:
             Summons.Summon(Summoned);
 
             if(Summoned->GetEntry() == 60858 || Summoned->GetEntry() == 60780)
+            {
                 Summoned->GetMotionMaster()->MoveJump(253.51f, 3954.70f, 66.00f, 20, 20);
+                Summoned->AI()->AttackStart(me);
+            }
         }
 
         void MovementInform(uint32 type, uint32 id)
@@ -6262,14 +6265,12 @@ public:
         uint32 Pop_timer;
         SummonList Summons;
 
-        bool Verifhp50;
         bool HealingShen;
 
         void Reset()
         {
             VerifCombat_Timer = 1000;
             Cast_Timer = 1000;
-            Verifhp50 = true;
             HealingShen = false;
         }
 
@@ -6278,6 +6279,7 @@ public:
             Summons.Summon(Summoned);
 
             Summoned->GetMotionMaster()->MoveJump(253.51f, 3954.70f, 66.00f, 20, 20);
+            Summoned->AI()->AttackStart(me);
         }
 
         void MovementInform(uint32 type, uint32 id)
@@ -6303,12 +6305,6 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     break;
             }
-        }
-
-        void SpellHit(Unit* caster, const SpellInfo* spell)
-        {
-            if (spell->Id == 117934 || spell->Id == 117765)
-                Verifhp50 = true;
         }
 
         void AddPowerToPlayersOnMap()
@@ -6376,6 +6372,11 @@ public:
 
             if(!HealingShen)
             {
+                if(me->HealthBelowPct(50))
+                {
+                    me->SetHealth(me->GetMaxHealth());
+                }
+
                 if(VerifCombat_Timer <= uiDiff)
                 {
                     if(me->isInCombat())
@@ -6392,12 +6393,6 @@ public:
 
                 if(!UpdateVictim())
                     return;
-
-                if(me->HealthBelowPct(50) && Verifhp50)
-                {
-                    me->SetHealth(me->GetMaxHealth());
-                    Verifhp50 = false;
-                }
 
                 if(Cast_Timer <= uiDiff)
                 {
