@@ -6097,6 +6097,7 @@ public:
             {
                 Talk(0);
                 me->SetHealth(me->GetMaxHealth());
+                me->GetMotionMaster()->MovePoint(0, 254.25f, 3959.83f, 65.0f, true);
             }
         }
 
@@ -6130,17 +6131,29 @@ public:
         npc_healer_shenAI(Creature* creature) : ScriptedAI(creature){}
 
         uint32 VerifCombat_Timer;
+        uint32 Cast_Timer;
+
+        bool Verifhp50;
 
         void Reset()
         {
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             VerifCombat_Timer = 1000;
+            Cast_Timer = 1000;
+            Verifhp50 = true;
         }
 
         void DoAction(int32 const action)
         {
             Talk(0);
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->GetMotionMaster()->MovePoint(0, 254.25f, 3959.83f, 65.0f, true);
+        }
+
+        void SpellHit(Unit* caster, const SpellInfo* spell)
+        {
+            if (spell->Id == 117934 || spell->Id == 117765)
+                Verifhp50 = true;
         }
 
         void UpdateAI(const uint32 uiDiff)
@@ -6158,13 +6171,32 @@ public:
             else
                 VerifCombat_Timer -= uiDiff;
 
-            if(me->HealthBelowPct(50))
+            if(me->HealthBelowPct(50) && Verifhp50)
             {
-                me->CastSpell(me, 117934, false);
+                if(me->GetEntry() == 60877)
+                    me->CastSpell(me, 117934, false);
+
+                if(me->GetEntry() == 60770)
+                    me->CastSpell(me, 117765, false);
+
+                Verifhp50 = false;
             }
 
             if(!UpdateVictim())
                 return;
+
+            if(Cast_Timer <= uiDiff)
+            {
+                if(me->GetEntry() == 60877)
+                    me->CastSpell(me->getVictim(), 117935, false);
+
+                if(me->GetEntry() == 60770)
+                    me->CastSpell(me->getVictim(), 117767, false);
+
+                Cast_Timer = 2500;
+            }
+            else
+                Cast_Timer -= uiDiff;
 
             DoMeleeAttackIfReady();
         }
