@@ -5989,10 +5989,12 @@ public:
         npc_trigger_healing_shenAI(Creature* creature) : ScriptedAI(creature){}
 
         uint32 PainShake_Timer;
+        uint32 Healing_Timer;
 
         void Reset()
         {
             PainShake_Timer = 1000;
+            Healing_Timer = 1500;
         }
 
         void UpdateAI(const uint32 uiDiff)
@@ -6004,6 +6006,27 @@ public:
             }
             else
                 PainShake_Timer -= uiDiff;
+
+            if(Healing_Timer <= uiDiff)
+            {
+                VerifPlayer();
+                Healing_Timer = 1000;
+            }
+            else
+                Healing_Timer -= uiDiff;
+        }
+
+        void VerifPlayer()
+        {
+            Map* map = me->GetMap();
+            Map::PlayerList const& pl = map->GetPlayers();
+
+            for(Map::PlayerList::const_iterator iter = pl.begin() ; iter != pl.end() ; ++iter)
+                if(Player* player = iter->getSource())
+                    if(player->isAlive() && player->InSamePhase(1024))
+                        if(player->GetAreaId() == 5833)
+                            if(player->GetQuestStatus(29799) == QUEST_STATUS_NONE && player->HasAura(117783))
+                                player->RemoveAurasDueToSpell(117783);
         }
 
         void PainShake()
@@ -6078,11 +6101,22 @@ public:
     {
         npc_healer_shen_wreckageAI(Creature* creature) : ScriptedAI(creature){}
 
+        bool HealingShen;
+
         void Reset()
         {
             me->SetHealth(me->GetMaxHealth() / 4);
             me->SetStandState(UNIT_STAND_STATE_SLEEP);
             me->CastSpell(me, 117857, true);
+            HealingShen = false;
+        }
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type == POINT_MOTION_TYPE && id == 1)
+            {
+                me->CastSpell(me, 117932, true);
+            }
         }
 
         void DoAction(int32 const action)
@@ -6097,12 +6131,16 @@ public:
             {
                 Talk(0);
                 me->SetHealth(me->GetMaxHealth());
-                me->GetMotionMaster()->MovePoint(0, 254.25f, 3959.83f, 65.0f, true);
+                me->GetMotionMaster()->MovePoint(1, 254.25f, 3959.83f, 65.0f, true);
             }
         }
 
         void UpdateAI(const uint32 uiDiff)
         {
+            if(HealingShen)
+            {
+
+            }
         }
     };
 
@@ -6132,8 +6170,10 @@ public:
 
         uint32 VerifCombat_Timer;
         uint32 Cast_Timer;
+        uint32 Healing_timer;
 
         bool Verifhp50;
+        bool HealingShen;
 
         void Reset()
         {
@@ -6141,13 +6181,24 @@ public:
             VerifCombat_Timer = 1000;
             Cast_Timer = 1000;
             Verifhp50 = true;
+            HealingShen = false;
+        }
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type == POINT_MOTION_TYPE && id == 1)
+            {
+                me->CastSpell(me, 117932, true);
+                Healing_timer = 2000;
+                HealingShen = true;
+            }
         }
 
         void DoAction(int32 const action)
         {
             Talk(0);
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            me->GetMotionMaster()->MovePoint(0, 254.25f, 3959.83f, 65.0f, true);
+            me->GetMotionMaster()->MovePoint(1, 254.25f, 3959.83f, 65.0f, true);
         }
 
         void SpellHit(Unit* caster, const SpellInfo* spell)
@@ -6156,49 +6207,112 @@ public:
                 Verifhp50 = true;
         }
 
+        void AddPowerToPlayersOnMap()
+        {
+            Map* map = me->GetMap();
+            if(map)
+            {
+                Map::PlayerList const& players = map->GetPlayers();
+
+                if(players.isEmpty())
+                    return;
+
+                for(Map::PlayerList::const_iterator iter = players.begin() ; iter != players.end() ; ++iter)
+                {
+                    Player* player = iter->getSource();
+                    if(player)
+                    {
+                        if (player->isAlive() && player->GetQuestStatus(29799) == QUEST_STATUS_INCOMPLETE)
+                        {
+                            if(player->GetAreaId() == 5833)
+                            {
+                                if(player->HasAura(117783))
+                                {
+                                    AddPower(player);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        void AddPower(Player* player)
+        {
+            if(player)
+            {
+                player->ModifyPower(POWER_ALTERNATE_POWER, +2);
+
+                switch(player->GetPower(POWER_ALTERNATE_POWER))
+                {
+                    case 700 :
+                        //player->KilledMonsterCredit(NPC_MASTER_LI_FEI);
+                        player->RemoveAura(117783);
+                        break ;
+
+                    default :
+                        break ;
+                }
+            }
+        }
+
         void UpdateAI(const uint32 uiDiff)
         {
-            if(VerifCombat_Timer <= uiDiff)
+            if(HealingShen)
             {
-                if(me->isInCombat())
-                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-
-                if(!me->isInCombat())
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-
-                VerifCombat_Timer = 1000;
-            }
-            else
-                VerifCombat_Timer -= uiDiff;
-
-            if(me->HealthBelowPct(50) && Verifhp50)
-            {
-                if(me->GetEntry() == 60877)
-                    me->CastSpell(me, 117934, false);
-
-                if(me->GetEntry() == 60770)
-                    me->CastSpell(me, 117765, false);
-
-                Verifhp50 = false;
+                if(Healing_timer <= uiDiff)
+                {
+                    AddPowerToPlayersOnMap();
+                    Healing_timer = 2000;
+                }
+                else
+                    Healing_timer -= uiDiff;
             }
 
-            if(!UpdateVictim())
-                return;
-
-            if(Cast_Timer <= uiDiff)
+            if(!HealingShen)
             {
-                if(me->GetEntry() == 60877)
-                    me->CastSpell(me->getVictim(), 117935, false);
+                if(VerifCombat_Timer <= uiDiff)
+                {
+                    if(me->isInCombat())
+                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
-                if(me->GetEntry() == 60770)
-                    me->CastSpell(me->getVictim(), 117767, false);
+                    if(!me->isInCombat())
+                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
-                Cast_Timer = 2500;
+                    VerifCombat_Timer = 1000;
+                }
+                else
+                    VerifCombat_Timer -= uiDiff;
+
+                if(!UpdateVictim())
+                    return;
+
+                if(me->HealthBelowPct(50) && Verifhp50)
+                {
+                    if(me->GetEntry() == 60877)
+                        me->CastSpell(me, 117934, false);
+
+                    if(me->GetEntry() == 60770)
+                        me->CastSpell(me, 117765, false);
+
+                    Verifhp50 = false;
+                }
+
+                if(Cast_Timer <= uiDiff)
+                {
+                    if(me->GetEntry() == 60877)
+                        me->CastSpell(me->getVictim(), 117935, false);
+
+                    if(me->GetEntry() == 60770)
+                        me->CastSpell(me->getVictim(), 117767, false);
+
+                    Cast_Timer = 2500;
+                }
+                else
+                    Cast_Timer -= uiDiff;
+
+                DoMeleeAttackIfReady();
             }
-            else
-                Cast_Timer -= uiDiff;
-
-            DoMeleeAttackIfReady();
         }
     };
 
