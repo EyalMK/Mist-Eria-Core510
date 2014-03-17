@@ -6112,6 +6112,8 @@ public:
     {
         npc_healer_shen_wreckageAI(Creature* creature) : ScriptedAI(creature){}
 
+        uint32 Healing_timer;
+
         bool HealingShen;
 
         void Reset()
@@ -6127,6 +6129,8 @@ public:
             if (type == POINT_MOTION_TYPE && id == 1)
             {
                 me->CastSpell(me, 117932, true);
+                Healing_timer = 2000;
+                HealingShen = true;
             }
         }
 
@@ -6146,11 +6150,66 @@ public:
             }
         }
 
+        void AddPowerToPlayersOnMap()
+        {
+            Map* map = me->GetMap();
+            if(map)
+            {
+                Map::PlayerList const& players = map->GetPlayers();
+
+                if(players.isEmpty())
+                    return;
+
+                for(Map::PlayerList::const_iterator iter = players.begin() ; iter != players.end() ; ++iter)
+                {
+                    Player* player = iter->getSource();
+                    if(player)
+                    {
+                        if (player->isAlive() && player->GetQuestStatus(29799) == QUEST_STATUS_INCOMPLETE)
+                        {
+                            if(player->GetAreaId() == 5833)
+                            {
+                                if(player->HasAura(117783))
+                                {
+                                    AddPower(player);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        void AddPower(Player* player)
+        {
+            if(player)
+            {
+                player->ModifyPower(POWER_ALTERNATE_POWER, +2);
+
+                switch(player->GetPower(POWER_ALTERNATE_POWER))
+                {
+                    case 700 :
+                        player->KilledMonsterCredit(56011);
+                        player->RemoveAura(117783);
+                        break ;
+
+                    default :
+                        break ;
+                }
+            }
+        }
+
         void UpdateAI(const uint32 uiDiff)
         {
             if(HealingShen)
             {
-
+                if(Healing_timer <= uiDiff)
+                {
+                    AddPowerToPlayersOnMap();
+                    Healing_timer = 2000;
+                }
+                else
+                    Healing_timer -= uiDiff;
             }
         }
     };
@@ -6257,7 +6316,7 @@ public:
                 switch(player->GetPower(POWER_ALTERNATE_POWER))
                 {
                     case 700 :
-                        //player->KilledMonsterCredit(NPC_MASTER_LI_FEI);
+                        player->KilledMonsterCredit(56011);
                         player->RemoveAura(117783);
                         break ;
 
