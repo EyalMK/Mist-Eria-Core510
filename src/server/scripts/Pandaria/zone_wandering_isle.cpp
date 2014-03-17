@@ -6115,11 +6115,9 @@ public:
 
     struct npc_healer_shen_wreckageAI : public ScriptedAI
     {
-        npc_healer_shen_wreckageAI(Creature* creature) : ScriptedAI(creature), Summons(me){}
+        npc_healer_shen_wreckageAI(Creature* creature) : ScriptedAI(creature){}
 
         uint32 Healing_timer;
-        uint32 Pop_timer;
-        SummonList Summons;
 
         bool HealingShen;
 
@@ -6132,24 +6130,12 @@ public:
             HealingShen = false;
         }
 
-        void JustSummoned(Creature* Summoned)
-        {
-            Summons.Summon(Summoned);
-
-            if(Summoned->GetEntry() == 60858 || Summoned->GetEntry() == 60780)
-            {
-                Summoned->GetMotionMaster()->MoveJump(253.51f, 3954.70f, 66.00f, 20, 20);
-            }
-            Summoned->AI()->AttackStart(me);
-        }
-
         void MovementInform(uint32 type, uint32 id)
         {
             if (type == POINT_MOTION_TYPE && id == 1)
             {
                 me->CastSpell(me, 117932, true);
                 Healing_timer = 2000;
-                Pop_timer = 4000;
                 HealingShen = true;
             }
         }
@@ -6222,15 +6208,6 @@ public:
                 }
                 else
                     Healing_timer -= uiDiff;
-
-                if(Pop_timer <= uiDiff)
-                {
-                    me->SummonCreature(60780, 215.76f, 3950.22f, 72.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
-                    me->SummonCreature(60858, 288.58f, 3939.21f, 87.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
-                    Pop_timer = 30000;
-                }
-                else
-                    Pop_timer -= uiDiff;
             }
         }
     };
@@ -6367,7 +6344,7 @@ public:
                 {
                     me->SummonCreature(60780, 215.76f, 3950.22f, 72.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
                     me->SummonCreature(60858, 288.58f, 3939.21f, 87.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
-                    Pop_timer = 20000;
+                    Pop_timer = 25000;
                 }
                 else
                     Pop_timer -= uiDiff;
