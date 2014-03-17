@@ -6136,7 +6136,8 @@ public:
         {
             Summons.Summon(Summoned);
 
-            Summoned->GetMotionMaster()->MoveJump(253.51f, 3954.70f, 66.00f, 20, 20);
+            if(Summoned->GetEntry() == 60858 || Summoned->GetEntry() == 60780)
+                Summoned->GetMotionMaster()->MoveJump(253.51f, 3954.70f, 66.00f, 20, 20);
         }
 
         void MovementInform(uint32 type, uint32 id)
@@ -6375,12 +6376,6 @@ public:
 
             if(!HealingShen)
             {
-                if(me->HealthBelowPct(50) && Verifhp50)
-                {
-                    me->SetHealth(me->GetMaxHealth());
-                    Verifhp50 = false;
-                }
-
                 if(VerifCombat_Timer <= uiDiff)
                 {
                     if(me->isInCombat())
@@ -6398,6 +6393,12 @@ public:
                 if(!UpdateVictim())
                     return;
 
+                if(me->HealthBelowPct(50) && Verifhp50)
+                {
+                    me->SetHealth(me->GetMaxHealth());
+                    Verifhp50 = false;
+                }
+
                 if(Cast_Timer <= uiDiff)
                 {
                     if(me->GetEntry() == 60877)
@@ -6406,7 +6407,7 @@ public:
                     if(me->GetEntry() == 60770)
                         me->CastSpell(me->getVictim(), 117767, false);
 
-                    Cast_Timer = 2500;
+                    Cast_Timer = 3000;
                 }
                 else
                     Cast_Timer -= uiDiff;
