@@ -5986,13 +5986,34 @@ public:
     {
         npc_trigger_healing_shenAI(Creature* creature) : ScriptedAI(creature){}
 
+        uint32 PainShake_Timer;
+
         void Reset()
         {
+            PainShake_Timer = 1000;
         }
 
         void UpdateAI(const uint32 uiDiff)
         {
-            DoMeleeAttackIfReady();
+            if(PainShake_Timer <= uiDiff)
+            {
+                PainShake();
+                PainShake_Timer = 30000;
+            }
+            else
+                PainShake_Timer -= uiDiff;
+        }
+
+        void PainShake()
+        {
+            Map* map = me->GetMap();
+            Map::PlayerList const& pl = map->GetPlayers();
+
+            for(Map::PlayerList::const_iterator iter = pl.begin() ; iter != pl.end() ; ++iter)
+                if(Player* player = iter->getSource())
+                    if(player->isAlive() && player->InSamePhase(1024))
+                        if(player->GetAreaId() == 5833)
+                            player->CastSpell(player, 117969, true);
         }
     };
 
