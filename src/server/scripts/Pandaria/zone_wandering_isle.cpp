@@ -5976,8 +5976,11 @@ public:
     }
 };
 
-
-/* Final Event */
+/**************************/
+/**************************/
+/****** Final Event *******/
+/**************************/
+/**************************/
 
 class npc_trigger_healing_shen: public CreatureScript
 {
@@ -6165,18 +6168,10 @@ public:
                 {
                     Player* player = iter->getSource();
                     if(player)
-                    {
                         if (player->isAlive() && player->GetQuestStatus(29799) == QUEST_STATUS_INCOMPLETE)
-                        {
                             if(player->GetAreaId() == 5833)
-                            {
                                 if(player->HasAura(117783))
-                                {
                                     AddPower(player);
-                                }
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -6262,14 +6257,28 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 Healing_timer = 2000;
                 HealingShen = true;
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
         }
 
         void DoAction(int32 const action)
         {
-            Talk(0);
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            me->GetMotionMaster()->MovePoint(1, 254.25f, 3959.83f, 65.0f, true);
+            switch (action)
+            {
+                case 0:
+                    Talk(0);
+                    me->GetMotionMaster()->MovePoint(1, 254.25f, 3959.83f, 65.0f, true);
+                    me->SetReactState(REACT_PASSIVE);
+                    break;
+
+                case 1:
+                    me->CastSpell(me, 117934, false);
+                    break;
+
+                case 2:
+                    me->CastSpell(me, 117765, false);
+                    break;
+            }
         }
 
         void SpellHit(Unit* caster, const SpellInfo* spell)
@@ -6292,18 +6301,10 @@ public:
                 {
                     Player* player = iter->getSource();
                     if(player)
-                    {
                         if (player->isAlive() && player->GetQuestStatus(29799) == QUEST_STATUS_INCOMPLETE)
-                        {
                             if(player->GetAreaId() == 5833)
-                            {
                                 if(player->HasAura(117783))
-                                {
                                     AddPower(player);
-                                }
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -6362,10 +6363,10 @@ public:
                 if(me->HealthBelowPct(50) && Verifhp50)
                 {
                     if(me->GetEntry() == 60877)
-                        me->CastSpell(me, 117934, false);
+                        me->AI()->DoAction(1);
 
                     if(me->GetEntry() == 60770)
-                        me->CastSpell(me, 117765, false);
+                        me->AI()->DoAction(2);
 
                     Verifhp50 = false;
                 }
@@ -6442,6 +6443,78 @@ public:
         return new npc_wreckageAI(creature);
     }
 };
+
+class npc_deepscale_ravager: public CreatureScript
+{
+public:
+    npc_deepscale_ravager(): CreatureScript("npc_deepscale_ravager") { }
+
+    struct npc_deepscale_ravagerAI : public ScriptedAI
+    {
+        npc_deepscale_ravagerAI(Creature* creature) : ScriptedAI(creature){}
+
+        void Reset()
+        {
+
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_deepscale_ravagerAI(creature);
+    }
+};
+
+class npc_deepscale_fleshripper: public CreatureScript
+{
+public:
+    npc_deepscale_fleshripper(): CreatureScript("npc_deepscale_fleshripper") { }
+
+    struct npc_deepscale_fleshripperAI : public ScriptedAI
+    {
+        npc_deepscale_fleshripperAI(Creature* creature) : ScriptedAI(creature){}
+
+        uint32 RipFlesh_Timer;
+
+        void Reset()
+        {
+            RipFlesh_Timer = 5000;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(!UpdateVictim())
+                return;
+
+            if(RipFlesh_Timer <= uiDiff)
+            {
+                me->CastSpell(me, 128533, false);
+                RipFlesh_Timer = 10000;
+            }
+            else
+                RipFlesh_Timer -= uiDiff;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_deepscale_fleshripperAI(creature);
+    }
+};
+
+
+
+/**************************/
+/**************************/
+/**** END Final Event *****/
+/**************************/
+/**************************/
+
 
 void AddSC_wandering_isle()
 {
@@ -6537,4 +6610,6 @@ void AddSC_wandering_isle()
     new npc_healer_shen_wreckage();
     new npc_healer_shen();
     new npc_wreckage();
+    new npc_deepscale_ravager();
+    new npc_deepscale_fleshripper();
 }
