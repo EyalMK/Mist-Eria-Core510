@@ -6075,6 +6075,19 @@ public:
             me->CastSpell(me, 117857, true);
         }
 
+        void SpellHit(Unit* caster, const SpellInfo* spell)
+        {
+            if (spell->Id == 117848)
+            {
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetHealth(me->GetMaxHealth());
+
+                if(me->GetGUID() == 60834)
+                    me->DisappearAndDie();
+            }
+        }
+
+
         void UpdateAI(const uint32 uiDiff)
         {
         }
