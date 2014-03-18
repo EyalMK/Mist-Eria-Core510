@@ -637,7 +637,8 @@ void Creature::Update(uint32 diff)
         default:
             break;
     }
-
+	
+	UpdateObjectVisibility();
     sScriptMgr->OnCreatureUpdate(this, diff);
 }
 

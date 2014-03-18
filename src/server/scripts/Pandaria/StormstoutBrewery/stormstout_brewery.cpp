@@ -1710,6 +1710,356 @@ private :
     };
 };
 
+/*************************/
+/**** Uncle Gao Event ****/
+/*************************/
+
+/**
+ * @namespace UncleGaoEvent
+ *
+ * @brief Namespace used to store all the datas related to the Uncle Gao Event, such as
+ * spells, creatures, and other kinds of helpful things.
+ */
+namespace UncleGaoEvent {
+    /**
+     * @enum Spells
+     *
+     * @brief Global enum containing all the spells used by the npcs summoned during the Uncle Gao
+     * Event.
+     */
+    enum Spells {
+        // Generic
+        SPELL_STOUT_BREW_BOLT           = 115650,
+        SPELL_ALE_BREW_BOLT             = 116155,
+        SPELL_WHEAT_BREW_BOLT           = 115652,
+
+        // Sudsy Brew Alamental
+        SPELL_SUDSY_SUDS                = 116178,
+
+        // Fizzy Brew Alamental
+        SPELL_FIZZY_CARBONATION         = 116164, // Trigger missile works strangely, better with the triggered spell
+
+        // Bubbling Brew Alamental
+        SPELL_BUBBLING_BUBBLE_SHIELD    = 128708, // Need script !
+
+        // Yeasty Brew Alamental : nothing, curiously
+
+        // Stout Brew Alamental
+        SPELL_STOUT_BLACKOUT_BREW       = 106851, // Same as Yan-Zhu, no script to add
+
+        // Bloated Brew Alamental
+        SPELL_BLOATED_BLOAT             = 106546, // Same as Yan-Zhu, no script to add
+
+        // Adds
+        SPELL_SUD_PERIODIC              = 116179,
+        SPELL_SUD_DAMAGES               = 116182,
+
+        SPELL_CARBONATION_PERIODIC      = 116168,
+        SPELL_CARBONATION_DAMAGES       = 116170
+    };
+
+    /**
+     * @enum Events
+     *
+     * @brief Global enum containing all the ids of the events used by the npcs summoned during the
+     * Uncle Gao Event.
+     */
+    enum Events {
+        // Generic
+        EVENT_STOUT_BREW_BOLT           = 1, // Used by 59522 / 59520
+        EVENT_ALE_BREW_BOLT             = 2, // Used by 59521 / 59494
+        EVENT_WHEAT_BREW_BOLT           = 3, // Used by 59519 / 59518
+
+        // Sudsy
+        EVENT_SUDSY_SUDS                = 4,
+
+        // Fizzy
+        EVENT_FIZZY_CARBONATION         = 5,
+
+        // Bubbling
+        EVENT_BUBBLING_BUBBLE_SHIELD    = 6,
+
+        // Stout
+        EVENT_STOUT_BLACKOUT_BREW       = 7,
+
+        // Bloated
+        EVENT_BLOATED_BLOAT             = 8
+    };
+
+    /**
+     * @enum Creatures
+     *
+     * @brief Gloabl enum containing all the ids of the npcs summoned during the Uncle Gao Event.
+     */
+    enum Creatures {
+        // Stout alamentals
+        MOB_STOUT_ALAMENTAL_SUDSY_BREW      = 59522,
+        MOB_STOUT_ALAMENTAL_FIZZY_BREW      = 59520,
+
+        // Ale alamentals
+        MOB_ALE_ALAMENTAL_BUBBLING_BREW     = 59521,
+        MOB_ALE_ALAMENTAL_YEASTY_BREW       = 59494,
+
+        // Wheat alamentals
+        MOB_WHEAT_ALAMENTAL_STOUT_BREW      = 59519,
+        MOB_WHEAT_ALAMENTAL_BLOATED_BREW    = 59518,
+
+        // Summons
+        MOB_CARBONATION                     = 56746,
+        MOB_SUD                             = 56748,
+        MOB_BUBBLE_SHIELD                   = 65522
+    };
+
+    /**
+     * @class BloatedTargetSelector
+     *
+     * @brief A predicate inheriting from std::unary_function, taking a pointer to Unit as Arg and
+     * returning bool. It is used to filter the targets during the cast of the spell bloat.
+     */
+    struct BloatedTargetSelector : public std::unary_function<Unit*, bool> {
+    public :
+        /// Constructor
+        explicit BloatedTargetSelector(uint32 t = 0) : _t(t) {
+
+        }
+
+        /**
+         * @fn operator ()
+         *
+         * @brief Overload of the operator () turning the class into a predicate
+         *
+         * @param target Pointer to the unit we are checking as a potential target
+         *
+         * @return true if the target fits condition to be added to temp targets list,
+         * false otherwise
+         */
+        bool operator()(Unit* target) const {
+            if(!target)
+                return false ;
+
+            if(target->GetTypeId() != TYPEID_PLAYER)
+                return false ;
+
+            if(target->HasAura(SPELL_BLOATED_BLOAT))
+                return false ;
+
+            return true ;
+        }
+		
+		uint32 _t ;
+    };
+} // namespace UncleGaoEvent
+
+class mob_alamental_gao : public CreatureScript {
+public :
+    mob_alamental_gao() : CreatureScript("mob_alamental_gao") {
+
+    }
+
+    class mob_alamental_gao_AI : public ScriptedAI {
+    public :
+        mob_alamental_gao_AI(Creature* creature) : ScriptedAI(creature) {
+            _instance = creature->GetInstanceScript() ;
+        }
+
+        void Reset() {
+            _events.Reset();
+        }
+
+        void EnterCombat(Unit *aggro) {
+            switch(me->GetEntry()) {
+            case UncleGaoEvent::MOB_STOUT_ALAMENTAL_SUDSY_BREW :
+                _events.ScheduleEvent(UncleGaoEvent::EVENT_STOUT_BREW_BOLT, IsHeroic() ? 4000 : 5000);
+                _events.ScheduleEvent(UncleGaoEvent::EVENT_SUDSY_SUDS, IsHeroic() ? 6000 : 7000);
+                break ;
+
+            case UncleGaoEvent::MOB_STOUT_ALAMENTAL_FIZZY_BREW :
+                _events.ScheduleEvent(UncleGaoEvent::EVENT_STOUT_BREW_BOLT, IsHeroic() ? 4000 : 5000);
+                _events.ScheduleEvent(UncleGaoEvent::EVENT_FIZZY_CARBONATION, IsHeroic() ? 8000 : 10000);
+                break ;
+
+            case UncleGaoEvent::MOB_ALE_ALAMENTAL_BUBBLING_BREW :
+                _events.ScheduleEvent(UncleGaoEvent::EVENT_ALE_BREW_BOLT, IsHeroic() ? 4000 : 5000);
+                _events.ScheduleEvent(UncleGaoEvent::EVENT_BUBBLING_BUBBLE_SHIELD, IsHeroic() ? 6000 : 7500);
+                break ;
+
+            case UncleGaoEvent::MOB_ALE_ALAMENTAL_YEASTY_BREW :
+                _events.ScheduleEvent(UncleGaoEvent::EVENT_ALE_BREW_BOLT, IsHeroic() ? 4000 : 5000);
+                break ;
+
+            case UncleGaoEvent::MOB_WHEAT_ALAMENTAL_BLOATED_BREW :
+                _events.ScheduleEvent(UncleGaoEvent::EVENT_WHEAT_BREW_BOLT, IsHeroic() ? 4000 : 5000);
+                _events.ScheduleEvent(UncleGaoEvent::EVENT_BLOATED_BLOAT, IsHeroic() ? 5000 : 6000);
+                break ;
+
+            case UncleGaoEvent::MOB_WHEAT_ALAMENTAL_STOUT_BREW :
+                _events.ScheduleEvent(UncleGaoEvent::EVENT_WHEAT_BREW_BOLT, IsHeroic() ? 4000 : 5000);
+                _events.ScheduleEvent(UncleGaoEvent::EVENT_STOUT_BLACKOUT_BREW, IsHeroic() ? 6000 : 7000);
+                break ;
+
+            default :
+                break ;
+            }
+        }
+
+        void UpdateAI(const uint32 diff) {
+            if(!UpdateVictim())
+                return ;
+
+            _events.Update(diff);
+
+            while(uint32 eventId = _events.ExecuteEvent()) {
+                switch(eventId) {
+                case UncleGaoEvent::EVENT_ALE_BREW_BOLT :
+                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                        DoCast(target, UncleGaoEvent::SPELL_ALE_BREW_BOLT);
+                    _events.ScheduleEvent(UncleGaoEvent::EVENT_ALE_BREW_BOLT, IsHeroic() ? urand(3000, 5000) : urand(5000, 8000));
+                    break ;
+
+                case UncleGaoEvent::EVENT_STOUT_BREW_BOLT :
+                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                        DoCast(target, UncleGaoEvent::SPELL_STOUT_BREW_BOLT);
+                    _events.ScheduleEvent(UncleGaoEvent::EVENT_STOUT_BREW_BOLT, IsHeroic() ? urand(3000, 5000) : urand(5000, 8000));
+                    break ;
+
+                case UncleGaoEvent::EVENT_WHEAT_BREW_BOLT :
+                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                        DoCast(target, UncleGaoEvent::SPELL_WHEAT_BREW_BOLT);
+                    _events.ScheduleEvent(UncleGaoEvent::EVENT_WHEAT_BREW_BOLT, IsHeroic() ? urand(3000, 5000) : urand(5000, 8000));
+                    break ;
+
+                case UncleGaoEvent::EVENT_SUDSY_SUDS :
+                    DoCast(UncleGaoEvent::SPELL_SUDSY_SUDS);
+                    _events.ScheduleEvent(UncleGaoEvent::EVENT_SUDSY_SUDS, IsHeroic() ? urand(10000, 11000) : urand(12000, 14000));
+                    break ;
+
+                case UncleGaoEvent::EVENT_FIZZY_CARBONATION :
+                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                        me->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), UncleGaoEvent::SPELL_FIZZY_CARBONATION, false);
+                    _events.ScheduleEvent(UncleGaoEvent::EVENT_FIZZY_CARBONATION, IsHeroic() ? urand(10000, 11000) : urand(12000, 14000));
+                    break ;
+
+                case UncleGaoEvent::EVENT_BUBBLING_BUBBLE_SHIELD :
+                    if(!me->HasAura(UncleGaoEvent::SPELL_BUBBLING_BUBBLE_SHIELD))
+                        DoCast(me, UncleGaoEvent::SPELL_BUBBLING_BUBBLE_SHIELD);
+                    _events.ScheduleEvent(UncleGaoEvent::EVENT_BUBBLING_BUBBLE_SHIELD, IsHeroic() ? urand(5000, 6000) : urand(7000, 9000));
+                    break ;
+
+                case UncleGaoEvent::EVENT_STOUT_BLACKOUT_BREW :
+                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                        DoCast(target, UncleGaoEvent::SPELL_STOUT_BLACKOUT_BREW);
+                    _events.ScheduleEvent(UncleGaoEvent::EVENT_STOUT_BLACKOUT_BREW, IsHeroic() ? urand(3000, 4000) : urand(5000, 6500));
+                    break ;
+
+                case UncleGaoEvent::EVENT_BLOATED_BLOAT :
+                    if(Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, UncleGaoEvent::BloatedTargetSelector()))
+                        DoCast(target, UncleGaoEvent::SPELL_BLOATED_BLOAT);
+                    _events.ScheduleEvent(UncleGaoEvent::EVENT_BLOATED_BLOAT, IsHeroic() ? urand(7000, 8000) : urand(7500, 10000));
+                    break ;
+
+                default :
+                    break ;
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+
+    private :
+        EventMap _events ;
+        InstanceScript* _instance ;
+    };
+
+    CreatureAI* GetAI(Creature *creature) const {
+        return new mob_alamental_gao_AI(creature);
+    }
+};
+
+class mobs_gao_summons : public CreatureScript {
+public :
+    mobs_gao_summons() : CreatureScript("mob_gao_summon") {
+
+    }
+
+    class mobs_gao_summons_AI : public ScriptedAI {
+    public :
+        mobs_gao_summons_AI(Creature* creature) : ScriptedAI(creature) {
+
+        }
+
+        void Reset() {
+            switch(me->GetEntry()) {
+            case UncleGaoEvent::MOB_CARBONATION :
+                DoCast(me, UncleGaoEvent::SPELL_CARBONATION_PERIODIC);
+                break ;
+
+            case UncleGaoEvent::MOB_SUD :
+                DoCast(me, UncleGaoEvent::SPELL_SUD_PERIODIC);
+                break ;
+
+            default :
+                break ;
+            }
+        }
+
+    private :
+
+    };
+
+    CreatureAI* GetAI(Creature *creature) const {
+        return new mobs_gao_summons_AI(creature);
+    }
+};
+
+class spell_gao_bubble_shield : public SpellScriptLoader {
+public :
+    spell_gao_bubble_shield() : SpellScriptLoader("spell_gao_bubble_shield") {
+
+    }
+
+    class spell_gao_bubble_shield_AuraScript : public AuraScript {
+        PrepareAuraScript(spell_gao_bubble_shield_AuraScript);
+
+        bool Validate(const SpellInfo *spellInfo) {
+            return true ;
+        }
+
+        bool Load() {
+            return true ;
+        }
+
+        void HandleAfterEffectApply(AuraEffect const* auraEff, AuraEffectHandleModes mode) {
+            if(!GetCaster())
+                return ;
+
+            Unit* caster = GetCaster();
+
+            std::list<Creature*> bubbles ;
+            for(uint8 i = 0 ; i < 4 ; ++i) {
+                bubbles.push_back(caster->SummonCreature(UncleGaoEvent::MOB_BUBBLE_SHIELD, caster->GetPositionX() + rand() % 3,
+                                                         caster->GetPositionY() + rand() % 3, caster->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN));
+            }
+
+            if(Aura* aura = auraEff->GetBase())
+                aura->ModStackAmount(3);
+
+            for(std::list<Creature*>::iterator iter = bubbles.begin() ; iter != bubbles.end() ; ++iter) {
+                if(Creature* bubble = *iter) {
+                    bubble->EnterVehicle(caster);
+                }
+            }
+        }
+
+        void Register() {
+            AfterEffectApply += AuraEffectApplyFn(spell_gao_bubble_shield_AuraScript::HandleAfterEffectApply, EFFECT_1, SPELL_AURA_SET_VEHICLE_ID, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const {
+        return new spell_gao_bubble_shield_AuraScript();
+    }
+};
+
 void AddSC_stormstout_brewery()
 {
     // Ook Ook
@@ -1735,4 +2085,7 @@ void AddSC_stormstout_brewery()
     new stalker_gushing_brew();
     new stalker_gushing_brew_target();
     new npc_uncle_gao();
+    new mob_alamental_gao();
+    new mobs_gao_summons();
+    new spell_gao_bubble_shield();
 }

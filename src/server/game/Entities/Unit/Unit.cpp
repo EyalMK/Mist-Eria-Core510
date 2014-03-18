@@ -4504,7 +4504,14 @@ void Unit::_UnregisterDynObject(DynamicObject* dynObj)
 
 void Unit::_UnregisterAreaTrigger(AreaTrigger* areaTrigger)
 {
-    m_AreaTrigger.remove(areaTrigger);
+	std::list<AreaTrigger*>::iterator iter = m_AreaTrigger.begin() ;
+	for(; iter != m_AreaTrigger.end() ; ) {
+		if(*iter == areaTrigger) {
+			m_AreaTrigger.erase(iter++);
+		} else {
+			++iter ;
+		}
+	}
 }
 
 DynamicObject* Unit::GetDynObject(uint32 spellId)

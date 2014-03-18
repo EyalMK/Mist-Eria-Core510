@@ -3970,18 +3970,13 @@ void SpellMgr::LoadSpellInfoCorrections()
 				case 130774: // Amethyst pool
 					spellInfo->AttributesCu |= SPELL_ATTR0_CANT_CANCEL;
 					break;
-                case 105002: // Invocation d'un faucon de feu apprivoisé
+                case 105002: // Summon Hot Air Balloon
                     spellInfo->Effects[EFFECT_2].Effect = NULL;
                     break;
-				case 112944 :
-					// spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
-					// spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNEL_TRACK_TARGET ;
-					break ;
-				case 112945 :
-					spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CONE_ENEMY_24);
-					spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CONE_ENEMY_24);
-					spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CONE_ENEMY_24);
-					break ;
+				/*case 112944 :
+					spellInfo->ExplicitTargetMask |= TARGET_FLAG_UNIT_MASK ;
+					spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY) ;
+					break ;*/
 				default:
 					break;
 			}
