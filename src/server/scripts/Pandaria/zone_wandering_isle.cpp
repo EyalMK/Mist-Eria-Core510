@@ -6553,6 +6553,7 @@ public:
         void Reset()
         {
             me->CastSpell(me, 111810, true);
+            me->SetPhaseMask(2049, true);
         }
 
         void WaypointReached(uint32 waypointId)
@@ -6609,6 +6610,7 @@ public:
         {
             me->CastSpell(me, 108692, true);
             me->CastSpell(me, 111809, true);
+            me->SetPhaseMask(2049, true);
             StartTimer = 800;
         }
 
