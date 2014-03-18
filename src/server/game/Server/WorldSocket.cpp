@@ -80,7 +80,7 @@ struct ServerPktHeader
 
     bool isLargePacket() const
     {
-        return size > 0x7FFF;
+        return size > 0x400;
     }
 
     const uint32 size;
@@ -172,12 +172,12 @@ int WorldSocket::SendPacket(WorldPacket const& pct)
     WorldPacket const* pkt = &pct;
 
     // Empty buffer used in case packet should be compressed
-    //WorldPacket buff;
-    //if (m_Session && pkt->size() > 0x400)
-//{
-     //   buff.Compress(m_Session->GetCompressionStream(), pkt);
-      //  pkt = &buff;
-    //}
+    WorldPacket buff;
+    if (m_Session && pkt->size() > 0x400)
+    {
+        buff.Compress(m_Session->GetCompressionStream(), pkt);
+        pkt = &buff;
+    }
 
 	//switch to make console stop spams opcodes
 	switch(pkt->GetOpcode())
