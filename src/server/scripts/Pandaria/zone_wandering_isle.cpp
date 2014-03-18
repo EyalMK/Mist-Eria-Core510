@@ -5977,9 +5977,7 @@ public:
 };
 
 /**************************/
-/**************************/
 /****** Final Event *******/
-/**************************/
 /**************************/
 
 class npc_trigger_healing_shen: public CreatureScript
@@ -6489,14 +6487,166 @@ public:
     }
 };
 
-
-
-/**************************/
 /**************************/
 /**** END Final Event *****/
 /**************************/
-/**************************/
 
+
+class npc_master_shang_xi_spirit : public CreatureScript
+{
+public:
+    npc_master_shang_xi_spirit() : CreatureScript("npc_master_shang_xi_spirit") { }
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        if (creature->isQuestGiver())
+            player->PrepareQuestMenu(creature->GetGUID());
+
+        if(player->hasQuest(31450))
+        {
+            QueryResult result = WorldDatabase.Query("SELECT text FROM creature_text WHERE entry = 560130");
+
+            if (!result)
+                return false;
+
+            std::string text;
+
+            do
+            {
+                Field* neutralFaction = result->Fetch();
+                text = neutralFaction[0].GetString();
+            } while (result->NextRow());
+
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, text , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        }
+
+        player->PlayerTalkClass->SendGossipMenu(724006, creature->GetGUID());
+
+        return true;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action)
+    {
+        player->PlayerTalkClass->ClearMenus();
+
+        switch (action)
+        {
+            case GOSSIP_ACTION_INFO_DEF + 1:
+            {
+                WorldPacket data(SMSG_SHOW_NEUTRAL_PLAYER_FACTION_SELECT_UI);
+                player->GetSession()->SendPacket(&data);
+            }
+            break;
+        }
+
+        player->PlayerTalkClass->SendCloseGossip();
+        return true;
+    }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        if (quest->GetQuestId() == 31450)
+        {
+            creature->AI()->DoAction(ACTION_SAY);
+        }
+        return true;
+    }
+
+    struct npc_master_shang_xi_spiritAI : public ScriptedAI
+    {
+            npc_master_shang_xi_spiritAI(Creature* creature) : ScriptedAI(creature) {}
+
+            bool StartEvent;
+            uint32 Talk_1_Timer;
+            uint32 Talk_2_Timer;
+            uint32 Talk_3_Timer;
+            uint32 Talk_4_Timer;
+            uint32 Talk_5_Timer;
+            uint32 Talk_6_Timer;
+
+            void Reset()
+            {
+                StartEvent = false;
+                Talk_1_Timer = 1000;
+                Talk_2_Timer = 11000;
+                Talk_3_Timer = 21000;
+                Talk_4_Timer = 29000;
+                Talk_5_Timer = 37000;
+                Talk_6_Timer = 47000;
+            }
+
+            void DoAction(int32 const action)
+            {
+                switch (action)
+                {
+                    case ACTION_SAY:
+                        StartEvent = true;
+                        break;
+                }
+            }
+
+            void UpdateAI(const uint32 uiDiff)
+            {
+                if(StartEvent)
+                {
+                    if (Talk_1_Timer <= uiDiff)
+                    {
+                        Talk(0);
+                        Talk_1_Timer = 60000;
+                    }
+                    else Talk_1_Timer -= uiDiff;
+
+                    if (Talk_2_Timer <= uiDiff)
+                    {
+                        Talk(1);
+                        Talk_2_Timer = 60000;
+                    }
+                    else Talk_2_Timer -= uiDiff;
+
+                    if (Talk_3_Timer <= uiDiff)
+                    {
+                        Creature* aysa = me->FindNearestCreature(57721, 20.0f, true);
+                        if(aysa)
+                            aysa->AI()->Talk(0);
+
+                        Talk_3_Timer = 60000;
+                    }
+                    else Talk_3_Timer -= uiDiff;
+
+                    if (Talk_4_Timer <= uiDiff)
+                    {
+                        Talk(2);
+                        Talk_4_Timer = 60000;
+                    }
+                    else Talk_4_Timer -= uiDiff;
+
+                    if (Talk_5_Timer <= uiDiff)
+                    {
+                        Creature* ji = me->FindNearestCreature(57720, 20.0f, true);
+                        if(ji)
+                            ji->AI()->Talk(0);
+
+                        Talk_5_Timer = 60000;
+                    }
+                    else Talk_5_Timer -= uiDiff;
+
+                    if (Talk_6_Timer <= uiDiff)
+                    {
+                        Talk(3);
+                        Talk_4_Timer = 60000;
+                        Reset();
+                        StartEvent = false;
+                    }
+                    else Talk_6_Timer -= uiDiff;
+                }
+            }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_master_shang_xi_spiritAI(creature);
+    }
+};
 
 void AddSC_wandering_isle()
 {
@@ -6593,4 +6743,5 @@ void AddSC_wandering_isle()
     new npc_healer_shen();
     new npc_wreckage();
     new npc_deepscale_fleshripper();
+    new npc_master_shang_xi_spirit();
 }
