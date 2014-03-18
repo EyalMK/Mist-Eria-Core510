@@ -6492,6 +6492,163 @@ public:
 /**************************/
 
 
+class npc_korga_strongmane: public CreatureScript
+{
+public:
+    npc_korga_strongmane(): CreatureScript("npc_korga_strongmane") { }
+
+    struct npc_korga_strongmaneAI : public ScriptedAI
+    {
+        npc_korga_strongmaneAI(Creature* creature) : ScriptedAI(creature){}
+
+        uint32 Talk_1_Timer;
+        uint32 Talk_2_Timer;
+
+        void Reset()
+        {
+            Talk_1_Timer = 1000;
+            Talk_2_Timer = 11000;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if (Talk_1_Timer <= uiDiff)
+            {
+                Talk(0);
+                Talk_1_Timer = 60000;
+            }
+            else Talk_1_Timer -= uiDiff;
+
+            if (Talk_2_Timer <= uiDiff)
+            {
+                Creature* delora = me->FindNearestCreature(60889, 20.00f, true);
+                if(delora)
+                    delora->AI()->Talk(0);
+
+                Talk_2_Timer = 60000;
+            }
+            else Talk_2_Timer -= uiDiff;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_korga_strongmaneAI(creature);
+    }
+};
+
+/*######
+## npc_nourished_yak_escort_3
+######*/
+
+class npc_nourished_yak_escort_3 : public CreatureScript
+{
+public:
+    npc_nourished_yak_escort_3(): CreatureScript("npc_nourished_yak_escort_3") { }
+
+    struct npc_nourished_yak_escort_3AI : public npc_escortAI
+    {
+        npc_nourished_yak_escort_3AI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+            me->CastSpell(me, 111810, true);
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    break;
+                case 32:
+                    if (Creature* chariot = me->FindNearestCreature(57740, 50.00f, true))
+                        chariot->DespawnOrUnsummon();
+
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void OnCharmed(bool /*apply*/){}
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_nourished_yak_escort_3AI(creature);
+    }
+};
+
+/*######
+## npc_delivery_cart_escort_3
+######*/
+
+class npc_delivery_cart_escort_3 : public CreatureScript
+{
+public:
+    npc_delivery_cart_escort_3(): CreatureScript("npc_delivery_cart_escort_3") { }
+
+    struct npc_delivery_cart_escort_3AI : public npc_escortAI
+    {
+        npc_delivery_cart_escort_3AI(Creature* creature) : npc_escortAI(creature) {}
+
+        uint32 StartTimer;
+
+        void Reset()
+        {
+            me->CastSpell(me, 108692, true);
+            me->CastSpell(me, 111809, true);
+            StartTimer = 800;
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    break;
+                case 32:
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void OnCharmed(bool /*apply*/){}
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            if (StartTimer <= uiDiff)
+            {
+                Start(false, true);
+                StartTimer  = 300000;
+            }
+            else StartTimer -= uiDiff;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_delivery_cart_escort_3AI(creature);
+    }
+};
+
 class npc_master_shang_xi_spirit : public CreatureScript
 {
 public:
@@ -6743,5 +6900,8 @@ void AddSC_wandering_isle()
     new npc_healer_shen();
     new npc_wreckage();
     new npc_deepscale_fleshripper();
+    new npc_korga_strongmane();
+    new npc_nourished_yak_escort_3();
+    new npc_delivery_cart_escort_3();
     new npc_master_shang_xi_spirit();
 }
