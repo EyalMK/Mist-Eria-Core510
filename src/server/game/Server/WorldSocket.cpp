@@ -58,7 +58,7 @@ struct ServerPktHeader
     {
         if (_authCrypt->IsInitialized())
         {
-            uint32 data =  (size << 13) | cmd & MAX_OPCODE;
+            uint32 data =  (size << 13) | cmd & 0x7FFF;
             memcpy(&header[0], &data, 4);
             _authCrypt->EncryptSend((uint8*)&header[0], getHeaderLength());
         }
@@ -219,7 +219,7 @@ int WorldSocket::SendPacket(WorldPacket const& pct)
 
         if (msg_queue()->enqueue_tail(mb, (ACE_Time_Value*)&ACE_Time_Value::zero) == -1)
         {
-            TC_LOG_ERROR(LOG_FILTER_NETWORKIO, "WorldSocket::SendPacket enqueue_tail failed");
+            //TC_LOG_ERROR(LOG_FILTER_NETWORKIO, "WorldSocket::SendPacket enqueue_tail failed");
             mb->release();
             return -1;
         }
@@ -500,11 +500,11 @@ int WorldSocket::handle_input_header (void)
         if (header.size > 10236)
         {
             Player* _player = m_Session ? m_Session->GetPlayer() : NULL;
-            TC_LOG_ERROR(LOG_FILTER_GENERAL, "WorldSocket::handle_input_header(): client (account: %u, char [GUID: %u, name: %s]) sent malformed packet (size: %d, cmd: %d)",
+            /*TC_LOG_ERROR(LOG_FILTER_GENERAL, "WorldSocket::handle_input_header(): client (account: %u, char [GUID: %u, name: %s]) sent malformed packet (size: %d, cmd: %d)",
                 m_Session ? m_Session->GetAccountId() : 0,
                 _player ? _player->GetGUIDLow() : 0,
                 _player ? _player->GetName().c_str() : "<none>",
-                header.size, header.cmd);
+                header.size, header.cmd);*/
 
             errno = EINVAL;
             return -1;
@@ -529,11 +529,11 @@ int WorldSocket::handle_input_header (void)
         if ((header.size < 4) || (header.size > 10240))
         {
             Player* _player = m_Session ? m_Session->GetPlayer() : NULL;
-            TC_LOG_ERROR(LOG_FILTER_GENERAL, "WorldSocket::handle_input_header(): client (account: %u, char [GUID: %u, name: %s]) sent malformed packet (size: %d, cmd: %d)",
+            /*TC_LOG_ERROR(LOG_FILTER_GENERAL, "WorldSocket::handle_input_header(): client (account: %u, char [GUID: %u, name: %s]) sent malformed packet (size: %d, cmd: %d)",
                 m_Session ? m_Session->GetAccountId() : 0,
                 _player ? _player->GetGUIDLow() : 0,
                 _player ? _player->GetName().c_str() : "<none>",
-                header.size, header.cmd);
+                header.size, header.cmd);*/
 
             errno = EINVAL;
             return -1;
