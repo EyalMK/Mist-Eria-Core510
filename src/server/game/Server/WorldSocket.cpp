@@ -58,7 +58,7 @@ struct ServerPktHeader
     {
         if (_authCrypt->IsInitialized())
         {
-            uint32 data =  (size << 13) | cmd & 0x7FFF;
+            uint32 data =  (size << 12) | cmd & 0xFFF;
             memcpy(&header[0], &data, 4);
             _authCrypt->EncryptSend((uint8*)&header[0], getHeaderLength());
         }
@@ -488,52 +488,22 @@ int WorldSocket::handle_input_header (void)
 
     if (m_Crypt.IsInitialized())
     {
-        ACE_ASSERT(m_WorldHeader.length() == sizeof(WorldClientPktHeader));
-        uint8* uintHeader = (uint8*)m_WorldHeader.rd_ptr();
-        m_Crypt.DecryptRecv(uintHeader, sizeof(WorldClientPktHeader));
-        WorldClientPktHeader& header = *(WorldClientPktHeader*)uintHeader;
+        uint8* clientHeader = (uint8*)m_WorldHeader.rd_ptr();
+        WorldClientPktHeader& header = *((WorldClientPktHeader*)clientHeader);
 
-        uint32 value = *(uint32*)uintHeader;
-        header.cmd = value & 0x1FFF;
-        header.size = ((value & ~(uint32)0x1FFF) >> 13);
+        m_Crypt.DecryptRecv(clientHeader, 4);
 
-        if (header.size > 10236)
+        uint32 value = *(uint32*)clientHeader;
+        uint32 opcode = value & 0xFFF;
+        uint16 size = (uint16)((value & ~(uint32)0xFFF) >> 12);
+
+        header.size = size + 4;
+        header.cmd = opcode;
+
+        if ((header.size < 4) || (header.size > 10240) || (header.cmd >= 0xFFFF))
         {
-            Player* _player = m_Session ? m_Session->GetPlayer() : NULL;
-            /*TC_LOG_ERROR(LOG_FILTER_GENERAL, "WorldSocket::handle_input_header(): client (account: %u, char [GUID: %u, name: %s]) sent malformed packet (size: %d, cmd: %d)",
-                m_Session ? m_Session->GetAccountId() : 0,
-                _player ? _player->GetGUIDLow() : 0,
-                _player ? _player->GetName().c_str() : "<none>",
-                header.size, header.cmd);*/
-
-            errno = EINVAL;
-            return -1;
-        }
-
-        ACE_NEW_RETURN(m_RecvWPct, WorldPacket (PacketFilter::DropHighBytes(Opcodes(header.cmd)), header.size), -1);
-
-        if (header.size > 0)
-        {
-            m_RecvWPct->resize(header.size);
-            m_RecvPct.base ((char*) m_RecvWPct->contents(), m_RecvWPct->size());
-        }
-        else
-            ACE_ASSERT(m_RecvPct.space() == 0);
-    }
-    else
-    {
-        ACE_ASSERT(m_Header.length() == sizeof(AuthClientPktHeader));
-        uint8* uintHeader = (uint8*)m_Header.rd_ptr();
-        AuthClientPktHeader& header = *((AuthClientPktHeader*)uintHeader);
-
-        if ((header.size < 4) || (header.size > 10240))
-        {
-            Player* _player = m_Session ? m_Session->GetPlayer() : NULL;
-            /*TC_LOG_ERROR(LOG_FILTER_GENERAL, "WorldSocket::handle_input_header(): client (account: %u, char [GUID: %u, name: %s]) sent malformed packet (size: %d, cmd: %d)",
-                m_Session ? m_Session->GetAccountId() : 0,
-                _player ? _player->GetGUIDLow() : 0,
-                _player ? _player->GetName().c_str() : "<none>",
-                header.size, header.cmd);*/
+            sLog->outError(LOG_FILTER_GENERAL,"WorldSocket::handle_input_header: client sent malformed packet size = %d , cmd = %d",
+                header.size, header.cmd);
 
             errno = EINVAL;
             return -1;
@@ -549,8 +519,42 @@ int WorldSocket::handle_input_header (void)
             m_RecvPct.base ((char*) m_RecvWPct->contents(), m_RecvWPct->size());
         }
         else
+        {
             ACE_ASSERT(m_RecvPct.space() == 0);
+        }
+
     }
+    else
+    {
+        uint8* clientHeader = (uint8*)m_Header.rd_ptr();
+        AuthClientPktHeader& header = *((AuthClientPktHeader*)clientHeader);
+
+        EndianConvert(header.size);
+        EndianConvert(header.cmd);
+
+        if ((header.size < 4) || (header.size > 10240) || (header.cmd >= 0xFFFF && header.cmd != 0x4C524F57))
+        {
+            sLog->outError(LOG_FILTER_GENERAL,"WorldSocket::handle_input_header: client sent malformed packet size = %d , cmd = %d",
+                header.size, header.cmd);
+
+            errno = EINVAL;
+            return -1;
+        }
+
+        header.size -= 4;
+
+        ACE_NEW_RETURN(m_RecvWPct, WorldPacket (PacketFilter::DropHighBytes(Opcodes(header.cmd)), header.size), -1);
+
+        if (header.size > 0)
+        {
+            m_RecvWPct->resize(header.size);
+            m_RecvPct.base ((char*) m_RecvWPct->contents(), m_RecvWPct->size());
+        }
+        else
+        {
+            ACE_ASSERT(m_RecvPct.space() == 0);
+        }
+     }
 
     return 0;
 }
