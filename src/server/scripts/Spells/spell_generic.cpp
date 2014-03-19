@@ -36,6 +36,7 @@
 #include "SkillDiscovery.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
+#include "CreatureAIImpl.h"
 
 class spell_gen_absorb0_hitlimit1 : public SpellScriptLoader
 {
@@ -4007,6 +4008,89 @@ private :
 	}
 };
 
+class spell_gen_alchemy_transmut_living_elements : public SpellScriptLoader {
+public :
+    spell_gen_alchemy_transmut_living_elements() : SpellScriptLoader("spell_gen_alchemy_transmut_living_elements") {
+        
+    }
+    
+    class spell_gen_alchemy_transmut_living_elements_SpellScript : public SpellScript {
+        PrepareSpellScript(spell_gen_alchemy_transmut_living_elements_SpellScript)
+        
+        bool Validate(const SpellInfo* spellInfo) {
+            return true ;
+        }
+        
+        bool Load() {
+            return true ;
+        }
+        
+        void HandleEffect(SpellEffIndex effIndex) {
+            PreventHitDefaultEffect(effIndex);
+            
+            
+            if(Unit* caster = GetCaster()) {
+                if(caster->GetTypeId() != TYPEID_PLAYER)
+                    return ;
+                
+                uint32 element = RAND(ELEMENT_FIRE, ELEMENT_WATER, ELEMENT_EARTH, ELEMENT_AIR);
+                
+                switch(caster->GetZoneId()) {
+                case ZONE_HYJAL :
+                    element = ELEMENT_FIRE ;
+                    break ;
+                    
+                case ZONE_ULDUM : 
+                    element = ELEMENT_AIR ;
+                    break ;
+                    
+                case ZONE_DEEPHOLM :
+                    element = ELEMENT_EARTH ;
+                    break ;
+                    
+                case ZONE_VASHJIR :
+                case ZONE_VASHJIR_ABYSSAL :
+                case ZONE_VASHJIR_EXPANSE :
+                case ZONE_VASHJIR_FOREST :
+                    element = ELEMENT_WATER ;
+                    
+                default :
+                    break ;
+                }
+                
+                uint8 count = urand(14, 16) ;
+                caster->ToPlayer()->AddItem(element, count);
+            }
+            
+        }
+        
+        void Register() {
+            OnEffectHitTarget += SpellEffectFn(spell_gen_alchemy_transmut_living_elements_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_CREATE_ITEM_2);
+        }
+        
+        enum Elements {
+            // Elements (items)
+            ELEMENT_FIRE    = 52325,
+            ELEMENT_WATER   = 52326,
+            ELEMENT_EARTH   = 52327,
+            ELEMENT_AIR     = 52328,
+            
+            // Zones
+            ZONE_HYJAL              = 616, // Fire
+            ZONE_ULDUM              = 5034, // Air
+            ZONE_DEEPHOLM           = 5042, // Earth
+            /** Water **/
+            ZONE_VASHJIR_ABYSSAL    = 5145,
+            ZONE_VASHJIR_FOREST     = 4815,
+            ZONE_VASHJIR_EXPANSE    = 5144,
+            ZONE_VASHJIR            = 5146,
+        };
+    };
+    
+    SpellScript* GetSpellScript() const {
+        return new spell_gen_alchemy_transmut_living_elements_SpellScript();
+    }
+};
 
 void AddSC_generic_spell_scripts()
 {
@@ -4098,4 +4182,5 @@ void AddSC_generic_spell_scripts()
     new spell_gen_darkflight();
 	new spell_gen_sylvanas_musix_box();
 	new spell_gen_jewelcrafting_research();
+	new spell_gen_alchemy_transmut_living_elements();
 }
