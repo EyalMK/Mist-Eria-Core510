@@ -845,7 +845,7 @@ public:
             GetCreatureListWithEntryInGrid(creatures1, me, 65471, 50.0f);
 
             std::list<Creature*> creatures2;
-            GetCreatureListWithEntryInGrid(creatures2, me, 54596, 50.0f);
+            GetCreatureListWithEntryInGrid(creatures2, me, 54587, 50.0f);
 
             if(EmoteTimer1 <= diff)
             {
