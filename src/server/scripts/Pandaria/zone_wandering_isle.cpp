@@ -878,10 +878,14 @@ public:
             if(EmoteRepeatTimer1 <= diff)
             {
                 for(std::list<Creature*>::const_iterator iter = creatures1.begin() ; iter != creatures1.end() ; ++iter)
-                    (*iter)->HandleEmoteCommand(480);
+                    if (Creature* tushui = *iter)
+                        if(!tushui->isInCombat())
+                            tushui->HandleEmoteCommand(480);
 
                 for(std::list<Creature*>::const_iterator iter = creatures2.begin() ; iter != creatures2.end() ; ++iter)
-                    (*iter)->HandleEmoteCommand(480);
+                    if (Creature* tushui = *iter)
+                        if(!tushui->isInCombat())
+                            tushui->HandleEmoteCommand(480);
 
                 EmoteRepeatTimer1 = 20000;
             }
@@ -890,10 +894,14 @@ public:
             if(EmoteRepeatTimer2 <= diff)
             {
                 for(std::list<Creature*>::const_iterator iter = creatures1.begin() ; iter != creatures1.end() ; ++iter)
-                    (*iter)->HandleEmoteCommand(508);
+                    if (Creature* tushui = *iter)
+                        if(!tushui->isInCombat())
+                            tushui->HandleEmoteCommand(508);
 
                 for(std::list<Creature*>::const_iterator iter = creatures2.begin() ; iter != creatures2.end() ; ++iter)
-                    (*iter)->HandleEmoteCommand(508);
+                    if (Creature* tushui = *iter)
+                        if(!tushui->isInCombat())
+                            tushui->HandleEmoteCommand(508);
 
                 EmoteRepeatTimer2 = 20000;
             }
@@ -902,10 +910,14 @@ public:
             if(EmoteRepeatTimer3 <= diff)
             {
                 for(std::list<Creature*>::const_iterator iter = creatures1.begin() ; iter != creatures1.end() ; ++iter)
-                    (*iter)->HandleEmoteCommand(439);
+                    if (Creature* tushui = *iter)
+                        if(!tushui->isInCombat())
+                            tushui->HandleEmoteCommand(439);
 
                 for(std::list<Creature*>::const_iterator iter = creatures2.begin() ; iter != creatures2.end() ; ++iter)
-                    (*iter)->HandleEmoteCommand(439);
+                    if (Creature* tushui = *iter)
+                        if(!tushui->isInCombat())
+                            tushui->HandleEmoteCommand(439);
 
                 EmoteRepeatTimer3 = 20000;
             }
@@ -914,10 +926,14 @@ public:
             if(EmoteRepeatTimer4 <= diff)
             {
                 for(std::list<Creature*>::const_iterator iter = creatures1.begin() ; iter != creatures1.end() ; ++iter)
-                    (*iter)->HandleEmoteCommand(60);
+                    if (Creature* tushui = *iter)
+                        if(!tushui->isInCombat())
+                            tushui->HandleEmoteCommand(60);
 
                 for(std::list<Creature*>::const_iterator iter = creatures2.begin() ; iter != creatures2.end() ; ++iter)
-                    (*iter)->HandleEmoteCommand(60);
+                    if (Creature* tushui = *iter)
+                        if(!tushui->isInCombat())
+                            tushui->HandleEmoteCommand(60);
 
                 EmoteRepeatTimer4 = 20000;
             }
