@@ -2865,60 +2865,6 @@ public:
     }
 };
 
-class npc_neutral_faction_select : public CreatureScript
-{
-public:
-    npc_neutral_faction_select() : CreatureScript("npc_neutral_faction_select") { }
-
-    bool OnGossipHello(Player* player, Creature* creature)
-    {
-        if (creature->isQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if(player->hasQuest(31450))
-        {
-			QueryResult result = WorldDatabase.Query("SELECT text FROM creature_text WHERE entry = 560130");
-
-			if (!result)
-			return false;
-
-			std::string text;
-
-			do
-			{
-				Field* neutralFaction = result->Fetch();
-				text = neutralFaction[0].GetString();
-			} while (result->NextRow());
-
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, text , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        }
-
-        player->PlayerTalkClass->SendGossipMenu(724006, creature->GetGUID());
-
-        return true;
-
-    }
-
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action)
-    {
-        player->PlayerTalkClass->ClearMenus();
-
-        switch (action)
-        {
-        case GOSSIP_ACTION_INFO_DEF + 1:
-        {
-            WorldPacket data(SMSG_SHOW_NEUTRAL_PLAYER_FACTION_SELECT_UI);
-            player->GetSession()->SendPacket(&data);
-        }
-            break;
-        }
-
-        player->PlayerTalkClass->SendCloseGossip();
-        return true;
-    }
-
-};
-
 class npc_neutral_faction_select_auto : public CreatureScript
 {
 public:
@@ -3674,7 +3620,6 @@ void AddSC_npcs_special()
     new npc_firework();
     new npc_spring_rabbit();
     new npc_generic_harpoon_cannon();
-    new npc_neutral_faction_select();
     new npc_neutral_faction_select_auto();
     new npc_warrior_banner();
     new npc_transcendance();

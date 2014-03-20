@@ -28,591 +28,6 @@
 #include "Vehicle.h"
 #include "CombatAI.h"
 
-/***** Script Non Tweex ******/
-
-/********************************/
-/**The Lesson of the Iron Bough**/
-/********************************/
-
-class EquippedItemCheckPredicate
-{
-public :
-    EquippedItemCheckPredicate(uint32 questId, uint32 itemId, uint32 itemId2) : item1(itemId), item2(itemId2), quest(questId)
-    {
-        if(itemId2) twice = true ;
-    }
-
-    bool operator()(Player* p)
-    {
-        if(!p) return false ;
-
-        if(!twice)
-        {
-            if(p->hasQuest(quest) && p->GetQuestStatus(quest) == QUEST_STATUS_INCOMPLETE && p->GetItemByEntry(item1))
-                return(p->GetItemByEntry(item1)->IsEquipped());
-        }
-        else
-        {
-            if(p->hasQuest(quest) && p->GetQuestStatus(quest) == QUEST_STATUS_INCOMPLETE && p->GetItemByEntry(item1) && p->GetItemByEntry(item2))
-                return(p->GetItemByEntry(item1)->IsEquipped() && p->GetItemByEntry(item2)->IsEquipped());
-        }
-
-        return false ;
-    }
-
-    bool isTwiced()
-    {
-        return twice;
-    }
-
-private :
-    uint32 item1, item2, quest ;
-    bool twice ;
-};
-
-struct QuestAndItems
-{
-    uint8 playerClass;
-    uint32 quest;
-    uint32 questItems[2];
-};
-
-QuestAndItems items[] =
-{
-    {1, 30037, 76391, 72313},
-    {2, 30038, 73210, 0},
-    {3, 30034, 73211, 0},
-    {4, 30036, 73208, 73212},
-    {5, 30035, 73207, 76393},
-    {8, 30033, 76390, 76392},
-    {10, 30027, 73209, 0}
-};
-
-class stalker_item_equiped : public CreatureScript
-{
-public :
-    stalker_item_equiped() : CreatureScript("stalker_item_equipped")
-    {
-
-    }
-
-    struct stalker_item_equipedAI : public ScriptedAI
-    {
-    public :
-        stalker_item_equipedAI(Creature* c) : ScriptedAI(c)
-        {
-
-        }
-
-        void Reset()
-        {
-            checkTimer = 1000 ;
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if(checkTimer <= diff)
-            {
-                Check();
-                checkTimer = 1000 ;
-            }
-            else checkTimer -= diff ;
-        }
-
-    private :
-        uint32 checkTimer;
-
-        void Check()
-        {
-            Map* map = me->GetMap();
-            if(!map) return ;
-
-            Map::PlayerList const& pl = map->GetPlayers();
-
-            if(pl.isEmpty()) return ;
-
-
-            for(Map::PlayerList::const_iterator iter = pl.begin() ; iter != pl.end() ; ++iter)
-            {
-                if(Player* p = iter->getSource())
-                {
-                    uint8 pClass = p->getClass();
-                    uint8 i = 0 ;
-                    for(; i < 7 ; ++i)
-                    {
-                        if(pClass = items[i].playerClass)
-                        {
-                            EquippedItemCheckPredicate predicate(items[i].quest, items[i].questItems[0], items[i].questItems[1]);
-                            if(predicate(p))
-                            {
-                                p->KilledMonsterCredit(REWARD_1);
-                                if(predicate.isTwiced())
-                                        p->KilledMonsterCredit(REWARD_2);
-                            }
-                            break ;
-                        }
-                    }
-                }
-            }
-        }
-
-        enum NPCS
-        {
-            REWARD_1 = 0,
-            REWARD_2 = 0
-        };
-    };
-
-    CreatureAI* GetAI(Creature *c) const
-    {
-        return new stalker_item_equipedAI(c);
-    }
-};
-
-/**********************************/
-/*****The Disciple's Challenge*****/
-/**********************************/
-
-class mob_jaomin_ro : public CreatureScript
-{
-public :
-    mob_jaomin_ro() : CreatureScript("mob_jaomin_ro")
-    {
-
-    }
-
-    struct mob_jaomin_roAI : public ScriptedAI
-    {
-    public :
-        mob_jaomin_roAI(Creature* c) : ScriptedAI(c)
-        {
-
-        }
-
-        void Reset()
-        {
-            events.Reset();
-        }
-
-        void EnterCombat(Unit *pWho)
-        {
-            if(pWho->GetTypeId() != TYPEID_PLAYER)
-            {
-                me->Kill(pWho, false);
-                EnterEvadeMode();
-            }
-
-            ScheduleEvents();
-        }
-
-        void DamageTaken(Unit *attacker, uint32 &amount)
-        {
-            if(me->GetHealth() < amount)
-            {
-                amount = 0 ;
-                me->SetHealth(me->GetMaxHealth()/10);
-                me->CombatStop(true);
-                EnterEvadeMode();
-                if(attacker->ToPlayer())
-                    attacker->ToPlayer()->KilledMonsterCredit(me->GetEntry(), 0);
-                me->Say(irand(SAY_DEFEAT_1, SAY_DEFEAT_7), LANG_COMMON, attacker->GetGUID());
-            }
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if(!UpdateVictim())
-                return ;
-
-            events.Update(diff);
-
-            if(me->HasUnitState(UNIT_STATE_CASTING))
-                return ;
-
-            while(uint32 eventId = events.ExecuteEvent())
-            {
-                switch(eventId)
-                {
-                case EVENT_HAWK :
-                    if(me->getVictim())
-                        DoCast(me->getVictim(), SPELL_HAWK, false);
-                    events.ScheduleEvent(EVENT_ELEPHANT, 3000);;
-                    break ;
-
-                case EVENT_ELEPHANT :
-                    if(me->getVictim())
-                        DoCast(me->getVictim(), SPELL_ELEPHANT, false);
-                    events.ScheduleEvent(EVENT_HAWK, 3000);
-                    break;
-
-                case EVENT_ROUNDHOUSE :
-                    DoCastAOE(SPELL_ROUNDHOUSE, false);
-                    events.ScheduleEvent(EVENT_ROUNDHOUSE, 5000);
-                    break;
-
-                default :
-                    break ;
-                }
-            }
-            DoMeleeAttackIfReady();
-        }
-
-    private :
-        EventMap events ;
-
-        inline void ScheduleEvents()
-        {
-            events.ScheduleEvent(RAND(EVENT_HAWK, EVENT_ELEPHANT), 3000);
-            events.ScheduleEvent(EVENT_ROUNDHOUSE, 5000);
-        }
-
-        enum Events
-        {
-            EVENT_HAWK = 1,
-            EVENT_ELEPHANT,
-            EVENT_ROUNDHOUSE
-        };
-
-        enum Spells
-        {
-            SPELL_HAWK = 108955,
-            SPELL_ELEPHANT = 108938,
-            SPELL_ROUNDHOUSE = 119301
-        };
-
-        enum Says
-        {
-            SAY_DEFEAT_1 = -5461106,
-            SAY_DEFEAT_2,
-            SAY_DEFEAT_3,
-            SAY_DEFEAT_4,
-            SAY_DEFEAT_5,
-            SAY_DEFEAT_6,
-            SAY_DEFEAT_7
-        };
-    };
-
-    CreatureAI* GetAI(Creature *c) const
-    {
-        return new mob_jaomin_roAI(c);
-    }
-
-private :
-};
-
-/****************************/
-/*****The Missing Driver*****/
-/****************************/
-
-class MissingDriverCheckPredicate
-{
-public :
-    MissingDriverCheckPredicate(uint32 questId) : quest(questId)
-    {
-
-    }
-
-    bool operator()(Player* p)
-    {
-        if(!p) return false ;
-
-        return(p->hasQuest(quest) && p->GetQuestStatus(quest) == QUEST_STATUS_INCOMPLETE);
-    }
-
-private :
-    uint32 quest;
-};
-
-class mob_amberleaf_scamp29419 : public CreatureScript
-{
-public :
-    mob_amberleaf_scamp29419() : CreatureScript("mob_amberleaf_scamp29419")
-    {
-
-    }
-
-    struct mob_amberleaf_scamp29419_AI : public ScriptedAI
-    {
-    public :
-        mob_amberleaf_scamp29419_AI(Creature* c) : ScriptedAI(c)
-        {
-
-        }
-
-        void EnterCombat(Unit* who)
-        {
-            me->GetPosition(&homePosition);
-            MissingDriverCheckPredicate predicate(29419);
-            if(who->ToPlayer() && predicate(who->ToPlayer()))
-            {
-                me->GetMotionMaster()->MoveFleeing(who, 0);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                me->Yell(RAND(YELL_FLEE_1, YELL_FLEE_2), LANG_COMMON, who->GetGUID());
-                canAttack = false ;
-                who->ToPlayer()->KilledMonsterCredit(me->GetEntry(), 0);
-            }
-            else
-                me->AI()->AttackStart(who);
-        }
-
-        void Reset()
-        {
-            canAttack = true ;
-            takeThisTimer = 3500 ;
-            returnTimer = 7500 ;
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if(!UpdateVictim() && canAttack) return ;
-
-            if(!canAttack)
-            {
-                if(returnTimer <= diff)
-                {
-                    me->GetMotionMaster()->MovePoint(0, homePosition);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                    canAttack = true ;
-                    returnTimer = 7500 ;
-                }
-                else returnTimer -= diff ;
-            }
-            else
-            {
-                if(takeThisTimer <= diff)
-                {
-                    if(me->getVictim())
-                        DoCast(me->getVictim(), 109081, false);
-                    takeThisTimer = 3000;
-                }
-                else takeThisTimer -= diff ;
-            }
-        }
-
-    private :
-        uint32 takeThisTimer;
-        uint32 returnTimer;
-        Position homePosition;
-        bool canAttack;
-
-        enum Yells
-        {
-            YELL_FLEE_1 = -5413001,
-            YELL_FLEE_2
-        };
-    };
-
-    CreatureAI* GetAI(Creature *c) const
-    {
-        return new mob_amberleaf_scamp29419_AI(c);
-    }
-};
-
-/****************************/
-/*****Fanning the Flames*****/
-/****************************/
-
-class spell_summon_living_air : public SpellScriptLoader
-{
-public :
-    spell_summon_living_air() : SpellScriptLoader("spell_quest29523_summon_living_air")
-    {
-
-    }
-
-    class spell_summon_living_airSpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_summon_living_airSpellScript)
-
-        bool Validate(const SpellInfo *spellInfo)
-        {
-            if(!sSpellMgr->GetSpellInfo(106999) || !sSpellMgr->GetSpellInfo(102207))
-                return false ;
-
-            return true ;
-        }
-
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            if(Unit* caster = GetCaster())
-            {
-                caster->CastSpell((Unit*)NULL, 102207, true);
-            }
-        }
-
-        void Register()
-        {
-            OnEffectLaunch += SpellEffectFn(spell_summon_living_airSpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_summon_living_airSpellScript();
-    }
-};
-
-/********************************/
-/*****The Challenger's Fires*****/
-/********************************/
-
-class TorchEquippedPredicate
-{
-public :
-    TorchEquippedPredicate(uint32 questId, uint32 itemId) : quest(questId), item(itemId)
-    {
-
-    }
-
-    bool operator()(Player* p)
-    {
-        if(!p || !p->GetItemByEntry(item) || !p->hasQuest(quest) || p->GetQuestStatus(quest) != QUEST_STATUS_INCOMPLETE)
-            return false ;
-
-        return(p->GetItemByEntry(item)->IsInBag());
-    }
-
-private:
-    uint32 quest, item;
-};
-
-class go_brazier_of_flickering_flames : public GameObjectScript
-{
-public :
-    go_brazier_of_flickering_flames() : GameObjectScript("go_brazier_of_flickering_flames")
-    {
-
-    }
-
-    bool OnGossipHello(Player *p, GameObject *go)
-    {
-        if(!p->hasQuest(29664) || p->GetQuestStatus(29664) != QUEST_STATUS_INCOMPLETE)
-            return false ;
-        else if(p->hasQuest(29664) && p->GetQuestStatus(29664) == QUEST_STATUS_INCOMPLETE)
-        {
-            go->CastSpell(p, 105151);
-            return true;
-        }
-
-        return false ;
-    }
-};
-
-
-class npc_shang_xi_the_lesson_of_the_burning_scroll : public CreatureScript
-{
-public:
-    npc_shang_xi_the_lesson_of_the_burning_scroll() : CreatureScript("npc_shang_xi_the_lesson_of_the_burning_scroll") { }
-
-    bool OnGossipHello(Player *p, Creature *c)
-    {
-        if(p->hasQuest(QUEST_THE_LESSON_OF_THE_BURNING_SCROLL))
-        {
-            if(!p->HasItemCount(FLAMME, 1))
-            {
-                p->CastSpell(p, SPELL_ANIM_TAKE_FLAME, true);
-                p->CastSpell(p, SPELL_CREATE_THE_FLAMME, true);
-                p->KilledMonsterCredit(KILL_CREDIT_FLAMME, 0);
-                c->MonsterSay(SHANG_XI_TALK, 0, p->GetGUID());
-            }
-
-        } else if(p->GetQuestStatus(QUEST_THE_LESSON_OF_THE_BURNING_SCROLL) == QUEST_STATUS_COMPLETE) {
-            if (c->isQuestGiver())
-                p->PrepareQuestMenu(c->GetGUID());
-                p->PlayerTalkClass->SendGossipMenu(1,  c->GetGUID());
-        }
-
-        return true;
-    }
-private:
-    enum enums
-    {
-        QUEST_THE_LESSON_OF_THE_BURNING_SCROLL = 29408,
-        SPELL_ANIM_TAKE_FLAME = 114746,
-        FLAMME = 80212,
-        SPELL_CREATE_THE_FLAMME = 114611,
-        SHANG_XI_TALK = 0,
-        KILL_CREDIT_FLAMME = 59591
-    };
-};
-
-class gob_edict_of_temperance_the_lesson_of_the_burning_scroll : public GameObjectScript
-{
-public:
-    gob_edict_of_temperance_the_lesson_of_the_burning_scroll() : GameObjectScript("gob_edict_of_temperance_the_lesson_of_the_burning_scroll") { }
-
-    bool OnGossipHello(Player* p, GameObject* gob)
-    {
-        if(p->HasItemCount(FLAMME, 1))
-        {
-            p->KilledMonsterCredit(KILL_CREDIT_BURN, 0);
-            p->CastSpell(p, SPELL_NEW_PHASE, true);
-            p->RemoveAura(p->GetAura(59073)); // Enlève la phase 2
-
-            p->DestroyItemCount(FLAMME, 1, true);
-            if(GameObject* go = ObjectAccessor::GetGameObject(*p, 400014))
-                if(Creature* npc = go->FindNearestCreature(TRACKER, 10, true))
-                    npc->CastSpell(npc, SPELL_BURN, true);
-        }
-
-        return true;
-    }
-private:
-    enum enums
-    {
-        TRACKER = 65490,
-        FLAMME = 80212,
-        SPELL_BURN = 88579,
-        SPELL_NEW_PHASE = 59074, // Tester si le changement de phase marche bien
-        KILL_CREDIT_BURN = 59570
-    };
-};
-
-
-enum AreaTest
-{
-    SPELL_MALE  = 102938
-};
-
-class at_test_etang : public AreaTriggerScript
-{
-    public:
-
-        at_test_etang() : AreaTriggerScript("at_test_etang")
-        {
-        }
-
-        bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
-        {
-            if(player->GetPositionZ() <= 116.7)
-            {
-                if(!player->HasAura(SPELL_MALE))
-                {
-                    player->CastSpell(player, SPELL_MALE, true);
-                    return true;
-                }
-                return false;
-            }
-
-            if(player->HasAura(SPELL_MALE))
-            {
-                player->RemoveAurasDueToSpell(SPELL_MALE);
-                return true;
-            }
-
-            if(!player->HasAura(SPELL_MALE))
-            {
-                player->CastSpell(player, SPELL_MALE, true);
-                return true;
-            }
-
-            return true;
-        }
-};
-
-/**** Fin Script Non Tweex *****/
-
-
 /*******************************/
 /********* AreaTrigger *********/
 /*******************************/
@@ -1281,6 +696,7 @@ public:
         void Reset()
         {
             me->SetReactState(REACT_PASSIVE);
+            me->HandleEmoteCommand(27);
             AttackTimer = 5000;
             VerifPV = true;
             Despawn = false;
@@ -1379,6 +795,149 @@ public:
             }
 
             DoMeleeAttackIfReady();
+        }
+    };
+};
+
+class npc_zhi : public CreatureScript
+{
+public:
+    npc_zhi() : CreatureScript("npc_zhi") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_zhiAI(creature);
+    }
+
+    struct npc_zhiAI : public ScriptedAI
+    {
+        npc_zhiAI(Creature* creature) : ScriptedAI(creature){}
+
+        uint32 EmoteTimer1;
+        uint32 EmoteTimer2;
+        uint32 EmoteTimer3;
+        uint32 EmoteTimer4;
+
+        uint32 EmoteRepeatTimer1;
+        uint32 EmoteRepeatTimer2;
+        uint32 EmoteRepeatTimer3;
+        uint32 EmoteRepeatTimer4;
+
+        void Reset()
+        {
+            me->HandleEmoteCommand(27);
+
+            EmoteTimer1 = 5000;
+            EmoteTimer2 = 10000;
+            EmoteTimer3 = 15000;
+            EmoteTimer4 = 20000;
+
+            EmoteRepeatTimer1 = 7000;
+            EmoteRepeatTimer2 = 12000;
+            EmoteRepeatTimer3 = 17000;
+            EmoteRepeatTimer4 = 22000;
+        }
+
+
+        void UpdateAI(const uint32 diff)
+        {
+            std::list<Creature*> creatures1;
+            GetCreatureListWithEntryInGrid(creatures1, me, 65471, 50.0f);
+
+            std::list<Creature*> creatures2;
+            GetCreatureListWithEntryInGrid(creatures2, me, 54587, 50.0f);
+
+            if(EmoteTimer1 <= diff)
+            {
+                me->HandleEmoteCommand(480);
+                EmoteTimer1 = 20000;
+            }
+            else EmoteTimer1 -= diff;
+
+            if(EmoteTimer2 <= diff)
+            {
+                me->HandleEmoteCommand(508);
+                EmoteTimer2 = 20000;
+            }
+            else EmoteTimer2 -= diff;
+
+            if(EmoteTimer3 <= diff)
+            {
+                me->HandleEmoteCommand(439);
+                EmoteTimer3 = 20000;
+            }
+            else EmoteTimer3 -= diff;
+
+            if(EmoteTimer4 <= diff)
+            {
+                me->HandleEmoteCommand(60);
+                EmoteTimer4 = 20000;
+            }
+            else EmoteTimer4 -= diff;
+
+            if(EmoteRepeatTimer1 <= diff)
+            {
+                for(std::list<Creature*>::const_iterator iter = creatures1.begin() ; iter != creatures1.end() ; ++iter)
+                    if (Creature* tushui = *iter)
+                        if(!tushui->isInCombat())
+                            tushui->HandleEmoteCommand(480);
+
+                for(std::list<Creature*>::const_iterator iter = creatures2.begin() ; iter != creatures2.end() ; ++iter)
+                    if (Creature* tushui = *iter)
+                        if(!tushui->isInCombat())
+                            tushui->HandleEmoteCommand(480);
+
+                EmoteRepeatTimer1 = 20000;
+            }
+            else EmoteRepeatTimer1 -= diff;
+
+            if(EmoteRepeatTimer2 <= diff)
+            {
+                for(std::list<Creature*>::const_iterator iter = creatures1.begin() ; iter != creatures1.end() ; ++iter)
+                    if (Creature* tushui = *iter)
+                        if(!tushui->isInCombat())
+                            tushui->HandleEmoteCommand(508);
+
+                for(std::list<Creature*>::const_iterator iter = creatures2.begin() ; iter != creatures2.end() ; ++iter)
+                    if (Creature* tushui = *iter)
+                        if(!tushui->isInCombat())
+                            tushui->HandleEmoteCommand(508);
+
+                EmoteRepeatTimer2 = 20000;
+            }
+            else EmoteRepeatTimer2 -= diff;
+
+            if(EmoteRepeatTimer3 <= diff)
+            {
+                for(std::list<Creature*>::const_iterator iter = creatures1.begin() ; iter != creatures1.end() ; ++iter)
+                    if (Creature* tushui = *iter)
+                        if(!tushui->isInCombat())
+                            tushui->HandleEmoteCommand(439);
+
+                for(std::list<Creature*>::const_iterator iter = creatures2.begin() ; iter != creatures2.end() ; ++iter)
+                    if (Creature* tushui = *iter)
+                        if(!tushui->isInCombat())
+                            tushui->HandleEmoteCommand(439);
+
+                EmoteRepeatTimer3 = 20000;
+            }
+            else EmoteRepeatTimer3 -= diff;
+
+            if(EmoteRepeatTimer4 <= diff)
+            {
+                for(std::list<Creature*>::const_iterator iter = creatures1.begin() ; iter != creatures1.end() ; ++iter)
+                    if (Creature* tushui = *iter)
+                        if(!tushui->isInCombat())
+                            tushui->HandleEmoteCommand(60);
+
+                for(std::list<Creature*>::const_iterator iter = creatures2.begin() ; iter != creatures2.end() ; ++iter)
+                    if (Creature* tushui = *iter)
+                        if(!tushui->isInCombat())
+                            tushui->HandleEmoteCommand(60);
+
+                EmoteRepeatTimer4 = 20000;
+            }
+            else EmoteRepeatTimer4 -= diff;
         }
     };
 };
@@ -5976,16 +5535,841 @@ public:
     }
 };
 
+/**************************/
+/****** Final Event *******/
+/**************************/
+
+class npc_trigger_healing_shen: public CreatureScript
+{
+public:
+    npc_trigger_healing_shen(): CreatureScript("npc_trigger_healing_shen") { }
+
+    struct npc_trigger_healing_shenAI : public ScriptedAI
+    {
+        npc_trigger_healing_shenAI(Creature* creature) : ScriptedAI(creature){}
+
+        uint32 PainShake_Timer;
+        uint32 Healing_Timer;
+
+        void Reset()
+        {
+            PainShake_Timer = 1000;
+            Healing_Timer = 1500;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(PainShake_Timer <= uiDiff)
+            {
+                PainShake();
+                PainShake_Timer = 30000;
+            }
+            else
+                PainShake_Timer -= uiDiff;
+
+            if(Healing_Timer <= uiDiff)
+            {
+                VerifPlayer();
+                Healing_Timer = 1000;
+            }
+            else
+                Healing_Timer -= uiDiff;
+        }
+
+        void VerifPlayer()
+        {
+            Map* map = me->GetMap();
+            Map::PlayerList const& pl = map->GetPlayers();
+
+            for(Map::PlayerList::const_iterator iter = pl.begin() ; iter != pl.end() ; ++iter)
+            {
+                if(Player* player = iter->getSource())
+                {
+                    if(!player->HasAura(117783) && player->GetQuestStatus(29799) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        player->CastSpell(player, 117783, true);
+                        player->SetMaxPower(POWER_ALTERNATE_POWER, 700);
+                        player->SetPower(POWER_ALTERNATE_POWER, 0);
+                    }
+
+                    if(player->HasAura(117783) && player->GetQuestStatus(29799) == QUEST_STATUS_NONE)
+                    {
+                        player->RemoveAurasDueToSpell(117783);
+                    }
+                }
+            }
+        }
+
+        void PainShake()
+        {
+            Map* map = me->GetMap();
+            Map::PlayerList const& pl = map->GetPlayers();
+
+            for(Map::PlayerList::const_iterator iter = pl.begin() ; iter != pl.end() ; ++iter)
+                if(Player* player = iter->getSource())
+                    if(player->isAlive() && player->InSamePhase(1024))
+                        if(player->GetAreaId() == 5833)
+                            player->CastSpell(player, 117969, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_trigger_healing_shenAI(creature);
+    }
+};
+
+class npc_ji_healing_shen: public CreatureScript
+{
+public:
+    npc_ji_healing_shen(): CreatureScript("npc_ji_healing_shen") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        if (quest->GetQuestId() == 29799)
+        {
+            player->SendUpdateWorldState(6489, 1);
+            player->SendUpdateWorldState(6488, 1);
+        }
+        return true;
+    }
+
+    struct npc_ji_healing_shenAI : public ScriptedAI
+    {
+        npc_ji_healing_shenAI(Creature* creature) : ScriptedAI(creature){}
+
+        uint32 Text_Timer;
+
+        void Reset()
+        {
+            Text_Timer = 1000;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(Text_Timer <= uiDiff)
+            {
+                Talk(0);
+                Text_Timer = 120000;
+            }
+            else
+                Text_Timer -= uiDiff;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ji_healing_shenAI(creature);
+    }
+};
+
+class npc_healer_shen_wreckage: public CreatureScript
+{
+public:
+    npc_healer_shen_wreckage(): CreatureScript("npc_healer_shen_wreckage") { }
+
+    struct npc_healer_shen_wreckageAI : public ScriptedAI
+    {
+        npc_healer_shen_wreckageAI(Creature* creature) : ScriptedAI(creature){}
+
+        uint32 Healing_timer;
+
+        bool HealingShen;
+
+        void Reset()
+        {
+            me->SetHealth(me->GetMaxHealth() / 4);
+            me->SetStandState(UNIT_STAND_STATE_SLEEP);
+            me->SetReactState(REACT_PASSIVE);
+            me->setFaction(35);
+            me->CastSpell(me, 117857, true);
+            HealingShen = false;
+        }
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type == POINT_MOTION_TYPE && id == 1)
+            {
+                me->CastSpell(me, 117932, true);
+                me->setFaction(42);
+                Healing_timer = 2000;
+                HealingShen = true;
+            }
+        }
+
+        void DoAction(int32 const action)
+        {
+            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->CastSpell(me, 117934, false);
+        }
+
+        void SpellHit(Unit* caster, const SpellInfo* spell)
+        {
+            if (spell->Id == 117934)
+            {
+                Talk(0);
+                me->SetHealth(me->GetMaxHealth());
+                me->GetMotionMaster()->MovePoint(1, 254.25f, 3959.83f, 65.0f, true);
+            }
+        }
+
+        void AddPowerToPlayersOnMap()
+        {
+            Map* map = me->GetMap();
+            if(map)
+            {
+                Map::PlayerList const& players = map->GetPlayers();
+
+                if(players.isEmpty())
+                    return;
+
+                for(Map::PlayerList::const_iterator iter = players.begin() ; iter != players.end() ; ++iter)
+                {
+                    Player* player = iter->getSource();
+                    if(player)
+                        if (player->isAlive() && player->GetQuestStatus(29799) == QUEST_STATUS_INCOMPLETE)
+                            if(player->GetAreaId() == 5833)
+                                if(player->HasAura(117783))
+                                    AddPower(player);
+                }
+            }
+        }
+
+        void AddPower(Player* player)
+        {
+            if(player)
+            {
+                player->ModifyPower(POWER_ALTERNATE_POWER, +2);
+
+                switch(player->GetPower(POWER_ALTERNATE_POWER))
+                {
+                    case 700 :
+                        player->KilledMonsterCredit(56011);
+                        player->RemoveAura(117783);
+                        break ;
+
+                    default :
+                        break ;
+                }
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(HealingShen)
+            {
+                if(Healing_timer <= uiDiff)
+                {
+                    AddPowerToPlayersOnMap();
+                    Healing_timer = 2000;
+                }
+                else
+                    Healing_timer -= uiDiff;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_healer_shen_wreckageAI(creature);
+    }
+};
+
+class npc_healer_shen: public CreatureScript
+{
+public:
+    npc_healer_shen(): CreatureScript("npc_healer_shen") { }
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        if(player->hasQuest(29799))
+            if(!creature->isInCombat())
+            {
+                creature->AI()->DoAction(0);
+                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
+
+        return true;
+    }
+
+    struct npc_healer_shenAI : public ScriptedAI
+    {
+        npc_healer_shenAI(Creature* creature) : ScriptedAI(creature), Summons(me){}
+
+        uint32 VerifCombat_Timer;
+        uint32 Cast_Timer;
+        uint32 Healing_timer;
+        uint32 Pop_timer;
+        SummonList Summons;
+
+        bool HealingShen;
+
+        void Reset()
+        {
+            VerifCombat_Timer = 1000;
+            Cast_Timer = 1000;
+            me->setFaction(42);
+            HealingShen = false;
+        }
+
+        void JustSummoned(Creature* Summoned)
+        {
+            Summons.Summon(Summoned);
+
+            Summoned->GetMotionMaster()->MoveJump(253.51f, 3954.70f, 66.00f, 20, 20);
+            Summoned->AI()->AttackStart(me);
+        }
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type == POINT_MOTION_TYPE && id == 1)
+            {
+                me->CastSpell(me, 117932, true);
+                me->SetReactState(REACT_PASSIVE);
+                me->setFaction(42);
+                Healing_timer = 2000;
+                Pop_timer = 4000;
+                HealingShen = true;
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
+        }
+
+        void DoAction(int32 const action)
+        {
+            switch (action)
+            {
+                case 0:
+                    Talk(0);
+                    me->GetMotionMaster()->MovePoint(1, 254.25f, 3959.83f, 65.0f, true);
+                    me->SetReactState(REACT_PASSIVE);
+                    me->setFaction(35);
+                    break;
+            }
+        }
+
+        void AddPowerToPlayersOnMap()
+        {
+            Map* map = me->GetMap();
+            if(map)
+            {
+                Map::PlayerList const& players = map->GetPlayers();
+
+                if(players.isEmpty())
+                    return;
+
+                for(Map::PlayerList::const_iterator iter = players.begin() ; iter != players.end() ; ++iter)
+                {
+                    Player* player = iter->getSource();
+                    if(player)
+                        if (player->isAlive() && player->GetQuestStatus(29799) == QUEST_STATUS_INCOMPLETE)
+                            if(player->GetAreaId() == 5833)
+                                if(player->HasAura(117783))
+                                    AddPower(player);
+                }
+            }
+        }
+
+        void AddPower(Player* player)
+        {
+            if(player)
+            {
+                player->ModifyPower(POWER_ALTERNATE_POWER, +2);
+
+                switch(player->GetPower(POWER_ALTERNATE_POWER))
+                {
+                    case 700:
+                        player->KilledMonsterCredit(56011);
+                        player->RemoveAura(117783);
+                        break ;
+
+                    default :
+                        break ;
+                }
+            }
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(HealingShen)
+            {
+                if(Healing_timer <= uiDiff)
+                {
+                    AddPowerToPlayersOnMap();
+                    Healing_timer = 2000;
+                }
+                else
+                    Healing_timer -= uiDiff;
+
+                if(Pop_timer <= uiDiff)
+                {
+                    me->SummonCreature(60780, 215.76f, 3950.22f, 72.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
+                    me->SummonCreature(60858, 288.58f, 3939.21f, 87.00f, 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
+                    Pop_timer = 25000;
+                }
+                else
+                    Pop_timer -= uiDiff;
+            }
+
+            if(!HealingShen)
+            {
+                if(me->HealthBelowPct(30))
+                {
+                    me->SetHealth(me->GetMaxHealth());
+                }
+
+                if(VerifCombat_Timer <= uiDiff)
+                {
+                    if(me->isInCombat())
+                        me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+
+                    if(!me->isInCombat())
+                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+
+                    me->SetReactState(REACT_DEFENSIVE);
+                    VerifCombat_Timer = 1000;
+                }
+                else
+                    VerifCombat_Timer -= uiDiff;
+
+                if(!UpdateVictim())
+                    return;
+
+                if(Cast_Timer <= uiDiff)
+                {
+                    if(me->GetEntry() == 60877)
+                        me->CastSpell(me->getVictim(), 117935, false);
+
+                    if(me->GetEntry() == 60770)
+                        me->CastSpell(me->getVictim(), 117767, false);
+
+                    Cast_Timer = 3000;
+                }
+                else
+                    Cast_Timer -= uiDiff;
+
+                DoMeleeAttackIfReady();
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_healer_shenAI(creature);
+    }
+};
+
+class npc_wreckage: public CreatureScript
+{
+public:
+    npc_wreckage(): CreatureScript("npc_wreckage") { }
+
+    struct npc_wreckageAI : public ScriptedAI
+    {
+        npc_wreckageAI(Creature* creature) : ScriptedAI(creature){}
+
+        void Reset()
+        {
+            me->CastSpell(me, 117855, true);
+        }
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            switch (id)
+            {
+                case EVENT_JUMP:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+
+        void OnSpellClick(Unit* clicker)
+        {
+            me->GetMotionMaster()->MoveJump(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10, 10, 10, EVENT_JUMP);
+
+            Creature* healerA = me->FindNearestCreature(60878, 10.0f, true);
+            Creature* healerH = me->FindNearestCreature(60834, 10.0f, true);
+
+            if(healerA)
+                healerA->AI()->DoAction(0);
+
+            if(healerH)
+                healerH->AI()->DoAction(0);
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_wreckageAI(creature);
+    }
+};
+
+class npc_deepscale_fleshripper: public CreatureScript
+{
+public:
+    npc_deepscale_fleshripper(): CreatureScript("npc_deepscale_fleshripper") { }
+
+    struct npc_deepscale_fleshripperAI : public ScriptedAI
+    {
+        npc_deepscale_fleshripperAI(Creature* creature) : ScriptedAI(creature){}
+
+        uint32 RipFlesh_Timer;
+
+        void Reset()
+        {
+            RipFlesh_Timer = 5000;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if(!UpdateVictim())
+                return;
+
+            if(RipFlesh_Timer <= uiDiff)
+            {
+                me->CastSpell(me, 128533, false);
+                RipFlesh_Timer = 10000;
+            }
+            else
+                RipFlesh_Timer -= uiDiff;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_deepscale_fleshripperAI(creature);
+    }
+};
+
+/**************************/
+/**** END Final Event *****/
+/**************************/
+
+
+class npc_korga_strongmane: public CreatureScript
+{
+public:
+    npc_korga_strongmane(): CreatureScript("npc_korga_strongmane") { }
+
+    struct npc_korga_strongmaneAI : public ScriptedAI
+    {
+        npc_korga_strongmaneAI(Creature* creature) : ScriptedAI(creature){}
+
+        uint32 Talk_1_Timer;
+        uint32 Talk_2_Timer;
+
+        void Reset()
+        {
+            Talk_1_Timer = 1000;
+            Talk_2_Timer = 11000;
+        }
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            if (Talk_1_Timer <= uiDiff)
+            {
+                Talk(0);
+                Talk_1_Timer = 60000;
+            }
+            else Talk_1_Timer -= uiDiff;
+
+            if (Talk_2_Timer <= uiDiff)
+            {
+                Creature* delora = me->FindNearestCreature(60889, 20.00f, true);
+                if(delora)
+                    delora->AI()->Talk(0);
+
+                Talk_2_Timer = 60000;
+            }
+            else Talk_2_Timer -= uiDiff;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_korga_strongmaneAI(creature);
+    }
+};
+
+/*######
+## npc_nourished_yak_escort_3
+######*/
+
+class npc_nourished_yak_escort_3 : public CreatureScript
+{
+public:
+    npc_nourished_yak_escort_3(): CreatureScript("npc_nourished_yak_escort_3") { }
+
+    struct npc_nourished_yak_escort_3AI : public npc_escortAI
+    {
+        npc_nourished_yak_escort_3AI(Creature* creature) : npc_escortAI(creature) {}
+
+        void Reset()
+        {
+            me->CastSpell(me, 111810, true);
+            me->SetPhaseMask(2049, true);
+            me->setFaction(35);
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    break;
+                case 32:
+                    if (Creature* chariot = me->FindNearestCreature(57740, 50.00f, true))
+                        chariot->DespawnOrUnsummon();
+
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void OnCharmed(bool /*apply*/){}
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            Start(false, true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_nourished_yak_escort_3AI(creature);
+    }
+};
+
+/*######
+## npc_delivery_cart_escort_3
+######*/
+
+class npc_delivery_cart_escort_3 : public CreatureScript
+{
+public:
+    npc_delivery_cart_escort_3(): CreatureScript("npc_delivery_cart_escort_3") { }
+
+    struct npc_delivery_cart_escort_3AI : public npc_escortAI
+    {
+        npc_delivery_cart_escort_3AI(Creature* creature) : npc_escortAI(creature) {}
+
+        uint32 StartTimer;
+
+        void Reset()
+        {
+            me->CastSpell(me, 108692, true);
+            me->CastSpell(me, 111809, true);
+            me->SetPhaseMask(2049, true);
+            me->setFaction(35);
+            StartTimer = 800;
+        }
+
+        void WaypointReached(uint32 waypointId)
+        {
+            Player* player = GetPlayerForEscort();
+
+            switch (waypointId)
+            {
+                case 1:
+                    SetRun();
+                    break;
+                case 32:
+                    me->DespawnOrUnsummon();
+                    break;
+
+            }
+        }
+
+        void OnCharmed(bool /*apply*/){}
+
+        void UpdateAI(const uint32 uiDiff)
+        {
+            npc_escortAI::UpdateAI(uiDiff);
+
+            if (StartTimer <= uiDiff)
+            {
+                Start(false, true);
+                StartTimer  = 300000;
+            }
+            else StartTimer -= uiDiff;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_delivery_cart_escort_3AI(creature);
+    }
+};
+
+class npc_master_shang_xi_spirit : public CreatureScript
+{
+public:
+    npc_master_shang_xi_spirit() : CreatureScript("npc_master_shang_xi_spirit") { }
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        if (creature->isQuestGiver())
+            player->PrepareQuestMenu(creature->GetGUID());
+
+        if(player->hasQuest(31450))
+        {
+            QueryResult result = WorldDatabase.Query("SELECT text FROM creature_text WHERE entry = 560130");
+
+            if (!result)
+                return false;
+
+            std::string text;
+
+            do
+            {
+                Field* neutralFaction = result->Fetch();
+                text = neutralFaction[0].GetString();
+            } while (result->NextRow());
+
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, text , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        }
+
+        player->PlayerTalkClass->SendGossipMenu(724006, creature->GetGUID());
+
+        return true;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action)
+    {
+        player->PlayerTalkClass->ClearMenus();
+
+        switch (action)
+        {
+            case GOSSIP_ACTION_INFO_DEF + 1:
+            {
+                WorldPacket data(SMSG_SHOW_NEUTRAL_PLAYER_FACTION_SELECT_UI);
+                player->GetSession()->SendPacket(&data);
+            }
+            break;
+        }
+
+        player->PlayerTalkClass->SendCloseGossip();
+        return true;
+    }
+
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    {
+        if (quest->GetQuestId() == 31450)
+        {
+            creature->AI()->DoAction(ACTION_SAY);
+        }
+        return true;
+    }
+
+    struct npc_master_shang_xi_spiritAI : public ScriptedAI
+    {
+            npc_master_shang_xi_spiritAI(Creature* creature) : ScriptedAI(creature) {}
+
+            bool StartEvent;
+            uint32 Talk_1_Timer;
+            uint32 Talk_2_Timer;
+            uint32 Talk_3_Timer;
+            uint32 Talk_4_Timer;
+            uint32 Talk_5_Timer;
+            uint32 Talk_6_Timer;
+
+            void Reset()
+            {
+                StartEvent = false;
+                Talk_1_Timer = 1000;
+                Talk_2_Timer = 11000;
+                Talk_3_Timer = 21000;
+                Talk_4_Timer = 29000;
+                Talk_5_Timer = 37000;
+                Talk_6_Timer = 47000;
+            }
+
+            void DoAction(int32 const action)
+            {
+                switch (action)
+                {
+                    case ACTION_SAY:
+                        StartEvent = true;
+                        break;
+                }
+            }
+
+            void UpdateAI(const uint32 uiDiff)
+            {
+                if(StartEvent)
+                {
+                    if (Talk_1_Timer <= uiDiff)
+                    {
+                        Talk(0);
+                        Talk_1_Timer = 60000;
+                    }
+                    else Talk_1_Timer -= uiDiff;
+
+                    if (Talk_2_Timer <= uiDiff)
+                    {
+                        Talk(1);
+                        Talk_2_Timer = 60000;
+                    }
+                    else Talk_2_Timer -= uiDiff;
+
+                    if (Talk_3_Timer <= uiDiff)
+                    {
+                        Creature* aysa = me->FindNearestCreature(57721, 20.0f, true);
+                        if(aysa)
+                            aysa->AI()->Talk(0);
+
+                        Talk_3_Timer = 60000;
+                    }
+                    else Talk_3_Timer -= uiDiff;
+
+                    if (Talk_4_Timer <= uiDiff)
+                    {
+                        Talk(2);
+                        Talk_4_Timer = 60000;
+                    }
+                    else Talk_4_Timer -= uiDiff;
+
+                    if (Talk_5_Timer <= uiDiff)
+                    {
+                        Creature* ji = me->FindNearestCreature(57720, 20.0f, true);
+                        if(ji)
+                            ji->AI()->Talk(0);
+
+                        Talk_5_Timer = 60000;
+                    }
+                    else Talk_5_Timer -= uiDiff;
+
+                    if (Talk_6_Timer <= uiDiff)
+                    {
+                        Talk(3);
+                        Talk_4_Timer = 60000;
+                        Reset();
+                        StartEvent = false;
+                    }
+                    else Talk_6_Timer -= uiDiff;
+                }
+            }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_master_shang_xi_spiritAI(creature);
+    }
+};
+
 void AddSC_wandering_isle()
 {
-    new stalker_item_equiped();
-    new mob_jaomin_ro();
-    new mob_amberleaf_scamp29419();
-    new spell_summon_living_air();
-    new go_brazier_of_flickering_flames();
-    new npc_shang_xi_the_lesson_of_the_burning_scroll();
-    new gob_edict_of_temperance_the_lesson_of_the_burning_scroll();
-
     new at_huojin_monk_talk();
     new at_jaomin_ro_talk();
     new at_trainee_nim_talk();
@@ -5999,6 +6383,7 @@ void AddSC_wandering_isle()
     new at_7106_mongolfiere();
     new npc_first_quest_pandaren();	
     new npc_trainee();
+    new npc_zhi();
     new areatrigger_at_the_missing_driver();
     new npc_min_dimwind_pop();
     new npc_aysa_cloudsinger_pop();
@@ -6008,7 +6393,7 @@ void AddSC_wandering_isle()
     new npc_huo_escort();
     new npc_deng_child();
     new npc_cai_child();
-    new at_test_etang();
+    //new at_test_etang();
     new npc_balance_pole();
     new npc_balance_pole_finish();
     new npc_tushui_monk();
@@ -6065,4 +6450,14 @@ void AddSC_wandering_isle()
     new npc_aysa_attack_vordraka();
     new npc_aysa_boat();
     new npc_ji_boat();
+    new npc_trigger_healing_shen();
+    new npc_ji_healing_shen();
+    new npc_healer_shen_wreckage();
+    new npc_healer_shen();
+    new npc_wreckage();
+    new npc_deepscale_fleshripper();
+    new npc_korga_strongmane();
+    new npc_nourished_yak_escort_3();
+    new npc_delivery_cart_escort_3();
+    new npc_master_shang_xi_spirit();
 }
