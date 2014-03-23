@@ -32,6 +32,62 @@
 /********* AreaTrigger *********/
 /*******************************/
 
+enum AreaTriggerPool
+{
+    SPELL_FROG_CURSE    = 102938
+};
+
+typedef std::map<Player*, uint32> InsideAreaTriggerCheckMap ;
+
+class at_meditation_pool : public AreaTriggerScript
+{
+public :
+    at_meditation_pool() : AreaTriggerScript("at_meditation_pool")
+    {
+        check.clear();
+    }
+
+    bool OnTrigger(Player *player, const AreaTriggerEntry *areaTrigger)
+    {
+        /*
+         * First, check if the player has been or not registered in the map
+         * If not add it, otherwise, do some checks
+         */
+        InsideAreaTriggerCheckMap::iterator iter = check.find(player);
+        if(iter == check.end())
+        {
+            /*
+             * Player is not yet registered in the checker
+             * We must add it
+             */
+            check[player] = areaTrigger->id ;
+            player->CastSpell(player, SPELL_FROG_CURSE, true);
+        }
+        else
+        {
+            /*
+             * We have many cases to handle here : did the player exited the actual area ?
+             * Did it triggered the other, while inside the actual ?
+             */
+
+            // Player leaved the areaTrigger
+            if(areaTrigger->id == iter->second)
+            {
+                check.erase(iter);
+                player->RemoveAurasDueToSpell(SPELL_FROG_CURSE);
+            }
+            // Player switched AreaTrigger
+            else
+            {
+                check[player] = areaTrigger->id ;
+            }
+        }
+    }
+
+private :
+    InsideAreaTriggerCheckMap check ;
+};
+
 enum Area7736
 {
     NPC_HUOJIN_MONK             = 60176,
@@ -6369,6 +6425,7 @@ public:
 
 void AddSC_wandering_isle()
 {
+    new at_meditation_pool();
     new at_huojin_monk_talk();
     new at_jaomin_ro_talk();
     new at_trainee_nim_talk();
