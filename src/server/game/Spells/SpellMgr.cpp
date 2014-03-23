@@ -3934,10 +3934,10 @@ void SpellMgr::LoadSpellInfoCorrections()
 					spellInfo->Effects[EFFECT_1].BasePoints = 0;
 					spellInfo->Effects[EFFECT_1].MiscValue = 0;
 					break;
-				case 114465:
+                case 114465: // Terre Brulée Korloff
 					spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_1_YARD);
 					break ;
-                case 115290:
+                case 115290: // Tombe d'esprit Thalnos
                     spellInfo->Effects[EFFECT_1].Effect = NULL;
                     break ;
 				case 114020: // Percing Throw (Scarlet Halls)

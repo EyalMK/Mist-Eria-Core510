@@ -1841,8 +1841,7 @@ public:
                     {
                         if (passenger->GetTypeId() == TYPEID_PLAYER)
                         {
-							me->GetVehicleKit()->RemoveAllPassengers();
-							me->GetVehicleKit()->RemovePassenger(passenger);
+                            passenger->ExitVehicle();
                             passenger->GetMotionMaster()->MoveJump(935.44f, 3341.04f, 124.00f, 10, 10);
                         }
                     }
