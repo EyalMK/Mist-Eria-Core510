@@ -79,7 +79,7 @@ public :
             // Player switched AreaTrigger
             else
             {
-                check[player] = areaTrigger->id ;
+                 iter->second = areaTrigger->id ;
             }
         }
         return true;
