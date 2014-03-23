@@ -1069,6 +1069,7 @@ bool Aura::CanBeSaved() const
         case 44413: // Incanter's Absorption
         case 40075: // Fel Flak Fire
         case 55849: // Power Spark
+        case 102938: // Curse of the Frog
             return false;
             break;
     }
