@@ -82,6 +82,7 @@ public :
                 check[player] = areaTrigger->id ;
             }
         }
+        return true;
     }
 
 private :
