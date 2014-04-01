@@ -2928,9 +2928,9 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
         m_AchievementCriteriaListByAchievement[criteria->achievement].push_back(criteria);
 
         if (achievement && achievement->flags & ACHIEVEMENT_FLAG_GUILD)
-            ++guildCriterias, m_GuildAchievementCriteriasByType[criteria->type].push_back(criteria);
+            ++guildCriterias, m_AchievementCriteriasByType[ACHIEVEMENT_TYPE_GUILD][criteria->type].push_back(criteria);
         else
-            ++criterias, m_AchievementCriteriasByType[criteria->type].push_back(criteria);
+            ++criterias, m_AchievementCriteriasByType[ACHIEVEMENT_TYPE_CHARACTER][criteria->type].push_back(criteria);
 
         if (criteria->timeLimit)
             m_AchievementCriteriasByTimedType[criteria->timedCriteriaStartType].push_back(criteria);

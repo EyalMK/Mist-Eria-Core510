@@ -82,6 +82,14 @@ enum ProgressType
     PROGRESS_HIGHEST
 };
 
+enum AchievementType
+{
+    ACHIEVEMENT_TYPE_CHARACTER = 0,
+    ACHIEVEMENT_TYPE_GUILD = 1,
+};
+
+#define ACHIEVEMENT_TYPE_TOTAL 2
+
 template<class T>
 class AchievementMgr
 {
@@ -143,7 +151,7 @@ class AchievementGlobalMgr
 
         AchievementCriteriaEntryList const& GetAchievementCriteriaByType(AchievementCriteriaTypes type, bool guild = false) const
         {
-            return guild ? m_GuildAchievementCriteriasByType[type] : m_AchievementCriteriasByType[type];
+            return guild ? m_AchievementCriteriasByType[ACHIEVEMENT_TYPE_GUILD][type] : m_AchievementCriteriasByType[ACHIEVEMENT_TYPE_CHARACTER][type];
         }
 
         AchievementCriteriaEntryList const& GetTimedAchievementCriteriaByType(AchievementCriteriaTimedTypes type) const
@@ -213,8 +221,9 @@ class AchievementGlobalMgr
         AchievementCriteriaEntry const* GetAchievementCriteria(uint32 achievementId) const;
     private:
         // store achievement criterias by type to speed up lookup
-        AchievementCriteriaEntryList m_AchievementCriteriasByType[ACHIEVEMENT_CRITERIA_TYPE_TOTAL];
-        AchievementCriteriaEntryList m_GuildAchievementCriteriasByType[ACHIEVEMENT_CRITERIA_TYPE_TOTAL];
+
+
+        AchievementCriteriaEntryList m_AchievementCriteriasByType[ACHIEVEMENT_TYPE_TOTAL][ACHIEVEMENT_CRITERIA_TYPE_TOTAL];
 
         AchievementCriteriaEntryList m_AchievementCriteriasByTimedType[ACHIEVEMENT_TIMED_TYPE_MAX];
 
