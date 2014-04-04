@@ -20389,21 +20389,40 @@ void Player::_SaveSpells(SQLTransaction& trans)
     {
         if (itr->second->state == PLAYERSPELL_REMOVED || itr->second->state == PLAYERSPELL_CHANGED)
         {
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL_BY_SPELL);
-            stmt->setUInt32(0, itr->first);
-            stmt->setUInt32(1, GetGUIDLow());
-            trans->Append(stmt);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+            if (spellInfo->AttributesEx6 & SPELL_ATTR6_UNK17) {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ACC_SPELL_BY_SPELL);
+                stmt->setUInt32(0, itr->first);
+                stmt->setUInt32(1, GetSession()->GetAccountId());
+                trans->Append(stmt);
+            } else {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL_BY_SPELL);
+                stmt->setUInt32(0, itr->first);
+                stmt->setUInt32(1, GetGUIDLow());
+                trans->Append(stmt);
+            }
         }
 
         // add only changed/new not dependent spells
         if (!itr->second->dependent && (itr->second->state == PLAYERSPELL_NEW || itr->second->state == PLAYERSPELL_CHANGED))
         {
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_SPELL);
-            stmt->setUInt32(0, GetGUIDLow());
-            stmt->setUInt32(1, itr->first);
-            stmt->setBool(2, itr->second->active);
-            stmt->setBool(3, itr->second->disabled);
-            trans->Append(stmt);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+            if (spellInfo->AttributesEx6 & SPELL_ATTR6_UNK17) {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ACC_SPELL);
+                stmt->setUInt32(0, GetSession()->GetAccountId());
+                stmt->setUInt32(1, itr->first);
+                stmt->setBool(2, itr->second->active);
+                stmt->setBool(3, itr->second->disabled);
+                trans->Append(stmt);
+            } else {
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_SPELL);
+                stmt->setUInt32(0, GetGUIDLow());
+                stmt->setUInt32(1, itr->first);
+                stmt->setBool(2, itr->second->active);
+                stmt->setBool(3, itr->second->disabled);
+                trans->Append(stmt);
+            }
+
         }
 
         if (itr->second->state == PLAYERSPELL_REMOVED)
