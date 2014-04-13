@@ -813,7 +813,7 @@ void WorldSession::HandleRequestPvpOptions(WorldPacket& /*recvData*/)
     /// @Todo: perfome research in this case
     WorldPacket data(SMSG_PVP_OPTIONS_ENABLED, 1);
     data.WriteBit(1);
-    data.WriteBit(1);       // WargamesEnabled
+    data.WriteBit(0);       // WargamesEnabled
     data.WriteBit(1);
     data.WriteBit(1);       // RatedBGsEnabled
     data.WriteBit(1);       // RatedArenasEnabled
