@@ -167,6 +167,8 @@ void SpyMgrGlobal::AddBlackListedWord(std::string word)
 
     m_blackListedWords.push_back(word);
 
+    LoginDatabase.EscapeString(word);
+
     LoginDatabase.PQuery("INSERT INTO word_blacklist(word) VALUE ('%s')", word.c_str());
 }
 

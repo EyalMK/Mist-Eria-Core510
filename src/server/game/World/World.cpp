@@ -1866,7 +1866,7 @@ void World::SetInitialWorldSettings()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Calculate next currency reset time...");
     InitCurrencyResetTime();
 
-    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Initializing PRISM...");
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Initializing blacklisted word...");
     sSpyMgr->LoadBlackListedWords();
 
     LoadCharacterNameData();
