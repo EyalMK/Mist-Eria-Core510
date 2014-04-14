@@ -85,6 +85,7 @@
 #include "SpellLearn.h"
 #include "MasteryMgr.h"
 #include "SpyMgr.h"
+#include "BrawlersGuildMgr.h"
 
 ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
