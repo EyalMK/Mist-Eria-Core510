@@ -145,7 +145,7 @@ BrawlersGuildMgr::~BrawlersGuildMgr()
 void BrawlersGuildMgr::Update(uint32 diff)
 {
     for(uint8 i=0; i<MAX_BRAWLERS_GUILDS; ++i)
-        guilds.Update(diff);
+        guilds[i].Update(diff);
 }
 
 void BrawlersGuildMgr::AddPlayer(Player *player)
@@ -168,5 +168,5 @@ void BrawlersGuildMgr::RemovePlayer(Player *player)
 void BrawlersGuildMgr::RemovePlayer(uint64 guid)
 {
     for(uint8 i=0; i<MAX_BRAWLERS_GUILDS; ++i)
-        guilds.RemovePlayer(guid);
+        guilds[i].RemovePlayer(guid);
 }

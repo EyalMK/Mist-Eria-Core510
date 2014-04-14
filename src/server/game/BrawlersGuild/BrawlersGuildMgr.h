@@ -100,7 +100,9 @@ class BrawlersGuildMgr
         void Update(uint32 diff);
 
         void AddPlayer(Player *player);
+
         void RemovePlayer(Player *player);
+		void RemovePlayer(uint64 guid);
 
     private:
 
