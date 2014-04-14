@@ -13,7 +13,7 @@
 # weren't doing some -O3 psychooptimizations etc.
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-  add_definitions(-fno-delete-null-pointer-checks -std=c++11)
+  add_definitions(-fno-delete-null-pointer-checks)
 endif()
 
 if( SERVERS )
