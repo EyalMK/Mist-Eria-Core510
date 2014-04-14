@@ -32,6 +32,107 @@
 #include "Log.h"
 #include <vector>
 
+
+BrawlersGuild::BrawlersGuild()
+{
+
+}
+
+BrawlersGuild::~BrawlersGuild()
+{
+
+}
+
+void BrawlersGuild::Update(uint32 diff)
+{
+	bool needUpdateAura = !removeList.empty();
+
+    for(uint64 i : removeList)
+        waitList.remove(i);
+
+	if (needUpdateAura)
+		UpdateAllAuras();
+
+
+}
+
+void BrawlersGuild::AddPlayer(Player *player)
+{
+    if(!player)
+        return;
+
+    waitList.push_back(player->GetGUID());
+    UpdateAura(player, waitList.size());
+}
+
+void BrawlersGuild::RemovePlayer(Player *player)
+{
+    if(!player)
+        return;
+
+    RemovePlayer(player->GetGUID());
+}
+
+void BrawlersGuild::RemovePlayer(uint64 guid)
+{
+    removeList.push_back(guid);
+}
+
+void BrawlersGuild::UpdateAura(Player* player, uint32 rank)
+{
+	if (!player)
+		return;
+
+	if (player->HasAura(SPELL_QUEUED_FOR_BRAWL))
+	{
+		if (Aura* aura = player->GetAura(SPELL_QUEUED_FOR_BRAWL))
+			if (AuraEffect* eff = aura->GetEffect(0))
+				eff->SetAmount(rank);
+	}
+	else
+	{
+		int bp = rank;
+		player->CastCustomSpell(player, SPELL_QUEUED_FOR_BRAWL, &bp, NULL, NULL, true);
+	}
+}
+
+void BrawlersGuild::UpdateAllAuras()
+{
+	uint32 rank = 1;
+	for (uint64 guid : waitList)
+	{
+		if (Player *player = ObjectAccessor::FindPlayer(guid))
+		{
+			UpdateAura(player, rank);
+			++rank;
+		}
+		else
+			RemovePlayer(guid);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// BrawlersGuildMgr
+
 BrawlersGuildMgr::BrawlersGuildMgr()
 {
 
@@ -42,8 +143,31 @@ BrawlersGuildMgr::~BrawlersGuildMgr()
 
 }
 
-void BrawlersGuildMgr::Update()
+void BrawlersGuildMgr::Update(uint32 diff)
 {
+    for(uint8 i=0; i<MAX_BRAWLERS_GUILDS; ++i)
+        guilds.Update(diff);
+}
+
+void BrawlersGuildMgr::AddPlayer(Player *player)
+{
+    if(!player)
+        return;
+
+    guilds[player->GetTeamId()].AddPlayer(player);
 
 }
 
+void BrawlersGuildMgr::RemovePlayer(Player *player)
+{
+    if(!player)
+        return;
+
+    RemovePlayer(player->GetGUID());
+}
+
+void BrawlersGuildMgr::RemovePlayer(uint64 guid)
+{
+    for(uint8 i=0; i<MAX_BRAWLERS_GUILDS; ++i)
+        guilds.RemovePlayer(guid);
+}

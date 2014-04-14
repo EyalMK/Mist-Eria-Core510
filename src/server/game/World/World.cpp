@@ -1784,6 +1784,7 @@ void World::SetInitialWorldSettings()
     m_timers[WUPDATE_WEATHERS].SetInterval(1*IN_MILLISECONDS);
     m_timers[WUPDATE_AUCTIONS].SetInterval(MINUTE*IN_MILLISECONDS);
 	m_timers[WUPDATE_BLACKMARKET].SetInterval(MINUTE*IN_MILLISECONDS);
+    m_timers[WUPDATE_BRAWLERSGUILD].SetInterval(1*IN_MILLISECONDS);
     m_timers[WUPDATE_UPTIME].SetInterval(m_int_configs[CONFIG_UPTIME_UPDATE]*MINUTE*IN_MILLISECONDS);
                                                             //Update "uptime" table based on configuration entry in minutes.
     m_timers[WUPDATE_CORPSES].SetInterval(20 * MINUTE * IN_MILLISECONDS);
@@ -2072,6 +2073,13 @@ void World::Update(uint32 diff)
     {
         m_timers[WUPDATE_BLACKMARKET].Reset();
         sBlackMarketMgr->Update();
+    }
+
+    // Update BrawlersGuild
+    if (m_timers[WUPDATE_BRAWLERSGUILD].Passed())
+    {
+        m_timers[WUPDATE_BRAWLERSGUILD].Reset();
+        sBrawlersGuildMgr->Update(uint32(m_timers[WUPDATE_BRAWLERSGUILD].GetInterval()));
     }
 
     /// <li> Handle session updates when the timer has passed
