@@ -2,13 +2,6 @@
 #include "ScriptPCH.h"
 #include "BrawlersGuildMgr.h"
 
-enum Spells
-{
-	/* Bizmo's Brawlup Bouncer */
-	SPELL_QUEUED_FOR_BRAWL		= 132639,
-    SPELL_ARENA_TELEPORTATION	= 105315
-};
-
 enum Events
 {
 	/* Bizmo */

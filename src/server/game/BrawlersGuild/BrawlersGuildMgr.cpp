@@ -47,12 +47,11 @@ void BrawlersGuild::Update(uint32 diff)
 {
 	bool needUpdateAura = !removeList.empty();
 
-    for(uint64 i : removeList)
-        waitList.remove(i);
+	for(BrawlersList::iterator it = removeList.begin(); it != removeList.end(); it++)
+		 waitList.remove(*it);
 
 	if (needUpdateAura)
 		UpdateAllAuras();
-
 
 }
 
@@ -99,15 +98,15 @@ void BrawlersGuild::UpdateAura(Player* player, uint32 rank)
 void BrawlersGuild::UpdateAllAuras()
 {
 	uint32 rank = 1;
-	for (uint64 guid : waitList)
+	for(BrawlersList::iterator it = waitList.begin(); it != waitList.end(); it++)
 	{
-		if (Player *player = ObjectAccessor::FindPlayer(guid))
+		if (Player *player = ObjectAccessor::FindPlayer(*it))
 		{
 			UpdateAura(player, rank);
 			++rank;
 		}
 		else
-			RemovePlayer(guid);
+			RemovePlayer(*it);
 	}
 }
 
