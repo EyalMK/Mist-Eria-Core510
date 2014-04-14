@@ -23596,6 +23596,16 @@ void Player::SendInitialPacketsAfterAddToMap()
 
     GetSession()->SendPacket(&pets);
 
+    WorldPacket pvpOptions(SMSG_PVP_OPTIONS_ENABLED, 1);
+    pvpOptions.WriteBit(1);
+    pvpOptions.WriteBit(1);       // WargamesEnabled
+    pvpOptions.WriteBit(1);
+    pvpOptions.WriteBit(1);       // RatedBGsEnabled
+    pvpOptions.WriteBit(1);       // RatedArenasEnabled
+
+    pvpOptions.FlushBits();
+
+    GetSession()->SendPacket(&pvpOptions);
 }
 
 void Player::SendUpdateToOutOfRangeGroupMembers()
