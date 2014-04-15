@@ -32,6 +32,12 @@
 #include "Log.h"
 #include <vector>
 
+float BrawlersTeleportLocations[MAX_BRAWLERS_GUILDS][MAX_TELEPORTS][3] =
+{
+	{ { -121.f, 2499.f, -57.f }, { -89.f, 2476.f, -43.f } },
+	{ { 2032.f, -4753.f, 87.f }, { 2062.f, 4547.f, 87.f } }
+};
+
 
 BrawlersGuild::BrawlersGuild()
 {
