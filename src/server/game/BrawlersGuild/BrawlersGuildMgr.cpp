@@ -20,17 +20,13 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "World.h"
-#include "WorldPacket.h"
 #include "WorldSession.h"
 #include "DatabaseEnv.h"
-#include "DBCStores.h"
 #include "ScriptMgr.h"
 #include "AccountMgr.h"
 #include "BrawlersGuildMgr.h"
 #include "Item.h"
-#include "Language.h"
-#include "Log.h"
-#include <vector>
+#include "Chat.h"
 
 float BrawlersTeleportLocations[MAX_BRAWLERS_GUILDS][MAX_TELEPORTS][3] =
 {
@@ -88,17 +84,17 @@ void BrawlersGuild::UpdateAura(Player* player, uint32 rank)
 	if (!player)
 		return;
 
-	if (player->HasAura(SPELL_QUEUED_FOR_BRAWL))
-	{
-		if (Aura* aura = player->GetAura(SPELL_QUEUED_FOR_BRAWL))
-			if (AuraEffect* eff = aura->GetEffect(1))
-				eff->SetAmount(rank);
-	}
-	else
-	{
-		int bp = rank;
-		player->CastCustomSpell(player, SPELL_QUEUED_FOR_BRAWL, &bp, &bp, &bp, true);
-	}
+	if (!player->HasAura(SPELL_QUEUED_FOR_BRAWL))
+		player->CastSpell(player, SPELL_QUEUED_FOR_BRAWL, true);
+
+	if (Aura* aura = player->GetAura(SPELL_QUEUED_FOR_BRAWL))
+		if (AuraEffect* eff = aura->GetEffect(0))
+			eff->SetAmount(rank);
+
+	std::stringstream ss;
+	ss << "rang : " << rank;
+
+	ChatHandler(player->GetSession()).PSendSysMessage(ss.str().c_str());
 }
 
 void BrawlersGuild::UpdateAllAuras()
