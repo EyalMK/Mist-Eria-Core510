@@ -55,7 +55,7 @@ public:
 			if (!player->HasAura(SPELL_QUEUED_FOR_BRAWL))
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_QUEUE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
-			player->PlayerTalkClass->SendGossipMenu(40040, creature->GetGUID());
+			player->PlayerTalkClass->SendGossipMenu(player->GetGossipTextId(creature), creature->GetGUID());
 		}
 
 		return true;
