@@ -53,6 +53,7 @@ void BrawlersGuild::Update(uint32 diff)
 
 	for(BrawlersList::iterator it = removeList.begin(); it != removeList.end(); it++)
 		 waitList.remove(*it);
+	removeList.clear();
 
 	if (needUpdateAura)
 		UpdateAllAuras();
