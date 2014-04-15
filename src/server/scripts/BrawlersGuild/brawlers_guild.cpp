@@ -75,11 +75,6 @@ public:
 				sBrawlersGuildMgr->AddPlayer(player);
 				player->CLOSE_GOSSIP_MENU();
 			}
-
-			if (Aura* aura = player->GetAura(SPELL_QUEUED_FOR_BRAWL))
-				aura->SetCharges(2);
-
-
 		}
 
 		return true;

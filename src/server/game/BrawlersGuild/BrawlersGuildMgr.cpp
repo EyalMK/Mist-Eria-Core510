@@ -91,13 +91,13 @@ void BrawlersGuild::UpdateAura(Player* player, uint32 rank)
 	if (player->HasAura(SPELL_QUEUED_FOR_BRAWL))
 	{
 		if (Aura* aura = player->GetAura(SPELL_QUEUED_FOR_BRAWL))
-			if (AuraEffect* eff = aura->GetEffect(0))
+			if (AuraEffect* eff = aura->GetEffect(1))
 				eff->SetAmount(rank);
 	}
 	else
 	{
 		int bp = rank;
-		player->CastCustomSpell(player, SPELL_QUEUED_FOR_BRAWL, &bp, NULL, NULL, true);
+		player->CastCustomSpell(player, SPELL_QUEUED_FOR_BRAWL, &bp, &bp, &bp, true);
 	}
 }
 
