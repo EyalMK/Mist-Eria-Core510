@@ -48,38 +48,38 @@ class npc_brawlers_guild_queue : public CreatureScript
 public:
     npc_brawlers_guild_queue() : CreatureScript("npc_brawlers_guild_queue") { }
 
+	bool OnGossipHello(Player* player, Creature* creature)
+	{
+		if (player)
+		{
+			if (!player->HasAura(SPELL_QUEUED_FOR_BRAWL))
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_QUEUE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+			player->PlayerTalkClass->SendGossipMenu(40040, creature->GetGUID());
+		}
+
+		return true;
+	}
+
+	bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+	{
+		if (player)
+		{
+			player->PlayerTalkClass->ClearMenus();
+
+			if (action == GOSSIP_ACTION_INFO_DEF + 1)
+			{
+				sBrawlersGuildMgr->AddPlayer(player);
+				player->CLOSE_GOSSIP_MENU();
+			}
+		}
+
+		return true;
+	}
+
     struct npc_brawlers_guild_queueAI : public ScriptedAI
     {
         npc_brawlers_guild_queueAI(Creature* creature) : ScriptedAI(creature) {}
-
-		bool OnGossipHello(Player* player, Creature* creature)
-        {
-			if (player)
-			{
-				if (!player->HasAura(SPELL_QUEUED_FOR_BRAWL))
-					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_QUEUE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-
-				player->PlayerTalkClass->SendGossipMenu(40040, creature->GetGUID());
-			}
-
-            return true;
-        }
-
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
-        {
-			if (player)
-			{
-				player->PlayerTalkClass->ClearMenus();
-
-				if (action == GOSSIP_ACTION_INFO_DEF+1)
-				{
-					sBrawlersGuildMgr->AddPlayer(player);
-					player->CLOSE_GOSSIP_MENU();
-				}
-			}
-
-            return true;
-        }
 
         void Reset()
         {
