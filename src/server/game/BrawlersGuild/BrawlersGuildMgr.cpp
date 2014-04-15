@@ -37,7 +37,7 @@ float BrawlersTeleportLocations[MAX_BRAWLERS_GUILDS][MAX_TELEPORTS][3] =
 
 BrawlersGuild::BrawlersGuild()
 {
-
+	brawlstate = BRAWL_STATE_WAITING;
 }
 
 BrawlersGuild::~BrawlersGuild()
@@ -47,6 +47,8 @@ BrawlersGuild::~BrawlersGuild()
 
 void BrawlersGuild::Update(uint32 diff)
 {
+	CheckDisconectedPlayers();
+
 	bool needUpdateAura = !removeList.empty();
 
 	for(BrawlersList::iterator it = removeList.begin(); it != removeList.end(); it++)
@@ -54,6 +56,8 @@ void BrawlersGuild::Update(uint32 diff)
 
 	if (needUpdateAura)
 		UpdateAllAuras();
+
+
 
 }
 
@@ -112,8 +116,40 @@ void BrawlersGuild::UpdateAllAuras()
 	}
 }
 
+void BrawlersGuild::CheckDisconectedPlayers()
+{
+	for (BrawlersList::iterator it = waitList.begin(); it != waitList.end(); it++)
+		if (!ObjectAccessor::FindPlayer(*it))
+			RemovePlayer(*it);
+}
 
 
+void BrawlersGuild::UpdateBrawl(uint32 diff)
+{
+	switch (brawlstate)
+	{
+		case BRAWL_STATE_WAITING:
+		{
+			
+			break;
+		}
+
+		case BRAWL_STATE_COMBAT:
+		{
+
+			break;
+		}
+
+		case BRAWL_STATE_TRANSITION:
+		{
+
+			break;
+		}
+
+		default:
+			break;
+	}
+}
 
 
 

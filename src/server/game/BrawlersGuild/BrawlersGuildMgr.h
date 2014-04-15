@@ -49,9 +49,14 @@ enum BrawlersTeleports
     MAX_TELEPORTS
 };
 
+enum BrawlersStates
+{
+	BRAWL_STATE_WAITING = 0,
+	BRAWL_STATE_COMBAT,
+	BRAWL_STATE_TRANSITION
+};
+
 #define BrawlersList std::list<uint64>
-
-
 
 class BrawlersGuild
 {
@@ -66,6 +71,9 @@ class BrawlersGuild
         void RemovePlayer(Player *player);
         void RemovePlayer(uint64 guid);
 
+		void CheckDisconectedPlayers();
+
+		void UpdateBrawl(uint32 diff);
 
     private:
 
@@ -74,6 +82,8 @@ class BrawlersGuild
 
         BrawlersList waitList;
         BrawlersList removeList;
+
+		BrawlersStates brawlstate;
 };
 
 
