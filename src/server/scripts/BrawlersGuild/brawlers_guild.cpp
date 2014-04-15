@@ -53,7 +53,14 @@ public:
 		if (player)
 		{
 			if (!player->HasAura(SPELL_QUEUED_FOR_BRAWL))
+			{
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_QUEUE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_QUEUE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_QUEUE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_QUEUE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_QUEUE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+			}
+				
 
 			player->PlayerTalkClass->SendGossipMenu(player->GetGossipTextId(creature), creature->GetGUID());
 		}
@@ -67,11 +74,30 @@ public:
 		{
 			player->PlayerTalkClass->ClearMenus();
 
+			int32 bp = 0;
+
+			/*
 			if (action == GOSSIP_ACTION_INFO_DEF + 1)
 			{
 				sBrawlersGuildMgr->AddPlayer(player);
 				player->CLOSE_GOSSIP_MENU();
 			}
+			*/
+
+			if (action == GOSSIP_ACTION_INFO_DEF + 1)
+				bp = 0;
+			if (action == GOSSIP_ACTION_INFO_DEF + 2)
+				bp = 1;
+			if (action == GOSSIP_ACTION_INFO_DEF + 3)
+				bp = 10;
+			if (action == GOSSIP_ACTION_INFO_DEF + 4)
+				bp = -1;
+			if (action == GOSSIP_ACTION_INFO_DEF + 5)
+				bp = 30;
+
+			player->CLOSE_GOSSIP_MENU();
+			player->CastCustomSpell(player, SPELL_QUEUED_FOR_BRAWL, &bp, NULL, NULL, true);
+
 		}
 
 		return true;
