@@ -98,9 +98,6 @@ void BrawlersGuild::UpdateAura(Player* player, uint32 rank)
 	{
 		int bp = rank;
 		player->CastCustomSpell(player, SPELL_QUEUED_FOR_BRAWL, &bp, NULL, NULL, true);
-		if (Aura* aura = player->GetAura(SPELL_QUEUED_FOR_BRAWL))
-			if (AuraEffect* eff = aura->GetEffect(0))
-				eff->SetAmount(rank);
 	}
 }
 
