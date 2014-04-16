@@ -53,8 +53,13 @@ void BrawlersGuild::Update(uint32 diff)
 
 	bool needUpdateAura = !removeList.empty();
 
-	for(BrawlersList::iterator it = removeList.begin(); it != removeList.end(); it++)
-		 waitList.remove(*it);
+	for (BrawlersList::iterator it = removeList.begin(); it != removeList.end(); it++)
+	{
+		waitList.remove(*it);
+		if (Player *player = ObjectAccessor::FindPlayer(*it))
+			player->RemoveAura(SPELL_QUEUED_FOR_BRAWL);
+	}
+		 
 	removeList.clear();
 
 	if (needUpdateAura)
@@ -182,6 +187,7 @@ void BrawlersGuild::PrepareCombat()
 	{
 		player->TeleportTo(BrawlersTeleportLocations[id][ARENA][0], BrawlersTeleportLocations[id][ARENA][1], BrawlersTeleportLocations[id][ARENA][2], BrawlersTeleportLocations[id][ARENA][3], 0.f);
 		player->CastSpell(player, SPELL_ARENA_TELEPORTATION, true);
+		player->RemoveAura(SPELL_QUEUED_FOR_BRAWL);
 		prepareCombatTimer = 5000;
 		brawlstate = BRAWL_STATE_PREPARE_COMBAT;
 	}
@@ -212,6 +218,7 @@ void BrawlersGuild::EndCombat(bool win)
 		player->TeleportTo(BrawlersTeleportLocations[id][OUTSIDE][0], BrawlersTeleportLocations[id][OUTSIDE][1], BrawlersTeleportLocations[id][OUTSIDE][2], BrawlersTeleportLocations[id][OUTSIDE][3], 0.f);
 		player->CastSpell(player, SPELL_ARENA_TELEPORTATION, true);
 		transitionTimer = 5000;
+
 
 		if (win)
 			RewardPlayer(player);
