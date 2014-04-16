@@ -593,7 +593,7 @@ enum Opcodes
     CMSG_VOID_SWAP_ITEM                               = 0x0B33,//16357
     CMSG_WARDEN_DATA                                  = 0x0796,//16357
     CMSG_WARGAME_ACCEPT                               = 0x00AA,//16357
-    CMSG_WARGAME_START                                = 0x1533,
+    CMSG_WARGAME_START                                = 0x053E,//16357
     CMSG_WHO                                          = 0x0D20,//16357
     CMSG_WHOIS                                        = 0x0E25,//16357
     CMSG_WORLD_STATE_UI_TIMER_UPDATE                  = 0x0780, //16357
