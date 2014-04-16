@@ -23538,6 +23538,9 @@ void Player::SendInitialPacketsAfterAddToMap()
     GetZoneAndAreaId(newzone, newarea);
     UpdateZone(newzone, newarea);                            // also call SendInitWorldStates();
 
+    if(!GetGroup() && HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER))
+        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
+
     ResetTimeSync();
     SendTimeSync();
 
