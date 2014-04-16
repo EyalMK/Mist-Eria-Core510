@@ -40,6 +40,7 @@ if(SCRIPTS)
   include(Northrend/CMakeLists.txt)
   include(Events/CMakeLists.txt)
   include(Pandaria/CMakeLists.txt)
+  include(BrawlersGuild/CMakeLists.txt)
 endif()
 
 GenerateProject("${CMAKE_CURRENT_SOURCE_DIR}" "${sources}")
@@ -85,6 +86,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/server/game/Battlegrounds/Zones
   ${CMAKE_SOURCE_DIR}/src/server/game/BattlePet
   ${CMAKE_SOURCE_DIR}/src/server/game/BlackMarket
+  ${CMAKE_SOURCE_DIR}/src/server/game/BrawlersGuild
   ${CMAKE_SOURCE_DIR}/src/server/game/Calendar
   ${CMAKE_SOURCE_DIR}/src/server/game/Chat
   ${CMAKE_SOURCE_DIR}/src/server/game/Chat/Channels

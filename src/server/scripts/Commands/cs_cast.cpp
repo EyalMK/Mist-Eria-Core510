@@ -42,6 +42,7 @@ public:
             { "self",           SEC_ADMINISTRATOR,  false, &HandleCastSelfCommand,              "", NULL },
             { "target",         SEC_ADMINISTRATOR,  false, &HandleCastTargetCommad,             "", NULL },
             { "dest",           SEC_ADMINISTRATOR,  false, &HandleCastDestCommand,              "", NULL },
+			{ "cust",			SEC_ADMINISTRATOR,  false, &HandleCastCustomCommand,			"", NULL },
             { "",               SEC_ADMINISTRATOR,  false, &HandleCastCommand,                  "", NULL },
             { NULL,             0,                  false, NULL,                                "", NULL }
         };
@@ -100,6 +101,58 @@ public:
 
         return true;
     }
+
+	static bool HandleCastCustomCommand(ChatHandler* handler, char const* args)
+	{
+		if (!*args)
+			return false;
+
+		Unit* target = handler->getSelectedUnit();
+		if (!target)
+		{
+			handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+			handler->SetSentErrorMessage(true);
+			return false;
+		}
+
+		// number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
+		uint32 spellId = handler->extractSpellIdFromLink((char*)args);
+		if (!spellId)
+			return false;
+
+		int32 bp = handler->extractSpellIdFromLink((char*)args);
+		if (!bp)
+			return false;
+
+		SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+		if (!spellInfo)
+		{
+			handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
+			handler->SetSentErrorMessage(true);
+			return false;
+		}
+
+		if (!SpellMgr::IsSpellValid(spellInfo, handler->GetSession()->GetPlayer()))
+		{
+			handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spellId);
+			handler->SetSentErrorMessage(true);
+			return false;
+		}
+
+		char* triggeredStr = strtok(NULL, " ");
+		if (triggeredStr)
+		{
+			int l = strlen(triggeredStr);
+			if (strncmp(triggeredStr, "triggered", l) != 0)
+				return false;
+		}
+
+		bool triggered = (triggeredStr != NULL);
+
+		handler->GetSession()->GetPlayer()->CastCustomSpell(target, spellId, &bp, NULL, NULL, triggered);
+
+		return true;
+	}
 
     static bool HandleCastBackCommand(ChatHandler* handler, char const* args)
     {

@@ -25,9 +25,71 @@
 #include "DatabaseEnv.h"
 #include "DBCStructure.h"
 
-class Item;
 class Player;
-class WorldPacket;
+
+
+enum BrawlerSpells
+{
+	SPELL_QUEUED_FOR_BRAWL = 132639,
+	SPELL_ARENA_TELEPORTATION = 105315
+};
+
+
+enum BrawlersGuilds
+{
+    ALLIANCE_GUILD = 0,
+    HORDE_GUILD,
+    MAX_BRAWLERS_GUILDS
+};
+
+enum BrawlersTeleports
+{
+    ARENA = 0,
+    OUTSIDE,
+    MAX_TELEPORTS
+};
+
+enum BrawlersStates
+{
+	BRAWL_STATE_WAITING = 0,
+	BRAWL_STATE_COMBAT,
+	BRAWL_STATE_TRANSITION
+};
+
+#define BrawlersList std::list<uint64>
+
+class BrawlersGuild
+{
+    public:
+        BrawlersGuild();
+        ~BrawlersGuild();
+
+        void Update(uint32 diff);
+
+        void AddPlayer(Player *player);
+
+        void RemovePlayer(Player *player);
+        void RemovePlayer(uint64 guid);
+
+		void CheckDisconectedPlayers();
+
+		void UpdateBrawl(uint32 diff);
+
+    private:
+
+        void UpdateAura(Player* player, uint32 rank);
+		void UpdateAllAuras();
+
+        BrawlersList waitList;
+        BrawlersList removeList;
+
+		BrawlersStates brawlstate;
+};
+
+
+
+
+
 
 class BrawlersGuildMgr
 {
@@ -39,9 +101,16 @@ class BrawlersGuildMgr
 
 	public:
 
-        void Update();
+        void Update(uint32 diff);
+
+        void AddPlayer(Player *player);
+
+        void RemovePlayer(Player *player);
+		void RemovePlayer(uint64 guid);
 
     private:
+
+        BrawlersGuild guilds[MAX_BRAWLERS_GUILDS];
 		
 };
 
