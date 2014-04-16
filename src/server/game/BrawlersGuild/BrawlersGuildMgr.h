@@ -129,7 +129,7 @@ class BrawlersGuildMgr
 
     private:
 
-        BrawlersGuild guilds[MAX_BRAWLERS_GUILDS];
+        BrawlersGuild *guilds[MAX_BRAWLERS_GUILDS];
 		
 };
 

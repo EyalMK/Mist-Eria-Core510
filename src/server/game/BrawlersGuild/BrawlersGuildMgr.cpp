@@ -246,18 +246,20 @@ void BrawlersGuild::RewardPlayer(Player *player)
 
 BrawlersGuildMgr::BrawlersGuildMgr()
 {
-
+	guilds[ALLIANCE_GUILD] = new BrawlersGuild(ALLIANCE_GUILD);
+	guilds[HORDE_GUILD] = new BrawlersGuild(HORDE_GUILD);
 }
 
 BrawlersGuildMgr::~BrawlersGuildMgr()
 {
-
+	for (uint8 i; i < MAX_BRAWLERS_GUILDS; ++i)
+		delete guilds[i];
 }
 
 void BrawlersGuildMgr::Update(uint32 diff)
 {
     for(uint8 i=0; i<MAX_BRAWLERS_GUILDS; ++i)
-        guilds[i].Update(diff);
+        guilds[i]->Update(diff);
 }
 
 void BrawlersGuildMgr::AddPlayer(Player *player)
@@ -265,7 +267,7 @@ void BrawlersGuildMgr::AddPlayer(Player *player)
     if(!player)
         return;
 
-    guilds[player->GetTeamId()].AddPlayer(player);
+    guilds[player->GetTeamId()]->AddPlayer(player);
 
 }
 
@@ -280,5 +282,5 @@ void BrawlersGuildMgr::RemovePlayer(Player *player)
 void BrawlersGuildMgr::RemovePlayer(uint64 guid)
 {
     for(uint8 i=0; i<MAX_BRAWLERS_GUILDS; ++i)
-        guilds[i].RemovePlayer(guid);
+        guilds[i]->RemovePlayer(guid);
 }
