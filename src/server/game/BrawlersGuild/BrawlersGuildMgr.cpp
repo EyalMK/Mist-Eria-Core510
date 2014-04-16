@@ -28,16 +28,18 @@
 #include "Item.h"
 #include "Chat.h"
 
-float BrawlersTeleportLocations[MAX_BRAWLERS_GUILDS][MAX_TELEPORTS][3] =
+int32 BrawlersTeleportLocations[MAX_BRAWLERS_GUILDS][MAX_TELEPORTS][4] =
 {
-	{ { -121.f, 2499.f, -57.f }, { -89.f, 2476.f, -43.f } },
-	{ { 2032.f, -4753.f, 87.f }, { 2062.f, 4547.f, 87.f } }
+	{ { 369, -121, 2499, -57 }, { 369, -89, 2476, -43 } },
+	{ { 1043, 2032, -4753, 87 }, { 1043, 2062, 4547, 87 } }
 };
 
 
-BrawlersGuild::BrawlersGuild()
+BrawlersGuild::BrawlersGuild(uint32 _id)
 {
+	id = _id;
 	brawlstate = BRAWL_STATE_WAITING;
+	current = 0;
 }
 
 BrawlersGuild::~BrawlersGuild()
@@ -58,7 +60,7 @@ void BrawlersGuild::Update(uint32 diff)
 	if (needUpdateAura)
 		UpdateAllAuras();
 
-
+	UpdateBrawl(diff);
 
 }
 
@@ -131,19 +133,35 @@ void BrawlersGuild::UpdateBrawl(uint32 diff)
 	{
 		case BRAWL_STATE_WAITING:
 		{
-			
+			if (!waitList.empty())
+				PrepareCombat();
+			break;
+		}
+
+		case BRAWL_STATE_PREPARE_COMBAT:
+		{
+			if (prepareCombatTimer <= 0)
+				StartCombat();
+			else
+				prepareCombatTimer -= diff;
 			break;
 		}
 
 		case BRAWL_STATE_COMBAT:
 		{
-
+			if (combatTimer <= 0)
+				EndCombat(false);
+			else
+				combatTimer -= diff;
 			break;
 		}
 
 		case BRAWL_STATE_TRANSITION:
 		{
-
+			if (transitionTimer <= 0)
+			   brawlstate = BRAWL_STATE_WAITING;
+			else
+				transitionTimer -= diff;
 			break;
 		}
 
@@ -152,6 +170,61 @@ void BrawlersGuild::UpdateBrawl(uint32 diff)
 	}
 }
 
+void BrawlersGuild::PrepareCombat()
+{
+	if (waitList.empty())
+		return;
+
+	current = waitList.front();
+	RemovePlayer(current);
+
+	if (Player *player = ObjectAccessor::FindPlayer(current))
+	{
+		player->TeleportTo(BrawlersTeleportLocations[id][ARENA][0], BrawlersTeleportLocations[id][ARENA][1], BrawlersTeleportLocations[id][ARENA][2], BrawlersTeleportLocations[id][ARENA][3], 0.f);
+		player->CastSpell(player, SPELL_ARENA_TELEPORTATION, true);
+		prepareCombatTimer = 5000;
+		brawlstate = BRAWL_STATE_PREPARE_COMBAT;
+	}
+	else
+		return;
+}
+
+void BrawlersGuild::StartCombat()
+{
+	if (Player *player = ObjectAccessor::FindPlayer(current))
+	{
+		// Spawn Boss
+		combatTimer = 10000;
+		brawlstate = BRAWL_STATE_COMBAT;
+	}
+	else
+	{
+		EndCombat(false);
+		return;
+	}
+}
+
+void BrawlersGuild::EndCombat(bool win)
+{
+
+	if (Player *player = ObjectAccessor::FindPlayer(current))
+	{
+		player->TeleportTo(BrawlersTeleportLocations[id][OUTSIDE][0], BrawlersTeleportLocations[id][OUTSIDE][1], BrawlersTeleportLocations[id][OUTSIDE][2], BrawlersTeleportLocations[id][OUTSIDE][3], 0.f);
+		player->CastSpell(player, SPELL_ARENA_TELEPORTATION, true);
+		transitionTimer = 5000;
+
+		if (win)
+			RewardPlayer(player);
+	}
+
+	current = 0;
+	brawlstate = BRAWL_STATE_TRANSITION;
+}
+
+void BrawlersGuild::RewardPlayer(Player *player)
+{
+
+}
 
 
 
