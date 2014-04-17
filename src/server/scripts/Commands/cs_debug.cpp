@@ -32,6 +32,7 @@ EndScriptData */
 #include "GridNotifiersImpl.h"
 #include "GossipDef.h"
 #include "Language.h"
+#include "Group.h"
 
 #include <fstream>
 
@@ -95,6 +96,7 @@ public:
 			{ "questgiver",		SEC_MODERATOR,      false, &HandleDebugQuestGiverCommand,	   "", NULL },
             { "difficulty",		SEC_MODERATOR,      false, &HandleDebugDifficultyCommand,	   "", NULL },
             { "op32",		    SEC_MODERATOR,      false, &HandleDebugSendOpcodeUint32Command,"", NULL },
+            { "fakeGroup",      SEC_ADMINISTRATOR,  false, &HandleFakeGroupInvite,             "", NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
         };
         static ChatCommand debugSetCommandTable[] = 
@@ -1602,7 +1604,25 @@ public:
         return true;
     }
 
+    static bool HandleFakeGroupInvite(ChatHandler *handler, const char *args)
+    {
+        Player *pPlayer = handler->GetSession()->GetPlayer();
 
+        if(!pPlayer->GetGroup())
+        {
+            handler->PSendSysMessage("Vous etes deja en groupe");
+            return false;
+        }
+
+        Group *pGrp = new Group;
+
+        pGrp->AddLeaderInvite(pPlayer);
+
+        pGrp->Create(pPlayer);
+        pGrp->AddMember(pPlayer);
+
+        return true;
+    }
 
 };
 
