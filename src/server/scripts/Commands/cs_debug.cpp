@@ -1608,7 +1608,7 @@ public:
     {
         Player *pPlayer = handler->GetSession()->GetPlayer();
 
-        if(!pPlayer->GetGroup())
+        if(pPlayer->GetGroup())
         {
             handler->PSendSysMessage("Vous etes deja en groupe");
             return false;
