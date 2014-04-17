@@ -52,6 +52,7 @@ enum BrawlersTeleports
 enum BrawlersStates
 {
 	BRAWL_STATE_WAITING = 0,
+	BRAWL_STATE_PREPARE_COMBAT,
 	BRAWL_STATE_COMBAT,
 	BRAWL_STATE_TRANSITION
 };
@@ -61,7 +62,7 @@ enum BrawlersStates
 class BrawlersGuild
 {
     public:
-        BrawlersGuild();
+        BrawlersGuild(uint32 _id);
         ~BrawlersGuild();
 
         void Update(uint32 diff);
@@ -71,19 +72,37 @@ class BrawlersGuild
         void RemovePlayer(Player *player);
         void RemovePlayer(uint64 guid);
 
+		
+
+    private:
+
+		uint32 id;
+
+        void UpdateAura(Player* player, uint32 rank);
+		void UpdateAllAuras();
+
 		void CheckDisconectedPlayers();
 
 		void UpdateBrawl(uint32 diff);
 
-    private:
+		void PrepareCombat();
+		void StartCombat();
+		void EndCombat(bool win);
 
-        void UpdateAura(Player* player, uint32 rank);
-		void UpdateAllAuras();
+		void RewardPlayer(Player *player);
 
         BrawlersList waitList;
         BrawlersList removeList;
 
 		BrawlersStates brawlstate;
+
+
+		//Combat
+
+		uint64 current;
+		int32 prepareCombatTimer;
+		int32 combatTimer;
+		int32 transitionTimer;
 };
 
 
@@ -110,7 +129,7 @@ class BrawlersGuildMgr
 
     private:
 
-        BrawlersGuild guilds[MAX_BRAWLERS_GUILDS];
+        BrawlersGuild *guilds[MAX_BRAWLERS_GUILDS];
 		
 };
 
