@@ -887,7 +887,7 @@ void WorldSession::HandleStartWargame(WorldPacket &recvData)
     recvData.ReadByteSeq(targetGuid[4]);
 
     uint64 wargameData = static_cast<uint64>(data);
-    wargameData &= 0xFFFFFFFF;
+    wargameData &= 0xFFFFFF;
 
     uint32 memberCount = (wargameData >> 24) & 0x3F;
     uint32 bgId = wargameData & 0xFFFFFF;
