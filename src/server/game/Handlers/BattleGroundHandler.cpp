@@ -852,39 +852,39 @@ void WorldSession::HandleStartWargame(WorldPacket &recvData)
     ObjectGuid data; //Sent like a guid
     ObjectGuid targetGuid;
 
-    targetGuid[0] = recvData.ReadBit();
-    data[1] = recvData.ReadBit();
-    data[3] = recvData.ReadBit();
     data[0] = recvData.ReadBit();
-    targetGuid[3] = recvData.ReadBit();
-    targetGuid[2] = recvData.ReadBit();
-    targetGuid[7] = recvData.ReadBit();
-    data[5] = recvData.ReadBit();
     targetGuid[1] = recvData.ReadBit();
-    data[6] = recvData.ReadBit();
-    targetGuid[5] = recvData.ReadBit();
-    targetGuid[6] = recvData.ReadBit();
-    targetGuid[4] = recvData.ReadBit();
-    data[7] = recvData.ReadBit();
-    data[4] = recvData.ReadBit();
+    targetGuid[3] = recvData.ReadBit();
+    targetGuid[0] = recvData.ReadBit();
+    data[3] = recvData.ReadBit();
     data[2] = recvData.ReadBit();
+    data[7] = recvData.ReadBit();
+    targetGuid[5] = recvData.ReadBit();
+    data[1] = recvData.ReadBit();
+    targetGuid[6] = recvData.ReadBit();
+    data[5] = recvData.ReadBit();
+    data[6] = recvData.ReadBit();
+    data[4] = recvData.ReadBit();
+    targetGuid[7] = recvData.ReadBit();
+    targetGuid[4] = recvData.ReadBit();
+    targetGuid[2] = recvData.ReadBit();
 
-    recvData.ReadByteSeq(data[1]);
     recvData.ReadByteSeq(targetGuid[1]);
-    recvData.ReadByteSeq(data[3]);
-    recvData.ReadByteSeq(targetGuid[5]);
-    recvData.ReadByteSeq(data[7]);
-    recvData.ReadByteSeq(data[5]);
+    recvData.ReadByteSeq(data[1]);
     recvData.ReadByteSeq(targetGuid[3]);
-    recvData.ReadByteSeq(data[6]);
-    recvData.ReadByteSeq(targetGuid[6]);
-    recvData.ReadByteSeq(targetGuid[2]);
-    recvData.ReadByteSeq(data[0]);
-    recvData.ReadByteSeq(targetGuid[4]);
+    recvData.ReadByteSeq(data[5]);
     recvData.ReadByteSeq(targetGuid[7]);
+    recvData.ReadByteSeq(targetGuid[5]);
+    recvData.ReadByteSeq(data[3]);
+    recvData.ReadByteSeq(targetGuid[6]);
+    recvData.ReadByteSeq(data[6]);
     recvData.ReadByteSeq(data[2]);
     recvData.ReadByteSeq(targetGuid[0]);
     recvData.ReadByteSeq(data[4]);
+    recvData.ReadByteSeq(data[7]);
+    recvData.ReadByteSeq(targetGuid[2]);
+    recvData.ReadByteSeq(data[0]);
+    recvData.ReadByteSeq(targetGuid[4]);
 
     uint64 wargameData = static_cast<uint64>(data);
 
