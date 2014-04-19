@@ -901,7 +901,7 @@ void WorldSession::HandleStartWargame(WorldPacket &recvData)
     }
 
     uint64 wgResponseData = bgId & 0xFFFF;
-    wgResponseData <<= 48;
+    //wgResponseData <<= 48;
 
     ObjectGuid wgData = wgResponseData;
     ObjectGuid challengerGuid = _player->GetGUID();
