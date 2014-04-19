@@ -896,11 +896,12 @@ void WorldSession::HandleStartWargame(WorldPacket &recvData)
 
     if(!pPlayer)
     {
-        sLog->outInfo(LOG_FILTER_NETWORKIO, "Player not found", wargameData, memberCount, bgId);
+        sLog->outInfo(LOG_FILTER_NETWORKIO, "Player not found");
         return;
     }
 
     uint64 wgResponseData = bgId & 0xFFFF;
+    wgResponseData <<= 48;
 
     ObjectGuid wgData = wgResponseData;
     ObjectGuid challengerGuid = _player->GetGUID();
