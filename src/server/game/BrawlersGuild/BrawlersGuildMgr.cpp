@@ -34,6 +34,24 @@ int32 BrawlersTeleportLocations[MAX_BRAWLERS_GUILDS][MAX_TELEPORTS][4] =
 	{ { 1043, 2032, -4753, 87 }, { 1043, 2062, 4547, 87 } }
 };
 
+uint32 BrawlersBoss[MAX_BRAWLERS_RANK][BOSS_PER_RANK] =
+{
+	{ 67262, 67579, 68257, 67572 },
+	{ 68255, 67269, 67525, 68254 },
+	{ 67594, 67268, 68253, 68251 },
+	{ 67540, 68377, 67485, 67451 },
+	{ 67591, 67596, 68252, 67516 },
+	{ 68256, 67588, 68305, 68250 },
+	{ 67487, 67678, 67424, 67573 },
+	{ 70659, 70733, 70983, 70977 },
+	{ 70694, 70656, 70739, 70068 },
+	{ 67490, 67483, 67571, 67518 },
+};
+
+uint32 BrawlersFaction[MAX_BRAWLERS_GUILDS] =
+{
+	1419, 1374
+};
 
 BrawlersGuild::BrawlersGuild(uint32 _id)
 {
@@ -129,6 +147,9 @@ void BrawlersGuild::CheckDisconectedPlayers()
 	for (BrawlersList::iterator it = waitList.begin(); it != waitList.end(); it++)
 		if (!ObjectAccessor::FindPlayer(*it))
 			RemovePlayer(*it);
+
+		if (current && !!ObjectAccessor::FindPlayer(current))
+			EndCombat(false);
 }
 
 
@@ -230,7 +251,24 @@ void BrawlersGuild::EndCombat(bool win)
 
 void BrawlersGuild::RewardPlayer(Player *player)
 {
+	if (!player)
+		return;
 
+	player->AddItem(92718, 1);
+
+	uint32 rep = player->GetReputation(BrawlersFaction[player->GetTeamId()]);
+
+	rep += 250;
+	if (rep > MAX_BRAWLERS_REPUTATION)
+		rep = MAX_BRAWLERS_REPUTATION;
+
+	player->SetReputation(BrawlersFaction[player->GetTeamId()], rep);
+}
+
+void BrawlersGuild::BossReport(uint64 guid, bool win)
+{
+	if (current && current == guid)
+		EndCombat(win);
 }
 
 
@@ -290,4 +328,10 @@ void BrawlersGuildMgr::RemovePlayer(uint64 guid)
 {
     for(uint8 i=0; i<MAX_BRAWLERS_GUILDS; ++i)
         guilds[i]->RemovePlayer(guid);
+}
+
+void BrawlersGuildMgr::BossReport(uint64 guid, bool win)
+{
+	for (uint8 i = 0; i<MAX_BRAWLERS_GUILDS; ++i)
+		guilds[i]->BossReport(guid, win);
 }

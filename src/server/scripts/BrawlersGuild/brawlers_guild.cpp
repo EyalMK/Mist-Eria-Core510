@@ -1,6 +1,7 @@
 
 #include "ScriptPCH.h"
 #include "BrawlersGuildMgr.h"
+#include "AchievementMgr.h"
 
 enum Events
 {
@@ -196,9 +197,46 @@ public:
 };
 
 
+class brawl_invitation_item : public ItemScript
+{
+public:
+
+	brawl_invitation_item()
+		: ItemScript("brawl_invitation_item")
+	{
+	}
+
+	bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/)
+	{
+		if (!player || !item)
+			return false;
+
+		if (player->HasAchieved(ACHIEVEMENT_FIRST_RULE_A) || player->HasAchieved(ACHIEVEMENT_FIRST_RULE_H))
+			return false;
+
+		if (player->GetTeamId() == 0) // Alliance
+		{
+			if (AchievementEntry const* achievementEntry = sAchievementMgr->GetAchievement(ACHIEVEMENT_FIRST_RULE_A))
+				player->CompletedAchievement(achievementEntry);
+			player->CastSpell(player, SPELL_ALLIANCE_SOUND, true);
+		}
+		else // Horde
+		{
+			if (AchievementEntry const* achievementEntry = sAchievementMgr->GetAchievement(ACHIEVEMENT_FIRST_RULE_H))
+				player->CompletedAchievement(achievementEntry);
+			player->CastSpell(player, SPELL_HORDE_SOUND, true);
+		}
+
+		player->DestroyItemCount(item->GetEntry(), 1, true);
+		return true;
+	}
+};
+
+
 void AddSC_the_brawlers_guild()
 {
     new npc_brawlers_guild_queue();
     new npc_bizmo();
 	new spell_queued_for_brawl();
+	new brawl_invitation_item();
 }

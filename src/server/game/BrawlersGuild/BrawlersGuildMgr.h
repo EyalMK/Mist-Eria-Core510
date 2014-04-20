@@ -28,12 +28,19 @@
 class Player;
 
 
-enum BrawlerSpells
+enum BrawlersSpells
 {
 	SPELL_QUEUED_FOR_BRAWL = 132639,
-	SPELL_ARENA_TELEPORTATION = 105315
+	SPELL_ARENA_TELEPORTATION = 105315,
+	SPELL_ALLIANCE_SOUND = 136144,
+	SPELL_HORDE_SOUND = 136143
 };
 
+enum BrawlersAchievement
+{
+	ACHIEVEMENT_FIRST_RULE_A = 7947,
+	ACHIEVEMENT_FIRST_RULE_H = 7948
+};
 
 enum BrawlersGuilds
 {
@@ -57,6 +64,10 @@ enum BrawlersStates
 	BRAWL_STATE_TRANSITION
 };
 
+#define MAX_BRAWLERS_RANK 10
+#define BOSS_PER_RANK 4
+#define MAX_BRAWLERS_REPUTATION 10000
+
 #define BrawlersList std::list<uint64>
 
 class BrawlersGuild
@@ -72,7 +83,7 @@ class BrawlersGuild
         void RemovePlayer(Player *player);
         void RemovePlayer(uint64 guid);
 
-		
+		void BossReport(uint64 guid, bool win);
 
     private:
 
@@ -126,6 +137,8 @@ class BrawlersGuildMgr
 
         void RemovePlayer(Player *player);
 		void RemovePlayer(uint64 guid);
+
+		void BossReport(uint64 guid, bool win);
 
     private:
 
