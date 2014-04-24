@@ -15,6 +15,7 @@
 #include "Pet.h"
 #include "SpellScript.h"
 #include "Spell.h"
+#include "BrawlersGuildMgr.h"
 
 /************************/
 /****** BASTONNEUR ******/
@@ -44,6 +45,18 @@ public:
         {
             powerfulBiteTimer = 3000;
             chompTimer = 6000;
+        }
+
+        void KilledUnit(Unit* unit)
+        {
+            if(Player* player = unit->ToPlayer())
+                sBrawlersGuildMgr->BossReport(player->GetGUID(), false);
+        }
+
+        void JustDied(Unit* killer)
+        {
+            if(Player* player = killer->ToPlayer())
+                sBrawlersGuildMgr->BossReport(player->GetGUID(), true);
         }
 
         void UpdateAI(uint32 diff)
@@ -124,6 +137,18 @@ public:
             volatileflamesTimer = 1000;
             lavaburstTimer = 4000;
             firelineTimer = 10000;
+        }
+
+        void KilledUnit(Unit* unit)
+        {
+            if(Player* player = unit->ToPlayer())
+                sBrawlersGuildMgr->BossReport(player->GetGUID(), false);
+        }
+
+        void JustDied(Unit* killer)
+        {
+            if(Player* player = killer->ToPlayer())
+                sBrawlersGuildMgr->BossReport(player->GetGUID(), true);
         }
 
         void UpdateAI(uint32 diff)
