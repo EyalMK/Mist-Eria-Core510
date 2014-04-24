@@ -71,12 +71,7 @@ void BrawlersGuild::Update(uint32 diff)
 
 	bool needUpdateAura = !removeList.empty();
 
-	for (BrawlersList::iterator it = removeList.begin(); it != removeList.end(); it++)
-	{
-		waitList.remove(*it);
-		if (Player *player = ObjectAccessor::FindPlayer(*it))
-			player->RemoveAura(SPELL_QUEUED_FOR_BRAWL);
-	}
+	RemovePlayers();
 		 
 	removeList.clear();
 
@@ -94,6 +89,20 @@ void BrawlersGuild::AddPlayer(Player *player)
 
     waitList.push_back(player->GetGUID());
     UpdateAura(player, waitList.size());
+}
+
+void BrawlersGuild::RemovePlayers()
+{
+	for (BrawlersList::iterator it = removeList.begin(); it != removeList.end(); it++)
+	{
+		waitList.remove(*it);
+		if (Player *player = ObjectAccessor::FindPlayer(*it))
+		{
+			player->RemoveAura(SPELL_QUEUED_FOR_BRAWL);
+			ChatHandler(player->GetSession()).PSendSysMessage("Vous n'etes plus dans la file pour une baston.");
+		}
+			
+	}
 }
 
 void BrawlersGuild::RemovePlayer(Player *player)
@@ -121,10 +130,12 @@ void BrawlersGuild::UpdateAura(Player* player, uint32 rank)
 		if (AuraEffect* eff = aura->GetEffect(0))
 			eff->SetAmount(rank);
 
-	std::stringstream ss;
-	ss << "rang : " << rank;
-
-	ChatHandler(player->GetSession()).PSendSysMessage(ss.str().c_str());
+	if (rank <= 3 || rank == waitList.size())
+	{
+		std::stringstream ss;
+		ss << "Placement dans la file d'attente pour un combat : " << rank;
+		ChatHandler(player->GetSession()).PSendSysMessage(ss.str().c_str());
+	}
 }
 
 void BrawlersGuild::UpdateAllAuras()

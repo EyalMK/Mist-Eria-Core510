@@ -196,7 +196,7 @@ public:
 	}
 };
 
-
+// 93228, 93195, 93194
 class brawl_invitation_item : public ItemScript
 {
 public:

@@ -93,6 +93,7 @@ class BrawlersGuild
 		void UpdateAllAuras();
 
 		void CheckDisconectedPlayers();
+		void RemovePlayers();
 
 		void UpdateBrawl(uint32 diff);
 
