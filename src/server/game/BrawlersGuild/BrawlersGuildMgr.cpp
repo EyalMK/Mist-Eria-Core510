@@ -266,7 +266,7 @@ void BrawlersGuild::EndCombat(bool win)
 uint32 BrawlersGuild::GetPlayerRank(Player *player)
 {
 	if (!player)
-		return;
+		return 0;
 
 	return player->GetReputation(BrawlersFaction[player->GetTeamId()]) / (REPUTATION_PER_RANK*BOSS_PER_RANK);
 }
@@ -274,7 +274,7 @@ uint32 BrawlersGuild::GetPlayerRank(Player *player)
 uint32 BrawlersGuild::GetPlayerSubRank(Player *player)
 {
 	if (!player)
-		return;
+		return 0;
 
 	return (player->GetReputation(BrawlersFaction[player->GetTeamId()]) / REPUTATION_PER_RANK) % BOSS_PER_RANK;
 }
@@ -282,7 +282,7 @@ uint32 BrawlersGuild::GetPlayerSubRank(Player *player)
 uint32 BrawlersGuild::GetBossForPlayer(Player *player)
 {
 	if (!player)
-		return;
+		return 0;
 
 	uint32 rank = GetPlayerRank(player);
 	uint32 subrank = GetPlayerSubRank(player);
