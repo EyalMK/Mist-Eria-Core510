@@ -50,13 +50,13 @@ public:
         void KilledUnit(Unit* unit)
         {
             if(Player* player = unit->toPlayer())
-                sBrawlersGuildMgr->BossReport(player, false);
+                sBrawlersGuildMgr->BossReport(player->GetGUID(), false);
         }
 
         void JustDied(Unit* killer)
         {
             if(Player* player = killer->toPlayer())
-                sBrawlersGuildMgr->BossReport(player, true);
+                sBrawlersGuildMgr->BossReport(player->GetGUID(), true);
         }
 
         void UpdateAI(uint32 diff)
@@ -142,13 +142,13 @@ public:
         void KilledUnit(Unit* unit)
         {
             if(Player* player = unit->ToPlayer())
-                sBrawlersGuildMgr->BossReport(player, false);
+                sBrawlersGuildMgr->BossReport(player->GetGUID(), false);
         }
 
         void JustDied(Unit* killer)
         {
             if(Player* player = killer->ToPlayer())
-                sBrawlersGuildMgr->BossReport(player, true);
+                sBrawlersGuildMgr->BossReport(player->GetGUID(), true);
         }
 
         void UpdateAI(uint32 diff)
