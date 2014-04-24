@@ -66,6 +66,7 @@ enum BrawlersStates
 
 #define MAX_BRAWLERS_RANK 10
 #define BOSS_PER_RANK 4
+#define REPUTATION_PER_RANK 250
 #define MAX_BRAWLERS_REPUTATION 10000
 
 #define BrawlersList std::list<uint64>
@@ -102,6 +103,10 @@ class BrawlersGuild
 		void EndCombat(bool win);
 
 		void RewardPlayer(Player *player);
+
+		uint32 GetPlayerRank(Player *player);
+		uint32 GetPlayerSubRank(Player *player);
+		uint32 GetBossForPlayer(Player *player);
 
         BrawlersList waitList;
         BrawlersList removeList;

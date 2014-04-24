@@ -99,7 +99,7 @@ void BrawlersGuild::RemovePlayers()
 		if (Player *player = ObjectAccessor::FindPlayer(*it))
 		{
 			player->RemoveAura(SPELL_QUEUED_FOR_BRAWL);
-			ChatHandler(player->GetSession()).PSendSysMessage("Vous n'etes plus dans la file pour une baston.");
+			ChatHandler(player->GetSession()).PSendSysMessage("Vous n'etes plus dans la file pour une baston");
 		}
 			
 	}
@@ -133,7 +133,9 @@ void BrawlersGuild::UpdateAura(Player* player, uint32 rank)
 	if (rank <= 3 || rank == waitList.size())
 	{
 		std::stringstream ss;
-		ss << "Placement dans la file d'attente pour un combat : " << rank;
+		ss << "Place dans la file d'attente pour un combat : " << rank;
+		if (rank == 1)
+			ss << "\nVous etes le prochain !";
 		ChatHandler(player->GetSession()).PSendSysMessage(ss.str().c_str());
 	}
 }
@@ -231,7 +233,8 @@ void BrawlersGuild::StartCombat()
 {
 	if (Player *player = ObjectAccessor::FindPlayer(current))
 	{
-		// Spawn Boss
+		if (uint32 entry = GetBossForPlayer(player))
+			player->SummonCreature(entry, BrawlersTeleportLocations[id][ARENA][0], BrawlersTeleportLocations[id][ARENA][1], BrawlersTeleportLocations[id][ARENA][2], BrawlersTeleportLocations[id][ARENA][3], TEMPSUMMON_TIMED_DESPAWN, 125000);
 		combatTimer = 10000;
 		brawlstate = BRAWL_STATE_COMBAT;
 	}
@@ -260,6 +263,36 @@ void BrawlersGuild::EndCombat(bool win)
 	brawlstate = BRAWL_STATE_TRANSITION;
 }
 
+uint32 BrawlersGuild::GetPlayerRank(Player *player)
+{
+	if (!player)
+		return;
+
+	return player->GetReputation(BrawlersFaction[player->GetTeamId()]) / (REPUTATION_PER_RANK*BOSS_PER_RANK);
+}
+
+uint32 BrawlersGuild::GetPlayerSubRank(Player *player)
+{
+	if (!player)
+		return;
+
+	return (player->GetReputation(BrawlersFaction[player->GetTeamId()]) / REPUTATION_PER_RANK) % BOSS_PER_RANK;
+}
+
+uint32 BrawlersGuild::GetBossForPlayer(Player *player)
+{
+	if (!player)
+		return;
+
+	uint32 rank = GetPlayerRank(player);
+	uint32 subrank = GetPlayerSubRank(player);
+
+	if (rank < MAX_BRAWLERS_RANK)
+		return BrawlersBoss[rank][subrank];
+	
+	return 0;
+}
+
 void BrawlersGuild::RewardPlayer(Player *player)
 {
 	if (!player)
@@ -269,7 +302,7 @@ void BrawlersGuild::RewardPlayer(Player *player)
 
 	uint32 rep = player->GetReputation(BrawlersFaction[player->GetTeamId()]);
 
-	rep += 250;
+	rep += REPUTATION_PER_RANK;
 	if (rep > MAX_BRAWLERS_REPUTATION)
 		rep = MAX_BRAWLERS_REPUTATION;
 
