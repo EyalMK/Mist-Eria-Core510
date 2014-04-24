@@ -49,13 +49,13 @@ public:
 
         void KilledUnit(Unit* unit)
         {
-            if(Player* player = unit->toPlayer())
+            if(Player* player = unit->ToPlayer())
                 sBrawlersGuildMgr->BossReport(player->GetGUID(), false);
         }
 
         void JustDied(Unit* killer)
         {
-            if(Player* player = killer->toPlayer())
+            if(Player* player = killer->ToPlayer())
                 sBrawlersGuildMgr->BossReport(player->GetGUID(), true);
         }
 
