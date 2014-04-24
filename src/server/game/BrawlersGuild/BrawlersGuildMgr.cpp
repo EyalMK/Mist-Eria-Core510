@@ -315,7 +315,13 @@ void BrawlersGuild::BossReport(uint64 guid, bool win)
 		EndCombat(win);
 }
 
+bool BrawlersGuild::IsPlayerInBrawl(Player* player)
+{
+	if (!player || !current)
+		return false;
 
+	return player->GetGUID() == current;
+}
 
 
 
@@ -378,4 +384,16 @@ void BrawlersGuildMgr::BossReport(uint64 guid, bool win)
 {
 	for (uint8 i = 0; i<MAX_BRAWLERS_GUILDS; ++i)
 		guilds[i]->BossReport(guid, win);
+}
+
+bool BrawlersGuildMgr::IsPlayerInBrawl(Player* player)
+{
+	if (!player)
+		return false;
+
+	for (uint8 i = 0; i < MAX_BRAWLERS_GUILDS; ++i)
+		if (guilds[i]->IsPlayerInBrawl(player))
+			return true;
+
+		return false;
 }

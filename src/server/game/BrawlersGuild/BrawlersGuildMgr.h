@@ -86,6 +86,8 @@ class BrawlersGuild
 
 		void BossReport(uint64 guid, bool win);
 
+		bool IsPlayerInBrawl(Player* player);
+
     private:
 
 		uint32 id;
@@ -145,6 +147,8 @@ class BrawlersGuildMgr
 		void RemovePlayer(uint64 guid);
 
 		void BossReport(uint64 guid, bool win);
+
+		bool IsPlayerInBrawl(Player* player);
 
     private:
 

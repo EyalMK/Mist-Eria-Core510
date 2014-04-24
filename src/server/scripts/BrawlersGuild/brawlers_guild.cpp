@@ -181,7 +181,8 @@ public:
 
 		void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
 		{
-			sBrawlersGuildMgr->RemovePlayer(GetOwner()->ToPlayer());
+			if(!sBrawlersGuildMgr->IsPlayerInBrawl(GetOwner()->ToPlayer()))
+				sBrawlersGuildMgr->RemovePlayer(GetOwner()->ToPlayer());
 		}
 
 		void Register()
