@@ -53,7 +53,7 @@ public:
 
             if (powerfulBiteTimer <= diff)
             {
-                me->CastSpell(me->GetVictim(), 135340, false);
+                me->CastSpell(me->getVictim(), 135340, false);
                 powerfulBiteTimer = 8000;
             }
             else powerfulBiteTimer -= diff;
@@ -140,7 +140,7 @@ public:
 
             if (lavaburstTimer <= diff)
             {
-                me->CastSpell(me->GetVictim(), 133293, false);
+                me->CastSpell(me->getVictim(), 133293, false);
                 lavaburstTimer = 15000;
             }
             else lavaburstTimer -= diff;
