@@ -215,7 +215,7 @@ void BrawlersGuild::PrepareCombat()
 		return;
 
 	current = waitList.front();
-	RemovePlayer(current);
+	waitList.remove(current);
 
 	if (Player *player = ObjectAccessor::FindPlayer(current))
 	{
@@ -235,7 +235,7 @@ void BrawlersGuild::StartCombat()
 	{
 		if (uint32 entry = GetBossForPlayer(player))
 			player->SummonCreature(entry, BrawlersTeleportLocations[id][ARENA][0], BrawlersTeleportLocations[id][ARENA][1], BrawlersTeleportLocations[id][ARENA][2], BrawlersTeleportLocations[id][ARENA][3], TEMPSUMMON_TIMED_DESPAWN, 125000);
-		combatTimer = 10000;
+		combatTimer = 120000;
 		brawlstate = BRAWL_STATE_COMBAT;
 	}
 	else
@@ -286,6 +286,10 @@ uint32 BrawlersGuild::GetBossForPlayer(Player *player)
 
 	uint32 rank = GetPlayerRank(player);
 	uint32 subrank = GetPlayerSubRank(player);
+
+	std::stringstream ss;
+	ss << "GetBossForPlayer : rank " << rank << ", subrank " << subrank;
+	ChatHandler(player->GetSession()).PSendSysMessage(ss.str().c_str());
 
 	if (rank < MAX_BRAWLERS_RANK)
 		return BrawlersBoss[rank][subrank];
