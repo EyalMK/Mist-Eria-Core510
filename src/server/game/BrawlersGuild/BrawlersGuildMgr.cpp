@@ -172,41 +172,33 @@ void BrawlersGuild::UpdateBrawl(uint32 diff)
 	switch (brawlstate)
 	{
 		case BRAWL_STATE_WAITING:
-		{
 			if (!waitList.empty())
 				PrepareCombat();
 			break;
-		}
 
 		case BRAWL_STATE_PREPARE_COMBAT:
-		{
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "prepareCombatTimer %d", prepareCombatTimer);
 			if (prepareCombatTimer <= 0)
 				StartCombat();
 			else
 				prepareCombatTimer -= diff;
 			break;
-		}
 
 		case BRAWL_STATE_COMBAT:
-		{
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "combatTimer %d", combatTimer);
 			if (combatTimer <= 0)
 				EndCombat(false);
 			else
 				combatTimer -= diff;
 			break;
-		}
 
 		case BRAWL_STATE_TRANSITION:
-		{
 			sLog->outDebug(LOG_FILTER_NETWORKIO, "transitionTimer %d", transitionTimer);
 			if (transitionTimer <= 0)
 			   brawlstate = BRAWL_STATE_WAITING;
 			else
 				transitionTimer -= diff;
 			break;
-		}
 
 		default:
 			break;
