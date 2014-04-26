@@ -168,40 +168,43 @@ void BrawlersGuild::CheckDisconectedPlayers()
 
 void BrawlersGuild::UpdateBrawl(uint32 diff)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "diff %d, brawstate %d", diff, brawlstate);
-	switch (brawlstate)
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "UPDATEBRAWL #### brawstate %d", brawlstate);
+
+	if (brawlstate == BRAWL_STATE_WAITING)
 	{
-		case 0:
-			if (!waitList.empty())
-				PrepareCombat();
-			break;
+		if (!waitList.empty())
+			PrepareCombat();
+		return;
+	}
 
-		case 1:
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "prepareCombatTimer %d", prepareCombatTimer);
-			if (prepareCombatTimer <= 0)
-				StartCombat();
-			else
-				prepareCombatTimer -= diff;
-			break;
+	if (brawlstate == BRAWL_STATE_PREPARE_COMBAT)
+	{
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "prepareCombatTimer %d", prepareCombatTimer);
+		if (prepareCombatTimer <= 0)
+			StartCombat();
+		else
+			prepareCombatTimer -= diff;
+		return;
+	}
 
-		case 2:
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "combatTimer %d", combatTimer);
-			if (combatTimer <= 0)
-				EndCombat(false);
-			else
-				combatTimer -= diff;
-			break;
+	if (brawlstate == BRAWL_STATE_COMBAT)
+	{
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "combatTimer %d", combatTimer);
+		if (combatTimer <= 0)
+			EndCombat(false);
+		else
+			combatTimer -= diff;
+		return;
+	}
 
-		case 3:
-			sLog->outDebug(LOG_FILTER_NETWORKIO, "transitionTimer %d", transitionTimer);
-			if (transitionTimer <= 0)
-			   brawlstate = 0;
-			else
-				transitionTimer -= diff;
-			break;
-
-		default:
-			break;
+	if (brawlstate == BRAWL_STATE_TRANSITION)
+	{
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "transitionTimer %d", transitionTimer);
+		if (transitionTimer <= 0)
+			brawlstate = BRAWL_STATE_WAITING;
+		else
+			transitionTimer -= diff;
+		return;
 	}
 }
 
@@ -223,7 +226,7 @@ void BrawlersGuild::PrepareCombat()
 		player->TeleportTo(BrawlersTeleportLocations[id][ARENA][0], BrawlersTeleportLocations[id][ARENA][1], BrawlersTeleportLocations[id][ARENA][2], BrawlersTeleportLocations[id][ARENA][3], 0.f);
 		player->RemoveAura(SPELL_QUEUED_FOR_BRAWL);
 		prepareCombatTimer = 5000;
-		brawlstate = 1;
+		brawlstate = BRAWL_STATE_PREPARE_COMBAT;
 	}
 }
 
@@ -238,7 +241,7 @@ void BrawlersGuild::StartCombat()
 		if (uint32 entry = GetBossForPlayer(player))
 			player->SummonCreature(entry, BrawlersTeleportLocations[id][ARENA][0], BrawlersTeleportLocations[id][ARENA][1], BrawlersTeleportLocations[id][ARENA][2], BrawlersTeleportLocations[id][ARENA][3], TEMPSUMMON_TIMED_DESPAWN, 125000);
 		combatTimer = 120000;
-		brawlstate = 2;
+		brawlstate = BRAWL_STATE_COMBAT;
 	}
 	else
 		EndCombat(false);
@@ -261,7 +264,7 @@ void BrawlersGuild::EndCombat(bool win)
 	}
 
 	current = 0;
-	brawlstate = 3;
+	brawlstate = BRAWL_STATE_TRANSITION;
 }
 
 uint32 BrawlersGuild::GetPlayerRank(Player *player)
