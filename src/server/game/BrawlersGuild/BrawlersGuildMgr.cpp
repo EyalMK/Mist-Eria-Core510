@@ -168,7 +168,7 @@ void BrawlersGuild::CheckDisconectedPlayers()
 
 void BrawlersGuild::UpdateBrawl(uint32 diff)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "diff %d", diff);
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "diff %d, brawstate %d", diff, brawlstate);
 	switch (brawlstate)
 	{
 		case BRAWL_STATE_WAITING:
@@ -219,14 +219,12 @@ void BrawlersGuild::PrepareCombat()
 	{
 		ChatHandler(player->GetSession()).PSendSysMessage("PrepareCombat");
 
-		player->TeleportTo(BrawlersTeleportLocations[id][ARENA][0], BrawlersTeleportLocations[id][ARENA][1], BrawlersTeleportLocations[id][ARENA][2], BrawlersTeleportLocations[id][ARENA][3], 0.f);
 		player->CastSpell(player, SPELL_ARENA_TELEPORTATION, true);
+		player->TeleportTo(BrawlersTeleportLocations[id][ARENA][0], BrawlersTeleportLocations[id][ARENA][1], BrawlersTeleportLocations[id][ARENA][2], BrawlersTeleportLocations[id][ARENA][3], 0.f);
 		player->RemoveAura(SPELL_QUEUED_FOR_BRAWL);
 		prepareCombatTimer = 5000;
 		brawlstate = BRAWL_STATE_PREPARE_COMBAT;
 	}
-	else
-		return;
 }
 
 void BrawlersGuild::StartCombat()
