@@ -168,6 +168,7 @@ void BrawlersGuild::CheckDisconectedPlayers()
 
 void BrawlersGuild::UpdateBrawl(uint32 diff)
 {
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "diff %d", diff);
 	switch (brawlstate)
 	{
 		case BRAWL_STATE_WAITING:
@@ -179,6 +180,7 @@ void BrawlersGuild::UpdateBrawl(uint32 diff)
 
 		case BRAWL_STATE_PREPARE_COMBAT:
 		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "prepareCombatTimer %d", prepareCombatTimer);
 			if (prepareCombatTimer <= 0)
 				StartCombat();
 			else
@@ -188,6 +190,7 @@ void BrawlersGuild::UpdateBrawl(uint32 diff)
 
 		case BRAWL_STATE_COMBAT:
 		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "combatTimer %d", combatTimer);
 			if (combatTimer <= 0)
 				EndCombat(false);
 			else
@@ -197,6 +200,7 @@ void BrawlersGuild::UpdateBrawl(uint32 diff)
 
 		case BRAWL_STATE_TRANSITION:
 		{
+			sLog->outDebug(LOG_FILTER_NETWORKIO, "transitionTimer %d", transitionTimer);
 			if (transitionTimer <= 0)
 			   brawlstate = BRAWL_STATE_WAITING;
 			else
@@ -217,7 +221,7 @@ void BrawlersGuild::PrepareCombat()
 		return;
 
 	current = waitList.front();
-	waitList.remove(current);
+	RemovePlayer(current);
 
 	if (Player *player = ObjectAccessor::FindPlayer(current))
 	{
@@ -235,6 +239,8 @@ void BrawlersGuild::PrepareCombat()
 
 void BrawlersGuild::StartCombat()
 {
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "START COMBAT, guid %ld", current);
+
 	if (Player *player = ObjectAccessor::FindPlayer(current))
 	{
 		ChatHandler(player->GetSession()).PSendSysMessage("StartCombat");
