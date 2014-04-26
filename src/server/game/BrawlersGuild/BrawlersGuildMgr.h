@@ -113,7 +113,7 @@ class BrawlersGuild
         BrawlersList waitList;
         BrawlersList removeList;
 
-		BrawlersStates brawlstate;
+		uint32 brawlstate;
 
 
 		//Combat
