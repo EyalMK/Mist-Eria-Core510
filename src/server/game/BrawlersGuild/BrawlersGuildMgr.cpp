@@ -211,6 +211,8 @@ void BrawlersGuild::UpdateBrawl(uint32 diff)
 
 void BrawlersGuild::PrepareCombat()
 {
+	
+
 	if (waitList.empty())
 		return;
 
@@ -219,6 +221,8 @@ void BrawlersGuild::PrepareCombat()
 
 	if (Player *player = ObjectAccessor::FindPlayer(current))
 	{
+		ChatHandler(player->GetSession()).PSendSysMessage("PrepareCombat");
+
 		player->TeleportTo(BrawlersTeleportLocations[id][ARENA][0], BrawlersTeleportLocations[id][ARENA][1], BrawlersTeleportLocations[id][ARENA][2], BrawlersTeleportLocations[id][ARENA][3], 0.f);
 		player->CastSpell(player, SPELL_ARENA_TELEPORTATION, true);
 		player->RemoveAura(SPELL_QUEUED_FOR_BRAWL);
@@ -233,6 +237,8 @@ void BrawlersGuild::StartCombat()
 {
 	if (Player *player = ObjectAccessor::FindPlayer(current))
 	{
+		ChatHandler(player->GetSession()).PSendSysMessage("StartCombat");
+
 		if (uint32 entry = GetBossForPlayer(player))
 			player->SummonCreature(entry, BrawlersTeleportLocations[id][ARENA][0], BrawlersTeleportLocations[id][ARENA][1], BrawlersTeleportLocations[id][ARENA][2], BrawlersTeleportLocations[id][ARENA][3], TEMPSUMMON_TIMED_DESPAWN, 125000);
 		combatTimer = 120000;
@@ -250,6 +256,8 @@ void BrawlersGuild::EndCombat(bool win)
 
 	if (Player *player = ObjectAccessor::FindPlayer(current))
 	{
+		ChatHandler(player->GetSession()).PSendSysMessage("EndCombat");
+
 		player->TeleportTo(BrawlersTeleportLocations[id][OUTSIDE][0], BrawlersTeleportLocations[id][OUTSIDE][1], BrawlersTeleportLocations[id][OUTSIDE][2], BrawlersTeleportLocations[id][OUTSIDE][3], 0.f);
 		player->CastSpell(player, SPELL_ARENA_TELEPORTATION, true);
 		transitionTimer = 5000;
@@ -268,6 +276,10 @@ uint32 BrawlersGuild::GetPlayerRank(Player *player)
 	if (!player)
 		return 0;
 
+	std::stringstream ss;
+	ss << "GetRank : rep " << player->GetReputation(BrawlersFaction[player->GetTeamId()]) << ", rank " << player->GetReputation(BrawlersFaction[player->GetTeamId()]) / (REPUTATION_PER_RANK*BOSS_PER_RANK);
+	ChatHandler(player->GetSession()).PSendSysMessage(ss.str().c_str());
+
 	return player->GetReputation(BrawlersFaction[player->GetTeamId()]) / (REPUTATION_PER_RANK*BOSS_PER_RANK);
 }
 
@@ -275,6 +287,10 @@ uint32 BrawlersGuild::GetPlayerSubRank(Player *player)
 {
 	if (!player)
 		return 0;
+
+	std::stringstream ss;
+	ss << "GetSubRank : rep " << player->GetReputation(BrawlersFaction[player->GetTeamId()]) << ", subrank " << (player->GetReputation(BrawlersFaction[player->GetTeamId()]) / REPUTATION_PER_RANK) % BOSS_PER_RANK;
+	ChatHandler(player->GetSession()).PSendSysMessage(ss.str().c_str());
 
 	return (player->GetReputation(BrawlersFaction[player->GetTeamId()]) / REPUTATION_PER_RANK) % BOSS_PER_RANK;
 }
