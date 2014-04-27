@@ -53,7 +53,18 @@ public:
 	{
 		if (player)
 		{
-			if (!player->HasAura(SPELL_QUEUED_FOR_BRAWL))
+			bool ok = true;
+
+			if (player->GetTeamId() == 0 && !player->HasAchieved(ACHIEVEMENT_FIRST_RULE_A))
+				ok = false;
+
+			if (player->GetTeamId() == 1 && !player->HasAchieved(ACHIEVEMENT_FIRST_RULE_H))
+				ok = false;
+
+			if (player->HasAura(SPELL_QUEUED_FOR_BRAWL))
+				ok = false;
+
+			if (ok)
 				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_QUEUE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 				
 
@@ -120,6 +131,7 @@ public:
 			events.Reset();
 			battleStart = false;
 			me->Mount(DISPLAYID_GYROCOPTER);
+			sBrawlersGuildMgr->SetAnnouncer(TEAM_ALLIANCE, me->GetGUID()); 
         }
 
 		void DoAction(const int32 action)

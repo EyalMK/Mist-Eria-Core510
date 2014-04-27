@@ -32,8 +32,21 @@ enum BrawlersSpells
 {
 	SPELL_QUEUED_FOR_BRAWL = 132639,
 	SPELL_ARENA_TELEPORTATION = 105315,
-	SPELL_ALLIANCE_SOUND = 136144,
-	SPELL_HORDE_SOUND = 136143
+
+	SPELL_EXPLOSION_0 = 87706,
+	SPELL_EXPLOSION_1 = 87708,
+	SPELL_EXPLOSION_2 = 87711,
+	SPELL_EXPLOSION_3 = 87705,
+
+	SPELL_ALLIANCE_SOUND= 136144,
+	SPELL_HORDE_SOUND = 136143,
+};
+
+enum BrawlersSounds
+{
+	VICTORY = 0,
+	DEFEAT,
+	MAX_BRAWLERS_SOUNDS
 };
 
 enum BrawlersAchievement
@@ -88,6 +101,8 @@ class BrawlersGuild
 
 		bool IsPlayerInBrawl(Player* player);
 
+		void SetAnnouncer(uint64 guid);
+
     private:
 
 		uint32 id;
@@ -102,8 +117,9 @@ class BrawlersGuild
 
 		void PrepareCombat();
 		void StartCombat();
-		void EndCombat(bool win);
+		void EndCombat(bool win, bool time = false);
 
+		void KillPlayer(Player *player);
 		void RewardPlayer(Player *player);
 
 		uint32 GetPlayerRank(Player *player);
@@ -111,6 +127,16 @@ class BrawlersGuild
 		uint32 GetBossForPlayer(Player *player);
 
 		void SetBrawlState(uint32 state);
+
+		Creature* GetAnnouncer();
+
+		void PlayFightSound(bool play);
+
+
+
+
+
+
 
         BrawlersList waitList;
         BrawlersList removeList;
@@ -121,6 +147,8 @@ class BrawlersGuild
 		//Combat
 
 		uint64 current;
+		uint64 announcer;
+
 		int32 prepareCombatTimer;
 		int32 combatTimer;
 		int32 transitionTimer;
@@ -151,6 +179,8 @@ class BrawlersGuildMgr
 		void BossReport(uint64 guid, bool win);
 
 		bool IsPlayerInBrawl(Player* player);
+
+		void SetAnnouncer(uint32 guild, uint64 guid);
 
     private:
 

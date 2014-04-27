@@ -53,6 +53,22 @@ uint32 BrawlersFaction[MAX_BRAWLERS_GUILDS] =
 	1419, 1374
 };
 
+uint32 BrawlersSound[MAX_BRAWLERS_GUILDS][MAX_BRAWLERS_SOUNDS] =
+{
+	{ 34746, 34745 },
+	{ 34747, 34744 }
+};
+
+uint32 BrawlersFightAmbiance[MAX_BRAWLERS_GUILDS] =
+{
+	131338, 136329
+};
+
+
+
+
+
+
 BrawlersGuild::BrawlersGuild(uint32 _id)
 {
 	id = _id;
@@ -185,7 +201,7 @@ void BrawlersGuild::UpdateBrawl(uint32 diff)
 
 	case BRAWL_STATE_COMBAT:
 		if (combatTimer <= 0)
-			EndCombat(false);
+			EndCombat(false, true);
 		else
 			combatTimer -= diff;
 		break;
@@ -242,20 +258,28 @@ void BrawlersGuild::StartCombat()
 		EndCombat(false);
 }
 
-void BrawlersGuild::EndCombat(bool win)
+void BrawlersGuild::EndCombat(bool win, bool time)
 {
 
 	if (Player *player = ObjectAccessor::FindPlayer(current))
 	{
 		ChatHandler(player->GetSession()).PSendSysMessage("EndCombat");
 
+		if (time)
+			KillPlayer(player);
+
 		player->TeleportTo(BrawlersTeleportLocations[id][OUTSIDE][0], BrawlersTeleportLocations[id][OUTSIDE][1], BrawlersTeleportLocations[id][OUTSIDE][2], BrawlersTeleportLocations[id][OUTSIDE][3], 0.f);
 		player->CastSpell(player, SPELL_ARENA_TELEPORTATION, true);
 		transitionTimer = 5000;
 
+		if (win)
+			player->SendPlaySound(BrawlersSound[id][VICTORY], true);
+		else
+			player->SendPlaySound(BrawlersSound[id][DEFEAT], true);
 
 		if (win)
 			RewardPlayer(player);
+		
 	}
 
 	current = 0;
@@ -286,22 +310,30 @@ uint32 BrawlersGuild::GetBossForPlayer(Player *player)
 	uint32 rank = GetPlayerRank(player);
 	uint32 subrank = GetPlayerSubRank(player);
 
-	std::stringstream ss;
-	ss << "GetBossForPlayer : rank " << rank << ", subrank " << subrank;
-	ChatHandler(player->GetSession()).PSendSysMessage(ss.str().c_str());
-
 	if (rank < MAX_BRAWLERS_RANK && subrank < BOSS_PER_RANK)
 	{
-		ss.clear();
-		ss << "GetBossForPlayer : bossid " << BrawlersBoss[rank][subrank];
-		ChatHandler(player->GetSession()).PSendSysMessage(ss.str().c_str());
 		return BrawlersBoss[rank][subrank];
 	}
 	return 0;
 }
 
+void BrawlersGuild::KillPlayer(Player *player)
+{
+	if (!player)
+		return;
+
+	player->CastSpell(player, SPELL_EXPLOSION_0, true);
+	player->CastSpell(player, SPELL_EXPLOSION_1, true);
+	player->CastSpell(player, SPELL_EXPLOSION_2, true);
+	player->CastSpell(player, SPELL_EXPLOSION_3, true);
+	player->KillPlayer();
+}
+
 void BrawlersGuild::RewardPlayer(Player *player)
 {
+	//DEBUG
+	return;
+
 	if (!player)
 		return;
 
@@ -318,8 +350,6 @@ void BrawlersGuild::RewardPlayer(Player *player)
 
 void BrawlersGuild::BossReport(uint64 guid, bool win)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "\nBOSSREPORT win: %d\n", (uint32)win);
-
 	if (current && current == guid)
 		EndCombat(win);
 }
@@ -338,6 +368,26 @@ void BrawlersGuild::SetBrawlState(uint32 state)
 	brawlstate = state;
 }
 
+void BrawlersGuild::SetAnnouncer(uint64 guid)
+{
+	announcer = guid;
+}
+
+Creature* BrawlersGuild::GetAnnouncer()
+{
+	ObjectAccessor::FindCreature(announcer);
+}
+
+void BrawlersGuild::PlayFightSound(bool play)
+{
+	if (Creature* ann = GetAnnouncer())
+	{
+		if (play)
+			ann->CastSpell(ann, BrawlersFightAmbiance[id], true);
+		else
+			ann->RemoveAura(BrawlersFightAmbiance[id]);
+	}
+}
 
 
 
@@ -408,4 +458,10 @@ bool BrawlersGuildMgr::IsPlayerInBrawl(Player* player)
 			return true;
 
 		return false;
+}
+
+void BrawlersGuildMgr::SetAnnouncer(uint32 guild, uint64 guid)
+{
+	if (guid >= 0 && guid < MAX_BRAWLERS_GUILDS && guid)
+		guilds[guild]->SetAnnouncer(guid);
 }
