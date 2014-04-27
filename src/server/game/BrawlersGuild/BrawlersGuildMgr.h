@@ -110,6 +110,8 @@ class BrawlersGuild
 		uint32 GetPlayerSubRank(Player *player);
 		uint32 GetBossForPlayer(Player *player);
 
+		void SetBrawlState(uint32 state);
+
         BrawlersList waitList;
         BrawlersList removeList;
 
