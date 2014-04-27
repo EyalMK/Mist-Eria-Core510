@@ -99,7 +99,8 @@ void BrawlersGuild::RemovePlayers()
 		if (Player *player = ObjectAccessor::FindPlayer(*it))
 		{
 			player->RemoveAura(SPELL_QUEUED_FOR_BRAWL);
-			ChatHandler(player->GetSession()).PSendSysMessage("Vous n'etes plus dans la file pour une baston");
+			if (*it != current)
+				ChatHandler(player->GetSession()).PSendSysMessage("Vous n'etes plus dans la file pour une baston");
 		}
 			
 	}
@@ -168,43 +169,37 @@ void BrawlersGuild::CheckDisconectedPlayers()
 
 void BrawlersGuild::UpdateBrawl(uint32 diff)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "UPDATEBRAWL #### brawstate %d", brawlstate);
-
-	if (brawlstate == BRAWL_STATE_WAITING)
+	switch (brawlstate)
 	{
+	case BRAWL_STATE_WAITING:
 		if (!waitList.empty())
 			PrepareCombat();
-		return;
-	}
+		break;
 
-	if (brawlstate == BRAWL_STATE_PREPARE_COMBAT)
-	{
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "prepareCombatTimer %d", prepareCombatTimer);
+	case BRAWL_STATE_PREPARE_COMBAT:
 		if (prepareCombatTimer <= 0)
 			StartCombat();
 		else
 			prepareCombatTimer -= diff;
-		return;
-	}
+		break;
 
-	if (brawlstate == BRAWL_STATE_COMBAT)
-	{
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "combatTimer %d", combatTimer);
+	case BRAWL_STATE_COMBAT:
 		if (combatTimer <= 0)
 			EndCombat(false);
 		else
 			combatTimer -= diff;
-		return;
-	}
+		break;
 
-	if (brawlstate == BRAWL_STATE_TRANSITION)
-	{
-		sLog->outDebug(LOG_FILTER_NETWORKIO, "transitionTimer %d", transitionTimer);
+	case BRAWL_STATE_TRANSITION:
 		if (transitionTimer <= 0)
 			SetBrawlState(BRAWL_STATE_WAITING);
 		else
 			transitionTimer -= diff;
-		return;
+		break;
+
+	default:
+		break;
+
 	}
 }
 
@@ -303,9 +298,13 @@ uint32 BrawlersGuild::GetBossForPlayer(Player *player)
 	ss << "GetBossForPlayer : rank " << rank << ", subrank " << subrank;
 	ChatHandler(player->GetSession()).PSendSysMessage(ss.str().c_str());
 
-	if (rank < MAX_BRAWLERS_RANK)
+	if (rank < MAX_BRAWLERS_RANK && subrank < BOSS_PER_RANK)
+	{
+		ss.clear();
+		ss << "GetBossForPlayer : bossid " << BrawlersBoss[rank][subrank];
+		ChatHandler(player->GetSession()).PSendSysMessage(ss.str().c_str());
 		return BrawlersBoss[rank][subrank];
-	
+	}
 	return 0;
 }
 
@@ -344,7 +343,6 @@ bool BrawlersGuild::IsPlayerInBrawl(Player* player)
 
 void BrawlersGuild::SetBrawlState(uint32 state)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "\nBRAWLSTATE %d => %d\n", brawlstate, state);
 	brawlstate = state;
 }
 
