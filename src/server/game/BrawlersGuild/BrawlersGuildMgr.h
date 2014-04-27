@@ -127,8 +127,6 @@ class BrawlersGuild
 
 		void SetBrawlState(uint32 state);
 
-		Creature* GetAnnouncer();
-
 		void PlayFightSound(bool play);
 
 
@@ -147,6 +145,7 @@ class BrawlersGuild
 
 		uint64 current;
 		uint64 announcer;
+		uint64 boss;
 
 		int32 prepareCombatTimer;
 		int32 combatTimer;

@@ -75,6 +75,8 @@ BrawlersGuild::BrawlersGuild(uint32 _id)
 	id = _id;
 	brawlstate = BRAWL_STATE_WAITING;
 	current = 0;
+	announcer = 0;
+	boss = 0;
 }
 
 BrawlersGuild::~BrawlersGuild()
@@ -232,8 +234,6 @@ void BrawlersGuild::PrepareCombat()
 
 	if (Player *player = ObjectAccessor::FindPlayer(current))
 	{
-		ChatHandler(player->GetSession()).PSendSysMessage("PrepareCombat");
-
 		player->CastSpell(player, SPELL_ARENA_TELEPORTATION, true);
 		player->TeleportTo(BrawlersTeleportLocations[id][ARENA][0], BrawlersTeleportLocations[id][ARENA][1], BrawlersTeleportLocations[id][ARENA][2], BrawlersTeleportLocations[id][ARENA][3], 0.f);
 		player->RemoveAura(SPELL_QUEUED_FOR_BRAWL);
@@ -244,28 +244,30 @@ void BrawlersGuild::PrepareCombat()
 
 void BrawlersGuild::StartCombat()
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "START COMBAT, guid %ld", current);
-
 	if (Player *player = ObjectAccessor::FindPlayer(current))
 	{
-		ChatHandler(player->GetSession()).PSendSysMessage("StartCombat");
-
 		if (uint32 entry = GetBossForPlayer(player))
-			player->SummonCreature(entry, BrawlersTeleportLocations[id][ARENA][1], BrawlersTeleportLocations[id][ARENA][2], BrawlersTeleportLocations[id][ARENA][3], 0.f, TEMPSUMMON_TIMED_DESPAWN, 125000);
-		combatTimer = 120000;
-		SetBrawlState(BRAWL_STATE_COMBAT);
+		{
+			if (Creature* summon = (Creature*)player->SummonCreature(entry, BrawlersTeleportLocations[id][ARENA][1], BrawlersTeleportLocations[id][ARENA][2], BrawlersTeleportLocations[id][ARENA][3], 0.f, TEMPSUMMON_TIMED_DESPAWN, 125000))
+			{
+				boss = summon->GetGUID();
+				combatTimer = 120000;
+				SetBrawlState(BRAWL_STATE_COMBAT);
+				PlayFightSound(true);
+				return;
+			}
+		}
 	}
-	else
-		EndCombat(false);
+
+	EndCombat(false);
 }
 
 void BrawlersGuild::EndCombat(bool win, bool time)
 {
+	PlayFightSound(false);
 
 	if (Player *player = ObjectAccessor::FindPlayer(current))
 	{
-		ChatHandler(player->GetSession()).PSendSysMessage("EndCombat");
-
 		if (time)
 			KillPlayer(player);
 
@@ -283,7 +285,13 @@ void BrawlersGuild::EndCombat(bool win, bool time)
 		
 	}
 
+	if (Creature* cboss = ObjectAccessor::FindCreature(boss))
+	{
+		cboss->DespawnOrUnsummon();
+	}
+
 	current = 0;
+	boss = 0;
 	SetBrawlState(BRAWL_STATE_TRANSITION);
 }
 
@@ -374,14 +382,9 @@ void BrawlersGuild::SetAnnouncer(uint64 guid)
 	announcer = guid;
 }
 
-Creature* BrawlersGuild::GetAnnouncer()
-{
-	ObjectAccessor::FindCreature(announcer);
-}
-
 void BrawlersGuild::PlayFightSound(bool play)
 {
-	if (Creature* ann = GetAnnouncer())
+	if (Creature* ann = ObjectAccessor::FindCreature(announcer))
 	{
 		if (play)
 			ann->CastSpell(ann, BrawlersFightAmbiance[id], true);
