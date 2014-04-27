@@ -342,7 +342,7 @@ bool BrawlersGuild::IsPlayerInBrawl(Player* player)
 
 void BrawlersGuild::SetBrawlState(uint32 state)
 {
-	sLog->outDebug(LOG_FILTER_NETWORKIO, "\nBRAWLSTATE %d\n", state);
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "\nBRAWLSTATE %d => %d\n", brawlstate, state);
 	brawlstate = state;
 }
 
