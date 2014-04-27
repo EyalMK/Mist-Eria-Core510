@@ -235,7 +235,7 @@ void BrawlersGuild::StartCombat()
 
 		if (uint32 entry = GetBossForPlayer(player))
 			player->SummonCreature(entry, BrawlersTeleportLocations[id][ARENA][1], BrawlersTeleportLocations[id][ARENA][2], BrawlersTeleportLocations[id][ARENA][3], 0.f, TEMPSUMMON_TIMED_DESPAWN, 125000);
-		combatTimer = 15000;
+		combatTimer = 120000;
 		SetBrawlState(BRAWL_STATE_COMBAT);
 	}
 	else
