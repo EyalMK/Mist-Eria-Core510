@@ -161,7 +161,7 @@ void BrawlersGuild::CheckDisconectedPlayers()
 		if (!ObjectAccessor::FindPlayer(*it))
 			RemovePlayer(*it);
 
-		if (current && !!ObjectAccessor::FindPlayer(current))
+		if (current && !ObjectAccessor::FindPlayer(current))
 			EndCombat(false);
 }
 
@@ -327,6 +327,8 @@ void BrawlersGuild::RewardPlayer(Player *player)
 
 void BrawlersGuild::BossReport(uint64 guid, bool win)
 {
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "\nBOSSREPORT win: %d\n", (uint32)win);
+
 	if (current && current == guid)
 		EndCombat(win);
 }
