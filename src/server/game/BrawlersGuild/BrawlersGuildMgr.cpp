@@ -468,6 +468,5 @@ bool BrawlersGuildMgr::IsPlayerInBrawl(Player* player)
 
 void BrawlersGuildMgr::SetAnnouncer(uint32 guild, uint64 guid)
 {
-	if (guid >= 0 && guid < MAX_BRAWLERS_GUILDS && guid)
-		guilds[guild]->SetAnnouncer(guid);
+	guilds[guild]->SetAnnouncer(guid);
 }
