@@ -131,6 +131,7 @@ public:
 			events.Reset();
 			battleStart = false;
 			me->Mount(DISPLAYID_GYROCOPTER);
+			sBrawlersGuildMgr->SetAnnouncer(TEAM_ALLIANCE, me->GetGUID());
         }
 
 		void DoAction(const int32 action)
@@ -150,8 +151,6 @@ public:
 
         void UpdateAI(uint32 const /*diff*/)
         {
-			sBrawlersGuildMgr->SetAnnouncer(TEAM_ALLIANCE, me->GetGUID());
-
 			if (battleStart)
 				if (Creature* trigger = me->FindNearestCreature(NPC_BRAWLERS_TRIGGER, 99999.0f, true))
 					if (me->GetExactDist(trigger->GetPositionX(), trigger->GetPositionY(), trigger->GetPositionZ()) <= 1)

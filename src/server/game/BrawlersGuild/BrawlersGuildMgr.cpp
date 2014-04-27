@@ -384,6 +384,7 @@ void BrawlersGuild::SetAnnouncer(uint64 guid)
 
 void BrawlersGuild::PlayFightSound(bool play)
 {
+	sLog->outDebug(LOG_FILTER_NETWORKIO, "\nSOUND\n %ld", announcer);
 	if (Creature* ann = ObjectAccessor::FindCreature(announcer))
 	{
 		sLog->outDebug(LOG_FILTER_NETWORKIO, "\nSOUND\n %d", (uint32)play);
