@@ -56,7 +56,7 @@ uint32 BrawlersFaction[MAX_BRAWLERS_GUILDS] =
 BrawlersGuild::BrawlersGuild(uint32 _id)
 {
 	id = _id;
-	brawlstate = 0;
+	brawlstate = BRAWL_STATE_WAITING;
 	current = 0;
 }
 
@@ -240,7 +240,7 @@ void BrawlersGuild::StartCombat()
 
 		if (uint32 entry = GetBossForPlayer(player))
 			player->SummonCreature(entry, BrawlersTeleportLocations[id][ARENA][0], BrawlersTeleportLocations[id][ARENA][1], BrawlersTeleportLocations[id][ARENA][2], BrawlersTeleportLocations[id][ARENA][3], TEMPSUMMON_TIMED_DESPAWN, 125000);
-		combatTimer = 120000;
+		combatTimer = 15000;
 		SetBrawlState(BRAWL_STATE_COMBAT);
 	}
 	else
