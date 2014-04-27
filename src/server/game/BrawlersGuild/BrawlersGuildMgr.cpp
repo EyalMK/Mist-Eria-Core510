@@ -32,7 +32,7 @@
 int32 BrawlersTeleportLocations[MAX_BRAWLERS_GUILDS][MAX_TELEPORTS][4] =
 {
 	{ { 369, -121, 2499, -57 }, { 369, -89, 2476, -43 } },
-	{ { 1043, 2032, -4753, 87 }, { 1043, 2062, 4547, 87 } }
+	{ { 1043, 2032, -4753, 87 }, { 1043, 2062, -4547, 87 } }
 };
 
 uint32 BrawlersBoss[MAX_BRAWLERS_RANK][BOSS_PER_RANK] =
