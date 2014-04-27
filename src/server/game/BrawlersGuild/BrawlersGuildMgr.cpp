@@ -386,6 +386,7 @@ void BrawlersGuild::PlayFightSound(bool play)
 {
 	if (Creature* ann = ObjectAccessor::FindCreature(announcer))
 	{
+		sLog->outDebug(LOG_FILTER_NETWORKIO, "\nSOUND\n %d", (uint32)play);
 		if (play)
 			ann->CastSpell(ann, BrawlersFightAmbiance[id], true);
 		else
