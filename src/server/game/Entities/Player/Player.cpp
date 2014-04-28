@@ -9626,7 +9626,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
 
     WorldPacket data(SMSG_LOOT_RESPONSE, 8 + 1 + 50 + 1 + 1);           // we guess size
 
-    data << LootView(*loot, guid, permission);
+    data << LootView(*loot, this, permission);
 
 	/*
     data << uint64(guid);

@@ -888,6 +888,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootItemView const& iv)
 ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 {
     ObjectGuid lootGuid = uint64(lv.viewer->GetLootGUID());
+    lootGuid = 3;
 	Loot &l = lv.loot;
 
 	uint8 itemsShown = 0;
