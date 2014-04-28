@@ -9312,7 +9312,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
     Loot* loot = 0;
     PermissionTypes permission = ALL_PERMISSION;
 
-    sLog->outDebug(LOG_FILTER_LOOT, "Player::SendLoot");
+    sLog->outDebug(LOG_FILTER_LOOT, "Player::SendLoot  cmsg_loot guid : " UI64FMTD ", getlootguid : " UI64FMTD " ", guid, GetLootGUID());
     if (IS_GAMEOBJECT_GUID(guid))
     {
         sLog->outDebug(LOG_FILTER_LOOT, "IS_GAMEOBJECT_GUID(guid)");
