@@ -9481,12 +9481,12 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
                     loot->FillLoot(1, LootTemplates_Creature, this, true);
             // It may need a better formula
             // Now it works like this: lvl10: ~6copper, lvl70: ~9silver
-			if (GetTeam() == ALLIANCE)
-            bones->loot.gold = uint32(urand(50, 150) * 0.016f * pow(float(pLevel)/5.76f, 2.5f) * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_A2));
-			else if (GetTeam() == HORDE)
-            bones->loot.gold = uint32(urand(50, 150) * 0.016f * pow(float(pLevel)/5.76f, 2.5f) * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_H2));
-			else
-            bones->loot.gold = uint32(urand(50, 150) * 0.016f * pow(float(pLevel)/5.76f, 2.5f) * sWorld->getRate(RATE_DROP_MONEY));
+            if (GetTeam() == ALLIANCE)
+                bones->loot.gold = uint32(urand(50, 150) * 0.016f * pow(float(pLevel)/5.76f, 2.5f) * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_A2));
+            else if (GetTeam() == HORDE)
+                bones->loot.gold = uint32(urand(50, 150) * 0.016f * pow(float(pLevel)/5.76f, 2.5f) * sWorld->getRate(RATE_DROP_MONEY) * sWorld->getRate(RATE_MULTIPLICATEUR_DROP_MONEY_H2));
+            else
+                bones->loot.gold = uint32(urand(50, 150) * 0.016f * pow(float(pLevel)/5.76f, 2.5f) * sWorld->getRate(RATE_DROP_MONEY));
         }
 
         if (bones->lootRecipient != this)
@@ -9626,7 +9626,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
 
     WorldPacket data(SMSG_LOOT_RESPONSE, 8 + 1 + 50 + 1 + 1);           // we guess size
 
-	data << LootView(*loot, this, permission);
+    data << LootView(*loot, guid, permission);
 
 	/*
     data << uint64(guid);
