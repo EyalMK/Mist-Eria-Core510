@@ -1,6 +1,7 @@
 
 #include "ScriptPCH.h"
 #include "BrawlersGuildMgr.h"
+#include "AchievementMgr.h"
 
 enum Events
 {
@@ -48,38 +49,52 @@ class npc_brawlers_guild_queue : public CreatureScript
 public:
     npc_brawlers_guild_queue() : CreatureScript("npc_brawlers_guild_queue") { }
 
+	bool OnGossipHello(Player* player, Creature* creature)
+	{
+		if (player)
+		{
+			bool ok = true;
+
+			if (player->GetTeamId() == 0 && !player->HasAchieved(ACHIEVEMENT_FIRST_RULE_A))
+				ok = false;
+
+			if (player->GetTeamId() == 1 && !player->HasAchieved(ACHIEVEMENT_FIRST_RULE_H))
+				ok = false;
+
+			if (player->HasAura(SPELL_QUEUED_FOR_BRAWL))
+				ok = false;
+
+			if (ok)
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_QUEUE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+				
+
+			player->PlayerTalkClass->SendGossipMenu(player->GetGossipTextId(creature), creature->GetGUID());
+		}
+
+		return true;
+	}
+
+	bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+	{
+		if (player)
+		{
+			player->PlayerTalkClass->ClearMenus();
+
+			int32 bp = 0;
+
+			if (action == GOSSIP_ACTION_INFO_DEF + 1)
+			{
+				sBrawlersGuildMgr->AddPlayer(player);
+				player->CLOSE_GOSSIP_MENU();
+			}
+		}
+
+		return true;
+	}
+
     struct npc_brawlers_guild_queueAI : public ScriptedAI
     {
         npc_brawlers_guild_queueAI(Creature* creature) : ScriptedAI(creature) {}
-
-		bool OnGossipHello(Player* player, Creature* creature)
-        {
-			if (player)
-			{
-				if (!player->HasAura(SPELL_QUEUED_FOR_BRAWL))
-					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_QUEUE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-
-				player->PlayerTalkClass->SendGossipMenu(40040, creature->GetGUID());
-			}
-
-            return true;
-        }
-
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
-        {
-			if (player)
-			{
-				player->PlayerTalkClass->ClearMenus();
-
-				if (action == GOSSIP_ACTION_INFO_DEF+1)
-				{
-					sBrawlersGuildMgr->AddPlayer(player);
-					player->CLOSE_GOSSIP_MENU();
-				}
-			}
-
-            return true;
-        }
 
         void Reset()
         {
@@ -116,6 +131,7 @@ public:
 			events.Reset();
 			battleStart = false;
 			me->Mount(DISPLAYID_GYROCOPTER);
+			sBrawlersGuildMgr->SetAnnouncer(TEAM_ALLIANCE, me->GetGUID());
         }
 
 		void DoAction(const int32 action)
@@ -177,7 +193,8 @@ public:
 
 		void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
 		{
-			sBrawlersGuildMgr->RemovePlayer(GetOwner()->ToPlayer());
+			if(!sBrawlersGuildMgr->IsPlayerInBrawl(GetOwner()->ToPlayer()))
+				sBrawlersGuildMgr->RemovePlayer(GetOwner()->ToPlayer());
 		}
 
 		void Register()
@@ -192,10 +209,47 @@ public:
 	}
 };
 
+// 93228, 93195, 93194
+class brawl_invitation_item : public ItemScript
+{
+public:
+
+	brawl_invitation_item()
+		: ItemScript("brawl_invitation_item")
+	{
+	}
+
+	bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/)
+	{
+		if (!player || !item)
+			return false;
+
+		if (player->HasAchieved(ACHIEVEMENT_FIRST_RULE_A) || player->HasAchieved(ACHIEVEMENT_FIRST_RULE_H))
+			return false;
+
+		if (player->GetTeamId() == 0) // Alliance
+		{
+			if (AchievementEntry const* achievementEntry = sAchievementMgr->GetAchievement(ACHIEVEMENT_FIRST_RULE_A))
+				player->CompletedAchievement(achievementEntry);
+			player->CastSpell(player, SPELL_ALLIANCE_SOUND, true);
+		}
+		else // Horde
+		{
+			if (AchievementEntry const* achievementEntry = sAchievementMgr->GetAchievement(ACHIEVEMENT_FIRST_RULE_H))
+				player->CompletedAchievement(achievementEntry);
+			player->CastSpell(player, SPELL_HORDE_SOUND, true);
+		}
+
+		player->DestroyItemCount(item->GetEntry(), 1, true);
+		return true;
+	}
+};
+
 
 void AddSC_the_brawlers_guild()
 {
     new npc_brawlers_guild_queue();
     new npc_bizmo();
 	new spell_queued_for_brawl();
+	new brawl_invitation_item();
 }

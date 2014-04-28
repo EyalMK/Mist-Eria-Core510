@@ -846,3 +846,109 @@ void WorldSession::HandleRequestRatedBgStats(WorldPacket& /*recvData*/)
 
     SendPacket(&data);
 }
+
+void WorldSession::HandleStartWargame(WorldPacket &recvData)
+{
+    ObjectGuid data; //Sent like a guid
+    ObjectGuid targetGuid;
+
+    data[0] = recvData.ReadBit();
+    targetGuid[1] = recvData.ReadBit();
+    targetGuid[3] = recvData.ReadBit();
+    targetGuid[0] = recvData.ReadBit();
+    data[3] = recvData.ReadBit();
+    data[2] = recvData.ReadBit();
+    data[7] = recvData.ReadBit();
+    targetGuid[5] = recvData.ReadBit();
+    data[1] = recvData.ReadBit();
+    targetGuid[6] = recvData.ReadBit();
+    data[5] = recvData.ReadBit();
+    data[6] = recvData.ReadBit();
+    data[4] = recvData.ReadBit();
+    targetGuid[7] = recvData.ReadBit();
+    targetGuid[4] = recvData.ReadBit();
+    targetGuid[2] = recvData.ReadBit();
+
+    recvData.ReadByteSeq(targetGuid[1]);
+    recvData.ReadByteSeq(data[1]);
+    recvData.ReadByteSeq(targetGuid[3]);
+    recvData.ReadByteSeq(data[5]);
+    recvData.ReadByteSeq(targetGuid[7]);
+    recvData.ReadByteSeq(targetGuid[5]);
+    recvData.ReadByteSeq(data[3]);
+    recvData.ReadByteSeq(targetGuid[6]);
+    recvData.ReadByteSeq(data[6]);
+    recvData.ReadByteSeq(data[2]);
+    recvData.ReadByteSeq(targetGuid[0]);
+    recvData.ReadByteSeq(data[4]);
+    recvData.ReadByteSeq(data[7]);
+    recvData.ReadByteSeq(targetGuid[2]);
+    recvData.ReadByteSeq(data[0]);
+    recvData.ReadByteSeq(targetGuid[4]);
+
+    uint64 wargameData = static_cast<uint64>(data);
+    wargameData &= 0xFFFFFF;
+
+    uint32 memberCount = (wargameData >> 24) & 0x3F;
+    uint32 bgId = wargameData & 0xFFFF;
+
+    Player *pPlayer = sObjectAccessor->GetPlayer(*_player, targetGuid);
+
+    if(!pPlayer)
+    {
+        sLog->outInfo(LOG_FILTER_NETWORKIO, "Player not found");
+        return;
+    }
+
+    uint64 wgResponseData = bgId & 0xFFFF;
+    //wgResponseData <<= 48;
+
+    ObjectGuid wgData = wgResponseData;
+    ObjectGuid challengerGuid = _player->GetGUID();
+
+    WorldPacket invite(SMSG_WARGAME_CHECK_ENTRY);
+
+    invite.WriteBit(challengerGuid[0]);
+    invite.WriteBit(challengerGuid[4]);
+    invite.WriteBit(wgData[1]);
+    invite.WriteBit(challengerGuid[7]);
+    invite.WriteBit(wgData[0]);
+    invite.WriteBit(challengerGuid[1]);
+    invite.WriteBit(data[4]);
+    invite.WriteBit(challengerGuid[2]);
+    invite.WriteBit(challengerGuid[6]);
+    invite.WriteBit(wgData[2]);
+    invite.WriteBit(wgData[3]);
+    invite.WriteBit(wgData[5]);
+    invite.WriteBit(challengerGuid[5]);
+    invite.WriteBit(wgData[6]);
+    invite.WriteBit(challengerGuid[3]);
+    invite.WriteBit(data[7]);
+
+    invite.FlushBits();
+
+    invite.WriteByteSeq(challengerGuid[5]);
+    invite.WriteByteSeq(wgData[6]);
+    invite.WriteByteSeq(challengerGuid[7]);
+    invite << uint32(30000); // Timeout
+    invite.WriteByteSeq(wgData[4]);
+    invite.WriteByteSeq(challengerGuid[1]);
+    invite.WriteByteSeq(wgData[0]);
+    invite.WriteByteSeq(wgData[7]);
+    invite.WriteByteSeq(challengerGuid[4]);
+    invite.WriteByteSeq(wgData[5]);
+    invite.WriteByteSeq(wgData[3]);
+    invite.WriteByteSeq(wgData[1]);
+    invite.WriteByteSeq(wgData[2]);
+    invite.WriteByteSeq(challengerGuid[6]);
+    invite.WriteByteSeq(challengerGuid[3]);
+    invite.WriteByteSeq(challengerGuid[2]);
+    invite.WriteByteSeq(challengerGuid[0]);
+
+    pPlayer->GetSession()->SendPacket(&invite);
+
+    WorldPacket conf(SMSG_WARGAME_REQUEST_SENT);
+    SendPacket(&conf);
+
+    sLog->outInfo(LOG_FILTER_NETWORKIO, UI64FMTD" %u %u", wargameData, memberCount, bgId);
+}

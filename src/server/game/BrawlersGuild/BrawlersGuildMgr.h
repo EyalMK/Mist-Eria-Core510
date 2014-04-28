@@ -23,17 +23,36 @@
 
 #include "Common.h"
 #include "DatabaseEnv.h"
-#include "DBCStructure.h"
 
 class Player;
 
 
-enum BrawlerSpells
+enum BrawlersSpells
 {
 	SPELL_QUEUED_FOR_BRAWL = 132639,
-	SPELL_ARENA_TELEPORTATION = 105315
+	SPELL_ARENA_TELEPORTATION = 105315,
+
+	SPELL_EXPLOSION_0 = 87706,
+	SPELL_EXPLOSION_1 = 87708,
+	SPELL_EXPLOSION_2 = 87711,
+	SPELL_EXPLOSION_3 = 87705,
+
+	SPELL_ALLIANCE_SOUND= 136144,
+	SPELL_HORDE_SOUND = 136143,
 };
 
+enum BrawlersSounds
+{
+	VICTORY = 0,
+	DEFEAT,
+	MAX_BRAWLERS_SOUNDS
+};
+
+enum BrawlersAchievement
+{
+	ACHIEVEMENT_FIRST_RULE_A = 7947,
+	ACHIEVEMENT_FIRST_RULE_H = 7948
+};
 
 enum BrawlersGuilds
 {
@@ -49,20 +68,25 @@ enum BrawlersTeleports
     MAX_TELEPORTS
 };
 
-float BrawlersTeleportsTeleportLocations[MAX_BRAWLERS_GUILDS][MAX_TELEPORTS][3] =
+enum BrawlersStates
 {
-    {{-121.f, 2499.f, -57.f},{-89.f, 2476.f, -43.f}},
-    {{2032.f, -4753.f, 87.f},{2062.f, 4547.f, 87.f}}
+	BRAWL_STATE_WAITING = 1,
+	BRAWL_STATE_PREPARE_COMBAT,
+	BRAWL_STATE_COMBAT,
+	BRAWL_STATE_TRANSITION
 };
 
+#define MAX_BRAWLERS_RANK 10
+#define BOSS_PER_RANK 4
+#define REPUTATION_PER_RANK 250
+#define MAX_BRAWLERS_REPUTATION 10000
+
 #define BrawlersList std::list<uint64>
-
-
 
 class BrawlersGuild
 {
     public:
-        BrawlersGuild();
+        BrawlersGuild(uint32 _id);
         ~BrawlersGuild();
 
         void Update(uint32 diff);
@@ -72,14 +96,60 @@ class BrawlersGuild
         void RemovePlayer(Player *player);
         void RemovePlayer(uint64 guid);
 
+		void BossReport(uint64 guid, bool win);
+
+		bool IsPlayerInBrawl(Player* player);
+
+		void SetAnnouncer(uint64 guid);
 
     private:
+
+		uint32 id;
 
         void UpdateAura(Player* player, uint32 rank);
 		void UpdateAllAuras();
 
+		void CheckDisconectedPlayers();
+		void RemovePlayers();
+
+		void UpdateBrawl(uint32 diff);
+
+		void PrepareCombat();
+		void StartCombat();
+		void EndCombat(bool win, bool time = false);
+
+		void KillPlayer(Player *player);
+		void RewardPlayer(Player *player);
+
+		uint32 GetPlayerRank(Player *player);
+		uint32 GetPlayerSubRank(Player *player);
+		uint32 GetBossForPlayer(Player *player);
+
+		void SetBrawlState(uint32 state);
+
+		void PlayFightSound(bool play);
+
+
+
+
+
+
+
         BrawlersList waitList;
         BrawlersList removeList;
+
+		uint32 brawlstate;
+
+
+		//Combat
+
+		uint64 current;
+		uint64 announcer;
+		uint64 boss;
+
+		int32 prepareCombatTimer;
+		int32 combatTimer;
+		int32 transitionTimer;
 };
 
 
@@ -104,9 +174,15 @@ class BrawlersGuildMgr
         void RemovePlayer(Player *player);
 		void RemovePlayer(uint64 guid);
 
+		void BossReport(uint64 guid, bool win);
+
+		bool IsPlayerInBrawl(Player* player);
+
+		void SetAnnouncer(uint32 guild, uint64 guid);
+
     private:
 
-        BrawlersGuild guilds[MAX_BRAWLERS_GUILDS];
+        BrawlersGuild *guilds[MAX_BRAWLERS_GUILDS];
 		
 };
 
