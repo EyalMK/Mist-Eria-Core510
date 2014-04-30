@@ -243,7 +243,7 @@ void Battleground::Update(uint32 diff)
     if (!PreUpdateImpl(diff))
         return;
 
-    if (!GetPlayersSize() && !IsWargame()) //Gros hack bien degueu
+    if (!GetPlayersSize())
     {
         //BG is empty
         // if there are no players invited, delete BG
