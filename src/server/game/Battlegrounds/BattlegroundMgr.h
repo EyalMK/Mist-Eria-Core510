@@ -144,7 +144,7 @@ class BattlegroundMgr
 
         WargameInvitation* GetWargame(uint32 wargameId)
         {
-            if(m_wargames.find(wargameId))
+            if(m_wargames.find(wargameId) != m_wargames.end())
                 return &(m_wargames[wargameId]);
             else
                 return 0;
