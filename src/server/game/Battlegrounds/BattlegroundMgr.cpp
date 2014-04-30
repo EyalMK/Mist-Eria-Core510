@@ -57,7 +57,7 @@
 
 BattlegroundMgr::BattlegroundMgr() :
     m_NextRatedArenaUpdate(sWorld->getIntConfig(CONFIG_ARENA_RATED_UPDATE_TIMER)),
-    m_ArenaTesting(false), m_Testing(false)
+    m_ArenaTesting(false), m_Testing(false), lastWargameId(0)
 { }
 
 BattlegroundMgr::~BattlegroundMgr()
@@ -150,6 +150,8 @@ void BattlegroundMgr::Update(uint32 diff)
         else
             m_NextRatedArenaUpdate -= diff;
     }
+
+    UpdateWargames();
 }
 
 void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battleground* bg, Player* player, uint8 QueueSlot, uint8 StatusID, uint32 Time1, uint32 Time2, uint8 arenatype)
@@ -1216,7 +1218,7 @@ uint32 BattlegroundMgr::CreateClientVisibleInstanceId(BattlegroundTypeId bgTypeI
 }
 
 // create a new battleground that will really be used to play
-Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId originalBgTypeId, PvPDifficultyEntry const* bracketEntry, uint8 arenaType, bool isRated)
+Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId originalBgTypeId, PvPDifficultyEntry const* bracketEntry, uint8 arenaType, bool isRated, bool isWargame)
 {
     BattlegroundTypeId bgTypeId = originalBgTypeId;
     bool isRandom = false;
@@ -1310,6 +1312,7 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId original
     bg->SetTypeID(originalBgTypeId);
     bg->SetRandomTypeID(bgTypeId);
     bg->SetRated(isRated);
+    bg->SetIsWargame(isWargame);
     bg->SetRandom(isRandom);
     bg->SetGuid(MAKE_NEW_GUID(bgTypeId, 0, HIGHGUID_BATTLEGROUND));
 
@@ -1962,4 +1965,22 @@ void BattlegroundMgr::RemoveBattleground(BattlegroundTypeId bgTypeId, uint32 ins
 uint32 BattlegroundMgr::GetBattlegroundCount(BattlegroundTypeId bgTypeId)
 {
 	return bgDataStore[bgTypeId].m_Battlegrounds.size();
+}
+
+void BattlegroundMgr::UpdateWargames()
+{
+    std::vector< std::map<uint32, WargameInvitation> > wargameToRemove;
+
+    for(std::map<uint32, WargameInvitation>::iterator i = m_wargames.begin() ; i != m_wargames.end() ; i++)
+    {
+        WargameInvitation&  wg = i->second;
+        if(wg.IsReadyToStart())
+        {
+            wg.LaunchWargame();
+            wargameToRemove.push_back(i);
+        }
+    }
+
+    for(uint32 i = 0 ; i < wargameToRemove.size() ; i++)
+        m_wargames.erase(wargameToRemove[i]);
 }

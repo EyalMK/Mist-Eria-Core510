@@ -318,6 +318,9 @@ class Group
         // FG: evil hacks
         void BroadcastGroupUpdate(void);
 
+        void SetWargameId(uint32 id) { m_wargameId = id; }
+        uint32 GetWargameId() const { return m_wargameId; }
+
     protected:
         bool _setMembersGroup(uint64 guid, uint8 group);
         void _homebindIfInstance(Player* player);
@@ -350,5 +353,6 @@ class Group
         uint32              m_counter;                      // used only in SMSG_GROUP_LIST
         uint32              m_maxEnchantingLevel;
         uint32              m_dbStoreId;                    // Represents the ID used in database (Can be reused by other groups if group was disbanded)
+        uint32              m_wargameId;
 };
 #endif

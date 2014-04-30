@@ -87,7 +87,7 @@ class BattlegroundMgr
         Battleground* GetBattlegroundThroughClientInstance(uint32 instanceId, BattlegroundTypeId bgTypeId);
         Battleground* GetBattleground(uint32 InstanceID, BattlegroundTypeId bgTypeId);
         Battleground* GetBattlegroundTemplate(BattlegroundTypeId bgTypeId);
-        Battleground* CreateNewBattleground(BattlegroundTypeId bgTypeId, PvPDifficultyEntry const* bracketEntry, uint8 arenaType, bool isRated);
+        Battleground* CreateNewBattleground(BattlegroundTypeId bgTypeId, PvPDifficultyEntry const* bracketEntry, uint8 arenaType, bool isRated, bool isWargame = false);
 
         void AddBattleground(Battleground* bg);
         void RemoveBattleground(BattlegroundTypeId bgTypeId, uint32 instanceId);
@@ -134,6 +134,22 @@ class BattlegroundMgr
             return BATTLEGROUND_WS;
         }
 
+        void UpdateWargames();
+        WargameInvitation* CreateWargame(uint32 &wargameId)
+        {
+            lastWargameId++;
+            wargameId = lastWargameId;
+            return &(m_wargames[wargameId]);
+        }
+
+        WargameInvitation* GetWargame(uint32 wargameId)
+        {
+            if(m_wargames.find(wargameId))
+                return &(m_wargames[wargameId]);
+            else
+                return 0;
+        }
+
     private:
         bool CreateBattleground(CreateBattlegroundData& data);
         uint32 CreateClientVisibleInstanceId(BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id);
@@ -153,6 +169,9 @@ class BattlegroundMgr
         bool   m_ArenaTesting;
         bool   m_Testing;
         BattleMastersMap mBattleMastersMap;
+
+        std::map<uint32, WargameInvitation> m_wargames;
+        uint32 lastWargameId;
 };
 
 #define sBattlegroundMgr ACE_Singleton<BattlegroundMgr, ACE_Null_Mutex>::instance()

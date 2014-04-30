@@ -97,6 +97,7 @@ public:
             { "difficulty",		SEC_MODERATOR,      false, &HandleDebugDifficultyCommand,	   "", NULL },
             { "op32",		    SEC_MODERATOR,      false, &HandleDebugSendOpcodeUint32Command,"", NULL },
             { "fakeGroup",      SEC_ADMINISTRATOR,  false, &HandleFakeGroupInvite,             "", NULL },
+            { "wargame",        SEC_ADMINISTRATOR,  false, &HandleStartWargame,                "", NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
         };
         static ChatCommand debugSetCommandTable[] = 
@@ -1622,6 +1623,31 @@ public:
         pGrp->AddMember(pPlayer);
 
         return true;
+    }
+
+    static bool HandleStartWargame(ChatHandler *handler, const char *args)
+    {
+        Player *pPlayer = handler->GetSession()->GetPlayer();
+        Player *tgt = handler->getSelectedPlayer();
+
+        uint32 bgType = atoi(args);
+
+        if(!pPlayer || !tgt)
+            return false;
+
+        Group *g1 = pPlayer->GetGroup();
+        Group *g2 = tgt->GetGroup();
+
+        if(!g1 || !g2)
+            return false;
+
+        uint32 wgId;
+
+        WargameInvitation *invite = sBattlegroundMgr->CreateWargame(wgId);
+        invite->SetGroup1(g1);
+        invite->SetGroup2(g2);
+        invite->SetBGType(wgId);
+        invite->ReadyToStart(); //For testing purpose
     }
 
 };

@@ -26,6 +26,7 @@
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "GroupMgr.h"
 
 /*********************************************************/
 /***            BATTLEGROUND QUEUE SYSTEM              ***/
@@ -762,7 +763,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
     {
         Battleground* bg = *itr; ++itr;
         // DO NOT allow queue manager to invite new player to rated games
-        if (!bg->isRated() && bg->GetTypeID() == bgTypeId && bg->GetBracketId() == bracket_id &&
+        if (!bg->IsWargame() && !bg->isRated() && bg->GetTypeID() == bgTypeId && bg->GetBracketId() == bracket_id &&
             bg->GetStatus() > STATUS_WAIT_QUEUE && bg->GetStatus() < STATUS_WAIT_LEAVE)
         {
             // clear selection pools
@@ -1069,4 +1070,60 @@ bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 void BGQueueRemoveEvent::Abort(uint64 /*e_time*/)
 {
     //do nothing
+}
+
+void WargameInvitation::LaunchWargame()
+{
+    if(!IsReadyToStart())
+        return;
+
+    Group const *g1  = sGroupMgr->GetGroupByGUID(group1);
+    Group const *g2  = sGroupMgr->GetGroupByGUID(group2);
+
+    if(!g1 || !g2)
+        return;
+
+    g1->SetWargameId(0);
+    g2->SetWargameId(0);
+
+    Battleground *tmp = sBattlegroundMgr->GetBattlegroundTemplate(bgType);
+    if(!tmp)
+        return;
+
+    PvPDifficultyEntry *pvp = GetBattlegroundBracketByLevel(tmp->GetMapId(), g1->GetFirstMember()->getSource()->getLevel());
+    if(!pvp)
+        return;
+
+    Battleground *wargame = sBattlegroundMgr->CreateNewBattleground(bgType, pvp, 0, false, true);
+
+    if(wargame)
+    {        
+        wargame->StartBattleground();
+
+        for(GroupReference *it = grp->GetFirstMember() ; it != NULL ; it->next())
+        {
+            Player *plr = it->getSource();
+            if(plr)
+            {
+                plr->SetBGTeam(ALLIANCE);
+                wargame->AddPlayer(plr);
+                plr->SetBattlegroundEntryPoint();
+                plr->SetBattlegroundId(wargame->GetInstanceID(), wargame->GetTypeID());
+                sBattlegroundMgr->SendToBattleground(plr, wargame->GetInstanceID(), wargame->GetTypeID());
+            }
+        }
+
+        for(GroupReference *it = grp->GetFirstMember() ; it != NULL ; it->next())
+        {
+            Player *plr = it->getSource();
+            if(plr)
+            {
+                plr->SetBGTeam(HORDE);
+                wargame->AddPlayer(plr);
+                plr->SetBattlegroundEntryPoint();
+                plr->SetBattlegroundId(wargame->GetInstanceID(), wargame->GetTypeID());
+                sBattlegroundMgr->SendToBattleground(plr, wargame->GetInstanceID(), wargame->GetTypeID());
+            }
+        }
+    }
 }

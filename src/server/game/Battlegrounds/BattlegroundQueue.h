@@ -23,6 +23,7 @@
 #include "DBCEnums.h"
 #include "Battleground.h"
 #include "EventProcessor.h"
+#include "Group.h"
 
 #include <deque>
 
@@ -175,6 +176,33 @@ class BGQueueRemoveEvent : public BasicEvent
         uint32 m_RemoveTime;
         BattlegroundTypeId m_BgTypeId;
         BattlegroundQueueTypeId m_BgQueueTypeId;
+};
+
+class WargameInvitation
+{
+    uint64 group1, group2;
+    uint32 bgType;
+    bool readyToStart;
+
+    void InitGroupQueue(GroupQueueInfo &q, Group *grp);
+
+public:
+
+    WargameInvitation() : readyToStart(false) {}
+
+    uint64 GetGroup1() const { return group1; }
+    uint64 GetGroup2() const { return group2; }
+    uint32 GetBgType() const { return bgType; }
+
+    void SetGroup1(Group *g1) { group1 = g1->GetGUID(); }
+    void SetGroup2(Group *g2) { group2 = g2->GetGUID(); }
+    void SetBGType(uint32 bgTp) { bgType = bgTp; }
+
+    bool IsReadyToStart() const { return readyToStart; }
+
+    void ReadyToStart() { readyToStart = true; }
+
+    void LaunchWargame();
 };
 
 #endif
