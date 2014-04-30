@@ -11,6 +11,8 @@
 set(sources
   ${sources}
   BrawlersGuild/brawlers_guild.cpp
+  BrawlersGuild/brawlers_guild_boss.cpp
+  BrawlersGuild/brawlers_guild_special_boss.cpp
 )
 
 message("  -> Prepared: Brawlers Guild")

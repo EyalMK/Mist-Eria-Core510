@@ -23,17 +23,36 @@
 
 #include "Common.h"
 #include "DatabaseEnv.h"
-#include "DBCStructure.h"
 
 class Player;
 
 
-enum BrawlerSpells
+enum BrawlersSpells
 {
 	SPELL_QUEUED_FOR_BRAWL = 132639,
-	SPELL_ARENA_TELEPORTATION = 105315
+	SPELL_ARENA_TELEPORTATION = 105315,
+
+	SPELL_EXPLOSION_0 = 87706,
+	SPELL_EXPLOSION_1 = 87708,
+	SPELL_EXPLOSION_2 = 87711,
+	SPELL_EXPLOSION_3 = 87705,
+
+	SPELL_ALLIANCE_SOUND= 136144,
+	SPELL_HORDE_SOUND = 136143,
 };
 
+enum BrawlersSounds
+{
+	VICTORY = 0,
+	DEFEAT,
+	MAX_BRAWLERS_SOUNDS
+};
+
+enum BrawlersAchievement
+{
+	ACHIEVEMENT_FIRST_RULE_A = 7947,
+	ACHIEVEMENT_FIRST_RULE_H = 7948
+};
 
 enum BrawlersGuilds
 {
@@ -51,11 +70,16 @@ enum BrawlersTeleports
 
 enum BrawlersStates
 {
-	BRAWL_STATE_WAITING = 0,
+	BRAWL_STATE_WAITING = 1,
 	BRAWL_STATE_PREPARE_COMBAT,
 	BRAWL_STATE_COMBAT,
 	BRAWL_STATE_TRANSITION
 };
+
+#define MAX_BRAWLERS_RANK 10
+#define BOSS_PER_RANK 4
+#define REPUTATION_PER_RANK 250
+#define MAX_BRAWLERS_REPUTATION 10000
 
 #define BrawlersList std::list<uint64>
 
@@ -72,7 +96,11 @@ class BrawlersGuild
         void RemovePlayer(Player *player);
         void RemovePlayer(uint64 guid);
 
-		
+		void BossReport(uint64 guid, bool win);
+
+		bool IsPlayerInBrawl(Player* player);
+
+		void SetAnnouncer(uint64 guid);
 
     private:
 
@@ -82,24 +110,43 @@ class BrawlersGuild
 		void UpdateAllAuras();
 
 		void CheckDisconectedPlayers();
+		void RemovePlayers();
 
 		void UpdateBrawl(uint32 diff);
 
 		void PrepareCombat();
 		void StartCombat();
-		void EndCombat(bool win);
+		void EndCombat(bool win, bool time = false);
 
+		void KillPlayer(Player *player);
 		void RewardPlayer(Player *player);
+
+		uint32 GetPlayerRank(Player *player);
+		uint32 GetPlayerSubRank(Player *player);
+		uint32 GetBossForPlayer(Player *player);
+
+		void SetBrawlState(uint32 state);
+
+		void PlayFightSound(bool play);
+
+
+
+
+
+
 
         BrawlersList waitList;
         BrawlersList removeList;
 
-		BrawlersStates brawlstate;
+		uint32 brawlstate;
 
 
 		//Combat
 
 		uint64 current;
+		uint64 announcer;
+		uint64 boss;
+
 		int32 prepareCombatTimer;
 		int32 combatTimer;
 		int32 transitionTimer;
@@ -126,6 +173,12 @@ class BrawlersGuildMgr
 
         void RemovePlayer(Player *player);
 		void RemovePlayer(uint64 guid);
+
+		void BossReport(uint64 guid, bool win);
+
+		bool IsPlayerInBrawl(Player* player);
+
+		void SetAnnouncer(uint32 guild, uint64 guid);
 
     private:
 

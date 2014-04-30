@@ -928,225 +928,226 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 		if(l.loot_type)
 			b << uint8(l.loot_type);
 		return b;
-	}
+    } else {
 
-	b.WriteBits(0, 22);                                     // currency count placeholder
+        b.WriteBits(0, 22);                                     // currency count placeholder
 
-    b.WriteBit(lootGuid[7]);
-	b.WriteBit(lv.permission != NONE_PERMISSION); //byte18
-    b.WriteBit(1); //byte30
-    b.WriteBit(lootGuid[2]);
-	b.WriteBit(1); //!byte31
-    b.WriteBit(lootGuid[6]);
-	b.WriteBit(!l.gold); //!dword1C
-    b.WriteBit(lootGuid[1]);
-    b.WriteBit(lootGuid[4]);
+        b.WriteBit(lootGuid[7]);
+        b.WriteBit(lv.permission != NONE_PERMISSION); //byte18
+        b.WriteBit(1); //byte30
+        b.WriteBit(lootGuid[2]);
+        b.WriteBit(1); //!byte31
+        b.WriteBit(lootGuid[6]);
+        b.WriteBit(!l.gold); //!dword1C
+        b.WriteBit(lootGuid[1]);
+        b.WriteBit(lootGuid[4]);
 
-	std::list<LootItemView> itemsShownList;
-	switch (lv.permission)
-	{
-		case GROUP_PERMISSION:
-		{
-			// if you are not the round-robin group looter, you can only see
-			// blocked rolled items and quest items, and !ffa items
-			for (uint8 i = 0; i < l.items.size(); ++i)
-			{
-				if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
-				{
-					uint8 slot_type;
+        std::list<LootItemView> itemsShownList;
+        switch (lv.permission)
+        {
+        case GROUP_PERMISSION:
+        {
+            // if you are not the round-robin group looter, you can only see
+            // blocked rolled items and quest items, and !ffa items
+            for (uint8 i = 0; i < l.items.size(); ++i)
+            {
+                if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
+                {
+                    uint8 slot_type;
 
-					if (l.items[i].is_blocked)
-						slot_type = LOOT_SLOT_TYPE_ROLL_ONGOING;
-					else if (l.roundRobinPlayer == 0 || !l.items[i].is_underthreshold || lv.viewer->GetGUID() == l.roundRobinPlayer)
-					{
-						// no round robin owner or he has released the loot
-						// or it IS the round robin group owner
-						// => item is lootable
-						slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT;
-					}
-					else
-						// item shall not be displayed.
-						continue;
-					itemsShownList.push_back(LootItemView(l.items[i], itemsShown, LootSlotType(slot_type)));
-					++itemsShown;
-				}
-			}
-			break;
-		}
-		case ROUND_ROBIN_PERMISSION:
-		{
-			for (uint8 i = 0; i < l.items.size(); ++i)
-			{
-				if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
-				{
-					if (l.roundRobinPlayer != 0 && lv.viewer->GetGUID() != l.roundRobinPlayer)
-						// item shall not be displayed.
-							continue;
-					itemsShownList.push_back(LootItemView(l.items[i], itemsShown, LOOT_SLOT_TYPE_ALLOW_LOOT));
-					++itemsShown;
-				}
-			}
-			break;
-		}
-		case ALL_PERMISSION:
-		case MASTER_PERMISSION:
-		case OWNER_PERMISSION:
-		{
-			uint8 slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT;
-			switch (lv.permission)
-			{
-				case MASTER_PERMISSION:
-					slot_type = LOOT_SLOT_TYPE_MASTER;
-					break;
-				case OWNER_PERMISSION:
-					slot_type = LOOT_SLOT_TYPE_OWNER;
-					break;
-				default:
-					break;
-			}
+                    if (l.items[i].is_blocked)
+                        slot_type = LOOT_SLOT_TYPE_ROLL_ONGOING;
+                    else if (l.roundRobinPlayer == 0 || !l.items[i].is_underthreshold || lv.viewer->GetGUID() == l.roundRobinPlayer)
+                    {
+                        // no round robin owner or he has released the loot
+                        // or it IS the round robin group owner
+                        // => item is lootable
+                        slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT;
+                    }
+                    else
+                        // item shall not be displayed.
+                        continue;
+                    itemsShownList.push_back(LootItemView(l.items[i], itemsShown, LootSlotType(slot_type)));
+                    ++itemsShown;
+                }
+            }
+            break;
+        }
+        case ROUND_ROBIN_PERMISSION:
+        {
+            for (uint8 i = 0; i < l.items.size(); ++i)
+            {
+                if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
+                {
+                    if (l.roundRobinPlayer != 0 && lv.viewer->GetGUID() != l.roundRobinPlayer)
+                        // item shall not be displayed.
+                        continue;
+                    itemsShownList.push_back(LootItemView(l.items[i], itemsShown, LOOT_SLOT_TYPE_ALLOW_LOOT));
+                    ++itemsShown;
+                }
+            }
+            break;
+        }
+        case ALL_PERMISSION:
+        case MASTER_PERMISSION:
+        case OWNER_PERMISSION:
+        {
+            uint8 slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT;
+            switch (lv.permission)
+            {
+            case MASTER_PERMISSION:
+                slot_type = LOOT_SLOT_TYPE_MASTER;
+                break;
+            case OWNER_PERMISSION:
+                slot_type = LOOT_SLOT_TYPE_OWNER;
+                break;
+            default:
+                break;
+            }
 
-			for (uint8 i = 0; i < l.items.size(); ++i)
-			{
-				if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
-				{
-					itemsShownList.push_back(LootItemView(l.items[i], itemsShown, LootSlotType(slot_type)));
-					++itemsShown;
-				}
-			}
-			break;
-		}
-	}
+            for (uint8 i = 0; i < l.items.size(); ++i)
+            {
+                if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
+                {
+                    itemsShownList.push_back(LootItemView(l.items[i], itemsShown, LootSlotType(slot_type)));
+                    ++itemsShown;
+                }
+            }
+            break;
+        }
+        }
 
-	LootSlotType slotType = lv.permission == OWNER_PERMISSION ? LOOT_SLOT_TYPE_OWNER : LOOT_SLOT_TYPE_ALLOW_LOOT;
-	QuestItemMap const& lootPlayerQuestItems = l.GetPlayerQuestItems();
-	QuestItemMap::const_iterator q_itr = lootPlayerQuestItems.find(lv.viewer->GetGUIDLow());
-	if (q_itr != lootPlayerQuestItems.end())
-	{
-		QuestItemList* q_list = q_itr->second;
-		for (QuestItemList::const_iterator qi = q_list->begin(); qi != q_list->end(); ++qi)
-		{
-			LootItem &item = l.quest_items[qi->index];
-			if (!qi->is_looted && !item.is_looted)
-			{
-				LootSlotType currentSlot = slotType;
-				if (item.follow_loot_rules)
-				{
-					switch (lv.permission)
-					{
-						case MASTER_PERMISSION:
-							currentSlot = LOOT_SLOT_TYPE_MASTER;
-							break;
-						case GROUP_PERMISSION:
-						case ROUND_ROBIN_PERMISSION:
-							if (!item.is_blocked)
-								currentSlot = LOOT_SLOT_TYPE_ALLOW_LOOT;
-							else
-								currentSlot = LOOT_SLOT_TYPE_ROLL_ONGOING;
-							break;
-					}
-				}
-				itemsShownList.push_back(LootItemView(item, itemsShown, currentSlot));
-				++itemsShown;
-			}
-		}
-	}
+        LootSlotType slotType = lv.permission == OWNER_PERMISSION ? LOOT_SLOT_TYPE_OWNER : LOOT_SLOT_TYPE_ALLOW_LOOT;
+        QuestItemMap const& lootPlayerQuestItems = l.GetPlayerQuestItems();
+        QuestItemMap::const_iterator q_itr = lootPlayerQuestItems.find(lv.viewer->GetGUIDLow());
+        if (q_itr != lootPlayerQuestItems.end())
+        {
+            QuestItemList* q_list = q_itr->second;
+            for (QuestItemList::const_iterator qi = q_list->begin(); qi != q_list->end(); ++qi)
+            {
+                LootItem &item = l.quest_items[qi->index];
+                if (!qi->is_looted && !item.is_looted)
+                {
+                    LootSlotType currentSlot = slotType;
+                    if (item.follow_loot_rules)
+                    {
+                        switch (lv.permission)
+                        {
+                        case MASTER_PERMISSION:
+                            currentSlot = LOOT_SLOT_TYPE_MASTER;
+                            break;
+                        case GROUP_PERMISSION:
+                        case ROUND_ROBIN_PERMISSION:
+                            if (!item.is_blocked)
+                                currentSlot = LOOT_SLOT_TYPE_ALLOW_LOOT;
+                            else
+                                currentSlot = LOOT_SLOT_TYPE_ROLL_ONGOING;
+                            break;
+                        }
+                    }
+                    itemsShownList.push_back(LootItemView(item, itemsShown, currentSlot));
+                    ++itemsShown;
+                }
+            }
+        }
 
-	QuestItemMap const& lootPlayerFFAItems = l.GetPlayerFFAItems();
-	QuestItemMap::const_iterator ffa_itr = lootPlayerFFAItems.find(lv.viewer->GetGUIDLow());
-	if (ffa_itr != lootPlayerFFAItems.end())
-	{
-		QuestItemList* ffa_list = ffa_itr->second;
-		for (QuestItemList::const_iterator fi = ffa_list->begin(); fi != ffa_list->end(); ++fi)
-		{
-			LootItem &item = l.items[fi->index];
-			if (!fi->is_looted && !item.is_looted)
-			{
-				itemsShownList.push_back(LootItemView(item, itemsShown, slotType));
-				++itemsShown;
-			}
-		}
-	}
+        QuestItemMap const& lootPlayerFFAItems = l.GetPlayerFFAItems();
+        QuestItemMap::const_iterator ffa_itr = lootPlayerFFAItems.find(lv.viewer->GetGUIDLow());
+        if (ffa_itr != lootPlayerFFAItems.end())
+        {
+            QuestItemList* ffa_list = ffa_itr->second;
+            for (QuestItemList::const_iterator fi = ffa_list->begin(); fi != ffa_list->end(); ++fi)
+            {
+                LootItem &item = l.items[fi->index];
+                if (!fi->is_looted && !item.is_looted)
+                {
+                    itemsShownList.push_back(LootItemView(item, itemsShown, slotType));
+                    ++itemsShown;
+                }
+            }
+        }
 
-	QuestItemMap const& lootPlayerNonQuestNonFFAConditionalItems = l.GetPlayerNonQuestNonFFAConditionalItems();
-	QuestItemMap::const_iterator nn_itr = lootPlayerNonQuestNonFFAConditionalItems.find(lv.viewer->GetGUIDLow());
-	if (nn_itr != lootPlayerNonQuestNonFFAConditionalItems.end())
-	{
-		QuestItemList* conditional_list = nn_itr->second;
-		for (QuestItemList::const_iterator ci = conditional_list->begin(); ci != conditional_list->end(); ++ci)
-		{
-			LootItem &item = l.items[ci->index];
-			if (!ci->is_looted && !item.is_looted)
-			{
-				LootSlotType currentSlot = slotType;
-				if (item.follow_loot_rules)
-				{
-					switch (lv.permission)
-					{
-					case MASTER_PERMISSION:
-						currentSlot = LOOT_SLOT_TYPE_MASTER;
-						break;
-					case GROUP_PERMISSION:
-					case ROUND_ROBIN_PERMISSION:
-						if (!item.is_blocked)
-							currentSlot = LOOT_SLOT_TYPE_ALLOW_LOOT;
-						else
-							currentSlot = LOOT_SLOT_TYPE_ROLL_ONGOING;
-						break;
-					}
-				}
-				itemsShownList.push_back(LootItemView(item, itemsShown, currentSlot));
-				++itemsShown;
-			}
-		}
-	}
+        QuestItemMap const& lootPlayerNonQuestNonFFAConditionalItems = l.GetPlayerNonQuestNonFFAConditionalItems();
+        QuestItemMap::const_iterator nn_itr = lootPlayerNonQuestNonFFAConditionalItems.find(lv.viewer->GetGUIDLow());
+        if (nn_itr != lootPlayerNonQuestNonFFAConditionalItems.end())
+        {
+            QuestItemList* conditional_list = nn_itr->second;
+            for (QuestItemList::const_iterator ci = conditional_list->begin(); ci != conditional_list->end(); ++ci)
+            {
+                LootItem &item = l.items[ci->index];
+                if (!ci->is_looted && !item.is_looted)
+                {
+                    LootSlotType currentSlot = slotType;
+                    if (item.follow_loot_rules)
+                    {
+                        switch (lv.permission)
+                        {
+                        case MASTER_PERMISSION:
+                            currentSlot = LOOT_SLOT_TYPE_MASTER;
+                            break;
+                        case GROUP_PERMISSION:
+                        case ROUND_ROBIN_PERMISSION:
+                            if (!item.is_blocked)
+                                currentSlot = LOOT_SLOT_TYPE_ALLOW_LOOT;
+                            else
+                                currentSlot = LOOT_SLOT_TYPE_ROLL_ONGOING;
+                            break;
+                        }
+                    }
+                    itemsShownList.push_back(LootItemView(item, itemsShown, currentSlot));
+                    ++itemsShown;
+                }
+            }
+        }
 
-	b.WriteBits(itemsShownList.size(), 21);                        // item count placeholder
-	for(std::list<LootItemView>::const_iterator itr = itemsShownList.begin() ; itr != itemsShownList.end() ; ++itr)
-	{
-		b.WriteBit(!itr->position);
-        b.WriteBit(!itr->slotType);
-	}
+        b.WriteBits(itemsShownList.size(), 21);                        // item count placeholder
+        for(std::list<LootItemView>::const_iterator itr = itemsShownList.begin() ; itr != itemsShownList.end() ; ++itr)
+        {
+            b.WriteBit(!itr->position);
+            b.WriteBit(!itr->slotType);
+        }
 
 
 
-	b.WriteBit(1); //!byte44
-    b.WriteBit(lootGuid[0]);
-	b.WriteBit(!l.loot_type); //!byte32
-	b.WriteBit(!lv.permission); //!byte45
-    b.WriteBit(lootGuid[5]);
-    b.WriteBit(lootGuid[3]);
-	b.FlushBits();
+        b.WriteBit(1); //!byte44
+        b.WriteBit(lootGuid[0]);
+        b.WriteBit(!l.loot_type); //!byte32
+        b.WriteBit(!lv.permission); //!byte45
+        b.WriteBit(lootGuid[5]);
+        b.WriteBit(lootGuid[3]);
+        b.FlushBits();
 
-    b.WriteByteSeq(lootGuid[1]);
-    b.WriteByteSeq(lootGuid[6]);
+        b.WriteByteSeq(lootGuid[1]);
+        b.WriteByteSeq(lootGuid[6]);
 
-	for(std::list<LootItemView>::const_iterator itr = itemsShownList.begin() ; itr != itemsShownList.end() ; ++itr)
-	{
-		LootItemView item = (*itr);
-		b << item;
-	}
+        for(std::list<LootItemView>::const_iterator itr = itemsShownList.begin() ; itr != itemsShownList.end() ; ++itr)
+        {
+            LootItemView item = (*itr);
+            b << item;
+        }
 
-    b.WriteByteSeq(lootGuid[3]);
-    b.WriteByteSeq(lootGuid[2]);
+        b.WriteByteSeq(lootGuid[3]);
+        b.WriteByteSeq(lootGuid[2]);
 
-	//Si byte44 => uint8
-	//boucle sur currencyCounter
-	//       uint32
-	//       uint8
-	//       uint32
-	//fin boucle
-	//Si byte31 => uint8
-	
-	if(l.gold)
-		b << uint32(l.gold);
-    b.WriteByteSeq(lootGuid[7]);
-	if(lv.permission) //Si byte45 => uint8
-		b << uint8(lv.permission);
-    b.WriteByteSeq(lootGuid[5]);
-    b.WriteByteSeq(lootGuid[0]);
-    b.WriteByteSeq(lootGuid[4]);
-	if(l.loot_type)
-		b << uint8(l.loot_type);
+        //Si byte44 => uint8
+        //boucle sur currencyCounter
+        //       uint32
+        //       uint8
+        //       uint32
+        //fin boucle
+        //Si byte31 => uint8
+
+        if(l.gold)
+            b << uint32(l.gold);
+        b.WriteByteSeq(lootGuid[7]);
+        if(lv.permission) //Si byte45 => uint8
+            b << uint8(lv.permission);
+        b.WriteByteSeq(lootGuid[5]);
+        b.WriteByteSeq(lootGuid[0]);
+        b.WriteByteSeq(lootGuid[4]);
+        if(l.loot_type)
+            b << uint8(l.loot_type);
+    }
 
     return b;
 }
