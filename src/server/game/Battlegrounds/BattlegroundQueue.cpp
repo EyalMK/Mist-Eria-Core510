@@ -1100,7 +1100,7 @@ void WargameInvitation::LaunchWargame()
     {        
         wargame->StartBattleground();
 
-        for(GroupReference *it = g1->GetFirstMember() ; it != NULL ; it->next())
+        for(GroupReference *it = g1->GetFirstMember() ; it != NULL ; it = it->next())
         {
             Player *plr = it->getSource();
             if(plr)
@@ -1114,7 +1114,7 @@ void WargameInvitation::LaunchWargame()
             }
         }
 
-        for(GroupReference *it = g2->GetFirstMember() ; it != NULL ; it->next())
+        for(GroupReference *it = g2->GetFirstMember() ; it != NULL ; it = it->next())
         {
             Player *plr = it->getSource();
             if(plr)
