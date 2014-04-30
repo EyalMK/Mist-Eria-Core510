@@ -1109,7 +1109,6 @@ void WargameInvitation::LaunchWargame()
                 plr->SetBattlegroundId(wargame->GetInstanceID(), wargame->GetTypeID());
                 plr->SetInviteForBattlegroundQueueType(sBattlegroundMgr->BGQueueTypeId(wargame->GetTypeID(), wargame->GetArenaType()), wargame->GetInstanceID());
                 wargame->IncreaseInvitedCount(ALLIANCE);
-                wargame->AddPlayer(plr);
                 sBattlegroundMgr->SendToBattleground(plr, wargame->GetInstanceID(), wargame->GetTypeID());
             }
         }
@@ -1125,7 +1124,6 @@ void WargameInvitation::LaunchWargame()
                 plr->SetBattlegroundId(wargame->GetInstanceID(), wargame->GetTypeID());
                 plr->SetInviteForBattlegroundQueueType(sBattlegroundMgr->BGQueueTypeId(wargame->GetTypeID(), wargame->GetArenaType()), wargame->GetInstanceID());
                 wargame->IncreaseInvitedCount(HORDE);
-                wargame->AddPlayer(plr);
                 sBattlegroundMgr->SendToBattleground(plr, wargame->GetInstanceID(), wargame->GetTypeID());
             }
         }
