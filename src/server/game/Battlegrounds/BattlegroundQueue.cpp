@@ -1097,9 +1097,7 @@ void WargameInvitation::LaunchWargame()
     Battleground *wargame = sBattlegroundMgr->CreateNewBattleground(static_cast<BattlegroundTypeId>(bgType), pvp, 0, false, true);
 
     if(wargame)
-    {        
-        wargame->StartBattleground();
-
+    {
         for(GroupReference *it = g1->GetFirstMember() ; it != NULL ; it = it->next())
         {
             Player *plr = it->getSource();
@@ -1111,6 +1109,7 @@ void WargameInvitation::LaunchWargame()
                 plr->SetBattlegroundId(wargame->GetInstanceID(), wargame->GetTypeID());
                 plr->SetInviteForBattlegroundQueueType(sBattlegroundMgr->BGQueueTypeId(wargame->GetTypeID(), wargame->GetArenaType()), wargame->GetInstanceID());
                 wargame->IncreaseInvitedCount(ALLIANCE);
+                wargame->AddPlayer(plr);
                 sBattlegroundMgr->SendToBattleground(plr, wargame->GetInstanceID(), wargame->GetTypeID());
             }
         }
@@ -1126,8 +1125,11 @@ void WargameInvitation::LaunchWargame()
                 plr->SetBattlegroundId(wargame->GetInstanceID(), wargame->GetTypeID());
                 plr->SetInviteForBattlegroundQueueType(sBattlegroundMgr->BGQueueTypeId(wargame->GetTypeID(), wargame->GetArenaType()), wargame->GetInstanceID());
                 wargame->IncreaseInvitedCount(HORDE);
+                wargame->AddPlayer(plr);
                 sBattlegroundMgr->SendToBattleground(plr, wargame->GetInstanceID(), wargame->GetTypeID());
             }
         }
+
+        wargame->StartBattleground();
     }
 }
