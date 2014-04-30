@@ -1969,7 +1969,7 @@ uint32 BattlegroundMgr::GetBattlegroundCount(BattlegroundTypeId bgTypeId)
 
 void BattlegroundMgr::UpdateWargames()
 {
-    std::vector< std::map<uint32, WargameInvitation> > wargameToRemove;
+    std::vector< std::map<uint32, WargameInvitation>::iterator > wargameToRemove;
 
     for(std::map<uint32, WargameInvitation>::iterator i = m_wargames.begin() ; i != m_wargames.end() ; i++)
     {

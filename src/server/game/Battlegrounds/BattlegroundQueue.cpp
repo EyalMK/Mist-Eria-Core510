@@ -1077,8 +1077,8 @@ void WargameInvitation::LaunchWargame()
     if(!IsReadyToStart())
         return;
 
-    Group const *g1  = sGroupMgr->GetGroupByGUID(group1);
-    Group const *g2  = sGroupMgr->GetGroupByGUID(group2);
+    Group  *g1  = sGroupMgr->GetGroupByGUID(group1);
+    Group  *g2  = sGroupMgr->GetGroupByGUID(group2);
 
     if(!g1 || !g2)
         return;
@@ -1086,21 +1086,21 @@ void WargameInvitation::LaunchWargame()
     g1->SetWargameId(0);
     g2->SetWargameId(0);
 
-    Battleground *tmp = sBattlegroundMgr->GetBattlegroundTemplate(bgType);
+    Battleground *tmp = sBattlegroundMgr->GetBattlegroundTemplate(static_cast<BattlegroundTypeId>(bgType));
     if(!tmp)
         return;
 
-    PvPDifficultyEntry *pvp = GetBattlegroundBracketByLevel(tmp->GetMapId(), g1->GetFirstMember()->getSource()->getLevel());
+    PvPDifficultyEntry const *pvp = GetBattlegroundBracketByLevel(tmp->GetMapId(), g1->GetFirstMember()->getSource()->getLevel());
     if(!pvp)
         return;
 
-    Battleground *wargame = sBattlegroundMgr->CreateNewBattleground(bgType, pvp, 0, false, true);
+    Battleground *wargame = sBattlegroundMgr->CreateNewBattleground(static_cast<BattlegroundTypeId>(bgType), pvp, 0, false, true);
 
     if(wargame)
     {        
         wargame->StartBattleground();
 
-        for(GroupReference *it = grp->GetFirstMember() ; it != NULL ; it->next())
+        for(GroupReference *it = g1->GetFirstMember() ; it != NULL ; it->next())
         {
             Player *plr = it->getSource();
             if(plr)
@@ -1113,7 +1113,7 @@ void WargameInvitation::LaunchWargame()
             }
         }
 
-        for(GroupReference *it = grp->GetFirstMember() ; it != NULL ; it->next())
+        for(GroupReference *it = g2->GetFirstMember() ; it != NULL ; it->next())
         {
             Player *plr = it->getSource();
             if(plr)
