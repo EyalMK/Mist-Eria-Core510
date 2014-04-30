@@ -1646,7 +1646,7 @@ public:
         WargameInvitation *invite = sBattlegroundMgr->CreateWargame(wgId);
         invite->SetGroup1(g1);
         invite->SetGroup2(g2);
-        invite->SetBGType(wgId);
+        invite->SetBGType(bgType);
         invite->ReadyToStart(); //For testing purpose
     }
 
