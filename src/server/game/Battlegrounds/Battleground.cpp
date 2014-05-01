@@ -1190,9 +1190,9 @@ void Battleground::AddPlayer(Player* player)
 {
     if(IsWargame())
     {
-        if(player->GetBGTeam() == ALLIANCE)
+        if(player->GetBGTeam() == ALLIANCE && player->GetTeam() != ALLIANCE) //On le switch dans l'alliance
             player->AddAura(81748, player);
-        else
+        else if(player->GetBGTeam() == HORDE && player->GetTeam() != HORDE) //On le switch dans la horde
             player->AddAura(81744, player);
     }
 
