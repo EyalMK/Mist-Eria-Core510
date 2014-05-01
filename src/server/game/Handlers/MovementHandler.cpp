@@ -133,7 +133,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         // join to bg case
         else if (Battleground* bg = _player->GetBattleground())
         {
-            if (_player->IsInvitedForBattlegroundInstance(_player->GetBattlegroundId()))
+            if (_player->IsInvitedForBattlegroundInstance(_player->GetBattlegroundId()) || bg->IsWargame()) //Not invited in wargame case
                 bg->AddPlayer(_player);
         }
     }
