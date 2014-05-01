@@ -498,7 +498,7 @@ void BattlegroundAV::EndBattleground(uint32 winner)
     Battleground::EndBattleground(winner);
 }
 
-void BattlegroundAV::RemovePlayer(Player* player, uint64 /*guid*/, uint32 /*team*/)
+void BattlegroundAV::RemovePlayer(Player* player, uint64 guid, uint32 team)
 {
    if (!player)
     {
@@ -509,6 +509,7 @@ void BattlegroundAV::RemovePlayer(Player* player, uint64 /*guid*/, uint32 /*team
     player->RemoveAurasDueToSpell(AV_BUFF_ARMOR);
     player->RemoveAurasDueToSpell(AV_BUFF_A_CAPTAIN);
     player->RemoveAurasDueToSpell(AV_BUFF_H_CAPTAIN);
+    Battleground::RemovePlayer(player, guid, team);
 }
 
 void BattlegroundAV::HandleAreaTrigger(Player* player, uint32 trigger)

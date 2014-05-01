@@ -1191,9 +1191,9 @@ void Battleground::AddPlayer(Player* player)
     if(IsWargame())
     {
         if(player->GetBGTeam() == ALLIANCE)
-            player->AddAura(81748);
+            player->AddAura(81748, player);
         else
-            player->AddAura(81744);
+            player->AddAura(81744, player);
     }
 
     // remove afk from player

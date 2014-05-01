@@ -206,9 +206,9 @@ void BattlegroundAB::AddPlayer(Player* player)
     PlayerScores[player->GetGUID()] = sc;
 }
 
-void BattlegroundAB::RemovePlayer(Player* /*player*/, uint64 /*guid*/, uint32 /*team*/)
+void BattlegroundAB::RemovePlayer(Player* player, uint64 guid, uint32 team)
 {
-
+    Battleground::RemovePlayer(player, guid, team);
 }
 
 void BattlegroundAB::HandleAreaTrigger(Player* player, uint32 trigger)
