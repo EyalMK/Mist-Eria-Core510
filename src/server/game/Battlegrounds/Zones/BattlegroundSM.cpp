@@ -459,7 +459,7 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 		{
 			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
 			{
-				if (player->GetTeam() == ALLIANCE)
+                if (player->GetBGTeam() == ALLIANCE)
 				{
 					if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_1, 22.0f, true))
 					{
@@ -592,7 +592,7 @@ void BattlegroundSM::CheckPlayerNearMineCart(uint32 diff)
 
 					else UpdateWorldStateForPlayer(SM_DISPLAY_PROGRESS_BAR, BG_SM_PROGRESS_BAR_DONT_SHOW, player);
 				}
-				else // for GetTeam() == HORDE
+                else // for GetBGTeam() == HORDE
 				{
 					if (Creature* cart = player->FindNearestCreature(NPC_MINE_CART_1, 22.0f, true))
 					{
@@ -801,7 +801,7 @@ void BattlegroundSM::EventTeamCapturedMineCart(uint32 team, uint8 mineCart)
 	{
 		if (Player* player = ObjectAccessor::FindPlayer(itr->first))
 		{
-			if (player->GetTeam() == team)
+            if (player->GetBGTeam() == team)
 				if (player->FindNearestCreature(NPC_MINE_CART_1, 22.0f, true) ||
 					player->FindNearestCreature(NPC_MINE_CART_2, 22.0f, true) ||
 					player->FindNearestCreature(NPC_MINE_CART_3, 22.0f, true))

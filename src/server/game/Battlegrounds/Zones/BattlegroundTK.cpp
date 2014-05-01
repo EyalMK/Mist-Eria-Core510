@@ -102,7 +102,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 50.0f)
+                    if (player->GetBGTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 50.0f)
 					{
 						UpdateScore(ALLIANCE, BG_TK_CENTER_POINTS);
 						UpdatePlayerScore(player, SCORE_POINTS_SCORED, BG_TK_CENTER_POINTS);
@@ -112,7 +112,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 50.0f)
+                    if (player->GetBGTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 50.0f)
 					{
 						UpdateScore(HORDE, BG_TK_CENTER_POINTS);
 						UpdatePlayerScore(player, SCORE_POINTS_SCORED, BG_TK_CENTER_POINTS);
@@ -122,7 +122,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 50.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
+                    if (player->GetBGTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 50.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
 					{
 						UpdateScore(ALLIANCE, BG_TK_INDOOR_POINTS);
 						UpdatePlayerScore(player, SCORE_POINTS_SCORED, BG_TK_INDOOR_POINTS);
@@ -132,7 +132,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 50.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
+                    if (player->GetBGTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 50.0f && player->GetExactDist2d(1783.319336f, 1333.339722f) <= 100.0f)
 					{
 						UpdateScore(HORDE, BG_TK_INDOOR_POINTS);
 						UpdatePlayerScore(player, SCORE_POINTS_SCORED, BG_TK_INDOOR_POINTS);
@@ -142,7 +142,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f)
+                    if (player->GetBGTeam() == ALLIANCE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f)
 					{
 						UpdateScore(ALLIANCE, BG_TK_OUTDOOR_POINTS);
 						UpdatePlayerScore(player, SCORE_POINTS_SCORED, BG_TK_OUTDOOR_POINTS);
@@ -152,7 +152,7 @@ void BattlegroundTK::CalculatePoints(uint32 diff)
 						player->GetGUID() == m_orbOwners[1] ||
 						player->GetGUID() == m_orbOwners[2] ||
 						player->GetGUID() == m_orbOwners[3])
-					if (player->GetTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f)
+                    if (player->GetBGTeam() == HORDE && player->GetExactDist2d(1783.319336f, 1333.339722f) > 100.0f)
 					{
 						UpdateScore(HORDE, BG_TK_OUTDOOR_POINTS);
 						UpdatePlayerScore(player, SCORE_POINTS_SCORED, BG_TK_OUTDOOR_POINTS);
@@ -281,13 +281,13 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
     {
         message_id = LANG_BG_TK_PICKEDUP_ORB_BLUE;
 
-		if (Source->GetTeam() == ALLIANCE)
+        if (Source->GetBGTeam() == ALLIANCE)
 		{
 			type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
 			PlaySoundToAll(BG_TK_SOUND_ALLIANCE_ORB_PICKED_UP);
 		}
 
-		if (Source->GetTeam() ==  HORDE)
+        if (Source->GetBGTeam() ==  HORDE)
 		{
 			type = CHAT_MSG_BG_SYSTEM_HORDE;
 			PlaySoundToAll(BG_TK_SOUND_HORDE_ORB_PICKED_UP);
@@ -305,13 +305,13 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
     {
         message_id = LANG_BG_TK_PICKEDUP_ORB_PURPLE;
 
-        if (Source->GetTeam() == ALLIANCE)
+        if (Source->GetBGTeam() == ALLIANCE)
 		{
 			type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
 			PlaySoundToAll(BG_TK_SOUND_ALLIANCE_ORB_PICKED_UP);
 		}
 
-		if (Source->GetTeam() == HORDE)
+        if (Source->GetBGTeam() == HORDE)
 		{
 			type = CHAT_MSG_BG_SYSTEM_HORDE;
 			PlaySoundToAll(BG_TK_SOUND_HORDE_ORB_PICKED_UP);
@@ -328,13 +328,13 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
         && BgObjects[BG_TK_OBJECT_ORB_GREEN] == target_obj->GetGUID())
     {
         message_id = LANG_BG_TK_PICKEDUP_ORB_GREEN;
-        if (Source->GetTeam() == ALLIANCE)
+        if (Source->GetBGTeam() == ALLIANCE)
 		{
 			type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
 			PlaySoundToAll(BG_TK_SOUND_ALLIANCE_ORB_PICKED_UP);
 		}
 
-		if (Source->GetTeam() ==  HORDE)
+        if (Source->GetBGTeam() ==  HORDE)
 		{
 			type = CHAT_MSG_BG_SYSTEM_HORDE;
 			PlaySoundToAll(BG_TK_SOUND_HORDE_ORB_PICKED_UP);
@@ -352,13 +352,13 @@ void BattlegroundTK::EventPlayerClickedOnFlag(Player* Source, GameObject* target
     {
         message_id = LANG_BG_TK_PICKEDUP_ORB_ORANGE;
 
-        if (Source->GetTeam() == ALLIANCE)
+        if (Source->GetBGTeam() == ALLIANCE)
 		{
 			type = CHAT_MSG_BG_SYSTEM_ALLIANCE;
 			PlaySoundToAll(BG_TK_SOUND_ALLIANCE_ORB_PICKED_UP);
 		}
 
-		if (Source->GetTeam() ==  HORDE)
+        if (Source->GetBGTeam() ==  HORDE)
 		{
 			type = CHAT_MSG_BG_SYSTEM_HORDE;
 			PlaySoundToAll(BG_TK_SOUND_HORDE_ORB_PICKED_UP);
@@ -471,7 +471,7 @@ void BattlegroundTK::UpdateScore(uint16 team, int16 points)
 
 WorldSafeLocsEntry const* BattlegroundTK::GetClosestGraveYard(Player* player)
 {
-	if (player->GetTeam() == ALLIANCE)
+    if (player->GetBGTeam() == ALLIANCE)
 		return sWorldSafeLocsStore.LookupEntry(BG_TK_GraveyardIds[0]);
 
 	else
@@ -539,7 +539,7 @@ void BattlegroundTK::HandleKillPlayer(Player* player, Player* killer)
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 	
-	UpdateScore(killer->GetTeam(), BG_TK_PLAYER_KILL_POINTS);
+    UpdateScore(killer->GetBGTeam(), BG_TK_PLAYER_KILL_POINTS);
 	UpdatePlayerScore(killer, SCORE_POINTS_SCORED, BG_TK_PLAYER_KILL_POINTS);
 
 	if (m_orbOwners[0] == player->GetGUID())

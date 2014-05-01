@@ -446,7 +446,7 @@ void BattlegroundBFG::EventPlayerClickedOnFlag(Player* source, GameObject* /*tar
         return;
     }
 
-    TeamId teamIndex = GetTeamIndexByTeamId(source->GetTeam());
+    TeamId teamIndex = GetTeamIndexByTeamId(source->GetBGTeam());
 
     // Check if player really could use this banner, not cheated
     if (!(m_Nodes[node] == 0 || teamIndex == m_Nodes[node]%2))
@@ -641,7 +641,7 @@ void BattlegroundBFG::EndBattleground(uint32 winner)
 
 WorldSafeLocsEntry const* BattlegroundBFG::GetClosestGraveYard(Player* player)
 {
-    TeamId teamIndex = GetTeamIndexByTeamId(player->GetTeam());
+    TeamId teamIndex = GetTeamIndexByTeamId(player->GetBGTeam());
 
     // Is there any occupied node for this team?
     std::vector<uint8> nodes;
