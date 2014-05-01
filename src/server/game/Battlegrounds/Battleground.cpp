@@ -1137,6 +1137,12 @@ void Battleground::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
     //battleground object will be deleted next Battleground::Update() call
 }
 
+void Battleground::RemovePlayer(Player *plr, uint64, uint32)
+{
+    plr->RemoveAurasDueToSpell(81744);
+    plr->RemoveAurasDueToSpell(81748);
+}
+
 // this method is called when no players remains in battleground
 void Battleground::Reset()
 {
@@ -1182,6 +1188,14 @@ void Battleground::StartBattleground()
 
 void Battleground::AddPlayer(Player* player)
 {
+    if(IsWargame())
+    {
+        if(player->GetBGTeam() == ALLIANCE)
+            player->AddAura(81748);
+        else
+            player->AddAura(81744);
+    }
+
     // remove afk from player
     if (player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK))
         player->ToggleAFK();
