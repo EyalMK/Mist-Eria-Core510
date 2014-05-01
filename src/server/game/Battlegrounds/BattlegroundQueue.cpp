@@ -1098,6 +1098,8 @@ void WargameInvitation::LaunchWargame()
 
     if(wargame)
     {
+        wargame->StartBattleground();
+
         for(GroupReference *it = g1->GetFirstMember() ; it != NULL ; it = it->next())
         {
             Player *plr = it->getSource();
@@ -1126,8 +1128,6 @@ void WargameInvitation::LaunchWargame()
                 wargame->IncreaseInvitedCount(HORDE);
                 sBattlegroundMgr->SendToBattleground(plr, wargame->GetInstanceID(), wargame->GetTypeID());
             }
-        }
-
-        wargame->StartBattleground();
+        }        
     }
 }
