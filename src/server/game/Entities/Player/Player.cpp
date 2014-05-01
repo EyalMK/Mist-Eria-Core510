@@ -22583,6 +22583,12 @@ void Player::UpdatePvPState(bool onlyFFA)
             (*itr)->RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
     }
 
+    if(Battleground *wargame = GetBattleground())
+    {
+        if(wargame->IsWargame())
+            SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+    }
+
     if (onlyFFA)
         return;
 
