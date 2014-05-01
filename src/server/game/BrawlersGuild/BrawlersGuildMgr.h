@@ -104,6 +104,8 @@ class BrawlersGuild
 
 		void SetAnnouncer(uint64 guid);
 
+		uint32 GetPlayerPosition(Player* player);
+
     private:
 
 		uint32 id;
@@ -131,7 +133,6 @@ class BrawlersGuild
 
 		void PlayFightSound(bool play);
 
-		uint32 GetPlayerPosition(Player* player);
 
 
 
