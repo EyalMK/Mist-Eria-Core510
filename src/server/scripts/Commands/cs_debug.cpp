@@ -1648,6 +1648,8 @@ public:
         invite->SetGroup2(g2);
         invite->SetBGType(bgType);
         invite->ReadyToStart(); //For testing purpose
+
+        return true;
     }
 
 };
