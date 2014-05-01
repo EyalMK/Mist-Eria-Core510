@@ -51,7 +51,9 @@ enum BrawlersSounds
 enum BrawlersAchievement
 {
 	ACHIEVEMENT_FIRST_RULE_A = 7947,
-	ACHIEVEMENT_FIRST_RULE_H = 7948
+	ACHIEVEMENT_FIRST_RULE_H = 7948,
+	ACHIEVEMENT_WIN_BRAWL_A = 7937,
+	ACHIEVEMENT_WIN_BRAWL_H = 8020,
 };
 
 enum BrawlersGuilds
@@ -129,7 +131,7 @@ class BrawlersGuild
 
 		void PlayFightSound(bool play);
 
-
+		uint32 GetPlayerPosition(Player* player);
 
 
 
@@ -177,6 +179,7 @@ class BrawlersGuildMgr
 		void BossReport(uint64 guid, bool win);
 
 		bool IsPlayerInBrawl(Player* player);
+		uint32 GetPlayerPosition(Player* player);
 
 		void SetAnnouncer(uint32 guild, uint64 guid);
 

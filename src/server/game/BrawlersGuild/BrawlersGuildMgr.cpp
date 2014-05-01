@@ -28,6 +28,7 @@
 #include "BrawlersGuildMgr.h"
 #include "Item.h"
 #include "Chat.h"
+#include "AchievementMgr.h"
 
 int32 BrawlersTeleportLocations[MAX_BRAWLERS_GUILDS][MAX_TELEPORTS][4] =
 {
@@ -355,6 +356,16 @@ void BrawlersGuild::RewardPlayer(Player *player)
 		rep = MAX_BRAWLERS_REPUTATION;
 
 	player->SetReputation(BrawlersFaction[player->GetTeamId()], rep);
+
+	// Achievement First Win
+	if (player->GetTeamId() == TEAM_ALLIANCE && !player->HasAchieved(ACHIEVEMENT_WIN_BRAWL_A))
+		if (AchievementEntry const* achievementEntry = sAchievementMgr->GetAchievement(ACHIEVEMENT_WIN_BRAWL_A))
+			player->CompletedAchievement(achievementEntry);
+
+	if (player->GetTeamId() == TEAM_HORDE && !player->HasAchieved(ACHIEVEMENT_WIN_BRAWL_H))
+		if (AchievementEntry const* achievementEntry = sAchievementMgr->GetAchievement(ACHIEVEMENT_WIN_BRAWL_H))
+			player->CompletedAchievement(achievementEntry);
+	
 }
 
 void BrawlersGuild::BossReport(uint64 guid, bool win)
@@ -395,7 +406,21 @@ void BrawlersGuild::PlayFightSound(bool play)
 	}
 }
 
+uint32 BrawlersGuild::GetPlayerPosition(Player* player)
+{
+	if (!player)
+		return 0;
 
+	uint32 i = 1;
+	for (BrawlersList::iterator it = waitList.begin(); it != waitList.end(); it++)
+	{
+		if (player->GetGUID() == *it)
+			return i;
+		++i;
+	}
+
+	return 0;
+}
 
 
 
@@ -469,4 +494,12 @@ bool BrawlersGuildMgr::IsPlayerInBrawl(Player* player)
 void BrawlersGuildMgr::SetAnnouncer(uint32 guild, uint64 guid)
 {
 	guilds[guild]->SetAnnouncer(guid);
+}
+
+uint32 BrawlersGuildMgr::GetPlayerPosition(Player* player)
+{
+	if (!player)
+		return;
+
+	guilds[player->GetTeamId()]->GetPlayerPosition(player);
 }

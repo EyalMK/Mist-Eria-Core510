@@ -43,6 +43,7 @@ enum Npcs
 
 #define DISPLAYID_GYROCOPTER	44634
 #define GOSSIP_ITEM_QUEUE		"Oui, inscrivez-moi pour un combat !"
+#define GOSSIP_ITEM_RANK		"Rang dans la file : "
 
 class npc_brawlers_guild_queue : public CreatureScript
 {
@@ -61,11 +62,18 @@ public:
 			if (player->GetTeamId() == 1 && !player->HasAchieved(ACHIEVEMENT_FIRST_RULE_H))
 				ok = false;
 
-			if (player->HasAura(SPELL_QUEUED_FOR_BRAWL))
-				ok = false;
-
 			if (ok)
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_QUEUE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+			{
+				if (player->HasAura(SPELL_QUEUED_FOR_BRAWL))
+				{
+					std::stringstream ss;
+					ss << GOSSIP_ITEM_RANK << sBrawlersGuildMgr->GetPlayerPosition(player);
+					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ss.str().c_str(), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+				}
+				else
+					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_QUEUE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+			}
+				
 				
 
 			player->PlayerTalkClass->SendGossipMenu(player->GetGossipTextId(creature), creature->GetGUID());
