@@ -461,6 +461,8 @@ inline void Battleground::_ProcessProgress(uint32 diff)
 
 inline void Battleground::_ProcessJoin(uint32 diff)
 {
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "ProcessJoin");
+
     // *********************************************************
     // ***           BATTLEGROUND STARTING SYSTEM            ***
     // *********************************************************
