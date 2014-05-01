@@ -499,7 +499,7 @@ void BrawlersGuildMgr::SetAnnouncer(uint32 guild, uint64 guid)
 uint32 BrawlersGuildMgr::GetPlayerPosition(Player* player)
 {
 	if (!player)
-		return;
+		return 0;
 
-	guilds[player->GetTeamId()]->GetPlayerPosition(player);
+	return guilds[player->GetTeamId()]->GetPlayerPosition(player);
 }
