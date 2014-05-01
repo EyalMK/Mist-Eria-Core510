@@ -2888,6 +2888,10 @@ void SpellMgr::LoadSpellCustomAttr()
 						}
 						break;
 					}
+                    case SPELL_EFFECT_174:
+                    {
+                        spellInfo->Effects[j].Effect = SPELL_EFFECT_APPLY_AURA;
+                    }
 				}
 			}
 
